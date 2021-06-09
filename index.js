@@ -1,8 +1,9 @@
 const fs = require('fs')
 
 const GENERATED_DIR = 'generated';
+const LISTS_DIR = 'content-blocking-lists';
 
-const defaultConfig = JSON.parse(fs.readFileSync('default-config.json'));
+let defaultConfig = JSON.parse(fs.readFileSync('default-config.json'));
 
 const platforms = [
     'extension',
@@ -14,6 +15,19 @@ const platforms = [
 
 function writeConfigToDisk(platform, config) {
     fs.writeFileSync(`${GENERATED_DIR}/${platform}-config.json`, JSON.stringify(config, null, 4))
+}
+
+// Grab all allow lists
+const listNames = [
+    'trackers-unprotected-temporary.txt',
+    'trackers-whitelist-temporary.txt'
+]
+for (let listName of listNames) {
+    const listTxt = fs.readFileSync(`${LISTS_DIR}/${listName}`).toString().trim()
+    const list = listTxt.split('\n')
+
+    const listKey = listName.split('.')[0]
+    defaultConfig.allowLists[listKey] = list
 }
 
 if (!fs.existsSync(GENERATED_DIR)) {
