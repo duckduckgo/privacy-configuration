@@ -49,7 +49,11 @@ for (let platform of platforms) {
         }
     }
 
-    // TODO: Iterate allowlists and add/remove entries
+    if (platformOverride.allowLists) {
+        for (let listKey of Object.keys(platformOverride.allowLists)) {
+            platformConfig.allowLists[listKey] = platformConfig.allowLists[listKey].concat(platformOverride.allowLists[listKey])
+        }
+    }
 
     writeConfigToDisk(platform, platformConfig)
 }
