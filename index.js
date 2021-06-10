@@ -29,6 +29,19 @@ for (let listName of listNames) {
     const listKey = listName.split('.')[0]
     defaultConfig.allowLists[listKey] = list
 }
+const jsonListNames = [
+    'cookie_configuration.json'
+]
+for (let jsonList of jsonListNames) {
+    const listData = JSON.parse(fs.readFileSync(`${LISTS_DIR}/${jsonList}`))
+    // Find the list object
+    for (let key of Object.keys(listData)) {
+        if (listData[key].length) {
+            defaultConfig.allowLists[key] = listData[key]
+        }
+    }
+
+}
 
 if (!fs.existsSync(GENERATED_DIR)) {
     fs.mkdirSync(GENERATED_DIR)
