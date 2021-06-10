@@ -30,7 +30,8 @@ for (let listName of listNames) {
     defaultConfig.allowLists[listKey] = list
 }
 const jsonListNames = [
-    'cookie_configuration.json'
+    'cookie_configuration.json',
+    'useragent_excludes.json'
 ]
 for (let jsonList of jsonListNames) {
     const listData = JSON.parse(fs.readFileSync(`${LISTS_DIR}/${jsonList}`))

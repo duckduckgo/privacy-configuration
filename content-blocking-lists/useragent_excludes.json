@@ -1,0 +1,53 @@
+{
+    "Description": {
+        "Description": "URL's which should not receive a spoofed user agent, and agents to exclude based on regex.",
+        "Sample-exclude-records": {
+            "url": "example.com",
+            "agent": "MSIE 6.0"
+        }
+    },
+    "excludeAgentPatterns": [
+        {
+            "agent": "Brave Chrome",
+            "reason": "Uncommon UA"
+        }
+    ],
+    "excludedAgentDomains": [
+        {
+            "domain": "duosecurity.com",
+            "reason": "Two factor auth that verifies device pathes using user agent"
+        },
+        {
+            "domain": "okta.com",
+            "reason": "Two factor auth that verifies device pathes using user agent"
+        },
+        {
+            "domain": "pingidentity.com",
+            "reason": "Two factor auth that verifies device pathes using user agent"
+        },
+        {
+            "domain": "googleapis.com",
+            "reason": "Causes site breakage"
+        },
+        {
+            "domain": "recaptcha.net",
+            "reason": "Causes login breakage on some sites"
+        },
+        {
+            "domain": "google.com",
+            "reason": "If recaptcha is loaded from google, spoofed UA breaks recaptcha"
+        },
+        {
+            "domain": "gstatic.com",
+            "reason": "Sometimes hosts recaptcha"
+        },
+        {
+            "domain": "weather.com",
+            "reason": "Can break weather sites that depend on weather.com api's"
+        },
+        {
+            "domain": "dzcdn.net",
+            "reason": "Breaks images on deezer"
+        }
+    ]
+}
