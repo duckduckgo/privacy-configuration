@@ -13,6 +13,12 @@ const platforms = [
     'windows'
 ]
 
+/**
+ * Write a onfig file to disk
+ * 
+ * @param {string} platform - platform o write
+ * @param {object} config - the object to write
+ */
 function writeConfigToDisk(platform, config) {
     fs.writeFileSync(`${GENERATED_DIR}/${platform}-config.json`, JSON.stringify(config, null, 4))
 }
@@ -20,7 +26,11 @@ function writeConfigToDisk(platform, config) {
 // Grab all allow lists
 const listNames = [
     'trackers-unprotected-temporary.txt',
-    'trackers-whitelist-temporary.txt'
+    'trackers-whitelist-temporary.txt',
+    'audioSites.txt',
+    'autofillSites.txt',
+    'canvasSites.txt',
+    'hardwareSites.txt',
 ]
 for (let listName of listNames) {
     const listTxt = fs.readFileSync(`${LISTS_DIR}/${listName}`).toString().trim()
