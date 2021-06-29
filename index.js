@@ -83,6 +83,15 @@ for (let platform of platforms) {
 
             platformConfig.allow[listKey] = platformConfig.allow[listKey].concat(platformOverride.allow[listKey])
         }
+
+        if (platformOverride.allow.fingerprint) {
+            for (let listKey of Object.keys(platformOverride.allow.fingerprint)) {
+                if (!Array.isArray(platformConfig.allow.fingerprint[listKey]))
+                    continue
+    
+                platformConfig.allow.fingerprint[listKey] = platformConfig.allow.fingerprint[listKey].concat(platformOverride.allow.fingerprint[listKey])
+            }
+        }
     }
 
     writeConfigToDisk(platform, platformConfig)
