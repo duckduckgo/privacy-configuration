@@ -1,5 +1,6 @@
 const fs = require('fs')
 
+const OVERRIDE_DIR = 'overrides';
 const GENERATED_DIR = 'generated';
 const LISTS_DIR = 'content-blocking-lists';
 
@@ -24,63 +25,65 @@ function writeConfigToDisk(platform, config) {
 }
 
 // Grab all allow lists
-const listNames = [
-    'trackers-unprotected-temporary.txt',
-    'trackers-whitelist-temporary.txt',
-    'audioSites.txt',
-    'autofillSites.txt',
-    'canvasSites.txt',
-    'hardwareSites.txt',
-]
-for (let listName of listNames) {
-    const listTxt = fs.readFileSync(`${LISTS_DIR}/${listName}`).toString().trim()
-    const list = listTxt.split('\n')
-
-    const listKey = listName.split('.')[0]
-    defaultConfig.allowLists[listKey] = list
-}
 const jsonListNames = [
     'cookie_configuration.json',
-    'useragent_excludes.json'
+    'trackers-unprotected-temporary.json',
+    'autofillSites.json',
 ]
 for (let jsonList of jsonListNames) {
     const listData = JSON.parse(fs.readFileSync(`${LISTS_DIR}/${jsonList}`))
     // Find the list object
     for (let key of Object.keys(listData)) {
-        if (listData[key].length) {
-            defaultConfig.allowLists[key] = listData[key]
+        if (Array.isArray(listData[key])) {
+            defaultConfig.allow[key] = listData[key]
         }
     }
-
+}
+const fingerprintListNames = [
+    'useragent_excludes.json',
+    'audioSites.json',
+    'canvasSites.json',
+    'hardwareSites.json',
+]
+for (let jsonList of fingerprintListNames) {
+    const listData = JSON.parse(fs.readFileSync(`${LISTS_DIR}/${jsonList}`))
+    // Find the list object
+    for (let key of Object.keys(listData)) {
+        if (Array.isArray(listData[key])) {
+            defaultConfig.allow.fingerprinting[key] = listData[key]
+        }
+    }
 }
 
 if (!fs.existsSync(GENERATED_DIR)) {
     fs.mkdirSync(GENERATED_DIR)
 }
 
+// Handle platform specific overrides and write configs to disk
 for (let platform of platforms) {
     let platformConfig = { ...defaultConfig }
+    const overridePath = `${OVERRIDE_DIR}/${platform}-override.json`
 
-    if (!fs.existsSync(`${platform}-override.json`)) {
+    if (!fs.existsSync(overridePath)) {
         writeConfigToDisk(platform, platformConfig)
         continue
     }
 
-    const platformOverride = JSON.parse(fs.readFileSync(`${platform}-override.json`))
+    const platformOverride = JSON.parse(fs.readFileSync(overridePath))
     for (let key of Object.keys(defaultConfig.privacyFeatures)) {
         if (platformOverride.privacyFeatures[key] && platformOverride.privacyFeatures[key] !== defaultConfig.privacyFeatures[key]) {
             platformConfig.privacyFeatures[key] = platformOverride.privacyFeatures[key]
         }
     }
 
-    if (platformOverride.allowLists) {
-        for (let listKey of Object.keys(platformOverride.allowLists)) {
-            platformConfig.allowLists[listKey] = platformConfig.allowLists[listKey].concat(platformOverride.allowLists[listKey])
+    if (platformOverride.allow) {
+        for (let listKey of Object.keys(platformOverride.allow)) {
+            if (!Array.isArray(platformConfig.allow[listKey]))
+                continue
+
+            platformConfig.allow[listKey] = platformConfig.allow[listKey].concat(platformOverride.allow[listKey])
         }
     }
 
     writeConfigToDisk(platform, platformConfig)
 }
-
-// TODO: Upload genreated configs to s3
-

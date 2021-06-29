@@ -21,110 +21,143 @@
         "threshold": 86400,
         "maxAge": 86400
     },
-    "allowLists": {
-        "trackers-unprotected-temporary": [
-            "calbanktrust.com",
-            "fidelity.com",
-            "vanguard.com",
-            "mebank.com.au",
-            "wellsfargo.com",
-            "zionsbank.com",
-            "bankofscotland.co.uk",
-            "amegybank.com",
-            "suntrust.com",
-            "tdbank.com",
-            "inlandbank.com",
-            "bank.barclays.co.uk",
-            "capitalone.ca",
-            "capitalone.com",
-            "onlinebanking.nationwide.co.uk",
-            "nbarizona.com",
-            "sberbank.ru",
-            "td.com",
-            "ameritrade.com",
-            "santander.com",
-            "santander.co.uk",
-            "usbank.com",
-            "schwab.com",
-            "www.x-kom.pl",
-            "delta.com",
-            "chipotle.com",
-            "www.aspiration.com",
-            "sbs.com.au",
-            "reuters.com",
-            "www.sportskeeda.com",
-            "portal.edd.ca.gov",
-            "www.usajobs.gov",
-            "www.spiegel.de",
-            "www.tentree.com",
-            "www.dyson.com"
-        ],
-        "trackers-whitelist-temporary": [
-            "calbanktrust.com",
-            "fidelity.com",
-            "vanguard.com",
-            "mebank.com.au",
-            "wellsfargo.com",
-            "zionsbank.com",
-            "bankofscotland.co.uk",
-            "amegybank.com",
-            "suntrust.com",
-            "tdbank.com",
-            "inlandbank.com",
-            "bank.barclays.co.uk",
-            "capitalone.ca",
-            "capitalone.com",
-            "onlinebanking.nationwide.co.uk",
-            "nbarizona.com",
-            "sberbank.ru",
-            "td.com",
-            "ameritrade.com",
-            "santander.com",
-            "santander.co.uk",
-            "usbank.com",
-            "schwab.com",
-            "www.x-kom.pl",
-            "delta.com",
-            "chipotle.com"
-        ],
-        "audioSites": [
-            "youtube.com",
-            "meet.google.com"
-        ],
-        "autofillSites": [
-            "asana.com",
-            "fastmail.com"
-        ],
-        "canvasSites": [
-            "warzone.com",
-            "skribbl.io",
-            "kroger.com",
-            "bakersplus.com",
-            "citymarket.com",
-            "dillons.com",
-            "food4less.com",
-            "foodsco.net",
-            "fredmeyer.com",
-            "frysfood.com",
-            "gerbes.com",
-            "jaycfoods.com",
-            "kingsoopers.com",
-            "marianos.com",
-            "metromarket.net",
-            "pay-less.com",
-            "picknsave.com",
-            "qfc.com",
-            "ralphs.com",
-            "smithsfoodanddrug.com",
-            "yazaa.zone",
-            "pnc.com",
-            "pch.com",
-            "www.coolmathgames.com"
-        ],
-        "hardwareSites": [
-            "play.geforcenow.com",
-            "stadia.google.com"
-        ],
+    "allow": {
+        "fingerprinting": {
+            "excludeAgentPatterns": [
+                {
+                    "agent": "Brave Chrome",
+                    "reason": "Uncommon UA"
+                }
+            ],
+            "excludedAgentDomains": [
+                {
+                    "domain": "duosecurity.com",
+                    "reason": "Two factor auth that verifies device pathes using user agent"
+                },
+                {
+                    "domain": "okta.com",
+                    "reason": "Two factor auth that verifies device pathes using user agent"
+                },
+                {
+                    "domain": "pingidentity.com",
+                    "reason": "Two factor auth that verifies device pathes using user agent"
+                },
+                {
+                    "domain": "googleapis.com",
+                    "reason": "Causes site breakage"
+                },
+                {
+                    "domain": "recaptcha.net",
+                    "reason": "Causes login breakage on some sites"
+                },
+                {
+                    "domain": "google.com",
+                    "reason": "If recaptcha is loaded from google, spoofed UA breaks recaptcha"
+                },
+                {
+                    "domain": "gstatic.com",
+                    "reason": "Sometimes hosts recaptcha"
+                },
+                {
+                    "domain": "weather.com",
+                    "reason": "Can break weather sites that depend on weather.com api's"
+                },
+                {
+                    "domain": "dzcdn.net",
+                    "reason": "Breaks images on deezer"
+                }
+            ],
+            "audio": [
+                {
+                    "domain": "youtube.com"
+                },
+                {
+                    "domain": "meet.google.com"
+                }
+            ],
+            "canvas": [
+                {
+                    "domain": "warzone.com"
+                },
+                {
+                    "domain": "skribbl.io"
+                },
+                {
+                    "domain": "kroger.com"
+                },
+                {
+                    "domain": "bakersplus.com"
+                },
+                {
+                    "domain": "citymarket.com"
+                },
+                {
+                    "domain": "dillons.com"
+                },
+                {
+                    "domain": "food4less.com"
+                },
+                {
+                    "domain": "foodsco.net"
+                },
+                {
+                    "domain": "fredmeyer.com"
+                },
+                {
+                    "domain": "frysfood.com"
+                },
+                {
+                    "domain": "gerbes.com"
+                },
+                {
+                    "domain": "jaycfoods.com"
+                },
+                {
+                    "domain": "kingsoopers.com"
+                },
+                {
+                    "domain": "marianos.com"
+                },
+                {
+                    "domain": "metromarket.net"
+                },
+                {
+                    "domain": "pay-less.com"
+                },
+                {
+                    "domain": "picknsave.com"
+                },
+                {
+                    "domain": "qfc.com"
+                },
+                {
+                    "domain": "ralphs.com"
+                },
+                {
+                    "domain": "smithsfoodanddrug.com"
+                },
+                {
+                    "domain": "yazaa.zone"
+                },
+                {
+                    "domain": "pnc.com"
+                },
+                {
+                    "domain": "pch.com"
+                },
+                {
+                    "domain": "www.coolmathgames.com"
+                }
+            ],
+            "hardware": [
+                {
+                    "domain": "play.geforcenow.com"
+                },
+                {
+                    "domain": "stadia.google.com"
+                }
+            ]
+        },
         "excludedCookieDomains": [
             {
                 "domain": "accounts.google.com",
@@ -223,48 +256,154 @@
                 "reason": "Site breakage"
             }
         ],
-        "excludeAgentPatterns": [
+        "tempUnprotectedDomains": [
             {
-                "agent": "Brave Chrome",
-                "reason": "Uncommon UA"
+                "domain": "calbanktrust.com",
+                "reason": "site breakage"
+            },
+            {
+                "domain": "fidelity.com",
+                "reason": "site breakage"
+            },
+            {
+                "domain": "vanguard.com",
+                "reason": "site breakage"
+            },
+            {
+                "domain": "mebank.com.au",
+                "reason": "site breakage"
+            },
+            {
+                "domain": "wellsfargo.com",
+                "reason": "site breakage"
+            },
+            {
+                "domain": "zionsbank.com",
+                "reason": "site breakage"
+            },
+            {
+                "domain": "bankofscotland.co.uk",
+                "reason": "site breakage"
+            },
+            {
+                "domain": "amegybank.com",
+                "reason": "site breakage"
+            },
+            {
+                "domain": "suntrust.com",
+                "reason": "site breakage"
+            },
+            {
+                "domain": "tdbank.com",
+                "reason": "site breakage"
+            },
+            {
+                "domain": "inlandbank.com",
+                "reason": "site breakage"
+            },
+            {
+                "domain": "bank.barclays.co.uk",
+                "reason": "site breakage"
+            },
+            {
+                "domain": "capitalone.ca",
+                "reason": "site breakage"
+            },
+            {
+                "domain": "capitalone.com",
+                "reason": "site breakage"
+            },
+            {
+                "domain": "onlinebanking.nationwide.co.uk",
+                "reason": "site breakage"
+            },
+            {
+                "domain": "nbarizona.com",
+                "reason": "site breakage"
+            },
+            {
+                "domain": "sberbank.ru",
+                "reason": "site breakage"
+            },
+            {
+                "domain": "td.com",
+                "reason": "site breakage"
+            },
+            {
+                "domain": "ameritrade.com",
+                "reason": "site breakage"
+            },
+            {
+                "domain": "santander.com",
+                "reason": "site breakage"
+            },
+            {
+                "domain": "santander.co.uk",
+                "reason": "site breakage"
+            },
+            {
+                "domain": "usbank.com",
+                "reason": "site breakage"
+            },
+            {
+                "domain": "schwab.com",
+                "reason": "site breakage"
+            },
+            {
+                "domain": "www.x-kom.pl",
+                "reason": "site breakage"
+            },
+            {
+                "domain": "delta.com",
+                "reason": "site breakage"
+            },
+            {
+                "domain": "chipotle.com",
+                "reason": "site breakage"
+            },
+            {
+                "domain": "www.aspiration.com",
+                "reason": "site breakage"
+            },
+            {
+                "domain": "sbs.com.au",
+                "reason": "site breakage"
+            },
+            {
+                "domain": "reuters.com",
+                "reason": "site breakage"
+            },
+            {
+                "domain": "www.sportskeeda.com",
+                "reason": "site breakage"
+            },
+            {
+                "domain": "portal.edd.ca.gov",
+                "reason": "site breakage"
+            },
+            {
+                "domain": "www.usajobs.gov",
+                "reason": "site breakage"
+            },
+            {
+                "domain": "www.spiegel.de",
+                "reason": "site breakage"
+            },
+            {
+                "domain": "www.tentree.com",
+                "reason": "site breakage"
+            },
+            {
+                "domain": "www.dyson.com",
+                "reason": "site breakage"
             }
         ],
-        "excludedAgentDomains": [
+        "autofill": [
             {
-                "domain": "duosecurity.com",
-                "reason": "Two factor auth that verifies device pathes using user agent"
+                "domain": "asana.com"
             },
             {
-                "domain": "okta.com",
-                "reason": "Two factor auth that verifies device pathes using user agent"
-            },
-            {
-                "domain": "pingidentity.com",
-                "reason": "Two factor auth that verifies device pathes using user agent"
-            },
-            {
-                "domain": "googleapis.com",
-                "reason": "Causes site breakage"
-            },
-            {
-                "domain": "recaptcha.net",
-                "reason": "Causes login breakage on some sites"
-            },
-            {
-                "domain": "google.com",
-                "reason": "If recaptcha is loaded from google, spoofed UA breaks recaptcha"
-            },
-            {
-                "domain": "gstatic.com",
-                "reason": "Sometimes hosts recaptcha"
-            },
-            {
-                "domain": "weather.com",
-                "reason": "Can break weather sites that depend on weather.com api's"
-            },
-            {
-                "domain": "dzcdn.net",
-                "reason": "Breaks images on deezer"
+                "domain": "fastmail.com"
             }
         ]
     }
