@@ -15,9 +15,9 @@ const platforms = [
 ]
 
 /**
- * Write a onfig file to disk
+ * Write a config file to disk
  * 
- * @param {string} platform - platform o write
+ * @param {string} platform - platform to write
  * @param {object} config - the object to write
  */
 function writeConfigToDisk(platform, config) {
