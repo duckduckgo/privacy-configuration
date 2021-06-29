@@ -84,7 +84,7 @@ for (let platform of platforms) {
             platformConfig.allow[listKey] = platformConfig.allow[listKey].concat(platformOverride.allow[listKey])
         }
 
-        if (platformOverride.allow.fingerprint) {
+        if (platformOverride.allow.fingerprinting) {
             for (let listKey of Object.keys(platformOverride.allow.fingerprinting)) {
                 if (!Array.isArray(platformConfig.allow.fingerprinting[listKey]))
                     continue
