@@ -69,13 +69,15 @@ for (let platform of platforms) {
         continue
     }
 
+    // Handle feature overrides
     const platformOverride = JSON.parse(fs.readFileSync(overridePath))
     for (let key of Object.keys(defaultConfig.privacyFeatures)) {
-        if (platformOverride.privacyFeatures[key] && platformOverride.privacyFeatures[key] !== defaultConfig.privacyFeatures[key]) {
+        if (platformOverride.privacyFeatures[key]) {
             platformConfig.privacyFeatures[key] = platformOverride.privacyFeatures[key]
         }
     }
 
+    // handle allow list overrides
     if (platformOverride.allow) {
         for (let listKey of Object.keys(platformOverride.allow)) {
             if (!Array.isArray(platformConfig.allow[listKey]))
