@@ -24,34 +24,24 @@ function writeConfigToDisk(platform, config) {
     fs.writeFileSync(`${GENERATED_DIR}/${platform}-config.json`, JSON.stringify(config, null, 4))
 }
 
-// Grab all allow lists
-const jsonListNames = [
-    'cookie_configuration.json',
-    'trackers-unprotected-temporary.json',
-    'autofillSites.json',
-]
+// Grab all exception lists
+const jsonListNames = fs.readdirSync(LISTS_DIR).filter(listName => listName.includes('Sites'))
 for (let jsonList of jsonListNames) {
     const listData = JSON.parse(fs.readFileSync(`${LISTS_DIR}/${jsonList}`))
+    const configKey = jsonList.split('Sites')[0]
     // Find the list object
     for (let key of Object.keys(listData)) {
         if (Array.isArray(listData[key])) {
-            defaultConfig.allow[key] = listData[key]
+            defaultConfig.privacyFeatures[configKey].exceptions = listData[key]
         }
     }
 }
-const fingerprintListNames = [
-    'useragent_excludes.json',
-    'audioSites.json',
-    'canvasSites.json',
-    'hardwareSites.json',
-]
-for (let jsonList of fingerprintListNames) {
-    const listData = JSON.parse(fs.readFileSync(`${LISTS_DIR}/${jsonList}`))
-    // Find the list object
-    for (let key of Object.keys(listData)) {
-        if (Array.isArray(listData[key])) {
-            defaultConfig.allow.fingerprinting[key] = listData[key]
-        }
+
+const listData = JSON.parse(fs.readFileSync(`${LISTS_DIR}/trackers-unprotected-temporary.json`))
+// Find the list object
+for (let key of Object.keys(listData)) {
+    if (Array.isArray(listData[key])) {
+        defaultConfig.unprotectedTemporary = listData[key]
     }
 }
 
@@ -73,27 +63,23 @@ for (let platform of platforms) {
     const platformOverride = JSON.parse(fs.readFileSync(overridePath))
     for (let key of Object.keys(defaultConfig.privacyFeatures)) {
         if (platformOverride.privacyFeatures[key]) {
-            platformConfig.privacyFeatures[key] = platformOverride.privacyFeatures[key]
+            // Override existing keys
+            for (let platformKey of Object.keys(platformOverride.privacyFeatures[key])) {
+                if (platformKey === 'exceptions') {
+                    continue
+                }
+
+                platformConfig.privacyFeatures[key][platformKey] = platformOverride.privacyFeatures[key][platformKey]
+            }
+
+            if (platformOverride.privacyFeatures[key].exceptions) {
+                platformConfig.privacyFeatures[key].exceptions = platformConfig.privacyFeatures[key].exceptions.concat(platformOverride.privacyFeatures[key].exceptions)
+            }
         }
     }
 
-    // handle allow list overrides
-    if (platformOverride.allow) {
-        for (let listKey of Object.keys(platformOverride.allow)) {
-            if (!Array.isArray(platformConfig.allow[listKey]))
-                continue
-
-            platformConfig.allow[listKey] = platformConfig.allow[listKey].concat(platformOverride.allow[listKey])
-        }
-
-        if (platformOverride.allow.fingerprinting) {
-            for (let listKey of Object.keys(platformOverride.allow.fingerprinting)) {
-                if (!Array.isArray(platformConfig.allow.fingerprinting[listKey]))
-                    continue
-    
-                platformConfig.allow.fingerprinting[listKey] = platformConfig.allow.fingerprinting[listKey].concat(platformOverride.allow.fingerprinting[listKey])
-            }
-        }
+    if (platformOverride.unprotectedTemporary) {
+        platformConfig.unprotectedTemporary = platformConfig.unprotectedTemporary.concat(platformOverride.unprotectedTemporary)
     }
 
     writeConfigToDisk(platform, platformConfig)

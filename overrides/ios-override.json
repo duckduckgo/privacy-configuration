@@ -2,17 +2,19 @@
     "privacyFeatures": {
         "cookieProtections": {
             "state": "disabled"
-        }
-    },
-    "allow": {
-        "fingerprinting": {
-            "audio": [
+        },
+        "audio": {
+            "exceptions": [
                 { "domain": "example.com" }
             ]
         },
-        "tempUnprotectedDomains": [
-            { "domain": "example.com"},
-            { "domain": "example2.com"}
-        ]
-    }
+        "contentBlocking": {
+            "settings": {
+                "foo": true
+            }
+        }
+    },
+    "unprotectedTemporary": [
+        { "domain": "example.com" }
+    ]
 }
