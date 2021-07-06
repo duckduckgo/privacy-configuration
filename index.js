@@ -32,7 +32,7 @@ for (let jsonList of jsonListNames) {
     // Find the list object
     for (let key of Object.keys(listData)) {
         if (Array.isArray(listData[key])) {
-            defaultConfig.privacyFeatures[configKey].exceptions = listData[key]
+            defaultConfig.features[configKey].exceptions = listData[key]
         }
     }
 }
@@ -61,19 +61,19 @@ for (let platform of platforms) {
 
     // Handle feature overrides
     const platformOverride = JSON.parse(fs.readFileSync(overridePath))
-    for (let key of Object.keys(defaultConfig.privacyFeatures)) {
-        if (platformOverride.privacyFeatures[key]) {
+    for (let key of Object.keys(defaultConfig.features)) {
+        if (platformOverride.features[key]) {
             // Override existing keys
-            for (let platformKey of Object.keys(platformOverride.privacyFeatures[key])) {
+            for (let platformKey of Object.keys(platformOverride.features[key])) {
                 if (platformKey === 'exceptions') {
                     continue
                 }
 
-                platformConfig.privacyFeatures[key][platformKey] = platformOverride.privacyFeatures[key][platformKey]
+                platformConfig.features[key][platformKey] = platformOverride.features[key][platformKey]
             }
 
-            if (platformOverride.privacyFeatures[key].exceptions) {
-                platformConfig.privacyFeatures[key].exceptions = platformConfig.privacyFeatures[key].exceptions.concat(platformOverride.privacyFeatures[key].exceptions)
+            if (platformOverride.features[key].exceptions) {
+                platformConfig.features[key].exceptions = platformConfig.features[key].exceptions.concat(platformOverride.features[key].exceptions)
             }
         }
     }
