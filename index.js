@@ -45,6 +45,37 @@ for (let key of Object.keys(listData)) {
     }
 }
 
+// Generate legacy formats
+const domains = defaultConfig.unprotectedTemporary.map((obj) => obj.domain)
+const legacyTextDomains = domains.join('\n')
+fs.writeFileSync(`${GENERATED_DIR}/trackers-unprotected-temporary.txt`, legacyTextDomains)
+fs.writeFileSync(`${GENERATED_DIR}/trackers-whitelist-temporary.txt`, legacyTextDomains)
+const legacyNaming = {
+   fingerprintingCanvas: 'canvas',
+   trackingCookies: 'cookie',
+   fingerprintingAudio: 'audio',
+   fingerprintingTemporaryStorage: 'temporary-storage',
+   referrer: 'referrer',
+   fingerprintingBattery: 'battery',
+   fingerprintingScreenSize: 'screen-size',
+   fingerprintingHardware: 'hardware',
+   floc: 'floc',
+   gpc: 'gpc',
+   autofill: 'autofill',
+}
+const protections = {};
+for (const key in legacyNaming) {
+    const newConfig = defaultConfig.features[key]
+    const legacyConfig = {
+        enabled: newConfig.state === "enabled",
+        sites: newConfig.exceptions.map((obj) => obj.domain),
+        scripts: [],
+    }
+    protections[legacyNaming[key]] = legacyConfig
+}
+fs.writeFileSync(`${GENERATED_DIR}/protections.json`, JSON.stringify(protections, null, 4))
+fs.writeFileSync(`${GENERATED_DIR}/fingerprinting.json`, JSON.stringify(protections, null, 4))
+
 if (!fs.existsSync(GENERATED_DIR)) {
     fs.mkdirSync(GENERATED_DIR)
 }
