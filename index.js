@@ -2,9 +2,9 @@ const fs = require('fs')
 
 const OVERRIDE_DIR = 'overrides';
 const GENERATED_DIR = 'generated';
-const LISTS_DIR = 'exception-lists';
+const LISTS_DIR = 'exceptionLists';
 
-let defaultConfig = JSON.parse(fs.readFileSync('default-config.json'));
+let defaultConfig = JSON.parse(fs.readFileSync('defaultConfig.json'));
 
 const platforms = [
     'extension',
@@ -21,7 +21,7 @@ const platforms = [
  * @param {object} config - the object to write
  */
 function writeConfigToDisk(platform, config) {
-    fs.writeFileSync(`${GENERATED_DIR}/${platform}-config.json`, JSON.stringify(config, null, 4))
+    fs.writeFileSync(`${GENERATED_DIR}/${platform}Config.json`, JSON.stringify(config, null, 4))
 }
 
 // Grab all exception lists
@@ -37,7 +37,7 @@ for (let jsonList of jsonListNames) {
     }
 }
 
-const listData = JSON.parse(fs.readFileSync(`${LISTS_DIR}/trackers-unprotected-temporary.json`))
+const listData = JSON.parse(fs.readFileSync(`${LISTS_DIR}/trackersUnprotectedTemporary.json`))
 // Find the list object
 for (let key of Object.keys(listData)) {
     if (Array.isArray(listData[key])) {
@@ -52,7 +52,7 @@ if (!fs.existsSync(GENERATED_DIR)) {
 // Handle platform specific overrides and write configs to disk
 for (let platform of platforms) {
     let platformConfig = { ...defaultConfig }
-    const overridePath = `${OVERRIDE_DIR}/${platform}-override.json`
+    const overridePath = `${OVERRIDE_DIR}/${platform}Override.json`
 
     if (!fs.existsSync(overridePath)) {
         writeConfigToDisk(platform, platformConfig)
