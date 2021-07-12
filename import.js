@@ -59,7 +59,7 @@ async function init() {
     let updateNeeded = false
     const legacyNaming = {
        fingerprintingCanvas: 'canvas',
-       trackingCookies: 'cookie',
+       trackingCookies3p: 'cookie',
        fingerprintingAudio: 'audio',
        fingerprintingTemporaryStorage: 'temporary-storage',
        referrer: 'referrer',

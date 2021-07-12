@@ -52,7 +52,7 @@ fs.writeFileSync(`${GENERATED_DIR}/trackers-unprotected-temporary.txt`, legacyTe
 fs.writeFileSync(`${GENERATED_DIR}/trackers-whitelist-temporary.txt`, legacyTextDomains)
 const legacyNaming = {
    fingerprintingCanvas: 'canvas',
-   trackingCookies: 'cookie',
+   trackingCookies3p: 'cookie',
    fingerprintingAudio: 'audio',
    fingerprintingTemporaryStorage: 'temporary-storage',
    referrer: 'referrer',
