@@ -2,9 +2,9 @@ const fs = require('fs')
 
 const OVERRIDE_DIR = 'overrides';
 const GENERATED_DIR = 'generated';
-const LISTS_DIR = 'exceptionLists';
+const LISTS_DIR = 'exception-lists';
 
-let defaultConfig = JSON.parse(fs.readFileSync('defaultConfig.json'));
+let defaultConfig = JSON.parse(fs.readFileSync('default-config.json'));
 
 const platforms = [
     'extension',
@@ -21,14 +21,14 @@ const platforms = [
  * @param {object} config - the object to write
  */
 function writeConfigToDisk(platform, config) {
-    fs.writeFileSync(`${GENERATED_DIR}/${platform}Config.json`, JSON.stringify(config, null, 4))
+    fs.writeFileSync(`${GENERATED_DIR}/${platform}-config.json`, JSON.stringify(config, null, 4))
 }
 
 // Grab all exception lists
-const jsonListNames = fs.readdirSync(LISTS_DIR).filter(listName => listName.includes('Sites'))
+const jsonListNames = fs.readdirSync(LISTS_DIR).filter(listName => listName.includes('sites'))
 for (let jsonList of jsonListNames) {
     const listData = JSON.parse(fs.readFileSync(`${LISTS_DIR}/${jsonList}`))
-    const configKey = jsonList.split('Sites')[0]
+    const configKey = jsonList.split('-sites')[0].replace(/-([a-z0-9])/g, function (g) { return g[1].toUpperCase(); });
     // Find the list object
     for (let key of Object.keys(listData)) {
         if (Array.isArray(listData[key])) {
@@ -37,7 +37,7 @@ for (let jsonList of jsonListNames) {
     }
 }
 
-const listData = JSON.parse(fs.readFileSync(`${LISTS_DIR}/trackersUnprotectedTemporary.json`))
+const listData = JSON.parse(fs.readFileSync(`${LISTS_DIR}/trackers-unprotected-temporary.json`))
 // Find the list object
 for (let key of Object.keys(listData)) {
     if (Array.isArray(listData[key])) {
@@ -83,7 +83,7 @@ if (!fs.existsSync(GENERATED_DIR)) {
 // Handle platform specific overrides and write configs to disk
 for (let platform of platforms) {
     let platformConfig = { ...defaultConfig }
-    const overridePath = `${OVERRIDE_DIR}/${platform}Override.json`
+    const overridePath = `${OVERRIDE_DIR}/${platform}-override.json`
 
     if (!fs.existsSync(overridePath)) {
         writeConfigToDisk(platform, platformConfig)
