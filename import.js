@@ -42,7 +42,7 @@ async function init() {
     const fileData = await getFile('/contentblocking/trackers-unprotected-temporary.txt');
     const listData = JSON.parse(fs.readFileSync(`${LISTS_DIR}/trackers-unprotected-temporary.json`))
     let newListDomains = listData.tempUnprotectedDomains.map((obj) => obj.domain);
-    const oldListDomains = fileData.split('\n');
+    const oldListDomains = fileData.trim().split('\n');
     if (arrayDifference(newListDomains, oldListDomains)) {
         console.log("Unprotected items differ, updating...");
         listData.tempUnprotectedDomains = oldListDomains.map((domain) => {
