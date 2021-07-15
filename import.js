@@ -1,7 +1,6 @@
 const http = require('http');
 const fs = require('fs')
 const LISTS_DIR = 'exception-lists';
-const legacyCookieConfig = '/useragents/cookie_configuration.json';
 
 function getFile(path, host = 'duckduckgo.com') {
     return new Promise((resolve, reject) => {
@@ -59,7 +58,6 @@ async function init() {
     let updateNeeded = false
     const legacyNaming = {
        fingerprintingCanvas: 'canvas',
-       trackingCookies3p: 'cookie',
        fingerprintingAudio: 'audio',
        fingerprintingTemporaryStorage: 'temporary-storage',
        referrer: 'referrer',
@@ -90,7 +88,7 @@ async function init() {
     for (legacyName in protectionsData) {
         let legacyData = protectionsData[legacyName]
         // Known deprecated items we are removing
-        if (legacyName === 'do-not-track') {
+        if (legacyName === 'do-not-track' || legacyName === 'cookie') {
             continue;
         }
         if (!Object.values(legacyNaming).includes(legacyName)) {
@@ -109,10 +107,6 @@ async function init() {
             const listKey = findKey(exceptionListData);
             const listData = exceptionListData[listKey];
             // Merge multiple data sources
-            if (legacyName == 'cookie') {
-                legacyCookieData = JSON.parse(await getFile(legacyCookieConfig, 'staticcdn.duckduckgo.com'))
-                legacyData.sites = legacyData.sites.concat(legacyCookieData.excludedDomains.map(obj => obj.domain))
-            }
             if (arrayDifference(listData.map(obj => obj.domain), legacyData.sites)) {
                 console.warn(`${newName} sites lists are different...`);
                 exceptionListData[listKey] = legacyData.sites.map(domain => {
@@ -121,22 +115,6 @@ async function init() {
                         reason: 'site breakage'
                     }
                 })
-                // Merge multiple data sources
-                if (legacyName == 'cookie') {
-                    for (let obj of legacyCookieData.excludedDomains) {
-                        let found = false
-                        for (let item of exceptionListData[listKey]) {
-                            if (item.domain == obj.domain) {
-                                item.reason = obj.reason;
-                                found = true
-                                break;
-                            }
-                        }
-                        if (!found) {
-                            exceptionListData[listKey].push(obj)
-                        }
-                    }
-                }
                 fs.writeFileSync(`${LISTS_DIR}/${exceptionListName}-sites.json`, JSON.stringify(exceptionListData, null, 4))
             }
         } catch {
