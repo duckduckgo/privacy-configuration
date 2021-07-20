@@ -14,6 +14,8 @@ const platforms = [
     'windows'
 ]
 
+let nonDefaultLists = []
+
 /**
  * Write a config file to disk
  * 
@@ -29,6 +31,14 @@ const jsonListNames = fs.readdirSync(LISTS_DIR).filter(listName => listName.incl
 for (let jsonList of jsonListNames) {
     const listData = JSON.parse(fs.readFileSync(`${LISTS_DIR}/${jsonList}`))
     const configKey = jsonList.split('-sites')[0].replace(/-([a-z0-9])/g, function (g) { return g[1].toUpperCase(); });
+    
+    // If a list key is missing from the default config it is platform specific
+    // Store it for processing with the platforms
+    if (!defaultConfig.features[configKey]) {
+        nonDefaultLists.push(jsonList)
+        continue
+    }
+
     // Find the list object
     for (let key of Object.keys(listData)) {
         if (Array.isArray(listData[key])) {
@@ -60,8 +70,7 @@ const legacyNaming = {
    fingerprintingScreenSize: 'screen-size',
    fingerprintingHardware: 'hardware',
    floc: 'floc',
-   gpc: 'gpc',
-   autofill: 'autofill',
+   gpc: 'gpc'
 }
 const protections = {};
 for (const key in legacyNaming) {
@@ -82,7 +91,7 @@ if (!fs.existsSync(GENERATED_DIR)) {
 
 // Handle platform specific overrides and write configs to disk
 for (let platform of platforms) {
-    let platformConfig = { ...defaultConfig }
+    let platformConfig = JSON.parse(JSON.stringify(defaultConfig))
     const overridePath = `${OVERRIDE_DIR}/${platform}-override.json`
 
     if (!fs.existsSync(overridePath)) {
@@ -105,6 +114,30 @@ for (let platform of platforms) {
 
             if (platformOverride.features[key].exceptions) {
                 platformConfig.features[key].exceptions = platformConfig.features[key].exceptions.concat(platformOverride.features[key].exceptions)
+            }
+        }
+    }
+
+    // Add platform specific features
+    for (let key of Object.keys(platformOverride.features)) {
+        console.log(key)
+        if (platformConfig.features[key]) {
+            continue
+        }
+
+        platformConfig.features[key] = { ...platformOverride.features[key] }
+
+        for (let listName of nonDefaultLists) {
+            const configKey = listName.split('-sites')[0].replace(/-([a-z0-9])/g, function (g) { return g[1].toUpperCase(); });
+            if (configKey !== key) {
+                continue
+            }
+
+            const listData = JSON.parse(fs.readFileSync(`${LISTS_DIR}/${listName}`))
+            for (let listKey of Object.keys(listData)) {
+                if (Array.isArray(listData[key])) {
+                    platformConfig.features[key].exceptions = listData[listKey]
+                }
             }
         }
     }
