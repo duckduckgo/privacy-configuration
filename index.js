@@ -70,11 +70,33 @@ const legacyNaming = {
    fingerprintingScreenSize: 'screen-size',
    fingerprintingHardware: 'hardware',
    floc: 'floc',
-   gpc: 'gpc'
+   gpc: 'gpc',
+   autofill: 'autofill'
 }
 const protections = {};
 for (const key in legacyNaming) {
-    const newConfig = defaultConfig.features[key]
+    let newConfig
+    if (!defaultConfig.features[key]) {
+        const override = JSON.parse(fs.readFileSync(`${OVERRIDE_DIR}/extension-override.json`))
+        if (!override.features[key]) {
+            continue
+        }
+
+        newConfig = override.features[key]
+
+        // TODO: convert camel key to hyphen
+        if (fs.existsSync(`${LISTS_DIR}/${key}-sites.json`)) {
+            const listData = JSON.parse(fs.readFileSync(`${LISTS_DIR}/${key}-sites.json`))
+            for (let listKey of Object.keys(listData)) {
+                if (Array.isArray(listData[listKey])) {
+                    newConfig.exceptions = listData[listKey]
+                }
+            }
+        }
+
+    } else {
+        newConfig = defaultConfig.features[key]
+    }
     const legacyConfig = {
         enabled: newConfig.state === "enabled",
         sites: newConfig.exceptions.map((obj) => obj.domain),
