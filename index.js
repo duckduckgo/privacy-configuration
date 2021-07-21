@@ -120,7 +120,6 @@ for (let platform of platforms) {
 
     // Add platform specific features
     for (let key of Object.keys(platformOverride.features)) {
-        console.log(key)
         if (platformConfig.features[key]) {
             continue
         }
