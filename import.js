@@ -58,6 +58,8 @@ async function init() {
     let updateNeeded = false
     const legacyNaming = {
        fingerprintingCanvas: 'canvas',
+       trackingCookies3p: 'cookie',
+       trackingCookies1p: 'cookie',
        fingerprintingAudio: 'audio',
        fingerprintingTemporaryStorage: 'temporary-storage',
        referrer: 'referrer',
@@ -88,7 +90,7 @@ async function init() {
     for (legacyName in protectionsData) {
         let legacyData = protectionsData[legacyName]
         // Known deprecated items we are removing
-        if (legacyName === 'do-not-track' || legacyName === 'cookie') {
+        if (legacyName === 'do-not-track') {
             continue;
         }
         if (!Object.values(legacyNaming).includes(legacyName)) {
