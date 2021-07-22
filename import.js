@@ -97,7 +97,7 @@ async function init() {
         let newName = getNewName(legacyName)
         const exceptionListName = newName.replace(/([a-zA-Z])(?=[A-Z0-9])/g, '$1-').toLowerCase()
         let newStateNaming = legacyData.enabled ? 'enabled' : 'disabled'
-        if (defaultConfig.features[newName].state !== newStateNaming) {
+        if (defaultConfig.features[newName] && defaultConfig.features[newName].state !== newStateNaming) {
             updateNeeded = true
             console.log(`${newName} feature state didn't match legacy file: ${newStateNaming}`)
             defaultConfig.features[newName].state = newStateNaming
