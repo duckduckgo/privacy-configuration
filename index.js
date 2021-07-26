@@ -56,7 +56,8 @@ for (let key of Object.keys(listData)) {
 }
 
 // Generate legacy formats
-const domains = defaultConfig.unprotectedTemporary.map((obj) => obj.domain)
+let domains = defaultConfig.unprotectedTemporary.map((obj) => obj.domain)
+domains = domains.concat(defaultConfig.features.contentBlocking.exceptions.map((obj) => obj.domain).filter((domain) => !domains.includes(domain)))
 const legacyTextDomains = domains.join('\n')
 fs.writeFileSync(`${GENERATED_DIR}/trackers-unprotected-temporary.txt`, legacyTextDomains)
 fs.writeFileSync(`${GENERATED_DIR}/trackers-whitelist-temporary.txt`, legacyTextDomains)
