@@ -1,10 +1,11 @@
 const fs = require('fs')
 
-const OVERRIDE_DIR = 'overrides';
-const GENERATED_DIR = 'generated';
-const LISTS_DIR = 'exception-lists';
+const OVERRIDE_DIR = 'overrides'
+const GENERATED_DIR = 'generated'
+const LISTS_DIR = 'exception-lists'
 
-let defaultConfig = JSON.parse(fs.readFileSync('default-config.json'));
+let defaultConfig = JSON.parse(fs.readFileSync('default-config.json'))
+defaultConfig.version = Date.now()
 
 const platforms = [
     'extension',
