@@ -16,6 +16,6 @@ To add an unprotected entry manually, update the `tempUnprotectedDomains` of `ex
 
 Please note the files `trackers-unprotected-temporary.txt`, `trackers-whitelist-temporary.txt`, `protections.json`, `fingerprinting.json` in the `generated` directory are deprecated. These files are automatically generated and only used by legacy product versions.
 
-Contributing 
+## Contributing 
 You may open an issue in this GitHub repo or open a pull request.
 
