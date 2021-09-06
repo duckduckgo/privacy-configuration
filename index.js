@@ -48,6 +48,14 @@ for (let jsonList of jsonListNames) {
     }
 }
 
+let unprotectedDomains = new Set();
+function addExceptionsToUnprotected(exceptions) {
+    for (let exception of exceptions) {
+        unprotectedDomains.add(exception.domain)
+    }
+  return exceptions.map((obj) => obj.domain)
+}
+
 const listData = JSON.parse(fs.readFileSync(`${LISTS_DIR}/trackers-unprotected-temporary.json`))
 // Find the list object
 for (let key of Object.keys(listData)) {
@@ -56,10 +64,78 @@ for (let key of Object.keys(listData)) {
     }
 }
 
+addExceptionsToUnprotected(defaultConfig.unprotectedTemporary)
+addExceptionsToUnprotected(defaultConfig.features.contentBlocking.exceptions)
+
+if (!fs.existsSync(GENERATED_DIR)) {
+    fs.mkdirSync(GENERATED_DIR)
+}
+
+// Handle platform specific overrides and write configs to disk
+for (let platform of platforms) {
+    let platformConfig = JSON.parse(JSON.stringify(defaultConfig))
+    const overridePath = `${OVERRIDE_DIR}/${platform}-override.json`
+
+    if (!fs.existsSync(overridePath)) {
+        writeConfigToDisk(platform, platformConfig)
+        continue
+    }
+
+    // Handle feature overrides
+    const platformOverride = JSON.parse(fs.readFileSync(overridePath))
+    for (let key of Object.keys(defaultConfig.features)) {
+        if (platformOverride.features[key]) {
+            // Override existing keys
+            for (let platformKey of Object.keys(platformOverride.features[key])) {
+                if (platformKey === 'exceptions') {
+                    continue
+                }
+
+                platformConfig.features[key][platformKey] = platformOverride.features[key][platformKey]
+            }
+
+            if (platformOverride.features[key].exceptions) {
+                if (key === "contentBlocking") {
+                    addExceptionsToUnprotected(platformOverride.features[key].exceptions)
+                }
+                platformConfig.features[key].exceptions = platformConfig.features[key].exceptions.concat(platformOverride.features[key].exceptions)
+            }
+        }
+    }
+
+    // Add platform specific features
+    for (let key of Object.keys(platformOverride.features)) {
+        if (platformConfig.features[key]) {
+            continue
+        }
+
+        platformConfig.features[key] = { ...platformOverride.features[key] }
+
+        for (let listName of nonDefaultLists) {
+            const configKey = listName.split('-sites')[0].replace(/-([a-z0-9])/g, function (g) { return g[1].toUpperCase(); });
+            if (configKey !== key) {
+                continue
+            }
+
+            const listData = JSON.parse(fs.readFileSync(`${LISTS_DIR}/${listName}`))
+            for (let listKey of Object.keys(listData)) {
+                if (Array.isArray(listData[key])) {
+                    platformConfig.features[key].exceptions = listData[listKey]
+                }
+            }
+        }
+    }
+
+    if (platformOverride.unprotectedTemporary) {
+        addExceptionsToUnprotected(platformOverride.unprotectedTemporary)
+        platformConfig.unprotectedTemporary = platformConfig.unprotectedTemporary.concat(platformOverride.unprotectedTemporary)
+    }
+
+    writeConfigToDisk(platform, platformConfig)
+}
+
 // Generate legacy formats
-let domains = defaultConfig.unprotectedTemporary.map((obj) => obj.domain)
-domains = domains.concat(defaultConfig.features.contentBlocking.exceptions.map((obj) => obj.domain).filter((domain) => !domains.includes(domain)))
-const legacyTextDomains = domains.join('\n')
+const legacyTextDomains = [...unprotectedDomains].join('\n')
 fs.writeFileSync(`${GENERATED_DIR}/trackers-unprotected-temporary.txt`, legacyTextDomains)
 fs.writeFileSync(`${GENERATED_DIR}/trackers-whitelist-temporary.txt`, legacyTextDomains)
 const legacyNaming = {
@@ -108,66 +184,3 @@ for (const key in legacyNaming) {
 }
 fs.writeFileSync(`${GENERATED_DIR}/protections.json`, JSON.stringify(protections, null, 4))
 fs.writeFileSync(`${GENERATED_DIR}/fingerprinting.json`, JSON.stringify(protections, null, 4))
-
-if (!fs.existsSync(GENERATED_DIR)) {
-    fs.mkdirSync(GENERATED_DIR)
-}
-
-// Handle platform specific overrides and write configs to disk
-for (let platform of platforms) {
-    let platformConfig = JSON.parse(JSON.stringify(defaultConfig))
-    const overridePath = `${OVERRIDE_DIR}/${platform}-override.json`
-
-    if (!fs.existsSync(overridePath)) {
-        writeConfigToDisk(platform, platformConfig)
-        continue
-    }
-
-    // Handle feature overrides
-    const platformOverride = JSON.parse(fs.readFileSync(overridePath))
-    for (let key of Object.keys(defaultConfig.features)) {
-        if (platformOverride.features[key]) {
-            // Override existing keys
-            for (let platformKey of Object.keys(platformOverride.features[key])) {
-                if (platformKey === 'exceptions') {
-                    continue
-                }
-
-                platformConfig.features[key][platformKey] = platformOverride.features[key][platformKey]
-            }
-
-            if (platformOverride.features[key].exceptions) {
-                platformConfig.features[key].exceptions = platformConfig.features[key].exceptions.concat(platformOverride.features[key].exceptions)
-            }
-        }
-    }
-
-    // Add platform specific features
-    for (let key of Object.keys(platformOverride.features)) {
-        if (platformConfig.features[key]) {
-            continue
-        }
-
-        platformConfig.features[key] = { ...platformOverride.features[key] }
-
-        for (let listName of nonDefaultLists) {
-            const configKey = listName.split('-sites')[0].replace(/-([a-z0-9])/g, function (g) { return g[1].toUpperCase(); });
-            if (configKey !== key) {
-                continue
-            }
-
-            const listData = JSON.parse(fs.readFileSync(`${LISTS_DIR}/${listName}`))
-            for (let listKey of Object.keys(listData)) {
-                if (Array.isArray(listData[key])) {
-                    platformConfig.features[key].exceptions = listData[listKey]
-                }
-            }
-        }
-    }
-
-    if (platformOverride.unprotectedTemporary) {
-        platformConfig.unprotectedTemporary = platformConfig.unprotectedTemporary.concat(platformOverride.unprotectedTemporary)
-    }
-
-    writeConfigToDisk(platform, platformConfig)
-}
