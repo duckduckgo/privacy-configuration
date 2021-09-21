@@ -4,7 +4,7 @@ const OVERRIDE_DIR = 'overrides'
 const GENERATED_DIR = 'generated'
 const LISTS_DIR = 'exception-lists'
 
-let defaultConfig = JSON.parse(fs.readFileSync('default-config.json'))
+const defaultConfig = JSON.parse(fs.readFileSync('default-config.json'))
 defaultConfig.version = Date.now()
 
 const platforms = [
@@ -15,24 +15,24 @@ const platforms = [
     'windows'
 ]
 
-let nonDefaultLists = []
+const nonDefaultLists = []
 
 /**
  * Write a config file to disk
- * 
+ *
  * @param {string} platform - platform to write
  * @param {object} config - the object to write
  */
-function writeConfigToDisk(platform, config) {
+function writeConfigToDisk (platform, config) {
     fs.writeFileSync(`${GENERATED_DIR}/${platform}-config.json`, JSON.stringify(config, null, 4))
 }
 
 // Grab all exception lists
 const jsonListNames = fs.readdirSync(LISTS_DIR).filter(listName => listName.includes('sites'))
-for (let jsonList of jsonListNames) {
+for (const jsonList of jsonListNames) {
     const listData = JSON.parse(fs.readFileSync(`${LISTS_DIR}/${jsonList}`))
-    const configKey = jsonList.split('-sites')[0].replace(/-([a-z0-9])/g, function (g) { return g[1].toUpperCase(); });
-    
+    const configKey = jsonList.split('-sites')[0].replace(/-([a-z0-9])/g, function (g) { return g[1].toUpperCase() })
+
     // If a list key is missing from the default config it is platform specific
     // Store it for processing with the platforms
     if (!defaultConfig.features[configKey]) {
@@ -41,24 +41,24 @@ for (let jsonList of jsonListNames) {
     }
 
     // Find the list object
-    for (let key of Object.keys(listData)) {
+    for (const key of Object.keys(listData)) {
         if (Array.isArray(listData[key])) {
             defaultConfig.features[configKey].exceptions = listData[key]
         }
     }
 }
 
-let unprotectedDomains = new Set();
-function addExceptionsToUnprotected(exceptions) {
-    for (let exception of exceptions) {
+const unprotectedDomains = new Set()
+function addExceptionsToUnprotected (exceptions) {
+    for (const exception of exceptions) {
         unprotectedDomains.add(exception.domain)
     }
-  return exceptions.map((obj) => obj.domain)
+    return exceptions.map((obj) => obj.domain)
 }
 
 const listData = JSON.parse(fs.readFileSync(`${LISTS_DIR}/trackers-unprotected-temporary.json`))
 // Find the list object
-for (let key of Object.keys(listData)) {
+for (const key of Object.keys(listData)) {
     if (Array.isArray(listData[key])) {
         defaultConfig.unprotectedTemporary = listData[key]
     }
@@ -72,8 +72,8 @@ if (!fs.existsSync(GENERATED_DIR)) {
 }
 
 // Handle platform specific overrides and write configs to disk
-for (let platform of platforms) {
-    let platformConfig = JSON.parse(JSON.stringify(defaultConfig))
+for (const platform of platforms) {
+    const platformConfig = JSON.parse(JSON.stringify(defaultConfig))
     const overridePath = `${OVERRIDE_DIR}/${platform}-override.json`
 
     if (!fs.existsSync(overridePath)) {
@@ -83,10 +83,10 @@ for (let platform of platforms) {
 
     // Handle feature overrides
     const platformOverride = JSON.parse(fs.readFileSync(overridePath))
-    for (let key of Object.keys(defaultConfig.features)) {
+    for (const key of Object.keys(defaultConfig.features)) {
         if (platformOverride.features[key]) {
             // Override existing keys
-            for (let platformKey of Object.keys(platformOverride.features[key])) {
+            for (const platformKey of Object.keys(platformOverride.features[key])) {
                 if (platformKey === 'exceptions') {
                     continue
                 }
@@ -95,7 +95,7 @@ for (let platform of platforms) {
             }
 
             if (platformOverride.features[key].exceptions) {
-                if (key === "contentBlocking") {
+                if (key === 'contentBlocking') {
                     addExceptionsToUnprotected(platformOverride.features[key].exceptions)
                 }
                 platformConfig.features[key].exceptions = platformConfig.features[key].exceptions.concat(platformOverride.features[key].exceptions)
@@ -104,21 +104,21 @@ for (let platform of platforms) {
     }
 
     // Add platform specific features
-    for (let key of Object.keys(platformOverride.features)) {
+    for (const key of Object.keys(platformOverride.features)) {
         if (platformConfig.features[key]) {
             continue
         }
 
         platformConfig.features[key] = { ...platformOverride.features[key] }
 
-        for (let listName of nonDefaultLists) {
-            const configKey = listName.split('-sites')[0].replace(/-([a-z0-9])/g, function (g) { return g[1].toUpperCase(); });
+        for (const listName of nonDefaultLists) {
+            const configKey = listName.split('-sites')[0].replace(/-([a-z0-9])/g, function (g) { return g[1].toUpperCase() })
             if (configKey !== key) {
                 continue
             }
 
             const listData = JSON.parse(fs.readFileSync(`${LISTS_DIR}/${listName}`))
-            for (let listKey of Object.keys(listData)) {
+            for (const listKey of Object.keys(listData)) {
                 if (Array.isArray(listData[key])) {
                     platformConfig.features[key].exceptions = listData[listKey]
                 }
@@ -139,19 +139,19 @@ const legacyTextDomains = [...unprotectedDomains].join('\n')
 fs.writeFileSync(`${GENERATED_DIR}/trackers-unprotected-temporary.txt`, legacyTextDomains)
 fs.writeFileSync(`${GENERATED_DIR}/trackers-whitelist-temporary.txt`, legacyTextDomains)
 const legacyNaming = {
-   fingerprintingCanvas: 'canvas',
-   trackingCookies3p: 'cookie',
-   fingerprintingAudio: 'audio',
-   fingerprintingTemporaryStorage: 'temporary-storage',
-   referrer: 'referrer',
-   fingerprintingBattery: 'battery',
-   fingerprintingScreenSize: 'screen-size',
-   fingerprintingHardware: 'hardware',
-   floc: 'floc',
-   gpc: 'gpc',
-   autofill: 'autofill'
+    fingerprintingCanvas: 'canvas',
+    trackingCookies3p: 'cookie',
+    fingerprintingAudio: 'audio',
+    fingerprintingTemporaryStorage: 'temporary-storage',
+    referrer: 'referrer',
+    fingerprintingBattery: 'battery',
+    fingerprintingScreenSize: 'screen-size',
+    fingerprintingHardware: 'hardware',
+    floc: 'floc',
+    gpc: 'gpc',
+    autofill: 'autofill'
 }
-const protections = {};
+const protections = {}
 for (const key in legacyNaming) {
     let newConfig
     if (!defaultConfig.features[key]) {
@@ -165,20 +165,19 @@ for (const key in legacyNaming) {
         // TODO: convert camel key to hyphen
         if (fs.existsSync(`${LISTS_DIR}/${key}-sites.json`)) {
             const listData = JSON.parse(fs.readFileSync(`${LISTS_DIR}/${key}-sites.json`))
-            for (let listKey of Object.keys(listData)) {
+            for (const listKey of Object.keys(listData)) {
                 if (Array.isArray(listData[listKey])) {
                     newConfig.exceptions = listData[listKey]
                 }
             }
         }
-
     } else {
         newConfig = defaultConfig.features[key]
     }
     const legacyConfig = {
-        enabled: newConfig.state === "enabled",
+        enabled: newConfig.state === 'enabled',
         sites: newConfig.exceptions.map((obj) => obj.domain),
-        scripts: [],
+        scripts: []
     }
     protections[legacyNaming[key]] = legacyConfig
 }
