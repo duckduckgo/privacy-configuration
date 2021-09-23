@@ -1,46 +1,41 @@
 const expect = require('chai').expect
-const schema = require('./schema.js')
 const Ajv = require('ajv').default
 const ajv = new Ajv()
 const fs = require('fs')
-
-const platforms = [
-    'extension',
-    'ios',
-    'android',
-    'macos',
-    'windows'
-]
+const platforms = require('./../platforms')
 
 const configs = platforms.map((plat) => {
     return JSON.parse(fs.readFileSync(`./generated/${plat}-config.json`))
 })
 
-describe('Data schema tests', () => {
+describe('Config schema tests', () => {
     it('should have a valid root schema', () => {
+        const schema = JSON.parse(fs.readFileSync('./tests/schemas/root.json'))
         for (const config of configs) {
-            expect(ajv.validate(schema.root, config)).to.be.equal(true)
+            expect(ajv.validate(schema, config)).to.be.equal(true)
         }
     })
 
     it('should have a vaild feature schema', () => {
+        const schema = JSON.parse(fs.readFileSync('./tests/schemas/feature.json'))
         for (const config of configs) {
-            for (const featureKey of Object.keys(config.features)) {
-                expect(ajv.validate(schema.feature, config.features[featureKey])).to.be.equal(true)
+            for (const featureKey in config.features) {
+                expect(ajv.validate(schema, config.features[featureKey])).to.be.equal(true)
             }
         }
     })
 
     it('should have valid exception lists', () => {
+        const schema = JSON.parse(fs.readFileSync('./tests/schemas/exception.json'))
         for (const config of configs) {
-            for (const featureKey of Object.keys(config.features)) {
+            for (const featureKey in config.feature) {
                 for (const exception of config.features[featureKey].exceptions) {
-                    expect(ajv.validate(schema.exception, exception)).to.be.equal(true)
+                    expect(ajv.validate(schema, exception)).to.be.equal(true)
                 }
             }
 
             for (const exception of config.unprotectedTemporary) {
-                expect(ajv.validate(schema.exception, exception)).to.be.equal(true)
+                expect(ajv.validate(schema, exception)).to.be.equal(true)
             }
         }
     })
