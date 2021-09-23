@@ -7,13 +7,7 @@ const LISTS_DIR = 'exception-lists'
 const defaultConfig = JSON.parse(fs.readFileSync('default-config.json'))
 defaultConfig.version = Date.now()
 
-const platforms = [
-    'extension',
-    'ios',
-    'android',
-    'macos',
-    'windows'
-]
+const platforms = require('./platforms')
 
 const nonDefaultLists = []
 
