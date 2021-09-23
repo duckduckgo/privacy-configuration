@@ -19,7 +19,7 @@ describe('Config schema tests', () => {
     it('should have a vaild feature schema', () => {
         const schema = JSON.parse(fs.readFileSync('./tests/schemas/feature.json'))
         for (const config of configs) {
-            for (const featureKey of Object.keys(config.features)) {
+            for (const featureKey in config.features) {
                 expect(ajv.validate(schema, config.features[featureKey])).to.be.equal(true)
             }
         }
@@ -28,7 +28,7 @@ describe('Config schema tests', () => {
     it('should have valid exception lists', () => {
         const schema = JSON.parse(fs.readFileSync('./tests/schemas/exception.json'))
         for (const config of configs) {
-            for (const featureKey of Object.keys(config.features)) {
+            for (const featureKey in config.feature) {
                 for (const exception of config.features[featureKey].exceptions) {
                     expect(ajv.validate(schema, exception)).to.be.equal(true)
                 }
