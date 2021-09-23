@@ -1,16 +1,9 @@
 const expect = require('chai').expect
-const schema = require('./schema.js')
 const Ajv = require('ajv').default
 const ajv = new Ajv()
 const fs = require('fs')
-
-const platforms = [
-    'extension',
-    'ios',
-    'android',
-    'macos',
-    'windows'
-]
+const platforms = require('./../platforms')
+const schema = JSON.parse(fs.readFileSync('./tests/schema.json'))
 
 const configs = platforms.map((plat) => {
     return JSON.parse(fs.readFileSync(`./generated/${plat}-config.json`))
