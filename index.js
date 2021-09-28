@@ -5,10 +5,7 @@ const GENERATED_DIR = 'generated'
 const LISTS_DIR = 'exception-lists'
 
 const defaultConfig = JSON.parse(fs.readFileSync('default-config.json'))
-
-if (process.env.USING_CI) {
-    defaultConfig.version = Date.now()
-}
+defaultConfig.version = Date.now()
 
 const platforms = require('./platforms')
 
