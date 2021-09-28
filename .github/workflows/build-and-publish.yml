@@ -14,9 +14,9 @@ jobs:
     - uses: actions/checkout@main
     - name: Install dependencies
       run: npm install
+    - uses: ./
     - name: Run tests
       run: npm run test
-    - uses: ./
     - uses: jakejarvis/s3-sync-action@master
       with:
         args: --acl public-read --follow-symlinks
