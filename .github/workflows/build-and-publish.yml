@@ -8,11 +8,14 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
     env:
       USING_CI: true
     steps:
     - uses: actions/checkout@main
+    - name: Install dependencies
+      run: npm install
+    - name: Run tests
+      run: npm run test
     - uses: ./
     - uses: jakejarvis/s3-sync-action@master
       with:
@@ -23,9 +26,3 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         SOURCE_DIR: 'generated' 
         DEST_DIR: 'trackerblocking/config/v1'
-    - uses: EndBug/add-and-commit@v7
-      with:
-        add: 'generated'
-        message: 'Auto-generated config files'
-        pull_strategy: 'NO-PULL'
-        default_author: github_actions
