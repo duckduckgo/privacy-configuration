@@ -24,12 +24,11 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         SOURCE_DIR: 'generated' 
         DEST_DIR: 'trackerblocking/config/v1'
-    - name: Get current date
-      id: date
-      run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+    - name: Set version variable
+      run: echo "VERSION=$(jq -r .version ./generated/extension-config.json)" >> $GITHUB_ENV
     - uses: 'marvinpinto/action-automatic-releases@latest'
       with:
         repo_token: '${{ secrets.GITHUB_TOKEN }}'
         prerelease: false
-        title: 'remote-privacy-config-${{ steps.date.outputs.date }}'
+        title: 'remote-privacy-config-${{ env.VERSION }}'
         files: generated
