@@ -2,10 +2,13 @@ const fs = require('fs')
 
 const OVERRIDE_DIR = 'overrides'
 const GENERATED_DIR = 'generated'
-const LISTS_DIR = 'exception-lists'
+const LISTS_DIR = 'features'
 
-const defaultConfig = JSON.parse(fs.readFileSync('default-config.json'))
-defaultConfig.version = Date.now()
+const defaultConfig = {
+    readme: 'https://github.com/duckduckgo/privacy-configuration',
+    version: Date.now(),
+    features: {}
+}
 
 const platforms = require('./platforms')
 
@@ -21,25 +24,25 @@ function writeConfigToDisk (platform, config) {
     fs.writeFileSync(`${GENERATED_DIR}/${platform}-config.json`, JSON.stringify(config, null, 4))
 }
 
+const unprotectedListName = 'unprotected-temporary.json'
+
 // Grab all exception lists
-const jsonListNames = fs.readdirSync(LISTS_DIR).filter(listName => listName.includes('sites'))
+const jsonListNames = fs.readdirSync(LISTS_DIR).filter(listName => {
+    return listName !== unprotectedListName && listName !== '_template.json'
+})
 for (const jsonList of jsonListNames) {
     const listData = JSON.parse(fs.readFileSync(`${LISTS_DIR}/${jsonList}`))
-    const configKey = jsonList.split('-sites')[0].replace(/-([a-z0-9])/g, function (g) { return g[1].toUpperCase() })
+    const configKey = jsonList.replace(/[.]json$/, '').replace(/-([a-z0-9])/g, function (g) { return g[1].toUpperCase() })
 
     // If a list key is missing from the default config it is platform specific
     // Store it for processing with the platforms
     if (!defaultConfig.features[configKey]) {
         nonDefaultLists.push(jsonList)
-        continue
     }
 
-    // Find the list object
-    for (const key of Object.keys(listData)) {
-        if (Array.isArray(listData[key])) {
-            defaultConfig.features[configKey].exceptions = listData[key]
-        }
-    }
+    delete listData._meta
+
+    defaultConfig.features[configKey] = listData
 }
 
 const unprotectedDomains = new Set()
@@ -50,13 +53,8 @@ function addExceptionsToUnprotected (exceptions) {
     return exceptions.map((obj) => obj.domain)
 }
 
-const listData = JSON.parse(fs.readFileSync(`${LISTS_DIR}/trackers-unprotected-temporary.json`))
-// Find the list object
-for (const key of Object.keys(listData)) {
-    if (Array.isArray(listData[key])) {
-        defaultConfig.unprotectedTemporary = listData[key]
-    }
-}
+const listData = JSON.parse(fs.readFileSync(`${LISTS_DIR}/${unprotectedListName}`))
+defaultConfig.unprotectedTemporary = listData.exceptions
 
 addExceptionsToUnprotected(defaultConfig.unprotectedTemporary)
 addExceptionsToUnprotected(defaultConfig.features.contentBlocking.exceptions)
@@ -112,11 +110,7 @@ for (const platform of platforms) {
             }
 
             const listData = JSON.parse(fs.readFileSync(`${LISTS_DIR}/${listName}`))
-            for (const listKey of Object.keys(listData)) {
-                if (Array.isArray(listData[key])) {
-                    platformConfig.features[key].exceptions = listData[listKey]
-                }
-            }
+            platformConfig.features[key].exceptions = listData.exceptions
         }
     }
 
@@ -157,13 +151,9 @@ for (const key in legacyNaming) {
         newConfig = override.features[key]
 
         // TODO: convert camel key to hyphen
-        if (fs.existsSync(`${LISTS_DIR}/${key}-sites.json`)) {
-            const listData = JSON.parse(fs.readFileSync(`${LISTS_DIR}/${key}-sites.json`))
-            for (const listKey of Object.keys(listData)) {
-                if (Array.isArray(listData[listKey])) {
-                    newConfig.exceptions = listData[listKey]
-                }
-            }
+        if (fs.existsSync(`${LISTS_DIR}/${key}.json`)) {
+            const listData = JSON.parse(fs.readFileSync(`${LISTS_DIR}/${key}.json`))
+            newConfig.exceptions = listData.exceptions
         }
     } else {
         newConfig = defaultConfig.features[key]
