@@ -1,12 +1,21 @@
 {
-    "description": {
+    "_meta": {
         "description": "URL's which should not receive a spoofed user agent, and agents to exclude based on regex.",
         "sampleExcludeRecords": {
             "domain": "example.com",
             "reason": "Two factor auth that verifies device pathes using user agent"
         }
     },
-    "excludedAgentDomains": [
+    "state": "disabled",
+    "settings": {
+        "agentExcludePatterns": [
+            {
+                "agent": "Brave Chrome",
+                "reason": "Uncommon UA"
+            }
+        ]
+    },
+    "exceptions": [
         {
             "domain": "duosecurity.com",
             "reason": "Two factor auth that verifies device pathes using user agent"

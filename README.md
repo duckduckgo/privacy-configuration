@@ -2,7 +2,7 @@
 
 The configuration files within this repo are used by DuckDuckGo's Apps and Browser Extensions and control which privacy protections are enabled or disabled.
 
-In some cases, privacy protections can cause conflicts that affect expected website functionality. `exception-lists` can be used to temporarily disable privacy protections in order to restore expected site functionality.
+In some cases, privacy protections can cause conflicts that affect expected website functionality. `features` can be used to temporarily disable privacy protections in order to restore expected site functionality.
  
 This repo also contains code to build and deploy the configuration files.
  
@@ -10,7 +10,7 @@ These files (in the `generated` directory) are served from: https://staticcdn.du
  
 **Adding unprotected entries**
 
-To add an unprotected entry manually, update the `tempUnprotectedDomains` of `exception-lists/trackers-unprotected-temporary.json`.
+To add an unprotected entry manually, update the `exceptions` of `features/unprotected-temporary.json`.
  
 **Deprecated Files**
 
