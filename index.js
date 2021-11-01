@@ -12,8 +12,6 @@ const defaultConfig = {
 
 const platforms = require('./platforms')
 
-const nonDefaultLists = []
-
 /**
  * Write a config file to disk
  *
@@ -34,14 +32,7 @@ for (const jsonList of jsonListNames) {
     const listData = JSON.parse(fs.readFileSync(`${LISTS_DIR}/${jsonList}`))
     const configKey = jsonList.replace(/[.]json$/, '').replace(/-([a-z0-9])/g, function (g) { return g[1].toUpperCase() })
 
-    // If a list key is missing from the default config it is platform specific
-    // Store it for processing with the platforms
-    if (!defaultConfig.features[configKey]) {
-        nonDefaultLists.push(jsonList)
-    }
-
     delete listData._meta
-
     defaultConfig.features[configKey] = listData
 }
 
@@ -61,6 +52,10 @@ addExceptionsToUnprotected(defaultConfig.features.contentBlocking.exceptions)
 
 if (!fs.existsSync(GENERATED_DIR)) {
     fs.mkdirSync(GENERATED_DIR)
+}
+
+function isFeatureDisabled (feature) {
+    return !('state' in feature) || feature.state === 'disabled'
 }
 
 // Handle platform specific overrides and write configs to disk
@@ -93,6 +88,10 @@ for (const platform of platforms) {
                 platformConfig.features[key].exceptions = platformConfig.features[key].exceptions.concat(platformOverride.features[key].exceptions)
             }
         }
+        if (isFeatureDisabled(platformConfig.features[key])) {
+            // If feature isn't enabled for platform remove.
+            delete platformConfig.features[key]
+        }
     }
 
     // Add platform specific features
@@ -102,15 +101,9 @@ for (const platform of platforms) {
         }
 
         platformConfig.features[key] = { ...platformOverride.features[key] }
-
-        for (const listName of nonDefaultLists) {
-            const configKey = listName.split('-sites')[0].replace(/-([a-z0-9])/g, function (g) { return g[1].toUpperCase() })
-            if (configKey !== key) {
-                continue
-            }
-
-            const listData = JSON.parse(fs.readFileSync(`${LISTS_DIR}/${listName}`))
-            platformConfig.features[key].exceptions = listData.exceptions
+        if (isFeatureDisabled(platformConfig.features[key])) {
+            // If feature isn't enabled for platform remove.
+            delete platformConfig.features[key]
         }
     }
 
@@ -142,7 +135,7 @@ const legacyNaming = {
 const protections = {}
 for (const key in legacyNaming) {
     let newConfig
-    if (!defaultConfig.features[key]) {
+    if (!defaultConfig.features[key] || defaultConfig.features[key].state !== 'enabled') {
         const override = JSON.parse(fs.readFileSync(`${OVERRIDE_DIR}/extension-override.json`))
         if (!override.features[key]) {
             continue
