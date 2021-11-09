@@ -90,7 +90,7 @@ for (const platform of platforms) {
         }
         if (isFeatureDisabled(platformConfig.features[key])) {
             // If feature isn't enabled for platform remove.
-            delete platformConfig.features[key]
+            // delete platformConfig.features[key]
         }
     }
 
@@ -103,7 +103,7 @@ for (const platform of platforms) {
         platformConfig.features[key] = { ...platformOverride.features[key] }
         if (isFeatureDisabled(platformConfig.features[key])) {
             // If feature isn't enabled for platform remove.
-            delete platformConfig.features[key]
+            // delete platformConfig.features[key]
         }
     }
 
