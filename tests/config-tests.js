@@ -20,7 +20,7 @@ describe('Config schema tests', () => {
         const schema = JSON.parse(fs.readFileSync('./tests/schemas/feature.json'))
         for (const config of configs) {
             for (const featureKey in config.features) {
-                expect(ajv.validate(schema, config.features[featureKey])).to.be.equal(true)
+                expect(ajv.validate(schema, config.features[featureKey])).to.be.equal(true, `Feature ${featureKey} is not valid.`)
             }
         }
     })

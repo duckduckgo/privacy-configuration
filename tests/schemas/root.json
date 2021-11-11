@@ -3,9 +3,12 @@
     "properties": {
         "readme": {"type": "string"},
         "features": {"type": "object"},
+        "version": {"type": "integer"},
         "unprotectedTemporary": {
             "type": "array",
             "items": {"type": "object"}
         }
-    }
+    },
+    "additionalProperties": false,
+    "required": ["readme", "features", "version", "unprotectedTemporary"]
 }

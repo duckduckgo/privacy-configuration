@@ -1,10 +1,11 @@
 {
     "type": "object",
     "properties": {
-        "state": {"type": "string"},
+        "state": {"enum": ["enabled", "disabled", "beta"]},
         "exceptions": {
             "type": "array",
             "items": {"type": "object"}
         }
-    }
+    },
+    "required": ["state", "exceptions"]
 }
