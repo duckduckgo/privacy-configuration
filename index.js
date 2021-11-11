@@ -91,6 +91,7 @@ for (const platform of platforms) {
         if (isFeatureDisabled(platformConfig.features[key])) {
             // If feature isn't enabled for platform remove.
             // delete platformConfig.features[key]
+            platformConfig.features[key].state = 'disabled'
         }
     }
 
@@ -142,6 +143,9 @@ for (const key in legacyNaming) {
         }
 
         newConfig = override.features[key]
+        if (!newConfig.exceptions) {
+            newConfig.exceptions = []
+        }
 
         // TODO: convert camel key to hyphen
         if (fs.existsSync(`${LISTS_DIR}/${key}.json`)) {
