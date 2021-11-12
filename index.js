@@ -91,6 +91,7 @@ for (const platform of platforms) {
         if (isFeatureDisabled(platformConfig.features[key])) {
             // If feature isn't enabled for platform remove.
             // delete platformConfig.features[key]
+            platformConfig.features[key].state = 'disabled'
         }
     }
 
