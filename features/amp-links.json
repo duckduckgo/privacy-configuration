@@ -1,0 +1,31 @@
+{
+    "_meta": {
+        "description": "Rewrite AMP links to safer alternatives.",
+        "sampleExcludeRecords": {
+            "domain": "example.com",
+            "reason": "site breakage"
+        }
+    },
+    "exceptions": [],
+    "settings": {
+        "ampLinkFormats": [
+            "^https?:\\/\\/(?:w{3}\\.)?google\\.\\S{2,}\\/amp\\/s\\/(\\S+)$",
+            "^https?:\\/\\/\\S+ampproject\\.org\\/v\\/s\\/(\\S+)$"
+        ],
+        "ampKeywords": [
+            "=amp",
+            "amp=",
+            "&amp",
+            "amp&",
+            "/amp",
+            "amp/",
+            ".amp",
+            "amp.",
+            "%amp",
+            "amp%",
+            "_amp",
+            "amp_",
+            "?amp"
+        ]
+    }
+}

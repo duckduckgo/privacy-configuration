@@ -137,13 +137,18 @@ const legacyNaming = {
 const protections = {}
 for (const key in legacyNaming) {
     let newConfig
+    const override = JSON.parse(fs.readFileSync(`${OVERRIDE_DIR}/extension-override.json`))
     if (!defaultConfig.features[key] || defaultConfig.features[key].state !== 'enabled') {
-        const override = JSON.parse(fs.readFileSync(`${OVERRIDE_DIR}/extension-override.json`))
         if (!override.features[key]) {
             continue
         }
 
         newConfig = override.features[key]
+        if (!newConfig.exceptions) {
+            // feature may be disabled in default config but enabled in override
+            // add exceptions from default config
+            newConfig.exceptions = defaultConfig.features[key]?.exceptions || []
+        }
 
         // TODO: convert camel key to hyphen
         if (fs.existsSync(`${LISTS_DIR}/${key}.json`)) {
@@ -152,6 +157,7 @@ for (const key in legacyNaming) {
         }
     } else {
         newConfig = defaultConfig.features[key]
+        newConfig.exceptions = newConfig.exceptions.concat(override.features[key]?.exceptions || [])
     }
     const legacyConfig = {
         enabled: newConfig.state === 'enabled',
