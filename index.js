@@ -54,9 +54,11 @@ if (!fs.existsSync(GENERATED_DIR)) {
     fs.mkdirSync(GENERATED_DIR)
 }
 
-function isFeatureDisabled (feature) {
-    return !('state' in feature) || feature.state === 'disabled'
+function isFeatureMissingState (feature) {
+    return !('state' in feature)
 }
+
+const platformConfigs = {}
 
 // Handle platform specific overrides and write configs to disk
 for (const platform of platforms) {
@@ -88,9 +90,7 @@ for (const platform of platforms) {
                 platformConfig.features[key].exceptions = platformConfig.features[key].exceptions.concat(platformOverride.features[key].exceptions)
             }
         }
-        if (isFeatureDisabled(platformConfig.features[key])) {
-            // If feature isn't enabled for platform remove.
-            // delete platformConfig.features[key]
+        if (isFeatureMissingState(platformConfig.features[key])) {
             platformConfig.features[key].state = 'disabled'
         }
     }
@@ -102,9 +102,7 @@ for (const platform of platforms) {
         }
 
         platformConfig.features[key] = { ...platformOverride.features[key] }
-        if (isFeatureDisabled(platformConfig.features[key])) {
-            // If feature isn't enabled for platform remove.
-            // delete platformConfig.features[key]
+        if (isFeatureMissingState(platformConfig.features[key])) {
             platformConfig.features[key].state = 'disabled'
         }
     }
@@ -113,6 +111,8 @@ for (const platform of platforms) {
         addExceptionsToUnprotected(platformOverride.unprotectedTemporary)
         platformConfig.unprotectedTemporary = platformConfig.unprotectedTemporary.concat(platformOverride.unprotectedTemporary)
     }
+
+    platformConfigs[platform] = platformConfig
 
     writeConfigToDisk(platform, platformConfig)
 }
@@ -136,32 +136,10 @@ const legacyNaming = {
 }
 const protections = {}
 for (const key in legacyNaming) {
-    let newConfig
-    const override = JSON.parse(fs.readFileSync(`${OVERRIDE_DIR}/extension-override.json`))
-    if (!defaultConfig.features[key] || defaultConfig.features[key].state !== 'enabled') {
-        if (!override.features[key]) {
-            continue
-        }
-
-        newConfig = override.features[key]
-        if (!newConfig.exceptions) {
-            // feature may be disabled in default config but enabled in override
-            // add exceptions from default config
-            newConfig.exceptions = defaultConfig.features[key]?.exceptions || []
-        }
-
-        // TODO: convert camel key to hyphen
-        if (fs.existsSync(`${LISTS_DIR}/${key}.json`)) {
-            const listData = JSON.parse(fs.readFileSync(`${LISTS_DIR}/${key}.json`))
-            newConfig.exceptions = listData.exceptions
-        }
-    } else {
-        newConfig = defaultConfig.features[key]
-        newConfig.exceptions = newConfig.exceptions.concat(override.features[key]?.exceptions || [])
-    }
+    const feature = platformConfigs.extension.features[key]
     const legacyConfig = {
-        enabled: newConfig.state === 'enabled',
-        sites: newConfig.exceptions.map((obj) => obj.domain),
+        enabled: feature.state === 'enabled',
+        sites: feature.exceptions.map((obj) => obj.domain),
         scripts: []
     }
     protections[legacyNaming[key]] = legacyConfig
