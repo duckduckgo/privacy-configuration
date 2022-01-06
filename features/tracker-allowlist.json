@@ -9,12 +9,38 @@
     "state": "enabled",
     "settings": {
         "allowlistedTrackers": {
+            "doubleclick.net": {
+                "rules": [
+                    {
+                        "rule": "securepubads.g.doubleclick.net/tag/js/gpt.js",
+                        "domains": ["wunderground.com"],
+                        "reason": "videos not loading"
+                    },
+                    {
+                        "rule": "securepubads.g.doubleclick.net/gpt/pubads_impl_",
+                        "domains": ["wunderground.com"],
+                        "reason": "videos not loading"
+                    }
+                ]
+            },
             "dynamicyield.com": {
                 "rules": [
                     {
                         "rule": "cdn-eu.dynamicyield.com/9878090/api_static.js",
                         "domains": ["decathlon.co.uk"],
                         "reason": "checkout broken"
+                    }
+                ]
+            },
+            "twitter.com": {
+                "rules": [
+                    {
+                        "rule": "platform.twitter.com/embed/embed.modules",
+                        "domains": [
+                            "notthebee.com",
+                            "upworthy.com"
+                        ],
+                        "reason": "content not rendering"
                     }
                 ]
             }
