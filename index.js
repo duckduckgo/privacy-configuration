@@ -130,7 +130,7 @@ const legacyNaming = {
     fingerprintingBattery: 'battery',
     fingerprintingScreenSize: 'screen-size',
     fingerprintingHardware: 'hardware',
-    floc: 'floc',
+    browsingTopics: 'floc',
     gpc: 'gpc',
     autofill: 'autofill'
 }
