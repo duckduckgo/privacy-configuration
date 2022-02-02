@@ -18,7 +18,7 @@ jobs:
     - name: Extract branch name (PR Only)
       shell: bash
       run: echo "##[set-output name=branch;]$(echo ${GITHUB_HEAD_REF#refs/heads/})"
-      id: extract_branch
+      id: extract_branch_pr
     - uses: actions/checkout@v2
     - name: Install dependencies
       run: npm install
@@ -39,5 +39,5 @@ jobs:
       if: github.event.action == 'opened'
       with:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
-        message: 'Your PR is being temporarily hosted at https://staticcdn.duckduckgo.com/trackerblocking/config/staging/${{ steps.extract_branch.outputs.branch }} until this branch is deleted.'
+        message: 'Your PR is being temporarily hosted at https://staticcdn.duckduckgo.com/trackerblocking/config/staging/${{ steps.extract_branch_pr.outputs.branch }} until this branch is deleted.'
 
