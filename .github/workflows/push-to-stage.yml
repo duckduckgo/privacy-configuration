@@ -12,7 +12,12 @@ jobs:
     steps:
     - name: Extract branch name
       shell: bash
-      run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF_NAME#refs/heads/})"
+      run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+      id: extract_branch
+    # Github uses different branch var names for push vs PR event types
+    - name: Extract branch name (PR Only)
+      shell: bash
+      run: echo "##[set-output name=branch;]$(echo ${GITHUB_HEAD_REF#refs/heads/})"
       id: extract_branch
     - uses: actions/checkout@v2
     - name: Install dependencies
@@ -21,6 +26,7 @@ jobs:
     - name: Run tests
       run: npm run test
     - uses: jakejarvis/s3-sync-action@master
+      if: github.event_name == 'push'
       with:
         args: --acl public-read --follow-symlinks
       env:
