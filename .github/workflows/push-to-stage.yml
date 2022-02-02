@@ -1,6 +1,10 @@
 name: Push to Staging
 
-on: [push, pull_request]
+on: 
+  push:
+  pull_request:
+    types:
+      - opened
 
 jobs:
   publish:
@@ -25,3 +29,9 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         SOURCE_DIR: 'generated' 
         DEST_DIR: 'trackerblocking/config/staging/${{ steps.extract_branch.outputs.branch }}'
+    - uses: github-actions-up-and-running/pr-comment@v1.0.0
+      if: github.event.action == 'opened'
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        message: "Your PR is being temporarily hosted at https://staticcdn.duckduckgo.com/trackerblocking/config/staging/${{ steps.extract_branch.outputs.branch }} until this branch is deleted."
+
