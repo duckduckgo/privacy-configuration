@@ -16,6 +16,7 @@ jobs:
       id: extract_branch
     # Github uses different branch var names for push vs PR event types
     - name: Extract branch name (PR Only)
+      if: github.event_name == 'push'
       shell: bash
       run: echo "##[set-output name=branch;]$(echo ${GITHUB_HEAD_REF#refs/heads/})"
       id: extract_branch_pr
