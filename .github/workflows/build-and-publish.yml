@@ -15,7 +15,7 @@ jobs:
     - uses: ./
     - name: Run tests
       run: npm run test
-    - uses: jakejarvis/s3-sync-action@master
+    - uses: jakejarvis/s3-sync-action@7ed8b112447abb09f1da74f3466e4194fc7a6311
       with:
         args: --acl public-read --follow-symlinks
       env:
@@ -26,7 +26,7 @@ jobs:
         DEST_DIR: 'trackerblocking/config/v1'
     - name: Set version variable
       run: echo "VERSION=$(jq -r .version ./generated/extension-config.json)" >> $GITHUB_ENV
-    - uses: 'marvinpinto/action-automatic-releases@latest'
+    - uses: marvinpinto/action-automatic-releases@919008cf3f741b179569b7a6fb4d8860689ab7f0
       with:
         repo_token: '${{ secrets.GITHUB_TOKEN }}'
         prerelease: false

@@ -15,11 +15,11 @@ jobs:
       run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
       id: extract_branch
     - name: Remove from s3
-      uses: vitorsgomes/s3-rm-action@master
+      uses: vitorsgomes/s3-rm-action@88c92c6bf3f0768c8462ee057f8c7ae8a7a8b70e
       with:
         args: --recursive
       env:
         AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        PATH_TO_DELETE: 'trackerblocking/config/staging/${{ steps.extract_branch.outputs.branch }}'
+        PATH_TO_DELETE: 'trackerblocking/config/staging/${{ steps.extract_branch.outputs.branch }}/'
