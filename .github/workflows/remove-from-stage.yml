@@ -1,10 +1,9 @@
 name: Remove from Staging
 
 on: 
-  delete:
-    branches:
-      - '*'
-      - '!main'
+  pull_request:
+    types:
+      - 'closed'
 
 jobs:
   remove:
@@ -12,7 +11,7 @@ jobs:
     steps:
     - name: Extract branch name
       shell: bash
-      run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+      run: echo "##[set-output name=branch;]$(echo ${GITHUB_HEAD_REF#refs/heads/})"
       id: extract_branch
     - name: Remove from s3
       uses: vitorsgomes/s3-rm-action@88c92c6bf3f0768c8462ee057f8c7ae8a7a8b70e
