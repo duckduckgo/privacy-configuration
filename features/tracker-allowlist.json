@@ -9,6 +9,17 @@
     "state": "enabled",
     "settings": {
         "allowlistedTrackers": {
+            "cloudflare.com": {
+                "rules": [
+                    {
+                        "rule": "cdnjs.cloudflare.com/ajax/libs/fingerprintjs2/1.8.6/fingerprint2.min.js",
+                        "domains": [
+                            "winnipegfreepress.com"
+                        ],
+                        "reason": "content not loading"
+                    }
+                ]
+            },
             "doubleclick.net": {
                 "rules": [
                     {
@@ -103,6 +114,13 @@
                             "upworthy.com"
                         ],
                         "reason": "content not rendering"
+                    },
+                    {
+                        "rule": "platform.twitter.com/widgets/tweet_button",
+                        "domains": [
+                            "winnipegfreepress.com"
+                        ],
+                        "reason": "missing tweet button"
                     }
                 ]
             }
