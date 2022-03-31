@@ -12,10 +12,17 @@ function formatErrors (errors) {
     return errors.map(item => `${item.instancePath}: ${item.message}`).join(', ')
 }
 
-const configs = platforms.map((plat) => {
+const v2configs = platforms.map((plat) => {
     return {
         name: `${plat}-config.json`,
-        body: JSON.parse(fs.readFileSync(`./generated/${plat}-config.json`))
+        body: JSON.parse(fs.readFileSync(`./generated/v2/${plat}-config.json`))
+    }
+})
+
+const v1configs = platforms.map((plat) => {
+    return {
+        name: `${plat}-config.json`,
+        body: JSON.parse(fs.readFileSync(`./generated/v1/${plat}-config.json`))
     }
 })
 
@@ -27,7 +34,7 @@ describe('Config schema tests', () => {
     const exceptionSchema = JSON.parse(fs.readFileSync('./tests/schemas/exception.json'))
     const validateException = ajv.compile(exceptionSchema)
 
-    for (const config of configs) {
+    for (const config of v2configs.concat(v1configs)) {
         describe(`${config.name}`, () => {
             it('should have a valid root schema', () => {
                 expect(validateRoot(config.body)).to.be.equal(true, formatErrors(validateRoot.errors))
