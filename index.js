@@ -18,8 +18,25 @@ const platforms = require('./platforms')
  * @param {string} platform - platform to write
  * @param {object} config - the object to write
  */
-function writeConfigToDisk (platform, config) {
-    fs.writeFileSync(`${GENERATED_DIR}/${platform}-config.json`, JSON.stringify(config, null, 4))
+function writeConfigToDisk (platform, config, v1Config) {
+    fs.writeFileSync(`${GENERATED_DIR}/v2/${platform}-config.json`, JSON.stringify(config, null, 4))
+    fs.writeFileSync(`${GENERATED_DIR}/v1/${platform}-config.json`, JSON.stringify(v1Config, null, 4))
+}
+
+function generateV1Config (platformConfig) {
+    const v1Config = JSON.parse(JSON.stringify(platformConfig))
+
+    // Disable features with a minSupported version.
+    // This key is not supported in v1 and any features with this key
+    // will need to be disabled.
+    for (const feature of Object.keys(v1Config.features)) {
+        if (v1Config.features[feature].minSupportedVersion) {
+            delete v1Config.features[feature].minSupportedVersion
+            v1Config.features[feature].state = 'disabled'
+        }
+    }
+
+    return v1Config
 }
 
 const unprotectedListName = 'unprotected-temporary.json'
@@ -52,6 +69,10 @@ addExceptionsToUnprotected(defaultConfig.features.contentBlocking.exceptions)
 
 if (!fs.existsSync(GENERATED_DIR)) {
     fs.mkdirSync(GENERATED_DIR)
+
+    // Create version directories
+    fs.mkdirSync(`${GENERATED_DIR}/v1`)
+    fs.mkdirSync(`${GENERATED_DIR}/v2`)
 }
 
 function isFeatureMissingState (feature) {
@@ -114,7 +135,9 @@ for (const platform of platforms) {
 
     platformConfigs[platform] = platformConfig
 
-    writeConfigToDisk(platform, platformConfig)
+    const v1PlatformConfig = generateV1Config(platformConfig)
+
+    writeConfigToDisk(platform, platformConfig, v1PlatformConfig)
 }
 
 // Generate legacy formats
