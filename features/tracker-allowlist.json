@@ -9,11 +9,74 @@
     "state": "enabled",
     "settings": {
         "allowlistedTrackers": {
+            "adthrive.com": {
+                "rules": [
+                    {
+                        "rule": "ads.adthrive.com/builds/core/",
+                        "domains": [
+                            "mediaite.com"
+                        ],
+                        "reason": "video not loading"
+                    },
+                    {
+                        "rule": "ads.adthrive.com/sites/",
+                        "domains": [
+                            "mediaite.com"
+                        ],
+                        "reason": "video not loading"
+                    }
+                ]
+            },
+            "amazon-adsystem.com": {
+                "rules": [
+                    {
+                        "rule": "c.amazon-adsystem.com/aax2/apstag.js",
+                        "domains": [
+                            "seattletimes.com"
+                        ],
+                        "reason": "adwall"
+                    }
+                ]
+            },
+            "chipotle.com": {
+                "rules": [
+                    {
+                        "rule": "services.chipotle.com/new_cmg_utils1.js",
+                        "domains": [
+                            "chipotle.com"
+                        ],
+                        "reason": "login issues"
+                    }
+                ]
+            },
+            "cloudflare.com": {
+                "rules": [
+                    {
+                        "rule": "cdnjs.cloudflare.com/ajax/libs/fingerprintjs2/1.8.6/fingerprint2.min.js",
+                        "domains": [
+                            "winnipegfreepress.com"
+                        ],
+                        "reason": "content not loading"
+                    }
+                ]
+            },
+            "cxense.com": {
+                "rules": [
+                    {
+                        "rule": "api.cxense.com/public/widget/data",
+                        "domains": [
+                            "wsj.com"
+                        ],
+                        "reason": "content not loading"
+                    }
+                ]
+            },
             "doubleclick.net": {
                 "rules": [
                     {
                         "rule": "securepubads.g.doubleclick.net/tag/js/gpt.js",
                         "domains": [
+                            "mediaite.com",
                             "wunderground.com",
                             "youmath.it"
                         ],
@@ -23,6 +86,13 @@
                         "rule": "securepubads.g.doubleclick.net/gpt/pubads_impl_",
                         "domains": ["wunderground.com"],
                         "reason": "videos not loading"
+                    },
+                    {
+                        "rule": "www3.doubleclick.net",
+                        "domains": [
+                            "thingiverse.com"
+                        ],
+                        "reason": "adwall"
                     }
                 ]
             },
@@ -61,17 +131,103 @@
                             "youmath.it"
                         ],
                         "reason": "adwall"
+                    },
+                    {
+                        "rule": "tpc.googlesyndication.com/pagead/js/loader21.html",
+                        "domains": [
+                            "rumble.com"
+                        ],
+                        "reason": "adwall (video blocked)"
                     }
                 ]
             },
             "googletagmanager.com": {
                 "rules": [
                     {
+                        "rule": "googletagmanager.com/gtag/js",
+                        "domains": [
+                            "ikea.com"
+                        ],
+                        "reason": "content not loading"
+                    },
+                    {
                         "rule": "googletagmanager.com/gtm.js",
                         "domains": [
+                            "iltalehti.fi",
                             "rbcroyalbank.com"
                         ],
-                        "reason": "page not loading"
+                        "reason": "page not loading, video not loading"
+                    }
+                ]
+            },
+            "iesnare.com": {
+                "rules": [
+                    {
+                        "rule": "mpsnare.iesnare.com/snare.js",
+                        "domains": [
+                            "rei.com"
+                        ],
+                        "reason": "adwall"
+                    }
+                ]
+            },
+            "instagram.com": {
+                "rules": [
+                    {
+                        "rule": "platform.instagram.com/en_US/embeds.js",
+                        "domains": [
+                            "livejournal.com"
+                        ],
+                        "reason": "embeds"
+                    },
+                    {
+                        "rule": "www.instagram.com/embed.js",
+                        "domains": [
+                            "livejournal.com"
+                        ],
+                        "reason": "embeds"
+                    }
+                ]
+            },
+            "klarnaservices.com": {
+                "rules": [
+                    {
+                        "rule": "na-library.klarnaservices.com/lib.js",
+                        "domains": [
+                            "brooksrunning.com",
+                            "joann.com"
+                        ],
+                        "reason": "site not loading"
+                    }
+                ]
+            },
+            "opta.net": {
+                "rules": [
+                    {
+                        "rule": "secure.widget.cloud.opta.net/v3/v3.opta-widgets.js",
+                        "domains": [
+                            "abc.net.au",
+                            "emol.com"
+                        ],
+                        "reason": "widget blocked"
+                    }
+                ]
+            },
+            "shopeemobile.com": {
+                "rules": [
+                    {
+                        "rule": "deo.shopeemobile.com/shopee/shopee-pcmall-live-sg//assets/",
+                        "domains": [
+                            "shopee.co.id",
+                            "shopee.co.th",
+                            "shopee.com.br",
+                            "shopee.com.my",
+                            "shopee.ph",
+                            "shopee.sg",
+                            "shopee.tw",
+                            "shopee.vn"
+                        ],
+                        "reason": "content not loading"
                     }
                 ]
             },
@@ -82,6 +238,13 @@
                         "domains": [
                             "bravotv.com",
                             "oxygen.com"
+                        ],
+                        "reason": "video not loading"
+                    },
+                    {
+                        "rule": "pdk.theplatform.com/pdk6/current/pdk/player.js",
+                        "domains": [
+                            "eonline.com"
                         ],
                         "reason": "video not loading"
                     }
@@ -96,6 +259,24 @@
                             "upworthy.com"
                         ],
                         "reason": "content not rendering"
+                    },
+                    {
+                        "rule": "platform.twitter.com/widgets/tweet_button",
+                        "domains": [
+                            "winnipegfreepress.com"
+                        ],
+                        "reason": "missing tweet button"
+                    }
+                ]
+            },
+            "yandex.ru": {
+                "rules": [
+                    {
+                        "rule": "yandex.ru",
+                        "domains": [
+                            "tvrain.ru"
+                        ],
+                        "reason": "adwall"
                     }
                 ]
             }
