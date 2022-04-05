@@ -9,6 +9,17 @@
     "state": "enabled",
     "settings": {
         "allowlistedTrackers": {
+            "acdn.no": {
+                "rules": [
+                    {
+                        "rule": "assets.acdn.no/pkg/@amedia/browserid/",
+                        "domains": [
+                            "<all>"
+                        ],
+                        "reason": "site not loading"
+                    }
+                ]
+            },
             "adthrive.com": {
                 "rules": [
                     {
@@ -55,6 +66,17 @@
                         "rule": "cdnjs.cloudflare.com/ajax/libs/fingerprintjs2/1.8.6/fingerprint2.min.js",
                         "domains": [
                             "winnipegfreepress.com"
+                        ],
+                        "reason": "content not loading"
+                    }
+                ]
+            },
+            "cxense.com": {
+                "rules": [
+                    {
+                        "rule": "api.cxense.com/public/widget/data",
+                        "domains": [
+                            "wsj.com"
                         ],
                         "reason": "content not loading"
                     }
@@ -142,9 +164,10 @@
                     {
                         "rule": "googletagmanager.com/gtm.js",
                         "domains": [
+                            "iltalehti.fi",
                             "rbcroyalbank.com"
                         ],
-                        "reason": "page not loading"
+                        "reason": "page not loading, video not loading"
                     }
                 ]
             },
@@ -189,6 +212,17 @@
                     }
                 ]
             },
+            "mailgun.com": {
+                "rules": [
+                    {
+                        "rule": "hello.learn.mailgun.com/l/830283/2022-01-03/2q6vq5",
+                        "domains": [
+                            "mailjet.com"
+                        ],
+                        "reason": "content missing"
+                    }
+                ]
+            },
             "opta.net": {
                 "rules": [
                     {
@@ -204,7 +238,7 @@
             "shopeemobile.com": {
                 "rules": [
                     {
-                        "rule": "deo.shopeemobile.com/shopee/shopee-pcmall-live-sg//assets/2581.e008c4d7fc4804de8ba6.js",
+                        "rule": "deo.shopeemobile.com/shopee/shopee-pcmall-live-sg//assets/",
                         "domains": [
                             "shopee.co.id",
                             "shopee.co.th",
@@ -254,6 +288,17 @@
                             "winnipegfreepress.com"
                         ],
                         "reason": "missing tweet button"
+                    }
+                ]
+            },
+            "wellsfargo.com": {
+                "rules": [
+                    {
+                        "rule": "connect.secure.wellsfargo.com/auth/static/prefs/login-userprefs.min.js",
+                        "domains": [
+                            "wellsfargo.com"
+                        ],
+                        "reason": "broken login"
                     }
                 ]
             },
