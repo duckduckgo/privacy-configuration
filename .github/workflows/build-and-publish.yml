@@ -25,7 +25,7 @@ jobs:
         SOURCE_DIR: 'generated' 
         DEST_DIR: 'trackerblocking/config'
     - name: Set version variable
-      run: echo "VERSION=$(jq -r .version ./generated/extension-config.json)" >> $GITHUB_ENV
+      run: echo "VERSION=$(jq -r .version ./generated/v2/extension-config.json)" >> $GITHUB_ENV
     - uses: marvinpinto/action-automatic-releases@919008cf3f741b179569b7a6fb4d8860689ab7f0
       with:
         repo_token: '${{ secrets.GITHUB_TOKEN }}'
