@@ -1,8 +1,9 @@
 const fs = require('fs')
-
-const OVERRIDE_DIR = 'overrides'
-const GENERATED_DIR = 'generated'
-const LISTS_DIR = 'features'
+const utils = require('./lib/utils')
+const constants = require('./lib/constants')
+const platforms = require('./lib/platforms')
+const v1generator = require('./lib/legacy-gen/v1generator')
+const legacyFilesGenerator = require('./lib/legacy-gen/legacy-files-generator')
 
 const defaultConfig = {
     readme: 'https://github.com/duckduckgo/privacy-configuration',
@@ -10,93 +11,43 @@ const defaultConfig = {
     features: {}
 }
 
-const platforms = require('./platforms')
-
-/**
- * Write a config file to disk
- *
- * @param {string} platform - platform to write
- * @param {object} config - the object to write
- */
-function writeConfigToDisk (platform, config, v1Config) {
-    fs.writeFileSync(`${GENERATED_DIR}/v2/${platform}-config.json`, JSON.stringify(config, null, 4))
-    fs.writeFileSync(`${GENERATED_DIR}/v1/${platform}-config.json`, JSON.stringify(v1Config, null, 4))
-}
-
-/**
- * Create the specified directory if it doesn't exist
- *
- * @param {string} dir - directory path to create
- */
-function mkdirIfNeeded (dir) {
-    if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir)
-    }
-}
-
-function generateV1Config (platformConfig) {
-    const v1Config = JSON.parse(JSON.stringify(platformConfig))
-
-    // Disable features with a minSupported version.
-    // This key is not supported in v1 and any features with this key
-    // will need to be disabled.
-    for (const feature of Object.keys(v1Config.features)) {
-        if (v1Config.features[feature].minSupportedVersion) {
-            delete v1Config.features[feature].minSupportedVersion
-            v1Config.features[feature].state = 'disabled'
-        }
-    }
-
-    return v1Config
-}
-
 const unprotectedListName = 'unprotected-temporary.json'
 
 // Grab all exception lists
-const jsonListNames = fs.readdirSync(LISTS_DIR).filter(listName => {
+const jsonListNames = fs.readdirSync(constants.LISTS_DIR).filter(listName => {
     return listName !== unprotectedListName && listName !== '_template.json'
 })
 for (const jsonList of jsonListNames) {
-    const listData = JSON.parse(fs.readFileSync(`${LISTS_DIR}/${jsonList}`))
+    const listData = JSON.parse(fs.readFileSync(`${constants.LISTS_DIR}/${jsonList}`))
     const configKey = jsonList.replace(/[.]json$/, '').replace(/-([a-z0-9])/g, function (g) { return g[1].toUpperCase() })
 
     delete listData._meta
     defaultConfig.features[configKey] = listData
 }
 
-const unprotectedDomains = new Set()
-function addExceptionsToUnprotected (exceptions) {
-    for (const exception of exceptions) {
-        unprotectedDomains.add(exception.domain)
-    }
-    return exceptions.map((obj) => obj.domain)
-}
-
-const listData = JSON.parse(fs.readFileSync(`${LISTS_DIR}/${unprotectedListName}`))
+// Setup initial unprotected list
+const listData = JSON.parse(fs.readFileSync(`${constants.LISTS_DIR}/${unprotectedListName}`))
 defaultConfig.unprotectedTemporary = listData.exceptions
 
-addExceptionsToUnprotected(defaultConfig.unprotectedTemporary)
-addExceptionsToUnprotected(defaultConfig.features.contentBlocking.exceptions)
+// Add initial exceptions to legacy files
+legacyFilesGenerator.addExceptionsToUnprotected(defaultConfig.unprotectedTemporary)
+legacyFilesGenerator.addExceptionsToUnprotected(defaultConfig.features.contentBlocking.exceptions)
 
 // Create generated directory
-mkdirIfNeeded(GENERATED_DIR)
+utils.mkdirIfNeeded(constants.GENERATED_DIR)
 // Create version directories
-mkdirIfNeeded(`${GENERATED_DIR}/v1`)
-mkdirIfNeeded(`${GENERATED_DIR}/v2`)
-
-function isFeatureMissingState (feature) {
-    return !('state' in feature)
-}
+utils.mkdirIfNeeded(`${constants.GENERATED_DIR}/v1`)
+utils.mkdirIfNeeded(`${constants.GENERATED_DIR}/v2`)
 
 const platformConfigs = {}
 
 // Handle platform specific overrides and write configs to disk
 for (const platform of platforms) {
     const platformConfig = JSON.parse(JSON.stringify(defaultConfig))
-    const overridePath = `${OVERRIDE_DIR}/${platform}-override.json`
+    const overridePath = `${constants.OVERRIDE_DIR}/${platform}-override.json`
 
     if (!fs.existsSync(overridePath)) {
-        writeConfigToDisk(platform, platformConfig)
+        utils.writeConfigToDisk(platform, platformConfig)
         continue
     }
 
@@ -115,12 +66,13 @@ for (const platform of platforms) {
 
             if (platformOverride.features[key].exceptions) {
                 if (key === 'contentBlocking') {
-                    addExceptionsToUnprotected(platformOverride.features[key].exceptions)
+                    legacyFilesGenerator.addExceptionsToUnprotected(platformOverride.features[key].exceptions)
                 }
                 platformConfig.features[key].exceptions = platformConfig.features[key].exceptions.concat(platformOverride.features[key].exceptions)
             }
         }
-        if (isFeatureMissingState(platformConfig.features[key])) {
+
+        if (utils.isFeatureMissingState(platformConfig.features[key])) {
             platformConfig.features[key].state = 'disabled'
         }
     }
@@ -132,49 +84,24 @@ for (const platform of platforms) {
         }
 
         platformConfig.features[key] = { ...platformOverride.features[key] }
-        if (isFeatureMissingState(platformConfig.features[key])) {
+        if (utils.isFeatureMissingState(platformConfig.features[key])) {
             platformConfig.features[key].state = 'disabled'
         }
     }
 
+    // Add platform specific exceptions to legacy unprotected list
     if (platformOverride.unprotectedTemporary) {
-        addExceptionsToUnprotected(platformOverride.unprotectedTemporary)
+        legacyFilesGenerator.addExceptionsToUnprotected(platformOverride.unprotectedTemporary)
         platformConfig.unprotectedTemporary = platformConfig.unprotectedTemporary.concat(platformOverride.unprotectedTemporary)
     }
 
     platformConfigs[platform] = platformConfig
 
-    const v1PlatformConfig = generateV1Config(platformConfig)
+    // Generate legacy v1 config
+    const v1PlatformConfig = v1generator.generateV1Config(platformConfig)
 
-    writeConfigToDisk(platform, platformConfig, v1PlatformConfig)
+    utils.writeConfigToDisk(platform, platformConfig, v1PlatformConfig)
 }
 
-// Generate legacy formats
-const legacyTextDomains = [...unprotectedDomains].join('\n')
-fs.writeFileSync(`${GENERATED_DIR}/trackers-unprotected-temporary.txt`, legacyTextDomains)
-fs.writeFileSync(`${GENERATED_DIR}/trackers-whitelist-temporary.txt`, legacyTextDomains)
-const legacyNaming = {
-    fingerprintingCanvas: 'canvas',
-    trackingCookies3p: 'cookie',
-    fingerprintingAudio: 'audio',
-    fingerprintingTemporaryStorage: 'temporary-storage',
-    referrer: 'referrer',
-    fingerprintingBattery: 'battery',
-    fingerprintingScreenSize: 'screen-size',
-    fingerprintingHardware: 'hardware',
-    floc: 'floc',
-    gpc: 'gpc',
-    autofill: 'autofill'
-}
-const protections = {}
-for (const key in legacyNaming) {
-    const feature = platformConfigs.extension.features[key]
-    const legacyConfig = {
-        enabled: feature.state === 'enabled',
-        sites: feature.exceptions.map((obj) => obj.domain),
-        scripts: []
-    }
-    protections[legacyNaming[key]] = legacyConfig
-}
-fs.writeFileSync(`${GENERATED_DIR}/protections.json`, JSON.stringify(protections, null, 4))
-fs.writeFileSync(`${GENERATED_DIR}/fingerprinting.json`, JSON.stringify(protections, null, 4))
+// Generate legacy file formats
+legacyFilesGenerator.generateLegacyFiles(platformConfigs)

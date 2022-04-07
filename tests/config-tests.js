@@ -2,7 +2,7 @@ const expect = require('chai').expect
 const Ajv = require('ajv').default
 const ajv = new Ajv()
 const fs = require('fs')
-const platforms = require('./../platforms')
+const platforms = require('./../lib/platforms')
 
 function formatErrors (errors) {
     if (!Array.isArray(errors)) {
