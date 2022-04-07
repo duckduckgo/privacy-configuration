@@ -24,7 +24,7 @@ function writeConfigToDisk (platform, config, v1Config) {
 }
 
 /**
- * Create the specified directory if it doesn't exist 
+ * Create the specified directory if it doesn't exist
  *
  * @param {string} dir - directory path to create
  */
