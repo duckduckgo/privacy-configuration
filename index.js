@@ -23,6 +23,17 @@ function writeConfigToDisk (platform, config, v1Config) {
     fs.writeFileSync(`${GENERATED_DIR}/v1/${platform}-config.json`, JSON.stringify(v1Config, null, 4))
 }
 
+/**
+ * Create the specified directory if it doesn't exist 
+ *
+ * @param {string} dir - directory path to create
+ */
+function mkdirIfNeeded (dir) {
+    if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir)
+    }
+}
+
 function generateV1Config (platformConfig) {
     const v1Config = JSON.parse(JSON.stringify(platformConfig))
 
@@ -67,13 +78,11 @@ defaultConfig.unprotectedTemporary = listData.exceptions
 addExceptionsToUnprotected(defaultConfig.unprotectedTemporary)
 addExceptionsToUnprotected(defaultConfig.features.contentBlocking.exceptions)
 
-if (!fs.existsSync(GENERATED_DIR)) {
-    fs.mkdirSync(GENERATED_DIR)
-
-    // Create version directories
-    fs.mkdirSync(`${GENERATED_DIR}/v1`)
-    fs.mkdirSync(`${GENERATED_DIR}/v2`)
-}
+// Create generated directory
+mkdirIfNeeded(GENERATED_DIR)
+// Create version directories
+mkdirIfNeeded(`${GENERATED_DIR}/v1`)
+mkdirIfNeeded(`${GENERATED_DIR}/v2`)
 
 function isFeatureMissingState (feature) {
     return !('state' in feature)
