@@ -1,8 +1,8 @@
-const expect = require('chai').expect
-const Ajv = require('ajv').default
+import { expect } from 'chai'
+import Ajv from 'ajv'
+import fs from 'fs'
+import platforms from './../lib/platforms.js'
 const ajv = new Ajv()
-const fs = require('fs')
-const platforms = require('./../lib/platforms')
 
 function formatErrors (errors) {
     if (!Array.isArray(errors)) {
