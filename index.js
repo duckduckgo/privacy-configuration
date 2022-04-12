@@ -1,9 +1,8 @@
-const fs = require('fs')
-const utils = require('./lib/utils')
-const constants = require('./lib/constants')
-const platforms = require('./lib/platforms')
-const v1generator = require('./lib/legacy-gen/v1generator')
-const legacyFilesGenerator = require('./lib/legacy-gen/legacy-files-generator')
+import fs from 'fs'
+import { writeConfigToDisk, mkdirIfNeeded, isFeatureMissingState } from './lib/utils.js'
+import constants from './lib/constants.js'
+import platforms from './lib/platforms.js'
+import * as legacyFilesGenerator from './lib/v0-files-generator.js'
 
 const defaultConfig = {
     readme: 'https://github.com/duckduckgo/privacy-configuration',
@@ -34,10 +33,10 @@ legacyFilesGenerator.addExceptionsToUnprotected(defaultConfig.unprotectedTempora
 legacyFilesGenerator.addExceptionsToUnprotected(defaultConfig.features.contentBlocking.exceptions)
 
 // Create generated directory
-utils.mkdirIfNeeded(constants.GENERATED_DIR)
+mkdirIfNeeded(constants.GENERATED_DIR)
 // Create version directories
-utils.mkdirIfNeeded(`${constants.GENERATED_DIR}/v1`)
-utils.mkdirIfNeeded(`${constants.GENERATED_DIR}/v2`)
+mkdirIfNeeded(`${constants.GENERATED_DIR}/v1`)
+mkdirIfNeeded(`${constants.GENERATED_DIR}/v2`)
 
 const platformConfigs = {}
 
@@ -45,11 +44,6 @@ const platformConfigs = {}
 for (const platform of platforms) {
     const platformConfig = JSON.parse(JSON.stringify(defaultConfig))
     const overridePath = `${constants.OVERRIDE_DIR}/${platform}-override.json`
-
-    if (!fs.existsSync(overridePath)) {
-        utils.writeConfigToDisk(platform, platformConfig)
-        continue
-    }
 
     // Handle feature overrides
     const platformOverride = JSON.parse(fs.readFileSync(overridePath))
@@ -72,7 +66,7 @@ for (const platform of platforms) {
             }
         }
 
-        if (utils.isFeatureMissingState(platformConfig.features[key])) {
+        if (isFeatureMissingState(platformConfig.features[key])) {
             platformConfig.features[key].state = 'disabled'
         }
     }
@@ -84,7 +78,7 @@ for (const platform of platforms) {
         }
 
         platformConfig.features[key] = { ...platformOverride.features[key] }
-        if (utils.isFeatureMissingState(platformConfig.features[key])) {
+        if (isFeatureMissingState(platformConfig.features[key])) {
             platformConfig.features[key].state = 'disabled'
         }
     }
@@ -97,10 +91,7 @@ for (const platform of platforms) {
 
     platformConfigs[platform] = platformConfig
 
-    // Generate legacy v1 config
-    const v1PlatformConfig = v1generator.generateV1Config(platformConfig)
-
-    utils.writeConfigToDisk(platform, platformConfig, v1PlatformConfig)
+    writeConfigToDisk(platform, platformConfig)
 }
 
 // Generate legacy file formats
