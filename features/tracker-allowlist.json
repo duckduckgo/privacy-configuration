@@ -9,6 +9,39 @@
     "state": "enabled",
     "settings": {
         "allowlistedTrackers": {
+            "acdn.no": {
+                "rules": [
+                    {
+                        "rule": "assets.acdn.no/pkg/@amedia/browserid/",
+                        "domains": [
+                            "<all>"
+                        ],
+                        "reason": "site not loading"
+                    }
+                ]
+            },
+            "adnxs.com": {
+                "rules": [
+                    {
+                        "rule": "ib.adnxs.com/ut/v3",
+                        "domains": [
+                            "bild.de"
+                        ],
+                        "reason": "content alignment"
+                    }
+                ]
+            },
+            "adsafeprotected.com": {
+                "rules": [
+                    {
+                        "rule": "static.adsafeprotected.com/vans-adapter-google-ima.js",
+                        "domains": [
+                            "nhl.com"
+                        ],
+                        "reason": "video not loading"
+                    }
+                ]
+            },
             "adthrive.com": {
                 "rules": [
                     {
@@ -32,6 +65,7 @@
                     {
                         "rule": "c.amazon-adsystem.com/aax2/apstag.js",
                         "domains": [
+                            "eurogamer.net",
                             "seattletimes.com"
                         ],
                         "reason": "adwall"
@@ -71,21 +105,50 @@
                     }
                 ]
             },
+            "datadoghq-browser-agent.com": {
+                "rules": [
+                    {
+                        "rule": "www.datadoghq-browser-agent.com/datadog-logs-v3.js",
+                        "domains": [
+                            "bbcgoodfood.com"
+                        ],
+                        "reason": "site not loading"
+                    }
+                ]
+            },
             "doubleclick.net": {
                 "rules": [
                     {
+                        "rule": "securepubads.g.doubleclick.net/gampad/ads",
+                        "domains": [
+                            "ah.nl"
+                        ],
+                        "reason": "internal ads blocked"
+                    },
+                    {
+                        "rule": "pubads.g.doubleclick.net/gampad/ads",
+                        "domains": [
+                            "nhl.com"
+                        ],
+                        "reason": "videos not loading"
+                    },
+                    {
                         "rule": "securepubads.g.doubleclick.net/tag/js/gpt.js",
                         "domains": [
+                            "ah.nl",
                             "mediaite.com",
                             "wunderground.com",
                             "youmath.it"
                         ],
-                        "reason": "videos not loading, adwall"
+                        "reason": "videos not loading, adwall, internal ads blocked"
                     },
                     {
                         "rule": "securepubads.g.doubleclick.net/gpt/pubads_impl_",
-                        "domains": ["wunderground.com"],
-                        "reason": "videos not loading"
+                        "domains": [
+                            "ah.nl",
+                            "wunderground.com"
+                        ],
+                        "reason": "videos not loading, internal ads blocked"
                     },
                     {
                         "rule": "www3.doubleclick.net",
@@ -153,10 +216,11 @@
                     {
                         "rule": "googletagmanager.com/gtm.js",
                         "domains": [
+                            "ah.nl",
                             "iltalehti.fi",
                             "rbcroyalbank.com"
                         ],
-                        "reason": "page not loading, video not loading"
+                        "reason": "page not loading, video not loading, internal ads blocked"
                     }
                 ]
             },
@@ -183,6 +247,7 @@
                     {
                         "rule": "www.instagram.com/embed.js",
                         "domains": [
+                            "buzzfeed.com",
                             "livejournal.com"
                         ],
                         "reason": "embeds"
@@ -198,6 +263,17 @@
                             "joann.com"
                         ],
                         "reason": "site not loading"
+                    }
+                ]
+            },
+            "mailgun.com": {
+                "rules": [
+                    {
+                        "rule": "hello.learn.mailgun.com/l/830283/2022-01-03/2q6vq5",
+                        "domains": [
+                            "mailjet.com"
+                        ],
+                        "reason": "content missing"
                     }
                 ]
             },
@@ -266,6 +342,17 @@
                             "winnipegfreepress.com"
                         ],
                         "reason": "missing tweet button"
+                    }
+                ]
+            },
+            "wellsfargo.com": {
+                "rules": [
+                    {
+                        "rule": "connect.secure.wellsfargo.com/auth/static/prefs/login-userprefs.min.js",
+                        "domains": [
+                            "wellsfargo.com"
+                        ],
+                        "reason": "broken login"
                     }
                 ]
             },
