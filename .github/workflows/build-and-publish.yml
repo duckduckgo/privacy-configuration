@@ -26,10 +26,16 @@ jobs:
         DEST_DIR: 'trackerblocking/config'
     - name: Set version variable
       run: echo "VERSION=$(jq -r .version ./generated/v2/extension-config.json)" >> $GITHUB_ENV
+    - name: Archive Release
+      uses: thedoctor0/zip-release@master
+      with:
+        type: zip
+        filename: privacy-configuration.zip
+        path: generated
     - uses: marvinpinto/action-automatic-releases@919008cf3f741b179569b7a6fb4d8860689ab7f0
       with:
         repo_token: '${{ secrets.GITHUB_TOKEN }}'
         prerelease: false
         title: 'remote-privacy-config-${{ env.VERSION }}'
-        files: generated
+        files: privacy-configuration.zip
         automatic_release_tag: ${{ env.VERSION }}
