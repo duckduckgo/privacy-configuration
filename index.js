@@ -162,7 +162,7 @@ const legacyNaming = {
     fingerprintingBattery: 'battery',
     fingerprintingScreenSize: 'screen-size',
     fingerprintingHardware: 'hardware',
-    browsingTopics: 'floc',
+    googleRejected: 'floc',
     gpc: 'gpc',
     autofill: 'autofill'
 }
