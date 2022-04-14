@@ -45,6 +45,12 @@ function generateV1Config (platformConfig) {
             delete v1Config.features[feature].minSupportedVersion
             v1Config.features[feature].state = 'disabled'
         }
+
+        if (v1Config.features[feature].eol === 'v1') {
+            // This feature's support ends in v1 so remove it from platformConfig
+            delete v1Config.features[feature].eol
+            delete platformConfig.features[feature]
+        }
     }
 
     return v1Config
@@ -162,7 +168,7 @@ const legacyNaming = {
     fingerprintingBattery: 'battery',
     fingerprintingScreenSize: 'screen-size',
     fingerprintingHardware: 'hardware',
-    floc: 'floc',
+    googleRejected: 'floc',
     gpc: 'gpc',
     autofill: 'autofill'
 }
