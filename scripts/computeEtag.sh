@@ -15,12 +15,14 @@ OUTPUTSTR=""
 for ver in generated/v*
 do
     OUTPUTSTR+="**$(basename $ver)**\n"
+    OUTPUTSTR+="|Filename|etag|\n"
+    OUTPUTSTR+="|---|---|\n"
 
     for file in $ver/*.json
     do
-        OUTPUTSTR+="$(basename $file): "
+        OUTPUTSTR+="|$(basename $file)|"
         fileEtag=$($MD5_CMD $file | cut -d ' ' -f $MD5_IDX)
-        OUTPUTSTR+="- $fileEtag\n"
+        OUTPUTSTR+="$fileEtag|\n"
     done
 
     OUTPUTSTR+="\n"
