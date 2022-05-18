@@ -2,7 +2,13 @@ const expect = require('chai').expect
 const Ajv = require('ajv').default
 const ajv = new Ajv()
 const fs = require('fs')
-const platforms = require('./../platforms')
+const platforms = require('./../platforms').map(item => {
+    if (item.includes('browsers/')) {
+        return item.replace('browsers/', 'extension-')
+    }
+
+    return item
+})
 
 function formatErrors (errors) {
     if (!Array.isArray(errors)) {

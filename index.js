@@ -3,6 +3,7 @@ const fs = require('fs')
 const OVERRIDE_DIR = 'overrides'
 const GENERATED_DIR = 'generated'
 const LISTS_DIR = 'features'
+const BROWSERS_SUBDIR = 'browsers/'
 
 const defaultConfig = {
     readme: 'https://github.com/duckduckgo/privacy-configuration',
@@ -19,8 +20,13 @@ const platforms = require('./platforms')
  * @param {object} config - the object to write
  */
 function writeConfigToDisk (platform, config, v1Config) {
-    fs.writeFileSync(`${GENERATED_DIR}/v2/${platform}-config.json`, JSON.stringify(config, null, 4))
-    fs.writeFileSync(`${GENERATED_DIR}/v1/${platform}-config.json`, JSON.stringify(v1Config, null, 4))
+    let configName = platform
+    if (platform.includes(BROWSERS_SUBDIR)) {
+        configName = platform.replace(BROWSERS_SUBDIR, 'extension-')
+    }
+
+    fs.writeFileSync(`${GENERATED_DIR}/v2/${configName}-config.json`, JSON.stringify(config, null, 4))
+    fs.writeFileSync(`${GENERATED_DIR}/v1/${configName}-config.json`, JSON.stringify(v1Config, null, 4))
 }
 
 /**
@@ -98,8 +104,15 @@ const platformConfigs = {}
 
 // Handle platform specific overrides and write configs to disk
 for (const platform of platforms) {
-    const platformConfig = JSON.parse(JSON.stringify(defaultConfig))
+    let platformConfig = JSON.parse(JSON.stringify(defaultConfig))
     const overridePath = `${OVERRIDE_DIR}/${platform}-override.json`
+
+    // Use extension config as the base for browser configs
+    // Extension comes first in the list of platforms so its config should be defined
+    // in the platformConfigs array
+    if (platform.includes(BROWSERS_SUBDIR)) {
+        platformConfig = JSON.parse(JSON.stringify(platformConfigs.extension))
+    }
 
     if (!fs.existsSync(overridePath)) {
         writeConfigToDisk(platform, platformConfig)
@@ -108,7 +121,7 @@ for (const platform of platforms) {
 
     // Handle feature overrides
     const platformOverride = JSON.parse(fs.readFileSync(overridePath))
-    for (const key of Object.keys(defaultConfig.features)) {
+    for (const key of Object.keys(platformConfig.features)) {
         if (platformOverride.features[key]) {
             // Override existing keys
             for (const platformKey of Object.keys(platformOverride.features[key])) {
