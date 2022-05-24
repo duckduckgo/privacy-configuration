@@ -1,7 +1,7 @@
 module.exports = [
     'extension',
     'browsers/chrome',
-    'browsers/moz',
+    'browsers/firefox',
     'browsers/brave',
     'browsers/edge',
     'ios',
