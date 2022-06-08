@@ -1,4 +1,5 @@
 const fs = require('fs')
+const mergeWith = require('lodash.mergewith')
 
 const OVERRIDE_DIR = 'overrides'
 const GENERATED_DIR = 'generated'
@@ -62,6 +63,20 @@ function generateV1Config (platformConfig) {
     return v1Config
 }
 
+function arrayMerge (objValue, srcValue, key) {
+    if (key === 'contentBlocking' && srcValue.exceptions) {
+        addExceptionsToUnprotected(srcValue.exceptions)
+    }
+
+    if (Array.isArray(objValue)) {
+        return Array.from(new Set(objValue.concat(srcValue)))
+    }
+}
+
+function isFeatureMissingState (feature) {
+    return !('state' in feature)
+}
+
 const unprotectedListName = 'unprotected-temporary.json'
 
 // Grab all exception lists
@@ -84,6 +99,21 @@ function addExceptionsToUnprotected (exceptions) {
     return exceptions.map((obj) => obj.domain)
 }
 
+function generateConfigUsingOverride (platformConfig, platformOverride) {
+    mergeWith(platformConfig, platformOverride, arrayMerge)
+
+    for (const feature of Object.values(platformConfig.features)) {
+        if (isFeatureMissingState(feature)) {
+            feature.state = 'disabled'
+        }
+    }
+
+    if (platformOverride.unprotectedTemporary) {
+        addExceptionsToUnprotected(platformOverride.unprotectedTemporary)
+        platformConfig.unprotectedTemporary = platformConfig.unprotectedTemporary.concat(platformOverride.unprotectedTemporary)
+    }
+}
+
 const listData = JSON.parse(fs.readFileSync(`${LISTS_DIR}/${unprotectedListName}`))
 defaultConfig.unprotectedTemporary = listData.exceptions
 
@@ -95,10 +125,6 @@ mkdirIfNeeded(GENERATED_DIR)
 // Create version directories
 mkdirIfNeeded(`${GENERATED_DIR}/v1`)
 mkdirIfNeeded(`${GENERATED_DIR}/v2`)
-
-function isFeatureMissingState (feature) {
-    return !('state' in feature)
-}
 
 const platformConfigs = {}
 
@@ -119,47 +145,9 @@ for (const platform of platforms) {
         continue
     }
 
-    // Handle feature overrides
+    // Deep merge the override config with the default config
     const platformOverride = JSON.parse(fs.readFileSync(overridePath))
-    for (const key of Object.keys(platformConfig.features)) {
-        if (platformOverride.features[key]) {
-            // Override existing keys
-            for (const platformKey of Object.keys(platformOverride.features[key])) {
-                if (platformKey === 'exceptions') {
-                    continue
-                }
-
-                platformConfig.features[key][platformKey] = platformOverride.features[key][platformKey]
-            }
-
-            if (platformOverride.features[key].exceptions) {
-                if (key === 'contentBlocking') {
-                    addExceptionsToUnprotected(platformOverride.features[key].exceptions)
-                }
-                platformConfig.features[key].exceptions = platformConfig.features[key].exceptions.concat(platformOverride.features[key].exceptions)
-            }
-        }
-        if (isFeatureMissingState(platformConfig.features[key])) {
-            platformConfig.features[key].state = 'disabled'
-        }
-    }
-
-    // Add platform specific features
-    for (const key of Object.keys(platformOverride.features)) {
-        if (platformConfig.features[key]) {
-            continue
-        }
-
-        platformConfig.features[key] = { ...platformOverride.features[key] }
-        if (isFeatureMissingState(platformConfig.features[key])) {
-            platformConfig.features[key].state = 'disabled'
-        }
-    }
-
-    if (platformOverride.unprotectedTemporary) {
-        addExceptionsToUnprotected(platformOverride.unprotectedTemporary)
-        platformConfig.unprotectedTemporary = platformConfig.unprotectedTemporary.concat(platformOverride.unprotectedTemporary)
-    }
+    generateConfigUsingOverride(platformConfig, platformOverride)
 
     platformConfigs[platform] = platformConfig
 
@@ -197,3 +185,7 @@ for (const key in legacyNaming) {
 }
 fs.writeFileSync(`${GENERATED_DIR}/protections.json`, JSON.stringify(protections, null, 4))
 fs.writeFileSync(`${GENERATED_DIR}/fingerprinting.json`, JSON.stringify(protections, null, 4))
+
+module.exports = {
+    generateConfigUsingOverride
+}
