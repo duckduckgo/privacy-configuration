@@ -110,7 +110,6 @@ function generateConfigUsingOverride (platformConfig, platformOverride) {
 
     if (platformOverride.unprotectedTemporary) {
         addExceptionsToUnprotected(platformOverride.unprotectedTemporary)
-        platformConfig.unprotectedTemporary = platformConfig.unprotectedTemporary.concat(platformOverride.unprotectedTemporary)
     }
 }
 
