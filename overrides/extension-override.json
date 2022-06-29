@@ -11,16 +11,24 @@
                 "nonTrackerCookie": "disabled",
                 "excludedCookieDomains": [
                     {
+                        "domain": "accounts.google.com",
+                        "reason": "On some Google sign-in flows, there is an error after entering username and proceeding: 'Your browser has cookies disabled. Make sure that your cookies are enabled and try again.'"
+                    },
+                    {
+                        "domain": "pay.google.com",
+                        "reason": "After sign-in for Google Pay flows, there is repeated flickering and a loading spinner, preventing the flow from proceeding."
+                    },
+                    {
+                        "domain": "payments.google.com",
+                        "reason": "After sign-in for Google Pay flows (after flickering is resolved), blocking this causes the loading spinner to spin indefinitely, and the payment flow cannot proceed."
+                    },
+                    {
                         "domain": "hangouts.google.com",
                         "reason": "Site breakage"
                     },
                     {
                         "domain": "docs.google.com",
                         "reason": "Site breakage"
-                    },
-                    {
-                        "domain": "accounts.google.com",
-                        "reason": "SSO which needs cookies for auth"
                     },
                     {
                         "domain": "googleapis.com",
@@ -32,10 +40,6 @@
                     },
                     {
                         "domain": "apis.google.com",
-                        "reason": "Site breakage"
-                    },
-                    {
-                        "domain": "pay.google.com",
                         "reason": "Site breakage"
                     },
                     {
