@@ -1,5 +1,7 @@
 const fs = require('fs')
 
+const { mergeAllowlistedTrackers } = require('./util')
+
 const OVERRIDE_DIR = 'overrides'
 const GENERATED_DIR = 'generated'
 const LISTS_DIR = 'features'
@@ -129,7 +131,21 @@ for (const platform of platforms) {
                     continue
                 }
 
-                platformConfig.features[key][platformKey] = platformOverride.features[key][platformKey]
+                // ensure that trackerAllowlist.settings.allowlistedTrackers is treated as additive
+                if (key === 'trackerAllowlist' && platformKey === 'settings') {
+                    const settings = {}
+                    const overrideSettings = platformOverride.features[key][platformKey]
+                    for (const settingsKey in overrideSettings) {
+                        if (settingsKey === 'allowlistedTrackers') {
+                            settings[settingsKey] = mergeAllowlistedTrackers(platformConfig.features[key].settings[settingsKey] || {}, overrideSettings[settingsKey])
+                            continue
+                        }
+                        settings[settingsKey] = overrideSettings[settingsKey]
+                    }
+                    platformConfig.features[key][platformKey] = settings
+                } else {
+                    platformConfig.features[key][platformKey] = platformOverride.features[key][platformKey]
+                }
             }
 
             if (platformOverride.features[key].exceptions) {
