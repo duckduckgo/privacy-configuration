@@ -178,7 +178,53 @@
             "state": "enabled"
         }
     },
+    "trackerAllowlist": {
+        "settings": {
+            "allowlistedTrackers": {
+                "criteo.net": {
+                    "rules": [
+                        {
+                            "rule": "static.criteo.net/js/ld/publishertag.js",
+                            "domains": [
+                                "wp.pl"
+                            ],
+                            "reason": "Adwall appears which reappears when dismissed. The adwall prevents interaction with the page."
+                        },
+                        {
+                            "rule": "static.criteo.net/js/ld/publishertag.prebid.js",
+                            "domains": [
+                                "wp.pl"
+                            ],
+                            "reason": "Adwall appears which reappears when dismissed. The adwall prevents interaction with the page."
+                        }
+                    ]
+                },
+                "facebook.net": {
+                    "rules": [
+                        {
+                            "rule": "connect.facebook.net/en_US/fbevents.js",
+                            "domains": [
+                                "wp.pl"
+                            ],
+                            "reason": "Adwall appears which reappears when dismissed. The adwall prevents interaction with the page."
+                        }
+                    ]
+                },
+                "gemius.pl": {
+                    "rules": [
+                        {
+                            "rule": "wp.hit.gemius.pl/xgemius.js",
+                            "domains": [
+                                "wp.pl"
+                            ],
+                            "reason": "Adwall appears which reappears when dismissed. The adwall prevents interaction with the page."
+                        }
+                    ]
+                }
+            }
+        }
+    },
     "unprotectedTemporary": [
-        
+
     ]
 }
