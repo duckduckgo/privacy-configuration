@@ -1,6 +1,8 @@
 const fs = require('fs')
 const mergeWith = require('lodash.mergewith')
 
+const { mergeAllowlistedTrackers } = require('./util')
+
 const OVERRIDE_DIR = 'overrides'
 const GENERATED_DIR = 'generated'
 const LISTS_DIR = 'features'
@@ -66,6 +68,10 @@ function generateV1Config (platformConfig) {
 function arrayMerge (objValue, srcValue, key) {
     if (key === 'contentBlocking' && srcValue.exceptions) {
         addExceptionsToUnprotected(srcValue.exceptions)
+    }
+
+    if (key === 'allowlistedTrackers') {
+        return mergeAllowlistedTrackers(objValue, srcValue)
     }
 
     if (Array.isArray(objValue)) {
