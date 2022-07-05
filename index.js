@@ -131,13 +131,17 @@ for (const platform of platforms) {
                     continue
                 }
 
-                // ensure that trackerAllowlist.settings.allowlistedTrackers is treated as additive
-                if (key === 'trackerAllowlist' && platformKey === 'settings') {
+                // ensure certain settings are treated as additive, and aren't overwritten
+                if (['customUserAgent', 'trackerAllowlist'].includes(key) && platformKey === 'settings') {
                     const settings = {}
                     const overrideSettings = platformOverride.features[key][platformKey]
                     for (const settingsKey in overrideSettings) {
+                        const baseSettings = platformConfig.features[key].settings[settingsKey]
                         if (settingsKey === 'allowlistedTrackers') {
-                            settings[settingsKey] = mergeAllowlistedTrackers(platformConfig.features[key].settings[settingsKey] || {}, overrideSettings[settingsKey])
+                            settings[settingsKey] = mergeAllowlistedTrackers(baseSettings || {}, overrideSettings[settingsKey])
+                            continue
+                        } else if (['omitVersionSites', 'omitApplicationSites'].includes(settingsKey)) {
+                            settings[settingsKey] = baseSettings.concat(overrideSettings[settingsKey])
                             continue
                         }
                         settings[settingsKey] = overrideSettings[settingsKey]
