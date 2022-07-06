@@ -14,7 +14,6 @@ for (const dir of dirs) {
         continue
     }
 
-
     // Get the files in the directory
     const files = fs.readdirSync(`${GENERATED_DIR}/${dir}`)
 
@@ -31,7 +30,7 @@ for (const dir of dirs) {
         const content = fs.readFileSync(`${GENERATED_DIR}/${dir}/${file}`, 'utf8')
         // Compute the etag
         const etag = crypto.createHash('md5').update(content)
-        
+
         // Add the etag to the output
         output += `|${file}|${etag.digest('hex')}|\n`
     }
