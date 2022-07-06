@@ -2,14 +2,6 @@
     "features": {
         "contentBlocking": {
             "exceptions": [
-                {
-                    "domain": "zoosk.com",
-                    "reason": "Mobile site banner breakage"
-                },
-                {
-                    "domain": "dwell.com",
-                    "reason": "content not loading"
-                }
             ]
         },
         "fingerprintingTemporaryStorage": {
@@ -32,12 +24,29 @@
         },
         "autofill": {
             "state": "enabled"
+        },
+        "customUserAgent": {
+            "state": "enabled",
+            "settings": {
+                "omitApplicationSites": [
+                    {
+                        "domain": "cvs.com",
+                        "reason": "Navigation section at the top of the main page renders as text."
+                    },
+                    {
+                        "domain": "facebook.com",
+                        "reason": "When going to the main login page, there is a banner at the top which warns of an 'Unsupported browser'."
+                    },
+                    {
+                        "domain": "xfinity.com",
+                        "reason": "Stream page shows an incompatibility warning and does not load further."
+                    }
+                ],
+                "omitVersionSites": [
+                ]
+            }
         }
     },
     "unprotectedTemporary": [
-        {
-            "domain": "fapster.xxx",
-            "reason": "Site not loading"
-        }
     ]
 }

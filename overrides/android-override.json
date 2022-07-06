@@ -4,6 +4,9 @@
             "state": "enabled",
             "exceptions": [],
             "settings": {
+                "connectivityChecks": {
+                    "state": "enabled"
+                },
                 "vpnDdgBrowserTraffic": {
                     "state": "enabled"
                 },
@@ -25,14 +28,6 @@
         },
         "contentBlocking": {
             "exceptions": [
-                {
-                    "domain": "zoosk.com",
-                    "reason": "Mobile site banner breakage"
-                },
-                {
-                    "domain": "danmurphys.com.au",
-                    "reason": "Site not displaying"
-                }
             ]
         },
         "eme": {
@@ -40,10 +35,6 @@
             "exceptions": [
                 {
                     "domain": "open.spotify.com",
-                    "reason": "Site breakage"
-                },
-                {
-                    "domain": "netflix.com",
                     "reason": "Site breakage"
                 }
             ]
@@ -57,6 +48,23 @@
         },
         "autofill": {
             "state": "enabled"
+        },
+        "customUserAgent": {
+            "state": "enabled",
+            "settings": {
+                "omitApplicationSites": [
+                    {
+                        "domain": "vegas.williamhill.com",
+                        "reason": "Cannot interact with cookie prompt and some page elements don't load."
+                    }
+                ],
+                "omitVersionSites": [
+                    {
+                        "domain": "whitepages.com",
+                        "reason": "Site reports browser not supported"
+                    }
+                ]
+            }
         }
     },
     "unprotectedTemporary": [
