@@ -27,7 +27,7 @@ jobs:
     - name: Set version variable
       run: echo "VERSION=$(jq -r .version ./generated/v2/extension-config.json)" >> $GITHUB_ENV
     - name: Generate release description file
-      run: ./scripts/computeEtag.sh md5sum 1 >> release.md
+      uses: ./scripts/
     - name: Archive Release
       uses: thedoctor0/zip-release@master
       with:
