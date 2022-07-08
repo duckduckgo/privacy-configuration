@@ -1,6 +1,6 @@
 const fs = require('fs')
 
-const { mergeAllowlistedTrackers } = require('./util')
+const { fixReasons, mergeAllowlistedTrackers } = require('./util')
 
 const OVERRIDE_DIR = 'overrides'
 const GENERATED_DIR = 'generated'
@@ -27,8 +27,8 @@ function writeConfigToDisk (platform, config, v1Config) {
         configName = platform.replace(BROWSERS_SUBDIR, 'extension-')
     }
 
-    fs.writeFileSync(`${GENERATED_DIR}/v2/${configName}-config.json`, JSON.stringify(config, null, 4))
-    fs.writeFileSync(`${GENERATED_DIR}/v1/${configName}-config.json`, JSON.stringify(v1Config, null, 4))
+    fs.writeFileSync(`${GENERATED_DIR}/v2/${configName}-config.json`, JSON.stringify(fixReasons(config), null, 4))
+    fs.writeFileSync(`${GENERATED_DIR}/v1/${configName}-config.json`, JSON.stringify(fixReasons(v1Config), null, 4))
 }
 
 /**
