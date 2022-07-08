@@ -3,10 +3,6 @@
         "contentBlocking": {
             "state": "enabled",
             "exceptions": [
-                {
-                    "domain": "fantasynamegenerators.com",
-                    "reason": "Site not loading"
-                }
             ]
         },
         "gpc": {
@@ -28,13 +24,7 @@
             "state": "enabled"
         },
         "autofill": {
-            "state": "enabled",
-            "exceptions": [
-                {
-                    "domain": "containerstore.com",
-                    "reason": "Poor UX"
-                }
-            ]
+            "state": "enabled"
         },
         "ampLinks": {
             "state": "enabled"
@@ -42,6 +32,52 @@
         "trackingParameters": {
             "state": "enabled",
             "minSupportedVersion": "0.22.3"
+        },
+        "trackerAllowlist": {
+            "settings": {
+                "allowlistedTrackers": {
+                    "criteo.net": {
+                        "rules": [
+                            {
+                                "rule": "static.criteo.net/js/ld/publishertag.js",
+                                "domains": [
+                                    "wp.pl"
+                                ],
+                                "reason": "Adwall appears which reappears when dismissed. The adwall prevents interaction with the page."
+                            },
+                            {
+                                "rule": "static.criteo.net/js/ld/publishertag.prebid.js",
+                                "domains": [
+                                    "wp.pl"
+                                ],
+                                "reason": "Adwall appears which reappears when dismissed. The adwall prevents interaction with the page."
+                            }
+                        ]
+                    },
+                    "gemius.pl": {
+                        "rules": [
+                            {
+                                "rule": "wp.hit.gemius.pl/xgemius.js",
+                                "domains": [
+                                    "wp.pl"
+                                ],
+                                "reason": "Adwall appears which reappears when dismissed. The adwall prevents interaction with the page."
+                            }
+                        ]
+                    },
+                    "googletagservices.com": {
+                        "rules": [
+                            {
+                                "rule": "www.googletagservices.com/tag/js/gpt.js",
+                                "domains": [
+                                    "wp.pl"
+                                ],
+                                "reason": "Adwall appears which reappears when dismissed. The adwall prevents interaction with the page."
+                            }
+                        ]
+                    }
+                }
+            }
         }
     },
     "unprotectedTemporary": [
