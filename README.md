@@ -26,7 +26,7 @@ Please note the files `trackers-unprotected-temporary.txt`, `trackers-whitelist-
 
 **Adding unprotected entries**
 
- Unprotected entries will disabled all protections on a given site. This is only used in cases of severe web breakage where a root cause cannot be determined. To add an unprotected entry manually, update the `exceptions` of `features/unprotected-temporary.json`.
+ Unprotected entries will disable all protections on a given site. This is only used in cases of severe web breakage where a root cause cannot be determined. To add an unprotected entry manually, update the `exceptions` of `features/unprotected-temporary.json`.
 
 ## Contributing 
 You may open an issue in this GitHub repo. We are not accepting outside pull requests in this repo at this time.
