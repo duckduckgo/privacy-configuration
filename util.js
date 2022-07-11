@@ -35,7 +35,9 @@ function mergeAllowlistedTrackers (t1, t2) {
     for (const dom in t2) {
         addDomainRule(res, dom, t2[dom])
     }
-    return res
+    // Sort the resulting generated object by domain keys.
+    // This makes working with the generated config easier and more human-navigable.
+    return Object.keys(res).sort().reduce(function (acc, k) { acc[k] = res[k]; return acc }, {})
 }
 
 module.exports = {

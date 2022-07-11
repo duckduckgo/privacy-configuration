@@ -171,4 +171,11 @@ describe('mergeAllowlistedTrackers', () => {
     it('should be able to perform a basic merge', () => {
         expect(mergeAllowlistedTrackers(ta1, ta2)).to.deep.equal(ta1plus2)
     })
+    it('should sort merged domain keys', () => {
+        expect(Object.keys(mergeAllowlistedTrackers({
+            f2: { rules: [] }, f4: { rules: [] }
+        }, {
+            f1: { rules: [] }, f3: { rules: [] }
+        }))).to.deep.equal(['f1', 'f2', 'f3', 'f4'])
+    })
 })
