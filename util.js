@@ -46,9 +46,9 @@ function mergeAllowlistedTrackers (t1, t2) {
  * This allows specifying reasons as an array of strings, and converts these to
  * strings in the resulting data.
  */
-function fixReasons (data) {
+function inlineReasonArrays (data) {
     if (Array.isArray(data)) {
-        return data.map(fixReasons)
+        return data.map(inlineReasonArrays)
     } else if (typeof data === 'object' && data !== null) {
         const res = {}
         for (const [k, v] of Object.entries(data)) {
@@ -56,7 +56,7 @@ function fixReasons (data) {
                 // we collapse list 'reason' field values into a single string
                 res[k] = Array.isArray(v) ? v.join(' ') : v
             } else {
-                res[k] = fixReasons(v)
+                res[k] = inlineReasonArrays(v)
             }
         }
         return res
@@ -66,6 +66,6 @@ function fixReasons (data) {
 }
 
 module.exports = {
-    fixReasons: fixReasons,
+    inlineReasonArrays: inlineReasonArrays,
     mergeAllowlistedTrackers: mergeAllowlistedTrackers
 }

@@ -1,6 +1,6 @@
 const expect = require('chai').expect
 
-const { fixReasons, mergeAllowlistedTrackers } = require('../util')
+const { inlineReasonArrays, mergeAllowlistedTrackers } = require('../util')
 
 const ta1 = {
     'f1.com': {
@@ -180,26 +180,26 @@ describe('mergeAllowlistedTrackers', () => {
     })
 })
 
-describe('fixReasons', () => {
+describe('inlineReasonArrays', () => {
     it('simple object with array reason', () => {
-        expect(fixReasons({ reason: ['reason1', 'reason2'] })).to.deep.equal({ reason: 'reason1 reason2' })
+        expect(inlineReasonArrays({ reason: ['reason1', 'reason2'] })).to.deep.equal({ reason: 'reason1 reason2' })
     })
     it('simple object with empty array reason', () => {
-        expect(fixReasons({ reason: [] })).to.deep.equal({ reason: '' })
+        expect(inlineReasonArrays({ reason: [] })).to.deep.equal({ reason: '' })
     })
     it("doesn't merge non-reason arrays", () => {
-        expect(fixReasons({ nonreason: ['nonreason1', 'nonreason2'] })).to.deep.equal({ nonreason: ['nonreason1', 'nonreason2'] })
+        expect(inlineReasonArrays({ nonreason: ['nonreason1', 'nonreason2'] })).to.deep.equal({ nonreason: ['nonreason1', 'nonreason2'] })
     })
     it('simple object with string reason', () => {
-        expect(fixReasons({ reason: 'simple reason' })).to.deep.equal({ reason: 'simple reason' })
+        expect(inlineReasonArrays({ reason: 'simple reason' })).to.deep.equal({ reason: 'simple reason' })
     })
     it('nested in array', () => {
-        expect(fixReasons([{ reason: ['reason1', 'reason2'] }])).to.deep.equal([{ reason: 'reason1 reason2' }])
+        expect(inlineReasonArrays([{ reason: ['reason1', 'reason2'] }])).to.deep.equal([{ reason: 'reason1 reason2' }])
     })
     it('nested in object', () => {
-        expect(fixReasons({ exceptions: { reason: ['reason1', 'reason2'] } })).to.deep.equal({ exceptions: { reason: 'reason1 reason2' } })
+        expect(inlineReasonArrays({ exceptions: { reason: ['reason1', 'reason2'] } })).to.deep.equal({ exceptions: { reason: 'reason1 reason2' } })
     })
     it('null', () => {
-        expect(fixReasons(null)).to.equal(null)
+        expect(inlineReasonArrays(null)).to.equal(null)
     })
 })
