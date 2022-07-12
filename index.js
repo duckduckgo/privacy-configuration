@@ -116,13 +116,8 @@ for (const platform of platforms) {
         platformConfig = JSON.parse(JSON.stringify(platformConfigs.extension))
     }
 
-    if (!fs.existsSync(overridePath)) {
-        writeConfigToDisk(platform, platformConfig)
-        continue
-    }
-
     // Handle feature overrides
-    const platformOverride = JSON.parse(fs.readFileSync(overridePath))
+    const platformOverride = JSON.parse(fs.readFileSync(overridePath)) // throws error on missing platform file
     for (const key of Object.keys(platformConfig.features)) {
         if (platformOverride.features[key]) {
             // Override existing keys
