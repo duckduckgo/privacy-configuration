@@ -1,6 +1,6 @@
 const expect = require('chai').expect
 
-const { mergeAllowlistedTrackers } = require('../util')
+const { inlineReasonArrays, mergeAllowlistedTrackers } = require('../util')
 
 const ta1 = {
     'f1.com': {
@@ -170,5 +170,36 @@ const ta1plus2 = {
 describe('mergeAllowlistedTrackers', () => {
     it('should be able to perform a basic merge', () => {
         expect(mergeAllowlistedTrackers(ta1, ta2)).to.deep.equal(ta1plus2)
+    })
+    it('should sort merged domain keys', () => {
+        expect(Object.keys(mergeAllowlistedTrackers({
+            f2: { rules: [] }, f4: { rules: [] }
+        }, {
+            f1: { rules: [] }, f3: { rules: [] }
+        }))).to.deep.equal(['f1', 'f2', 'f3', 'f4'])
+    })
+})
+
+describe('inlineReasonArrays', () => {
+    it('simple object with array reason', () => {
+        expect(inlineReasonArrays({ reason: ['reason1', 'reason2'] })).to.deep.equal({ reason: 'reason1 reason2' })
+    })
+    it('simple object with empty array reason', () => {
+        expect(inlineReasonArrays({ reason: [] })).to.deep.equal({ reason: '' })
+    })
+    it("doesn't merge non-reason arrays", () => {
+        expect(inlineReasonArrays({ nonreason: ['nonreason1', 'nonreason2'] })).to.deep.equal({ nonreason: ['nonreason1', 'nonreason2'] })
+    })
+    it('simple object with string reason', () => {
+        expect(inlineReasonArrays({ reason: 'simple reason' })).to.deep.equal({ reason: 'simple reason' })
+    })
+    it('nested in array', () => {
+        expect(inlineReasonArrays([{ reason: ['reason1', 'reason2'] }])).to.deep.equal([{ reason: 'reason1 reason2' }])
+    })
+    it('nested in object', () => {
+        expect(inlineReasonArrays({ exceptions: { reason: ['reason1', 'reason2'] } })).to.deep.equal({ exceptions: { reason: 'reason1 reason2' } })
+    })
+    it('null', () => {
+        expect(inlineReasonArrays(null)).to.equal(null)
     })
 })
