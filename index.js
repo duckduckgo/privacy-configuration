@@ -27,8 +27,8 @@ function writeConfigToDisk (platform, config, v1Config) {
         configName = platform.replace(BROWSERS_SUBDIR, 'extension-')
     }
 
-    fs.writeFileSync(`${GENERATED_DIR}/v2/${configName}-config.json`, JSON.stringify(inlineReasonArrays(config), null, 4))
-    fs.writeFileSync(`${GENERATED_DIR}/v1/${configName}-config.json`, JSON.stringify(inlineReasonArrays(v1Config), null, 4))
+    fs.writeFileSync(`${GENERATED_DIR}/v2/${configName}-config.json`, JSON.stringify(config, null, 4))
+    fs.writeFileSync(`${GENERATED_DIR}/v1/${configName}-config.json`, JSON.stringify(v1Config, null, 4))
 }
 
 /**
@@ -176,6 +176,7 @@ for (const platform of platforms) {
         platformConfig.unprotectedTemporary = platformConfig.unprotectedTemporary.concat(platformOverride.unprotectedTemporary)
     }
 
+    platformConfig = inlineReasonArrays(platformConfig)
     platformConfigs[platform] = platformConfig
 
     const v1PlatformConfig = generateV1Config(platformConfig)
