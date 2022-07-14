@@ -35,9 +35,37 @@ function mergeAllowlistedTrackers (t1, t2) {
     for (const dom in t2) {
         addDomainRule(res, dom, t2[dom])
     }
-    return res
+    // Sort the resulting generated object by domain keys.
+    // This makes working with the generated config easier and more human-navigable.
+    return Object.keys(res).sort().reduce(function (acc, k) { acc[k] = res[k]; return acc }, {})
+}
+
+/**
+ * Traverse the input (JSON data) and ensure any "reason" fields are strings in the output.
+ *
+ * This allows specifying reasons as an array of strings, and converts these to
+ * strings in the resulting data.
+ */
+function inlineReasonArrays (data) {
+    if (Array.isArray(data)) {
+        return data.map(inlineReasonArrays)
+    } else if (typeof data === 'object' && data !== null) {
+        const res = {}
+        for (const [k, v] of Object.entries(data)) {
+            if (k === 'reason') {
+                // we collapse list 'reason' field values into a single string
+                res[k] = Array.isArray(v) ? v.join(' ') : v
+            } else {
+                res[k] = inlineReasonArrays(v)
+            }
+        }
+        return res
+    } else {
+        return data
+    }
 }
 
 module.exports = {
+    inlineReasonArrays: inlineReasonArrays,
     mergeAllowlistedTrackers: mergeAllowlistedTrackers
 }

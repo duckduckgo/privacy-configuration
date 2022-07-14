@@ -1,6 +1,6 @@
 const fs = require('fs')
 
-const { mergeAllowlistedTrackers } = require('./util')
+const { inlineReasonArrays, mergeAllowlistedTrackers } = require('./util')
 
 const OVERRIDE_DIR = 'overrides'
 const GENERATED_DIR = 'generated'
@@ -116,13 +116,8 @@ for (const platform of platforms) {
         platformConfig = JSON.parse(JSON.stringify(platformConfigs.extension))
     }
 
-    if (!fs.existsSync(overridePath)) {
-        writeConfigToDisk(platform, platformConfig)
-        continue
-    }
-
     // Handle feature overrides
-    const platformOverride = JSON.parse(fs.readFileSync(overridePath))
+    const platformOverride = JSON.parse(fs.readFileSync(overridePath)) // throws error on missing platform file
     for (const key of Object.keys(platformConfig.features)) {
         if (platformOverride.features[key]) {
             // Override existing keys
@@ -181,6 +176,7 @@ for (const platform of platforms) {
         platformConfig.unprotectedTemporary = platformConfig.unprotectedTemporary.concat(platformOverride.unprotectedTemporary)
     }
 
+    platformConfig = inlineReasonArrays(platformConfig)
     platformConfigs[platform] = platformConfig
 
     const v1PlatformConfig = generateV1Config(platformConfig)
