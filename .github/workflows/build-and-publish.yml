@@ -15,15 +15,15 @@ jobs:
     - uses: ./
     - name: Run tests
       run: npm run test
-    - uses: jakejarvis/s3-sync-action@7ed8b112447abb09f1da74f3466e4194fc7a6311
-      with:
-        args: --acl public-read --follow-symlinks
-      env:
-        AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        SOURCE_DIR: 'generated' 
-        DEST_DIR: 'trackerblocking/config'
+    # - uses: jakejarvis/s3-sync-action@7ed8b112447abb09f1da74f3466e4194fc7a6311
+    #   with:
+    #     args: --acl public-read --follow-symlinks
+    #   env:
+    #     AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+    #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+    #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    #     SOURCE_DIR: 'generated' 
+    #     DEST_DIR: 'trackerblocking/config'
     - name: Set version variable
       run: echo "VERSION=$(jq -r .version ./generated/v2/extension-config.json)" >> $GITHUB_ENV
     - name: Generate release description file
