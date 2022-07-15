@@ -12,6 +12,23 @@
             "adsafeprotected.com": {
                 "rules": [
                     {
+                        "rule": "static.adsafeprotected.com/favicon.ico",
+                        "domains": [
+                            "tf1info.fr"
+                        ],
+                        "reason": "Adwall displays over video and prevents video from being played."
+                    },
+                    {
+                        "rule": "static.adsafeprotected.com/iasPET.1.js",
+                        "domains": [
+                            "corriere.it"
+                        ],
+                        "reason": [
+                            "Example URL: https://www.corriere.it/video-articoli/2022/07/13/missione-wwf-liberare-mare-plastica/9abb64de-029d-11ed-a0cc-ad3c68cacbae.shtml;",
+                            "Clicking on the video to play causes a still frame to show and the video does not continue."
+                        ]
+                    },
+                    {
                         "rule": "static.adsafeprotected.com/vans-adapter-google-ima.js",
                         "domains": [
                             "nhl.com"
@@ -47,10 +64,16 @@
                     {
                         "rule": "c.amazon-adsystem.com/aax2/apstag.js",
                         "domains": [
+                            "corriere.it",
                             "eurogamer.net",
                             "seattletimes.com"
                         ],
-                        "reason": "An unskippable adwall appears which prevents interaction with the page."
+                        "reason": [
+                            "corriere.it - ",
+                            "Example URL: https://www.corriere.it/video-articoli/2022/07/13/missione-wwf-liberare-mare-plastica/9abb64de-029d-11ed-a0cc-ad3c68cacbae.shtml;",
+                            "Clicking on the video to play causes a still frame to show and the video does not continue.",
+                            "eurogamer.net, seattletimes.com - An unskippable adwall appears which prevents interaction with the page."
+                        ]
                     }
                 ]
             },
@@ -62,6 +85,36 @@
                             "chipotle.com"
                         ],
                         "reason": "Site loads blank and cannot be interacted with."
+                    }
+                ]
+            },
+            "bc0a.com": {
+                "rules": [
+                    {
+                        "rule": "marvel-b1-cdn.bc0a.com/f00000000269380/www.beretta.com/assets/",
+                        "domains": [
+                            "beretta.com"
+                        ],
+                        "reason": [
+                            "Example URL1: https://www.beretta.com/en-us/womens-clothing/caps-and-hats/;",
+                            "Example URL2: https://www.beretta.com/en-us/mens-clothing/caps-and-hats/lp-trucker-hat/;",
+                            "Various product and product-related images do not render - e.g., main product images on product pages, product images in product listings, etc."
+                        ]
+                    }
+                ]
+            },
+            "bing.com": {
+                "rules": [
+                    {
+                        "rule": "th.bing.com/th",
+                        "domains": [
+                            "drudgereport.com"
+                        ],
+                        "reason": [
+                            "On the homepage (drudgereport.com), some images are fetched from bing.com.",
+                            "When we block these requests, the images do not render, and the page appears to have blank boxes.",
+                            "Note that requests can be of the form th.bing.com/th?id=... or th.bing.com/th/id/..., hence we unblock the common path here."
+                        ]
                     }
                 ]
             },
@@ -155,11 +208,13 @@
                     {
                         "rule": "connect.facebook.net/en_US/sdk.js",
                         "domains": [
+                            "bandsintown.com",
                             "nextdoor.co.uk",
                             "nextdoor.com"
                         ],
                         "reason": [
-                            "Facebook login option appears greyed out and cannot be clicked."
+                            "bandsintown.com - Ticket page renders blank. With this exception the page redirects to ticketspice.com.",
+                            "nextdoor.co.uk, nextdoor.com - Facebook login option appears greyed out and cannot be clicked."
                         ]
                     }
                 ]
@@ -180,9 +235,20 @@
                     {
                         "rule": "google-analytics.com/analytics.js",
                         "domains": [
+                            "doterra.com",
                             "easyjet.com"
                         ],
-                        "reason": "Clicking 'Show Worldwide flights' after entering parameters for a worldwide flight in the flight viewing form does nothing."
+                        "reason": [
+                            "doterra.com - For doterra.com/login/loading, the page shows a loading indicator and never redirects.",
+                            "easyjet.com - Clicking 'Show Worldwide flights' after entering parameters for a worldwide flight in the flight viewing form does nothing."
+                        ]
+                    },
+                    {
+                        "rule": "www.google-analytics.com/plugins/ua/ecommerce.js",
+                        "domains": [
+                            "doterra.com"
+                        ],
+                        "reason": "For doterra.com/login/loading, the page shows a loading indicator and never redirects."
                     }
                 ]
             },
