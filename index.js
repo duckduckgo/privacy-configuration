@@ -1,7 +1,7 @@
 const fs = require('fs')
 const mergeWith = require('lodash.mergewith')
 
-const { mergeAllowlistedTrackers } = require('./util')
+const { inlineReasonArrays, mergeAllowlistedTrackers } = require('./util')
 
 const OVERRIDE_DIR = 'overrides'
 const GENERATED_DIR = 'generated'
@@ -154,6 +154,7 @@ for (const platform of platforms) {
     const platformOverride = JSON.parse(fs.readFileSync(overridePath))
     generateConfigUsingOverride(platformConfig, platformOverride)
 
+    platformConfig = inlineReasonArrays(platformConfig)
     platformConfigs[platform] = platformConfig
 
     const v1PlatformConfig = generateV1Config(platformConfig)
