@@ -37,13 +37,10 @@
             "state": "enabled",
             "settings": {
                 "keyboard": {"type": "undefined"},
-                "hardwareConcurrency": {
-                    "type": "object", 
-                    "value": {
-                        "intel": 4,
-                        "appleSilicon": 8
-                    }
-                },
+                "hardwareConcurrency": [
+                    {"type": "number", "value": 4},
+                    {"type": "number", "value": 8, "criteria": {"arch": "AppleSilicon"}}
+                 ],
                 "deviceMemory": {"type": "undefined"}
             }
         },
