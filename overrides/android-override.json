@@ -22,7 +22,14 @@
                 },
                 "badHealthMitigation": {
                     "state": "enabled",
-                    "settings": {}
+                    "settings": {
+                        "triggers": {
+                            "socketReadExceptionAlerts": {
+                                "state": "enabled",
+                                "threshold": 20
+                            }
+                        }
+                    }
                 }
             }
         },
@@ -45,6 +52,9 @@
         "trackingParameters": {
             "state": "enabled",
             "minSupportedVersion": 51250000
+        },
+        "autoconsent": {
+            "state": "enabled"
         },
         "autofill": {
             "state": "enabled"
