@@ -178,6 +178,10 @@ describe('mergeAllowlistedTrackers', () => {
             f1: { rules: [] }, f3: { rules: [] }
         }))).to.deep.equal(['f1', 'f2', 'f3', 'f4'])
     })
+    it('is idempotent', () => {
+        const gen = () => ({ 'simple.com': { rules: [{ rule: 'really.simple.com/foo', domains: ['domain1.com'], reason: 'Simple reason' }] } })
+        expect(mergeAllowlistedTrackers(gen(), gen())).to.deep.equal(gen())
+    })
 })
 
 describe('inlineReasonArrays', () => {

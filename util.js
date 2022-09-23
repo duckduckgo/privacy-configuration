@@ -24,7 +24,11 @@ function addPathRule (rules, rule) {
         rules.push(existing)
     }
     existing.domains = Array.from(new Set(existing.domains.concat(rule.domains).sort()))
-    existing.reason = [existing.reason, rule.reason].filter(function (x) { return x !== '' }).join('; ')
+    const reasons = existing.reason.split('; ')
+    const newReason = rule.reason
+    if (!reasons.includes(rule.reason)) {
+        existing.reason = reasons.concat([newReason]).filter(function (x) { return x !== '' }).join('; ')
+    }
 }
 
 function mergeAllowlistedTrackers (t1, t2) {
