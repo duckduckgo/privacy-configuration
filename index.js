@@ -1,6 +1,8 @@
 const fs = require('fs')
 
-const { inlineReasonArrays, mergeAllowlistedTrackers } = require('./util')
+const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args))
+
+const { addCnameEntriesToAllowlist, inlineReasonArrays, mergeAllowlistedTrackers } = require('./util')
 
 const OVERRIDE_DIR = 'overrides'
 const GENERATED_DIR = 'generated'
@@ -14,6 +16,25 @@ const defaultConfig = {
 }
 
 const platforms = require('./platforms')
+
+const tdsPath = 'live'
+
+let tdsCached
+async function getTds () {
+    if (tdsCached) {
+        return tdsCached
+    }
+    if (tdsPath === 'live') {
+        console.log('Fetching remote TDS')
+        const response = await fetch('https://staticcdn.duckduckgo.com/trackerblocking/v3/tds.json')
+        tdsCached = await response.json()
+        console.log('Fetched remote TDS')
+    } else {
+        console.log('Using local TDS')
+        tdsCached = JSON.parse(fs.readFileSync(tdsPath))
+    }
+    return tdsCached
+}
 
 /**
  * Write a config file to disk
@@ -102,114 +123,121 @@ function isFeatureMissingState (feature) {
     return !('state' in feature)
 }
 
-const platformConfigs = {}
-
 // Handle platform specific overrides and write configs to disk
-for (const platform of platforms) {
-    let platformConfig = JSON.parse(JSON.stringify(defaultConfig))
-    const overridePath = `${OVERRIDE_DIR}/${platform}-override.json`
+async function buildPlatforms () {
+    const platformConfigs = {}
 
-    // Use extension config as the base for browser configs
-    // Extension comes first in the list of platforms so its config should be defined
-    // in the platformConfigs array
-    if (platform.includes(BROWSERS_SUBDIR)) {
-        platformConfig = JSON.parse(JSON.stringify(platformConfigs.extension))
-    }
+    for (const platform of platforms) {
+        let platformConfig = JSON.parse(JSON.stringify(defaultConfig))
+        const overridePath = `${OVERRIDE_DIR}/${platform}-override.json`
 
-    // Handle feature overrides
-    const platformOverride = JSON.parse(fs.readFileSync(overridePath)) // throws error on missing platform file
-    for (const key of Object.keys(platformConfig.features)) {
-        if (platformOverride.features[key]) {
-            // Override existing keys
-            for (const platformKey of Object.keys(platformOverride.features[key])) {
-                if (platformKey === 'exceptions') {
-                    continue
-                }
+        // Use extension config as the base for browser configs
+        // Extension comes first in the list of platforms so its config should be defined
+        // in the platformConfigs array
+        if (platform.includes(BROWSERS_SUBDIR)) {
+            platformConfig = JSON.parse(JSON.stringify(platformConfigs.extension))
+        }
 
-                // ensure certain settings are treated as additive, and aren't overwritten
-                if (['customUserAgent', 'trackerAllowlist'].includes(key) && platformKey === 'settings') {
-                    const settings = {}
-                    const overrideSettings = platformOverride.features[key][platformKey]
-                    for (const settingsKey in overrideSettings) {
-                        const baseSettings = platformConfig.features[key].settings[settingsKey]
-                        if (settingsKey === 'allowlistedTrackers') {
-                            settings[settingsKey] = mergeAllowlistedTrackers(baseSettings || {}, overrideSettings[settingsKey])
-                            continue
-                        } else if (['omitVersionSites', 'omitApplicationSites'].includes(settingsKey)) {
-                            settings[settingsKey] = baseSettings.concat(overrideSettings[settingsKey])
-                            continue
-                        }
-                        settings[settingsKey] = overrideSettings[settingsKey]
+        // Handle feature overrides
+        const platformOverride = JSON.parse(fs.readFileSync(overridePath)) // throws error on missing platform file
+        for (const key of Object.keys(platformConfig.features)) {
+            if (platformOverride.features[key]) {
+                // Override existing keys
+                for (const platformKey of Object.keys(platformOverride.features[key])) {
+                    if (platformKey === 'exceptions') {
+                        continue
                     }
-                    platformConfig.features[key][platformKey] = settings
-                } else {
-                    platformConfig.features[key][platformKey] = platformOverride.features[key][platformKey]
+
+                    // ensure certain settings are treated as additive, and aren't overwritten
+                    if (['customUserAgent', 'trackerAllowlist'].includes(key) && platformKey === 'settings') {
+                        const settings = {}
+                        const overrideSettings = platformOverride.features[key][platformKey]
+                        for (const settingsKey in overrideSettings) {
+                            const baseSettings = platformConfig.features[key].settings[settingsKey]
+                            if (settingsKey === 'allowlistedTrackers') {
+                                settings[settingsKey] = mergeAllowlistedTrackers(baseSettings || {}, overrideSettings[settingsKey])
+                                continue
+                            } else if (['omitVersionSites', 'omitApplicationSites'].includes(settingsKey)) {
+                                settings[settingsKey] = baseSettings.concat(overrideSettings[settingsKey])
+                                continue
+                            }
+                            settings[settingsKey] = overrideSettings[settingsKey]
+                        }
+                        platformConfig.features[key][platformKey] = settings
+                    } else {
+                        platformConfig.features[key][platformKey] = platformOverride.features[key][platformKey]
+                    }
+                }
+
+                if (platformOverride.features[key].exceptions) {
+                    if (key === 'contentBlocking') {
+                        addExceptionsToUnprotected(platformOverride.features[key].exceptions)
+                    }
+                    platformConfig.features[key].exceptions = platformConfig.features[key].exceptions.concat(platformOverride.features[key].exceptions)
                 }
             }
-
-            if (platformOverride.features[key].exceptions) {
-                if (key === 'contentBlocking') {
-                    addExceptionsToUnprotected(platformOverride.features[key].exceptions)
-                }
-                platformConfig.features[key].exceptions = platformConfig.features[key].exceptions.concat(platformOverride.features[key].exceptions)
+            if (isFeatureMissingState(platformConfig.features[key])) {
+                platformConfig.features[key].state = 'disabled'
             }
         }
-        if (isFeatureMissingState(platformConfig.features[key])) {
-            platformConfig.features[key].state = 'disabled'
+
+        // Add platform specific features
+        for (const key of Object.keys(platformOverride.features)) {
+            if (platformConfig.features[key]) {
+                continue
+            }
+
+            platformConfig.features[key] = { ...platformOverride.features[key] }
+            if (isFeatureMissingState(platformConfig.features[key])) {
+                platformConfig.features[key].state = 'disabled'
+            }
         }
-    }
 
-    // Add platform specific features
-    for (const key of Object.keys(platformOverride.features)) {
-        if (platformConfig.features[key]) {
-            continue
+        if (platformOverride.unprotectedTemporary) {
+            addExceptionsToUnprotected(platformOverride.unprotectedTemporary)
+            platformConfig.unprotectedTemporary = platformConfig.unprotectedTemporary.concat(platformOverride.unprotectedTemporary)
         }
 
-        platformConfig.features[key] = { ...platformOverride.features[key] }
-        if (isFeatureMissingState(platformConfig.features[key])) {
-            platformConfig.features[key].state = 'disabled'
-        }
+        const tds = await getTds()
+        addCnameEntriesToAllowlist(tds, platformConfig.features.trackerAllowlist.settings.allowlistedTrackers)
+        platformConfig = inlineReasonArrays(platformConfig)
+        platformConfigs[platform] = platformConfig
+
+        const v1PlatformConfig = generateV1Config(platformConfig)
+
+        writeConfigToDisk(platform, platformConfig, v1PlatformConfig)
     }
-
-    if (platformOverride.unprotectedTemporary) {
-        addExceptionsToUnprotected(platformOverride.unprotectedTemporary)
-        platformConfig.unprotectedTemporary = platformConfig.unprotectedTemporary.concat(platformOverride.unprotectedTemporary)
-    }
-
-    platformConfig = inlineReasonArrays(platformConfig)
-    platformConfigs[platform] = platformConfig
-
-    const v1PlatformConfig = generateV1Config(platformConfig)
-
-    writeConfigToDisk(platform, platformConfig, v1PlatformConfig)
+    return platformConfigs
 }
 
-// Generate legacy formats
-const legacyTextDomains = [...unprotectedDomains].join('\n')
-fs.writeFileSync(`${GENERATED_DIR}/trackers-unprotected-temporary.txt`, legacyTextDomains)
-fs.writeFileSync(`${GENERATED_DIR}/trackers-whitelist-temporary.txt`, legacyTextDomains)
-const legacyNaming = {
-    fingerprintingCanvas: 'canvas',
-    trackingCookies3p: 'cookie',
-    fingerprintingAudio: 'audio',
-    fingerprintingTemporaryStorage: 'temporary-storage',
-    referrer: 'referrer',
-    fingerprintingBattery: 'battery',
-    fingerprintingScreenSize: 'screen-size',
-    fingerprintingHardware: 'hardware',
-    googleRejected: 'floc',
-    gpc: 'gpc',
-    autofill: 'autofill'
-}
-const protections = {}
-for (const key in legacyNaming) {
-    const feature = platformConfigs.extension.features[key]
-    const legacyConfig = {
-        enabled: feature.state === 'enabled',
-        sites: feature.exceptions.map((obj) => obj.domain),
-        scripts: []
+buildPlatforms().then((platformConfigs) => {
+    // Generate legacy formats
+    const legacyTextDomains = [...unprotectedDomains].join('\n')
+    fs.writeFileSync(`${GENERATED_DIR}/trackers-unprotected-temporary.txt`, legacyTextDomains)
+    fs.writeFileSync(`${GENERATED_DIR}/trackers-whitelist-temporary.txt`, legacyTextDomains)
+    const legacyNaming = {
+        fingerprintingCanvas: 'canvas',
+        trackingCookies3p: 'cookie',
+        fingerprintingAudio: 'audio',
+        fingerprintingTemporaryStorage: 'temporary-storage',
+        referrer: 'referrer',
+        fingerprintingBattery: 'battery',
+        fingerprintingScreenSize: 'screen-size',
+        fingerprintingHardware: 'hardware',
+        googleRejected: 'floc',
+        gpc: 'gpc',
+        autofill: 'autofill'
     }
-    protections[legacyNaming[key]] = legacyConfig
-}
-fs.writeFileSync(`${GENERATED_DIR}/protections.json`, JSON.stringify(protections, null, 4))
-fs.writeFileSync(`${GENERATED_DIR}/fingerprinting.json`, JSON.stringify(protections, null, 4))
+    const protections = {}
+    for (const key in legacyNaming) {
+        const feature = platformConfigs.extension.features[key]
+        const legacyConfig = {
+            enabled: feature.state === 'enabled',
+            sites: feature.exceptions.map((obj) => obj.domain),
+            scripts: []
+        }
+        protections[legacyNaming[key]] = legacyConfig
+    }
+    fs.writeFileSync(`${GENERATED_DIR}/protections.json`, JSON.stringify(protections, null, 4))
+    fs.writeFileSync(`${GENERATED_DIR}/fingerprinting.json`, JSON.stringify(protections, null, 4))
+})
