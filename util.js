@@ -31,6 +31,9 @@ function addPathRule (rules, rule) {
         rules.push(existing)
     }
     existing.domains = Array.from(new Set(existing.domains.concat(rule.domains).sort()))
+    if (existing.domains.includes('<all>')) {
+        existing.domains = ['<all>']
+    }
     const reasons = existing.reason.split('; ')
     const newReason = rule.reason
     if (!reasons.includes(rule.reason)) {

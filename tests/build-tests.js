@@ -184,6 +184,14 @@ describe('mergeAllowlistedTrackers', () => {
     })
 })
 
+const mkRule = (rulePath, domains, reason) => {
+    return {
+        rule: rulePath,
+        domains: domains || ['<all>'],
+        reason: reason || ''
+    }
+}
+
 describe('addAllowlistRule', () => {
     let allowlist
     beforeEach(() => {
@@ -208,6 +216,18 @@ describe('addAllowlistRule', () => {
         addAllowlistRule(allowlist, { rule: 'really.simple.com/foo', domains: ['domain1.com'], reason: 'Simple reason 2' })
         expect(allowlist).to.deep.equal({ 'simple.com': { rules: [{ rule: 'really.simple.com/foo', domains: ['domain1.com'], reason: 'Simple reason 1; Simple reason 2' }] } })
     })
+    describe('<all> domain is absorbing', () => {
+        it('adding domain to <all> is <all>', () => {
+            addAllowlistRule(allowlist, mkRule('really.simple.com/foo', ['<all>']))
+            addAllowlistRule(allowlist, mkRule('really.simple.com/foo', ['domain.com']))
+            expect(allowlist['simple.com'].rules[0].domains).to.deep.equal(['<all>'])
+        })
+        it('adding <all> to domain is <all>', () => {
+            addAllowlistRule(allowlist, mkRule('really.simple.com/foo', ['domain.com']))
+            addAllowlistRule(allowlist, mkRule('really.simple.com/foo', ['<all>']))
+            expect(allowlist['simple.com'].rules[0].domains).to.deep.equal(['<all>'])
+        })
+    })
     it('should merge domains and reasons', () => {
         addAllowlistRule(allowlist, { rule: 'really.simple.com/foo', domains: ['domain1.com'], reason: 'Simple reason 1' })
         addAllowlistRule(allowlist, { rule: 'really.simple.com/foo', domains: ['domain2.com'], reason: 'Simple reason 2' })
@@ -216,13 +236,6 @@ describe('addAllowlistRule', () => {
 })
 
 describe('addCnameEntriesToAllowlist', () => {
-    const mkRule = (rulePath, domains, reason) => {
-        return {
-            rule: rulePath,
-            domains: domains || ['<all>'],
-            reason: reason || ''
-        }
-    }
     const tds = { cnames: { 'tracker.simple.com': 'simple.tracker.com', 'tracker.simple2.com': 'simple2.tracker.com' } }
     it('adds only specific domains when full CNAME domain specified', () => {
         const allowlist = {}
