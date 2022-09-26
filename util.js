@@ -1,8 +1,10 @@
+const tldts = require('tldts')
+
 function getAllowlistedRule (rules, rulePath) {
     return rules.find(function (x) { return x.rule === rulePath })
 }
 
-function addDomainRule (allowlist, domain, rule) {
+function addDomainRules (allowlist, domain, rule) {
     const found = allowlist[domain]
     const existing = found || { rules: [] }
     if (!found) {
@@ -17,6 +19,11 @@ function addDomainRule (allowlist, domain, rule) {
     })
 }
 
+function addAllowlistRule (allowlist, rule) {
+    const dom = tldts.getDomain(rule.rule)
+    addDomainRules(allowlist, dom, { rules: [rule] })
+}
+
 function addPathRule (rules, rule) {
     const found = getAllowlistedRule(rules, rule.rule)
     const existing = found || { rule: rule.rule, domains: [], reason: '' }
@@ -24,16 +31,23 @@ function addPathRule (rules, rule) {
         rules.push(existing)
     }
     existing.domains = Array.from(new Set(existing.domains.concat(rule.domains).sort()))
-    existing.reason = [existing.reason, rule.reason].filter(function (x) { return x !== '' }).join('; ')
+    if (existing.domains.includes('<all>')) {
+        existing.domains = ['<all>']
+    }
+    const reasons = existing.reason.split('; ')
+    const newReason = rule.reason
+    if (!reasons.includes(rule.reason)) {
+        existing.reason = reasons.concat([newReason]).filter(function (x) { return x !== '' }).join('; ')
+    }
 }
 
 function mergeAllowlistedTrackers (t1, t2) {
     const res = {}
     for (const dom in t1) {
-        addDomainRule(res, dom, t1[dom])
+        addDomainRules(res, dom, t1[dom])
     }
     for (const dom in t2) {
-        addDomainRule(res, dom, t2[dom])
+        addDomainRules(res, dom, t2[dom])
     }
     // Sort the resulting generated object by domain keys.
     // This makes working with the generated config easier and more human-navigable.
@@ -65,7 +79,42 @@ function inlineReasonArrays (data) {
     }
 }
 
+/**
+ * All domains that may map to the given cnameTarget.
+ */
+function getCnameSources (tds, cnameTarget) {
+    return Object.entries(tds.cnames).filter(([k, v]) => v.endsWith(cnameTarget)).map(kv => kv[0])
+}
+
+/**
+ * Generate rules which CNAME to the CNAMEd rule.
+ */
+function generateCnameRules (tds, cnamedRule) {
+    const dom = cnamedRule.rule.split('/')[0]
+    const sources = getCnameSources(tds, dom)
+    const resultRules = []
+    for (const source of sources) {
+        resultRules.push({
+            ...cnamedRule,
+            rule: cnamedRule.rule.replace(dom, source),
+            reason: 'CNAME ENTRY GENERATED FROM: ' + dom
+        })
+    }
+    return resultRules
+}
+
+/**
+ * Add CNAME entries to the allowlist to support platforms with incorrect CNAME resolution.
+ */
+function addCnameEntriesToAllowlist (tds, allowlist) {
+    Object.values(allowlist).forEach(ruleSet => ruleSet.rules.forEach(rule => {
+        generateCnameRules(tds, rule).forEach(rule => addAllowlistRule(allowlist, rule))
+    }))
+}
+
 module.exports = {
+    addAllowlistRule: addAllowlistRule,
+    addCnameEntriesToAllowlist: addCnameEntriesToAllowlist,
     inlineReasonArrays: inlineReasonArrays,
     mergeAllowlistedTrackers: mergeAllowlistedTrackers
 }
