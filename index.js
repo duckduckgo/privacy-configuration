@@ -19,21 +19,18 @@ const platforms = require('./platforms')
 
 const tdsPath = 'live'
 
-let tdsCached
 async function getTds () {
-    if (tdsCached) {
-        return tdsCached
-    }
+    let tds
     if (tdsPath === 'live') {
         console.log('Fetching remote TDS')
         const response = await fetch('https://staticcdn.duckduckgo.com/trackerblocking/v3/tds.json')
-        tdsCached = await response.json()
+        tds = await response.json()
         console.log('Fetched remote TDS')
     } else {
         console.log('Using local TDS')
-        tdsCached = JSON.parse(fs.readFileSync(tdsPath))
+        tds = JSON.parse(fs.readFileSync(tdsPath))
     }
-    return tdsCached
+    return tds
 }
 
 /**
@@ -126,6 +123,7 @@ function isFeatureMissingState (feature) {
 // Handle platform specific overrides and write configs to disk
 async function buildPlatforms () {
     const platformConfigs = {}
+    const tds = await getTds()
 
     for (const platform of platforms) {
         let platformConfig = JSON.parse(JSON.stringify(defaultConfig))
@@ -198,7 +196,6 @@ async function buildPlatforms () {
             platformConfig.unprotectedTemporary = platformConfig.unprotectedTemporary.concat(platformOverride.unprotectedTemporary)
         }
 
-        const tds = await getTds()
         addCnameEntriesToAllowlist(tds, platformConfig.features.trackerAllowlist.settings.allowlistedTrackers)
         platformConfig = inlineReasonArrays(platformConfig)
         platformConfigs[platform] = platformConfig
