@@ -1,0 +1,95 @@
+{
+    "_meta": {
+        "description": "Hide empty ad slots.",
+        "sampleExcludeRecords": {
+            "domain": "example.com",
+            "reason": "site breakage"
+        }
+    },
+    "exceptions": [
+        {
+            "domain": "gazeta.pl",
+            "reason": "Testing exceptions"
+        }
+    ],
+    "settings": {
+        "rules": [
+            {
+                "selector": "[id*='gpt-']",
+                "type": "closest-empty"
+            },
+            {
+                "selector": "[id*='taboola-']",
+                "type": "closest-empty"
+            },
+            {
+                "selector": "[class*='dfp-']",
+                "type": "hide"
+            },
+            {
+                "selector": ".cx-recommended",
+                "type": "hide"
+            }
+        ],
+        "domains": [
+            {
+                "domain": "businessinsider.com",
+                "rules": [
+                    {
+                        "selector": "[data-targeting*='{']",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "wsj.com",
+                "rules": [
+                    {
+                        "selector": ".adWrapper",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "bloomberg.com",
+                "rules": [
+                    {
+                        "selector": "[data-ad-placeholder*='Advertisement']",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "indy100.com",
+                "rules": [
+                    {
+                        "selector": "#thirdparty01",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "marketwatch.com",
+                "rules": [
+                    {
+                        "selector": ".cx-recommended",
+                        "type": "override"
+                    },
+                    {
+                        "selector": ".j-ad",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "www.marketwatch.com",
+                "rules": [
+                    {
+                        "selector": "[class*='dfp-']",
+                        "type": "override"
+                    }
+                ]
+            }
+        ]
+    }
+}
