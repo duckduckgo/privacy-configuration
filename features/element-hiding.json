@@ -6,12 +6,7 @@
             "reason": "site breakage"
         }
     },
-    "exceptions": [
-        {
-            "domain": "gazeta.pl",
-            "reason": "Testing exceptions"
-        }
-    ],
+    "exceptions": [],
     "settings": {
         "rules": [
             {
@@ -23,29 +18,59 @@
                 "type": "closest-empty"
             },
             {
-                "selector": "[class*='dfp-']",
-                "type": "hide"
+                "selector": ".adHolder",
+                "type": "closest-empty"
             },
             {
-                "selector": ".cx-recommended",
-                "type": "hide"
+                "selector": "[class*='ad_unit']",
+                "type": "closest-empty"
+            },
+            {
+                "selector": ".ad-leaderboard",
+                "type": "closest-empty"
+            },
+            {
+                "selector": ".ad-container",
+                "type": "closest-empty"
+            },
+            {
+                "selector": ".ad-wrapper",
+                "type": "closest-empty"
+            },
+            {
+                "selector": "[data-adunitpath]",
+                "type": "closest-empty"
+            },
+            {
+                "selector": "[data-unit]",
+                "type": "closest-empty"
+            },
+            {
+                "selector": "[data-targeting]",
+                "type": "closest-empty"
             }
         ],
+        "adLabelStrings": [
+            "advertisement",
+            "advertising",
+            "sponsored",
+            "reklama"
+        ],
         "domains": [
+            {
+                "domain": "bbc.com",
+                "rules": [
+                    {
+                        "selector": ".dotcom-ad",
+                        "rule": "closest-empty"
+                    }
+                ]
+            },
             {
                 "domain": "businessinsider.com",
                 "rules": [
                     {
                         "selector": "[data-targeting*='{']",
-                        "type": "closest-empty"
-                    }
-                ]
-            },
-            {
-                "domain": "wsj.com",
-                "rules": [
-                    {
-                        "selector": ".adWrapper",
                         "type": "closest-empty"
                     }
                 ]
@@ -64,7 +89,7 @@
                 "rules": [
                     {
                         "selector": "#thirdparty01",
-                        "type": "hide"
+                        "type": "hide-empty"
                     }
                 ]
             },
@@ -72,21 +97,65 @@
                 "domain": "marketwatch.com",
                 "rules": [
                     {
-                        "selector": ".cx-recommended",
-                        "type": "override"
-                    },
-                    {
                         "selector": ".j-ad",
                         "type": "closest-empty"
                     }
                 ]
             },
             {
-                "domain": "www.marketwatch.com",
+                "domain": "wsj.com",
                 "rules": [
                     {
-                        "selector": "[class*='dfp-']",
-                        "type": "override"
+                        "selector": "[class*='adWrapper']",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": "[id*='cx-']",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "yahoo.com",
+                "rules": [
+                    {
+                        "selector": ".darla",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "gazeta.pl",
+                "rules": [
+                    {
+                        "selector": "[class*='DFP-']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "nfl.com",
+                "rules": [
+                    {
+                        "selector": "[class*='adv-block']",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "usatoday.com",
+                "rules": [
+                    {
+                        "selector": "[aria-label='advertisement']",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": ".gnt_tb",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".gnt_flp",
+                        "type": "hide-empty"
                     }
                 ]
             }
