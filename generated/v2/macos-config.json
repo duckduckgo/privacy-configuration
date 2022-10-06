@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1665013746088,
+    "version": 1665014912756,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -252,7 +252,8 @@
                     "advertising",
                     "ad feedback",
                     "sponsored",
-                    "reklama"
+                    "reklama",
+                    "continue reading the main story"
                 ],
                 "domains": [
                     {
@@ -362,6 +363,15 @@
                         "rules": [
                             {
                                 "selector": ".proper-dynamic-insertion",
+                                "type": "closest-empty"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "washingtonpost.com",
+                        "rules": [
+                            {
+                                "selector": "wp-ad",
                                 "type": "closest-empty"
                             }
                         ]
