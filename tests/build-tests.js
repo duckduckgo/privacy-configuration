@@ -1,6 +1,6 @@
 const expect = require('chai').expect
 
-const { inlineReasonArrays, mergeAllowlistedTrackers } = require('../util')
+const { addAllowlistRule, addCnameEntriesToAllowlist, inlineReasonArrays, mergeAllowlistedTrackers } = require('../util')
 
 const ta1 = {
     'f1.com': {
@@ -177,6 +177,90 @@ describe('mergeAllowlistedTrackers', () => {
         }, {
             f1: { rules: [] }, f3: { rules: [] }
         }))).to.deep.equal(['f1', 'f2', 'f3', 'f4'])
+    })
+    it('is idempotent', () => {
+        const gen = () => ({ 'simple.com': { rules: [{ rule: 'really.simple.com/foo', domains: ['domain1.com'], reason: 'Simple reason' }] } })
+        expect(mergeAllowlistedTrackers(gen(), gen())).to.deep.equal(gen())
+    })
+})
+
+const mkRule = (rulePath, domains, reason) => {
+    return {
+        rule: rulePath,
+        domains: domains || ['<all>'],
+        reason: reason || ''
+    }
+}
+
+describe('addAllowlistRule', () => {
+    let allowlist
+    beforeEach(() => {
+        allowlist = {}
+    })
+    it('should add single entry', () => {
+        addAllowlistRule(allowlist, { rule: 'really.simple.com/foo', domains: ['domain1.com'], reason: 'Simple reason' })
+        expect(allowlist).to.deep.equal({ 'simple.com': { rules: [{ rule: 'really.simple.com/foo', domains: ['domain1.com'], reason: 'Simple reason' }] } })
+    })
+    it('identifies true base domain', () => {
+        addAllowlistRule(allowlist, { rule: 'really.simple.co.uk/foo', domains: ['domain1.com'], reason: 'Simple reason' })
+        expect(Object.keys(allowlist)).to.deep.equal(['simple.co.uk'])
+    })
+    it('should be idempotent', () => {
+        addAllowlistRule(allowlist, { rule: 'really.simple.com/foo', domains: ['domain1.com'], reason: 'Simple reason' })
+        addAllowlistRule(allowlist, { rule: 'really.simple.com/foo', domains: ['domain1.com'], reason: 'Simple reason' })
+        expect(allowlist).to.deep.equal({ 'simple.com': { rules: [{ rule: 'really.simple.com/foo', domains: ['domain1.com'], reason: 'Simple reason' }] } })
+    })
+    it('does not add duplicate reason', () => {
+        addAllowlistRule(allowlist, { rule: 'really.simple.com/foo', domains: ['domain1.com'], reason: 'Simple reason 1' })
+        addAllowlistRule(allowlist, { rule: 'really.simple.com/foo', domains: ['domain1.com'], reason: 'Simple reason 2' })
+        addAllowlistRule(allowlist, { rule: 'really.simple.com/foo', domains: ['domain1.com'], reason: 'Simple reason 2' })
+        expect(allowlist).to.deep.equal({ 'simple.com': { rules: [{ rule: 'really.simple.com/foo', domains: ['domain1.com'], reason: 'Simple reason 1; Simple reason 2' }] } })
+    })
+    describe('<all> domain is absorbing', () => {
+        it('adding domain to <all> is <all>', () => {
+            addAllowlistRule(allowlist, mkRule('really.simple.com/foo', ['<all>']))
+            addAllowlistRule(allowlist, mkRule('really.simple.com/foo', ['domain.com']))
+            expect(allowlist['simple.com'].rules[0].domains).to.deep.equal(['<all>'])
+        })
+        it('adding <all> to domain is <all>', () => {
+            addAllowlistRule(allowlist, mkRule('really.simple.com/foo', ['domain.com']))
+            addAllowlistRule(allowlist, mkRule('really.simple.com/foo', ['<all>']))
+            expect(allowlist['simple.com'].rules[0].domains).to.deep.equal(['<all>'])
+        })
+    })
+    it('should merge domains and reasons', () => {
+        addAllowlistRule(allowlist, { rule: 'really.simple.com/foo', domains: ['domain1.com'], reason: 'Simple reason 1' })
+        addAllowlistRule(allowlist, { rule: 'really.simple.com/foo', domains: ['domain2.com'], reason: 'Simple reason 2' })
+        expect(allowlist).to.deep.equal({ 'simple.com': { rules: [{ rule: 'really.simple.com/foo', domains: ['domain1.com', 'domain2.com'], reason: 'Simple reason 1; Simple reason 2' }] } })
+    })
+})
+
+describe('addCnameEntriesToAllowlist', () => {
+    const tds = { cnames: { 'tracker.simple.com': 'simple.tracker.com', 'tracker.simple2.com': 'simple2.tracker.com' } }
+    it('adds only specific domains when full CNAME domain specified', () => {
+        const allowlist = {}
+        addAllowlistRule(allowlist, mkRule('simple.tracker.com/request'))
+        addCnameEntriesToAllowlist(tds, allowlist)
+        expect(Object.keys(allowlist)).to.deep.equal(['tracker.com', 'simple.com'])
+    })
+    it('if domains are specified, exempts only on specified domains', () => {
+        const allowlist = {}
+        addAllowlistRule(allowlist, mkRule('simple.tracker.com/request', ['domain.com']))
+        addCnameEntriesToAllowlist(tds, allowlist)
+        expect(allowlist['simple.com'].rules[0].domains).to.deep.equal(['domain.com'])
+    })
+    it('merges with existing entry', () => {
+        const allowlist = {}
+        addAllowlistRule(allowlist, mkRule('tracker.simple.com/request', ['domain1.com']))
+        addAllowlistRule(allowlist, mkRule('simple.tracker.com/request', ['domain2.com']))
+        addCnameEntriesToAllowlist(tds, allowlist)
+        expect(allowlist['simple.com'].rules[0].domains).to.deep.equal(['domain1.com', 'domain2.com'])
+    })
+    it('adds all domains when partial CNAME domain specified', () => {
+        const allowlist = {}
+        addAllowlistRule(allowlist, mkRule('tracker.com/request'))
+        addCnameEntriesToAllowlist(tds, allowlist)
+        expect(Object.keys(allowlist)).to.deep.equal(['tracker.com', 'simple.com', 'simple2.com'])
     })
 })
 
