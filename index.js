@@ -3,6 +3,7 @@ const fs = require('fs')
 const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args))
 
 const { addCnameEntriesToAllowlist, inlineReasonArrays, mergeAllowlistedTrackers } = require('./util')
+const { generateAppTPConfig } = require('./apptp/apptp')
 
 const OVERRIDE_DIR = 'overrides'
 const GENERATED_DIR = 'generated'
@@ -115,6 +116,9 @@ mkdirIfNeeded(GENERATED_DIR)
 // Create version directories
 mkdirIfNeeded(`${GENERATED_DIR}/v1`)
 mkdirIfNeeded(`${GENERATED_DIR}/v2`)
+
+// Generate AppTP config separately
+generateAppTPConfig(GENERATED_DIR)
 
 function isFeatureMissingState (feature) {
     return !('state' in feature)

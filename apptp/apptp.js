@@ -1,11 +1,14 @@
 const fs = require('fs')
-const path = require('path');
+const path = require('path')
 
-const LISTS_DIR = path.join(__dirname, `allowlists`)
+const LISTS_DIR = path.join(__dirname, 'allowlists')
 
-function generateAppTPConfig(generated_dir) {
+function generateAppTPConfig (generatedDir) {
     // Get base file
-    let baseConfig = JSON.parse(fs.readFileSync(path.join(__dirname, `apptp.json`)))
+    const baseConfig = JSON.parse(fs.readFileSync(path.join(__dirname, 'apptp.json')))
+
+    // Add version
+    baseConfig['version'] = Date.now()
 
     // Grab all exception lists
     const jsonListNames = fs.readdirSync(LISTS_DIR)
@@ -16,8 +19,7 @@ function generateAppTPConfig(generated_dir) {
         delete listData._meta
         baseConfig.lists[configKey] = listData
     }
-    console.log(baseConfig)
-    fs.writeFileSync(`${generated_dir}/v2/apptp-config.json`, JSON.stringify(baseConfig, null, 4))
+    fs.writeFileSync(`${generatedDir}/v2/apptp-config.json`, JSON.stringify(baseConfig, null, 4))
 }
 
 module.exports = {

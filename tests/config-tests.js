@@ -60,3 +60,31 @@ describe('Config schema tests', () => {
         })
     }
 })
+
+describe('AppTP config schema tests', () => {
+    const rootSchema = JSON.parse(fs.readFileSync('./tests/schemas/apptp/root.json'))
+    const validateRoot = ajv.compile(rootSchema)
+    const featureSchema = JSON.parse(fs.readFileSync('./tests/schemas/apptp/feature.json'))
+    const validateFeature = ajv.compile(featureSchema)
+    const listSchema = JSON.parse(fs.readFileSync('./tests/schemas/apptp/list.json'))
+    const validateList = ajv.compile(listSchema)
+
+    config = JSON.parse(fs.readFileSync('./generated/v2/apptp-config.json'))
+    describe('apptp-config', () => {
+        it('should have a valid root schema', () => {
+            expect(validateRoot(config)).to.be.equal(true, formatErrors(validateRoot.errors))
+        })
+
+        it('should have a vaild feature schema', () => {
+            for (const featureKey in config.features) {
+                expect(validateFeature(config.features[featureKey])).to.be.equal(true, `Feature ${featureKey}: ` + formatErrors(validateFeature.errors))
+            }
+        })
+
+        it('should have valid lists', () => {
+            for (const list in config.lists) {
+                expect(validateList(config.lists[list])).to.be.equal(true, `List ${list}: ` + formatErrors(validateList.errors))
+            }
+        })
+    })
+})

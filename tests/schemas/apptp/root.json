@@ -1,0 +1,23 @@
+{
+    "type": "object",
+    "properties": {
+        "readme": {"type": "string"},
+        "features": {
+            "type": "object",
+            "patternProperties": {
+                "^[a-zA-Z0-9]+$": {"type": "object"}
+            },
+            "additionalProperties": false
+        },
+        "lists": {
+            "type": "object",
+            "patternProperties": {
+                "^[a-zA-Z0-9]+$": {"type": "object"}
+            },
+            "additionalProperties": false
+        },
+        "version": {"type": "integer"}
+    },
+    "additionalProperties": false,
+    "required": ["readme", "features", "version", "lists"]
+}
