@@ -69,7 +69,7 @@ describe('AppTP config schema tests', () => {
     const listSchema = JSON.parse(fs.readFileSync('./tests/schemas/apptp/list.json'))
     const validateList = ajv.compile(listSchema)
 
-    config = JSON.parse(fs.readFileSync('./generated/v2/apptp-config.json'))
+    const config = JSON.parse(fs.readFileSync('./generated/v2/apptp-config.json'))
     describe('apptp-config', () => {
         it('should have a valid root schema', () => {
             expect(validateRoot(config)).to.be.equal(true, formatErrors(validateRoot.errors))

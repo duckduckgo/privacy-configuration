@@ -8,7 +8,7 @@ function generateAppTPConfig (generatedDir) {
     const baseConfig = JSON.parse(fs.readFileSync(path.join(__dirname, 'apptp.json')))
 
     // Add version
-    baseConfig['version'] = Date.now()
+    baseConfig.version = Date.now()
 
     // Grab all exception lists
     const jsonListNames = fs.readdirSync(LISTS_DIR)
