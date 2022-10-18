@@ -1,0 +1,52 @@
+{
+    "_meta": {
+        "description": "App Tracking Protection"
+    },
+    "state": "enabled",
+    "settings": {
+        "connectivityChecks": {
+            "state": "enabled"
+        },
+        "ipv6Support": {
+            "state": "enabled"
+        },
+        "privateDnsSupport": {
+            "state": "enabled"
+        },
+        "badHealthMitigation": {
+            "state": "enabled",
+            "settings": {
+                "triggers": {
+                    "socketReadExceptionAlerts": {
+                        "state": "enabled",
+                        "threshold": 20
+                    }
+                }
+            }
+        },
+        "cpuMonitoring": {
+            "state": "enabled"
+        }, 
+        "appTrackerAllowList": [
+            {
+                "packageName": "com.example.app",
+                "domains": [
+                    {
+                        "domain": "example.tracker.com",
+                        "allowTTL": 1
+                    }
+                ]
+            }
+        ],
+        "unportectedApps": [
+            {
+                "packageName": "com.example.app",
+                "reason": "Loads websites"
+            }
+        ],
+        "unhideSystemApps": [
+            "com.example.system.app"
+        ]
+    },
+    "exceptions": []
+}
