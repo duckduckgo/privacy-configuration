@@ -58,11 +58,11 @@ describe('Config schema tests', () => {
                 }
             })
 
-            // apptp should only be on the Android config since it is a large feature
+            // appTrackerProtection should only be on the Android config since it is a large feature
             const shouldContainAppTP = (config.name === 'android-config.json')
-            it('should contain appTP or not', () => {
-                expect('apptp' in config.body.features).to.be.equal(shouldContainAppTP, `appTP expected: ${shouldContainAppTP}`)
-            })            
+            it('should contain appTrackerProtection or not', () => {
+                expect('appTrackerProtection' in config.body.features).to.be.equal(shouldContainAppTP, `appTrackerProtection expected: ${shouldContainAppTP}`)
+            })
         })
     }
 })
