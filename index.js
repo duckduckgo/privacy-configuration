@@ -175,7 +175,12 @@ async function buildPlatforms () {
                 }
             }
             if (isFeatureMissingState(platformConfig.features[key])) {
-                platformConfig.features[key].state = 'disabled'
+                // Avoid adding appTP to platforms that don't use it since it's a large feature
+                if (key === 'apptp') {
+                    delete platformConfig.features[key]
+                } else {
+                    platformConfig.features[key].state = 'disabled'
+                }
             }
         }
 

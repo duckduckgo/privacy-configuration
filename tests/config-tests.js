@@ -57,6 +57,12 @@ describe('Config schema tests', () => {
                     expect(validateException(exception)).to.be.equal(true, 'unprotectedTemporary: ' + formatErrors(validateException.errors))
                 }
             })
+
+            // apptp should only be on the Android config since it is a large feature
+            const shouldContainAppTP = (config.name === 'android-config.json')
+            it('should contain appTP or not', () => {
+                expect('apptp' in config.body.features).to.be.equal(shouldContainAppTP, `appTP expected: ${shouldContainAppTP}`)
+            })            
         })
     }
 })
