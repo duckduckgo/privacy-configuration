@@ -29,26 +29,28 @@
         "cpuMonitoring": {
             "state": "enabled"
         }, 
-        "appTrackerAllowList": [
-            {
-                "packageName": "se.prisjakt.pricespy",
-                "domains": [
-                    {
-                        "domain": "acdn.adnxs.com",
-                        "allowTTL": 0
-                    }
-                ]
-            }
-        ],
-        "unprotectedApps": [
-            {
-                "packageName": "com.android.chrome",
-                "reason": "Loads websites"
-            }
-        ],
-        "unhideSystemApps": [
-            "com.android.chrome"
-        ]
+        "exceptionLists": {
+            "appTrackerAllowList": [
+                {
+                    "packageName": "se.prisjakt.pricespy",
+                    "domains": [
+                        {
+                            "domain": "acdn.adnxs.com",
+                            "allowTTL": 0
+                        }
+                    ]
+                }
+            ],
+            "unprotectedApps": [
+                {
+                    "packageName": "com.android.chrome",
+                    "reason": "Loads websites"
+                }
+            ],
+            "unhideSystemApps": [
+                "com.android.chrome"
+            ]
+        }        
     },
     "exceptions": []
 }
