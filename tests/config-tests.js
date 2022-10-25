@@ -57,6 +57,12 @@ describe('Config schema tests', () => {
                     expect(validateException(exception)).to.be.equal(true, 'unprotectedTemporary: ' + formatErrors(validateException.errors))
                 }
             })
+
+            // appTrackerProtection should only be on the Android config since it is a large feature
+            const shouldContainAppTP = (config.name === 'android-config.json')
+            it('should contain appTrackerProtection or not', () => {
+                expect('appTrackerProtection' in config.body.features).to.be.equal(shouldContainAppTP, `appTrackerProtection expected: ${shouldContainAppTP}`)
+            })
         })
     }
 })
