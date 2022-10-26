@@ -7,7 +7,7 @@ module.exports = [
     'browsers/edge',
     'browsers/chromemv3',
     'browsers/bravemv3',
-    'browsers/edgemv3',
+    'browsers/edgmv3',
     'ios',
     'android',
     'macos',
