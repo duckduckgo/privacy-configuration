@@ -5,6 +5,7 @@ module.exports = [
     'browsers/firefox',
     'browsers/brave',
     'browsers/edge',
+    'browsers/chromemv3',
     'ios',
     'android',
     'macos',
