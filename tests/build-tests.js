@@ -1,6 +1,6 @@
 const expect = require('chai').expect
 
-const { addAllowlistRule, addCnameEntriesToAllowlist, inlineReasonArrays, mergeAllowlistedTrackers } = require('../util')
+const { addAllowlistRule, addCnameEntriesToAllowlist, inlineReasonArrays, mergeAllowlistedTrackers, addHashToFeatures } = require('../util')
 
 const ta1 = {
     'f1.com': {
@@ -285,5 +285,31 @@ describe('inlineReasonArrays', () => {
     })
     it('null', () => {
         expect(inlineReasonArrays(null)).to.equal(null)
+    })
+})
+
+describe('addHashToFeatures', () => {
+    const testConfigStr = `{
+        "features": {
+            "testFeature": {
+                "exceptions": [],
+                "settings": {
+                    "setting1": 123,
+                    "setting2": "some setting"
+                },
+                "state": "enabled"
+            }
+        }
+    }`
+    it('should generate correct hash', () => {
+        const testConfig = JSON.parse(testConfigStr)
+        addHashToFeatures(testConfig)
+        expect(testConfig.features.testFeature.hash).to.be.equal('28ea3a50d97a1e3eada2b8666b096e40')
+    })
+    it('should update hash', () => {
+        const testConfig = JSON.parse(testConfigStr)
+        testConfig.features.testFeature.settings.setting1 = 456
+        addHashToFeatures(testConfig)
+        expect(testConfig.features.testFeature.hash).to.be.equal('91f8efc44dcd8f708619421e045120c4')
     })
 })

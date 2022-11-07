@@ -1,4 +1,5 @@
 const tldts = require('tldts')
+const crypto = require('crypto')
 
 function getAllowlistedRule (rules, rulePath) {
     return rules.find(function (x) { return x.rule === rulePath })
@@ -112,9 +113,22 @@ function addCnameEntriesToAllowlist (tds, allowlist) {
     }))
 }
 
+/**
+ * Adds a hash of each feature to each feature object of the provided config
+ *
+ * @param {object} config - the config object to update
+ */
+function addHashToFeatures (config) {
+    for (const key of Object.keys(config.features)) {
+        const featureString = JSON.stringify(config.features[key])
+        config.features[key].hash = crypto.createHash('md5').update(featureString).digest('hex')
+    }
+}
+
 module.exports = {
     addAllowlistRule: addAllowlistRule,
     addCnameEntriesToAllowlist: addCnameEntriesToAllowlist,
     inlineReasonArrays: inlineReasonArrays,
-    mergeAllowlistedTrackers: mergeAllowlistedTrackers
+    mergeAllowlistedTrackers: mergeAllowlistedTrackers,
+    addHashToFeatures: addHashToFeatures
 }
