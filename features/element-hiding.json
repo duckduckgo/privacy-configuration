@@ -22,6 +22,10 @@
                 "type": "closest-empty"
             },
             {
+                "selector": "[id*='dfp_']",
+                "type": "closest-empty"
+            },
+            {
                 "selector": "[id*='taboola-']",
                 "type": "closest-empty"
             },
@@ -38,7 +42,19 @@
                 "type": "closest-empty"
             },
             {
+                "selector": ".leaderboard",
+                "type": "closest-empty"
+            },
+            {
+                "selector": "#leaderboard",
+                "type": "closest-empty"
+            },
+            {
                 "selector": "[class*='bannerAd']",
+                "type": "closest-empty"
+            },
+            {
+                "selector": ".ad_container",
                 "type": "closest-empty"
             },
             {
@@ -50,11 +66,19 @@
                 "type": "closest-empty"
             },
             {
+                "selector": ".advertisement",
+                "type": "closest-empty"
+            },
+            {
                 "selector": ".ad-slot",
                 "type": "closest-empty"
             },
             {
                 "selector": ".ad-wrapper",
+                "type": "closest-empty"
+            },
+            {
+                "selector": "[class*='adWrapper']",
                 "type": "closest-empty"
             },
             {
@@ -80,7 +104,9 @@
         ],
         "adLabelStrings": [
             "advertisement",
+            "advertisment",
             "advertisementclose",
+            "advertisement\ncontinue reading the main story",
             "advertising",
             "ad feedback",
             "sponsored",
@@ -89,10 +115,23 @@
         ],
         "domains": [
             {
+                "domain": "apnews.com",
+                "rules": [
+                    {
+                        "selector": ".proper-dynamic-insertion",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
                 "domain": "bbc.com",
                 "rules": [
                     {
                         "selector": ".dotcom-ad",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": ".leaderboard-ad-placeholder",
                         "type": "closest-empty"
                     }
                 ]
@@ -103,6 +142,15 @@
                     {
                         "selector": ".br-ad-wrapper",
                         "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "coingecko.com",
+                "rules": [
+                    {
+                        "selector": "[data-target='ads.banner']",
+                        "type": "hide-empty"
                     }
                 ]
             },
@@ -160,10 +208,41 @@
                 ]
             },
             {
+                "domain": "huffpost.com",
+                "rules": [
+                    {
+                        "selector": ".connatix-player",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "indiatimes.com",
+                "rules": [
+                    {
+                        "selector": ".ad-cls",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
                 "domain": "indy100.com",
                 "rules": [
                     {
                         "selector": "[id*='thirdparty']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "macrumors.com",
+                "rules": [
+                    {
+                        "selector": ".tertiary",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[class*='sidebarblock']",
                         "type": "hide-empty"
                     }
                 ]
@@ -200,6 +279,15 @@
                 ]
             },
             {
+                "domain": "skysports.com",
+                "rules": [
+                    {
+                        "selector": "[data-format='leaderboard']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
                 "domain": "snopes.com",
                 "rules": [
                     {
@@ -225,11 +313,7 @@
                 "domain": "wsj.com",
                 "rules": [
                     {
-                        "selector": "[class*='adWrapper']",
-                        "type": "closest-empty"
-                    },
-                    {
-                        "selector": "[id*='cx-']",
+                        "selector": "#cx-what-to-read-next",
                         "type": "closest-empty"
                     }
                 ]
@@ -248,6 +332,14 @@
                 "rules": [
                     {
                         "selector": "[class*='DFP-']",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": "[id*='banC']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".indexPremium__adv",
                         "type": "hide-empty"
                     }
                 ]
