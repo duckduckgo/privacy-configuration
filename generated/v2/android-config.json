@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1668538036197,
+    "version": 1668635092554,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -226,14 +226,14 @@
             "hash": "dc169190f1a63a60fd2aba6c70dd8351"
         },
         "contentBlocking": {
-            "state": "disabled",
+            "state": "enabled",
             "exceptions": [
                 {
                     "domain": "welt.de",
                     "reason": "Video pauses at about 13-15 seconds in. Playing the video again results in a single frame rendering without progressing to the next frame."
                 }
             ],
-            "hash": "09e1953a56d6d14154f221ce8ef6e145"
+            "hash": "ee4fc0c8e6acc9ef2629ae96156a76a5"
         },
         "cookie": {
             "exceptions": [],
@@ -419,6 +419,15 @@
                             {
                                 "selector": ".br-ad-wrapper",
                                 "type": "closest-empty"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "bloomberg.com",
+                        "rules": [
+                            {
+                                "selector": ".unsupported-browser-notification-container",
+                                "type": "hide"
                             }
                         ]
                     },
@@ -662,8 +671,8 @@
                     }
                 ]
             },
-            "state": "enabled",
-            "hash": "8f29dc1b18f6c768547205566197c0a2"
+            "state": "disabled",
+            "hash": "7320e725b9782a875554998d5d4b90a5"
         },
         "fingerprintingAudio": {
             "state": "disabled",
