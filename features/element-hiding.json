@@ -38,6 +38,10 @@
                 "type": "closest-empty"
             },
             {
+                "selector": ".ad",
+                "type": "closest-empty"
+            },
+            {
                 "selector": ".ad-leaderboard",
                 "type": "closest-empty"
             },
@@ -51,7 +55,7 @@
             },
             {
                 "selector": "[class*='bannerAd']",
-                "type": "closest-empty"
+                "type": "hide-empty"
             },
             {
                 "selector": ".ad_container",
@@ -389,6 +393,48 @@
                     {
                         "selector": "[id*='cxense-']",
                         "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "first-party.site",
+                "rules": [
+                    {
+                        "selector": ".hide-test",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".hide-empty-test",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".closest-empty-test",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": ".ad-container",
+                        "type": "override"
+                    }
+                ]
+            },
+            {
+                "domain": "privacy-test-pages.glitch.me",
+                "rules": [
+                    {
+                        "selector": ".hide-test",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".hide-empty-test",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".closest-empty-test",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": ".ad-container",
+                        "type": "override"
                     }
                 ]
             }

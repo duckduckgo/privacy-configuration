@@ -97,61 +97,6 @@
             "state": "enabled",
             "hash": "8668c1396cf49ac18e2e057c48dac1a7"
         },
-        "appTrackerProtection": {
-            "settings": {
-                "protectGames": {
-                    "state": "enabled"
-                },
-                "connectivityChecks": {
-                    "state": "enabled"
-                },
-                "ipv6Support": {
-                    "state": "enabled"
-                },
-                "privateDnsSupport": {
-                    "state": "enabled"
-                },
-                "badHealthMitigation": {
-                    "state": "enabled",
-                    "settings": {
-                        "triggers": {
-                            "socketReadExceptionAlerts": {
-                                "state": "enabled",
-                                "threshold": 20
-                            }
-                        }
-                    }
-                },
-                "cpuMonitoring": {
-                    "state": "enabled"
-                },
-                "exceptionLists": {
-                    "appTrackerAllowList": [
-                        {
-                            "packageName": "se.prisjakt.pricespy",
-                            "domains": [
-                                {
-                                    "domain": "acdn.adnxs.com",
-                                    "allowTTL": 0
-                                }
-                            ]
-                        }
-                    ],
-                    "unprotectedApps": [
-                        {
-                            "packageName": "com.android.chrome",
-                            "reason": "Loads websites"
-                        }
-                    ],
-                    "unhideSystemApps": [
-                        "com.android.chrome"
-                    ]
-                }
-            },
-            "exceptions": [],
-            "state": "enabled",
-            "hash": "0efb9e2c038be12d05164bd0f67edc25"
-        },
         "autoconsent": {
             "exceptions": [
                 {
@@ -202,8 +147,8 @@
             "settings": {
                 "disabledCMPs": []
             },
-            "state": "enabled",
-            "hash": "a27ca1a5dbc7625c915d51ab0b9da960"
+            "state": "disabled",
+            "hash": "d3941af4a241f0df0ff9a41921568a82"
         },
         "autofill": {
             "exceptions": [
@@ -237,14 +182,8 @@
         },
         "cookie": {
             "exceptions": [],
-            "state": "enabled",
-            "settings": {
-                "firstPartyCookiePolicy": {
-                    "threshold": 604800,
-                    "maxAge": 604800
-                }
-            },
-            "hash": "283f2bbdeb4af091d165875e6b3f3cef"
+            "state": "disabled",
+            "hash": "728493ef7a1488e4781656d3f9db84aa"
         },
         "customUserAgent": {
             "settings": {
@@ -258,24 +197,23 @@
                         "reason": "Homepage UI elements appear squashed together, preventing interaction with the site."
                     },
                     {
-                        "domain": "mail.google.com",
-                        "reason": "Page loads blank after login (inbox does not show)."
+                        "domain": "cvs.com",
+                        "reason": "Navigation section at the top of the main page renders as text."
                     },
                     {
-                        "domain": "vegas.williamhill.com",
-                        "reason": "Cannot interact with cookie prompt and some page elements don't load."
+                        "domain": "facebook.com",
+                        "reason": "When going to the main login page, there is a banner at the top which warns of an 'Unsupported browser'."
+                    },
+                    {
+                        "domain": "xfinity.com",
+                        "reason": "Stream page shows an incompatibility warning and does not load further."
                     }
                 ],
-                "omitVersionSites": [
-                    {
-                        "domain": "whitepages.com",
-                        "reason": "After performing a search, the site displays a page stating that the browser is not supported, and results are not shown."
-                    }
-                ]
+                "omitVersionSites": []
             },
             "exceptions": [],
             "state": "enabled",
-            "hash": "d4b3671bb240425bfce2dfae7b5dda4d"
+            "hash": "0cdbfd6c0ee82201b90ab950650e48b9"
         },
         "duckPlayer": {
             "exceptions": [],
@@ -727,8 +665,8 @@
         },
         "fingerprintingBattery": {
             "exceptions": [],
-            "state": "disabled",
-            "hash": "728493ef7a1488e4781656d3f9db84aa"
+            "state": "enabled",
+            "hash": "52857469413a66e8b0c7b00de5589162"
         },
         "fingerprintingCanvas": {
             "settings": {
@@ -786,11 +724,10 @@
                 },
                 "hardwareConcurrency": {
                     "type": "number",
-                    "value": 2
+                    "value": 4
                 },
                 "deviceMemory": {
-                    "type": "number",
-                    "value": 8
+                    "type": "undefined"
                 }
             },
             "exceptions": [
@@ -815,8 +752,8 @@
                     "reason": "Site loads blank and does not proceed."
                 }
             ],
-            "state": "disabled",
-            "hash": "3557297277ab28a73ca0b138d1569138"
+            "state": "enabled",
+            "hash": "c64ee53841a5ae4f246bff8f055d7258"
         },
         "fingerprintingScreenSize": {
             "settings": {
@@ -855,13 +792,13 @@
                     "reason": "After entering login details and clicking to log in, the site shows an adwall and prevents login."
                 }
             ],
-            "state": "disabled",
-            "hash": "f26cec64f445fbe1cfabd1d9f6eb2c33"
+            "state": "enabled",
+            "hash": "7d4ea2f0c3583b807e930b1397e82ba3"
         },
         "fingerprintingTemporaryStorage": {
             "exceptions": [],
-            "state": "disabled",
-            "hash": "728493ef7a1488e4781656d3f9db84aa"
+            "state": "enabled",
+            "hash": "52857469413a66e8b0c7b00de5589162"
         },
         "googleRejected": {
             "exceptions": [],
@@ -894,8 +831,8 @@
         },
         "navigatorInterface": {
             "exceptions": [],
-            "state": "disabled",
-            "hash": "728493ef7a1488e4781656d3f9db84aa"
+            "state": "enabled",
+            "hash": "52857469413a66e8b0c7b00de5589162"
         },
         "nonTracking3pCookies": {
             "settings": {
@@ -907,8 +844,8 @@
         },
         "referrer": {
             "exceptions": [],
-            "state": "disabled",
-            "hash": "728493ef7a1488e4781656d3f9db84aa"
+            "state": "enabled",
+            "hash": "52857469413a66e8b0c7b00de5589162"
         },
         "trackerAllowlist": {
             "state": "enabled",
@@ -3259,8 +3196,7 @@
                 ]
             },
             "state": "enabled",
-            "minSupportedVersion": 51250000,
-            "hash": "346bdb54e198b52b0abee74379a450a6"
+            "hash": "69fbd3a82a04b8dfcf93498113009e23"
         },
         "userAgentRotation": {
             "settings": {
@@ -3572,16 +3508,6 @@
             "exceptions": [],
             "state": "disabled",
             "hash": "728493ef7a1488e4781656d3f9db84aa"
-        },
-        "eme": {
-            "state": "enabled",
-            "exceptions": [
-                {
-                    "domain": "open.spotify.com",
-                    "reason": "Site displays a 'Playback disabled' notice on some media, preventing listening."
-                }
-            ],
-            "hash": "26a2d609fb8e6bc38c7761a2db3f6075"
         }
     },
     "unprotectedTemporary": []
