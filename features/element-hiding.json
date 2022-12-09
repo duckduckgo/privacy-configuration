@@ -74,6 +74,10 @@
                 "type": "hide"
             },
             {
+                "selector": "#credential_picker_iframe",
+                "type": "hide"
+            },
+            {
                 "selector": ".ad_container",
                 "type": "closest-empty"
             },
@@ -141,6 +145,8 @@
             "advertisement\ncontinue reading the main story",
             "advertisement - scroll to continue",
             "advertising",
+            "advertising\nskip ad",
+            "advertising\nskip ad\nskip ad\nskip ad",
             "ad feedback",
             "anzeige",
             "sponsored",
@@ -148,6 +154,7 @@
             "publicité",
             "publicidade",
             "reklama",
+            "skip ad",
             "continue reading the main story"
         ],
         "domains": [
@@ -197,6 +204,28 @@
                     {
                         "selector": ".unsupported-browser-notification-container",
                         "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "bostonglobe.com",
+                "rules": [
+                    {
+                        "selector": ".arc_ad",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "cbssports.com",
+                "rules": [
+                    {
+                        "selector": ".leaderboard-wrap",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".skybox-top-wrapper",
+                        "type": "hide-empty"
                     }
                 ]
             },
@@ -334,6 +363,19 @@
                 ]
             },
             {
+                "domain": "nbcsports.com",
+                "rules": [
+                    {
+                        "selector": ".block-mps",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "#nbcsports-leaderboard",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
                 "domain": "orange.fr",
                 "rules": [
                     {
@@ -348,6 +390,15 @@
                     {
                         "selector": "#marquee-ad",
                         "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "reuters.com",
+                "rules": [
+                    {
+                        "selector": "[testid='ResponsiveAdSlot']",
+                        "type": "hide-empty"
                     }
                 ]
             },
