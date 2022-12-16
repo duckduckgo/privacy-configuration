@@ -11,7 +11,7 @@
         "rules": [
             {
                 "selector": "[id*='gpt-']",
-                "type": "closest-empty"
+                "type": "hide-empty"
             },
             {
                 "selector": "[class*='gpt-']",
@@ -19,7 +19,7 @@
             },
             {
                 "selector": "[class*='dfp-']",
-                "type": "closest-empty"
+                "type": "hide-empty"
             },
             {
                 "selector": "[id*='dfp_']",
@@ -51,7 +51,7 @@
             },
             {
                 "selector": ".ad",
-                "type": "closest-empty"
+                "type": "hide-empty"
             },
             {
                 "selector": "[class*='ad-content']",
@@ -74,10 +74,6 @@
                 "type": "hide-empty"
             },
             {
-                "selector": ".google-one-tap",
-                "type": "hide"
-            },
-            {
                 "selector": "#credential_picker_container",
                 "type": "hide"
             },
@@ -86,12 +82,20 @@
                 "type": "hide"
             },
             {
+                "selector": ".google-one-tap-modal-div",
+                "type": "hide"
+            },
+            {
+                "selector": ".google-one-tap",
+                "type": "hide-empty"
+            },
+            {
                 "selector": ".ad_container",
                 "type": "closest-empty"
             },
             {
                 "selector": ".ad-container",
-                "type": "closest-empty"
+                "type": "hide-empty"
             },
             {
                 "selector": ".adcontainer",
@@ -144,10 +148,6 @@
             {
                 "selector": ".bordeaux-slot",
                 "type": "closest-empty"
-            },
-            {
-                "selector": "#spotim-specific",
-                "type": "hide"
             }
         ],
         "adLabelStrings": [
@@ -336,6 +336,15 @@
                     {
                         "selector": "[id*='InStream']",
                         "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "foxnews.com",
+                "rules": [
+                    {
+                        "selector": ".vendor-unit",
+                        "type": "hide-empty"
                     }
                 ]
             },
