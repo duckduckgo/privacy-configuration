@@ -5,6 +5,86 @@
         },
         "autofill": {
             "state": "enabled"
+        },
+        "navigatorInterface": {
+            "state": "enabled"
+        },
+        "elementHiding": {
+            "state": "enabled"
+        },
+        "cookie": {
+            "exceptions": [],
+            "state": "enabled",
+            "minSupportedVersion": "0.36.0",
+            "settings": {
+                "trackerCookie": "enabled",
+                "nonTrackerCookie": "disabled",
+                "excludedCookieDomains": [
+                    {
+                        "domain": "accounts.google.com",
+                        "reason": "On some Google sign-in flows, there is an error after entering username and proceeding: 'Your browser has cookies disabled. Make sure that your cookies are enabled and try again.'"
+                    },
+                    {
+                        "domain": "pay.google.com",
+                        "reason": "After sign-in for Google Pay flows, there is repeated flickering and a loading spinner, preventing the flow from proceeding."
+                    },
+                    {
+                        "domain": "payments.google.com",
+                        "reason": "After sign-in for Google Pay flows (after flickering is resolved), blocking this causes the loading spinner to spin indefinitely, and the payment flow cannot proceed."
+                    }
+                ],
+                "excludedCookieNames": [
+                    {
+                        "domain": "google.com",
+                        "name": "__Secure-1PSID",
+                        "reason": "Required for Google login flow"
+                    },
+                    {
+                        "domain": "google.com",
+                        "name": "__Secure-1PSIDCC",
+                        "reason": "Required for Google login flow"
+                    },
+                    {
+                        "domain": "google.com",
+                        "name": "__Secure-1PAPISID",
+                        "reason": "Required for Google login flow"
+                    },
+                    {
+                        "domain": "google.com",
+                        "name": "__Secure-3PSID",
+                        "reason": "Required for Google login flow"
+                    },
+                    {
+                        "domain": "google.com",
+                        "name": "__Secure-3PSIDCC",
+                        "reason": "Required for Google login flow"
+                    },
+                    {
+                        "domain": "google.com",
+                        "name": "__Secure-3PAPISID",
+                        "reason": "Required for Google login flow"
+                    },
+                    {
+                        "domain": "facebook.com",
+                        "name": "xs",
+                        "reason": "Required for Facebook login flow"
+                    },
+                    {
+                        "domain": "facebook.com",
+                        "name": "c_user",
+                        "reason": "Required for Facebook login flow"
+                    },
+                    {
+                        "domain": "bbc.co.uk",
+                        "name": "ckns_nonce",
+                        "reason": "Required for BBC login flow"
+                    }
+                ],                
+                "firstPartyCookiePolicy": {
+                    "threshold": 604800,
+                    "maxAge": 604800
+                }
+            }
         }
     },
     "unprotectedTemporary": [

@@ -27,7 +27,18 @@
             "state": "enabled"
         },
         "autofill": {
-            "state": "enabled"
+            "state": "enabled",
+            "features": {
+                "injectCredentials": {
+                    "state": "disabled"
+                },
+                "saveCredentials": {
+                    "state": "disabled"
+                },
+                "accessCredentialManagement": {
+                    "state": "disabled"
+                }
+            }
         },
         "elementHiding": {
             "state": "enabled"
@@ -47,6 +58,10 @@
                     {
                         "domain": "homedepot.ca",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/554"
+                    },
+                    {
+                        "domain": "usabilityhub.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/654"
                     }
                 ],
                 "omitVersionSites": [
@@ -106,7 +121,7 @@
             ]
         },
         "requestFilterer": {
-            "state": "enabled",
+            "state": "disabled",
             "settings": {
                 "windowInMs": 200
             },
