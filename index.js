@@ -2,7 +2,7 @@ const fs = require('fs')
 
 const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args))
 
-const { addCnameEntriesToAllowlist, inlineReasonArrays, mergeAllowlistedTrackers } = require('./util')
+const { addCnameEntriesToAllowlist, inlineReasonArrays, mergeAllowlistedTrackers, addHashToFeatures } = require('./util')
 
 const OVERRIDE_DIR = 'overrides'
 const GENERATED_DIR = 'generated'
@@ -44,6 +44,10 @@ function writeConfigToDisk (platform, config, v1Config) {
     if (platform.includes(BROWSERS_SUBDIR)) {
         configName = platform.replace(BROWSERS_SUBDIR, 'extension-')
     }
+
+    // Now that the features have been finalized, write out their hashes
+    addHashToFeatures(config)
+    addHashToFeatures(v1Config)
 
     fs.writeFileSync(`${GENERATED_DIR}/v2/${configName}-config.json`, JSON.stringify(config, null, 4))
     fs.writeFileSync(`${GENERATED_DIR}/v1/${configName}-config.json`, JSON.stringify(v1Config, null, 4))
@@ -162,6 +166,10 @@ async function buildPlatforms () {
                             settings[settingsKey] = overrideSettings[settingsKey]
                         }
                         platformConfig.features[key][platformKey] = settings
+                    } else if (key === 'clickToPlay' && platformKey === 'settings') {
+                        // Handle Click to Load settings override later, so that individual entities
+                        // are disabled/enabled correctly (and disabled by default).
+                        continue
                     } else {
                         platformConfig.features[key][platformKey] = platformOverride.features[key][platformKey]
                     }
@@ -174,6 +182,17 @@ async function buildPlatforms () {
                     platformConfig.features[key].exceptions = platformConfig.features[key].exceptions.concat(platformOverride.features[key].exceptions)
                 }
             }
+
+            // Ensure the correct enabled state for Click to Load entities.
+            const clickToLoadSettings = platformConfig?.features?.clickToPlay?.settings
+            if (clickToLoadSettings) {
+                const clickToLoadSettingsOverride = platformOverride?.features?.clickToPlay?.settings
+                for (const entity of Object.keys(clickToLoadSettings)) {
+                    clickToLoadSettings[entity].state =
+                        clickToLoadSettingsOverride?.[entity]?.state || clickToLoadSettings[entity].state || 'disabled'
+                }
+            }
+
             if (isFeatureMissingState(platformConfig.features[key])) {
                 platformConfig.features[key].state = 'disabled'
             }
@@ -189,6 +208,11 @@ async function buildPlatforms () {
             if (isFeatureMissingState(platformConfig.features[key])) {
                 platformConfig.features[key].state = 'disabled'
             }
+        }
+
+        // Remove appTP feature from platforms that don't use it since it's a large feature
+        if ('appTrackerProtection' in platformConfig.features && platformConfig.features.appTrackerProtection.state === 'disabled') {
+            delete platformConfig.features.appTrackerProtection
         }
 
         if (platformOverride.unprotectedTemporary) {
