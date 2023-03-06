@@ -9,6 +9,7 @@ module.exports = [
     'browsers/chromemv3',
     'browsers/bravemv3',
     'browsers/edgmv3',
+    'browsers/safarimv3',
     'ios',
     'android',
     'macos',
