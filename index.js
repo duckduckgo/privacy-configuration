@@ -166,7 +166,7 @@ async function buildPlatforms () {
                             settings[settingsKey] = overrideSettings[settingsKey]
                         }
                         platformConfig.features[key][platformKey] = settings
-                    } else if (key === 'clickToPlay' && platformKey === 'settings') {
+                    } else if ((key === 'clickToLoad' || key === 'clickToPlay') && platformKey === 'settings') {
                         // Handle Click to Load settings override later, so that individual entities
                         // are disabled/enabled correctly (and disabled by default).
                         continue
@@ -184,12 +184,14 @@ async function buildPlatforms () {
             }
 
             // Ensure the correct enabled state for Click to Load entities.
-            const clickToLoadSettings = platformConfig?.features?.clickToPlay?.settings
-            if (clickToLoadSettings) {
-                const clickToLoadSettingsOverride = platformOverride?.features?.clickToPlay?.settings
-                for (const entity of Object.keys(clickToLoadSettings)) {
-                    clickToLoadSettings[entity].state =
-                        clickToLoadSettingsOverride?.[entity]?.state || clickToLoadSettings[entity].state || 'disabled'
+            if (key === 'clickToLoad' || key === 'clickToPlay') {
+                const clickToLoadSettings = platformConfig?.features?.[key]?.settings
+                if (clickToLoadSettings) {
+                    const clickToLoadSettingsOverride = platformOverride?.features?.[key]?.settings
+                    for (const entity of Object.keys(clickToLoadSettings)) {
+                        clickToLoadSettings[entity].state =
+                            clickToLoadSettingsOverride?.[entity]?.state || clickToLoadSettings[entity].state || 'disabled'
+                    }
                 }
             }
 
