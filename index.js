@@ -171,6 +171,15 @@ async function buildPlatforms () {
                         // are disabled/enabled correctly (and disabled by default).
                         continue
                     } else {
+                        if (platformKey === 'settings') {
+                            if (platformKey in platformConfig.features[key]) {
+                                platformConfig.features[key][platformKey] = {
+                                    ...platformConfig.features[key][platformKey],
+                                    ...platformOverride.features[key][platformKey]
+                                }
+                            }
+                            continue
+                        }
                         platformConfig.features[key][platformKey] = platformOverride.features[key][platformKey]
                     }
                 }
