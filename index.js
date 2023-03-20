@@ -124,6 +124,8 @@ function isFeatureMissingState (feature) {
     return !('state' in feature)
 }
 
+const supportedPlatformKeys = ['settings', 'state', 'minSupportedVersion', 'features', 'exceptions']
+
 // Handle platform specific overrides and write configs to disk
 async function buildPlatforms () {
     const platformConfigs = {}
@@ -146,6 +148,10 @@ async function buildPlatforms () {
             if (platformOverride.features[key]) {
                 // Override existing keys
                 for (const platformKey of Object.keys(platformOverride.features[key])) {
+                    // Throw error for unsupported platform keys
+                    if (!supportedPlatformKeys.includes(platformKey)) {
+                        throw new Error('Unexpected key in platform level key: ' + platformKey + ' for feature: ' + key)
+                    }
                     if (platformKey === 'exceptions') {
                         continue
                     }
