@@ -348,7 +348,8 @@
             "publicidade",
             "reklama",
             "skip ad",
-            "continue reading the main story"
+            "continue reading the main story",
+            "this advertisement has not loaded yet, but your article continues below."
         ],
         "domains": [
             {
@@ -694,6 +695,15 @@
                 ]
             },
             {
+                "domain": "mail.com",
+                "rules": [
+                    {
+                        "selector": ".primis",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
                 "domain": "marketwatch.com",
                 "rules": [
                     {
@@ -780,6 +790,10 @@
                     {
                         "selector": "[id*='story-ad']",
                         "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[data-testid='StandardAd']",
+                        "type": "closest-empty"
                     }
                 ]
             },
