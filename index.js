@@ -39,17 +39,21 @@ async function getTds () {
  * @param {string} platform - platform to write
  * @param {object} config - the object to write
  */
-function writeConfigToDisk (platform, config, v1Config) {
+function writeConfigToDisk (platform, config) {
     let configName = platform
     if (platform.includes(BROWSERS_SUBDIR)) {
         configName = platform.replace(BROWSERS_SUBDIR, 'extension-')
     }
 
+    const v2Config = generateV2Config(config)
+    const v1Config = generateV1Config(v2Config)
     // Now that the features have been finalized, write out their hashes
     addHashToFeatures(config)
     addHashToFeatures(v1Config)
+    addHashToFeatures(v2Config)
 
-    fs.writeFileSync(`${GENERATED_DIR}/v2/${configName}-config.json`, JSON.stringify(config, null, 4))
+    fs.writeFileSync(`${GENERATED_DIR}/v3/${configName}-config.json`, JSON.stringify(config, null, 4))
+    fs.writeFileSync(`${GENERATED_DIR}/v2/${configName}-config.json`, JSON.stringify(v2Config, null, 4))
     fs.writeFileSync(`${GENERATED_DIR}/v1/${configName}-config.json`, JSON.stringify(v1Config, null, 4))
 }
 
@@ -62,6 +66,20 @@ function mkdirIfNeeded (dir) {
     if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir)
     }
+}
+
+function generateV2Config (platformConfig) {
+    const v2Config = JSON.parse(JSON.stringify(platformConfig))
+    if (v2Config.features.autofill.features) {
+        const subFeatures = v2Config.features.autofill.features
+        for (const subFeature of Object.keys(subFeatures)) {
+            if (subFeatures[subFeature].minSupportedVersion) {
+                delete subFeatures[subFeature].minSupportedVersion
+            }
+        }
+    }
+
+    return v2Config
 }
 
 function generateV1Config (platformConfig) {
@@ -119,6 +137,7 @@ mkdirIfNeeded(GENERATED_DIR)
 // Create version directories
 mkdirIfNeeded(`${GENERATED_DIR}/v1`)
 mkdirIfNeeded(`${GENERATED_DIR}/v2`)
+mkdirIfNeeded(`${GENERATED_DIR}/v3`)
 
 function isFeatureMissingState (feature) {
     return !('state' in feature)
@@ -226,9 +245,7 @@ async function buildPlatforms () {
         platformConfig = inlineReasonArrays(platformConfig)
         platformConfigs[platform] = platformConfig
 
-        const v1PlatformConfig = generateV1Config(platformConfig)
-
-        writeConfigToDisk(platform, platformConfig, v1PlatformConfig)
+        writeConfigToDisk(platform, platformConfig)
     }
     return platformConfigs
 }
