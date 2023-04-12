@@ -216,6 +216,10 @@
                 "type": "hide"
             },
             {
+                "selector": "#google-one-tap-popup-container",
+                "type": "hide"
+            },
+            {
                 "selector": ".google-one-tap-modal-div",
                 "type": "hide"
             },
@@ -225,6 +229,10 @@
             },
             {
                 "selector": ".ad_container",
+                "type": "closest-empty"
+            },
+            {
+                "selector": ".ad__container",
                 "type": "closest-empty"
             },
             {
@@ -262,6 +270,10 @@
             {
                 "selector": ".ads__native",
                 "type": "closest-empty"
+            },
+            {
+                "selector": ".fixed-slots",
+                "type": "hide-empty"
             },
             {
                 "selector": ".ad-slot",
@@ -348,7 +360,10 @@
             "publicidade",
             "reklama",
             "skip ad",
-            "continue reading the main story"
+            "sponsored news",
+            "continue reading the main story",
+            "this advertisement has not loaded yet, but your article continues below.",
+            "story continues below\nthis advertisement has not loaded yet, but your article continues below."
         ],
         "domains": [
             {
@@ -694,6 +709,15 @@
                 ]
             },
             {
+                "domain": "mail.com",
+                "rules": [
+                    {
+                        "selector": ".primis",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
                 "domain": "marketwatch.com",
                 "rules": [
                     {
@@ -747,6 +771,19 @@
                 ]
             },
             {
+                "domain": "nottinghampost.com",
+                "rules": [
+                    {
+                        "selector": "#auth-ui_one-tap-container",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": "#comments-standalone-mpu",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
                 "domain": "nytimes.com",
                 "rules": [
                     {
@@ -780,6 +817,10 @@
                     {
                         "selector": "[id*='story-ad']",
                         "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[data-testid='StandardAd']",
+                        "type": "closest-empty"
                     }
                 ]
             },
