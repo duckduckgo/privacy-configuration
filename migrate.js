@@ -138,19 +138,19 @@ async function main () {
                 }
                 return !patchExists
             })
-          }
+        }
 
-          for (const platform of allPlatforms) {
+        for (const platform of allPlatforms) {
             if (!data[platform]) continue
             // Check if patch is empty
             if (data[platform].length === 0) {
-              delete data[platform]
+                delete data[platform]
             }
-          }
+        }
 
         // Check if patch exists for all platforms
         if (Object.keys(data).length === 0) {
-          delete featurePatches[feature]
+            delete featurePatches[feature]
         }
     }
     writeJsonFile(path.join(patchDir, 'feature_patches.json'), featurePatches)

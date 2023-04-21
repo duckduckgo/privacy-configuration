@@ -2,9 +2,8 @@ const fs = require('fs')
 const jsonpatch = require('fast-json-patch')
 const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args))
 
-const { addCnameEntriesToAllowlist, inlineReasonArrays, mergeAllowlistedTrackers, addHashToFeatures } = require('./util')
+const { addCnameEntriesToAllowlist, inlineReasonArrays, addHashToFeatures } = require('./util')
 
-const OVERRIDE_DIR = 'overrides'
 const GENERATED_DIR = 'generated'
 const LISTS_DIR = 'features'
 const BROWSERS_SUBDIR = 'browsers/'
@@ -122,10 +121,6 @@ mkdirIfNeeded(GENERATED_DIR)
 // Create version directories
 mkdirIfNeeded(`${GENERATED_DIR}/v1`)
 mkdirIfNeeded(`${GENERATED_DIR}/v2`)
-
-function isFeatureMissingState (feature) {
-    return !('state' in feature)
-}
 
 // Handle platform specific overrides and write configs to disk
 async function buildPlatforms () {
