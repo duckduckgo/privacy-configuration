@@ -15,15 +15,18 @@
         "duckPlayer": {
             "state": "enabled",
             "settings": {
-                "youtubeOverlays": "disabled",
-                "serpYoutubeProxy": "disabled",
+                "overlays": {
+                    "youtube": {
+                        "state": "disabled"
+                    }
+                },
                 "domains": [
                     {
                         "domain": "www.youtube.com",
                         "patchSettings": [
                             {
                                 "op": "replace",
-                                "path": "/youtubeOverlays",
+                                "path": "/overlays/youtube/state",
                                 "value": "enabled"
                             }
                         ]
