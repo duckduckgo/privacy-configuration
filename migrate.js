@@ -56,7 +56,7 @@ async function main () {
             for (const exception of targetData.exceptions) {
                 if ('reason' in exception) {
                     if (Array.isArray(exception.reason)) {
-                        exception.reason = exception.reason.join(' ')
+                        exception.reason = exception.reason.join(',')
                         console.log(exception)
                     }
                 }
