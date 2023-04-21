@@ -131,8 +131,10 @@ async function buildPlatforms () {
         let platformConfig = JSON.parse(JSON.stringify(defaultConfig))
 
         for (const feature of Object.keys(platformConfig.features)) {
+            if (platform.startsWith('extension-') && patches[feature]?.extension) {
+                jsonpatch.applyPatch(platformConfig.features[feature], patches[feature].extension)
+            }
             if (patches[feature]?.[platform]) {
-                console.log(`Applying patches for ${feature} on ${platform}`)
                 jsonpatch.applyPatch(platformConfig.features[feature], patches[feature][platform])
             }
         }

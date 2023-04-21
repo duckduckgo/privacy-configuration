@@ -57,7 +57,6 @@ async function main () {
                 if ('reason' in exception) {
                     if (Array.isArray(exception.reason)) {
                         exception.reason = exception.reason.join(',')
-                        console.log(exception)
                     }
                 }
             }
@@ -69,43 +68,10 @@ async function main () {
             featurePatches[feature][platform] = patch
         }
     }
-    const overrideExtensions = [
-        'extension-chrome',
-        'extension-firefox',
-        'extension-brave',
-        'extension-edge',
-        'extension-edg',
-        'extension-bravemv3',
-        'extension-chromemv3',
-        'extension-safarimv3',
-        'extension-edgmv3'
-    ]
-    const allPlatforms = [
-        'android',
-        'ios',
-        'macos',
-        'windows',
-        'extension',
-        ...overrideExtensions
-    ]
+    const allPlatforms = require('./platforms').map(platform => platform.replace('browsers/', 'extension-'))
+    const overrideExtensions = allPlatforms.filter(platform => platform.startsWith('extension-'))
     // Prune and clean data
     for (const [feature, data] of Object.entries(featurePatches)) {
-        // Check if all platforms data matches
-        const firstPlatform = Object.keys(allPlatforms)[0]
-        const firstPlatformData = data[firstPlatform]
-        let allMatches = true
-        for (const platform of allPlatforms) {
-            if (platform === firstPlatform) continue
-            if (!data[platform] || JSON.stringify(data[platform]) !== JSON.stringify(firstPlatformData)) {
-                allMatches = false
-            }
-        }
-        if (allMatches) {
-            featurePatches[feature] = {
-                all: firstPlatformData
-            }
-        }
-
         for (const platform of allPlatforms) {
             if (!data[platform]) continue
             for (const patch of data[platform]) {
