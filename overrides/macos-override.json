@@ -2,12 +2,52 @@
     "features": {
         "runtimeChecks": {
             "state": "enabled",
+            "exceptions": [
+                {
+                    "domain": "ally.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/780"
+                },
+                {
+                    "domain": "stackoverflow.com",
+                    "reason": "https://github.com/duckduckgo/duckduckgo-privacy-extension/issues/1819"
+                },
+                {
+                    "domain": "stackexchange.com",
+                    "reason": "https://github.com/duckduckgo/duckduckgo-privacy-extension/issues/1819"
+                },
+                {
+                    "domain": "mathoverflow.net",
+                    "reason": "https://github.com/duckduckgo/duckduckgo-privacy-extension/issues/1819"
+                },
+                {
+                    "domain": "askubuntu.com",
+                    "reason": "https://github.com/duckduckgo/duckduckgo-privacy-extension/issues/1819"
+                },
+                {
+                    "domain": "superuser.com",
+                    "reason": "https://github.com/duckduckgo/duckduckgo-privacy-extension/issues/1819"
+                },
+                {
+                    "domain": "serverfault.com",
+                    "reason": "https://github.com/duckduckgo/duckduckgo-privacy-extension/issues/1819"
+                },
+                {
+                    "domain": "stackapps.com",
+                    "reason": "https://github.com/duckduckgo/duckduckgo-privacy-extension/issues/1819"
+                },
+                {
+                    "domain": "substack.com",
+                    "reason": "https://github.com/duckduckgo/duckduckgo-privacy-extension/issues/1841"
+                }
+            ],
             "settings": {
                 "taintCheck": "enabled",
                 "matchAllDomains": "disabled",
                 "matchAllStackDomains": "disabled",
                 "overloadInstanceOf": "enabled",
                 "elementRemovalTimeout": 1000,
+                "injectGlobalStyles": "enabled",
+                "shadowDom": "enabled",
                 "domains": [
                     {
                         "domain": "bbc.co.uk"
@@ -402,7 +442,8 @@
                         "domain": "dr3fr5q4g2ul9.cloudfront.net"
                     },
                     {
-                        "domain": "cnn.io"
+                        "disabled_domain": "cnn.io",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/837"
                     },
                     {
                         "domain": "cams.gratis"
@@ -508,7 +549,10 @@
             ]
         },
         "duckPlayer": {
-            "state": "enabled"
+            "state": "enabled",
+            "settings": {
+                "tryDuckPlayerLink": "https://www.youtube.com/watch?v=yKWIA-Pys4c"
+            }
         },
         "elementHiding": {
             "state": "enabled",
