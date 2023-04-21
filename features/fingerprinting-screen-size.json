@@ -7,10 +7,22 @@
         }
     },
     "settings": {
-        "availTop": {"type": "number", "value": 0},
-        "availLeft": {"type": "number", "value": 0},
-        "colorDepth": {"type": "number", "value": 24},
-        "pixelDepth": {"type": "number", "value": 24}
+        "availTop": {
+            "type": "number",
+            "value": 0
+        },
+        "availLeft": {
+            "type": "number",
+            "value": 0
+        },
+        "colorDepth": {
+            "type": "number",
+            "value": 24
+        },
+        "pixelDepth": {
+            "type": "number",
+            "value": 24
+        }
     },
     "exceptions": [
         {
@@ -29,5 +41,63 @@
             "domain": "secureserver.net",
             "reason": "After entering login details and clicking to log in, the site shows an adwall and prevents login."
         }
-    ]
+    ],
+    "_patches": {
+        "android": [
+            {
+                "op": "replace",
+                "path": "/state",
+                "value": "enabled"
+            },
+            {
+                "op": "add",
+                "path": "/exceptions/-",
+                "value": {
+                    "domain": "youtube.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/557"
+                }
+            }
+        ],
+        "extension-chrome": [
+            {
+                "op": "add",
+                "path": "/exceptions/-",
+                "value": {
+                    "domain": "wp.pl",
+                    "reason": "Adwall appears which reappears when dismissed. The adwall prevents interaction with the page."
+                }
+            }
+        ],
+        "extension-chromemv3": [
+            {
+                "op": "add",
+                "path": "/exceptions/-",
+                "value": {
+                    "domain": "wp.pl",
+                    "reason": "Adwall appears which reappears when dismissed. The adwall prevents interaction with the page."
+                }
+            }
+        ],
+        "extension": [
+            {
+                "op": "replace",
+                "path": "/state",
+                "value": "enabled"
+            }
+        ],
+        "ios": [
+            {
+                "op": "replace",
+                "path": "/state",
+                "value": "enabled"
+            }
+        ],
+        "macos": [
+            {
+                "op": "replace",
+                "path": "/state",
+                "value": "enabled"
+            }
+        ]
+    }
 }

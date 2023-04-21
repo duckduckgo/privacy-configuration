@@ -3,5 +3,19 @@
         "description": "Display Email Protection signup tooltip on email fields",
         "sampleExcludeRecords": {}
     },
-    "exceptions": []
+    "exceptions": [],
+    "_patches": {
+        "extension": [
+            {
+                "op": "replace",
+                "path": "/state",
+                "value": "enabled"
+            },
+            {
+                "op": "add",
+                "path": "/minSupportedVersion",
+                "value": "2023.3.28.1"
+            }
+        ]
+    }
 }

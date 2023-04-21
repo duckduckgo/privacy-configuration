@@ -31,13 +31,13 @@
         },
         "cpuMonitoring": {
             "state": "enabled"
-        }, 
+        },
         "exceptionLists": {
             "appTrackerAllowList": [
                 {
                     "domain": "api2.branch.io",
                     "packageNames": [
-                        {   
+                        {
                             "packageName": "com.toyota.oneapp"
                         }
                     ]
@@ -71,7 +71,7 @@
                             "packageName": "com.udonistemple.magicalmixing"
                         }
                     ]
-                },       
+                },
                 {
                     "domain": "insight.adsrvr.org",
                     "packageNames": [
@@ -665,7 +665,16 @@
                 "com.samsung.android.messaging",
                 "com.touchtype.swiftkey"
             ]
-        }        
+        }
     },
-    "exceptions": []
+    "exceptions": [],
+    "_patches": {
+        "android": [
+            {
+                "op": "replace",
+                "path": "/state",
+                "value": "enabled"
+            }
+        ]
+    }
 }

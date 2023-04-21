@@ -1186,5 +1186,50 @@
                 ]
             }
         ]
+    },
+    "_patches": {
+        "android": [
+            {
+                "op": "replace",
+                "path": "/state",
+                "value": "enabled"
+            }
+        ],
+        "extension": [
+            {
+                "op": "replace",
+                "path": "/state",
+                "value": "enabled"
+            }
+        ],
+        "ios": [
+            {
+                "op": "replace",
+                "path": "/state",
+                "value": "enabled"
+            }
+        ],
+        "macos": [
+            {
+                "op": "replace",
+                "path": "/state",
+                "value": "enabled"
+            },
+            {
+                "op": "add",
+                "path": "/exceptions/-",
+                "value": {
+                    "domain": "wunderground.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/592"
+                }
+            }
+        ],
+        "windows": [
+            {
+                "op": "replace",
+                "path": "/state",
+                "value": "enabled"
+            }
+        ]
     }
 }

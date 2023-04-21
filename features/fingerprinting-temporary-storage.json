@@ -6,5 +6,36 @@
             "reason": "site breakage"
         }
     },
-    "exceptions": []
+    "exceptions": [],
+    "_patches": {
+        "android": [
+            {
+                "op": "replace",
+                "path": "/state",
+                "value": "enabled"
+            },
+            {
+                "op": "add",
+                "path": "/exceptions/-",
+                "value": {
+                    "domain": "ticketmaster.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/575"
+                }
+            }
+        ],
+        "extension": [
+            {
+                "op": "replace",
+                "path": "/state",
+                "value": "enabled"
+            }
+        ],
+        "ios": [
+            {
+                "op": "replace",
+                "path": "/state",
+                "value": "enabled"
+            }
+        ]
+    }
 }

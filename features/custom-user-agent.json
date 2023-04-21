@@ -31,5 +31,137 @@
         ],
         "omitVersionSites": []
     },
-    "exceptions": []
+    "exceptions": [],
+    "_patches": {
+        "android": [
+            {
+                "op": "replace",
+                "path": "/state",
+                "value": "enabled"
+            },
+            {
+                "op": "add",
+                "path": "/settings/omitVersionSites/0",
+                "value": {
+                    "domain": "steamdb.info",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/667"
+                }
+            },
+            {
+                "op": "add",
+                "path": "/settings/omitVersionSites/1",
+                "value": {
+                    "domain": "whitepages.com",
+                    "reason": "After performing a search, the site displays a page stating that the browser is not supported, and results are not shown."
+                }
+            },
+            {
+                "op": "add",
+                "path": "/settings/omitApplicationSites/5",
+                "value": {
+                    "domain": "mail.google.com",
+                    "reason": "Page loads blank after login (inbox does not show)."
+                }
+            },
+            {
+                "op": "add",
+                "path": "/settings/omitApplicationSites/6",
+                "value": {
+                    "domain": "vegas.williamhill.com",
+                    "reason": "Cannot interact with cookie prompt and some page elements don't load."
+                }
+            },
+            {
+                "op": "add",
+                "path": "/settings/omitApplicationSites/7",
+                "value": {
+                    "domain": "homedepot.ca",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/554"
+                }
+            },
+            {
+                "op": "add",
+                "path": "/settings/omitApplicationSites/8",
+                "value": {
+                    "domain": "usabilityhub.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/654"
+                }
+            }
+        ],
+        "ios": [
+            {
+                "op": "replace",
+                "path": "/state",
+                "value": "enabled"
+            },
+            {
+                "op": "add",
+                "path": "/settings/omitApplicationSites/5",
+                "value": {
+                    "domain": "cvs.com",
+                    "reason": "Navigation section at the top of the main page renders as text."
+                }
+            },
+            {
+                "op": "add",
+                "path": "/settings/omitApplicationSites/6",
+                "value": {
+                    "domain": "facebook.com",
+                    "reason": "When going to the main login page, there is a banner at the top which warns of an 'Unsupported browser'."
+                }
+            },
+            {
+                "op": "add",
+                "path": "/settings/omitApplicationSites/7",
+                "value": {
+                    "domain": "instagram.com",
+                    "reason": "A banner at the bottom which warns of an 'Unsupported browser' and interferes with rest of the UI."
+                }
+            },
+            {
+                "op": "add",
+                "path": "/settings/omitApplicationSites/8",
+                "value": {
+                    "domain": "republicservices.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/667"
+                }
+            },
+            {
+                "op": "add",
+                "path": "/settings/omitApplicationSites/9",
+                "value": {
+                    "domain": "xfinity.com",
+                    "reason": "Stream page shows an incompatibility warning and does not load further."
+                }
+            },
+            {
+                "op": "add",
+                "path": "/settings/omitApplicationSites/10",
+                "value": {
+                    "domain": "homedepot.ca",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/554"
+                }
+            }
+        ],
+        "macos": [
+            {
+                "op": "replace",
+                "path": "/state",
+                "value": "enabled"
+            },
+            {
+                "op": "remove",
+                "path": "/settings/omitVersionSites"
+            },
+            {
+                "op": "remove",
+                "path": "/settings/omitApplicationSites"
+            },
+            {
+                "op": "add",
+                "path": "/settings/webViewDefault",
+                "value": []
+            }
+        ]
+    }
 }

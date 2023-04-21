@@ -597,7 +597,6 @@
                             "https://github.com/duckduckgo/privacy-configuration/issues/415",
                             "rocketnews24.com - https://github.com/duckduckgo/privacy-configuration/issues/846"
                         ]
-
                     },
                     {
                         "rule": "doubleclick.net",
@@ -1867,7 +1866,6 @@
                         ],
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/477"
                     }
-
                 ]
             },
             "viafoura.net": {
@@ -2011,5 +2009,120 @@
             }
         }
     },
-    "exceptions": []
+    "exceptions": [],
+    "_patches": {
+        "android": [
+            {
+                "op": "add",
+                "path": "/settings/allowlistedTrackers/cedexis.net",
+                "value": {
+                    "rules": [
+                        {
+                            "rule": "cdx.cedexis.net",
+                            "domains": [
+                                "linkedin.com"
+                            ],
+                            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/675"
+                        }
+                    ]
+                }
+            }
+        ],
+        "extension": [
+            {
+                "op": "add",
+                "path": "/settings/allowlistedTrackers/gemius.pl/rules/2",
+                "value": {
+                    "rule": "wp.hit.gemius.pl/xgemius.js",
+                    "domains": [
+                        "wp.pl"
+                    ],
+                    "reason": "Adwall appears which reappears when dismissed. The adwall prevents interaction with the page."
+                }
+            },
+            {
+                "op": "add",
+                "path": "/settings/allowlistedTrackers/facebook.net/rules/1",
+                "value": {
+                    "rule": "connect.facebook.net/en_US/fbevents.js",
+                    "domains": [
+                        "wp.pl"
+                    ],
+                    "reason": "Adwall appears which reappears when dismissed. The adwall prevents interaction with the page."
+                }
+            },
+            {
+                "op": "add",
+                "path": "/settings/allowlistedTrackers/criteo.net",
+                "value": {
+                    "rules": [
+                        {
+                            "rule": "static.criteo.net/js/ld/publishertag.js",
+                            "domains": [
+                                "wp.pl"
+                            ],
+                            "reason": "Adwall appears which reappears when dismissed. The adwall prevents interaction with the page."
+                        },
+                        {
+                            "rule": "static.criteo.net/js/ld/publishertag.prebid.js",
+                            "domains": [
+                                "wp.pl"
+                            ],
+                            "reason": "Adwall appears which reappears when dismissed. The adwall prevents interaction with the page."
+                        }
+                    ]
+                }
+            }
+        ],
+        "macos": [
+            {
+                "op": "add",
+                "path": "/settings/allowlistedTrackers/gemius.pl/rules/2",
+                "value": {
+                    "rule": "wp.hit.gemius.pl/xgemius.js",
+                    "domains": [
+                        "wp.pl"
+                    ],
+                    "reason": "Adwall appears which reappears when dismissed. The adwall prevents interaction with the page."
+                }
+            },
+            {
+                "op": "add",
+                "path": "/settings/allowlistedTrackers/criteo.net",
+                "value": {
+                    "rules": [
+                        {
+                            "rule": "static.criteo.net/js/ld/publishertag.js",
+                            "domains": [
+                                "wp.pl"
+                            ],
+                            "reason": "Adwall appears which reappears when dismissed. The adwall prevents interaction with the page."
+                        },
+                        {
+                            "rule": "static.criteo.net/js/ld/publishertag.prebid.js",
+                            "domains": [
+                                "wp.pl"
+                            ],
+                            "reason": "Adwall appears which reappears when dismissed. The adwall prevents interaction with the page."
+                        }
+                    ]
+                }
+            },
+            {
+                "op": "add",
+                "path": "/settings/allowlistedTrackers/googletagservices.com",
+                "value": {
+                    "rules": [
+                        {
+                            "rule": "www.googletagservices.com/tag/js/gpt.js",
+                            "domains": [
+                                "wp.pl"
+                            ],
+                            "reason": "Adwall appears which reappears when dismissed. The adwall prevents interaction with the page."
+                        }
+                    ]
+                }
+            }
+        ]
+    }
 }

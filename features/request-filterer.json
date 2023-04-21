@@ -10,5 +10,24 @@
     "exceptions": [],
     "settings": {
         "windowInMs": 0
+    },
+    "_patches": {
+        "android": [
+            {
+                "op": "replace",
+                "path": "/settings/windowInMs",
+                "value": 200
+            },
+            {
+                "op": "replace",
+                "path": "/state",
+                "value": "enabled"
+            },
+            {
+                "op": "add",
+                "path": "/minSupportedVersion",
+                "value": 51501000
+            }
+        ]
     }
 }

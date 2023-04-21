@@ -6,16 +6,89 @@
             "reason": "site breakage"
         }
     },
-    "exceptions": [{
-        "domain": "duckduckgo.com",
-        "reason": "Warnings are already displayed before embedded YouTube videos are loaded."
-    }],
+    "exceptions": [
+        {
+            "domain": "duckduckgo.com",
+            "reason": "Warnings are already displayed before embedded YouTube videos are loaded."
+        }
+    ],
     "settings": {
         "Facebook, Inc.": {
-            "ruleActions": ["block-ctl-fb"]
+            "ruleActions": [
+                "block-ctl-fb"
+            ]
         },
         "Youtube": {
-            "ruleActions": ["block-ctl-yt"]
+            "ruleActions": [
+                "block-ctl-yt"
+            ]
         }
+    },
+    "_patches": {
+        "android": [
+            {
+                "op": "add",
+                "path": "/settings/Youtube/state",
+                "value": "disabled"
+            },
+            {
+                "op": "add",
+                "path": "/settings/Facebook, Inc./state",
+                "value": "disabled"
+            }
+        ],
+        "extension": [
+            {
+                "op": "replace",
+                "path": "/state",
+                "value": "enabled"
+            },
+            {
+                "op": "add",
+                "path": "/settings/Youtube/state",
+                "value": "disabled"
+            },
+            {
+                "op": "add",
+                "path": "/settings/Facebook, Inc./state",
+                "value": "enabled"
+            }
+        ],
+        "ios": [
+            {
+                "op": "add",
+                "path": "/settings/Youtube/state",
+                "value": "disabled"
+            },
+            {
+                "op": "add",
+                "path": "/settings/Facebook, Inc./state",
+                "value": "disabled"
+            }
+        ],
+        "macos": [
+            {
+                "op": "add",
+                "path": "/settings/Youtube/state",
+                "value": "disabled"
+            },
+            {
+                "op": "add",
+                "path": "/settings/Facebook, Inc./state",
+                "value": "disabled"
+            }
+        ],
+        "windows": [
+            {
+                "op": "add",
+                "path": "/settings/Youtube/state",
+                "value": "disabled"
+            },
+            {
+                "op": "add",
+                "path": "/settings/Facebook, Inc./state",
+                "value": "disabled"
+            }
+        ]
     }
 }

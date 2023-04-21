@@ -10,7 +10,56 @@
     "settings": {
         "Facebook": {
             "clicksBeforeSimpleVersion": 3,
-            "ruleActions": ["block-ctl-fb"]
+            "ruleActions": [
+                "block-ctl-fb"
+            ]
         }
+    },
+    "_patches": {
+        "android": [
+            {
+                "op": "add",
+                "path": "/settings/Facebook/state",
+                "value": "disabled"
+            }
+        ],
+        "extension": [
+            {
+                "op": "replace",
+                "path": "/state",
+                "value": "enabled"
+            },
+            {
+                "op": "add",
+                "path": "/settings/Facebook/state",
+                "value": "enabled"
+            }
+        ],
+        "ios": [
+            {
+                "op": "add",
+                "path": "/settings/Facebook/state",
+                "value": "disabled"
+            }
+        ],
+        "macos": [
+            {
+                "op": "replace",
+                "path": "/state",
+                "value": "enabled"
+            },
+            {
+                "op": "add",
+                "path": "/settings/Facebook/state",
+                "value": "disabled"
+            }
+        ],
+        "windows": [
+            {
+                "op": "add",
+                "path": "/settings/Facebook/state",
+                "value": "disabled"
+            }
+        ]
     }
 }

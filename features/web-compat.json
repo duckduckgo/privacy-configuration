@@ -303,5 +303,23 @@
             "domain": "community.bitwarden.com",
             "reason": "https://github.com/duckduckgo/privacy-configuration/issues/519"
         }
-    ]
+    ],
+    "_patches": {
+        "macos": [
+            {
+                "op": "replace",
+                "path": "/state",
+                "value": "enabled"
+            },
+            {
+                "op": "add",
+                "path": "/settings",
+                "value": {
+                    "windowSizing": "enabled",
+                    "navigatorCredentials": "enabled",
+                    "safariObject": "enabled"
+                }
+            }
+        ]
+    }
 }

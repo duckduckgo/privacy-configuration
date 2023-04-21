@@ -3,5 +3,14 @@
         "description": "Private YouTube video player used by our macOS browser, allowing users to watch YouTube videos without personalized ads and preventing viewing activity from influencing users' YouTube recommendations.",
         "sampleExcludeRecords": {}
     },
-    "exceptions": []
+    "exceptions": [],
+    "_patches": {
+        "macos": [
+            {
+                "op": "replace",
+                "path": "/state",
+                "value": "enabled"
+            }
+        ]
+    }
 }

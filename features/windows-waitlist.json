@@ -3,5 +3,21 @@
         "description": "Display Windows Private Beta waitlist UI in mobile apps.",
         "sampleExcludeRecords": {}
     },
-    "exceptions": []
+    "exceptions": [],
+    "_patches": {
+        "android": [
+            {
+                "op": "replace",
+                "path": "/state",
+                "value": "enabled"
+            }
+        ],
+        "ios": [
+            {
+                "op": "replace",
+                "path": "/state",
+                "value": "enabled"
+            }
+        ]
+    }
 }

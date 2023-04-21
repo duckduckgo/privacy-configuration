@@ -7,9 +7,17 @@
         }
     },
     "settings": {
-        "keyboard": {"type": "undefined"},
-        "hardwareConcurrency": {"type": "number", "value": 2},
-        "deviceMemory": {"type": "number", "value": 8}
+        "keyboard": {
+            "type": "undefined"
+        },
+        "hardwareConcurrency": {
+            "type": "number",
+            "value": 2
+        },
+        "deviceMemory": {
+            "type": "number",
+            "value": 8
+        }
     },
     "exceptions": [
         {
@@ -32,5 +40,93 @@
             "domain": "hyatt.com",
             "reason": "Site loads blank and does not proceed."
         }
-    ]
+    ],
+    "_patches": {
+        "android": [
+            {
+                "op": "replace",
+                "path": "/state",
+                "value": "enabled"
+            },
+            {
+                "op": "add",
+                "path": "/exceptions/-",
+                "value": {
+                    "domain": "crocs.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/567"
+                }
+            },
+            {
+                "op": "replace",
+                "path": "/settings/deviceMemory/value",
+                "value": 4
+            },
+            {
+                "op": "replace",
+                "path": "/settings/hardwareConcurrency/value",
+                "value": 8
+            }
+        ],
+        "extension": [
+            {
+                "op": "replace",
+                "path": "/state",
+                "value": "enabled"
+            }
+        ],
+        "ios": [
+            {
+                "op": "replace",
+                "path": "/state",
+                "value": "enabled"
+            },
+            {
+                "op": "remove",
+                "path": "/settings/deviceMemory/value"
+            },
+            {
+                "op": "replace",
+                "path": "/settings/deviceMemory/type",
+                "value": "undefined"
+            },
+            {
+                "op": "replace",
+                "path": "/settings/hardwareConcurrency/value",
+                "value": 4
+            }
+        ],
+        "macos": [
+            {
+                "op": "replace",
+                "path": "/state",
+                "value": "enabled"
+            },
+            {
+                "op": "remove",
+                "path": "/settings/deviceMemory/value"
+            },
+            {
+                "op": "replace",
+                "path": "/settings/deviceMemory/type",
+                "value": "undefined"
+            },
+            {
+                "op": "replace",
+                "path": "/settings/hardwareConcurrency",
+                "value": [
+                    {
+                        "type": "number",
+                        "value": 4
+                    },
+                    {
+                        "type": "number",
+                        "value": 8,
+                        "criteria": {
+                            "arch": "AppleSilicon"
+                        }
+                    }
+                ]
+            }
+        ]
+    }
 }
