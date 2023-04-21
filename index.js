@@ -1,5 +1,5 @@
 const fs = require('fs')
-
+const jsonpatch = require('fast-json-patch')
 const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args))
 
 const { addCnameEntriesToAllowlist, inlineReasonArrays, mergeAllowlistedTrackers, addHashToFeatures } = require('./util')
@@ -92,11 +92,14 @@ const unprotectedListName = 'unprotected-temporary.json'
 const jsonListNames = fs.readdirSync(LISTS_DIR).filter(listName => {
     return listName !== unprotectedListName && listName !== '_template.json'
 })
+const patches = {}
 for (const jsonList of jsonListNames) {
     const listData = JSON.parse(fs.readFileSync(`${LISTS_DIR}/${jsonList}`))
     const configKey = jsonList.replace(/[.]json$/, '').replace(/-([a-z0-9])/g, function (g) { return g[1].toUpperCase() })
 
     delete listData._meta
+    patches[configKey] = listData._patches
+    delete listData._patches
     defaultConfig.features[configKey] = listData
 }
 
@@ -131,95 +134,17 @@ async function buildPlatforms () {
 
     for (const platform of platforms) {
         let platformConfig = JSON.parse(JSON.stringify(defaultConfig))
-        const overridePath = `${OVERRIDE_DIR}/${platform}-override.json`
 
-        // Use extension config as the base for browser configs
-        // Extension comes first in the list of platforms so its config should be defined
-        // in the platformConfigs array
-        if (platform.includes(BROWSERS_SUBDIR)) {
-            platformConfig = JSON.parse(JSON.stringify(platformConfigs.extension))
-        }
-
-        // Handle feature overrides
-        const platformOverride = JSON.parse(fs.readFileSync(overridePath)) // throws error on missing platform file
-        for (const key of Object.keys(platformConfig.features)) {
-            if (platformOverride.features[key]) {
-                // Override existing keys
-                for (const platformKey of Object.keys(platformOverride.features[key])) {
-                    if (platformKey === 'exceptions') {
-                        continue
-                    }
-
-                    // ensure certain settings are treated as additive, and aren't overwritten
-                    if (['customUserAgent', 'trackerAllowlist'].includes(key) && platformKey === 'settings') {
-                        const settings = {}
-                        const overrideSettings = platformOverride.features[key][platformKey]
-                        for (const settingsKey in overrideSettings) {
-                            const baseSettings = platformConfig.features[key].settings[settingsKey]
-                            if (settingsKey === 'allowlistedTrackers') {
-                                settings[settingsKey] = mergeAllowlistedTrackers(baseSettings || {}, overrideSettings[settingsKey])
-                                continue
-                            } else if (['omitVersionSites', 'omitApplicationSites'].includes(settingsKey)) {
-                                settings[settingsKey] = baseSettings.concat(overrideSettings[settingsKey])
-                                continue
-                            }
-                            settings[settingsKey] = overrideSettings[settingsKey]
-                        }
-                        platformConfig.features[key][platformKey] = settings
-                    } else if ((key === 'clickToLoad' || key === 'clickToPlay') && platformKey === 'settings') {
-                        // Handle Click to Load settings override later, so that individual entities
-                        // are disabled/enabled correctly (and disabled by default).
-                        continue
-                    } else {
-                        platformConfig.features[key][platformKey] = platformOverride.features[key][platformKey]
-                    }
-                }
-
-                if (platformOverride.features[key].exceptions) {
-                    if (key === 'contentBlocking') {
-                        addExceptionsToUnprotected(platformOverride.features[key].exceptions)
-                    }
-                    platformConfig.features[key].exceptions = platformConfig.features[key].exceptions.concat(platformOverride.features[key].exceptions)
-                }
-            }
-
-            // Ensure the correct enabled state for Click to Load entities.
-            if (key === 'clickToLoad' || key === 'clickToPlay') {
-                const clickToLoadSettings = platformConfig?.features?.[key]?.settings
-                if (clickToLoadSettings) {
-                    const clickToLoadSettingsOverride = platformOverride?.features?.[key]?.settings
-                    for (const entity of Object.keys(clickToLoadSettings)) {
-                        clickToLoadSettings[entity].state =
-                            clickToLoadSettingsOverride?.[entity]?.state || clickToLoadSettings[entity].state || 'disabled'
-                    }
-                }
-            }
-
-            if (isFeatureMissingState(platformConfig.features[key])) {
-                platformConfig.features[key].state = 'disabled'
-            }
-        }
-
-        // Add platform specific features
-        for (const key of Object.keys(platformOverride.features)) {
-            if (platformConfig.features[key]) {
-                continue
-            }
-
-            platformConfig.features[key] = { ...platformOverride.features[key] }
-            if (isFeatureMissingState(platformConfig.features[key])) {
-                platformConfig.features[key].state = 'disabled'
+        for (const feature of Object.keys(platformConfig.features)) {
+            if (patches[feature]?.[platform]) {
+                console.log(`Applying patches for ${feature} on ${platform}`)
+                jsonpatch.applyPatch(platformConfig.features[feature], patches[feature][platform])
             }
         }
 
         // Remove appTP feature from platforms that don't use it since it's a large feature
         if ('appTrackerProtection' in platformConfig.features && platformConfig.features.appTrackerProtection.state === 'disabled') {
             delete platformConfig.features.appTrackerProtection
-        }
-
-        if (platformOverride.unprotectedTemporary) {
-            addExceptionsToUnprotected(platformOverride.unprotectedTemporary)
-            platformConfig.unprotectedTemporary = platformConfig.unprotectedTemporary.concat(platformOverride.unprotectedTemporary)
         }
 
         addCnameEntriesToAllowlist(tds, platformConfig.features.trackerAllowlist.settings.allowlistedTrackers)
