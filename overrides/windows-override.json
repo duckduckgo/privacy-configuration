@@ -12,6 +12,28 @@
         "navigatorInterface": {
             "state": "enabled"
         },
+        "duckPlayer": {
+            "state": "enabled",
+            "settings": {
+                "overlays": {
+                    "youtube": {
+                        "state": "disabled"
+                    }
+                },
+                "domains": [
+                    {
+                        "domain": "www.youtube.com",
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/overlays/youtube/state",
+                                "value": "enabled"
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
         "elementHiding": {
             "state": "enabled"
         },
@@ -36,6 +58,14 @@
                         "reason": "After sign-in for Google Pay flows (after flickering is resolved), blocking this causes the loading spinner to spin indefinitely, and the payment flow cannot proceed."
                     }
                 ],
+                "firstPartyTrackerCookiePolicy": {
+                    "threshold": 86400,
+                    "maxAge": 86400
+                },
+                "firstPartyCookiePolicy": {
+                    "threshold": 604800,
+                    "maxAge": 604800
+                },
                 "excludedCookieNames": [
                     {
                         "domain": "google.com",
@@ -82,11 +112,7 @@
                         "name": "ckns_nonce",
                         "reason": "Required for BBC login flow"
                     }
-                ],                
-                "firstPartyCookiePolicy": {
-                    "threshold": 604800,
-                    "maxAge": 604800
-                }
+                ]
             }
         }
     },
@@ -105,9 +131,9 @@
             "omitClientHintMutations": []
         },
         "exceptions": [],
-        "state": "enabled"            
+        "state": "enabled"
     },
     "unprotectedTemporary": [
-        
+
     ]
 }
