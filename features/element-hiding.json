@@ -37,7 +37,7 @@
         }
     ],
     "settings": {
-        "useStrictHideStyleTag": false,
+        "useStrictHideStyleTag": true,
         "rules": [
             {
                 "selector": "[id*='gpt-']",
@@ -332,7 +332,12 @@
                 "type": "hide-empty"
             }
         ],
-        "styleTagExceptions": [],
+        "styleTagExceptions": [
+            {
+                "domain": "github.com",
+                "reason": "style-src CSP prevents styletag injection"
+            }
+        ],
         "mediaAndFormSelectors": "video,canvas,embed,object,audio,map,form,input,textarea,select,option",
         "adLabelStrings": [
             "ad",
