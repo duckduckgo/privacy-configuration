@@ -114,26 +114,24 @@
                     }
                 ]
             }
+        },
+        "customUserAgent": {
+            "settings": {
+                "omitApplicationSites": [],
+                "omitVersionSites": [],
+                "userAgentOverrides": [],
+                "omitClientHintMutations": []
+            },
+            "exceptions": [],
+            "state": "disabled"
+        },
+        "requestFilterer": {
+            "state": "enabled",
+            "settings": {
+                "windowInMs": 450
+            },
+            "exceptions": [ ]
         }
     },
-    "customUserAgent": {
-        "settings": {
-            "omitApplicationSites": [],
-            "omitVersionSites": [],
-            "userAgentOverrides": [
-                {
-                    "domain": "accounts.google.com",
-                    "userAgent": "chrome",
-                    "pathRegex": "^/ServiceLogin$",
-                    "reason": "Auth flow broken when Google detects a webview. Using a 'chrome' UA works around the issue."
-                }
-            ],
-            "omitClientHintMutations": []
-        },
-        "exceptions": [],
-        "state": "enabled"
-    },
-    "unprotectedTemporary": [
-
-    ]
+    "unprotectedTemporary": []
 }
