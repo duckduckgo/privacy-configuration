@@ -18,6 +18,9 @@
                 "overlays": {
                     "youtube": {
                         "state": "disabled"
+                    },
+                    "serpProxy": {
+                        "state": "disabled"
                     }
                 },
                 "domains": [
@@ -27,6 +30,16 @@
                             {
                                 "op": "replace",
                                 "path": "/overlays/youtube/state",
+                                "value": "enabled"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "duckduckgo.com",
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/overlays/serpProxy/state",
                                 "value": "enabled"
                             }
                         ]
