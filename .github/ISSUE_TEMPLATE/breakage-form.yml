@@ -1,0 +1,44 @@
+---
+name: Breakage Form
+description: Report breakage that requires a config mitigation
+title: "<breaking-domain>"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Each exception should be documented. Please create an issue using this form before creating a new exception. The exception should then link back to the created issue.
+        Set the title to the domain (etld+1) of the tracker that is breaking the site.
+  - type: input
+    id: domain
+    attributes:
+      label: Broken Site
+      description: Link to the page with breakage
+      placeholder: example.com
+    validations:
+      required: true
+  - type: textarea
+    id: reason
+    attributes:
+      label: Reason
+      description: The reason why the tracker is breaking the site
+      placeholder: Page is blank for 5s after loading
+    validations:
+      required: true
+  - type: textarea
+    id: requests-required
+    attributes:
+      label: Requests Required
+      description: Requests that must be unblocked for the site to function
+      placeholder: |
+        1. https://example.com/script.js
+        2. …
+    validations:
+      required: true
+  - type: textarea
+    id: other-sites
+    attributes:
+      label: Other Sites
+      description: Other sites that are broken by the same tracker
+      placeholder: |
+        1. https://example.com
+        2. …
