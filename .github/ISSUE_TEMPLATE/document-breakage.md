@@ -7,7 +7,7 @@ assignees: ''
 
 ---
 
-<!-- Each exception shoudl be documented. Please create an issue using template below before creating a new exception. -->
+<!-- Each exception should be documented. Please create an issue using this template before creating a new exception. The exception should then link back to the created issue. -->
 <!-- Title should contain eTLD+1 of the tracker (and not the site that's broken). -->
   
 - https://example.com <!--link to page with breakage--> (last verified 2021-12-31)
