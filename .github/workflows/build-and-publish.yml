@@ -3,7 +3,11 @@ name: Build and Publish
 on:
   push:
     branches:
-    - main
+      - main
+    paths:
+      - '**.json'
+      - '**.js'
+      - '**.yml'
 
 jobs:
   publish:
