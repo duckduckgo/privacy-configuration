@@ -1,6 +1,16 @@
 name: Test
 
-on: [push, pull_request]
+on: 
+  push:
+    paths:
+      - '**.json'
+      - '**.js'
+      - '**.yml'
+  pull_request:
+    paths:
+      - '**.json'
+      - '**.js'
+      - '**.yml'
 
 jobs:
   unit:
