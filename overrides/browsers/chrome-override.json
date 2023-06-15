@@ -8,6 +8,146 @@
                     "reason": "Adwall appears which reappears when dismissed. The adwall prevents interaction with the page."
                 }
             ]
+        },
+        "runtimeChecks": {
+            "state": "enabled",
+            "exceptions": [
+                {
+                    "domain": "lowes.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/991"
+                }
+            ],
+            "minSupportedVersion": "2023.4.11",
+            "settings": {
+                "taintCheck": "enabled",
+                "matchAllDomains": "enabled",
+                "matchAllStackDomains": "disabled",
+                "overloadInstanceOf": "enabled",
+                "overloadRemoveChild": "enabled",
+                "overloadReplaceChild": "enabled",
+                "replaceElement": "enabled",
+                "injectGlobalStyles": "enabled",
+                "domains": [
+                    {
+                        "domain": "duckduckgo.com",
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/injectGlobalStyles",
+                                "value": "disabled"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "ally.com",
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/stackDomains",
+                                "value": []
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "developer.mozilla.org",
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/scriptOverload",
+                                "value": {
+                                    "navigator.maxTouchPoints":{
+                                        "type": "number",
+                                        "value": 0
+                                    },
+                                    "devicePixelRatio": {
+                                        "type": "number",
+                                        "value": 2
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "github.com",
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/injectGlobalStyles",
+                                "value": "disabled"
+                            }
+                        ]
+                    }
+                ],
+                "scripts": [
+                ],
+                "stackDomains": [
+                    {
+                        "domain": "adobedtm.com"
+                    },
+                    {
+                        "domain": "tiqcdn.com"
+                    }
+                ],
+                "tagModifiers": {
+                    "script": {
+                        "filters": {
+                            "property": [
+                                "blocking",
+                                "fetchPriority"
+                            ],
+                            "attribute": [
+                                "blocking",
+                                "fetchpriority"
+                            ]
+                        }
+                    }
+                },
+                "breakpoints": [
+                    {"height": 768, "width": 1024},
+                    {"height": 1024, "width": 768},
+                    {"height": 375, "width": 812},
+                    {"height": 812, "width": 375}
+                ],
+                "injectGenericOverloads": {
+                    "Date": {
+                        "stackCheck": true
+                    },
+                    "Date.prototype.getTimezoneOffset": {
+                        "stackCheck": true
+                    },
+                    "NavigatorUAData.prototype.getHighEntropyValues": {
+                        "stackCheck": true
+                    },
+                    "localStorage": {
+                        "stackCheck": true,
+                        "scheme": "session"
+                    },
+                    "sessionStorage": {
+                        "stackCheck": true,
+                        "scheme": "memory"
+                    },
+                    "innerHeight": {
+                        "stackCheck": true,
+                        "offset": 100
+                    },
+                    "innerWidth":  {
+                        "stackCheck": true,
+                        "offset": 100
+                    },
+                    "outerHeight": {
+                        "stackCheck": true
+                    },
+                    "outerWidth":  {
+                        "stackCheck": true
+                    },
+                    "Screen.prototype.height": {
+                        "stackCheck": true
+                    },
+                    "Screen.prototype.width": {
+                        "stackCheck": true
+                    }
+                }
+            }
         }
     }
 }
