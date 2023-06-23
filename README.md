@@ -57,11 +57,10 @@ If you'd like to license the source for commercial use, [please reach out](https
 
 - **Why do some exceptions have more documentation than others?** A review of
     existing systems is ongoing to make this repository the central location for
-    exceptions and bring documentation and mitigations up-to-date. We're looking
-    to complete this by Winter, 2022.
+    exceptions and bring documentation and mitigations up-to-date.
 
 - **How can I contribute to this repository?** If you suspect any website
     usability issues or breakage, or have concerns about what is/isn't blocked,
-    please [open an issue](https://github.com/duckduckgo/privacy-configuration/issues/new).
+    please [open an issue]([https://github.com/duckduckgo/privacy-configuration/issues/new](https://github.com/duckduckgo/privacy-configuration/issues/new?assignees=&labels=&projects=&template=breakage-form.yml&title=Broken+Site%3A+)https://github.com/duckduckgo/privacy-configuration/issues/new?assignees=&labels=&projects=&template=breakage-form.yml&title=Broken+Site%3A+).
 
     We are not accepting external pull requests at this time.
