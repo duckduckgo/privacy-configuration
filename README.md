@@ -61,6 +61,6 @@ If you'd like to license the source for commercial use, [please reach out](https
 
 - **How can I contribute to this repository?** If you suspect any website
     usability issues or breakage, or have concerns about what is/isn't blocked,
-    please [open an issue]([https://github.com/duckduckgo/privacy-configuration/issues/new](https://github.com/duckduckgo/privacy-configuration/issues/new?assignees=&labels=&projects=&template=breakage-form.yml&title=Broken+Site%3A+)https://github.com/duckduckgo/privacy-configuration/issues/new?assignees=&labels=&projects=&template=breakage-form.yml&title=Broken+Site%3A+).
+    please [open an issue](https://github.com/duckduckgo/privacy-configuration/issues/new?assignees=&labels=&projects=&template=breakage-form.yml&title=Broken+Site%3A+).
 
     We are not accepting external pull requests at this time.
