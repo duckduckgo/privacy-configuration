@@ -1,0 +1,106 @@
+{
+    "_meta": {
+        "description": "Protection from APIs harmful for user privacy.",
+        "sampleExcludeRecords": {
+            "domain": "example.com",
+            "reason": "site breakage"
+        }
+    },
+    "settings": {
+        "deviceOrientation": {
+            "protected": true,
+            "filterEvents": [
+                "deviceorientation",
+                "devicemotion"
+            ]
+        },
+        "GenericSensor": {
+            "protected": true,
+            "filterPermissions": [
+                "accelerometer",
+                "ambient-light-sensor",
+                "gyroscope",
+                "magnetometer"
+            ],
+            "blockSensorStart": true
+        },
+        "UaClientHints": {
+            "protected": true,
+            "highEntropyValues": {
+                "trimBrands": true,
+                "model": "",
+                "trimPlatformVersion": 2,
+                "trimUaFullVersion": 1,
+                "trimFullVersionList": 1
+            }
+        },
+        "NetworkInformation": {
+            "protected": true
+        },
+        "getInstalledRelatedApps": {
+            "protected": true,
+            "returnValue": []
+        },
+        "FileSystemAccess": {
+            "protected": true,
+            "disableOpenFilePicker": true,
+            "disableSaveFilePicker": true,
+            "disableDirectoryPicker": true,
+            "disableGetAsFileSystemHandle": true
+        },
+        "WindowPlacement": {
+            "protected": true,
+            "filterPermissions": [
+                "window-placement",
+                "window-management"
+            ],
+            "screenIsExtended": false
+        },
+        "WebBluetooth": {
+            "protected": true,
+            "filterPermissions": [
+                "bluetooth"
+            ],
+            "filterEvents": ["availabilitychanged"],
+            "blockGetAvailability": true,
+            "blockRequestDevice": true
+        },
+        "WebUsb": {
+            "protected": true
+        },
+        "WebSerial": {
+            "protected": true
+        },
+        "WebHid": {
+            "protected": true
+        },
+        "WebMidi": {
+            "protected": true,
+            "filterPermissions": [
+                "midi"
+            ]
+        },
+        "IdleDetection": {
+            "protected": true,
+            "filterPermissions": [
+                "idle-detection"
+            ]
+        },
+        "WebNfc": {
+            "protected": true,
+            "disableNdefReader": true,
+            "disableNdefMessage": true,
+            "disableNdefRecord": true
+        },
+        "StorageManager": {
+            "protected": true,
+            "allowedQuotaValues": [
+                1073741824,
+                4294967296,
+                9999999999
+            ]
+        },
+        "domains": []
+    },
+    "exceptions": []
+}
