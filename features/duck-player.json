@@ -3,5 +3,54 @@
         "description": "Private YouTube video player used by our macOS browser, allowing users to watch YouTube videos without personalized ads and preventing viewing activity from influencing users' YouTube recommendations.",
         "sampleExcludeRecords": {}
     },
-    "exceptions": []
+    "exceptions": [],
+    "settings": {
+        "overlays": {
+            "youtube": {
+                "state": "disabled",
+                "selectors": {
+                    "thumbLink": "a[href^='/watch']:has(img)",
+                    "excludedRegions": [
+                        "#playlist"
+                    ],
+                    "videoElement": "#player video",
+                    "videoElementContainer": "#player .html5-video-player"
+                },
+                "thumbnailOverlays": {
+                    "state": "enabled"
+                },
+                "clickInterception": {
+                    "state": "enabled"
+                },
+                "videoOverlays": {
+                    "state": "enabled"
+                }
+            },
+            "serpProxy": {
+                "state": "disabled"
+            }
+        },
+        "domains": [
+            {
+                "domain": "youtube.com",
+                "patchSettings": [
+                    {
+                        "op": "replace",
+                        "path": "/overlays/youtube/state",
+                        "value": "enabled"
+                    }
+                ]
+            },
+            {
+                "domain": "duckduckgo.com",
+                "patchSettings": [
+                    {
+                        "op": "replace",
+                        "path": "/overlays/serpProxy/state",
+                        "value": "enabled"
+                    }
+                ]
+            }
+        ]
+    }
 }
