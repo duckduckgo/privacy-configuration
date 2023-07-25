@@ -1,3 +1,8 @@
+function versionToInt(version) {
+    // convert v2 to 2
+    return parseInt(version.replace('v', ''))
+}
+
 const compatFunctions = {
     v1: (config) => {
         const v1Config = JSON.parse(JSON.stringify(config))
@@ -11,7 +16,7 @@ const compatFunctions = {
                 v1Config.features[feature].state = 'disabled'
             }
 
-            if (v1Config.features[feature].eol === 'v1') {
+            if (versionToInt(v1Config.features[feature].eol) < 2) {
                 // This feature's support ends in v1 so remove it from platformConfig
                 delete v1Config.features[feature].eol
                 delete config.features[feature]
@@ -37,7 +42,7 @@ const compatFunctions = {
                 }
             }
 
-            if (v2Config.features[feature].eol === 'v2') {
+            if (versionToInt(v1Config.features[feature].eol) < 3) {
                 // This feature's support ends in v2 so remove it from platformConfig
                 delete v2Config.features[feature].eol
                 delete config.features[feature]
