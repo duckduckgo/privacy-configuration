@@ -52,8 +52,8 @@ function writeConfigToDisk (platform, config) {
     fs.writeFileSync(`${GENERATED_DIR}/v3/${configName}-config.json`, JSON.stringify(config, null, 4))
 
     // Convert config to backwards compatible versions
-    var compatConfig = JSON.parse(JSON.stringify(config))
-    for (version of ['v2', 'v1']) {
+    let compatConfig = JSON.parse(JSON.stringify(config))
+    for (const version of ['v2', 'v1']) {
         if (!compatFunctions[version]) {
             continue
         }

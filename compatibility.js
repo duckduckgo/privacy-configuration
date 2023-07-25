@@ -10,14 +10,14 @@ const compatFunctions = {
                 delete v1Config.features[feature].minSupportedVersion
                 v1Config.features[feature].state = 'disabled'
             }
-    
+
             if (v1Config.features[feature].eol === 'v1') {
                 // This feature's support ends in v1 so remove it from platformConfig
                 delete v1Config.features[feature].eol
                 delete config.features[feature]
             }
         }
-    
+
         return v1Config
     },
     v2: (config) => {
