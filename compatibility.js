@@ -16,7 +16,8 @@ const compatFunctions = {
                 v1Config.features[feature].state = 'disabled'
             }
 
-            if (versionToInt(v1Config.features[feature].eol) < 2) {
+            const eol = v1Config.features[feature].eol
+            if (eol && versionToInt(eol) < 2) {
                 // This feature's support ends in v1 so remove it from platformConfig
                 delete v1Config.features[feature].eol
                 delete config.features[feature]
@@ -42,7 +43,8 @@ const compatFunctions = {
                 }
             }
 
-            if (versionToInt(v2Config.features[feature].eol) < 3) {
+            const eol = v2Config.features[feature].eol
+            if (eol && versionToInt(eol) < 3) {
                 // This feature's support ends in v2 so remove it from platformConfig
                 delete v2Config.features[feature].eol
                 delete config.features[feature]
