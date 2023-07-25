@@ -1,4 +1,4 @@
-function versionToInt(version) {
+function versionToInt (version) {
     // convert v2 to 2
     return parseInt(version.replace('v', ''))
 }
