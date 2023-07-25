@@ -140,7 +140,7 @@ const sections = {
 }
 function sortFiles (dirFiles, dirName) {
     for (const [filePath, fileContent] of Object.entries(dirFiles)) {
-        if (filePath.startsWith('v2')) {
+        if (filePath.startsWith('v3')) {
             sections.latest[dirName] = sections.latest[dirName] || {}
             sections.latest[dirName][filePath] = fileContent
         } else {
