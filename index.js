@@ -16,7 +16,7 @@ const defaultConfig = {
 }
 
 const platforms = require('./platforms')
-const compatFunctions = require('./compatibility')
+const compatibility = require('./compatibility')
 
 const tdsPath = 'live'
 
@@ -46,22 +46,31 @@ function writeConfigToDisk (platform, config) {
         configName = platform.replace(BROWSERS_SUBDIR, 'extension-')
     }
 
+    // Convert config to backwards compatible versions
+    let compatConfig = config
+    const configsToWrite = []
+    for (const version of ['v2', 'v1']) {
+        if (!compatibility.compatFunctions[version]) {
+            continue
+        }
+
+        compatConfig = compatibility.compatFunctions[version](compatConfig)
+        addHashToFeatures(compatConfig)
+        configsToWrite.push({
+            version,
+            config: compatConfig
+        })
+    }
+
+    // Write backwards compatible versions to disk
+    for (const { version, config } of configsToWrite) {
+        fs.writeFileSync(`${GENERATED_DIR}/${version}/${configName}-config.json`, JSON.stringify(config, null, 4))
+    }
+
     addHashToFeatures(config)
 
     // Write current version to disk
     fs.writeFileSync(`${GENERATED_DIR}/v3/${configName}-config.json`, JSON.stringify(config, null, 4))
-
-    // Convert config to backwards compatible versions
-    let compatConfig = JSON.parse(JSON.stringify(config))
-    for (const version of ['v2', 'v1']) {
-        if (!compatFunctions[version]) {
-            continue
-        }
-
-        compatConfig = compatFunctions[version](compatConfig)
-        addHashToFeatures(compatConfig)
-        fs.writeFileSync(`${GENERATED_DIR}/${version}/${configName}-config.json`, JSON.stringify(compatConfig, null, 4))
-    }
 }
 
 /**

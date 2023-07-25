@@ -3,6 +3,21 @@ function versionToInt (version) {
     return parseInt(version.replace('v', ''))
 }
 
+function removeEolFeatures (config, prevConfig, version) {
+    for (const feature of Object.keys(config.features)) {
+        const eol = config.features[feature].eol
+        if (eol && versionToInt(eol) < version) {
+            // This feature's support ends in a previous config so remove it from platformConfig
+            delete config.features[feature]
+
+            if (versionToInt(eol) === version - 1) {
+                // Only remove the eol key if it is the previous version
+                delete prevConfig.features[feature].eol
+            }
+        }
+    }
+}
+
 const compatFunctions = {
     v1: (config) => {
         const v1Config = JSON.parse(JSON.stringify(config))
@@ -15,14 +30,9 @@ const compatFunctions = {
                 delete v1Config.features[feature].minSupportedVersion
                 v1Config.features[feature].state = 'disabled'
             }
-
-            const eol = v1Config.features[feature].eol
-            if (eol && versionToInt(eol) < 2) {
-                // This feature's support ends in v1 so remove it from platformConfig
-                delete v1Config.features[feature].eol
-                delete config.features[feature]
-            }
         }
+
+        removeEolFeatures(config, v1Config, 2)
 
         return v1Config
     },
@@ -42,17 +52,14 @@ const compatFunctions = {
                     }
                 }
             }
-
-            const eol = v2Config.features[feature].eol
-            if (eol && versionToInt(eol) < 3) {
-                // This feature's support ends in v2 so remove it from platformConfig
-                delete v2Config.features[feature].eol
-                delete config.features[feature]
-            }
         }
+
+        removeEolFeatures(config, v2Config, 3)
 
         return v2Config
     }
 }
 
-module.exports = compatFunctions
+module.exports = {
+    compatFunctions
+}
