@@ -42,7 +42,7 @@ const compatFunctions = {
                 }
             }
 
-            if (versionToInt(v1Config.features[feature].eol) < 3) {
+            if (versionToInt(v2Config.features[feature].eol) < 3) {
                 // This feature's support ends in v2 so remove it from platformConfig
                 delete v2Config.features[feature].eol
                 delete config.features[feature]
