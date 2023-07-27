@@ -50,7 +50,7 @@ function writeConfigToDisk (platform, config) {
 
     // Write config and convert to backwards compatible versions
     let prevConfig = null
-    for (var i = CURRENT_CONFIG_VERSION; i > 0; i--) {
+    for (let i = CURRENT_CONFIG_VERSION; i > 0; i--) {
         const version = `v${i}`
         mkdirIfNeeded(`${GENERATED_DIR}/${version}`)
 

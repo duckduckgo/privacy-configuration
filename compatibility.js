@@ -17,7 +17,7 @@ function removeEolFeatures (config, version) {
         if (!eol) {
             continue
         }
-        
+
         const eolInt = versionToInt(eol)
         if (eolInt < version) {
             // This feature's support ends in a previous config so remove it from platformConfig
@@ -33,6 +33,10 @@ function removeEolFeatures (config, version) {
  * The compat functions are used to convert a config object to a previous version.
  * Each previous version of the config should have an entry which modifies the config
  * to be compatible with that version.
+ *
+ * Compat function format:
+ * param {object} config - the config object to convert. This config should be one version higher than the target version.
+ * return {object} - The converted config object
  */
 const compatFunctions = {
     v1: (config) => {
