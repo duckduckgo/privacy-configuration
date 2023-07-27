@@ -186,6 +186,46 @@
             },
             "exceptions": [ ]
         },
+        "webCompat": {
+            "state": "enabled",
+            "settings": {
+                "domains": [
+                    {
+                        "domain": [
+                            "dailystar.co.uk",
+                            "manchestereveningnews.co.uk",
+                            "hulldailymail.co.uk",
+                            "walesonline.co.uk",
+                            "examinerlive.co.uk",
+                            "dailyrecord.co.uk",
+                            "coventrytelegraph.co.uk",
+                            "plymouthherald.co.uk",
+                            "getreading.co.uk",
+                            "birminghammail.co.uk"
+                        ],
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/notifications",
+                                "value": {
+                                    "state": "enabled"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/permissions",
+                                "value": {
+                                    "state": "enabled",
+                                    "validPermissionNames": [
+                                        "notifications"
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
         "windowsWaitlist": {
             "state": "enabled"
         },
