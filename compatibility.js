@@ -22,7 +22,7 @@ function removeEolFeatures (config, version) {
         if (eolInt < version) {
             // This feature's support ends in a previous config so remove it from platformConfig
             delete config.features[feature]
-        } else if (eolInt === version) {
+        } else if (eolInt >= version) {
             // Remove the eol key if it matches the current version
             delete config.features[feature].eol
         }
