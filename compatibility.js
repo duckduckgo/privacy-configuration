@@ -3,28 +3,42 @@ function versionToInt (version) {
     return parseInt(version.replace('v', ''))
 }
 
-function removeEolFeatures (config, prevConfig, version) {
+/**
+ * Remove features from `config` that have reached their end of life.
+ * This function will also remove the `eol` key from features when it
+ * matches the current version of `config`.
+ *
+ * @param {object} config - the config object to remove eol features from
+ * @param {int} version - the version of the config object
+ */
+function removeEolFeatures (config, version) {
     for (const feature of Object.keys(config.features)) {
         const eol = config.features[feature].eol
-        if (eol && versionToInt(eol) < version) {
+        if (!eol) {
+            continue
+        }
+        
+        const eolInt = versionToInt(eol)
+        if (eolInt < version) {
             // This feature's support ends in a previous config so remove it from platformConfig
             delete config.features[feature]
-
-            if (versionToInt(eol) === version - 1) {
-                // Only remove the eol key if it is the previous version
-                delete prevConfig.features[feature].eol
-            }
+        } else if (eolInt === version) {
+            // Remove the eol key if it matches the current version
+            delete config.features[feature].eol
         }
     }
 }
 
+/**
+ * The compat functions are used to convert a config object to a previous version.
+ * Each previous version of the config should have an entry which modifies the config
+ * to be compatible with that version.
+ */
 const compatFunctions = {
     v1: (config) => {
-        const v1Config = JSON.parse(JSON.stringify(config))
+        // Breaking changes: minSupportedVersion key in features
 
-        // Disable features with a minSupported version.
-        // This key is not supported in v1 and any features with this key
-        // will need to be disabled.
+        const v1Config = JSON.parse(JSON.stringify(config))
         for (const feature of Object.keys(v1Config.features)) {
             if (v1Config.features[feature].minSupportedVersion) {
                 delete v1Config.features[feature].minSupportedVersion
@@ -32,16 +46,12 @@ const compatFunctions = {
             }
         }
 
-        removeEolFeatures(config, v1Config, 2)
-
         return v1Config
     },
     v2: (config) => {
-        const v2Config = JSON.parse(JSON.stringify(config))
+        // Breaking changes: rollouts key in sub-features
 
-        // Disable sub-features with a rollouts key.
-        // This key is not supported in v2 and any sub-features with this key
-        // will need to be disabled.
+        const v2Config = JSON.parse(JSON.stringify(config))
         for (const feature of Object.keys(v2Config.features)) {
             const subFeatures = v2Config.features[feature].features
             if (subFeatures) {
@@ -54,12 +64,11 @@ const compatFunctions = {
             }
         }
 
-        removeEolFeatures(config, v2Config, 3)
-
         return v2Config
     }
 }
 
 module.exports = {
+    removeEolFeatures,
     compatFunctions
 }

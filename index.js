@@ -9,6 +9,8 @@ const GENERATED_DIR = 'generated'
 const LISTS_DIR = 'features'
 const BROWSERS_SUBDIR = 'browsers/'
 
+const CURRENT_CONFIG_VERSION = 3
+
 const defaultConfig = {
     readme: 'https://github.com/duckduckgo/privacy-configuration',
     version: Date.now(),
@@ -46,31 +48,27 @@ function writeConfigToDisk (platform, config) {
         configName = platform.replace(BROWSERS_SUBDIR, 'extension-')
     }
 
-    // Convert config to backwards compatible versions
-    let compatConfig = config
-    const configsToWrite = []
-    for (const version of ['v2', 'v1']) {
-        if (!compatibility.compatFunctions[version]) {
-            continue
+    // Write config and convert to backwards compatible versions
+    let prevConfig = null
+    for (var i = CURRENT_CONFIG_VERSION; i > 0; i--) {
+        const version = `v${i}`
+        mkdirIfNeeded(`${GENERATED_DIR}/${version}`)
+
+        if (!prevConfig) {
+            prevConfig = config
+        } else {
+            if (!compatibility.compatFunctions[version]) {
+                throw new Error(`No compat function for config version ${version}`)
+            }
+
+            prevConfig = compatibility.compatFunctions[version](prevConfig)
         }
 
-        compatConfig = compatibility.compatFunctions[version](compatConfig)
+        const compatConfig = JSON.parse(JSON.stringify(prevConfig))
         addHashToFeatures(compatConfig)
-        configsToWrite.push({
-            version,
-            config: compatConfig
-        })
+        compatibility.removeEolFeatures(compatConfig, i)
+        fs.writeFileSync(`${GENERATED_DIR}/${version}/${configName}-config.json`, JSON.stringify(compatConfig, null, 4))
     }
-
-    // Write backwards compatible versions to disk
-    for (const { version, config } of configsToWrite) {
-        fs.writeFileSync(`${GENERATED_DIR}/${version}/${configName}-config.json`, JSON.stringify(config, null, 4))
-    }
-
-    addHashToFeatures(config)
-
-    // Write current version to disk
-    fs.writeFileSync(`${GENERATED_DIR}/v3/${configName}-config.json`, JSON.stringify(config, null, 4))
 }
 
 /**
@@ -114,10 +112,6 @@ addExceptionsToUnprotected(defaultConfig.features.contentBlocking.exceptions)
 
 // Create generated directory
 mkdirIfNeeded(GENERATED_DIR)
-// Create version directories
-mkdirIfNeeded(`${GENERATED_DIR}/v1`)
-mkdirIfNeeded(`${GENERATED_DIR}/v2`)
-mkdirIfNeeded(`${GENERATED_DIR}/v3`)
 
 function isFeatureMissingState (feature) {
     return !('state' in feature)
