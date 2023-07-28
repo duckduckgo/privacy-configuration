@@ -352,7 +352,27 @@
             "settings": {
                 "windowSizing": "enabled",
                 "navigatorCredentials": "enabled",
-                "safariObject": "enabled"
+                "safariObject": "enabled",
+                "messageHandlers": {
+                    "state": "disabled",
+                    "handlerStrategies": {
+                        "reflect": ["trackerDetectedMessage", "printHandler", "specialPages"],
+                        "polyfill": ["*"],
+                        "undefined": ["jsHandler"]
+                    }
+                },
+                "domains": [
+                    {
+                        "domain": "www.cbsnews.com",
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/messageHandlers/state",
+                                "value": "enabled"
+                            }
+                        ]
+                    }
+                ]
             }
         },
         "navigatorCredentials": {
