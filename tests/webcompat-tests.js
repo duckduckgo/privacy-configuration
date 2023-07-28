@@ -7,7 +7,7 @@ describe('WebCompat Settings Tests', () => {
     const rootSchema = JSON.parse(fs.readFileSync('./tests/schemas/webcompat-settings.json', 'utf8'))
     const validateRoot = ajv.compile(rootSchema)
 
-    it('validates the override settings for macos', () => {
+    it('validates the config settings for macos', () => {
         const macosConfig = JSON.parse(fs.readFileSync('./generated/v2/macos-config.json', 'utf8'))
         const actual = validateRoot(macosConfig.features.webCompat.settings)
         if (validateRoot.errors) {
