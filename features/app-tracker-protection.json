@@ -3,6 +3,9 @@
         "description": "App Tracking Protection"
     },
     "settings": {
+        "interceptDnsRequests": {
+            "state": "disabled"
+        },
         "openBeta": {
             "state": "enabled"
         },
@@ -71,10 +74,24 @@
                     "domain": "g.doubleclick.net",
                     "packageNames": [
                         {
+                            "packageName": "com.cbs.app"
+                        },
+                        {
+                            "packageName": "com.foxnews.android"
+                        },
+                        {
                             "packageName": "com.udonistemple.magicalmixing"
                         }
                     ]
-                },       
+                },
+                {
+                    "domain": "hb.omtrdc.net",
+                    "packageNames": [
+                        {
+                            "packageName": "com.foxnews.android"
+                        }
+                    ]
+                },   
                 {
                     "domain": "insight.adsrvr.org",
                     "packageNames": [
@@ -118,6 +135,9 @@
                         },
                         {
                             "packageName": "com.macys.android"
+                        },
+                        {
+                            "packageName": "com.sephora"
                         }
                     ]
                 },

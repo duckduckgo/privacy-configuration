@@ -1,0 +1,72 @@
+---
+name: Breakage Form
+description: Report breakage that requires a config mitigation
+title: "Broken Site: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Each exception should be documented. Please create an issue using this form before creating a new exception. The exception should then link back to the created issue.
+        Set the title to the domain of the broken site.
+  - type: textarea
+    id: urls
+    attributes:
+      label: URLs affected
+      description: Which URLs are affected by this breakage?
+      placeholder: https://example.com/page.html?product=shoes
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Description of Breakage
+      description: What is broken and how it is broken? (Include screenshots if possible)
+      placeholder: Page is blank for 5s after loading
+    validations:
+      required: true
+  - type: textarea
+    id: breaking-requests
+    attributes:
+      label: Tracker Requests breaking the site
+      description: Requests that must be unblocked for the site to function
+      placeholder: |
+        1. https://example.com/script.js
+        2. …
+    validations:
+      required: true
+  - type: checkboxes
+    id: affected-platforms
+    attributes:
+      label: Affected Platforms
+      description: Which DuckDuckGo products are affected by this breakage?
+      options:
+        - label: Browser Extensions
+        - label: Android Browser
+        - label: iOS Browser
+        - label: macOS Browser
+        - label: Windows Browser
+  - type: textarea
+    id: other
+    attributes:
+      label: Other Details
+      description: Any other information that may be useful
+  - type: markdown
+    attributes:
+      value: |
+        ## Additional Information
+  - type: dropdown
+    id: disable-privacy-protection
+    attributes:
+      label: Tested without Privacy Protections
+      description: Does the site work if Privacy Protection is disabled?
+      options:
+        - "Yes"
+        - "No"
+  - type: dropdown
+    id: verified-on-other-browsers
+    attributes:
+      label: Verified on other browsers
+      description: Does this breakage occur on other non-DuckDuckGo browsers?
+      options:
+        - "Yes"
+        - "No"

@@ -11,12 +11,24 @@
             "state": "enabled",
             "exceptions": [
                 {
+                    "domain": "amazon.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1162"
+                },
+                {
+                    "domain": "foxnews.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/984"
+                },
+                {
                     "domain": "open.spotify.com",
                     "reason": "Site displays a 'Playback disabled' notice on some media, preventing listening."
                 },
                 {
                     "domain": "plex.tv",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/684"
+                },
+                {
+                    "domain": "primevideo.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1162"
                 },
                 {
                     "domain": "showtime.com",
@@ -37,6 +49,10 @@
                 {
                     "domain": "livescience.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/326"
+                },
+                {
+                    "domain": "healthline.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/326"
                 }
             ]
         },
@@ -51,52 +67,14 @@
                 },
                 "canAccessCredentialManagement": {
                     "state": "enabled"
+                },
+                "canGeneratePasswords": {
+                    "state": "enabled"
                 }
             }
         },
         "elementHiding": {
             "state": "enabled"
-        },
-        "runtimeChecks": {
-            "state": "enabled",
-            "exceptions": [
-                {
-                    "domain": "ally.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/780"
-                },
-                {
-                    "domain": "stackoverflow.com",
-                    "reason": "https://github.com/duckduckgo/duckduckgo-privacy-extension/issues/1819"
-                },
-                {
-                    "domain": "stackexchange.com",
-                    "reason": "https://github.com/duckduckgo/duckduckgo-privacy-extension/issues/1819"
-                },
-                {
-                    "domain": "mathoverflow.net",
-                    "reason": "https://github.com/duckduckgo/duckduckgo-privacy-extension/issues/1819"
-                },
-                {
-                    "domain": "askubuntu.com",
-                    "reason": "https://github.com/duckduckgo/duckduckgo-privacy-extension/issues/1819"
-                },
-                {
-                    "domain": "superuser.com",
-                    "reason": "https://github.com/duckduckgo/duckduckgo-privacy-extension/issues/1819"
-                },
-                {
-                    "domain": "serverfault.com",
-                    "reason": "https://github.com/duckduckgo/duckduckgo-privacy-extension/issues/1819"
-                },
-                {
-                    "domain": "stackapps.com",
-                    "reason": "https://github.com/duckduckgo/duckduckgo-privacy-extension/issues/1819"
-                },
-                {
-                    "domain": "substack.com",
-                    "reason": "https://github.com/duckduckgo/duckduckgo-privacy-extension/issues/1841"
-                }
-            ]
         },
         "customUserAgent": {
             "state": "enabled",
@@ -121,6 +99,14 @@
                     {
                         "domain": "unclaimedmoneyinfo.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/667"
+                    },
+                    {
+                        "domain": "info.stimmoney.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1137"
+                    },
+                    {
+                        "domain": "hulu.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1145"
                     }
                 ],
                 "omitVersionSites": [
@@ -131,6 +117,10 @@
                     {
                         "domain": "whitepages.com",
                         "reason": "After performing a search, the site displays a page stating that the browser is not supported, and results are not shown."
+                    },
+                    {
+                        "domain": "xfinity.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1075"
                     }
                 ]
             }
@@ -143,7 +133,7 @@
             "state": "enabled"
         },
         "fingerprintingCanvas": {
-            "state": "enabled"
+            "state": "disabled"
         },
         "fingerprintingHardware": {
             "state": "enabled",
@@ -204,11 +194,55 @@
             },
             "exceptions": [ ]
         },
+        "webCompat": {
+            "state": "enabled",
+            "settings": {
+                "domains": [
+                    {
+                        "domain": [
+                            "dailystar.co.uk",
+                            "manchestereveningnews.co.uk",
+                            "hulldailymail.co.uk",
+                            "walesonline.co.uk",
+                            "examinerlive.co.uk",
+                            "dailyrecord.co.uk",
+                            "coventrytelegraph.co.uk",
+                            "plymouthherald.co.uk",
+                            "getreading.co.uk",
+                            "birminghammail.co.uk"
+                        ],
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/notifications",
+                                "value": {
+                                    "state": "enabled"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/permissions",
+                                "value": {
+                                    "state": "enabled",
+                                    "validPermissionNames": [
+                                        "notifications"
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
         "windowsWaitlist": {
             "state": "enabled"
         },
         "windowsDownloadLink": {
-            "state": "disabled"
+            "state": "enabled"
+        },
+        "clientContentFeatures": {
+            "state": "enabled",
+            "exceptions": [ ]
         }
     },
     "unprotectedTemporary": [

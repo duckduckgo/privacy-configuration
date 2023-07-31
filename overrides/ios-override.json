@@ -14,7 +14,7 @@
             "state": "enabled"
         },
         "fingerprintingCanvas": {
-            "state": "enabled"
+            "state": "disabled"
         },
         "fingerprintingHardware": {
             "state": "enabled",
@@ -23,47 +23,6 @@
                 "hardwareConcurrency": {"type": "number", "value": 4},
                 "deviceMemory": {"type": "undefined"}
             }
-        },
-        "runtimeChecks": {
-            "state": "enabled",
-            "exceptions": [
-                {
-                    "domain": "ally.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/780"
-                },
-                {
-                    "domain": "stackoverflow.com",
-                    "reason": "https://github.com/duckduckgo/duckduckgo-privacy-extension/issues/1819"
-                },
-                {
-                    "domain": "stackexchange.com",
-                    "reason": "https://github.com/duckduckgo/duckduckgo-privacy-extension/issues/1819"
-                },
-                {
-                    "domain": "mathoverflow.net",
-                    "reason": "https://github.com/duckduckgo/duckduckgo-privacy-extension/issues/1819"
-                },
-                {
-                    "domain": "askubuntu.com",
-                    "reason": "https://github.com/duckduckgo/duckduckgo-privacy-extension/issues/1819"
-                },
-                {
-                    "domain": "superuser.com",
-                    "reason": "https://github.com/duckduckgo/duckduckgo-privacy-extension/issues/1819"
-                },
-                {
-                    "domain": "serverfault.com",
-                    "reason": "https://github.com/duckduckgo/duckduckgo-privacy-extension/issues/1819"
-                },
-                {
-                    "domain": "stackapps.com",
-                    "reason": "https://github.com/duckduckgo/duckduckgo-privacy-extension/issues/1819"
-                },
-                {
-                    "domain": "substack.com",
-                    "reason": "https://github.com/duckduckgo/duckduckgo-privacy-extension/issues/1841"
-                }
-            ]
         },
         "ampLinks": {
             "state": "enabled"
@@ -100,7 +59,8 @@
                     "minSupportedVersion": "7.74.0"
                 },
                 "autofillPasswordGeneration": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": "7.75.0"
                 }
             }
         },
@@ -138,6 +98,10 @@
                     {
                         "domain": "unclaimedmoneyinfo.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/667"
+                    },
+                    {
+                        "domain": "hulu.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1145"
                     }
                 ],
                 "omitVersionSites": [

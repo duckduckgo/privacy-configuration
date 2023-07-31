@@ -12,6 +12,10 @@
             "reason": "https://github.com/duckduckgo/privacy-configuration/issues/589"
         },
         {
+            "domain": "derstandard.at",
+            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1101"
+        },
+        {
             "domain": "foxnews.com",
             "reason": "https://github.com/duckduckgo/privacy-configuration/issues/965"
         },
@@ -38,10 +42,42 @@
         {
             "domain": "bizjournals.com",
             "reason": "https://github.com/duckduckgo/privacy-configuration/issues/592"
+        },
+        {
+            "domain": "slate.com",
+            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/592"
+        },
+        {
+            "domain": "dailycaller.com",
+            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/592"
+        },
+        {
+            "domain": "dailymail.co.uk",
+            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/592"
+        },
+        {
+            "domain": "eltiempo.com",
+            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/592"
+        },
+        {
+            "domain": "dailyherald.com",
+            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/592"
+        },
+        {
+            "domain": "publico.es",
+            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/592"
+        },
+        {
+            "domain": "rawstory.com",
+            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/592"
+        },
+        {
+            "domain": "allgemeine-zeitung.de",
+            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/592"
         }
     ],
     "settings": {
-        "useStrictHideStyleTag": false,
+        "useStrictHideStyleTag": true,
         "rules": [
             {
                 "selector": "[id*='gpt-']",
@@ -172,6 +208,10 @@
                 "type": "hide-empty"
             },
             {
+                "selector": "#top-banner",
+                "type": "hide-empty"
+            },
+            {
                 "selector": "#topBanner",
                 "type": "hide-empty"
             },
@@ -208,7 +248,7 @@
                 "type": "hide"
             },
             {
-                "selector": "#google-one-tap-iframe",
+                "selector": "[id*='google-one-tap-iframe']",
                 "type": "hide"
             },
             {
@@ -336,7 +376,16 @@
                 "type": "hide-empty"
             }
         ],
-        "styleTagExceptions": [],
+        "styleTagExceptions": [
+            {
+                "domain": "github.com",
+                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1058"
+            },
+            {
+                "domain": "duckduckgo.com",
+                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1058"
+            }
+        ],
         "mediaAndFormSelectors": "video,canvas,embed,object,audio,map,form,input,textarea,select,option",
         "adLabelStrings": [
             "ad",
@@ -402,11 +451,29 @@
                 ]
             },
             {
+                "domain": "bestbuy.com",
+                "rules": [
+                    {
+                        "selector": "#credential_picker_container",
+                        "type": "override"
+                    }
+                ]
+            },
+            {
                 "domain": "bleacherreport.com",
                 "rules": [
                     {
                         "selector": ".br-ad-wrapper",
                         "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "bleedcubbieblue.com",
+                "rules": [
+                    {
+                        "selector": "[class*='ad_unit']",
+                        "type": "override"
                     }
                 ]
             },
@@ -557,6 +624,31 @@
                 ]
             },
             {
+                "domain": "focus.de",
+                "rules": [
+                    {
+                        "selector": "[id*='M_CONTENTAD']",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": "[id*='M_TRSCT_hor']",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": "[id*='M_FLYCPT_hor']",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": "#tfm_admanagerTeaser",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": ".cls_slot_xxoutstreamxx",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
                 "domain": "football365.com",
                 "rules": [
                     {
@@ -610,6 +702,59 @@
                     {
                         "selector": "[id^='ghacks_ad_code']",
                         "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "google.com",
+                "rules": [
+                    {
+                        "selector": ":is(div:has(> iframe[src*='prid=19026802']))",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ":is(div:has(> iframe[src*='prid=19015398']))",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ":is(div:has(> iframe[src*='prid=19026796']))",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ":is(div:has(> iframe[src*='prid=19018053']))",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ":is(div:has(> iframe[src*='prid=19018054']))",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ":is(div:has(> iframe[src*='prid=19016403']))",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ":is(div:has(> iframe[src*='prid=19015972']))",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ":is(div:has(> iframe[src*='prid=19016223']))",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ":is(div:has(> iframe[src*='prid=19015952']))",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ":is(div:has(> iframe[src*='prid=19030391']))",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ":is(div:has(> iframe[src*='prid=19030389']))",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ":is(div:has(> iframe[src*='prid=19030167']))",
+                        "type": "hide"
                     }
                 ]
             },
@@ -1016,6 +1161,15 @@
                 ]
             },
             {
+                "domain": "spankbang.com",
+                "rules": [
+                    {
+                        "selector": ".ptgncdn_holder",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
                 "domain": "target.com",
                 "rules": [
                     {
@@ -1041,6 +1195,44 @@
                         "type": "hide"
                     },
                     {
+                        "selector": ".ZkqhQ",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".mxEhR",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "tripadvisor.de",
+                "rules": [
+                    {
+                        "selector": "#tripGoogleOnetapContainer",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".ZkqhQ",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".mxEhR",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "tripadvisor.co.uk",
+                "rules": [
+                    {
+                        "selector": "#tripGoogleOnetapContainer",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".ZkqhQ",
+                        "type": "hide"
+                    },
+                    {
                         "selector": ".mxEhR",
                         "type": "hide"
                     }
@@ -1051,6 +1243,27 @@
                 "rules": [
                     {
                         "selector": "#tripGoogleOnetapContainer",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".ZkqhQ",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".mxEhR",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "tripadvisor.fr",
+                "rules": [
+                    {
+                        "selector": "#tripGoogleOnetapContainer",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".ZkqhQ",
                         "type": "hide"
                     },
                     {
