@@ -69,6 +69,9 @@ const compatFunctions = {
         }
 
         return v2Config
+    },
+    v3: (config) => {
+        return config
     }
 }
 
