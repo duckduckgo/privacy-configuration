@@ -4,12 +4,7 @@ const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fet
 
 const { addCnameEntriesToAllowlist, inlineReasonArrays, mergeAllowlistedTrackers, addHashToFeatures } = require('./util')
 
-const OVERRIDE_DIR = 'overrides'
-const GENERATED_DIR = 'generated'
-const LISTS_DIR = 'features'
-const BROWSERS_SUBDIR = 'browsers/'
-
-const CURRENT_CONFIG_VERSION = 4
+const { OVERRIDE_DIR, GENERATED_DIR, LISTS_DIR, BROWSERS_SUBDIR, CURRENT_CONFIG_VERSION } = require('./constants')
 
 const defaultConfig = {
     readme: 'https://github.com/duckduckgo/privacy-configuration',
@@ -255,8 +250,3 @@ buildPlatforms().then((platformConfigs) => {
     fs.writeFileSync(`${GENERATED_DIR}/protections.json`, JSON.stringify(protections, null, 4))
     fs.writeFileSync(`${GENERATED_DIR}/fingerprinting.json`, JSON.stringify(protections, null, 4))
 })
-
-// For github actions
-module.exports = {
-    CURRENT_CONFIG_VERSION
-}

@@ -1,7 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 const diff = require('diff')
-const { CURRENT_CONFIG_VERSION } = require('../../index')
+const { CURRENT_CONFIG_VERSION } = require('../../constants')
 
 function readFilesRecursively (directory) {
     const filenames = fs.readdirSync(directory)
