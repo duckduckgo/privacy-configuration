@@ -104,6 +104,35 @@
                 ]
             }
         },
+        "webCompat": {
+            "state": "enabled",
+            "exceptions": [],
+            "settings": {
+                "windowSizing": "disabled",
+                "navigatorCredentials": "disabled",
+                "safariObject": "disabled",
+                "messageHandlers": {
+                    "state": "disabled",
+                    "handlerStrategies": {
+                        "reflect": [],
+                        "polyfill": ["*"],
+                        "undefined": []
+                    }
+                },
+                "domains": [
+                    {
+                        "domain": "www.cbsnews.com",
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/messageHandlers/state",
+                                "value": "enabled"
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
         "windowsWaitlist": {
             "state": "enabled"
         },
