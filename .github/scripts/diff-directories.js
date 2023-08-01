@@ -1,6 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 const diff = require('diff')
+const { CURRENT_CONFIG_VERSION } = require('../../index')
 
 function readFilesRecursively (directory) {
     const filenames = fs.readdirSync(directory)
@@ -140,7 +141,7 @@ const sections = {
 }
 function sortFiles (dirFiles, dirName) {
     for (const [filePath, fileContent] of Object.entries(dirFiles)) {
-        if (filePath.startsWith('v3')) {
+        if (filePath.startsWith(`v${CURRENT_CONFIG_VERSION}`)) {
             sections.latest[dirName] = sections.latest[dirName] || {}
             sections.latest[dirName][filePath] = fileContent
         } else {
@@ -149,6 +150,12 @@ function sortFiles (dirFiles, dirName) {
         }
     }
 }
+
+if (!fs.existsSync(dir1)) {
+    console.log(`New config version: v${CURRENT_CONFIG_VERSION}`)
+    process.exit(0)
+}
+
 sortFiles(readFilesRecursively(dir1), 'dir1')
 sortFiles(readFilesRecursively(dir2), 'dir2')
 
