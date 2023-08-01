@@ -151,16 +151,16 @@ function sortFiles (dirFiles, dirName) {
     }
 }
 
-if (!fs.existsSync(dir1)) {
+if (!fs.existsSync(`${dir1}/v${CURRENT_CONFIG_VERSION}`)) {
     console.log(`New config version: v${CURRENT_CONFIG_VERSION}`)
     process.exit(0)
-} else {
-    sortFiles(readFilesRecursively(dir1), 'dir1')
-    sortFiles(readFilesRecursively(dir2), 'dir2')
+}
 
-    for (const [section, files] of Object.entries(sections)) {
-        const isOpen = section === 'latest'
-        const fileOut = displayDiffs(files.dir1, files.dir2, isOpen)
-        console.log(renderDetails(section, fileOut, isOpen))
-    }
+sortFiles(readFilesRecursively(dir1), 'dir1')
+sortFiles(readFilesRecursively(dir2), 'dir2')
+
+for (const [section, files] of Object.entries(sections)) {
+    const isOpen = section === 'latest'
+    const fileOut = displayDiffs(files.dir1, files.dir2, isOpen)
+    console.log(renderDetails(section, fileOut, isOpen))
 }
