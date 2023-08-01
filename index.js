@@ -256,7 +256,6 @@ buildPlatforms().then((platformConfigs) => {
     fs.writeFileSync(`${GENERATED_DIR}/fingerprinting.json`, JSON.stringify(protections, null, 4))
 })
 
-
 // For github actions
 module.exports = {
     CURRENT_CONFIG_VERSION
