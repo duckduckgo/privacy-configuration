@@ -64,4 +64,3 @@ If you'd like to license the source for commercial use, [please reach out](https
     please [open an issue](https://github.com/duckduckgo/privacy-configuration/issues/new?assignees=&labels=&projects=&template=breakage-form.yml&title=Broken+Site%3A+).
 
     We are not accepting external pull requests at this time.
- 
