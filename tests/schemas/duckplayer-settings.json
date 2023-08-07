@@ -3,7 +3,6 @@
     "title": "DuckPlayerSettings",
     "description": "Settings configuration for video player",
     "type": "object",
-    "additionalProperties": false,
     "properties": {
         "overlays": {
             "title": "Overlays",
@@ -37,6 +36,20 @@
                                         "type": "string"
                                     }
                                 },
+                                "hoverExcluded": {
+                                    "type": "array",
+                                    "description": "CSS selectors for elements that should prevent side effects from hovers",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                },
+                                "clickExcluded": {
+                                    "type": "array",
+                                    "description": "CSS selectors for elements that should prevent side effects from clicks",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                },
                                 "videoElement": {
                                     "type": "string",
                                     "description": "CSS selector for the video element on YouTube"
@@ -50,7 +63,9 @@
                                 "thumbLink",
                                 "excludedRegions",
                                 "videoElement",
-                                "videoElementContainer"
+                                "videoElementContainer",
+                                "clickExcluded",
+                                "hoverExcluded"
                             ]
                         },
                         "thumbnailOverlays": {
