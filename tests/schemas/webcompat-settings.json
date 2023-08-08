@@ -1,0 +1,129 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Web Compat Settings",
+    "description": "Settings configuration for Web Compat",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "windowSizing": {
+            "$ref": "#/definitions/state"
+        },
+        "navigatorCredentials": {
+            "$ref": "#/definitions/state"
+        },
+        "safariObject": {
+            "$ref": "#/definitions/state"
+        },
+        "messageHandlers": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "state",
+                "handlerStrategies"
+            ],
+            "properties": {
+                "state": {
+                    "$ref": "#/definitions/state"
+                },
+                "handlerStrategies": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                        "polyfill",
+                        "reflect",
+                        "undefined"
+                    ],
+                    "properties": {
+                        "reflect": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "polyfill": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "undefined": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "domains": {
+            "$ref": "#/definitions/domains"
+        }
+    },
+    "definitions": {
+        "state": {
+            "type": "string",
+            "enum": [
+                "enabled",
+                "disabled"
+            ]
+        },
+        "domains": {
+            "description": "List of domains with specific patch settings",
+            "type": "array",
+            "items": {
+                "title": "Domain",
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                    "domain": {
+                        "oneOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            }
+                        ],
+                        "description": "Domain name"
+                    },
+                    "patchSettings": {
+                        "description": "List of operations to be applied on the settings for a specific domain",
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "title": "Patch Setting",
+                            "additionalProperties": false,
+                            "properties": {
+                                "op": {
+                                    "type": "string",
+                                    "description": "The operation to be performed"
+                                },
+                                "path": {
+                                    "type": "string",
+                                    "description": "The path of the setting to be patched"
+                                },
+                                "value": {
+                                    "type": "string",
+                                    "description": "The value to replace at the specified path"
+                                }
+                            },
+                            "required": [
+                                "op",
+                                "path",
+                                "value"
+                            ]
+                        }
+                    }
+                },
+                "required": [
+                    "domain",
+                    "patchSettings"
+                ]
+            }
+        }
+    }
+}

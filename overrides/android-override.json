@@ -11,6 +11,10 @@
             "state": "enabled",
             "exceptions": [
                 {
+                    "domain": "amazon.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1162"
+                },
+                {
                     "domain": "foxnews.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/984"
                 },
@@ -21,6 +25,10 @@
                 {
                     "domain": "plex.tv",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/684"
+                },
+                {
+                    "domain": "primevideo.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1162"
                 },
                 {
                     "domain": "showtime.com",
@@ -73,6 +81,10 @@
             "settings": {
                 "omitApplicationSites": [
                     {
+                        "domain": "fedex.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/927"
+                    },
+                    {
                         "domain": "mail.google.com",
                         "reason": "Page loads blank after login (inbox does not show)."
                     },
@@ -91,9 +103,17 @@
                     {
                         "domain": "unclaimedmoneyinfo.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/667"
+                    },
+                    {
+                        "domain": "info.stimmoney.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1137"
                     }
                 ],
                 "omitVersionSites": [
+                    {
+                        "domain": "fedex.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/927"
+                    },
                     {
                         "domain": "steamdb.info",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/667"
@@ -178,6 +198,46 @@
             },
             "exceptions": [ ]
         },
+        "webCompat": {
+            "state": "enabled",
+            "settings": {
+                "domains": [
+                    {
+                        "domain": [
+                            "dailystar.co.uk",
+                            "manchestereveningnews.co.uk",
+                            "hulldailymail.co.uk",
+                            "walesonline.co.uk",
+                            "examinerlive.co.uk",
+                            "dailyrecord.co.uk",
+                            "coventrytelegraph.co.uk",
+                            "plymouthherald.co.uk",
+                            "getreading.co.uk",
+                            "birminghammail.co.uk"
+                        ],
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/notifications",
+                                "value": {
+                                    "state": "enabled"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/permissions",
+                                "value": {
+                                    "state": "enabled",
+                                    "validPermissionNames": [
+                                        "notifications"
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
         "windowsWaitlist": {
             "state": "enabled"
         },
@@ -190,6 +250,9 @@
         }
     },
     "unprotectedTemporary": [
-
+        {
+            "domain": "vinted.fr",
+            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/794"
+        }
     ]
 }
