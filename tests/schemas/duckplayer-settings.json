@@ -1,0 +1,182 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "DuckPlayerSettings",
+    "description": "Settings configuration for video player",
+    "type": "object",
+    "properties": {
+        "overlays": {
+            "title": "Overlays",
+            "description": "Specific configurations for different overlay types",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "youtube": {
+                    "title": "YouTube Overlay",
+                    "description": "Configuration specific to YouTube overlays",
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "state": {
+                            "$ref": "#/definitions/state"
+                        },
+                        "selectors": {
+                            "title": "Selectors",
+                            "description": "CSS selectors for identifying specific HTML elements on a YouTube page",
+                            "type": "object",
+                            "additionalProperties": false,
+                            "properties": {
+                                "thumbLink": {
+                                    "type": "string",
+                                    "description": "CSS selector for YouTube thumbnail links"
+                                },
+                                "excludedRegions": {
+                                    "type": "array",
+                                    "description": "CSS selectors for regions to exclude from hover/click interactions",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                },
+                                "hoverExcluded": {
+                                    "type": "array",
+                                    "description": "CSS selectors for elements that should prevent side effects from hovers",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                },
+                                "clickExcluded": {
+                                    "type": "array",
+                                    "description": "CSS selectors for elements that should prevent side effects from clicks",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                },
+                                "allowedEventTargets": {
+                                    "type": "array",
+                                    "description": "CSS selectors to explicitly allow known event targets for hovers/clicks. For example, preview overlays.",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                },
+                                "videoElement": {
+                                    "type": "string",
+                                    "description": "CSS selector for the video element on YouTube"
+                                },
+                                "videoElementContainer": {
+                                    "type": "string",
+                                    "description": "CSS selector for the container of the video element"
+                                }
+                            },
+                            "required": [
+                                "thumbLink",
+                                "excludedRegions",
+                                "videoElement",
+                                "videoElementContainer",
+                                "clickExcluded",
+                                "hoverExcluded",
+                                "allowedEventTargets"
+                            ]
+                        },
+                        "thumbnailOverlays": {
+                            "title": "Thumbnail Overlays",
+                            "description": "Settings related to the display of thumbnail overlays",
+                            "$ref": "#/definitions/stateObject"
+                        },
+                        "clickInterception": {
+                            "title": "Click Interception",
+                            "description": "Settings for intercepting click events",
+                            "$ref": "#/definitions/stateObject"
+                        },
+                        "videoOverlays": {
+                            "title": "Video Overlays",
+                            "description": "Settings related to the display of video overlays",
+                            "$ref": "#/definitions/stateObject"
+                        }
+                    },
+                    "required": [
+                        "state",
+                        "selectors",
+                        "thumbnailOverlays",
+                        "clickInterception",
+                        "videoOverlays"
+                    ]
+                },
+                "serpProxy": {
+                    "title": "SERP Proxy",
+                    "description": "Configuration for the SERP (Search Engine Results Page) proxy",
+                    "$ref": "#/definitions/stateObject"
+                }
+            },
+            "required": [
+                "youtube",
+                "serpProxy"
+            ]
+        },
+        "domains": {
+            "description": "List of domains with specific patch settings",
+            "type": "array",
+            "items": {
+                "title": "Domain",
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                    "domain": {
+                        "type": "string",
+                        "description": "Domain name"
+                    },
+                    "patchSettings": {
+                        "description": "List of operations to be applied on the settings for a specific domain",
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "title": "Patch Setting",
+                            "additionalProperties": false,
+                            "properties": {
+                                "op": {
+                                    "type": "string",
+                                    "description": "The operation to be performed"
+                                },
+                                "path": {
+                                    "type": "string",
+                                    "description": "The path of the setting to be patched"
+                                },
+                                "value": {
+                                    "type": "string",
+                                    "description": "The value to replace at the specified path"
+                                }
+                            },
+                            "required": [
+                                "op",
+                                "path",
+                                "value"
+                            ]
+                        }
+                    }
+                },
+                "required": [
+                    "domain",
+                    "patchSettings"
+                ]
+            }
+        }
+    },
+    "required": [
+        "overlays",
+        "domains"
+    ],
+    "definitions": {
+        "stateObject": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "state": { "$ref": "#/definitions/state" }
+            },
+            "required": [
+                "state"
+            ]
+        },
+        "state": {
+            "type": "string",
+            "enum": ["enabled", "disabled"]
+        }
+    }
+}
