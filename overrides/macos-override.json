@@ -6,40 +6,7 @@
             ]
         },
         "duckPlayer": {
-            "state": "enabled",
-            "settings": {
-                "tryDuckPlayerLink": "https://www.youtube.com/watch?v=yKWIA-Pys4c",
-                "overlays": {
-                    "youtube": {
-                        "state": "disabled"
-                    },
-                    "serpProxy": {
-                        "state": "disabled"
-                    }
-                },
-                "domains": [
-                    {
-                        "domain": "www.youtube.com",
-                        "patchSettings": [
-                            {
-                                "op": "replace",
-                                "path": "/overlays/youtube/state",
-                                "value": "enabled"
-                            }
-                        ]
-                    },
-                    {
-                        "domain": "duckduckgo.com",
-                        "patchSettings": [
-                            {
-                                "op": "replace",
-                                "path": "/overlays/serpProxy/state",
-                                "value": "enabled"
-                            }
-                        ]
-                    }
-                ]
-            }
+            "state": "enabled"
         },
         "newTabContinueSetUp": {
             "state": "enabled",
@@ -359,7 +326,27 @@
             "settings": {
                 "windowSizing": "enabled",
                 "navigatorCredentials": "enabled",
-                "safariObject": "enabled"
+                "safariObject": "enabled",
+                "messageHandlers": {
+                    "state": "disabled",
+                    "handlerStrategies": {
+                        "reflect": ["trackerDetectedMessage", "printHandler", "specialPages"],
+                        "polyfill": ["*"],
+                        "undefined": []
+                    }
+                },
+                "domains": [
+                    {
+                        "domain": "www.cbsnews.com",
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/messageHandlers/state",
+                                "value": "enabled"
+                            }
+                        ]
+                    }
+                ]
             }
         },
         "navigatorCredentials": {
