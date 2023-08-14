@@ -17,4 +17,14 @@ describe('WebCompat Settings Tests', () => {
         }
         expect(actual).to.be.equal(true)
     })
+    it('validates the config settings for ios', () => {
+        const macosConfig = JSON.parse(fs.readFileSync('./generated/v2/ios-config.json', 'utf8'))
+        const actual = validateRoot(macosConfig.features.webCompat.settings)
+        if (validateRoot.errors) {
+            for (const error of validateRoot.errors) {
+                console.error(error)
+            }
+        }
+        expect(actual).to.be.equal(true)
+    })
 })
