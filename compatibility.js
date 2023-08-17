@@ -53,15 +53,15 @@ const compatFunctions = {
         return v1Config
     },
     v2: (config) => {
-        // Breaking changes: rollouts key in sub-features
+        // Breaking changes: rollout key in sub-features
 
         const v2Config = JSON.parse(JSON.stringify(config))
         for (const feature of Object.keys(v2Config.features)) {
             const subFeatures = v2Config.features[feature].features
             if (subFeatures) {
                 for (const subFeature of Object.keys(subFeatures)) {
-                    if (subFeatures[subFeature].rollouts) {
-                        delete subFeatures[subFeature].rollouts
+                    if (subFeatures[subFeature].rollout) {
+                        delete subFeatures[subFeature].rollout
                         v2Config.features[feature].features[subFeature].state = 'disabled'
                     }
                 }
