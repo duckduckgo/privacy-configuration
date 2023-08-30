@@ -1,5 +1,26 @@
 {
     "features": {
+        "incrementalRolloutTest": {
+            "state": "enabled",
+            "features": {
+                "rollout": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 1.0
+                            },
+                            {
+                                "percent": 5.0
+                            },
+                            {
+                                "percent": 15.0
+                            }
+                        ]
+                    }
+                }
+            }
+        },
         "contentBlocking": {
             "state": "enabled",
             "exceptions": [
@@ -345,6 +366,16 @@
                                 "value": "enabled"
                             }
                         ]
+                    },
+                    {
+                        "domain": "kia.com",
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/safariObject",
+                                "value": "disabled"
+                            }
+                        ]
                     }
                 ]
             }
@@ -383,7 +414,49 @@
                     {"type": "number", "value": 8, "criteria": {"arch": "AppleSilicon"}}
                  ],
                 "deviceMemory": {"type": "undefined"}
-            }
+            },
+            "exceptions": [
+                {
+                    "domain": "airbnb.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1224"
+                },
+                {
+                    "domain": "airbnb.fr",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1224"
+                },
+                {
+                    "domain": "airbnb.cn",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1224"
+                },
+                {
+                    "domain": "airbnb.co.uk",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1224"
+                },
+                {
+                    "domain": "airbnb.es",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1224"
+                },
+                {
+                    "domain": "airbnb.it",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1224"
+                },
+                {
+                    "domain": "airbnb.ca",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1224"
+                },
+                {
+                    "domain": "airbnb.com.au",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1224"
+                },
+                {
+                    "domain": "airbnb.de",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1224"
+                },
+                {
+                    "domain": "airbnb.com.br",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1224"
+                }
+            ]
         },
         "fingerprintingScreenSize": {
             "state": "disabled"
@@ -425,6 +498,28 @@
                             }
                         ]
                     },
+                    "facebook.com": {
+                        "rules": [
+                            {
+                                "rule": "facebook.com",
+                                "domains": [
+                                    "nextdoor.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1190"
+                            }
+                        ]
+                    },
+                    "facebook.net": {
+                        "rules": [
+                            {
+                                "rule": "facebook.net",
+                                "domains": [
+                                    "nextdoor.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1190"
+                            }
+                        ]
+                    },
                     "gemius.pl": {
                         "rules": [
                             {
@@ -444,6 +539,17 @@
                                     "wp.pl"
                                 ],
                                 "reason": "Adwall appears which reappears when dismissed. The adwall prevents interaction with the page."
+                            }
+                        ]
+                    },
+                    "monetate.net": {
+                        "rules": [
+                            {
+                                "rule": "monetate.net",
+                                "domains": [
+                                    "kleen-ritecorp.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1231"
                             }
                         ]
                     }

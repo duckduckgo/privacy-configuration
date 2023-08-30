@@ -15,6 +15,10 @@
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1162"
                 },
                 {
+                    "domain": "cnn.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1220"
+                },
+                {
                     "domain": "foxnews.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/984"
                 },
@@ -29,6 +33,10 @@
                 {
                     "domain": "primevideo.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1162"
+                },
+                {
+                    "domain": "rte.ie",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1217"
                 },
                 {
                     "domain": "showtime.com",
@@ -85,6 +93,10 @@
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/927"
                     },
                     {
+                        "domain": "fifa.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/667"
+                    },
+                    {
                         "domain": "mail.google.com",
                         "reason": "Page loads blank after login (inbox does not show)."
                     },
@@ -127,7 +139,13 @@
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1075"
                     }
                 ]
-            }
+            },
+            "exceptions": [
+                {
+                    "domain": "m.facebook.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1258"
+                }
+            ]
         },
         "cookie": {
             "state": "enabled",
@@ -171,6 +189,29 @@
                 }
             ]
         },
+        "incrementalRolloutTest": {
+            "state": "enabled",
+            "minSupportedVersion": 51670000
+        },
+        "networkProtection": {
+            "state": "enabled",
+            "features": {
+                "waitlist": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 0.1
+                            },
+                            {
+                                "percent": 0.25
+                            }
+                        ]
+                    }
+                }
+            },
+            "minSupportedVersion": 51670000
+        },
         "requestFilterer": {
             "state": "enabled",
             "minSupportedVersion": 51501000,
@@ -197,6 +238,14 @@
                 }
             },
             "exceptions": [ ]
+        },
+        "voiceSearch": {
+            "exceptions": [],
+            "state": "enabled",
+            "settings": {
+              "minVersion": 33,
+              "excludedManufacturers": []
+            }
         },
         "webCompat": {
             "state": "enabled",

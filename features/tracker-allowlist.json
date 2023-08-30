@@ -104,7 +104,6 @@
                             "gardeningknowhow.com",
                             "adamtheautomator.com",
                             "packhacker.com"
-                            
                         ],
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1122"
                     }
@@ -199,16 +198,20 @@
                         "rule": "c.amazon-adsystem.com/aax2/apstag.js",
                         "domains": [
                             "corriere.it",
+                            "cnn.com",
                             "eurogamer.net",
                             "seattletimes.com",
-                            "wcvb.com"
+                            "wcvb.com",
+                            "wildrivers.lostcoastoutpost.com"
                         ],
                         "reason": [
                             "corriere.it - ",
                             "Example URL: https://www.corriere.it/video-articoli/2022/07/13/missione-wwf-liberare-mare-plastica/9abb64de-029d-11ed-a0cc-ad3c68cacbae.shtml;",
                             "Clicking on the video to play causes a still frame to show and the video does not continue.",
                             "eurogamer.net, seattletimes.com - An unskippable adwall appears which prevents interaction with the page.",
-                            "wcvb.com - https://github.com/duckduckgo/privacy-configuration/issues/1088"
+                            "cnn.com - https://github.com/duckduckgo/privacy-configuration/issues/1220",
+                            "wcvb.com - https://github.com/duckduckgo/privacy-configuration/issues/1088",
+                            "wildrivers.lostcoastoutpost.com - https://github.com/duckduckgo/privacy-configuration/issues/1252"
                         ]
                     }
                 ]
@@ -387,6 +390,17 @@
                             "See https://github.com/duckduckgo/privacy-configuration/issues/321.",
                             "These requests are associated with map/location functionality on websites."
                         ]
+                    }
+                ]
+            },
+            "boldapps.net": {
+                "rules": [
+                    {
+                        "rule": "option.boldapps.net/js/options.js",
+                        "domains": [
+                            "<all>"
+                        ],
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1222"
                     }
                 ]
             },
@@ -730,14 +744,14 @@
                     {
                         "rule": "pubads.g.doubleclick.net/gampad/ads",
                         "domains": [
+                            "fifa.com",
                             "nhl.com",
                             "viki.com",
                             "rocketnews24.com",
                             "crunchyroll.com"
                         ],
                         "reason": [
-                            "nhl.com - Videos show a spinner and never load.",
-                            "viki.com - after a video has played for a few seconds an adwall pops up. Clicking 'I've turned off my adblocker' resets the video, then after a few seconds the adwall pops up again.",
+                            "https://github.com/duckduckgo/privacy-configuration/issues/1185",
                             "rocketnews24.com - https://github.com/duckduckgo/privacy-configuration/issues/846",
                             "crunchyroll.com - https://github.com/duckduckgo/privacy-configuration/issues/1140"
                         ]
@@ -1245,7 +1259,8 @@
                             "magicgameworld.com",
                             "youmath.it",
                             "duden.de",
-                            "rocketnews24.com"
+                            "rocketnews24.com",
+                            "zefoy.com"
                         ],
                         "reason": [
                             "https://github.com/duckduckgo/privacy-configuration/issues/388",
@@ -1257,7 +1272,8 @@
                         "domains": [
                             "laprensa.hn",
                             "rumble.com",
-                            "rocketnews24.com"
+                            "rocketnews24.com",
+                            "zefoy.com"
                         ],
                         "reason": [
                             "https://github.com/duckduckgo/privacy-configuration/issues/388",
@@ -1267,9 +1283,13 @@
                     {
                         "rule": "googlesyndication.com",
                         "domains": [
-                            "rocketnews24.com"
+                            "rocketnews24.com",
+                            "zefoy.com"
                         ],
-                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/846"
+                        "reason": [
+                            "https://github.com/duckduckgo/privacy-configuration/issues/388",
+                            "rocketnews24.com - https://github.com/duckduckgo/privacy-configuration/issues/846"
+                        ]
                     }
                 ]
             },
@@ -1572,6 +1592,17 @@
                             "livejournal.com"
                         ],
                         "reason": "Instagram embeds as main article content render as grey boxes."
+                    }
+                ]
+            },
+            "ipify.org": {
+                "rules": [
+                    {
+                        "rule": "api.ipify.org/",
+                        "domains": [
+                            "mass.gov"
+                        ],
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1239"
                     }
                 ]
             },
@@ -2427,6 +2458,13 @@
                             "virginmedia.com"
                         ],
                         "reason": "Chat button appears faded and cannot be interacted with."
+                    },
+                    {
+                        "rule": "tags.tiqcdn.com/utag/rccl/gdp/prod/utag.js",
+                        "domains": [
+                            "royalcaribbean.com"
+                        ],
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1255"
                     }
                 ]
             },
