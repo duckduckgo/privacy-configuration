@@ -257,7 +257,6 @@ buildPlatforms().then((platformConfigs) => {
         }
         protections[legacyNaming[key]] = legacyConfig
     }
-
     fs.writeFileSync(`${GENERATED_DIR}/protections.json`, JSON.stringify(protections, null, 4))
     fs.writeFileSync(`${GENERATED_DIR}/fingerprinting.json`, JSON.stringify(protections, null, 4))
 })
