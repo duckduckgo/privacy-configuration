@@ -9,7 +9,8 @@ const { OVERRIDE_DIR, GENERATED_DIR, LISTS_DIR, BROWSERS_SUBDIR, CURRENT_CONFIG_
 const defaultConfig = {
     readme: 'https://github.com/duckduckgo/privacy-configuration',
     version: Date.now(),
-    features: {}
+    features: {},
+    unprotectedTemporary: []
 }
 
 const platforms = require('./platforms')
@@ -100,10 +101,19 @@ function addExceptionsToUnprotected (exceptions) {
 }
 
 const listData = JSON.parse(fs.readFileSync(`${LISTS_DIR}/${unprotectedListName}`))
-defaultConfig.unprotectedTemporary = listData.exceptions
-
-addExceptionsToUnprotected(defaultConfig.unprotectedTemporary)
+addExceptionsToUnprotected(listData.exceptions)
 addExceptionsToUnprotected(defaultConfig.features.contentBlocking.exceptions)
+
+const notExcluded = ['adClickAttribution', 'appTrackerProtection', 'autofill', 'duckPlayer', 'incontextSignup',
+    'incrementalRolloutTest', 'networkProtection', 'newTabContinueSetUp', 'voiceSearch', 'windowsPermissionUsage',
+    'windowsWaitlist', 'windowsDownloadLink']
+for (const exception of listData.exceptions) {
+    for (const key of Object.keys(defaultConfig.features)) {
+        if (!(notExcluded.includes(key))) {
+            defaultConfig.features[key].exceptions = defaultConfig.features[key].exceptions.concat(exception)
+        }
+    }
+}
 
 // Create generated directory
 mkdirIfNeeded(GENERATED_DIR)
@@ -247,6 +257,7 @@ buildPlatforms().then((platformConfigs) => {
         }
         protections[legacyNaming[key]] = legacyConfig
     }
+
     fs.writeFileSync(`${GENERATED_DIR}/protections.json`, JSON.stringify(protections, null, 4))
     fs.writeFileSync(`${GENERATED_DIR}/fingerprinting.json`, JSON.stringify(protections, null, 4))
 })
