@@ -104,9 +104,21 @@ const listData = JSON.parse(fs.readFileSync(`${LISTS_DIR}/${unprotectedListName}
 addExceptionsToUnprotected(listData.exceptions)
 addExceptionsToUnprotected(defaultConfig.features.contentBlocking.exceptions)
 
-const excludedFeaturesFromUnprotectedTempExceptions = ['adClickAttribution', 'appTrackerProtection', 'autofill', 'duckPlayer', 'incontextSignup',
-    'incrementalRolloutTest', 'networkProtection', 'newTabContinueSetUp', 'voiceSearch', 'windowsPermissionUsage',
-    'windowsWaitlist', 'windowsDownloadLink']
+// Exclude selected features from the global unprotected-temporary.json domain exceptions
+const excludedFeaturesFromUnprotectedTempExceptions = [
+    'adClickAttribution',
+    'appTrackerProtection',
+    'autofill',
+    'duckPlayer',
+    'incontextSignup',
+    'incrementalRolloutTest',
+    'networkProtection',
+    'newTabContinueSetUp',
+    'voiceSearch',
+    'windowsPermissionUsage',
+    'windowsWaitlist',
+    'windowsDownloadLink'
+]
 for (const key of Object.keys(defaultConfig.features)) {
     if (!(excludedFeaturesFromUnprotectedTempExceptions.includes(key))) {
         defaultConfig.features[key].exceptions = defaultConfig.features[key].exceptions.concat(listData.exceptions)
