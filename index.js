@@ -125,8 +125,8 @@ for (const key of Object.keys(defaultConfig.features)) {
         defaultConfig.features[key].exceptions = defaultConfig.features[key].exceptions.concat(listData.exceptions)
     }
     if (key === 'customUserAgent') {
-        defaultConfig.features[key].omitApplicationSites = defaultConfig.features[key].omitApplicationSites.concat(listData.exceptions)
-        defaultConfig.features[key].omitVersionSites = defaultConfig.features[key].omitVersionSites.concat(listData.exceptions)
+        defaultConfig.features[key].settings.omitApplicationSites = defaultConfig.features[key].settings.omitApplicationSites.concat(listData.exceptions)
+        defaultConfig.features[key].settings.omitVersionSites = defaultConfig.features[key].settings.omitVersionSites.concat(listData.exceptions)
     }
 }
 
