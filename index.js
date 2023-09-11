@@ -9,7 +9,8 @@ const { OVERRIDE_DIR, GENERATED_DIR, LISTS_DIR, BROWSERS_SUBDIR, CURRENT_CONFIG_
 const defaultConfig = {
     readme: 'https://github.com/duckduckgo/privacy-configuration',
     version: Date.now(),
-    features: {}
+    features: {},
+    unprotectedTemporary: []
 }
 
 const platforms = require('./platforms')
@@ -100,10 +101,29 @@ function addExceptionsToUnprotected (exceptions) {
 }
 
 const listData = JSON.parse(fs.readFileSync(`${LISTS_DIR}/${unprotectedListName}`))
-defaultConfig.unprotectedTemporary = listData.exceptions
-
-addExceptionsToUnprotected(defaultConfig.unprotectedTemporary)
+addExceptionsToUnprotected(listData.exceptions)
 addExceptionsToUnprotected(defaultConfig.features.contentBlocking.exceptions)
+
+// Exclude selected features from the global unprotected-temporary.json domain exceptions
+const excludedFeaturesFromUnprotectedTempExceptions = [
+    'adClickAttribution',
+    'appTrackerProtection',
+    'autofill',
+    'duckPlayer',
+    'incontextSignup',
+    'incrementalRolloutTest',
+    'networkProtection',
+    'newTabContinueSetUp',
+    'voiceSearch',
+    'windowsPermissionUsage',
+    'windowsWaitlist',
+    'windowsDownloadLink'
+]
+for (const key of Object.keys(defaultConfig.features)) {
+    if (!(excludedFeaturesFromUnprotectedTempExceptions.includes(key))) {
+        defaultConfig.features[key].exceptions = defaultConfig.features[key].exceptions.concat(listData.exceptions)
+    }
+}
 
 // Create generated directory
 mkdirIfNeeded(GENERATED_DIR)
