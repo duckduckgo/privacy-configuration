@@ -2,7 +2,7 @@ const fs = require('fs')
 
 const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args))
 
-const { addCnameEntriesToAllowlist, inlineReasonArrays, mergeAllowlistedTrackers, addHashToFeatures } = require('./util')
+const { addCnameEntriesToAllowlist, inlineReasonArrays, mergeAllowlistedTrackers, addHashToFeatures, stripReasons } = require('./util')
 
 const { OVERRIDE_DIR, GENERATED_DIR, LISTS_DIR, BROWSERS_SUBDIR, CURRENT_CONFIG_VERSION } = require('./constants')
 
@@ -57,11 +57,16 @@ function writeConfigToDisk (platform, config) {
                 throw new Error(`No compat function for config version ${version}`)
             }
 
-            prevConfig = compatibility.compatFunctions[version](prevConfig)
+            prevConfig = compatibility.compatFunctions[version].compat(prevConfig)
         }
 
         const compatConfig = JSON.parse(JSON.stringify(prevConfig))
         addHashToFeatures(compatConfig)
+
+        if (i === CURRENT_CONFIG_VERSION || compatibility.compatFunctions[version].stripReasons) {
+            stripReasons(compatConfig)
+        }
+
         compatibility.removeEolFeatures(compatConfig, i)
         fs.writeFileSync(`${GENERATED_DIR}/${version}/${configName}-config.json`, JSON.stringify(compatConfig, null, 4))
     }

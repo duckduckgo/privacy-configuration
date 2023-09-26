@@ -12,17 +12,18 @@ function formatErrors (errors) {
     return errors.map(item => `${item.instancePath}: ${item.message}`).join(', ')
 }
 
+// Test the latest 2 versions of each platform
 const v2configs = platforms.map((plat) => {
     return {
         name: `${plat}-config.json`,
-        body: JSON.parse(fs.readFileSync(`./generated/v2/${plat}-config.json`))
+        body: JSON.parse(fs.readFileSync(`./generated/v4/${plat}-config.json`))
     }
 })
 
 const v1configs = platforms.map((plat) => {
     return {
         name: `${plat}-config.json`,
-        body: JSON.parse(fs.readFileSync(`./generated/v1/${plat}-config.json`))
+        body: JSON.parse(fs.readFileSync(`./generated/v3/${plat}-config.json`))
     }
 })
 

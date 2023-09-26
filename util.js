@@ -125,10 +125,45 @@ function addHashToFeatures (config) {
     }
 }
 
+/**
+ * Removes reason fields from the config object
+ *
+ * @param {object} config - the config object to update
+ */
+function stripReasons (config) {
+    for (const key of Object.keys(config.features)) {
+        for (const exception of config.features[key].exceptions) {
+            delete exception.reason
+        }
+
+        if (key === 'trackerAllowlist') {
+            for (const domain of Object.keys(config.features[key].settings.allowlistedTrackers)) {
+                for (const rule of config.features[key].settings.allowlistedTrackers[domain].rules) {
+                    delete rule.reason
+                }
+            }
+        }
+
+        if (key === 'customUserAgent') {
+            if (config.features[key].settings.omitApplicationSites) {
+                for (const exception of config.features[key].settings.omitApplicationSites) {
+                    delete exception.reason
+                }
+            }
+            if (config.features[key].settings.omitVersionSites) {
+                for (const exception of config.features[key].settings.omitVersionSites) {
+                    delete exception.reason
+                }
+            }
+        }
+    }
+}
+
 module.exports = {
     addAllowlistRule: addAllowlistRule,
     addCnameEntriesToAllowlist: addCnameEntriesToAllowlist,
     inlineReasonArrays: inlineReasonArrays,
     mergeAllowlistedTrackers: mergeAllowlistedTrackers,
-    addHashToFeatures: addHashToFeatures
+    addHashToFeatures: addHashToFeatures,
+    stripReasons: stripReasons
 }
