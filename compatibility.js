@@ -39,49 +39,71 @@ function removeEolFeatures (config, version) {
  * return {object} - The converted config object
  */
 const compatFunctions = {
-    v1: {
-        stripReasons: false,
-        compat: (config) => {
-            // Breaking changes: minSupportedVersion key in features
+    v1: (unmodifiedConfig, config) => {
+        // Breaking changes: minSupportedVersion key in features
 
-            const v1Config = JSON.parse(JSON.stringify(config))
-            for (const feature of Object.keys(v1Config.features)) {
-                if (v1Config.features[feature].minSupportedVersion) {
-                    delete v1Config.features[feature].minSupportedVersion
-                    v1Config.features[feature].state = 'disabled'
-                }
+        const v1Config = JSON.parse(JSON.stringify(config))
+        for (const feature of Object.keys(v1Config.features)) {
+            if (v1Config.features[feature].minSupportedVersion) {
+                delete v1Config.features[feature].minSupportedVersion
+                v1Config.features[feature].state = 'disabled'
             }
-
-            return v1Config
         }
-    },
-    v2: {
-        stripReasons: false,
-        compat: (config) => {
-            // Breaking changes: rollout key in sub-features
 
-            const v2Config = JSON.parse(JSON.stringify(config))
-            for (const feature of Object.keys(v2Config.features)) {
-                const subFeatures = v2Config.features[feature].features
-                if (subFeatures) {
-                    for (const subFeature of Object.keys(subFeatures)) {
-                        if (subFeatures[subFeature].rollout) {
-                            delete subFeatures[subFeature].rollout
-                            v2Config.features[feature].features[subFeature].state = 'disabled'
-                        }
+        return v1Config
+    },
+    v2: (unmodifiedConfig, config) => {
+        // Breaking changes: rollout key in sub-features
+
+        const v2Config = JSON.parse(JSON.stringify(config))
+        for (const feature of Object.keys(v2Config.features)) {
+            const subFeatures = v2Config.features[feature].features
+            if (subFeatures) {
+                for (const subFeature of Object.keys(subFeatures)) {
+                    if (subFeatures[subFeature].rollout) {
+                        delete subFeatures[subFeature].rollout
+                        v2Config.features[feature].features[subFeature].state = 'disabled'
                     }
                 }
             }
+        }
 
-            return v2Config
-        }
+        return v2Config
     },
-    v3: {
-        stripReasons: false,
-        compat: (config) => {
-            // Breaking changes: none, reasons stripped starting in v4
-            return config
+    v3: (unmodifiedConfig, config) => {
+        // Breaking changes: none, reasons stripped starting in v4
+
+        const v3Config = JSON.parse(JSON.stringify(config))
+
+        // Replace reasons
+        for (const key of Object.keys(unmodifiedConfig.features)) {
+            for (const i in unmodifiedConfig.features[key].exceptions) {
+                v3Config.features[key].exceptions[i].reason = unmodifiedConfig.features[key].exceptions[i].reason
+            }
+    
+            if (key === 'trackerAllowlist') {
+                for (const domain of Object.keys(unmodifiedConfig.features[key].settings.allowlistedTrackers)) {
+                    for (const i in unmodifiedConfig.features[key].settings.allowlistedTrackers[domain].rules) {
+                        v3Config.features[key].settings.allowlistedTrackers[domain].rules[i].reason = unmodifiedConfig.features[key].settings.allowlistedTrackers[domain].rules[i].reason
+                    }
+                }
+            }
+    
+            if (key === 'customUserAgent') {
+                if (unmodifiedConfig.features[key].settings.omitApplicationSites) {
+                    for (const i in unmodifiedConfig.features[key].settings.omitApplicationSites) {
+                        v3Config.features[key].settings.omitApplicationSites[i].reason = unmodifiedConfig.features[key].settings.omitApplicationSites[i].reason
+                    }
+                }
+                if (unmodifiedConfig.features[key].settings.omitVersionSites) {
+                    for (const i in unmodifiedConfig.features[key].settings.omitVersionSites) {
+                        v3Config.features[key].settings.omitVersionSites[i].reason = unmodifiedConfig.features[key].settings.omitVersionSites[i].reason
+                    }
+                }
+            }
         }
+
+        return v3Config
     }
 }
 

@@ -46,9 +46,14 @@ function writeConfigToDisk (platform, config) {
 
     // Write config and convert to backwards compatible versions
     let prevConfig = null
+    const unmodifiedConfig = JSON.parse(JSON.stringify(config))
     for (let i = CURRENT_CONFIG_VERSION; i > 0; i--) {
         const version = `v${i}`
         mkdirIfNeeded(`${GENERATED_DIR}/${version}`)
+
+        if (i === CURRENT_CONFIG_VERSION) {
+            stripReasons(config)
+        }
 
         if (!prevConfig) {
             prevConfig = config
@@ -57,15 +62,11 @@ function writeConfigToDisk (platform, config) {
                 throw new Error(`No compat function for config version ${version}`)
             }
 
-            prevConfig = compatibility.compatFunctions[version].compat(prevConfig)
+            prevConfig = compatibility.compatFunctions[version](unmodifiedConfig, prevConfig)
         }
 
         const compatConfig = JSON.parse(JSON.stringify(prevConfig))
         addHashToFeatures(compatConfig)
-
-        if (i === CURRENT_CONFIG_VERSION || compatibility.compatFunctions[version].stripReasons) {
-            stripReasons(compatConfig)
-        }
 
         compatibility.removeEolFeatures(compatConfig, i)
         fs.writeFileSync(`${GENERATED_DIR}/${version}/${configName}-config.json`, JSON.stringify(compatConfig, null, 4))
