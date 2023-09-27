@@ -36,7 +36,7 @@ function addPathRule (rules, rule) {
         existing.domains = ['<all>']
     }
 
-    if (!existing.reason) {
+    if (existing.reason === undefined) {
         return
     }
 

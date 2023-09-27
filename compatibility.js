@@ -80,7 +80,7 @@ const compatFunctions = {
             for (const i in unmodifiedConfig.features[key].exceptions) {
                 v3Config.features[key].exceptions[i].reason = unmodifiedConfig.features[key].exceptions[i].reason
             }
-    
+
             if (key === 'trackerAllowlist') {
                 for (const domain of Object.keys(unmodifiedConfig.features[key].settings.allowlistedTrackers)) {
                     for (const i in unmodifiedConfig.features[key].settings.allowlistedTrackers[domain].rules) {
@@ -88,7 +88,7 @@ const compatFunctions = {
                     }
                 }
             }
-    
+
             if (key === 'customUserAgent') {
                 if (unmodifiedConfig.features[key].settings.omitApplicationSites) {
                     for (const i in unmodifiedConfig.features[key].settings.omitApplicationSites) {

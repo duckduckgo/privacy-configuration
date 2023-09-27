@@ -245,7 +245,9 @@ async function buildPlatforms () {
         platformConfig = inlineReasonArrays(platformConfig)
         platformConfigs[platform] = platformConfig
 
-        writeConfigToDisk(platform, platformConfig)
+        // Write config to disk
+        // Make a copy to avoid mutating the original object
+        writeConfigToDisk(platform, JSON.parse(JSON.stringify(platformConfig)))
     }
     return platformConfigs
 }
