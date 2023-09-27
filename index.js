@@ -233,7 +233,6 @@ async function buildPlatforms () {
 
         if (platformOverride.unprotectedTemporary) {
             addExceptionsToUnprotected(platformOverride.unprotectedTemporary)
-            // platformConfig.unprotectedTemporary = platformConfig.unprotectedTemporary.concat(platformOverride.unprotectedTemporary)
 
             for (const key of Object.keys(platformOverride.features)) {
                 if (!(excludedFeaturesFromUnprotectedTempExceptions.includes(key))) {
