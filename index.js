@@ -113,6 +113,7 @@ const excludedFeaturesFromUnprotectedTempExceptions = [
     'duckPlayer',
     'incontextSignup',
     'incrementalRolloutTest',
+    'incrementalRolloutTest2',
     'networkProtection',
     'newTabContinueSetUp',
     'voiceSearch',
@@ -232,7 +233,19 @@ async function buildPlatforms () {
 
         if (platformOverride.unprotectedTemporary) {
             addExceptionsToUnprotected(platformOverride.unprotectedTemporary)
-            platformConfig.unprotectedTemporary = platformConfig.unprotectedTemporary.concat(platformOverride.unprotectedTemporary)
+            // platformConfig.unprotectedTemporary = platformConfig.unprotectedTemporary.concat(platformOverride.unprotectedTemporary)
+
+            for (const key of Object.keys(platformOverride.features)) {
+                if (!(excludedFeaturesFromUnprotectedTempExceptions.includes(key))) {
+                    platformConfig.features[key].exceptions = platformConfig.features[key].exceptions.concat(platformOverride.unprotectedTemporary)
+                }
+
+                if (key === 'customUserAgent' && !(platformConfig.features[key].settings.webViewDefault)) {
+                    console.log('platform: ' + platform)
+                    platformConfig.features[key].settings.omitApplicationSites = platformConfig.features[key].settings.omitApplicationSites.concat(platformOverride.unprotectedTemporary)
+                    platformConfig.features[key].settings.omitVersionSites = platformConfig.features[key].settings.omitVersionSites.concat(platformOverride.unprotectedTemporary)
+                }
+            }
         }
 
         addCnameEntriesToAllowlist(tds, platformConfig.features.trackerAllowlist.settings.allowlistedTrackers)
