@@ -62,7 +62,7 @@ function writeConfigToDisk (platform, config) {
                 throw new Error(`No compat function for config version ${version}`)
             }
 
-            prevConfig = compatibility.compatFunctions[version](unmodifiedConfig, prevConfig)
+            prevConfig = compatibility.compatFunctions[version](prevConfig, unmodifiedConfig)
         }
 
         const compatConfig = JSON.parse(JSON.stringify(prevConfig))

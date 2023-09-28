@@ -39,7 +39,7 @@ function removeEolFeatures (config, version) {
  * return {object} - The converted config object
  */
 const compatFunctions = {
-    v1: (unmodifiedConfig, config) => {
+    v1: (config) => {
         // Breaking changes: minSupportedVersion key in features
 
         const v1Config = JSON.parse(JSON.stringify(config))
@@ -52,7 +52,7 @@ const compatFunctions = {
 
         return v1Config
     },
-    v2: (unmodifiedConfig, config) => {
+    v2: (config) => {
         // Breaking changes: rollout key in sub-features
 
         const v2Config = JSON.parse(JSON.stringify(config))
@@ -70,35 +70,41 @@ const compatFunctions = {
 
         return v2Config
     },
-    v3: (unmodifiedConfig, config) => {
+    v3: (config, unmodifiedConfig) => {
         // Breaking changes: none, reasons stripped starting in v4
 
         const v3Config = JSON.parse(JSON.stringify(config))
 
+        /**
+         * This function will take reasons from the source array and assign them to the target array.
+         *
+         * @param {Array} target - the array to assign reasons to
+         * @param {Array} source - the array to pull reasons from
+         */
+        function assignReasons (target, source) {
+            target = target.map((exception, i) => {
+                const reason = source[i]?.reason || ''
+                return Object.assign(exception, { reason })
+            })
+        }
+
         // Replace reasons
         for (const key of Object.keys(unmodifiedConfig.features)) {
-            for (const i in unmodifiedConfig.features[key].exceptions) {
-                v3Config.features[key].exceptions[i].reason = unmodifiedConfig.features[key].exceptions[i].reason
-            }
+            assignReasons(v3Config.features[key].exceptions, unmodifiedConfig?.features[key]?.exceptions)
 
             if (key === 'trackerAllowlist') {
                 for (const domain of Object.keys(unmodifiedConfig.features[key].settings.allowlistedTrackers)) {
-                    for (const i in unmodifiedConfig.features[key].settings.allowlistedTrackers[domain].rules) {
-                        v3Config.features[key].settings.allowlistedTrackers[domain].rules[i].reason = unmodifiedConfig.features[key].settings.allowlistedTrackers[domain].rules[i].reason
-                    }
+                    const rules = v3Config.features[key].settings.allowlistedTrackers[domain].rules
+                    assignReasons(rules, unmodifiedConfig?.features[key]?.settings?.allowlistedTrackers[domain]?.rules)
                 }
             }
 
             if (key === 'customUserAgent') {
                 if (unmodifiedConfig.features[key].settings.omitApplicationSites) {
-                    for (const i in unmodifiedConfig.features[key].settings.omitApplicationSites) {
-                        v3Config.features[key].settings.omitApplicationSites[i].reason = unmodifiedConfig.features[key].settings.omitApplicationSites[i].reason
-                    }
+                    assignReasons(v3Config.features[key].settings.omitApplicationSites, unmodifiedConfig.features[key].settings.omitApplicationSites)
                 }
                 if (unmodifiedConfig.features[key].settings.omitVersionSites) {
-                    for (const i in unmodifiedConfig.features[key].settings.omitVersionSites) {
-                        v3Config.features[key].settings.omitVersionSites[i].reason = unmodifiedConfig.features[key].settings.omitVersionSites[i].reason
-                    }
+                    assignReasons(v3Config.features[key].settings.omitVersionSites, unmodifiedConfig.features[key].settings.omitVersionSites)
                 }
             }
         }
