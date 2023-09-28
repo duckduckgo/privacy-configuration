@@ -121,18 +121,17 @@ const excludedFeaturesFromUnprotectedTempExceptions = [
     'windowsWaitlist',
     'windowsDownloadLink'
 ]
-function addGlobalExceptionsToSelectedFeatures (baseConfig, exceptions) {
-    return baseConfig.concat(exceptions)
+function applyGlobalUnprotectedTempExceptionsToFeatures (key, baseConfig, globalExceptions) {
+    if (!excludedFeaturesFromUnprotectedTempExceptions.includes(key)) {
+        baseConfig.features[key].exceptions = baseConfig.features[key].exceptions.concat(globalExceptions)
+    }
+    if (key === 'customUserAgent' && !(baseConfig.features[key].settings.webViewDefault)) {
+        baseConfig.features[key].settings.omitApplicationSites = baseConfig.features[key].settings.omitApplicationSites.concat(globalExceptions)
+        baseConfig.features[key].settings.omitVersionSites = baseConfig.features[key].settings.omitVersionSites.concat(globalExceptions)
+    }
 }
-
 for (const key of Object.keys(defaultConfig.features)) {
-    if (!(excludedFeaturesFromUnprotectedTempExceptions.includes(key))) {
-        defaultConfig.features[key].exceptions = addGlobalExceptionsToSelectedFeatures(defaultConfig.features[key].exceptions, listData.exceptions)
-    }
-    if (key === 'customUserAgent') {
-        defaultConfig.features[key].settings.omitApplicationSites = addGlobalExceptionsToSelectedFeatures(defaultConfig.features[key].settings.omitApplicationSites, listData.exceptions)
-        defaultConfig.features[key].settings.omitVersionSites = addGlobalExceptionsToSelectedFeatures(defaultConfig.features[key].settings.omitVersionSites, listData.exceptions)
-    }
+    applyGlobalUnprotectedTempExceptionsToFeatures(key, defaultConfig, listData.exceptions)
 }
 
 // Create generated directory
@@ -237,16 +236,8 @@ async function buildPlatforms () {
 
         if (platformOverride.unprotectedTemporary) {
             addExceptionsToUnprotected(platformOverride.unprotectedTemporary)
-
             for (const key of Object.keys(platformOverride.features)) {
-                if (!(excludedFeaturesFromUnprotectedTempExceptions.includes(key))) {
-                    platformConfig.features[key].exceptions = addGlobalExceptionsToSelectedFeatures(platformConfig.features[key].exceptions, platformOverride.unprotectedTemporary)
-                }
-
-                if (key === 'customUserAgent' && !(platformConfig.features[key].settings.webViewDefault)) {
-                    platformConfig.features[key].settings.omitApplicationSites = addGlobalExceptionsToSelectedFeatures(platformConfig.features[key].settings.omitApplicationSites, platformOverride.unprotectedTemporary)
-                    platformConfig.features[key].settings.omitVersionSites = addGlobalExceptionsToSelectedFeatures(platformConfig.features[key].settings.omitVersionSites, platformOverride.unprotectedTemporary)
-                }
+                applyGlobalUnprotectedTempExceptionsToFeatures(key, platformConfig, platformOverride.unprotectedTemporary)
             }
         }
 
