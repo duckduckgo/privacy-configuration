@@ -121,13 +121,17 @@ const excludedFeaturesFromUnprotectedTempExceptions = [
     'windowsWaitlist',
     'windowsDownloadLink'
 ]
+function addGlobalExceptionsToSelectedFeatures (baseConfig, exceptions) {
+    return baseConfig.concat(exceptions)
+}
+
 for (const key of Object.keys(defaultConfig.features)) {
     if (!(excludedFeaturesFromUnprotectedTempExceptions.includes(key))) {
-        defaultConfig.features[key].exceptions = defaultConfig.features[key].exceptions.concat(listData.exceptions)
+        defaultConfig.features[key].exceptions = addGlobalExceptionsToSelectedFeatures(defaultConfig.features[key].exceptions, listData.exceptions)
     }
     if (key === 'customUserAgent') {
-        defaultConfig.features[key].settings.omitApplicationSites = defaultConfig.features[key].settings.omitApplicationSites.concat(listData.exceptions)
-        defaultConfig.features[key].settings.omitVersionSites = defaultConfig.features[key].settings.omitVersionSites.concat(listData.exceptions)
+        defaultConfig.features[key].settings.omitApplicationSites = addGlobalExceptionsToSelectedFeatures(defaultConfig.features[key].settings.omitApplicationSites, listData.exceptions)
+        defaultConfig.features[key].settings.omitVersionSites = addGlobalExceptionsToSelectedFeatures(defaultConfig.features[key].settings.omitVersionSites, listData.exceptions)
     }
 }
 
@@ -236,13 +240,12 @@ async function buildPlatforms () {
 
             for (const key of Object.keys(platformOverride.features)) {
                 if (!(excludedFeaturesFromUnprotectedTempExceptions.includes(key))) {
-                    platformConfig.features[key].exceptions = platformConfig.features[key].exceptions.concat(platformOverride.unprotectedTemporary)
+                    platformConfig.features[key].exceptions = addGlobalExceptionsToSelectedFeatures(platformConfig.features[key].exceptions, platformOverride.unprotectedTemporary)
                 }
 
                 if (key === 'customUserAgent' && !(platformConfig.features[key].settings.webViewDefault)) {
-                    console.log('platform: ' + platform)
-                    platformConfig.features[key].settings.omitApplicationSites = platformConfig.features[key].settings.omitApplicationSites.concat(platformOverride.unprotectedTemporary)
-                    platformConfig.features[key].settings.omitVersionSites = platformConfig.features[key].settings.omitVersionSites.concat(platformOverride.unprotectedTemporary)
+                    platformConfig.features[key].settings.omitApplicationSites = addGlobalExceptionsToSelectedFeatures(platformConfig.features[key].settings.omitApplicationSites, platformOverride.unprotectedTemporary)
+                    platformConfig.features[key].settings.omitVersionSites = addGlobalExceptionsToSelectedFeatures(platformConfig.features[key].settings.omitVersionSites, platformOverride.unprotectedTemporary)
                 }
             }
         }
