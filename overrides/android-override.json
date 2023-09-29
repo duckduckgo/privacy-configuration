@@ -119,9 +119,17 @@
                     {
                         "domain": "info.stimmoney.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1137"
+                    },
+                    {
+                        "domain": "twitter.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1338"
                     }
                 ],
                 "omitVersionSites": [
+                    {
+                        "domain": "accounts.google.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1319"
+                    },
                     {
                         "domain": "fedex.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/927"
@@ -137,6 +145,14 @@
                     {
                         "domain": "xfinity.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1075"
+                    },
+                    {
+                        "domain": "booking.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1317"
+                    },
+                     {
+                        "domain": "twitter.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1338"
                     }
                 ]
             },
@@ -208,6 +224,9 @@
         "networkProtection": {
             "state": "enabled",
             "features": {
+                "waitlistBetaActive": {
+                    "state": "enabled"
+                },
                 "waitlist": {
                     "state": "enabled",
                     "rollout": {
@@ -223,6 +242,9 @@
                             },
                             {
                                 "percent": 1
+                            },
+                            {
+                                "percent": 1.5
                             }
                         ]
                     }
@@ -268,78 +290,15 @@
         "webCompat": {
             "state": "enabled",
             "settings": {
-                "domains": [
-                    {
-                        "domain": [
-                            "dailystar.co.uk",
-                            "accringtonobserver.co.uk",
-                            "bathchronicle.co.uk",
-                            "belfastlive.co.uk",
-                            "birminghamlive.co.uk",
-                            "birminghammail.co.uk",
-                            "birminghampost.co.uk",
-                            "bristolpost.co.uk",
-                            "burtonmail.co.uk",
-                            "cambridge-news.co.uk",
-                            "cheshire-live.co.uk",
-                            "chesterchronicle.co.uk",
-                            "chroniclelive.co.uk",
-                            "cornwalllive.com",
-                            "coventrytelegraph.net",
-                            "dailypost.co.uk",
-                            "dailyrecord.co.uk",
-                            "derbytelegraph.co.uk",
-                            "devonlive.com",
-                            "dublinlive.ie",
-                            "essexlive.news",
-                            "examinerlive.co.uk",
-                            "footballscotland.co.uk",
-                            "gazettelive.co.uk",
-                            "getreading.co.uk",
-                            "getsurrey.co.uk",
-                            "getwestlondon.co.uk",
-                            "glasgowlive.co.uk",
-                            "gloucestershirelive.co.uk",
-                            "grimsbytelegraph.co.uk",
-                            "hulldailymail.co.uk",
-                            "insider.co.uk",
-                            "irishmirror.ie",
-                            "kentlive.news",
-                            "leicestermercury.co.uk",
-                            "liverpoolecho.co.uk",
-                            "manchestereveningnews.co.uk",
-                            "mirror.co.uk",
-                            "nottinghampost.com",
-                            "plymouthherald.co.uk",
-                            "somersetlive.co.uk",
-                            "stokesentinel.co.uk",
-                            "tm-aws.com",
-                            "tm-awx.com",
-                            "tm-dev-awx.com",
-                            "walesonline.co.uk",
-                            "wharf.co.uk"
-                        ],
-                        "patchSettings": [
-                            {
-                                "op": "add",
-                                "path": "/notification",
-                                "value": {
-                                    "state": "enabled"
-                                }
-                            },
-                            {
-                                "op": "add",
-                                "path": "/permissions",
-                                "value": {
-                                    "state": "enabled",
-                                    "validPermissionNames": [
-                                        "notifications"
-                                    ]
-                                }
-                            }
-                        ]
-                    }
-                ]
+                "notification": {
+                    "state": "enabled"
+                },
+                "permissions": {
+                    "state": "enabled",
+                    "validPermissionNames": [
+                        "notifications"
+                    ]
+                }
             }
         },
         "windowsWaitlist": {
@@ -354,9 +313,5 @@
         }
     },
     "unprotectedTemporary": [
-        {
-            "domain": "vinted.fr",
-            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/794"
-        }
     ]
 }
