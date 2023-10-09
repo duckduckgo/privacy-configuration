@@ -2,7 +2,7 @@ const fs = require('fs')
 
 const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args))
 
-const { addCnameEntriesToAllowlist, inlineReasonArrays, mergeAllowlistedTrackers, addHashToFeatures } = require('./util')
+const { addCnameEntriesToAllowlist, inlineReasonArrays, mergeAllowlistedTrackers, addHashToFeatures, stripReasons } = require('./util')
 
 const { OVERRIDE_DIR, GENERATED_DIR, LISTS_DIR, BROWSERS_SUBDIR, CURRENT_CONFIG_VERSION } = require('./constants')
 
@@ -46,9 +46,14 @@ function writeConfigToDisk (platform, config) {
 
     // Write config and convert to backwards compatible versions
     let prevConfig = null
+    const unmodifiedConfig = JSON.parse(JSON.stringify(config))
     for (let i = CURRENT_CONFIG_VERSION; i > 0; i--) {
         const version = `v${i}`
         mkdirIfNeeded(`${GENERATED_DIR}/${version}`)
+
+        if (i === CURRENT_CONFIG_VERSION) {
+            stripReasons(config)
+        }
 
         if (!prevConfig) {
             prevConfig = config
@@ -57,11 +62,12 @@ function writeConfigToDisk (platform, config) {
                 throw new Error(`No compat function for config version ${version}`)
             }
 
-            prevConfig = compatibility.compatFunctions[version](prevConfig)
+            prevConfig = compatibility.compatFunctions[version](prevConfig, unmodifiedConfig)
         }
 
         const compatConfig = JSON.parse(JSON.stringify(prevConfig))
         addHashToFeatures(compatConfig)
+
         compatibility.removeEolFeatures(compatConfig, i)
         fs.writeFileSync(`${GENERATED_DIR}/${version}/${configName}-config.json`, JSON.stringify(compatConfig, null, 4))
     }
@@ -245,7 +251,9 @@ async function buildPlatforms () {
         platformConfig = inlineReasonArrays(platformConfig)
         platformConfigs[platform] = platformConfig
 
-        writeConfigToDisk(platform, platformConfig)
+        // Write config to disk
+        // Make a copy to avoid mutating the original object
+        writeConfigToDisk(platform, JSON.parse(JSON.stringify(platformConfig)))
     }
     return platformConfigs
 }
