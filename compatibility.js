@@ -69,6 +69,47 @@ const compatFunctions = {
         }
 
         return v2Config
+    },
+    v3: (config, unmodifiedConfig) => {
+        // Breaking changes: none, reasons stripped starting in v4
+
+        const v3Config = JSON.parse(JSON.stringify(config))
+
+        /**
+         * This function will take reasons from the source array and assign them to the target array.
+         *
+         * @param {Array} target - the array to assign reasons to
+         * @param {Array} source - the array to pull reasons from
+         */
+        function assignReasons (target, source) {
+            target = target.map((exception, i) => {
+                const reason = source[i]?.reason || ''
+                return Object.assign(exception, { reason })
+            })
+        }
+
+        // Replace reasons
+        for (const key of Object.keys(unmodifiedConfig.features)) {
+            assignReasons(v3Config.features[key].exceptions, unmodifiedConfig?.features[key]?.exceptions)
+
+            if (key === 'trackerAllowlist') {
+                for (const domain of Object.keys(unmodifiedConfig.features[key].settings.allowlistedTrackers)) {
+                    const rules = v3Config.features[key].settings.allowlistedTrackers[domain].rules
+                    assignReasons(rules, unmodifiedConfig?.features[key]?.settings?.allowlistedTrackers[domain]?.rules)
+                }
+            }
+
+            if (key === 'customUserAgent') {
+                if (unmodifiedConfig.features[key].settings.omitApplicationSites) {
+                    assignReasons(v3Config.features[key].settings.omitApplicationSites, unmodifiedConfig.features[key].settings.omitApplicationSites)
+                }
+                if (unmodifiedConfig.features[key].settings.omitVersionSites) {
+                    assignReasons(v3Config.features[key].settings.omitVersionSites, unmodifiedConfig.features[key].settings.omitVersionSites)
+                }
+            }
+        }
+
+        return v3Config
     }
 }
 

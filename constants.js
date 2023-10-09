@@ -1,5 +1,5 @@
 module.exports = {
-    CURRENT_CONFIG_VERSION: 3,
+    CURRENT_CONFIG_VERSION: 4,
     OVERRIDE_DIR: 'overrides',
     GENERATED_DIR: 'generated',
     LISTS_DIR: 'features',
