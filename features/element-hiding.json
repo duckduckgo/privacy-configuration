@@ -85,7 +85,7 @@
         }
     ],
     "settings": {
-        "useStrictHideStyleTag": true,
+        "useStrictHideStyleTag": false,
         "rules": [
             {
                 "selector": "[id*='gpt-']",
@@ -233,6 +233,10 @@
             },
             {
                 "selector": "#topBanner",
+                "type": "hide-empty"
+            },
+            {
+                "selector": ".top-ad",
                 "type": "hide-empty"
             },
             {
@@ -456,6 +460,10 @@
             {
                 "domain": "github.com",
                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1058"
+            },
+            {
+                "domain": "pocketbook.digital",
+                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1365"
             }
         ],
         "hideTimeouts": [0, 100, 300, 500, 1000, 2000, 3000],
@@ -469,6 +477,7 @@
             "advertisements",
             "advertisment",
             "advertisementclose",
+            "advertisementadvertisement",
             "advertisementcontinue reading the main story",
             "advertisement\ncontinue reading the main story",
             "advertisement\n\ncontinue reading the main story",
@@ -487,6 +496,7 @@
             "sponsored",
             "sponsorisé",
             "story continues below advertisement",
+            "story continues below advertisementadvertisement",
             "publicité",
             "publicidade",
             "reklama",
@@ -1407,6 +1417,15 @@
                 ]
             },
             {
+                "domain": "refinery29.com",
+                "rules": [
+                    {
+                        "selector": ".section-ad",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
                 "domain": "reuters.com",
                 "rules": [
                     {
@@ -1493,11 +1512,37 @@
                 ]
             },
             {
+                "domain": "slate.com",
+                "rules": [
+                    {
+                        "selector": ".slate-ad",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
                 "domain": "snopes.com",
                 "rules": [
                     {
                         "selector": ".proper-dynamic-insertion",
                         "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "spanishdict.com",
+                "rules": [
+                    {
+                "selector": "[id*='adSide']",
+                "type": "hide-empty"
+                    },
+                    {
+                "selector": "[id*='adTop']",
+                "type": "hide-empty"
+                    },
+                    {
+                "selector": "[id*='adMiddle']",
+                "type": "hide-empty"
                     }
                 ]
             },
@@ -1715,6 +1760,10 @@
                     {
                         "selector": "#cx-what-to-read-next",
                         "type": "closest-empty"
+                    },
+                    {
+                       "selector": "[class*='WSJTheme--adWrapper']",
+                       "type": "hide-empty"
                     }
                 ]
             },
@@ -1742,6 +1791,10 @@
                     {
                         "selector": ".darla",
                         "type": "closest-empty"
+                    },
+                    {
+                        "selector": "[data-content='Advertisement']",
+                        "type": "hide-empty"
                     }
                 ]
             },
@@ -1816,27 +1869,6 @@
             },
             {
                 "domain": "first-party.site",
-                "rules": [
-                    {
-                        "selector": ".hide-test",
-                        "type": "hide"
-                    },
-                    {
-                        "selector": ".hide-empty-test",
-                        "type": "hide-empty"
-                    },
-                    {
-                        "selector": ".closest-empty-test",
-                        "type": "closest-empty"
-                    },
-                    {
-                        "selector": "[class^='ad-container']",
-                        "type": "override"
-                    }
-                ]
-            },
-            {
-                "domain": "privacy-test-pages.glitch.me",
                 "rules": [
                     {
                         "selector": ".hide-test",
