@@ -4,29 +4,6 @@
             "exceptions": [
             ]
         },
-        "incrementalRolloutTest2": {
-            "state": "enabled",
-            "features": {
-                "rollout": {
-                    "state": "enabled",
-                    "rollout": {
-                        "steps": [
-                            {
-                                "percent": 1.0
-                            },
-                            {
-                                "percent": 5.0
-                            },
-                            {
-                                "percent": 15.0
-                            }
-                        ]
-                    }
-                }
-            },
-            "exceptions": [
-            ]
-        },
         "fingerprintingTemporaryStorage": {
             "state": "enabled"
         },
@@ -90,6 +67,17 @@
                 "autofillPasswordGeneration": {
                     "state": "enabled",
                     "minSupportedVersion": "7.75.0"
+                },
+                "onByDefault": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.93.0",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 1.0
+                            }
+                        ]
+                    }
                 }
             }
         },
@@ -250,6 +238,10 @@
                     {
                         "domain": "facebook.com",
                         "reason": "When going to the main login page, there is a banner at the top which warns of an 'Unsupported browser'."
+                    },
+                    {
+                        "domain": "hulu.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1145"
                     },
                     {
                         "domain": "instagram.com",

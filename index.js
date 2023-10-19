@@ -122,6 +122,7 @@ const excludedFeaturesFromUnprotectedTempExceptions = [
     'incrementalRolloutTest2',
     'networkProtection',
     'newTabContinueSetUp',
+    'privacyDashboard',
     'voiceSearch',
     'windowsPermissionUsage',
     'windowsWaitlist',
