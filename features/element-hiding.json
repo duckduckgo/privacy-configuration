@@ -85,7 +85,7 @@
         }
     ],
     "settings": {
-        "useStrictHideStyleTag": false,
+        "useStrictHideStyleTag": true,
         "rules": [
             {
                 "selector": "[id*='gpt-']",
@@ -466,8 +466,8 @@
                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1365"
             }
         ],
-        "hideTimeouts": [0, 100, 300, 500, 1000, 2000, 3000],
-        "unhideTimeouts": [1250, 2250, 3000],
+        "hideTimeouts": [0, 100, 300, 500, 1000, 1500, 2000, 3000, 5000],
+        "unhideTimeouts": [1250, 2250, 3250, 5250],
         "mediaAndFormSelectors": "video,canvas,embed,object,audio,map,form,input,textarea,select,option",
         "adLabelStrings": [
             "ad",
@@ -522,6 +522,15 @@
                     {
                         "selector": ".proper-dynamic-insertion",
                         "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "avito.ru",
+                "rules": [
+                    {
+                         "selector": "[class*='advert-mimicry-block']",
+                         "type": "hide"
                     }
                 ]
             },
@@ -1530,6 +1539,23 @@
                 ]
             },
             {
+                "domain": "spanishdict.com",
+                "rules": [
+                    {
+                "selector": "[id*='adSide']",
+                "type": "hide-empty"
+                    },
+                    {
+                "selector": "[id*='adTop']",
+                "type": "hide-empty"
+                    },
+                    {
+                "selector": "[id*='adMiddle']",
+                "type": "hide-empty"
+                    }
+                ]
+            },
+            {
                 "domain": "spankbang.com",
                 "rules": [
                     {
@@ -1729,6 +1755,15 @@
                 ]
             },
             {
+                "domain": "whitakerfuneralhome.com",
+                "rules": [
+                    {
+                        "selector": ".top-banner",
+                        "type": "override"
+                    }
+                ]
+            },
+            {
                 "domain": "winnipegfreepress.com",
                 "rules": [
                     {
@@ -1852,27 +1887,6 @@
             },
             {
                 "domain": "first-party.site",
-                "rules": [
-                    {
-                        "selector": ".hide-test",
-                        "type": "hide"
-                    },
-                    {
-                        "selector": ".hide-empty-test",
-                        "type": "hide-empty"
-                    },
-                    {
-                        "selector": ".closest-empty-test",
-                        "type": "closest-empty"
-                    },
-                    {
-                        "selector": "[class^='ad-container']",
-                        "type": "override"
-                    }
-                ]
-            },
-            {
-                "domain": "privacy-test-pages.glitch.me",
                 "rules": [
                     {
                         "selector": ".hide-test",
