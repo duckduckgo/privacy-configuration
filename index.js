@@ -115,7 +115,7 @@ const excludedFeaturesFromUnprotectedTempExceptions = [
     'adClickAttribution',
     'appTrackerProtection',
     'autofill',
-    'browser',
+    'androidBrowserConfig',
     'customUserAgent',
     'duckPlayer',
     'incontextSignup',
