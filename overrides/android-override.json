@@ -169,6 +169,14 @@
                 }
             }
         },
+        "androidBrowserConfig": {
+            "state": "enabled",
+            "features": {
+                "collectFullWebViewVersion": {
+                    "state": "enabled"
+                }
+            }
+        },
         "elementHiding": {
             "state": "enabled"
         },
@@ -177,6 +185,14 @@
             "settings": {
                 "defaultPolicy": "ddg",
                 "ddgFixedSites": [
+                    {
+                        "domain": "fifa.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/667"
+                    },
+                    {
+                        "domain": "xhamster.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1435"
+                    }
                 ],
                 "ddgDefaultSites": [
                     {
@@ -318,12 +334,16 @@
                 },
                 "omitApplicationSites": [
                     {
+                        "domain": "xhamster.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1435"
+                    },
+                    {
                         "domain": "fedex.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/927"
                     },
                     {
-                        "domain": "fifa.com",
-                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/667"
+                        "domain": "formula1.com",
+                        "reason": "Stream page shows 'unsupported browser'"
                     },
                     {
                         "domain": "hulu.com",
@@ -368,6 +388,10 @@
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/927"
                     },
                     {
+                        "domain": "formula1.com",
+                        "reason": "Stream page shows 'unsupported browser'"
+                    },
+                    {
                         "domain": "hulu.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1145"
                     },
@@ -403,12 +427,12 @@
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1268"
                 },
                 {
-                    "domain": "reddit.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1272"
-                },
-                {
                     "domain": "goodrx.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1305"
+                },
+                {
+                    "domain": "fanfiction.net",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1443"
                 }
             ]
         },
@@ -558,6 +582,20 @@
         "webCompat": {
             "state": "enabled",
             "settings": {
+                "domains": [
+                    {
+                        "domain": "m.facebook.com",
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/cleanIframeValue",
+                                "value": {
+                                    "state": "enabled"
+                                }
+                            }
+                        ]
+                    }
+                ],
                 "notification": {
                     "state": "enabled"
                 },
@@ -566,7 +604,9 @@
                     "validPermissionNames": [
                         "notifications"
                     ]
-                }
+                },
+                "mediaSession": "enabled",
+                "presentation": "enabled"
             }
         },
         "windowsWaitlist": {
