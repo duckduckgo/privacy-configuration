@@ -360,6 +360,50 @@
                 "type": "closest-empty"
             },
             {
+                "selector": "[class*='container--ads']",
+                "type": "hide-empty"
+            },
+            {
+                "selector": "[class*='l-ad']",
+                "type": "hide-empty"
+            },
+            {
+                "selector": "[class*='page-ad']",
+                "type": "hide-empty"
+            },
+            {
+                "selector": "[class*='module__ad']",
+                "type": "hide-empty"
+            },
+            {
+                "selector": "[class*='advertising']",
+                "type": "hide-empty"
+            },
+            {
+                "selector": "[class*='AdvertisingSlot']",
+                "type": "hide-empty"
+            },
+            {
+                "selector": "[class*='AdSlot']",
+                "type": "hide-empty"
+            },
+            {
+                "selector": "[class*='werbung']",
+                "type": "hide-empty"
+            },
+            {
+                "selector": "[class*='am-bazaar-ad']",
+                "type": "hide-empty"
+            },
+            {
+                "selector": ".adBanner",
+                "type": "hide-empty"
+            },
+            {
+                "selector": ".adModule",
+                "type": "hide-empty"
+            },
+            {
                 "selector": "[class^='Display_displayAd']",
                 "type": "hide-empty"
             },
@@ -489,6 +533,7 @@
             "advertising\nskip ad",
             "advertising\nskip ad\nskip ad\nskip ad",
             "ad feedback",
+            "annonse",
             "anzeige",
             "close ad",
             "close this ad",
@@ -497,14 +542,17 @@
             "sponsorisé",
             "story continues below advertisement",
             "story continues below advertisementadvertisement",
+            "oglas",
             "publicité",
             "publicidade",
+            "- publicidade -",
             "reklama",
             "skip ad",
             "sponsored news",
             "continue reading the main story",
             "this advertisement has not loaded yet, but your article continues below.",
-            "story continues below\nthis advertisement has not loaded yet, but your article continues below."
+            "story continues below\nthis advertisement has not loaded yet, but your article continues below.",
+            "upgrade to flickr pro to hide these ads"
         ],
         "domains": [
             {
@@ -512,6 +560,19 @@
                 "rules": [
                     {
                         "selector": ".voc-advertising",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "acidadeon.com",
+                "rules": [
+                    {
+                        "selector": "[class*='mrf-adv']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[class*='td-block']",
                         "type": "hide-empty"
                     }
                 ]
@@ -751,6 +812,19 @@
                 ]
             },
             {
+                "domain": "examiner.com.au",
+                "rules": [
+                    {
+                        "selector": "[class*='flex items']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".hidden",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
                 "domain": "express.de",
                 "rules": [
                     {
@@ -789,6 +863,15 @@
                 "rules": [
                     {
                         "selector": ".top-ads-container",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "flickr.com",
+                "rules": [
+                    {
+                        "selector": ".feed-b",
                         "type": "hide-empty"
                     }
                 ]
@@ -1021,6 +1104,15 @@
                 ]
             },
             {
+                "domain": "ilfattoquotidiano.it",
+                "rules": [
+                    {
+                        "selector": "[class*='adv']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
                 "domain": "indeed.com",
                 "rules": [
                     {
@@ -1084,6 +1176,19 @@
                         "type": "hide"
                     }
                 ]
+            },
+            {
+                "domain": "komputerswiat.pl",
+                "rules": [
+                    {
+                        "selector": "[class*='extraList']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[class*='placeholder']",
+                        "type": "hide-empty"
+                    }
+                ]    
             },
             {
                 "domain": "leboncoin.fr",
@@ -1164,6 +1269,15 @@
                     },
                     {
                         "selector": ".AtFxB",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "n1info.si",
+                "rules": [
+                    {
+                        "selector": "[class*='banner-placeholder']",
                         "type": "hide-empty"
                     }
                 ]
@@ -1499,6 +1613,15 @@
                 ]
             },
             {
+                "domain": "sfchronicle.com",
+                "rules": [
+                    {
+                        "selector": "[class*='belowMastheadWrapper']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
                 "domain": "si.com",
                 "rules": [
                     {
@@ -1580,6 +1703,15 @@
                         "selector": "[class*='ArticleInjector']",
                         "type": "hide-empty"
                     }
+                ]
+            },
+            {
+                "domain": "thehour.com",
+                "rules": [
+                    {
+                        "selector": ".belowMastheadWrapper",
+                        "type": "hide-empty"
+                    }    
                 ]
             },
             {
@@ -1691,6 +1823,15 @@
                         "selector": ".mxEhR",
                         "type": "hide"
                     }
+                ]
+            },
+            {
+                "domain": "tvtropes.org",
+                "rules": [
+                  {
+                        "selector": "[class*='-fad-unit']",
+                        "type": "hide-empty"
+                  }
                 ]
             },
             {
@@ -1813,8 +1954,12 @@
                     {
                         "selector": "[data-content='Advertisement']",
                         "type": "hide-empty"
-                    }
-                ]
+                    },
+                    {
+                        "selector": "[id*='default']",
+                        "type": "hide-empty"
+                      }
+                ]    
             },
             {
                 "domain": "gazeta.pl",
