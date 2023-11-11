@@ -246,6 +246,10 @@
                         "reason": "When going to the main login page, there is a banner at the top which warns of an 'Unsupported browser'."
                     },
                     {
+                        "domain": "finewineandgoodspirits.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1490"
+                    },
+                    {
                         "domain": "formula1.com",
                         "reason": "Stream page shows 'unsupported browser'"
                     },
@@ -286,6 +290,17 @@
             "state": "enabled",
             "settings": {
                 "allowlistedTrackers": {
+                    "googleapis.com": {
+                        "rules": [
+                            {
+                                "rule": "imasdk.googleapis.com/js/sdkloader/ima3.js",
+                                "domains": [
+                                    "nfl.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1488"
+                            }
+                        ]
+                    },
                     "monetate.net": {
                         "rules": [
                             {
