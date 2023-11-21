@@ -1,5 +1,16 @@
 {
     "features": {
+        "networkProtection": {
+            "state": "enabled",
+            "features": {
+                "waitlistBetaActive": {
+                    "state": "enabled"
+                },
+                "waitlist": {
+                    "state": "enabled"
+                }
+            }
+        },
         "contentBlocking": {
             "exceptions": [
             ]
@@ -246,6 +257,10 @@
                         "reason": "When going to the main login page, there is a banner at the top which warns of an 'Unsupported browser'."
                     },
                     {
+                        "domain": "finewineandgoodspirits.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1490"
+                    },
+                    {
                         "domain": "formula1.com",
                         "reason": "Stream page shows 'unsupported browser'"
                     },
@@ -286,6 +301,24 @@
             "state": "enabled",
             "settings": {
                 "allowlistedTrackers": {
+                    "googleapis.com": {
+                        "rules": [
+                            {
+                                "rule": "imasdk.googleapis.com/js/sdkloader/ima3.js",
+                                "domains": [
+                                    "nfl.com",
+                                    "usatoday.com",
+                                    "bloomberg.com",
+                                    "games.washingtonpost.com"
+                                ],
+                                "reason": [
+                                    "https://github.com/duckduckgo/privacy-configuration/issues/1488",
+                                    "https://github.com/duckduckgo/privacy-configuration/issues/1507",
+                                    "games.washingtonpost.com - https://github.com/duckduckgo/privacy-configuration/issues/1518"
+                                ]
+                            }
+                        ]
+                    },
                     "monetate.net": {
                         "rules": [
                             {
@@ -294,6 +327,28 @@
                                     "kleen-ritecorp.com"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1231"
+                            }
+                        ]
+                    },
+                    "npttech.com": {
+                        "rules": [
+                            {
+                                "rule": "npttech.com/advertising.js",
+                                "domains": [
+                                    "blick.ch"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1520"
+                            }
+                        ]
+                    },
+                    "tiqcdn.com": {
+                        "rules": [
+                            {
+                                "rule": "tags.tiqcdn.com/utag/",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1534"
                             }
                         ]
                     }
@@ -328,6 +383,15 @@
                     }
                 ]
             }
+        },
+        "gpc": {
+            "state": "enabled",
+            "exceptions": [
+                {
+                    "domain": "oreillyauto.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1501"
+                }
+            ]
         },
         "windowsWaitlist": {
             "state": "enabled"

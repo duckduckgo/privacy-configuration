@@ -10,78 +10,6 @@
         {
             "domain": "duckduckgo.com",
             "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1236"
-        },
-        {
-            "domain": "bild.de",
-            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/589"
-        },
-        {
-            "domain": "derstandard.at",
-            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1101"
-        },
-        {
-            "domain": "foxnews.com",
-            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/965"
-        },
-        {
-            "domain": "kbb.com",
-            "reason": "Adblocker wall"
-        },
-        {
-            "domain": "wiwo.de",
-            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/592"
-        },
-        {
-            "domain": "metro.co.uk",
-            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/592"
-        },
-        {
-            "domain": "blick.ch",
-            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/592"
-        },
-        {
-            "domain": "thechive.com",
-            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/592"
-        },
-        {
-            "domain": "bizjournals.com",
-            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/592"
-        },
-        {
-            "domain": "slate.com",
-            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/592"
-        },
-        {
-            "domain": "dailycaller.com",
-            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/592"
-        },
-        {
-            "domain": "dailymail.co.uk",
-            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/592"
-        },
-        {
-            "domain": "eltiempo.com",
-            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/592"
-        },
-        {
-            "domain": "dailyherald.com",
-            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/592"
-        },
-        {
-            "domain": "publico.es",
-            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/592"
-        },
-        {
-            "domain": "rawstory.com",
-            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/592"
-        },
-        {
-            "domain": "allgemeine-zeitung.de",
-            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/592"
-        },
-        {
-            "domain": "thehindu.com",
-            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/592"
         }
     ],
     "settings": {
@@ -292,6 +220,10 @@
                 "type": "closest-empty"
             },
             {
+                "selector": ".ad-container--leaderboard",
+                "type": "hide-empty"
+            },
+            {
                 "selector": ".ads_container",
                 "type": "hide-empty"
             },
@@ -342,6 +274,14 @@
             {
                 "selector": ".ad-slot",
                 "type": "closest-empty"
+            },
+            {
+                "selector": "#ad-top",
+                "type": "hide-empty"
+            },
+            {
+                "selector": "#ad-wrap",
+                "type": "hide-empty"
             },
             {
                 "selector": ".ad-wrap",
@@ -436,6 +376,10 @@
                 "type": "hide-empty"
             },
             {
+                "selector": ".instream_ad",
+                "type": "hide-empty"
+            },
+            {
                 "selector": ".adthrive",
                 "type": "hide-empty"
             },
@@ -494,10 +438,6 @@
             {
                 "selector": "#ez-content-blocker-container",
                 "type": "hide"
-            },
-            {
-                "selector": "#notify-adblock",
-                "type": "hide"
             }
         ],
         "styleTagExceptions": [
@@ -529,6 +469,7 @@
             "advertisementhide ad",
             "advertisement - scroll to continue",
             "advertisement · scroll to continue",
+            "advertisement - story continues below",
             "advertising",
             "advertising\nskip ad",
             "advertising\nskip ad\nskip ad\nskip ad",
@@ -578,6 +519,35 @@
                 ]
             },
             {
+                "domain": "allgemeine-zeitung.de",
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    },
+                    {
+                        "selector": ".adSlot",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".adBorder",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".nativeAd",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "androidpolice.com",
+                "rules": [
+                    {
+                        "selector": "[class*='ad-zone']",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
                 "domain": "apnews.com",
                 "rules": [
                     {
@@ -618,6 +588,31 @@
                 ]
             },
             {
+                "domain": "bild.de",
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    },
+                    {
+                        "selector": "[id^='mrec']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "#superbanner",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "bizjournals.com",
+                "rules": [
+                    {
+                        "selector": ".adwrap",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
                 "domain": "bleacherreport.com",
                 "rules": [
                     {
@@ -632,6 +627,15 @@
                     {
                         "selector": "[class*='ad_unit']",
                         "type": "override"
+                    }
+                ]
+            },
+            {
+                "domain": "blick.ch",
+                "rules": [
+                    {
+                        "selector": "[id*='appnexus-placement-']",
+                        "type": "hide-empty"
                     }
                 ]
             },
@@ -732,6 +736,31 @@
                 "rules": [
                     {
                         "selector": "[data-block-name='ads']",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "dailyherald.com",
+                "rules": [
+                    {
+                        "selector": ".instoryAdBlock",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "dailymail.co.uk",
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    },
+                    {
+                        "selector": "[class*='dmg-ads']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".mol-ads-label-container",
                         "type": "closest-empty"
                     }
                 ]
@@ -898,6 +927,27 @@
                     {
                         "selector": ".cls_slot_xxoutstreamxx",
                         "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "foodnetwork.co.uk",
+                "rules": [
+                    {
+                        "selector": ".bg-bodyBg",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".module--ad-module-primary",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "#mtf-1",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": "#btf-1",
+                        "type": "closest-empty"
                     }
                 ]
             },
@@ -1148,6 +1198,15 @@
                 ]
             },
             {
+                "domain": "insider.com",
+                "rules": [
+                    {
+                        "selector": ".in-post-sticky",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
                 "domain": "investing.com",
                 "rules": [
                     {
@@ -1244,6 +1303,18 @@
                     {
                         "selector": ".j-ad",
                         "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "metro.co.uk",
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    },
+                    {
+                        "selector": ".ad-slot-container",
+                        "type": "hide-empty"
                     }
                 ]
             },
@@ -1462,6 +1533,19 @@
                 ]
             },
             {
+                "domain": "petapixel.com",
+                "rules": [
+                    {
+                        "selector": ".banners",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "#ppvideoadvertisement",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
                 "domain": "peterboroughtoday.co.uk",
                 "rules": [
                     {
@@ -1514,11 +1598,53 @@
                 ]
             },
             {
+                "domain": "publico.es",
+                "rules": [
+                    {
+                        "selector": ".pb-ads",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "#sc_intxt_container",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
                 "domain": "qz.com",
                 "rules": [
                     {
                         "selector": "#marquee-ad",
                         "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "rawstory.com",
+                "rules": [
+                    {
+                        "selector": ".container_proper-ad-unit",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".controlled_via_ad_manager",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".mgid_3x2",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".proper-ad-unit",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": "[id^='rc-widget-']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "#story-top-ad",
+                        "type": "hide"
                     }
                 ]
             },
@@ -1649,6 +1775,10 @@
                     {
                         "selector": ".slate-ad",
                         "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".top-ad",
+                        "type": "hide"
                     }
                 ]
             },
@@ -1665,16 +1795,16 @@
                 "domain": "spanishdict.com",
                 "rules": [
                     {
-                "selector": "[id*='adSide']",
-                "type": "hide-empty"
+                        "selector": "[id*='adSide']",
+                        "type": "hide-empty"
                     },
                     {
-                "selector": "[id*='adTop']",
-                "type": "hide-empty"
+                        "selector": "[id*='adTop']",
+                        "type": "hide-empty"
                     },
                     {
-                "selector": "[id*='adMiddle']",
-                "type": "hide-empty"
+                        "selector": "[id*='adMiddle']",
+                        "type": "hide-empty"
                     }
                 ]
             },
@@ -1684,6 +1814,24 @@
                     {
                         "selector": ".ptgncdn_holder",
                         "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "sportbible.com",
+                "rules": [
+                    {
+                        "selector": "[class*='Advert']",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "takealot.com",
+                "rules": [
+                    {
+                        "selector": "[class*='ad-slot_']",
+                        "type": "override"
                     }
                 ]
             },
@@ -1706,12 +1854,30 @@
                 ]
             },
             {
+                "domain": "thegatewaypundit.com",
+                "rules": [
+                    {
+                        "selector": ".code-block",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
                 "domain": "thehour.com",
                 "rules": [
                     {
                         "selector": ".belowMastheadWrapper",
                         "type": "hide-empty"
-                    }    
+                    }
+                ]
+            },
+            {
+                "domain": "thehindu.com",
+                "rules": [
+                    {
+                        "selector": "#articledivrec",
+                        "type": "hide-empty"
+                    }
                 ]
             },
             {
@@ -1732,10 +1898,28 @@
                 ]
             },
             {
+                "domain": "thewordfinder.com",
+                "rules": [
+                    {
+                        "selector": "[id*='adngin']",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
                 "domain": "thingiverse.com",
                 "rules": [
                     {
                         "selector": "[class*='AdCard__leaderboard']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "tinybeans.com",
+                "rules": [
+                    {
+                        "selector": ".tb-ad",
                         "type": "hide-empty"
                     }
                 ]
@@ -1849,6 +2033,10 @@
                     {
                         "selector": "[class^='Ad__Container-']",
                         "type": "hide"
+                    },
+                    {
+                        "selector": "#ac-lre-player",
+                        "type": "hide-empty"
                     }
                 ]
             },
@@ -1875,6 +2063,15 @@
                     {
                         "selector": ".fixed-slot",
                         "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "westernjournal.com",
+                "rules": [
+                    {
+                        "selector": ".sponsor",
+                        "type": "hide-empty"
                     }
                 ]
             },
@@ -1910,6 +2107,14 @@
                     {
                         "selector": ".article-ad",
                         "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "wiwo.de",
+                "rules": [
+                    {
+                        "type": "disable-default"
                     }
                 ]
             },
@@ -1954,11 +2159,7 @@
                     {
                         "selector": "[data-content='Advertisement']",
                         "type": "hide-empty"
-                    },
-                    {
-                        "selector": "[id*='default']",
-                        "type": "hide-empty"
-                      }
+                    }
                 ]    
             },
             {
