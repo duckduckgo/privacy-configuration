@@ -161,6 +161,16 @@
                 },
                 "canGeneratePasswords": {
                     "state": "enabled"
+                },
+                "onByDefault": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 1.0
+                            }
+                        ]
+                    }
                 }
             }
         },
@@ -388,6 +398,18 @@
                                 }
                             }
                         ]
+                    },
+                    {
+                        "domain": "m.signupgenius.com",
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/viewportWidth",
+                                "value": {
+                                    "state": "enabled"
+                                }
+                            }
+                        ]
                     }
                 ],
                 "notification": {
@@ -415,7 +437,8 @@
                     ]
                 },
                 "mediaSession": "disabled",
-                "presentation": "enabled"
+                "presentation": "enabled",
+                "webShare": "enabled"
             }
         },
         "windowsWaitlist": {
