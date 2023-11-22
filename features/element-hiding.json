@@ -990,8 +990,45 @@
                 "domain": "foxnews.com",
                 "rules": [
                     {
+                        "type": "disable-default"
+                    },
+                    {
                         "selector": ".vendor-unit",
                         "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".pre-content",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[class*='rr-ad-']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".ad-h-250",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".sticky-pre-header",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".adhesion-ad",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".sticky-pre-header-inner",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".site-header",
+                        "type": "modify-style",
+                        "values": [
+                            {
+                                "property": "min-height",
+                                "value": "50px"
+                            }
+                        ]
                     }
                 ]
             },
@@ -1533,6 +1570,15 @@
                 ]
             },
             {
+                "domain": "paypal.com",
+                "rules": [
+                    {
+                        "selector": "#gslFrame",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
                 "domain": "petapixel.com",
                 "rules": [
                     {
@@ -1823,6 +1869,15 @@
                     {
                         "selector": "[class*='Advert']",
                         "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "takealot.com",
+                "rules": [
+                    {
+                        "selector": "[class*='ad-slot_']",
+                        "type": "override"
                     }
                 ]
             },

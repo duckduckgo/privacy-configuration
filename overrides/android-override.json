@@ -161,6 +161,16 @@
                 },
                 "canGeneratePasswords": {
                     "state": "enabled"
+                },
+                "onByDefault": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 1.0
+                            }
+                        ]
+                    }
                 }
             }
         },
@@ -427,7 +437,8 @@
                     ]
                 },
                 "mediaSession": "disabled",
-                "presentation": "enabled"
+                "presentation": "enabled",
+                "webShare": "enabled"
             }
         },
         "windowsWaitlist": {
@@ -442,5 +453,35 @@
         }
     },
     "unprotectedTemporary": [
-    ]
+    ],
+    "experimentalVariants": {
+        "variants": [
+          {
+            "desc": "this is SERP don't remove",
+            "variantKey": "sc",
+            "weight": 0.0
+          },
+          {
+            "desc": "this is SERP don't remove",
+            "variantKey": "se",
+            "weight": 0.0
+          },
+          {
+            "desc": "Control variant for AskForDefaultBrowserMoreThanOnce experiment",
+            "variantKey": "zh",
+            "weight": 0.0,
+            "filters": {
+                "locale": ["en_US", "en_CA", "en_GB", "en_AU"]
+            }
+          },
+          {
+            "desc": "Experimental variant for AskForDefaultBrowserMoreThanOnce",
+            "variantKey": "zj",
+            "weight": 0.0,
+            "filters": {
+                "locale": ["en_US", "en_CA", "en_GB", "en_AU"]
+            }
+          }
+        ]
+    }
 }
