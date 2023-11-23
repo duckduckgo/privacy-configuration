@@ -249,6 +249,10 @@ async function buildPlatforms () {
             }
         }
 
+        if (platformOverride.experimentalVariants) {
+            platformConfig.experimentalVariants = platformOverride.experimentalVariants
+        }
+
         addCnameEntriesToAllowlist(tds, platformConfig.features.trackerAllowlist.settings.allowlistedTrackers)
         platformConfig = inlineReasonArrays(platformConfig)
         platformConfigs[platform] = platformConfig
