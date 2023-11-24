@@ -2,6 +2,25 @@
     "type": "object",
     "properties": {
         "readme": {"type": "string"},
+        "experimentalVariants": {
+            "type": "object",
+            "properties": {
+                "variants": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "desc": {"type": "string"},
+                            "variantKey": {"type": "string"},
+                            "weight": {"type": "number"},
+                            "filters": {"type": "object"}
+                        },
+                        "required": ["desc", "variantKey", "weight"]
+                    }
+                }
+            },
+            "additionalProperties": false
+        },
         "features": {
             "type": "object",
             "patternProperties": {
