@@ -127,7 +127,8 @@ const excludedFeaturesFromUnprotectedTempExceptions = [
     'voiceSearch',
     'windowsPermissionUsage',
     'windowsWaitlist',
-    'windowsDownloadLink'
+    'windowsDownloadLink',
+    'dbp'
 ]
 function applyGlobalUnprotectedTempExceptionsToFeatures (key, baseConfig, globalExceptions) {
     if (!excludedFeaturesFromUnprotectedTempExceptions.includes(key)) {
