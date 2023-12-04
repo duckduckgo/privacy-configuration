@@ -127,7 +127,8 @@ const excludedFeaturesFromUnprotectedTempExceptions = [
     'voiceSearch',
     'windowsPermissionUsage',
     'windowsWaitlist',
-    'windowsDownloadLink'
+    'windowsDownloadLink',
+    'dbp'
 ]
 function applyGlobalUnprotectedTempExceptionsToFeatures (key, baseConfig, globalExceptions) {
     if (!excludedFeaturesFromUnprotectedTempExceptions.includes(key)) {
@@ -244,7 +245,7 @@ async function buildPlatforms () {
 
         if (platformOverride.unprotectedTemporary) {
             addExceptionsToUnprotected(platformOverride.unprotectedTemporary)
-            for (const key of Object.keys(platformOverride.features)) {
+            for (const key of Object.keys(platformConfig.features)) {
                 applyGlobalUnprotectedTempExceptionsToFeatures(key, platformConfig, platformOverride.unprotectedTemporary)
             }
         }
