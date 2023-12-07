@@ -45,7 +45,7 @@ if (dir === undefined) {
 
 const files = fs.readdirSync(`${Constants.GENERATED_DIR}/${dir}`)
 files.forEach(file => {
-    if (checkPlatform !== undefined && !file.startsWith(checkPlatform)) {
+    if (checkPlatform !== undefined && !file.includes(checkPlatform)) {
         return
     }
 
