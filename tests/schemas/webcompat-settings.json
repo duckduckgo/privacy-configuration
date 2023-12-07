@@ -56,6 +56,41 @@
                 }
             }
         },
+        "notification": {
+            "type": "object",
+            "required": [
+                "state"
+            ],
+            "properties": {
+                "state": {
+                    "$ref": "#/definitions/state"
+                }
+            }
+        },
+        "permissions": {
+            "type": "object",
+            "required": [
+                "state",
+                "supportedPermissions"
+            ],
+            "properties": {
+                "state": {
+                    "$ref": "#/definitions/state"
+                },
+                "supportedPermissions": {
+                    "type": "object"
+                }
+            }
+        },
+        "mediaSession": {
+            "$ref": "#/definitions/state"
+        },
+        "presentation": {
+            "$ref": "#/definitions/state"
+        },
+        "webShare": {
+            "$ref": "#/definitions/state"
+        },
         "domains": {
             "$ref": "#/definitions/domains"
         }
