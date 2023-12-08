@@ -7,8 +7,9 @@ const baseUrl = document.location.origin
 const platforms = [
     ['Android', 'v4/android-config.json'],
     ['Extension', 'v4/extension-config.json'],
+    ['iOS', 'v4/ios-config.json'],
     ['macOS', 'v4/macos-config.json'],
-    ['windows', 'v4/windows-config.json']
+    ['Windows', 'v4/windows-config.json']
 ]
 
 platforms.forEach(([name, path]) => {
