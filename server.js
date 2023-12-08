@@ -46,7 +46,7 @@ app.listen(port, () => {
 // Run a config build
 exec('node index.js')
 // set up build watching
-const watcher = chokidar.watch(['features', 'overrides'], { persistent: true })
+const watcher = chokidar.watch(['features', 'overrides'])
 watcher.on('change', () => {
     exec('node index.js', (err) => {
         if (err) {
