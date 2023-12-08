@@ -1,6 +1,5 @@
 const express = require('express')
-const chokidar = require('chokidar');
-const fs = require('fs')
+const chokidar = require('chokidar')
 const { exec } = require('node:child_process')
 const app = express()
 const port = process.env.PORT || 3000
