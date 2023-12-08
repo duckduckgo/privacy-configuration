@@ -3,18 +3,22 @@
   "version": "1.0.0",
   "description": "Build scripts and generated files for privacy feature configuration",
   "main": "index.js",
+  "engines": {
+    "node": ">=16"
+  },
   "scripts": {
     "test": "npm run lint && npm run build && npm run unit-tests",
     "lint": "eslint .",
     "unit-tests": "mocha ./tests/**/*.js",
     "build": "node index.js",
-    "dev-server": "node server.js"
+    "start": "node server.js"
   },
   "author": "DuckDuckGo",
   "license": "Apache 2.0",
   "devDependencies": {
     "ajv": "^8.6.3",
     "chai": "^4.3.4",
+    "chokidar": "^3.5.3",
     "diff": "^5.1.0",
     "eslint": "^7.32.0",
     "eslint-config-standard": "^16.0.3",

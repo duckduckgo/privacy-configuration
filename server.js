@@ -1,6 +1,7 @@
 const express = require('express')
+const chokidar = require('chokidar');
 const fs = require('fs')
-const { exec } = require('node:child_process');
+const { exec } = require('node:child_process')
 const app = express()
 const port = process.env.PORT || 3000
 
@@ -43,17 +44,16 @@ app.listen(port, () => {
 })
 
 // Run a config build
-exec('node index.js');
+exec('node index.js')
 // set up build watching
-['features', 'overrides'].forEach((path) => {
-    fs.watch(path, { recursive: true }, () => {
-        exec('node index.js', (err) => {
-            if (err) {
-                console.warn('Error building config', err)
-            } else {
-                console.log(`[${timestamp()}] config updated`)
-                lastBuild = Date.now()
-            }
-        })
+const watcher = chokidar.watch(['features', 'overrides'], { persistent: true })
+watcher.on('change', () => {
+    exec('node index.js', (err) => {
+        if (err) {
+            console.warn('Error building config', err)
+        } else {
+            console.log(`[${timestamp()}] config updated`)
+            lastBuild = Date.now()
+        }
     })
 })
