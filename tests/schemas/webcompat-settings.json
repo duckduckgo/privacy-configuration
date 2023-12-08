@@ -56,6 +56,41 @@
                 }
             }
         },
+        "notification": {
+            "type": "object",
+            "required": [
+                "state"
+            ],
+            "properties": {
+                "state": {
+                    "$ref": "#/definitions/state"
+                }
+            }
+        },
+        "permissions": {
+            "type": "object",
+            "required": [
+                "state",
+                "supportedPermissions"
+            ],
+            "properties": {
+                "state": {
+                    "$ref": "#/definitions/state"
+                },
+                "supportedPermissions": {
+                    "type": "object"
+                }
+            }
+        },
+        "mediaSession": {
+            "$ref": "#/definitions/state"
+        },
+        "presentation": {
+            "$ref": "#/definitions/state"
+        },
+        "webShare": {
+            "$ref": "#/definitions/state"
+        },
         "domains": {
             "$ref": "#/definitions/domains"
         }
@@ -107,7 +142,20 @@
                                     "description": "The path of the setting to be patched"
                                 },
                                 "value": {
-                                    "type": "string",
+                                    "oneOf": [
+                                        {
+                                            "type": "string"
+                                        },
+                                        {
+                                            "type": "array"
+                                        },
+                                        {
+                                            "type": "object"
+                                        },
+                                        {
+                                            "type": "number"
+                                        }
+                                    ],
                                     "description": "The value to replace at the specified path"
                                 }
                             },
