@@ -373,6 +373,17 @@
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/675"
                             }
                         ]
+                    },
+                    "yandex.ru": {
+                        "rules": [
+                            {
+                                "rule": "api-maps.yandex.ru/services/startup/v1",
+                                "domains": [
+                                    "m.dzen.ru"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1627"
+                            }
+                        ]
                     }
                 }
             },
@@ -403,14 +414,12 @@
                         ]
                     },
                     {
-                        "domain": "m.signupgenius.com",
+                        "domain": "secure.wellsfargo.com",
                         "patchSettings": [
                             {
-                                "op": "add",
+                                "op": "replace",
                                 "path": "/viewportWidth",
-                                "value": {
-                                    "state": "enabled"
-                                }
+                                "value": "disabled"
                             }
                         ]
                     }
@@ -504,6 +513,7 @@
                 },
                 "mediaSession": "enabled",
                 "presentation": "enabled",
+                "viewportWidth": "enabled",
                 "webShare": "enabled"
             }
         },
