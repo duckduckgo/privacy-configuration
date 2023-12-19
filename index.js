@@ -128,7 +128,8 @@ const excludedFeaturesFromUnprotectedTempExceptions = [
     'windowsPermissionUsage',
     'windowsWaitlist',
     'windowsDownloadLink',
-    'dbp'
+    'dbp',
+    'sync'
 ]
 function applyGlobalUnprotectedTempExceptionsToFeatures (key, baseConfig, globalExceptions) {
     if (!excludedFeaturesFromUnprotectedTempExceptions.includes(key)) {
