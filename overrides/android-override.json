@@ -217,6 +217,10 @@
             },
             "exceptions": [
                 {
+                    "domain": "duosecurity.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1637"
+                },
+                {
                     "domain": "m.facebook.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1258"
                 },
@@ -359,6 +363,23 @@
             },
             "exceptions": [ ]
         },
+        "sync": {
+            "state": "disabled",
+            "features": {
+              "level0ShowSync": {
+                "state": "enabled"
+              },
+              "level1AllowDataSyncing": {
+                "state": "enabled"
+              },
+              "level2AllowSetupFlows": {
+                "state": "enabled"
+              },
+              "level3AllowCreateAccount": {
+                "state": "enabled"
+              }
+            }
+        },
         "trackerAllowlist": {
             "state": "enabled",
             "settings": {
@@ -410,6 +431,26 @@
                                 "value": {
                                     "state": "enabled"
                                 }
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "secure.wellsfargo.com",
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/viewportWidth",
+                                "value": "disabled"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "idealo.de",
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/viewportWidth",
+                                "value": "disabled"
                             }
                         ]
                     }

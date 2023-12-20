@@ -59,23 +59,23 @@
             "minSupportedVersion": "1.57.1"
         },
         "dbp": {
-            "state": "disabled",
+            "state": "enabled",
             "features": {
                 "waitlistBetaActive": {
-                    "state": "disabled"
+                    "state": "enabled"
                 },
                 "waitlist": {
-                    "state": "disabled",
+                    "state": "enabled",
                     "rollout": {
                         "steps": [
                             {
-                                "percent": 1.0
+                                "percent": 3.0
                             }
                         ]
                     }
                 }
             },
-            "minSupportedVersion": "1.66.0"
+            "minSupportedVersion": "1.68.0"
         },
         "contentBlocking": {
             "state": "enabled",
@@ -501,6 +501,10 @@
                 {
                     "domain": "airbnb.com.br",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1224"
+                },
+                {
+                    "domain": "zoom.us",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1635"
                 }
             ]
         },
@@ -527,13 +531,45 @@
                     {
                         "domain": "flysas.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1347"
+                    },
+                    {
+                        "domain": "facebook.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1641"
                     }
                 ]
+            }
+        },
+        "sync": {
+            "state": "internal",
+            "features": {
+                "level0ShowSync": {
+                    "state": "enabled"
+                },
+                "level1AllowDataSyncing": {
+                    "state": "enabled"
+                },
+                "level2AllowSetupFlows": {
+                    "state": "enabled"
+                },
+                "level3AllowCreateAccount": {
+                    "state": "enabled"
+                }
             }
         },
         "trackerAllowlist": {
             "settings": {
                 "allowlistedTrackers": {
+                    "appboycdn.com": {
+                        "rules": [
+                            {
+                                "rule": "js.appboycdn.com/web-sdk/3.1/appboy.min.js",
+                                "domains": [
+                                    "edx.org"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1596"
+                            }
+                        ]
+                    },
                     "criteo.net": {
                         "rules": [
                             {
@@ -642,6 +678,17 @@
                                     "wp.pl"
                                 ],
                                 "reason": "Adwall appears which reappears when dismissed. The adwall prevents interaction with the page."
+                            }
+                        ]
+                    },
+                    "google-analytics.com": {
+                        "rules": [
+                            {
+                                "rule": "google-analytics.com/analytics.js",
+                                "domains": [
+                                    "edx.org"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1596"
                             }
                         ]
                     },
