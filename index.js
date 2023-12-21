@@ -124,6 +124,7 @@ const excludedFeaturesFromUnprotectedTempExceptions = [
     'networkProtection',
     'newTabContinueSetUp',
     'privacyDashboard',
+    'privacyProtectionsPopup',
     'voiceSearch',
     'windowsPermissionUsage',
     'windowsWaitlist',
