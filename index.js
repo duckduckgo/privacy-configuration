@@ -124,6 +124,7 @@ const excludedFeaturesFromUnprotectedTempExceptions = [
     'networkProtection',
     'newTabContinueSetUp',
     'privacyDashboard',
+    'privacyProtectionsPopup',
     'voiceSearch',
     'windowsPermissionUsage',
     'windowsWaitlist',
@@ -134,10 +135,6 @@ const excludedFeaturesFromUnprotectedTempExceptions = [
 function applyGlobalUnprotectedTempExceptionsToFeatures (key, baseConfig, globalExceptions) {
     if (!excludedFeaturesFromUnprotectedTempExceptions.includes(key)) {
         baseConfig.features[key].exceptions = baseConfig.features[key].exceptions.concat(globalExceptions)
-    }
-    if (key === 'customUserAgent' && !(baseConfig.features[key].settings.webViewDefault)) {
-        baseConfig.features[key].settings.omitApplicationSites = baseConfig.features[key].settings.omitApplicationSites.concat(globalExceptions)
-        baseConfig.features[key].settings.omitVersionSites = baseConfig.features[key].settings.omitVersionSites.concat(globalExceptions)
     }
 }
 for (const key of Object.keys(defaultConfig.features)) {
