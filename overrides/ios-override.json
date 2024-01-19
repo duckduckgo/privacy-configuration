@@ -110,17 +110,15 @@
         },
         "customUserAgent": {
             "state": "enabled",
-            "exceptions": [
-                {
-                    "domain": "chase.com",
-                    "reason": "Login issues"
-                }
-            ],
             "settings": {
                 "defaultPolicy": "brand",
                 "ddgFixedSites": [
                 ],
                 "ddgDefaultSites": [
+                    {
+                        "domain": "chase.com",
+                        "reason": "Login issues"
+                    },
                     {
                         "domain": "duckduckgo.com",
                         "reason": "Internal exclusion to roll out experiment"
@@ -131,6 +129,10 @@
                     ]
                 },
                 "omitApplicationSites": [
+                    {
+                        "domain": "chase.com",
+                        "reason": "Login issues"
+                    }
                 ],
                 "omitVersionSites": [
                 ]
