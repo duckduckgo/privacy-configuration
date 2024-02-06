@@ -132,7 +132,8 @@ const excludedFeaturesFromUnprotectedTempExceptions = [
     'windowsDownloadLink',
     'dbp',
     'sync',
-    'notificationPermissions'
+    'notificationPermissions',
+    'mediaPlaybackRequiresUserGesture'
 ]
 function applyGlobalUnprotectedTempExceptionsToFeatures (key, baseConfig, globalExceptions) {
     if (!excludedFeaturesFromUnprotectedTempExceptions.includes(key)) {
