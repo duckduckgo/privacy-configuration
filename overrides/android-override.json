@@ -149,7 +149,19 @@
                     "domain": "healthline.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/326"
                 }
-            ]
+            ],
+            "features": {
+                "onByDefault": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25.0
+                            }
+                        ]
+                    }
+                }
+            }
         },
         "autofill": {
             "state": "enabled",
@@ -202,6 +214,12 @@
                         "steps": [
                             {
                                 "percent": 50
+                            },
+                            {
+                                "percent": 50.1
+                            },
+                            {
+                                "percent": 100
                             }
                         ]
                     }
@@ -382,6 +400,19 @@
                 }
             }
         },
+        "notificationPermissions": {
+            "state": "enabled",
+            "features": {
+              "noPermissionsPrompt": {
+                "state": "enabled",
+                "targets": [
+                  {
+                    "variantKey": "mg"
+                  }
+                ]
+              }
+            }
+        },
         "requestFilterer": {
             "state": "enabled",
             "minSupportedVersion": 51501000,
@@ -552,6 +583,51 @@
         "clientContentFeatures": {
             "state": "enabled",
             "exceptions": [ ]
+        },
+        "mediaPlaybackRequiresUserGesture": {
+            "state": "enabled",
+            "exceptions": [
+                {
+                    "domain": "clearmemorysolution.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1786"
+                },
+                {
+                    "domain": "id.onlyfans.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1787"
+                },
+                {
+                    "domain": "naturemetabolism.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1788"
+                },
+                {
+                    "domain": "upperbodystretch.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1789"
+                },
+                {
+                    "domain": "app.trunarrative.cloud",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1791"
+                },
+                {
+                    "domain": "cloudapi.trustid.co.uk",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1792"
+                },
+                {
+                    "domain": "rtwapi.trustid.co.uk",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1792"
+                },
+                {
+                    "domain": "rtw.trustid.co.uk",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1792"
+                },
+                {
+                    "domain": "facialwebcapture.cloud.itau.com.br",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1793"
+                },
+                {
+                    "domain": "tinder.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1790"
+                }
+            ]
         }
     },
     "unprotectedTemporary": [
@@ -567,6 +643,22 @@
             "desc": "this is SERP don't remove",
             "variantKey": "se",
             "weight": 0.0
+          },
+          {
+            "desc": "Control group for notification permissions experiment",
+            "variantKey": "mf",
+            "weight": 0.0,
+            "filters": {
+              "androidVersion": ["34", "33"]
+            }
+          },
+          {
+            "desc": "No notifications permissions prompt experimental group",
+            "variantKey": "mg",
+            "weight": 0.0,
+            "filters": {
+              "androidVersion": ["34", "33"]
+            }
           }
         ]
     }
