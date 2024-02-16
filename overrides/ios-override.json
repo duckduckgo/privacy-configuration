@@ -54,7 +54,19 @@
             "state": "enabled"
         },
         "autoconsent": {
-            "state": "enabled"
+            "state": "enabled",
+            "features": {
+                "onByDefault": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25.0
+                            }
+                        ]
+                    }
+                }
+            }
         },
         "autofill": {
             "state": "enabled",
@@ -120,6 +132,10 @@
                         "reason": "Login issues"
                     },
                     {
+                        "domain": "www.canva.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1818"
+                    },
+                    {
                         "domain": "duckduckgo.com",
                         "reason": "Internal exclusion to roll out experiment"
                     }
@@ -132,6 +148,10 @@
                     {
                         "domain": "chase.com",
                         "reason": "Login issues"
+                    },
+                    {
+                        "domain": "www.canva.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1818"
                     }
                 ],
                 "omitVersionSites": [
@@ -251,6 +271,16 @@
                 "domains": [
                     {
                         "domain": "www.cbsnews.com",
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/messageHandlers/state",
+                                "value": "enabled"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "myhome.experian.co.uk",
                         "patchSettings": [
                             {
                                 "op": "replace",
