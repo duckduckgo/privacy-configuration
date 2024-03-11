@@ -132,7 +132,6 @@ const excludedFeaturesFromUnprotectedTempExceptions = [
     'windowsDownloadLink',
     'dbp',
     'sync',
-    'notificationPermissions',
     'mediaPlaybackRequiresUserGesture',
     'history'
 ]
