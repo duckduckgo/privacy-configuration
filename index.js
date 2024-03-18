@@ -12,6 +12,8 @@ const defaultConfig = {
     features: {},
     unprotectedTemporary: []
 }
+// Env flag that can be used to override stripping of 'reason' strings from the config.
+const keepReasons = process.argv.includes('--keep-reasons')
 
 const platforms = require('./platforms')
 const compatibility = require('./compatibility')
@@ -51,7 +53,7 @@ function writeConfigToDisk (platform, config) {
         const version = `v${i}`
         mkdirIfNeeded(`${GENERATED_DIR}/${version}`)
 
-        if (i === CURRENT_CONFIG_VERSION) {
+        if (i === CURRENT_CONFIG_VERSION && !keepReasons) {
             stripReasons(config)
         }
 
