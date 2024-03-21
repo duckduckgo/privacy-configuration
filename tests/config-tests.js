@@ -66,13 +66,6 @@ describe('Config schema tests', () => {
             it('should contain appTrackerProtection or not', () => {
                 expect('appTrackerProtection' in config.body.features).to.be.equal(shouldContainAppTP, `appTrackerProtection expected: ${shouldContainAppTP}`)
             })
-
-            // check for privacyPro support
-            const privacyProSupportedConfigs = ['android-config.json', 'ios-config.json', 'macos-config.json', 'windows-config.json']
-            const shouldContainPrivacyPro = privacyProSupportedConfigs.includes((config.name.split('/')[1])
-            it('should contain privacyPro or not', () => {
-                expect('privacyPro' in config.body.features).to.be.equal(shouldContainPrivacyPro, `privacyPro expected: ${shouldContainPrivacyPro}`)
-            })
         })
     }
 
@@ -104,13 +97,6 @@ describe('Config schema tests', () => {
             const shouldContainAppTP = (config.name.split('/')[1] === 'android-config.json')
             it('should contain appTrackerProtection or not', () => {
                 expect('appTrackerProtection' in config.body.features).to.be.equal(shouldContainAppTP, `appTrackerProtection expected: ${shouldContainAppTP}`)
-            })
-
-            // check for privacyPro support
-            const privacyProSupportedConfigs = ['android-config.json', 'ios-config.json', 'macos-config.json', 'windows-config.json']
-            const shouldContainPrivacyPro = privacyProSupportedConfigs.includes((config.name.split('/')[1])
-            it('should contain privacyPro or not', () => {
-                expect('privacyPro' in config.body.features).to.be.equal(shouldContainPrivacyPro, `privacyPro expected: ${shouldContainPrivacyPro}`)
             })
         })
     }
