@@ -133,7 +133,8 @@ const excludedFeaturesFromUnprotectedTempExceptions = [
     'dbp',
     'sync',
     'mediaPlaybackRequiresUserGesture',
-    'history'
+    'history',
+    'performanceMetrics'
 ]
 function applyGlobalUnprotectedTempExceptionsToFeatures (key, baseConfig, globalExceptions) {
     if (!excludedFeaturesFromUnprotectedTempExceptions.includes(key)) {
