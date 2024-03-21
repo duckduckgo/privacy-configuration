@@ -247,6 +247,11 @@ async function buildPlatforms () {
             delete platformConfig.features.appTrackerProtection
         }
 
+        // Remove privacyPro from platforms that don't use it
+        if ('privacyPro' in platformConfig.features && platformConfig.features.privacyPro.state === 'disabled') {
+            delete platformConfig.features.privacyPro
+        }
+
         if (platformOverride.unprotectedTemporary) {
             addExceptionsToUnprotected(platformOverride.unprotectedTemporary)
             for (const key of Object.keys(platformConfig.features)) {
