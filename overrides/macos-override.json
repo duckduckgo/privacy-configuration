@@ -8,13 +8,13 @@
                     "rollout": {
                         "steps": [
                             {
-                                "percent": 1.0
+                                "percent": 1
                             },
                             {
-                                "percent": 5.0
+                                "percent": 5
                             },
                             {
-                                "percent": 15.0
+                                "percent": 15
                             }
                         ]
                     }
@@ -32,25 +32,25 @@
                     "rollout": {
                         "steps": [
                             {
-                                "percent": 1.0
+                                "percent": 1
                             },
                             {
-                                "percent": 5.0
+                                "percent": 5
                             },
                             {
-                                "percent": 15.0
+                                "percent": 15
                             },
                             {
-                                "percent": 25.0
+                                "percent": 25
                             },
                             {
-                                "percent": 50.0
+                                "percent": 50
                             },
                             {
-                                "percent": 75.0
+                                "percent": 75
                             },
                             {
-                                "percent": 100.0
+                                "percent": 100
                             }
                         ]
                     }
@@ -69,10 +69,10 @@
                     "rollout": {
                         "steps": [
                             {
-                                "percent": 10.0
+                                "percent": 10
                             },
                             {
-                                "percent": 50.0
+                                "percent": 50
                             }
                         ]
                     }
@@ -82,8 +82,7 @@
         },
         "contentBlocking": {
             "state": "enabled",
-            "exceptions": [
-            ]
+            "exceptions": []
         },
         "duckPlayer": {
             "state": "enabled"
@@ -411,8 +410,14 @@
                 "messageHandlers": {
                     "state": "disabled",
                     "handlerStrategies": {
-                        "reflect": ["trackerDetectedMessage", "printHandler", "specialPages"],
-                        "polyfill": ["*"],
+                        "reflect": [
+                            "trackerDetectedMessage",
+                            "printHandler",
+                            "specialPages"
+                        ],
+                        "polyfill": [
+                            "*"
+                        ],
                         "undefined": []
                     }
                 },
@@ -471,12 +476,25 @@
         "fingerprintingHardware": {
             "state": "enabled",
             "settings": {
-                "keyboard": {"type": "undefined"},
+                "keyboard": {
+                    "type": "undefined"
+                },
                 "hardwareConcurrency": [
-                    {"type": "number", "value": 4},
-                    {"type": "number", "value": 8, "criteria": {"arch": "AppleSilicon"}}
-                 ],
-                "deviceMemory": {"type": "undefined"}
+                    {
+                        "type": "number",
+                        "value": 4
+                    },
+                    {
+                        "type": "number",
+                        "value": 8,
+                        "criteria": {
+                            "arch": "AppleSilicon"
+                        }
+                    }
+                ],
+                "deviceMemory": {
+                    "type": "undefined"
+                }
             },
             "exceptions": [
                 {
@@ -613,7 +631,7 @@
                     "rollout": {
                         "steps": [
                             {
-                                "percent": 5.0
+                                "percent": 5
                             }
                         ]
                     }
@@ -830,7 +848,5 @@
             }
         }
     },
-    "unprotectedTemporary": [
-
-    ]
+    "unprotectedTemporary": []
 }
