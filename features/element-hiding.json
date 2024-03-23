@@ -446,6 +446,14 @@
             {
                 "selector": "#ez-content-blocker-container",
                 "type": "hide"
+            },
+            {
+                "selector": ".m-balloon-header--ad",
+                "type": "hide-empty"
+            },
+            {
+                "selector": ".m-in-content-ad-row",
+                "type": "hide-empty"
             }
         ],
         "styleTagExceptions": [
@@ -473,6 +481,7 @@
             "advertisementcontinue reading the main story",
             "advertisement\ncontinue reading the main story",
             "advertisement\n\ncontinue reading the main story",
+            "advertisement - continue reading below",
             "advertisement\n\nhide ad",
             "advertisementhide ad",
             "advertisement - scroll to continue",
@@ -486,6 +495,7 @@
             "anzeige",
             "close ad",
             "close this ad",
+            "content continues below",
             "x",
             "_",
             "sponsored",
@@ -562,6 +572,33 @@
                     {
                         "selector": ".voc-advertising",
                         "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "accuweather.com",
+                "rules": [
+                    {
+                        "selector": ".glacier-ad",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "#connatix",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".adhesion-header",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".header-placeholder.has-alerts.has-adhesion",
+                        "type": "modify-style",
+                        "values": [
+                            {
+                                "property": "height",
+                                "value": "76px"
+                            }
+                        ]
                     }
                 ]
             },
@@ -803,6 +840,31 @@
                 ]
             },
             {
+                "domain": "clevelandclinic.org",
+                "rules": [
+                    {
+                        "selector": "[data-identity='adhesive-ad']",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": "[data-identity='billboard-ad']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[data-identity='leaderboard-ad']",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": "[data-identity='sticky-leaderboard-ad']",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": "[data-identity='leaderboard-ad-page-header-placeholder']",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
                 "domain": "cnbc.com",
                 "rules": [
                     {
@@ -817,6 +879,31 @@
                     {
                         "selector": "[data-target='ads.banner']",
                         "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "comicbook.com",
+                "rules": [
+                    {
+                        "selector": "body:not(.skybox-loaded)>header",
+                        "type": "modify-style",
+                        "values": [
+                            {
+                                "property": "top",
+                                "value": "0px"
+                            }
+                        ]
+                    },
+                    {
+                        "selector": "body.pcm-public:not(.skybox-loaded)",
+                        "type": "modify-style",
+                        "values": [
+                            {
+                                "property": "margin-top",
+                                "value": "90px"
+                            }
+                        ]
                     }
                 ]
             },
@@ -1687,6 +1774,23 @@
                 ]
             },
             {
+                "domain": "n4g.com",
+                "rules": [
+                    {
+                        "selector": ".top-ads-container-outer",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": ".f-item-ad",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": ".f-item-ad-inhouse",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
                 "domain": "nasdaq.com",
                 "rules": [
                     {
@@ -2036,6 +2140,26 @@
                     {
                         "selector": "#marquee-ad",
                         "type": "closest-empty"
+                    },
+                    {
+                        "selector": ".js_sticky-top-ad",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".js_sticky-footer",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "#leftrail_dynamic_ad_wrapper",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "#splashy-ad-container-top",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".ad-mobile",
+                        "type": "closest-empty"
                     }
                 ]
             },
@@ -2109,6 +2233,15 @@
                     {
                         "selector": "[id^='rumble-ad']",
                         "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "runnersworld.com",
+                "rules": [
+                    {
+                        "selector": ".ad-disclaimer",
+                        "type": "closest-empty"
                     }
                 ]
             },
@@ -2336,7 +2469,19 @@
                         "type": "hide-empty"
                     }
                 ]
-            },  
+            },
+            {
+                "domain": "thetvdb.com",
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    },
+                    {
+                        "selector": "[data-aa-adunit]",
+                        "type": "hide"
+                    }
+                ]
+            },
             {
                 "domain": "thewindowsclub.com",
                 "rules": [
@@ -2620,6 +2765,22 @@
                     {
                         "selector": "#YDC-Lead-Stack",
                         "type": "hide-empty"
+                    },
+                    {
+                        "selector": "#topAd",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "#neoLeadAdMobile",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".caas-da",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".gam-placeholder",
+                        "type": "closest-empty"
                     }
                 ]    
             },
