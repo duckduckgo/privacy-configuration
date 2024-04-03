@@ -92,7 +92,28 @@
             "$ref": "#/definitions/state"
         },
         "viewportWidth": {
-            "$ref": "#/definitions/state"
+            "oneOf": [
+                {
+                    "$ref": "#/definitions/state"
+                },
+                {
+                    "type": "object",
+                    "required": [
+                        "state"
+                   ],
+                    "properties": {
+                        "state": {
+                            "$ref": "#/definitions/state"
+                        },
+                        "forcedDesktopValue": {
+                            "type": "string"
+                        },
+                        "forcedMobileValue": {
+                            "type": "string"
+                        }
+                    }
+                }
+            ]
         },
         "screenLock": {
             "$ref": "#/definitions/state"
