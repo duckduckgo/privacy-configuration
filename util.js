@@ -164,11 +164,42 @@ function stripReasons (config) {
     }
 }
 
+/**
+ * Enforces web feature rules on a config feature namely:
+ * 1. Web Features do not use % rollouts
+ * 2. Non-web features should have an empty exceptions array
+ *
+ * @param {string} key - The name of the feature to process
+ * @param {object} feature - The feature to process
+ */
+function enforceWebFeatureRules (key, feature) {
+    if (feature._meta?.webExposed === undefined) {
+        console.error(`[Error] Feature ${key} is missing the 'webExposed' key in the '_meta' object.\nAborting!`)
+        process.exit(1)
+    }
+
+    const webExposed = feature._meta.webExposed
+    delete feature._meta
+
+    if (webExposed) {
+        // No rollouts for web exposed features
+        if (feature.features) {
+            for (const subKey of Object.keys(feature.features)) {
+                delete feature.features[subKey].rollout
+            }
+        }
+    } else {
+        // No exceptions for non-web features
+        feature.exceptions = []
+    }
+}
+
 module.exports = {
     addAllowlistRule: addAllowlistRule,
     addCnameEntriesToAllowlist: addCnameEntriesToAllowlist,
     inlineReasonArrays: inlineReasonArrays,
     mergeAllowlistedTrackers: mergeAllowlistedTrackers,
     addHashToFeatures: addHashToFeatures,
-    stripReasons: stripReasons
+    stripReasons: stripReasons,
+    enforceWebFeatureRules: enforceWebFeatureRules
 }

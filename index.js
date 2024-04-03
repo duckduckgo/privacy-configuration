@@ -2,9 +2,9 @@ const fs = require('fs')
 
 const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args))
 
-const { addCnameEntriesToAllowlist, inlineReasonArrays, mergeAllowlistedTrackers, addHashToFeatures, stripReasons } = require('./util')
+const { addCnameEntriesToAllowlist, inlineReasonArrays, mergeAllowlistedTrackers, addHashToFeatures, stripReasons, enforceWebFeatureRules } = require('./util')
 
-const { OVERRIDE_DIR, GENERATED_DIR, LISTS_DIR, BROWSERS_SUBDIR, CURRENT_CONFIG_VERSION } = require('./constants')
+const { OVERRIDE_DIR, GENERATED_DIR, FEATURES_DIR, BROWSERS_SUBDIR, CURRENT_CONFIG_VERSION } = require('./constants')
 
 const defaultConfig = {
     readme: 'https://github.com/duckduckgo/privacy-configuration',
@@ -88,16 +88,15 @@ function mkdirIfNeeded (dir) {
 
 const unprotectedListName = 'unprotected-temporary.json'
 
-// Grab all exception lists
-const jsonListNames = fs.readdirSync(LISTS_DIR).filter(listName => {
-    return listName !== unprotectedListName && listName !== '_template.json'
+// Grab all features
+const jsonFeatureNames = fs.readdirSync(FEATURES_DIR).filter(featureName => {
+    return featureName !== unprotectedListName && featureName !== '_template.json'
 })
-for (const jsonList of jsonListNames) {
-    const listData = JSON.parse(fs.readFileSync(`${LISTS_DIR}/${jsonList}`))
+for (const jsonList of jsonFeatureNames) {
+    const featureData = JSON.parse(fs.readFileSync(`${FEATURES_DIR}/${jsonList}`))
     const configKey = jsonList.replace(/[.]json$/, '').replace(/-([a-z0-9])/g, function (g) { return g[1].toUpperCase() })
 
-    delete listData._meta
-    defaultConfig.features[configKey] = listData
+    defaultConfig.features[configKey] = featureData
 }
 
 const unprotectedDomains = new Set()
@@ -108,7 +107,7 @@ function addExceptionsToUnprotected (exceptions) {
     return exceptions.map((obj) => obj.domain)
 }
 
-const listData = JSON.parse(fs.readFileSync(`${LISTS_DIR}/${unprotectedListName}`))
+const listData = JSON.parse(fs.readFileSync(`${FEATURES_DIR}/${unprotectedListName}`))
 addExceptionsToUnprotected(listData.exceptions)
 addExceptionsToUnprotected(defaultConfig.features.contentBlocking.exceptions)
 
@@ -256,6 +255,14 @@ async function buildPlatforms () {
 
         if (platformOverride.experimentalVariants) {
             platformConfig.experimentalVariants = platformOverride.experimentalVariants
+        }
+
+        // Enforce web feature rules for each feature
+        for (const key of Object.keys(platformConfig.features)) {
+            // Exclude browsers because their features are already processed by the extension config
+            if (!platform.includes(BROWSERS_SUBDIR)) {
+                enforceWebFeatureRules(key, platformConfig.features[key])
+            }
         }
 
         addCnameEntriesToAllowlist(tds, platformConfig.features.trackerAllowlist.settings.allowlistedTrackers)
