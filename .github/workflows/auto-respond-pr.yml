@@ -15,12 +15,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout main branch
+      - name: Checkout base branch
         uses: actions/checkout@v2
         with:
-          ref: main
+          ref: ${{ github.event.pull_request.base.ref }}
           repository: ${{ github.event.pull_request.head.repo.full_name }}
-          path: main
+          path: base
 
       - name: Checkout PR branch
         uses: actions/checkout@v2
@@ -28,15 +28,16 @@ jobs:
           ref: ${{ github.event.pull_request.head.ref }}
           repository: ${{ github.event.pull_request.head.repo.full_name }}
           path: pr
+          fetch-depth: 0
 
       - name: Install dependencies
         run: |
           npm install @octokit/rest
           npm install diff
 
-      - name: Run build script on main branch
+      - name: Run build script on base branch
         run: |
-          cd main
+          cd base
           npm install
           node index.js
           cd ..
@@ -44,12 +45,15 @@ jobs:
       - name: Run build script on PR branch
         run: |
           cd pr
+          git config --global user.email "dax@duck.com"
+          git config --global user.name "dax"
+          git rebase origin/${{ github.event.pull_request.base.ref }}
           npm install
           node index.js
           cd ..
 
       - name: Create diff of file outputs
-        run: node pr/.github/scripts/diff-directories.js main/generated pr/generated > diff_output.txt
+        run: node pr/.github/scripts/diff-directories.js base/generated pr/generated > diff_output.txt
 
       - name: Run auto response script
         env:
