@@ -1041,6 +1041,27 @@
                 "state": "internal"
               }
             }
+        },
+        "extendedOnboarding": {
+            "state": "enabled",
+            "features": {
+              "comparisonChart": {
+                "state": "enabled",
+                "targets": [
+                  {
+                    "variantKey": "mt"
+                  }
+                ]
+              },
+              "aestheticUpdates": {
+                "state": "enabled",
+                "targets": [
+                  {
+                    "variantKey": "mt"
+                  }
+                ]
+              }
+            }
         }
     },
     "unprotectedTemporary": [],
@@ -1055,6 +1076,34 @@
                 "desc": "this is SERP don't remove",
                 "variantKey": "se",
                 "weight": 0
+            },
+            {
+                "desc": "Control group for extended onboarding experiment",
+                "variantKey": "ms",
+                "weight": 0,
+                "filters": {
+                    "locale": [
+                        "en_US",
+                        "en_UK",
+                        "en_CA",
+                        "en_IN",
+                        "en_AU"
+                  ]
+                }
+            },
+            {
+                "desc": "Aesthetic updates in onboarding experimental group",
+                "variantKey": "mt",
+                "weight": 0,
+                "filters": {
+                    "locale": [
+                        "en_US",
+                        "en_UK",
+                        "en_CA",
+                        "en_IN",
+                        "en_AU"
+                  ]
+                }
             }
         ]
     }
