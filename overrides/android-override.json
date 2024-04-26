@@ -1037,8 +1037,15 @@
         "sslCertificates": {
             "state": "enabled",
             "features": {
-              "allowBypass": {
-                "state": "internal"
+              "allowBypass": {        
+                "state": "enabled",
+                "rollout": {
+                    "steps": [
+                        {
+                            "percent": 5
+                        }
+                    ]
+                }
               }
             }
         },
