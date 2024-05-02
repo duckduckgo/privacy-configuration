@@ -1052,8 +1052,36 @@
         "sslCertificates": {
             "state": "enabled",
             "features": {
-              "allowBypass": {
-                "state": "internal"
+              "allowBypass": {        
+                "state": "enabled",
+                "rollout": {
+                    "steps": [
+                        {
+                            "percent": 5
+                        }
+                    ]
+                }
+              }
+            }
+        },
+        "extendedOnboarding": {
+            "state": "enabled",
+            "features": {
+              "comparisonChart": {
+                "state": "enabled",
+                "targets": [
+                  {
+                    "variantKey": "mt"
+                  }
+                ]
+              },
+              "aestheticUpdates": {
+                "state": "enabled",
+                "targets": [
+                  {
+                    "variantKey": "mt"
+                  }
+                ]
               }
             }
         }
@@ -1070,6 +1098,34 @@
                 "desc": "this is SERP don't remove",
                 "variantKey": "se",
                 "weight": 0
+            },
+            {
+                "desc": "Control group for extended onboarding experiment",
+                "variantKey": "ms",
+                "weight": 0,
+                "filters": {
+                    "locale": [
+                        "en_US",
+                        "en_UK",
+                        "en_CA",
+                        "en_IN",
+                        "en_AU"
+                  ]
+                }
+            },
+            {
+                "desc": "Aesthetic updates in onboarding experimental group",
+                "variantKey": "mt",
+                "weight": 0,
+                "filters": {
+                    "locale": [
+                        "en_US",
+                        "en_UK",
+                        "en_CA",
+                        "en_IN",
+                        "en_AU"
+                  ]
+                }
             }
         ]
     }

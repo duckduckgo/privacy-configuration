@@ -137,7 +137,8 @@ const excludedFeaturesFromUnprotectedTempExceptions = [
     'mediaPlaybackRequiresUserGesture',
     'history',
     'privacyPro',
-    'sslCertificates'
+    'sslCertificates',
+    'extendedOnboarding'
 ]
 function applyGlobalUnprotectedTempExceptionsToFeatures (key, baseConfig, globalExceptions) {
     if (!excludedFeaturesFromUnprotectedTempExceptions.includes(key)) {
