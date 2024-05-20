@@ -139,7 +139,7 @@ const excludedFeaturesFromUnprotectedTempExceptions = [
     'privacyPro',
     'sslCertificates',
     'extendedOnboarding',
-    'webMessageListener'
+    'dummyWebMessageListener'
 ]
 function applyGlobalUnprotectedTempExceptionsToFeatures (key, baseConfig, globalExceptions) {
     if (!excludedFeaturesFromUnprotectedTempExceptions.includes(key)) {
