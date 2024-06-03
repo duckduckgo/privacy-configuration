@@ -143,8 +143,7 @@ const excludedFeaturesFromUnprotectedTempExceptions = [
     'pluginPointFocusedViewPlugin',
     'pluginPointNewTabPagePlugin',
     'pluginPointNewTabPageSectionPlugin',
-    'pluginPointNewTabPageShortcutPlugin',
-
+    'pluginPointNewTabPageShortcutPlugin'
 ]
 function applyGlobalUnprotectedTempExceptionsToFeatures (key, baseConfig, globalExceptions) {
     if (!excludedFeaturesFromUnprotectedTempExceptions.includes(key)) {
