@@ -1,18 +1,17 @@
 ---
-name: Breakage Form
-description: Report breakage that requires a config mitigation
+name: Site Breakage Form
+description: Report a website issue on a DuckDuckGo app or browser extension
 title: "Broken Site: "
 body:
   - type: markdown
     attributes:
       value: |
-        Each exception should be documented. Please create an issue using this form before creating a new exception. The exception should then link back to the created issue.
-        Set the title to the domain of the broken site.
+        Thanks for reporting a broken site! Please add the domain you're reporting to the title of this issue above.
   - type: textarea
     id: urls
     attributes:
       label: URLs affected
-      description: Which URLs are affected by this breakage?
+      description: On which URLs are you seeing the problem?
       placeholder: https://example.com/page.html?product=shoes
     validations:
       required: true
@@ -22,16 +21,6 @@ body:
       label: Description of Breakage
       description: What is broken and how it is broken? (Include screenshots if possible)
       placeholder: Page is blank for 5s after loading
-    validations:
-      required: true
-  - type: textarea
-    id: breaking-requests
-    attributes:
-      label: Tracker Requests breaking the site
-      description: Requests that must be unblocked for the site to function
-      placeholder: |
-        1. https://example.com/script.js
-        2. …
     validations:
       required: true
   - type: checkboxes
@@ -45,11 +34,13 @@ body:
         - label: iOS Browser
         - label: macOS Browser
         - label: Windows Browser
+    validations:
+      required: true
   - type: textarea
     id: other
     attributes:
       label: Other Details
-      description: Any other information that may be useful
+      description: Any other information that might help us to investigate and fix your reported site?
   - type: markdown
     attributes:
       value: |
@@ -62,6 +53,9 @@ body:
       options:
         - "Yes"
         - "No"
+        - "I don't know what this means"
+    validations:
+      required: true
   - type: dropdown
     id: verified-on-other-browsers
     attributes:
@@ -70,3 +64,5 @@ body:
       options:
         - "Yes"
         - "No"
+    validations:
+      required: true
