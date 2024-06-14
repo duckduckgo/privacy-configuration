@@ -132,6 +132,8 @@ const excludedFeaturesFromUnprotectedTempExceptions = [
     'windowsPermissionUsage',
     'windowsWaitlist',
     'windowsDownloadLink',
+    'windowsSpellChecker',
+    'windowsStartupBoost',
     'dbp',
     'sync',
     'mediaPlaybackRequiresUserGesture',
@@ -141,6 +143,10 @@ const excludedFeaturesFromUnprotectedTempExceptions = [
     'extendedOnboarding',
     'dummyWebMessageListener',
     'brokenSiteReportExperiment'
+    'pluginPointFocusedViewPlugin',
+    'pluginPointNewTabPagePlugin',
+    'pluginPointNewTabPageSectionPlugin',
+    'pluginPointNewTabPageShortcutPlugin'
 ]
 function applyGlobalUnprotectedTempExceptionsToFeatures (key, baseConfig, globalExceptions) {
     if (!excludedFeaturesFromUnprotectedTempExceptions.includes(key)) {
