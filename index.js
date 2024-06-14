@@ -143,10 +143,6 @@ const excludedFeaturesFromUnprotectedTempExceptions = [
     'extendedOnboarding',
     'dummyWebMessageListener',
     'brokenSiteReportExperiment'
-    'pluginPointFocusedViewPlugin',
-    'pluginPointNewTabPagePlugin',
-    'pluginPointNewTabPageSectionPlugin',
-    'pluginPointNewTabPageShortcutPlugin'
 ]
 function applyGlobalUnprotectedTempExceptionsToFeatures (key, baseConfig, globalExceptions) {
     if (!excludedFeaturesFromUnprotectedTempExceptions.includes(key)) {
