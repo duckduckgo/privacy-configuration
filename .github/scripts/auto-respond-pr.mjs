@@ -1,5 +1,5 @@
-const { Octokit } = require('@octokit/rest')
-const fs = require('fs')
+import { Octokit } from '@octokit/rest'
+import * as fs from 'fs'
 
 const githubToken = process.env.GITHUB_TOKEN
 const repoFullName = process.env.GITHUB_REPOSITORY
