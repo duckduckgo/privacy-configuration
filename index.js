@@ -143,6 +143,7 @@ const excludedFeaturesFromUnprotectedTempExceptions = [
     'sslCertificates',
     'extendedOnboarding',
     'dummyWebMessageListener',
+    'webViewBlobDownload',
     'pluginPointFocusedViewPlugin',
     'pluginPointNewTabPagePlugin',
     'pluginPointNewTabPageSectionPlugin',
