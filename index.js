@@ -148,7 +148,8 @@ const excludedFeaturesFromUnprotectedTempExceptions = [
     'pluginPointNewTabPagePlugin',
     'pluginPointNewTabPageSectionPlugin',
     'pluginPointNewTabPageShortcutPlugin',
-    'brokenSiteReportExperiment'
+    'brokenSiteReportExperiment',
+    'toggleReports'
 ]
 function applyGlobalUnprotectedTempExceptionsToFeatures (key, baseConfig, globalExceptions) {
     if (!excludedFeaturesFromUnprotectedTempExceptions.includes(key)) {
