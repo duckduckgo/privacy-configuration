@@ -135,6 +135,7 @@ const excludedFeaturesFromUnprotectedTempExceptions = [
     'windowsSpellChecker',
     'windowsStartupBoost',
     'windowsPrecisionScroll',
+    'windowsExternalPreviewReleases',
     'dbp',
     'sync',
     'mediaPlaybackRequiresUserGesture',
