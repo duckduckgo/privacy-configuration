@@ -124,7 +124,7 @@ const excludedFeaturesFromUnprotectedTempExceptions = [
     'incontextSignup',
     'incrementalRolloutTest',
     'incrementalRolloutTest2',
-    'mac-pir-database-v3-migration',
+    'macPirDatabaseV3Migration',
     'networkProtection',
     'newTabContinueSetUp',
     'privacyDashboard',
