@@ -151,7 +151,8 @@ const excludedFeaturesFromUnprotectedTempExceptions = [
     'pluginPointNewTabPageShortcutPlugin',
     'brokenSiteReportExperiment',
     'toggleReports',
-    'androidNewStateKillSwitch'
+    'androidNewStateKillSwitch',
+    'autofillBreakageReporter'
 ]
 function applyGlobalUnprotectedTempExceptionsToFeatures (key, baseConfig, globalExceptions) {
     if (!excludedFeaturesFromUnprotectedTempExceptions.includes(key)) {
