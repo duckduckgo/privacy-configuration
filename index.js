@@ -153,6 +153,8 @@ const excludedFeaturesFromUnprotectedTempExceptions = [
     'toggleReports',
     'androidNewStateKillSwitch',
     'autofillBreakageReporter',
+    'syncPromotion',
+    'brokenSitePrompt',
     'webBrokenSiteForm'
 ]
 function applyGlobalUnprotectedTempExceptionsToFeatures (key, baseConfig, globalExceptions) {
