@@ -76,6 +76,9 @@
                             }
                         ]
                     }
+                },
+                "freemium": {
+                    "state": "internal"
                 }
             },
             "minSupportedVersion": "1.70.0"
@@ -91,7 +94,8 @@
                     "state": "enabled"
                 },
                 "autoplay": {
-                    "state": "disabled"
+                    "state": "enabled",
+                    "minSupportedVersion": "1.103.0"
                 },
                 "openInNewTab": {
                     "state": "enabled",
@@ -469,7 +473,12 @@
             "state": "enabled"
         },
         "autoconsent": {
-            "state": "enabled"
+            "state": "enabled",
+            "features": {
+                "filterlistExperiment": {
+                    "state": "disabled"
+                }
+            }
         },
         "navigatorInterface": {
             "state": "enabled"
@@ -686,6 +695,17 @@
         "sync": {
             "state": "enabled",
             "minSupportedVersion": "1.70.0"
+        },
+        "syncPromotion": {
+            "state": "enabled",
+            "features": {
+                "bookmarks": {
+                    "state": "enabled"
+                },
+                "passwords": {
+                    "state": "enabled"
+                }
+            }
         },
         "privacyDashboard": {
             "state": "enabled",

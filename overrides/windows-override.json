@@ -75,6 +75,9 @@
         "navigatorInterface": {
             "state": "enabled"
         },
+        "breakageReporting": {
+            "state": "enabled"
+        },
         "duckPlayer": {
             "state": "enabled",
             "features": {
@@ -82,7 +85,7 @@
                     "state": "enabled"
                 },
                 "autoplay": {
-                    "state": "disabled"
+                    "state": "enabled"
                 },
                 "openInNewTab": {
                     "state": "disabled"
@@ -94,6 +97,18 @@
         },
         "elementHiding": {
             "state": "enabled"
+        },
+        "fingerprintingScreenSize": {
+            "state": "enabled",
+            "minSupportedVersion": "0.88.3"
+        },
+        "fingerprintingHardware": {
+            "state": "enabled",
+            "minSupportedVersion": "0.88.3"
+        },
+        "fingerprintingBattery": {
+            "state": "enabled",
+            "minSupportedVersion": "0.88.3"
         },
         "cookie": {
             "exceptions": [],
@@ -272,11 +287,16 @@
         "windowsExternalPreviewReleases": {
             "state": "disabled",
             "features": {
-                "allowLaunchingPreviewInstaller": {
+                "allowOpenPreviewReleaseHelpPage": {
                     "state": "disabled"
                 }
             }
         }
     },
-    "unprotectedTemporary": []
+    "unprotectedTemporary": [
+        {
+            "domain": "chase.com",
+            "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2248"
+        }
+    ]
 }
