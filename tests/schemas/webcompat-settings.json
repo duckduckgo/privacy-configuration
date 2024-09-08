@@ -58,12 +58,20 @@
         },
         "modifyLocalStorage": {
             "type": "object",
-            "required": {
+            "additionalProperties": false,
+            "required": [
+                "state",
+                "changes"
+            ],
+            "properties": {
                 "state": {
                     "$ref": "#/definitions/state"
                 },
                 "changes": {
-                    "type": "array"
+                    "type": "array",
+                    "items": {
+                        "type": "object"
+                    }
                 }
             }
         },
