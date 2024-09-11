@@ -56,6 +56,9 @@
                 },
                 "unknownUsernameCategorization": {
                     "state": "enabled"
+                },
+                "credentialsImportPromotion": {
+                    "state": "enabled"
                 }
             }
         },
@@ -88,7 +91,7 @@
                     "state": "disabled"
                 },
                 "overlayExperiment": {
-                    "state": "enabled"
+                    "state": "disabled"
                 }
             }
         },
@@ -101,7 +104,17 @@
         },
         "fingerprintingHardware": {
             "state": "enabled",
-            "minSupportedVersion": "0.88.3"
+            "minSupportedVersion": "0.88.3",
+            "exceptions": [
+                {
+                    "domain": "target.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/2225"
+                },
+                {
+                    "domain": "signin.att.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2281"
+                }
+            ]
         },
         "fingerprintingBattery": {
             "state": "enabled",
@@ -288,12 +301,21 @@
                     "state": "disabled"
                 }
             }
+        },
+        "windowsWebviewFailures": {
+            "state": "enabled",
+            "features": {
+                "enableTabUnresponsivePopup": {
+                    "state": "enabled"
+                },
+                "enableOutOfMemoryView": {
+                    "state": "enabled"
+                },
+                "preserveCrashedTabAttributes": {
+                    "state": "enabled"
+                }
+            }
         }
     },
-    "unprotectedTemporary": [
-        {
-            "domain": "chase.com",
-            "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2248"
-        }
-    ]
+    "unprotectedTemporary": []
 }

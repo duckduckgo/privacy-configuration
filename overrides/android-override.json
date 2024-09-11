@@ -4,7 +4,7 @@
             "state": "enabled",
             "features": {
                 "persistExemptions": {
-                    "state": "disabled"
+                    "state": "enabled"
                 }
             }
         },
@@ -252,6 +252,17 @@
         "autofillBreakageReporter": {
             "state": "enabled"
         },
+        "autofillSurveys": {
+            "state": "enabled",
+            "settings": {
+                "surveys": [
+                    {
+                        "id": "2024-09-10",
+                        "url": "https://selfserve.decipherinc.com/survey/selfserve/32ab/240802"
+                    }
+                ]
+            }
+        },
         "androidBrowserConfig": {
             "state": "enabled",
             "features": {
@@ -370,6 +381,23 @@
         "cookie": {
             "state": "enabled",
             "exceptions": []
+        },
+        "duckPlayer": {
+            "state": "internal",
+            "features": {
+                "pip": {
+                    "state": "disabled"
+                },
+                "autoplay": {
+                    "state": "disabled"
+                },
+                "openInNewTab": {
+                    "state": "disabled"
+                },
+                "enableDuckPlayer": {
+                    "state": "internal"
+                }
+            }
         },
         "fingerprintingBattery": {
             "state": "enabled"
@@ -1144,33 +1172,12 @@
                     "state": "enabled"
                 },
                 "noBrowserCtas": {
-                    "state": "disabled",
-                    "targets": [
-                        {
-                            "variantKey": "mo"
-                        }
-                    ]
+                    "state": "disabled"
                 }
             }
         },
         "webViewBlobDownload": {
             "state": "enabled"
-        },
-        "pluginPointFocusedViewPlugin": {
-            "state": "enabled",
-            "features": {
-                "pluginFocusedLegacyPage": {
-                    "state": "enabled"
-                },
-                "pluginFocusedPage": {
-                    "state": "enabled",
-                    "targets": [
-                        {
-                            "variantKey": "mr"
-                        }
-                    ]
-                }
-            }
         },
         "pluginPointNewTabPagePlugin": {
             "state": "enabled",
@@ -1243,24 +1250,14 @@
                 "weight": 0
             },
             {
-                "desc": "Control group for not showing onboarding CTAs experiment",
-                "variantKey": "mp",
-                "weight": 0
-            },
-            {
-                "desc": "Dax dialogs removal during onboarding experimental group",
-                "variantKey": "mo",
-                "weight": 0
-            },
-            {
                 "desc": "Control group for New Tab Page improvements experiment",
                 "variantKey": "mq",
-                "weight": 1
+                "weight": 0
             },
             {
                 "desc": "New Tab Page improvements experimental group",
                 "variantKey": "mr",
-                "weight": 1
+                "weight": 0
             }
         ]
     }

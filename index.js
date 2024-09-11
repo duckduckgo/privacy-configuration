@@ -137,6 +137,7 @@ const excludedFeaturesFromUnprotectedTempExceptions = [
     'windowsStartupBoost',
     'windowsPrecisionScroll',
     'windowsExternalPreviewReleases',
+    'windowsWebviewFailures',
     'dbp',
     'sync',
     'mediaPlaybackRequiresUserGesture',
@@ -156,7 +157,8 @@ const excludedFeaturesFromUnprotectedTempExceptions = [
     'syncPromotion',
     'brokenSitePrompt',
     'backgroundAgentPixelTest',
-    'webBrokenSiteForm'
+    'webBrokenSiteForm',
+    'autofillSurveys'
 ]
 function applyGlobalUnprotectedTempExceptionsToFeatures (key, baseConfig, globalExceptions) {
     if (!excludedFeaturesFromUnprotectedTempExceptions.includes(key)) {
