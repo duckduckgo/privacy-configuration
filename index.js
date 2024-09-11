@@ -155,7 +155,8 @@ const excludedFeaturesFromUnprotectedTempExceptions = [
     'autofillBreakageReporter',
     'syncPromotion',
     'brokenSitePrompt',
-    'backgroundAgentPixelTest'
+    'backgroundAgentPixelTest',
+    'webBrokenSiteForm'
 ]
 function applyGlobalUnprotectedTempExceptionsToFeatures (key, baseConfig, globalExceptions) {
     if (!excludedFeaturesFromUnprotectedTempExceptions.includes(key)) {

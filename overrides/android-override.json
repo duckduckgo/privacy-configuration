@@ -14,7 +14,12 @@
         "clientBrandHint": {
             "state": "enabled",
             "minSupportedVersion": 51852000,
-            "exceptions": [],
+            "exceptions": [
+                {
+                    "domain": "capitalone.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2269"
+                }
+            ],
             "settings": {
                 "domains": []
             }
@@ -162,18 +167,8 @@
                 {
                     "domain": "livescience.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/326"
-                },
-                {
-                    "domain": "instagram.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1856"
                 }
             ],
-            "settings": {
-                "disabledCMPs": [
-                    "generic-cosmetic",
-                    "termsfeed3"
-                ]
-            },
             "features": {
                 "onByDefault": {
                     "state": "enabled",
@@ -217,6 +212,9 @@
                 "canGeneratePasswords": {
                     "state": "enabled"
                 },
+                "canCategorizeUnknownUsername": {
+                    "state": "enabled"
+                },
                 "onByDefault": {
                     "state": "enabled",
                     "rollout": {
@@ -242,6 +240,9 @@
                         "steps": [
                             {
                                 "percent": 10
+                            },
+                            {
+                                "percent": 25
                             }
                         ]
                     }
@@ -694,7 +695,8 @@
                 "presentation": "enabled",
                 "viewportWidth": "enabled",
                 "webShare": "enabled",
-                "screenLock": "enabled"
+                "screenLock": "enabled",
+                "plainTextViewPort": "enabled"
             }
         },
         "windowsWaitlist": {

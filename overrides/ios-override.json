@@ -102,12 +102,7 @@
         },
         "autoconsent": {
             "state": "enabled",
-            "exceptions": [
-                {
-                    "domain": "instagram.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1856"
-                }
-            ],
+            "exceptions": [],
             "features": {
                 "onByDefault": {
                     "state": "enabled",
@@ -151,6 +146,9 @@
                     "state": "enabled",
                     "minSupportedVersion": "7.75.0"
                 },
+                "unknownUsernameCategorization": {
+                    "state": "enabled"
+                },
                 "onByDefault": {
                     "state": "enabled",
                     "minSupportedVersion": "7.93.0",
@@ -174,6 +172,9 @@
                         "steps": [
                             {
                                 "percent": 10
+                            },
+                            {
+                                "percent": 25
                             }
                         ]
                     }
@@ -500,12 +501,27 @@
         },
         "brokenSitePrompt": {
             "state": "enabled"
+        },
+        "sslCertificates": {
+            "state": "enabled",
+            "features": {
+                "allowBypass": {
+                    "state": "enabled"
+                }
+            }
+        },
+        "backgroundAgentPixelTest": {
+            "state": "enabled"
         }
     },
     "unprotectedTemporary": [
         {
             "domain": "instructure.com",
             "reason": "https://github.com/duckduckgo/privacy-configuration/issues/2212"
+        },
+        {
+            "domain": "capitalone.com",
+            "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2269"
         }
     ]
 }
