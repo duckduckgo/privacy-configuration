@@ -8,12 +8,13 @@
     "lint": "eslint .",
     "unit-tests": "mocha ./tests/**/*.js",
     "build": "node index.js",
-    "format": "node format.js"
+    "format": "node format.js",
+    "generate-schema": "ts-json-schema-generator --path 'schema/config.d.ts' --type 'GenericV4Config'"
   },
   "author": "DuckDuckGo",
   "license": "Apache 2.0",
   "devDependencies": {
-    "ajv": "^8.6.3",
+    "ajv": "^8.17.1",
     "chai": "^4.3.4",
     "diff": "^5.1.0",
     "eslint": "^7.32.0",
@@ -21,7 +22,8 @@
     "eslint-plugin-import": "^2.24.2",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^5.1.0",
-    "mocha": "^9.2.2"
+    "mocha": "^9.2.2",
+    "ts-json-schema-generator": "^2.3.0"
   },
   "dependencies": {
     "node-fetch": "^3.2.10",
