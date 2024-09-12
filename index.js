@@ -158,7 +158,8 @@ const excludedFeaturesFromUnprotectedTempExceptions = [
     'syncPromotion',
     'brokenSitePrompt',
     'webBrokenSiteForm',
-    'autofillSurveys'
+    'autofillSurveys',
+    'marketplaceAdPostback'
 ]
 function applyGlobalUnprotectedTempExceptionsToFeatures (key, baseConfig, globalExceptions) {
     if (!excludedFeaturesFromUnprotectedTempExceptions.includes(key)) {
