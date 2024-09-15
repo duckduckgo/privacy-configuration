@@ -117,6 +117,7 @@ const excludedFeaturesFromUnprotectedTempExceptions = [
     'adClickAttribution',
     'appTrackerProtection',
     'autofill',
+    'bookmarks',
     'androidBrowserConfig',
     'clientBrandHint',
     'customUserAgent',
@@ -158,7 +159,8 @@ const excludedFeaturesFromUnprotectedTempExceptions = [
     'brokenSitePrompt',
     'backgroundAgentPixelTest',
     'webBrokenSiteForm',
-    'autofillSurveys'
+    'autofillSurveys',
+    'marketplaceAdPostback'
 ]
 function applyGlobalUnprotectedTempExceptionsToFeatures (key, baseConfig, globalExceptions) {
     if (!excludedFeaturesFromUnprotectedTempExceptions.includes(key)) {
