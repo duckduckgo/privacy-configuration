@@ -1,4 +1,8 @@
 <!-- 
+  ⚠️ ⚠️ IF YOU ARE MODIFYING `index.js` OR A FILE IN `features` ⚠️ ⚠️
+  Please request a review and ping a DRI from the Config AOR or Breakage AOR
+  These people can be easily reached in the ~Breakage channel in MatterMost
+
   PLEASE NOTE: Many people are automatically added as reviewers by default.
   Consider setting your PR as a draft unless you know you are ready for a review.
   Use the "merge when ready" label to help reviewers know to merge your PR as soon
