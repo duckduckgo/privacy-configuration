@@ -160,7 +160,8 @@ const excludedFeaturesFromUnprotectedTempExceptions = [
     'backgroundAgentPixelTest',
     'webBrokenSiteForm',
     'autofillSurveys',
-    'marketplaceAdPostback'
+    'marketplaceAdPostback',
+    'autocompleteTabs'
 ]
 function applyGlobalUnprotectedTempExceptionsToFeatures (key, baseConfig, globalExceptions) {
     if (!excludedFeaturesFromUnprotectedTempExceptions.includes(key)) {
