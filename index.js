@@ -157,6 +157,7 @@ const excludedFeaturesFromUnprotectedTempExceptions = [
     'autofillBreakageReporter',
     'syncPromotion',
     'brokenSitePrompt',
+    'backgroundAgentPixelTest',
     'webBrokenSiteForm',
     'autofillSurveys',
     'marketplaceAdPostback'
