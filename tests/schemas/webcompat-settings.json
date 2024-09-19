@@ -70,7 +70,20 @@
                 "changes": {
                     "type": "array",
                     "items": {
-                        "type": "object"
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                            "key",
+                            "action"
+                        ],
+                        "properties": {
+                            "key": {
+                                "type": "string"
+                            },
+                            "action": {
+                                "type": "string"
+                            }
+                        }
                     }
                 }
             }
