@@ -162,7 +162,8 @@ const excludedFeaturesFromUnprotectedTempExceptions = [
     'autofillSurveys',
     'marketplaceAdPostback',
     'autocompleteTabs',
-    'loadingBarExp'
+    'loadingBarExp',
+    'changeOmnibarPosition'
 ]
 function applyGlobalUnprotectedTempExceptionsToFeatures (key, baseConfig, globalExceptions) {
     if (!excludedFeaturesFromUnprotectedTempExceptions.includes(key)) {
