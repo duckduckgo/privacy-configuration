@@ -56,6 +56,38 @@
                 }
             }
         },
+        "modifyLocalStorage": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "state",
+                "changes"
+            ],
+            "properties": {
+                "state": {
+                    "$ref": "#/definitions/state"
+                },
+                "changes": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                            "key",
+                            "action"
+                        ],
+                        "properties": {
+                            "key": {
+                                "type": "string"
+                            },
+                            "action": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "notification": {
             "type": "object",
             "required": [

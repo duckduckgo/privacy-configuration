@@ -638,6 +638,32 @@
                                 }
                             }
                         ]
+                    },
+                    {
+                        "domain": "msn.com",
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/modifyLocalStorage/changes/-",
+                                "value": {
+                                    "key": "continuousReadingOnAppState",
+                                    "action": "delete"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "privacy-test-pages.site",
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/modifyLocalStorage/changes/-",
+                                "value": {
+                                    "key": "keyToBeDeleted",
+                                    "action": "delete"
+                                }
+                            }
+                        ]
                     }
                 ],
                 "notification": {
@@ -732,7 +758,11 @@
                 "viewportWidth": "enabled",
                 "webShare": "enabled",
                 "screenLock": "enabled",
-                "plainTextViewPort": "enabled"
+                "plainTextViewPort": "enabled",
+                "modifyLocalStorage": {
+                    "state": "enabled",
+                    "changes": []
+                }
             }
         },
         "windowsWaitlist": {
