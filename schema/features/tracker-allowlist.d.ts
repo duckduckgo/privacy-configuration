@@ -7,7 +7,7 @@ type AllowlistRule = {
 
 type TrackerAllowlist = {
     allowlistedTrackers: {
-        [key: string]: {
+        [domain: string]: {
             rules: AllowlistRule[]
         }
     }
