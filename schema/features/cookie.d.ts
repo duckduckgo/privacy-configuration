@@ -1,4 +1,4 @@
-import { Feature, FeatureState, SiteException } from "./feature";
+import { Feature, FeatureState, SiteException } from "../feature";
 
 type CookieSettings = {
   trackerCookie: FeatureState;
