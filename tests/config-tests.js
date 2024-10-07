@@ -2,6 +2,7 @@ const expect = require('chai').expect
 const Ajv = require('ajv').default
 const ajv = new Ajv()
 const fs = require('fs')
+const createGenerator = require('ts-json-schema-generator').createGenerator
 const platforms = require('./../platforms').map(item => item.replace('browsers/', 'extension-'))
 
 function formatErrors (errors) {
@@ -10,6 +11,10 @@ function formatErrors (errors) {
     }
 
     return errors.map(item => `${item.instancePath}: ${item.message}`).join(', ')
+}
+
+const platformSpecificSchemas = {
+    'v4/android-config.json': 'AndroidV4Config'
 }
 
 // Test the latest 2 versions of each platform
@@ -36,6 +41,10 @@ describe('Config schema tests', () => {
     const validateException = ajv.compile(exceptionSchema)
     const exceptionSchemav4 = JSON.parse(fs.readFileSync('./tests/schemas/exception-v4.json'))
     const validateExceptionv4 = ajv.compile(exceptionSchemav4)
+
+    const fullSchemaGenerator = createGenerator({
+        path: './schema/config.d.ts'
+    })
 
     for (const config of latestConfigs) {
         describe(`${config.name}`, () => {
@@ -65,6 +74,12 @@ describe('Config schema tests', () => {
             const shouldContainAppTP = (config.name.split('/')[1] === 'android-config.json')
             it('should contain appTrackerProtection or not', () => {
                 expect('appTrackerProtection' in config.body.features).to.be.equal(shouldContainAppTP, `appTrackerProtection expected: ${shouldContainAppTP}`)
+            })
+
+            it('should validate against the full configV4 schema', () => {
+                const schema = fullSchemaGenerator.createSchema(platformSpecificSchemas[config.name] || 'GenericV4Config')
+                const validate = ajv.compile(schema)
+                expect(validate(config.body)).to.be.equal(true, formatErrors(validate.errors))
             })
         })
     }

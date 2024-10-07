@@ -32,3 +32,5 @@ export type Feature<SettingsType, VersionType> = {
     hash: string;
     minSupportedVersion?: VersionType;
 }
+
+export type GenericFeature = Feature<any, string | number>;
