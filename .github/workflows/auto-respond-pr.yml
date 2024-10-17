@@ -32,7 +32,6 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm install @octokit/rest
           npm install diff
 
       - name: Run build script on base branch
@@ -55,7 +54,38 @@ jobs:
       - name: Create diff of file outputs
         run: node pr/.github/scripts/diff-directories.js base/generated pr/generated > diff_output.txt
 
-      - name: Run auto response script
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: node pr/.github/scripts/auto-respond-pr.mjs
+      - name: Find Previous Comment
+        uses: peter-evans/find-comment@v3
+        id: find_comment
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: 'Generated file outputs'
+          direction: last
+
+      - name: Create Comment Body
+        uses: actions/github-script@v7
+        id: create_body
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const prNumber = context.issue.number;
+            const diffOutput = fs.readFileSync('diff_output.txt', 'utf8');
+            let commentBody = `
+            ### Generated file outputs:
+            *Time updated:* ${new Date().toUTCString()}
+            ${diffOutput}
+            `
+            if (commentBody.length > 65536) {
+                commentBody = '❌ Generated diff output is too large to post as a comment, run locally to see the diff and validate'
+            }
+            core.setOutput('comment_body', commentBody);
+
+      - name: Create, or Update the Comment
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-id: ${{ steps.find_comment.outputs.comment-id }}
+          body: ${{ steps.create_body.outputs.comment_body }}
+          edit-mode: replace
