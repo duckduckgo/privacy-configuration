@@ -4,9 +4,14 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+    open-pull-requests-limit: 20
     target-branch: "main"
     labels:
       - "dependencies"
+    groups:
+      build:
+        patterns:
+          - "eslint*"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
