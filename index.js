@@ -49,7 +49,8 @@ function writeConfigToDisk (platform, config) {
     // Write config and convert to backwards compatible versions
     let prevConfig = null
     const unmodifiedConfig = JSON.parse(JSON.stringify(config))
-    for (let i = CURRENT_CONFIG_VERSION; i > 0; i--) {
+    const MIN_SUPPORTED_VERSION = 2
+    for (let i = CURRENT_CONFIG_VERSION; i > MIN_SUPPORTED_VERSION; i--) {
         const version = `v${i}`
         mkdirIfNeeded(`${GENERATED_DIR}/${version}`)
 
@@ -283,33 +284,7 @@ async function buildPlatforms () {
 }
 
 buildPlatforms().then((platformConfigs) => {
-    // Generate legacy formats
+    // Generate legacy Safari format
     const legacyTextDomains = [...unprotectedDomains].join('\n')
     fs.writeFileSync(`${GENERATED_DIR}/trackers-unprotected-temporary.txt`, legacyTextDomains)
-    fs.writeFileSync(`${GENERATED_DIR}/trackers-whitelist-temporary.txt`, legacyTextDomains)
-    const legacyNaming = {
-        fingerprintingCanvas: 'canvas',
-        trackingCookies3p: 'cookie',
-        fingerprintingAudio: 'audio',
-        fingerprintingTemporaryStorage: 'temporary-storage',
-        referrer: 'referrer',
-        fingerprintingBattery: 'battery',
-        fingerprintingScreenSize: 'screen-size',
-        fingerprintingHardware: 'hardware',
-        googleRejected: 'floc',
-        gpc: 'gpc',
-        autofill: 'autofill'
-    }
-    const protections = {}
-    for (const key in legacyNaming) {
-        const feature = platformConfigs.extension.features[key]
-        const legacyConfig = {
-            enabled: feature.state === 'enabled',
-            sites: feature.exceptions.map((obj) => obj.domain),
-            scripts: []
-        }
-        protections[legacyNaming[key]] = legacyConfig
-    }
-    fs.writeFileSync(`${GENERATED_DIR}/protections.json`, JSON.stringify(protections, null, 4))
-    fs.writeFileSync(`${GENERATED_DIR}/fingerprinting.json`, JSON.stringify(protections, null, 4))
 })
