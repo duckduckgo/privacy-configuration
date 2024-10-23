@@ -29,7 +29,7 @@ jobs:
         SOURCE_DIR: 'generated' 
         DEST_DIR: 'trackerblocking/config'
     - name: Set version variable
-      run: echo "VERSION=$(jq -r .version ./generated/v2/extension-config.json)" >> $GITHUB_ENV
+      run: echo "VERSION=$(jq -r .version ./generated/v4/extension-config.json)" >> $GITHUB_ENV
     - name: Generate release description file
       uses: ./scripts/
     - name: Archive Release
