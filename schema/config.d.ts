@@ -2,6 +2,7 @@ import { Feature, SiteException } from "./feature";
 import { AutoconsentFeature } from "./features/autoconsent";
 import { CookieFeature } from "./features/cookie";
 import { TrackerAllowlistFeature } from "./features/tracker-allowlist";
+import { WebCompatFeature } from "./features/webcompat";
 
 /**
  * Defines the structure of the built V4 config output as downloaded by clients.
@@ -14,6 +15,7 @@ export type ConfigV4<VersionType> = {
         autoconsent: AutoconsentFeature<VersionType>
         cookie: CookieFeature<VersionType>
         trackerAllowlist: TrackerAllowlistFeature<VersionType>
+        webCompat: WebCompatFeature<VersionType>
     },
     unprotectedTemporary: SiteException[],
 
