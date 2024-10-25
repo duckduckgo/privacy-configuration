@@ -150,8 +150,7 @@ const featuresToIncludeTempUnprotectedExceptions = [
     'trackingParameters',
     'unprotectedTemporary',
     'userAgentRotation',
-    'webCompat',
-    'contextualOnboarding'
+    'webCompat'
 ]
 function applyGlobalUnprotectedTempExceptionsToFeatures (key, baseConfig, globalExceptions) {
     if (featuresToIncludeTempUnprotectedExceptions.includes(key)) {
