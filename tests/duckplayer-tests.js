@@ -7,8 +7,8 @@ describe('Duck Player Settings Tests', () => {
     const rootSchema = JSON.parse(fs.readFileSync('./tests/schemas/duckplayer-settings.json', 'utf8'))
     const validateRoot = ajv.compile(rootSchema)
 
-    it('validates the duckplayer settings in `./generated/v2/macos-config.json`', () => {
-        const macosConfig = JSON.parse(fs.readFileSync('./generated/v2/macos-config.json', 'utf8'))
+    it('validates the duckplayer settings in `./generated/v4/macos-config.json`', () => {
+        const macosConfig = JSON.parse(fs.readFileSync('./generated/v4/macos-config.json', 'utf8'))
         const actual = validateRoot(macosConfig.features.duckPlayer.settings)
         if (validateRoot.errors) {
             for (const error of validateRoot.errors) {
@@ -17,8 +17,8 @@ describe('Duck Player Settings Tests', () => {
         }
         expect(actual).to.be.equal(true)
     })
-    it('validates the duckplayer settings in `./generated/v2/windows-config.json`', () => {
-        const windowsConfig = JSON.parse(fs.readFileSync('./generated/v2/windows-config.json', 'utf8'))
+    it('validates the duckplayer settings in `./generated/v4/windows-config.json`', () => {
+        const windowsConfig = JSON.parse(fs.readFileSync('./generated/v4/windows-config.json', 'utf8'))
         const actual = validateRoot(windowsConfig.features.duckPlayer.settings)
         if (validateRoot.errors) {
             for (const error of validateRoot.errors) {
