@@ -151,7 +151,8 @@ const featuresToIncludeTempUnprotectedExceptions = [
     'unprotectedTemporary',
     'userAgentRotation',
     'webCompat',
-    'swipingTabs'
+    'swipingTabs',
+    'showOnAppLaunch'
 ]
 function applyGlobalUnprotectedTempExceptionsToFeatures (key, baseConfig, globalExceptions) {
     if (featuresToIncludeTempUnprotectedExceptions.includes(key)) {
