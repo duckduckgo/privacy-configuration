@@ -1,16 +1,16 @@
-import { Feature } from "../feature";
+import { Feature } from '../feature';
 
 type AllowlistRule = {
-    rule: string
-    domains: string[]
-}
+    rule: string;
+    domains: string[];
+};
 
 type TrackerAllowlist = {
     allowlistedTrackers: {
         [domain: string]: {
-            rules: AllowlistRule[]
-        }
-    }
-}
+            rules: AllowlistRule[];
+        };
+    };
+};
 
 export type TrackerAllowlistFeature<VersionType> = Feature<TrackerAllowlist, VersionType>;

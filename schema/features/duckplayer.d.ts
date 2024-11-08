@@ -1,10 +1,10 @@
-import { Feature } from "../feature";
-import { Operation } from "../json-patch";
+import { Feature } from '../feature';
+import { Operation } from '../json-patch';
 
-type State = 'enabled' | 'disabled'
+type State = 'enabled' | 'disabled';
 type StateObject = {
-    state: State
-}
+    state: State;
+};
 export type DuckPlayerSettings = {
     tryDuckPlayerLink: string;
     duckPlayerDisabledHelpPageLink: string | null;
@@ -16,7 +16,7 @@ export type DuckPlayerSettings = {
     youTubeVideoIDQueryParam: string;
     overlays: {
         youtube: {
-            state: State
+            state: State;
             selectors: {
                 thumbLink: string;
                 excludedRegions: string[];
@@ -34,8 +34,8 @@ export type DuckPlayerSettings = {
     };
     domains: {
         domain: string;
-        patchSettings: Operation<string>[]
-    }[]
+        patchSettings: Operation<string>[];
+    }[];
 };
 
 export type DuckPlayerFeature<VersionType> = Feature<DuckPlayerSettings, VersionType>;

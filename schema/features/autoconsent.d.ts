@@ -1,9 +1,14 @@
-import { Feature } from "../feature";
+import { Feature } from '../feature';
 
-export type AutoconsentFeature<VersionType> = Feature<{
-    disabledCMPs: string[] | undefined;
-    enableIfMainWorldIsSupported: {
-        state: 'enabled' | 'disabled';
-        minSupportedVersion: VersionType;
-    } | undefined
-}, VersionType>;
+export type AutoconsentFeature<VersionType> = Feature<
+    {
+        disabledCMPs: string[] | undefined;
+        enableIfMainWorldIsSupported:
+            | {
+                  state: 'enabled' | 'disabled';
+                  minSupportedVersion: VersionType;
+              }
+            | undefined;
+    },
+    VersionType
+>;
