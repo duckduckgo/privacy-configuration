@@ -37,6 +37,9 @@ export type AndroidV4Config = ConfigV4<number> & {
             desc: string;
             variantKey: string;
             weight: number;
+            filters?: {
+                privacyProEligible?: boolean;
+            }
         }[]
     }
 }
