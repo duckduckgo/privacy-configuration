@@ -33,43 +33,12 @@ const previousConfigs = platforms.map((plat) => {
 })
 
 describe('Config schema tests', () => {
-    const rootSchema = JSON.parse(fs.readFileSync('./tests/schemas/root.json'))
-    const validateRoot = ajv.compile(rootSchema)
-    const featureSchema = JSON.parse(fs.readFileSync('./tests/schemas/feature.json'))
-    const validateFeature = ajv.compile(featureSchema)
-    const exceptionSchema = JSON.parse(fs.readFileSync('./tests/schemas/exception.json'))
-    const validateException = ajv.compile(exceptionSchema)
-    const exceptionSchemav4 = JSON.parse(fs.readFileSync('./tests/schemas/exception-v4.json'))
-    const validateExceptionv4 = ajv.compile(exceptionSchemav4)
-
     const fullSchemaGenerator = createGenerator({
         path: './schema/config.d.ts'
     })
 
     for (const config of latestConfigs) {
         describe(`${config.name}`, () => {
-            it('should have a valid root schema', () => {
-                expect(validateRoot(config.body)).to.be.equal(true, formatErrors(validateRoot.errors))
-            })
-
-            it('should have a vaild feature schema', () => {
-                for (const featureKey in config.body.features) {
-                    expect(validateFeature(config.body.features[featureKey])).to.be.equal(true, `Feature ${featureKey}: ` + formatErrors(validateFeature.errors))
-                }
-            })
-
-            it('should have valid exception lists', () => {
-                for (const featureKey in config.body.features) {
-                    for (const exception of config.body.features[featureKey].exceptions) {
-                        expect(validateExceptionv4(exception)).to.be.equal(true, `Feature ${featureKey}: ` + formatErrors(validateException.errors))
-                    }
-                }
-
-                for (const exception of config.body.unprotectedTemporary) {
-                    expect(validateExceptionv4(exception)).to.be.equal(true, 'unprotectedTemporary: ' + formatErrors(validateException.errors))
-                }
-            })
-
             // appTrackerProtection should only be on the Android config since it is a large feature
             const shouldContainAppTP = (config.name.split('/')[1] === 'android-config.json')
             it('should contain appTrackerProtection or not', () => {
@@ -86,32 +55,16 @@ describe('Config schema tests', () => {
 
     for (const config of previousConfigs) {
         describe(`${config.name}`, () => {
-            it('should have a valid root schema', () => {
-                expect(validateRoot(config.body)).to.be.equal(true, formatErrors(validateRoot.errors))
-            })
-
-            it('should have a vaild feature schema', () => {
-                for (const featureKey in config.body.features) {
-                    expect(validateFeature(config.body.features[featureKey])).to.be.equal(true, `Feature ${featureKey}: ` + formatErrors(validateFeature.errors))
-                }
-            })
-
-            it('should have valid exception lists', () => {
-                for (const featureKey in config.body.features) {
-                    for (const exception of config.body.features[featureKey].exceptions) {
-                        expect(validateException(exception)).to.be.equal(true, `Feature ${featureKey}: ` + formatErrors(validateException.errors))
-                    }
-                }
-
-                for (const exception of config.body.unprotectedTemporary) {
-                    expect(validateException(exception)).to.be.equal(true, 'unprotectedTemporary: ' + formatErrors(validateException.errors))
-                }
-            })
-
             // appTrackerProtection should only be on the Android config since it is a large feature
             const shouldContainAppTP = (config.name.split('/')[1] === 'android-config.json')
             it('should contain appTrackerProtection or not', () => {
                 expect('appTrackerProtection' in config.body.features).to.be.equal(shouldContainAppTP, `appTrackerProtection expected: ${shouldContainAppTP}`)
+            })
+
+            it('should validate against the full configLegacy schema', () => {
+                const schema = fullSchemaGenerator.createSchema(platformSpecificSchemas[config.name] || 'GenericV4Config')
+                const validate = ajv.compile(schema)
+                expect(validate(config.body)).to.be.equal(true, formatErrors(validate.errors))
             })
         })
     }
