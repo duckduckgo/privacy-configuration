@@ -1,11 +1,5 @@
 import { Feature } from "../feature";
-
-type Operation = {
-    op: 'add' | 'remove' | 'replace' | 'move' | 'copy' | 'test'
-    from?: string
-    path: string
-    value: any
-}
+import { Operation } from "../json-patch";
 
 type StateToggle = 'enabled' | 'disabled'
 type FullWebCompatOptions = {
@@ -40,7 +34,7 @@ type FullWebCompatOptions = {
     plainTextViewPort: StateToggle;
     domains: {
         domain: string | string[];
-        patchSettings: Operation[];
+        patchSettings: Operation<any>[];
     }[],
     modifyLocalStorage: {
         state: StateToggle,

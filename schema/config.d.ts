@@ -3,11 +3,15 @@ import { AutoconsentFeature } from "./features/autoconsent";
 import { CookieFeature } from "./features/cookie";
 import { TrackerAllowlistFeature } from "./features/tracker-allowlist";
 import { WebCompatFeature } from "./features/webcompat";
+import { DuckPlayerFeature } from "./features/duckplayer";
+
 export { WebCompatSettings } from  "./features/webcompat";
+export { DuckPlayerSettings } from './features/duckplayer';
 
 export type SupportedSchemas = 'GenericV4Config' |
     'AndroidV4Config' |
-    'WebCompatSettings'
+    'WebCompatSettings' |
+    'DuckPlayerSettings'
 
 /**
  * Defines the structure of the built V4 config output as downloaded by clients.
@@ -19,6 +23,7 @@ export type ConfigV4<VersionType> = {
         // These features have typed settings
         autoconsent: AutoconsentFeature<VersionType>
         cookie: CookieFeature<VersionType>
+        duckPlayer: DuckPlayerFeature<VersionType>
         trackerAllowlist: TrackerAllowlistFeature<VersionType>
         webCompat: WebCompatFeature<VersionType>
     },
