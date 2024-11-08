@@ -36,7 +36,7 @@ type FullWebCompatOptions = {
     plainTextViewPort: StateToggle;
     domains: {
         domain: string | string[];
-        patchSettings: Operation<any>[];
+        patchSettings: Operation<string | object | number>[];
     }[];
     modifyLocalStorage: {
         state: StateToggle;
