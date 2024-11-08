@@ -1,22 +1,29 @@
 const Ajv = require('ajv').default
 const ajv = new Ajv()
-const createGenerator = require('ts-json-schema-generator').createGenerator
+const schemaGenerator = require('ts-json-schema-generator')
 
-const fullSchemaGenerator = createGenerator({
-    path: './schema/config.d.ts'
-})
+function createGenerator () {
+    try {
+        return schemaGenerator.createGenerator({
+            path: './schema/config.d.ts'
+        })
+    } catch (e) {
+        console.error(e.diagnostic)
+        throw e
+    }
+}
 
 /**
  * Generate the JSONSchema for the named TS type
- * @param {import('../schema/config').SupportedSchemas} schemaName
+ * @param {import('../schema/config').ExportedSchemas} schemaName
  */
 function getSchema (schemaName) {
-    return fullSchemaGenerator.createSchema(schemaName)
+    return createGenerator().createSchema(schemaName)
 }
 
 /**
  * Generate a validator for checking JSON objects against the named TS type
- * @param {import('../schema/config').SupportedSchemas} schemaName
+ * @param {import('../schema/config').ExportedSchemas} schemaName
  */
 function createValidator (schemaName) {
     return ajv.compile(getSchema(schemaName))

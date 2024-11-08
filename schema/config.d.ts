@@ -8,7 +8,7 @@ import { DuckPlayerFeature } from "./features/duckplayer";
 export { WebCompatSettings } from  "./features/webcompat";
 export { DuckPlayerSettings } from './features/duckplayer';
 
-export type SupportedSchemas = 'GenericV4Config' |
+export type ExportedSchemas = 'GenericV4Config' |
     'AndroidV4Config' |
     'WebCompatSettings' |
     'DuckPlayerSettings'

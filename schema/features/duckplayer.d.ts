@@ -6,6 +6,14 @@ type StateObject = {
     state: State
 }
 export type DuckPlayerSettings = {
+    tryDuckPlayerLink: string;
+    duckPlayerDisabledHelpPageLink: string | null;
+    youtubePath: string;
+    youtubeEmbedUrl: string;
+    youTubeUrl: string;
+    youTubeReferrerHeaders: string[];
+    youTubeReferrerQueryParams: string[];
+    youTubeVideoIDQueryParam: string;
     overlays: {
         youtube: {
             state: State
@@ -16,7 +24,7 @@ export type DuckPlayerSettings = {
                 clickExcluded: string[];
                 allowedEventTargets: string[];
                 videoElement: string;
-                videoElementContainer: string[]
+                videoElementContainer: string;
             };
             thumbnailOverlays: StateObject;
             clickInterception: StateObject;
@@ -26,7 +34,7 @@ export type DuckPlayerSettings = {
     };
     domains: {
         domain: string;
-        patchSettings: Operation<string>
+        patchSettings: Operation<string>[]
     }[]
 };
 
