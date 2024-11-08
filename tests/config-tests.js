@@ -36,6 +36,13 @@ describe('Config schema tests', () => {
                 const validate = createValidator(platformSpecificSchemas[config.name] || 'GenericV4Config')
                 expect(validate(config.body)).to.be.equal(true, formatErrors(validate.errors))
             })
+
+            it('all features should be named correctly', () => {
+                const featureNameRegex = /^[a-zA-Z0-9]+$/
+                for (const featureName of Object.keys(config.body.features)) {
+                    expect(featureName).to.match(featureNameRegex)
+                }
+            })
         })
     }
 
