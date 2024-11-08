@@ -4,7 +4,8 @@ const { createValidator, formatErrors } = require('./schema-validation')
 const platforms = require('./../platforms').map(item => item.replace('browsers/', 'extension-'))
 
 const platformSpecificSchemas = {
-    'v4/android-config.json': 'AndroidV4Config'
+    'v4/android-config.json': 'AndroidV4Config',
+    'v3/android-config.json': 'LegacyAndroidConfig'
 }
 
 // Test the latest 2 versions of each platform
@@ -46,8 +47,8 @@ describe('Config schema tests', () => {
                 expect('appTrackerProtection' in config.body.features).to.be.equal(shouldContainAppTP, `appTrackerProtection expected: ${shouldContainAppTP}`)
             })
 
-            it('should validate against the full configLegacy schema', () => {
-                const validate = createValidator(platformSpecificSchemas[config.name] || 'GenericV4Config')
+            it('should validate against the legacy schema', () => {
+                const validate = createValidator(platformSpecificSchemas[config.name] || 'LegacyConfig')
                 expect(validate(config.body)).to.be.equal(true, formatErrors(validate.errors))
             })
         })

@@ -8,7 +8,13 @@ import { DuckPlayerFeature } from './features/duckplayer';
 export { WebCompatSettings } from './features/webcompat';
 export { DuckPlayerSettings } from './features/duckplayer';
 
-export type ExportedSchemas = 'GenericV4Config' | 'AndroidV4Config' | 'WebCompatSettings' | 'DuckPlayerSettings';
+export type ExportedSchemas =
+    | 'GenericV4Config'
+    | 'AndroidV4Config'
+    | 'LegacyConfig'
+    | 'LegacyAndroidConfig'
+    | 'WebCompatSettings'
+    | 'DuckPlayerSettings';
 
 /**
  * Defines the structure of the built V4 config output as downloaded by clients.
@@ -50,3 +56,6 @@ export type AndroidV4Config = ConfigV4<number> & {
  *  - Use string version numbers for minSupportedVersion
  */
 export type GenericV4Config = ConfigV4<string>;
+
+export type LegacyConfig = GenericV4Config;
+export type LegacyAndroidConfig = AndroidV4Config;
