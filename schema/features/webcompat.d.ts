@@ -4,11 +4,11 @@ type Operation = {
     op: 'add' | 'remove' | 'replace' | 'move' | 'copy' | 'test'
     from?: string
     path: string
-    value: string
+    value: any
 }
 
 type StateToggle = 'enabled' | 'disabled'
-export type WebCompatSettings = {
+type FullWebCompatOptions = {
     windowSizing: StateToggle;
     navigatorCredentials: StateToggle;
     safariObject: StateToggle;
@@ -25,6 +25,7 @@ export type WebCompatSettings = {
     }
     permissions: {
         state: StateToggle;
+        validPermissionNames: string[];
         supportedPermissions: object;
     }
     mediaSession: StateToggle;
@@ -40,7 +41,12 @@ export type WebCompatSettings = {
     domains: {
         domain: string | string[];
         patchSettings: Operation[];
-    }[]
+    }[],
+    modifyLocalStorage: {
+        state: StateToggle,
+        changes: any[]
+    }
 }
+export type WebCompatSettings = Partial<FullWebCompatOptions>
 
-export type WebCompatFeature<VersionType> = Feature<Partial<WebCompatSettings>, VersionType>;
+export type WebCompatFeature<VersionType> = Feature<WebCompatSettings, VersionType>;
