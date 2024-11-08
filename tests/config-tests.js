@@ -1,17 +1,7 @@
 const expect = require('chai').expect
-const Ajv = require('ajv').default
-const ajv = new Ajv()
 const fs = require('fs')
-const createGenerator = require('ts-json-schema-generator').createGenerator
+const { createValidator, formatErrors } = require('./schema-validation')
 const platforms = require('./../platforms').map(item => item.replace('browsers/', 'extension-'))
-
-function formatErrors (errors) {
-    if (!Array.isArray(errors)) {
-        return ''
-    }
-
-    return errors.map(item => `${item.instancePath}: ${item.message}`).join(', ')
-}
 
 const platformSpecificSchemas = {
     'v4/android-config.json': 'AndroidV4Config'
@@ -33,10 +23,6 @@ const previousConfigs = platforms.map((plat) => {
 })
 
 describe('Config schema tests', () => {
-    const fullSchemaGenerator = createGenerator({
-        path: './schema/config.d.ts'
-    })
-
     for (const config of latestConfigs) {
         describe(`${config.name}`, () => {
             // appTrackerProtection should only be on the Android config since it is a large feature
@@ -46,8 +32,7 @@ describe('Config schema tests', () => {
             })
 
             it('should validate against the full configV4 schema', () => {
-                const schema = fullSchemaGenerator.createSchema(platformSpecificSchemas[config.name] || 'GenericV4Config')
-                const validate = ajv.compile(schema)
+                const validate = createValidator(platformSpecificSchemas[config.name] || 'GenericV4Config')
                 expect(validate(config.body)).to.be.equal(true, formatErrors(validate.errors))
             })
         })
@@ -62,8 +47,7 @@ describe('Config schema tests', () => {
             })
 
             it('should validate against the full configLegacy schema', () => {
-                const schema = fullSchemaGenerator.createSchema(platformSpecificSchemas[config.name] || 'GenericV4Config')
-                const validate = ajv.compile(schema)
+                const validate = createValidator(platformSpecificSchemas[config.name] || 'GenericV4Config')
                 expect(validate(config.body)).to.be.equal(true, formatErrors(validate.errors))
             })
         })

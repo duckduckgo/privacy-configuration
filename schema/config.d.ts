@@ -3,6 +3,11 @@ import { AutoconsentFeature } from "./features/autoconsent";
 import { CookieFeature } from "./features/cookie";
 import { TrackerAllowlistFeature } from "./features/tracker-allowlist";
 import { WebCompatFeature } from "./features/webcompat";
+export { WebCompatSettings } from  "./features/webcompat";
+
+export type SupportedSchemas = 'GenericV4Config' |
+    'AndroidV4Config' |
+    'WebCompatSettings'
 
 /**
  * Defines the structure of the built V4 config output as downloaded by clients.
@@ -41,3 +46,4 @@ export type AndroidV4Config = ConfigV4<number> & {
  *  - Use string version numbers for minSupportedVersion
  */
 export type GenericV4Config = ConfigV4<string>;
+
