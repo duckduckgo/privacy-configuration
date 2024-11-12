@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "npm run lint && npm run build && npm run unit-tests",
-    "lint": "eslint .",
+    "lint": "eslint . && prettier . --check",
     "unit-tests": "mocha ./tests/**/*.js",
     "build": "node index.js",
     "format": "node format.js"
