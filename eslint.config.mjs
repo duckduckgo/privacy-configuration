@@ -1,5 +1,5 @@
-import globals from "globals";
-import ddgConfig from '@duckduckgo/eslint-config'
+import globals from 'globals';
+import ddgConfig from '@duckduckgo/eslint-config';
 
 export default [
     ...ddgConfig,
@@ -11,6 +11,6 @@ export default [
                 ...globals.jasmine,
                 ...globals.node,
             },
-        }
-    }
+        },
+    },
 ];

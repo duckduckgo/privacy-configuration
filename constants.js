@@ -3,5 +3,5 @@ module.exports = {
     OVERRIDE_DIR: 'overrides',
     GENERATED_DIR: 'generated',
     LISTS_DIR: 'features',
-    BROWSERS_SUBDIR: 'browsers/'
-}
+    BROWSERS_SUBDIR: 'browsers/',
+};
