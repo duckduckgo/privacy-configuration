@@ -22,6 +22,8 @@ type SubFeature<VersionType> = {
     };
     targets?: {
         variantKey?: string;
+        localeCountry?: string;
+        localeLanguage?: string;
     }[];
     cohorts?: Cohort[];
     minSupportedVersion?: VersionType;
