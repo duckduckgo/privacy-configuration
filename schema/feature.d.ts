@@ -5,7 +5,7 @@ export type SiteException = {
 
 export type Cohort = {
     name: string;
-    weight: integer;
+    weight: number;
 };
 
 export type FeatureState = 'enabled' | 'disabled' | 'internal';
