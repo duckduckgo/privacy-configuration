@@ -23,7 +23,7 @@ jobs:
               with:
                   node-version: 20.x
             - name: Install dependencies
-              run: npm install
+              run: npm ci
             - uses: ./
             - name: Run tests
               run: npm run test
@@ -35,9 +35,7 @@ jobs:
               uses: actions/setup-node@v4
               with:
                   node-version: 20.x
+            - name: Install dependencies
+              run: npm ci
             - name: Lint JSON
-              run: npm run format
-            - name: Check diff
-              run: |
-                  git update-index --refresh
-                  git diff-index --quiet HEAD --
+              run: npm run lint
