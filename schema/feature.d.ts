@@ -12,6 +12,7 @@ type FeatureMeta = {
 
 type SubFeature<VersionType> = {
     state: FeatureState;
+    config?: Record<string, string>;
     rollout?: {
         steps: { percent: number }[];
     };
