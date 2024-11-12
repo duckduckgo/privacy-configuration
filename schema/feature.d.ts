@@ -3,6 +3,11 @@ export type SiteException = {
     reason?: string;
 };
 
+export type Cohort = {
+    name: string;
+    weight: integer;
+};
+
 export type FeatureState = 'enabled' | 'disabled' | 'internal';
 
 type FeatureMeta = {
@@ -18,6 +23,7 @@ type SubFeature<VersionType> = {
     targets?: {
         variantKey?: string;
     }[];
+    exceptions?: Cohort[];
     minSupportedVersion?: VersionType;
 };
 
