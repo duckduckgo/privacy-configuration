@@ -23,7 +23,7 @@ type SubFeature<VersionType> = {
     targets?: {
         variantKey?: string;
     }[];
-    exceptions?: Cohort[];
+    cohorts?: Cohort[];
     minSupportedVersion?: VersionType;
 };
 
