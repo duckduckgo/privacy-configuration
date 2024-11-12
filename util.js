@@ -165,10 +165,10 @@ function stripReasons (config) {
 }
 
 module.exports = {
-    addAllowlistRule: addAllowlistRule,
-    addCnameEntriesToAllowlist: addCnameEntriesToAllowlist,
-    inlineReasonArrays: inlineReasonArrays,
-    mergeAllowlistedTrackers: mergeAllowlistedTrackers,
-    addHashToFeatures: addHashToFeatures,
-    stripReasons: stripReasons
+    addAllowlistRule,
+    addCnameEntriesToAllowlist,
+    inlineReasonArrays,
+    mergeAllowlistedTrackers,
+    addHashToFeatures,
+    stripReasons
 }

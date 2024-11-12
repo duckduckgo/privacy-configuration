@@ -66,7 +66,7 @@ function displayDiffs (dir1Files, dir2Files, isOpen) {
     }
     for (const [filePath, fileContent] of Object.entries(dir1Files)) {
         let diffOut = ''
-        let compareOut = undefined
+        let compareOut
         if (filePath in dir2Files) {
             const fileOut = mungeFileContents(fileContent, filePath)
             const file2Out = mungeFileContents(dir2Files[filePath], filePath)
@@ -79,7 +79,6 @@ function displayDiffs (dir1Files, dir2Files, isOpen) {
                 // Ignore out lines
                 compareOut = fileDiff.split('\n').slice(3).filter(line => line.startsWith('-') || line.startsWith('+')).join('\n')
                 if (fileDiff) {
-                    fileDiffOut =
                     diffOut = `
 
 \`\`\`diff\n
