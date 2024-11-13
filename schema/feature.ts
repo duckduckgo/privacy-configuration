@@ -17,8 +17,9 @@ type FeatureMeta = {
     sampleExcludeRecords?: any;
 };
 
-type SubFeature<VersionType> = {
+type SubFeature<VersionType, SettingsType = Record<string, string>> = {
     state: FeatureState;
+    settings?: SettingsType;
     rollout?: {
         steps: { percent: number }[];
     };
@@ -31,13 +32,17 @@ type SubFeature<VersionType> = {
     minSupportedVersion?: VersionType;
 };
 
-export type Feature<SettingsType, VersionType> = {
+export type Feature<
+    SettingsType,
+    VersionType,
+    SubFeatures extends Record<string, SubFeature<VersionType>> = Record<string, SubFeature<VersionType>>
+> = {
     readme?: string;
     _meta?: FeatureMeta;
     state: FeatureState;
     exceptions: SiteException[];
     settings?: SettingsType;
-    features?: Record<string, SubFeature<VersionType>>;
+    features?: SubFeatures;
     hash: string;
     minSupportedVersion?: VersionType;
 };
