@@ -1,8 +1,11 @@
-import { Feature } from '../feature';
+import { Feature, CSSInjectFeatureSettings } from '../feature';
 import { Operation } from '../json-patch';
 
 type StateToggle = 'enabled' | 'disabled';
-type FullWebCompatOptions = {
+type FullWebCompatOptions = CSSInjectFeatureSettings<{
+    cleanIframeValue: {
+        state: StateToggle;
+    };
     windowSizing: StateToggle;
     navigatorCredentials: StateToggle;
     safariObject: StateToggle;
@@ -34,15 +37,11 @@ type FullWebCompatOptions = {
           };
     screenLock: StateToggle;
     plainTextViewPort: StateToggle;
-    domains: {
-        domain: string | string[];
-        patchSettings: Operation<string | object | number>[];
-    }[];
     modifyLocalStorage: {
         state: StateToggle;
         changes: any[];
     };
-};
+}>;
 export type WebCompatSettings = Partial<FullWebCompatOptions>;
 
 export type WebCompatFeature<VersionType> = Feature<WebCompatSettings, VersionType>;
