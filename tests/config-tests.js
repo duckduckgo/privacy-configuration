@@ -2,6 +2,7 @@ const expect = require('chai').expect;
 const fs = require('fs');
 const { createValidator, formatErrors } = require('./schema-validation');
 const platforms = require('./../platforms').map((item) => item.replace('browsers/', 'extension-'));
+const immutableJSONPatch = require('immutable-json-patch').immutableJSONPatch
 
 const platformSpecificSchemas = {
     'v4/android-config.json': 'AndroidV4Config',
@@ -45,8 +46,29 @@ describe('Config schema tests', () => {
                 for (const featureName of Object.keys(config.body.features)) {
                     expect(featureName).to.match(featureNameRegex);
                 }
-            });
-        });
+            })
+
+            it('All patchSettings should also be valid', () => {
+                const validate = createValidator(platformSpecificSchemas[config.name] || 'GenericV4Config')
+                for (const featureName of Object.keys(config.body.features)) {
+                    const feature = config.body.features[featureName]
+                    if (feature?.settings?.domains) {
+                        for (const domain of feature.settings.domains) {
+                            if (!domain.patchSettings) {
+                                continue
+                            }
+                            let featureSettings = feature.settings
+                            featureSettings = immutableJSONPatch(featureSettings, domain.patchSettings)
+                            // Clone config and check the schema with the patched featureSettings
+                            const clonedConfig = JSON.parse(JSON.stringify(config.body))
+                            expect(clonedConfig.features[featureName].settings).to.not.be.equal(featureSettings)
+                            clonedConfig.features[featureName].settings = featureSettings
+                            expect(validate(clonedConfig)).to.be.equal(true, formatErrors(validate.errors))
+                        }
+                    }
+                }
+            })
+        })
     }
 
     for (const config of previousConfigs) {

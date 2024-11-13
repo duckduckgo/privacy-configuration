@@ -5,8 +5,8 @@ const schemaGenerator = require('ts-json-schema-generator');
 function createGenerator() {
     try {
         return schemaGenerator.createGenerator({
-            path: './schema/config.d.ts',
-        });
+            path: './schema/config.ts'
+        })
     } catch (e) {
         console.error(e.diagnostic);
         throw e;

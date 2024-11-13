@@ -4,8 +4,10 @@
   "description": "Build scripts and generated files for privacy feature configuration",
   "main": "index.js",
   "scripts": {
-    "test": "npm run build && npm run unit-tests",
+    "test": "npm run lint && npm run tsc && npm run build && npm run unit-tests",
     "lint": "eslint . && prettier . --check",
+    "tsc": "tsc",
+    "tsc-watch": "tsc --watch",
     "unit-tests": "mocha ./tests/**/*.js",
     "build": "node index.js",
     "format": "prettier . --write"
@@ -18,9 +20,11 @@
     "chai": "^4.3.4",
     "diff": "^7.0.0",
     "eslint": "^9.14.0",
+    "immutable-json-patch": "^6.0.1",
     "mocha": "^10.7.3",
     "prettier": "3.3.3",
-    "ts-json-schema-generator": "^2.3.0"
+    "ts-json-schema-generator": "^2.3.0",
+    "typescript": "^5.6.3"
   },
   "dependencies": {
     "node-fetch": "^3.3.2",

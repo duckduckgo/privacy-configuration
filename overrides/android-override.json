@@ -1,5 +1,24 @@
 {
     "features": {
+        "experimentTest": {
+            "state": "enabled",
+            "exceptions": [],
+            "features": {
+                "experimentTestAA": {
+                    "state": "enabled",
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                }
+            }
+        },
         "adClickAttribution": {
             "state": "enabled",
             "features": {
@@ -1367,7 +1386,7 @@
                     "rollout": {
                         "steps": [
                             {
-                                "percent": 5
+                                "percent": 25
                             }
                         ]
                     }

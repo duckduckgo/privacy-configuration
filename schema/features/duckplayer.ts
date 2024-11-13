@@ -1,11 +1,11 @@
-import { Feature } from '../feature';
+import { Feature, CSSInjectFeatureSettings } from '../feature';
 import { Operation } from '../json-patch';
 
 type State = 'enabled' | 'disabled';
 type StateObject = {
     state: State;
 };
-export type DuckPlayerSettings = {
+export type DuckPlayerSettings = CSSInjectFeatureSettings<{
     tryDuckPlayerLink: string;
     duckPlayerDisabledHelpPageLink: string | null;
     youtubePath: string;
@@ -32,10 +32,6 @@ export type DuckPlayerSettings = {
         };
         serpProxy: StateObject;
     };
-    domains: {
-        domain: string;
-        patchSettings: Operation<string>[];
-    }[];
-};
+}>;
 
 export type DuckPlayerFeature<VersionType> = Feature<DuckPlayerSettings, VersionType>;
