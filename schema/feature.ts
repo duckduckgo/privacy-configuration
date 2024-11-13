@@ -17,7 +17,7 @@ type FeatureMeta = {
     sampleExcludeRecords?: any;
 };
 
-type SubFeature<VersionType, SettingsType = Record<string, string>> = {
+export type SubFeature<VersionType, SettingsType = Record<string, string>> = {
     state: FeatureState;
     settings?: SettingsType;
     rollout?: {
