@@ -1,3 +1,5 @@
+import { Operation } from './json-patch';
+
 export type SiteException = {
     domain: string;
     reason?: string;
@@ -39,5 +41,14 @@ export type Feature<SettingsType, VersionType> = {
     hash: string;
     minSupportedVersion?: VersionType;
 };
+
+type CSSInjectFeatureSettingsPatches = {
+    domains: {
+        domain: string | string[];
+        patchSettings: Operation<string | object | number>[];
+    }[];
+};
+
+export type CSSInjectFeatureSettings<T> = T & CSSInjectFeatureSettingsPatches;
 
 export type GenericFeature = Feature<any, string | number>;
