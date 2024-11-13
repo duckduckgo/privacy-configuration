@@ -1,68 +1,68 @@
 ---
 name: Site Breakage Form
 description: Report a website issue on a DuckDuckGo app or browser extension
-title: "Broken Site: "
+title: 'Broken Site: '
 body:
-  - type: markdown
-    attributes:
-      value: |
-        Thanks for reporting a broken site! Please add the domain you're reporting to the title of this issue above.
-  - type: textarea
-    id: urls
-    attributes:
-      label: URLs affected
-      description: On which URLs are you seeing the problem?
-      placeholder: https://example.com/page.html?product=shoes
-    validations:
-      required: true
-  - type: textarea
-    id: description
-    attributes:
-      label: Description of Breakage
-      description: What is broken and how it is broken? (Include screenshots if possible)
-      placeholder: Page is blank for 5s after loading
-    validations:
-      required: true
-  - type: checkboxes
-    id: affected-platforms
-    attributes:
-      label: Affected Platforms
-      description: Which DuckDuckGo products are affected by this breakage?
-      options:
-        - label: Browser Extensions
-        - label: Android Browser
-        - label: iOS Browser
-        - label: macOS Browser
-        - label: Windows Browser
-    validations:
-      required: true
-  - type: textarea
-    id: other
-    attributes:
-      label: Other Details
-      description: Any other information that might help us to investigate and fix your reported site?
-  - type: markdown
-    attributes:
-      value: |
-        ## Additional Information
-  - type: dropdown
-    id: disable-privacy-protection
-    attributes:
-      label: Tested without Privacy Protections
-      description: Does the site work if Privacy Protections are turned off?
-      options:
-        - "Yes"
-        - "No"
-        - "I don't know what this means"
-    validations:
-      required: true
-  - type: dropdown
-    id: verified-on-other-browsers
-    attributes:
-      label: Verified on other browsers
-      description: Does this breakage occur on other non-DuckDuckGo browsers?
-      options:
-        - "Yes"
-        - "No"
-    validations:
-      required: true
+    - type: markdown
+      attributes:
+          value: |
+              Thanks for reporting a broken site! Please add the domain you're reporting to the title of this issue above.
+    - type: textarea
+      id: urls
+      attributes:
+          label: URLs affected
+          description: On which URLs are you seeing the problem?
+          placeholder: https://example.com/page.html?product=shoes
+      validations:
+          required: true
+    - type: textarea
+      id: description
+      attributes:
+          label: Description of Breakage
+          description: What is broken and how it is broken? (Include screenshots if possible)
+          placeholder: Page is blank for 5s after loading
+      validations:
+          required: true
+    - type: checkboxes
+      id: affected-platforms
+      attributes:
+          label: Affected Platforms
+          description: Which DuckDuckGo products are affected by this breakage?
+          options:
+              - label: Browser Extensions
+              - label: Android Browser
+              - label: iOS Browser
+              - label: macOS Browser
+              - label: Windows Browser
+      validations:
+          required: true
+    - type: textarea
+      id: other
+      attributes:
+          label: Other Details
+          description: Any other information that might help us to investigate and fix your reported site?
+    - type: markdown
+      attributes:
+          value: |
+              ## Additional Information
+    - type: dropdown
+      id: disable-privacy-protection
+      attributes:
+          label: Tested without Privacy Protections
+          description: Does the site work if Privacy Protections are turned off?
+          options:
+              - 'Yes'
+              - 'No'
+              - "I don't know what this means"
+      validations:
+          required: true
+    - type: dropdown
+      id: verified-on-other-browsers
+      attributes:
+          label: Verified on other browsers
+          description: Does this breakage occur on other non-DuckDuckGo browsers?
+          options:
+              - 'Yes'
+              - 'No'
+      validations:
+          required: true
