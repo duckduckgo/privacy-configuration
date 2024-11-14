@@ -13,5 +13,5 @@ module.exports = [
     'ios',
     'android',
     'macos',
-    'windows'
-]
+    'windows',
+];

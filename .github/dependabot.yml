@@ -1,21 +1,21 @@
 version: 2
 updates:
-  - package-ecosystem: "npm"
-    directory: "/"
-    schedule:
-      interval: "daily"
-    open-pull-requests-limit: 20
-    target-branch: "main"
-    labels:
-      - "dependencies"
-    groups:
-      build:
-        patterns:
-          - "eslint*"
-  - package-ecosystem: "github-actions"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-    target-branch: "main"
-    labels:
-      - "dependencies"
+    - package-ecosystem: 'npm'
+      directory: '/'
+      schedule:
+          interval: 'daily'
+      open-pull-requests-limit: 20
+      target-branch: 'main'
+      labels:
+          - 'dependencies'
+      groups:
+          build:
+              patterns:
+                  - 'eslint*'
+    - package-ecosystem: 'github-actions'
+      directory: '/'
+      schedule:
+          interval: 'weekly'
+      target-branch: 'main'
+      labels:
+          - 'dependencies'

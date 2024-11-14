@@ -1,6 +1,13 @@
+import { Operation } from './json-patch';
+
 export type SiteException = {
     domain: string;
     reason?: string;
+};
+
+export type Cohort = {
+    name: string;
+    weight: number;
 };
 
 export type FeatureState = 'enabled' | 'disabled' | 'internal';
@@ -17,7 +24,10 @@ type SubFeature<VersionType> = {
     };
     targets?: {
         variantKey?: string;
+        localeCountry?: string;
+        localeLanguage?: string;
     }[];
+    cohorts?: Cohort[];
     minSupportedVersion?: VersionType;
 };
 
@@ -31,5 +41,14 @@ export type Feature<SettingsType, VersionType> = {
     hash: string;
     minSupportedVersion?: VersionType;
 };
+
+type CSSInjectFeatureSettingsPatches = {
+    domains: {
+        domain: string | string[];
+        patchSettings: Operation<string | object | number>[];
+    }[];
+};
+
+export type CSSInjectFeatureSettings<T> = T & CSSInjectFeatureSettingsPatches;
 
 export type GenericFeature = Feature<any, string | number>;
