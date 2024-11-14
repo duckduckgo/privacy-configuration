@@ -19,6 +19,20 @@ If this is a SITE BREAKAGE MITIGATION, please include a BRIEF EXPLANATION that c
 Please also check that you have referenced the URL of this PR as the "reason" value for the exception (where applicable).
 -->
 
+<!--
+  These questions are a friendly reminder to shipping config, if you're uncertain ask the AoR owners.
+  It's also totally appropriate to not check some of these boxes, if they don't apply to your change.
+-->
+*Please tick all that apply:*
+
+- [ ] I have added a [schema](https://github.com/duckduckgo/privacy-configuration/tree/main/schema) to validate this feature change
+- [ ] I have tested this change locally
+- [ ] I have tested this change locally in all supported browsers
+- [ ] This change will be visible to users
+- [ ] This change was covered by a ship review
+- [ ] This change was covered by a tech design
+- [ ] This code for the config change is ready
+
 #### Reference
 
 -   [Config Reviewer Documentation](https://app.asana.com/0/1200890834746050/1204443212791216/f)
