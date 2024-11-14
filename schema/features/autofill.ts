@@ -8,13 +8,13 @@ type ButtonConfig = {
     path: string;
     selectors: string[];
     labelTexts: string[];
-  };
+};
 
-  type ImportFromGooglePasswordManager = {
+type ImportFromGooglePasswordManager = {
     settingsButton: ButtonConfig;
     exportButton: ButtonConfig;
     signInButton: ButtonConfig;
-  };
+};
 
 // Any subfeatures that have typed `settings` should be defined here.
 // Subfeatures without settings (or just string:string mappings for settings) will be automatically validated.

@@ -35,7 +35,7 @@ export type SubFeature<VersionType, SettingsType = Record<string, string>> = {
 export type Feature<
     SettingsType,
     VersionType,
-    SubFeatures extends Record<string, SubFeature<VersionType>> = Record<string, SubFeature<VersionType>>
+    SubFeatures extends Record<string, SubFeature<VersionType>> = Record<string, SubFeature<VersionType>>,
 > = {
     readme?: string;
     _meta?: FeatureMeta;
