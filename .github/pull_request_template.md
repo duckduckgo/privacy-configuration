@@ -17,6 +17,7 @@
 <!--
   These questions are a friendly reminder to shipping config changes, if you're uncertain ask the AoR owners.
   It's also totally appropriate to not check some of these boxes, if they don't apply to your change.
+  Please delete either or both process sections below.
 -->
 ### Feature change process:
 
@@ -29,9 +30,6 @@
 - [ ] This code for the config change is ready
 - [ ] This is a site breakage mitigation 
 
-<!--
-If this is a SITE BREAKAGE MITIGATION, please include a BRIEF EXPLANATION that covers the REPORTED URL, the PLATFORMS AFFECTED, and the TRACKER(S) being unblocked or FEATURE being disabled, as well as a mention of the PROBLEM(S) users are experiencing.
--->
 ### Site breakage mitigation process:
 
 #### Brief explanation
