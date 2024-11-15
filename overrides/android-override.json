@@ -274,6 +274,48 @@
                             }
                         ]
                     }
+                },
+                "canImportFromGooglePasswordManager": {
+                    "state": "enabled",
+                    "settings": {
+                        "launchUrl": "https://passwords.google.com/options?ep=1",
+                        "javascriptConfig": {
+                            "domains": [
+                                {
+                                    "domain": ["google.com", "localhost"],
+                                    "patchSettings": [
+                                        {
+                                            "path": "",
+                                            "op": "add",
+                                            "value": {
+                                                "settingsButton": {
+                                                    "shouldAutotap": false,
+                                                    "path": "/",
+                                                    "selectors": ["a[href*='options']"],
+                                                    "labelTexts": ["Password options"]
+                                                },
+                                                "exportButton": {
+                                                    "shouldAutotap": false,
+                                                    "path": "/options",
+                                                    "selectors": [
+                                                        "c-wiz[data-node-index*='2;0'][data-p*='options']",
+                                                        "c-wiz[data-p*='options'][jsdata='deferred-i4']"
+                                                    ],
+                                                    "labelTexts": ["Export"]
+                                                },
+                                                "signInButton": {
+                                                    "shouldAutotap": false,
+                                                    "path": "/intro",
+                                                    "selectors": ["a[href*='ServiceLogin'][target='_top']"],
+                                                    "labelTexts": ["Sign in"]
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    }
                 }
             }
         },
