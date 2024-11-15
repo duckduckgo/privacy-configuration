@@ -1,4 +1,5 @@
 import { CSSInjectFeatureSettings, Feature, SubFeature } from '../feature';
+import { Operation } from '../json-patch';
 
 // Type of the feature `settings` object
 type SettingsType = undefined;
@@ -23,7 +24,12 @@ type SubFeatures<VersionType> = {
         VersionType,
         {
             launchUrl: string;
-            javascriptConfig: CSSInjectFeatureSettings<ImportFromGooglePasswordManager>;
+            javascriptConfig: {
+                domains: {
+                    domain: string | string[];
+                    patchSettings: Operation<ImportFromGooglePasswordManager>[];
+                }[];
+            };
         }
     >;
 };
