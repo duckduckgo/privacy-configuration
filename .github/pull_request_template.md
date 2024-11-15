@@ -14,21 +14,26 @@
 
 ## Description
 
-<!--
-  These questions are a friendly reminder to shipping config changes, if you're uncertain ask the AoR owners.
-  It's also totally appropriate to not check some of these boxes, if they don't apply to your change.
+<!-- 
   Please delete either or both process sections below.
 -->
+
 ### Feature change process:
 
 - [ ] I have added a [schema](https://github.com/duckduckgo/privacy-configuration/tree/main/schema) to validate this feature change
 - [ ] I have tested this change locally
+- [ ] This code for the config change is ready to merge
+- [ ] This feature was covered by a tech design
+
+#### Additional info:
+<!--
+  These questions are a friendly reminder to shipping config changes, if you're uncertain ask the AoR owners.
+  It's also totally appropriate to not check some of these boxes, if they don't apply to your change.
+-->
 - [ ] I have tested this change locally in all supported browsers
 - [ ] This change will be visible to users
-- [ ] This change was covered by a ship review
-- [ ] This change was covered by a tech design
 - [ ] This code for the config change is ready
-- [ ] This is a site breakage mitigation 
+- [ ] This change was covered by a ship review
 
 ### Site breakage mitigation process:
 
