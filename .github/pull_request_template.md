@@ -46,6 +46,7 @@
 
 
 - [ ] I have referenced the URL of this PR as the "reason" value for the exception (where applicable).
+- [ ] This change is a speculative mitigation to fix reported breakage.
 
 #### Reference
 
