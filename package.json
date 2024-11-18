@@ -4,25 +4,28 @@
   "description": "Build scripts and generated files for privacy feature configuration",
   "main": "index.js",
   "scripts": {
-    "test": "npm run lint && npm run build && npm run unit-tests",
-    "lint": "eslint .",
+    "test": "npm run lint && npm run tsc && npm run build && npm run unit-tests",
+    "lint": "eslint . && prettier . --check",
+    "lint-fix": "eslint . --fix && prettier . --write",
+    "tsc": "tsc",
+    "tsc-watch": "tsc --watch",
     "unit-tests": "mocha ./tests/**/*.js",
     "build": "node index.js",
-    "format": "node format.js"
+    "format": "prettier . --write"
   },
   "author": "DuckDuckGo",
   "license": "Apache 2.0",
   "devDependencies": {
+    "@duckduckgo/eslint-config": "github:duckduckgo/eslint-config#v0.1.0",
     "ajv": "^8.17.1",
     "chai": "^4.3.4",
     "diff": "^7.0.0",
-    "eslint": "^7.32.0",
-    "eslint-config-standard": "^16.0.3",
-    "eslint-plugin-import": "^2.31.0",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^5.1.0",
+    "eslint": "^9.14.0",
+    "immutable-json-patch": "^6.0.1",
     "mocha": "^10.7.3",
-    "ts-json-schema-generator": "^2.3.0"
+    "prettier": "3.3.3",
+    "ts-json-schema-generator": "^2.3.0",
+    "typescript": "^5.6.3"
   },
   "dependencies": {
     "node-fetch": "^3.3.2",

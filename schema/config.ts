@@ -4,6 +4,8 @@ import { CookieFeature } from './features/cookie';
 import { TrackerAllowlistFeature } from './features/tracker-allowlist';
 import { WebCompatFeature } from './features/webcompat';
 import { DuckPlayerFeature } from './features/duckplayer';
+import { AutofillFeature } from './features/autofill';
+import { MessageBridgeFeature } from './features/message-bridge';
 
 export { WebCompatSettings } from './features/webcompat';
 export { DuckPlayerSettings } from './features/duckplayer';
@@ -25,10 +27,12 @@ export type ConfigV4<VersionType> = {
     features: Record<string, Feature<any, VersionType>> & {
         // These features have typed settings
         autoconsent: AutoconsentFeature<VersionType>;
+        autofill: AutofillFeature<VersionType>;
         cookie: CookieFeature<VersionType>;
         duckPlayer: DuckPlayerFeature<VersionType>;
         trackerAllowlist: TrackerAllowlistFeature<VersionType>;
         webCompat: WebCompatFeature<VersionType>;
+        messageBridge: MessageBridgeFeature<VersionType>;
     };
     unprotectedTemporary: SiteException[];
 };

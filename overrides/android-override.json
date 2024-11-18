@@ -1,5 +1,24 @@
 {
     "features": {
+        "experimentTest": {
+            "state": "enabled",
+            "exceptions": [],
+            "features": {
+                "experimentTestAA": {
+                    "state": "enabled",
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                }
+            }
+        },
         "adClickAttribution": {
             "state": "enabled",
             "features": {
@@ -255,6 +274,48 @@
                             }
                         ]
                     }
+                },
+                "canImportFromGooglePasswordManager": {
+                    "state": "enabled",
+                    "settings": {
+                        "launchUrl": "https://passwords.google.com/options?ep=1",
+                        "javascriptConfig": {
+                            "domains": [
+                                {
+                                    "domain": ["google.com", "localhost"],
+                                    "patchSettings": [
+                                        {
+                                            "path": "",
+                                            "op": "add",
+                                            "value": {
+                                                "settingsButton": {
+                                                    "shouldAutotap": false,
+                                                    "path": "/",
+                                                    "selectors": ["a[href*='options']"],
+                                                    "labelTexts": ["Password options"]
+                                                },
+                                                "exportButton": {
+                                                    "shouldAutotap": false,
+                                                    "path": "/options",
+                                                    "selectors": [
+                                                        "c-wiz[data-node-index*='2;0'][data-p*='options']",
+                                                        "c-wiz[data-p*='options'][jsdata='deferred-i4']"
+                                                    ],
+                                                    "labelTexts": ["Export"]
+                                                },
+                                                "signInButton": {
+                                                    "shouldAutotap": false,
+                                                    "path": "/intro",
+                                                    "selectors": ["a[href*='ServiceLogin'][target='_top']"],
+                                                    "labelTexts": ["Sign in"]
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    }
                 }
             }
         },
@@ -304,6 +365,9 @@
                             }
                         ]
                     }
+                },
+                "featuresRequestHeader": {
+                    "state": "enabled"
                 }
             }
         },
@@ -607,9 +671,7 @@
         "sendFullPackageInstallSource": {
             "state": "enabled",
             "settings": {
-                "includedPackages": [
-                    "*"
-                ]
+                "includedPackages": ["*"]
             },
             "exceptions": []
         },
@@ -651,9 +713,7 @@
                         "rules": [
                             {
                                 "rule": "cdx.cedexis.net",
-                                "domains": [
-                                    "linkedin.com"
-                                ],
+                                "domains": ["linkedin.com"],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/675"
                             }
                         ]
@@ -662,9 +722,7 @@
                         "rules": [
                             {
                                 "rule": "api-maps.yandex.ru/services/startup/v1",
-                                "domains": [
-                                    "m.dzen.ru"
-                                ],
+                                "domains": ["m.dzen.ru"],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1627"
                             }
                         ]
@@ -1373,7 +1431,7 @@
                     "rollout": {
                         "steps": [
                             {
-                                "percent": 25
+                                "percent": 50
                             }
                         ]
                     }

@@ -23,28 +23,28 @@ legacy product versions.
 
 **Adding Unprotected Entries**
 
- Unprotected entries will disable all protections on a given site. This is only used in cases of severe web breakage where a root cause cannot be determined. To add an unprotected entry manually, update the `exceptions` of `features/unprotected-temporary.json`.
+Unprotected entries will disable all protections on a given site. This is only used in cases of severe web breakage where a root cause cannot be determined. To add an unprotected entry manually, update the `exceptions` of `features/unprotected-temporary.json`.
 
 ## Related Resources
 
-- Apps and extensions using the privacy configuration:
-  - [iOS app](https://github.com/duckduckgo/iOS)
-    - [ios-config.json](https://staticcdn.duckduckgo.com/trackerblocking/config/v2/ios-config.json)
-  - [Android app](https://github.com/duckduckgo/Android)
-    - [android-config.json](https://staticcdn.duckduckgo.com/trackerblocking/config/v2/android-config.json)
-  - [WebExtension](https://github.com/duckduckgo/duckduckgo-privacy-extension) (for Chrome, Firefox, Edge, Brave, and Opera)
-    - [extension-config.json](https://staticcdn.duckduckgo.com/trackerblocking/config/v2/extension-config.json)
-    - [extension-chrome-config.json](https://staticcdn.duckduckgo.com/trackerblocking/config/v2/extension-chrome-config.json)
-    - [extension-firefox-config.json](https://staticcdn.duckduckgo.com/trackerblocking/config/v2/extension-firefox-config.json)
-    - [extension-edge-config.json](https://staticcdn.duckduckgo.com/trackerblocking/config/v2/extension-edge-config.json)
-    - [extension-brave-config.json](https://staticcdn.duckduckgo.com/trackerblocking/config/v2/extension-brave-config.json)
-  - [Safari extension](https://github.com/duckduckgo/privacy-essentials-safari)
-    - The Safari extension has only partial remote configuration support, and uses
-      [trackers-unprotected-temporary.txt](https://staticcdn.duckduckgo.com/trackerblocking/config/trackers-unprotected-temporary.txt)
-  - Mac app (in beta, code not yet open source)
-    - [macos-config.json](https://staticcdn.duckduckgo.com/trackerblocking/config/v2/macos-config.json)
-  - Windows app (in beta, code not yet open source)
-    - [windows-config.json](https://staticcdn.duckduckgo.com/trackerblocking/config/v2/windows-config.json)
+-   Apps and extensions using the privacy configuration:
+    -   [iOS app](https://github.com/duckduckgo/iOS)
+        -   [ios-config.json](https://staticcdn.duckduckgo.com/trackerblocking/config/v2/ios-config.json)
+    -   [Android app](https://github.com/duckduckgo/Android)
+        -   [android-config.json](https://staticcdn.duckduckgo.com/trackerblocking/config/v2/android-config.json)
+    -   [WebExtension](https://github.com/duckduckgo/duckduckgo-privacy-extension) (for Chrome, Firefox, Edge, Brave, and Opera)
+        -   [extension-config.json](https://staticcdn.duckduckgo.com/trackerblocking/config/v2/extension-config.json)
+        -   [extension-chrome-config.json](https://staticcdn.duckduckgo.com/trackerblocking/config/v2/extension-chrome-config.json)
+        -   [extension-firefox-config.json](https://staticcdn.duckduckgo.com/trackerblocking/config/v2/extension-firefox-config.json)
+        -   [extension-edge-config.json](https://staticcdn.duckduckgo.com/trackerblocking/config/v2/extension-edge-config.json)
+        -   [extension-brave-config.json](https://staticcdn.duckduckgo.com/trackerblocking/config/v2/extension-brave-config.json)
+    -   [Safari extension](https://github.com/duckduckgo/privacy-essentials-safari)
+        -   The Safari extension has only partial remote configuration support, and uses
+            [trackers-unprotected-temporary.txt](https://staticcdn.duckduckgo.com/trackerblocking/config/trackers-unprotected-temporary.txt)
+    -   Mac app (in beta, code not yet open source)
+        -   [macos-config.json](https://staticcdn.duckduckgo.com/trackerblocking/config/v2/macos-config.json)
+    -   Windows app (in beta, code not yet open source)
+        -   [windows-config.json](https://staticcdn.duckduckgo.com/trackerblocking/config/v2/windows-config.json)
 
 ## Licensing
 
@@ -55,13 +55,13 @@ If you'd like to license the source for commercial use, [please reach out](https
 
 ## Questions
 
-- **Where can I find out why a particular exception has been added?** We mostly do two kinds of mitigations -- either allowing [certain trackers](https://github.com/duckduckgo/privacy-configuration/tree/main/features/tracker-allowlist.json) or disabling one or more [protections](https://github.com/duckduckgo/privacy-configuration/tree/main/features) on specific URLs or on certain [platforms](https://github.com/duckduckgo/privacy-configuration/tree/main/overrides). If you search in Code for the domain you're interested in, in most cases there will be a `"reason"` key below the exception for it with the URL of either an issue (old process) or a pull request (current process). Within the description of that linked URL we explain why we've added a breakage mitigation to the site in question and exactly what we're allowing or disabling to improve users' experience on the page.
+-   **Where can I find out why a particular exception has been added?** We mostly do two kinds of mitigations -- either allowing [certain trackers](https://github.com/duckduckgo/privacy-configuration/tree/main/features/tracker-allowlist.json) or disabling one or more [protections](https://github.com/duckduckgo/privacy-configuration/tree/main/features) on specific URLs or on certain [platforms](https://github.com/duckduckgo/privacy-configuration/tree/main/overrides). If you search in Code for the domain you're interested in, in most cases there will be a `"reason"` key below the exception for it with the URL of either an issue (old process) or a pull request (current process). Within the description of that linked URL we explain why we've added a breakage mitigation to the site in question and exactly what we're allowing or disabling to improve users' experience on the page.
 
-- **Why do some exceptions have more documentation than others?** A review of
+-   **Why do some exceptions have more documentation than others?** A review of
     existing systems is ongoing to make this repository the central location for
     exceptions and bring documentation and mitigations up-to-date.
 
-- **How can I contribute to this repository?** If you suspect any website
+-   **How can I contribute to this repository?** If you suspect any website
     usability issues or breakage, or have concerns about what is/isn't blocked,
     please [open an issue](https://github.com/duckduckgo/privacy-configuration/issues/new?assignees=&labels=&projects=&template=breakage-form.yml&title=Broken+Site%3A+).
 
