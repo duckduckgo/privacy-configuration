@@ -30,4 +30,4 @@ jobs:
             - name: Install dependencies
               run: npm ci
             - name: Lint JSON
-              run: npm run lint
+              run: npm run lint && echo 'No lint issues!' || (npm run lint-fix; git diff; echo 'Lint check failed, review diff above or run "npm run lint-fix"'; return 1)
