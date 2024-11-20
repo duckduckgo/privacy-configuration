@@ -61,7 +61,7 @@ jobs:
                   cd pr
                   git config --global user.email "dax@duck.com"
                   git config --global user.name "dax"
-                  git rebase origin/${{ github.event.pull_request.base.ref }}
+                  git rebase -X theirs origin/${{ github.event.pull_request.base.ref }}
                   npm install
                   node index.js
                   cd ..
