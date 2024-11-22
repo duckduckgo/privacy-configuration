@@ -582,16 +582,20 @@
                 }
             }
         },
-        "phishingDetection": {
+        "maliciousSiteProtection": {
             "state": "internal",
             "features": {
-                "allowErrorPage": {
+                "allowPhishingURLChecks": {
                     "state": "internal"
                 },
-                "allowPreferencesToggle": {
+                "allowMalwareURLChecks": {
                     "state": "internal"
                 }
-            }
+            },
+	    "settings": {
+		"hashPrefixUpdateFrequency": 20,
+		"filterSetUpdateFrequency": 720
+	    }
         },
         "backgroundAgentPixelTest": {
             "state": "enabled",
