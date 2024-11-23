@@ -6,6 +6,9 @@ import { WebCompatFeature } from './features/webcompat';
 import { DuckPlayerFeature } from './features/duckplayer';
 import { AutofillFeature } from './features/autofill';
 import { MessageBridgeFeature } from './features/message-bridge';
+import { APIModificationFeature } from './features/api-modification';
+import { FingerprintingHardwareFeature } from './features/fingerprinting-hardware';
+import { FingerprintingScreenSizeFeature } from './features/fingerprinting-screen-size';
 
 export { WebCompatSettings } from './features/webcompat';
 export { DuckPlayerSettings } from './features/duckplayer';
@@ -26,6 +29,7 @@ export type ConfigV4<VersionType> = {
     version: number;
     features: Record<string, Feature<any, VersionType>> & {
         // These features have typed settings
+        apiModification?: APIModificationFeature<VersionType>;
         autoconsent: AutoconsentFeature<VersionType>;
         autofill: AutofillFeature<VersionType>;
         cookie: CookieFeature<VersionType>;
@@ -33,6 +37,8 @@ export type ConfigV4<VersionType> = {
         trackerAllowlist: TrackerAllowlistFeature<VersionType>;
         webCompat: WebCompatFeature<VersionType>;
         messageBridge: MessageBridgeFeature<VersionType>;
+        fingerprintingHardware?: FingerprintingHardwareFeature<VersionType>;
+        fingerpringtingScreenSize?: FingerprintingScreenSizeFeature<VersionType>;
     };
     unprotectedTemporary: SiteException[];
 };
