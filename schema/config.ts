@@ -6,7 +6,13 @@ import { WebCompatFeature } from './features/webcompat';
 import { DuckPlayerFeature } from './features/duckplayer';
 import { AutofillFeature } from './features/autofill';
 import { MessageBridgeFeature } from './features/message-bridge';
+<<<<<<< HEAD
 import { AndroidBrowserConfig } from './features/android-browser-config';
+=======
+import { APIModificationFeature } from './features/api-modification';
+import { FingerprintingHardwareFeature } from './features/fingerprinting-hardware';
+import { FingerprintingScreenSizeFeature } from './features/fingerprinting-screen-size';
+>>>>>>> d0d7132 (Add API modification feature and respective schema for variadic features)
 
 export { WebCompatSettings } from './features/webcompat';
 export { DuckPlayerSettings } from './features/duckplayer';
@@ -27,6 +33,7 @@ export type ConfigV4<VersionType> = {
     version: number;
     features: Record<string, Feature<any, VersionType>> & {
         // These features have typed settings
+        apiModification?: APIModificationFeature<VersionType>;
         autoconsent: AutoconsentFeature<VersionType>;
         autofill: AutofillFeature<VersionType>;
         cookie: CookieFeature<VersionType>;
@@ -35,6 +42,8 @@ export type ConfigV4<VersionType> = {
         webCompat: WebCompatFeature<VersionType>;
         messageBridge: MessageBridgeFeature<VersionType>;
         androidBrowserConfig: AndroidBrowserConfig<VersionType>;
+        fingerprintingHardware?: FingerprintingHardwareFeature<VersionType>;
+        fingerpringtingScreenSize?: FingerprintingScreenSizeFeature<VersionType>;
     };
     unprotectedTemporary: SiteException[];
 };

@@ -1,5 +1,5 @@
 const Ajv = require('ajv').default;
-const ajv = new Ajv();
+const ajv = new Ajv({ allowUnionTypes: true });
 const schemaGenerator = require('ts-json-schema-generator');
 
 function createGenerator() {
