@@ -141,6 +141,7 @@ const featuresToIncludeTempUnprotectedExceptions = [
     'navigatorInterface',
     'nonTracking3pCookies',
     'performanceMetrics',
+    'phishingDetection',
     'maliciousSiteProtection',
     'referrer',
     'requestFilterer',
