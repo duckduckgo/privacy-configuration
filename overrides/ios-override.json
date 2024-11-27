@@ -596,13 +596,16 @@
                 }
             }
         },
-        "maliciousSiteProtection": {
+        "phishingDetection": {
             "state": "internal",
-            "settings": {
-                "hashPrefixUpdateFrequency": 20,
-                "filterSetUpdateFrequency": 720
-            },
-            "exceptions": []
+            "features": {
+                "allowErrorPage": {
+                    "state": "internal"
+                },
+                "allowPreferencesToggle": {
+                    "state": "internal"
+                }
+            }
         },
         "backgroundAgentPixelTest": {
             "state": "enabled",
