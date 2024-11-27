@@ -1,9 +1,4 @@
-import { Feature, CSSInjectFeatureSettings } from '../feature';
-
-type State = 'enabled' | 'disabled' | 'internal';
-type StateObject = {
-    state: State;
-};
+import { CSSInjectFeatureSettings } from '../feature';
 
 export type MaliciousSiteProtectionSettings = CSSInjectFeatureSettings<{
     hashPrefixUpdateFrequency: number;
