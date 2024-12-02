@@ -27,6 +27,20 @@
                 }
             }
         },
+        "aiChat": {
+            "state": "disabled",
+            "features": {
+                "browsingToolbarShortcut": {
+                    "state": "disabled"
+                },
+                "addressBarShortcut": {
+                    "state": "disabled"
+                }
+            },
+            "settings": {
+                "aiChatURL": "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=4"
+            }
+        },
         "duckPlayer": {
             "state": "enabled",
             "features": {
@@ -311,6 +325,24 @@
                             }
                         ]
                     },
+                    "cquotient.com": {
+                        "rules": [
+                            {
+                                "rule": "api.cquotient.com/v3",
+                                "domains": ["grillagrills.com"],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2495"
+                            }
+                        ]
+                    },
+                    "criteo.net": {
+                        "rules": [
+                            {
+                                "rule": "static.criteo.net/js/ld/ld.js",
+                                "domains": ["jackssmallengines.com"],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2495"
+                            }
+                        ]
+                    },
                     "doubleclick.net": {
                         "rules": [
                             {
@@ -547,6 +579,25 @@
                 "useUnifiedFeedback": {
                     "state": "enabled",
                     "minSupportedVersion": "7.136.0"
+                },
+                "setAccessTokenCookieForSubscriptionDomains": {
+                    "state": "disabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
+                },
+                "freeTrials": {
+                    "state": "internal"
                 }
             }
         },
@@ -563,6 +614,14 @@
                     "state": "enabled"
                 }
             }
+        },
+        "maliciousSiteProtection": {
+            "state": "internal",
+            "settings": {
+                "hashPrefixUpdateFrequency": 20,
+                "filterSetUpdateFrequency": 720
+            },
+            "exceptions": []
         },
         "backgroundAgentPixelTest": {
             "state": "enabled",

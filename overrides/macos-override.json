@@ -105,7 +105,8 @@
                     }
                 },
                 "freemium": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": "1.114.0"
                 }
             },
             "minSupportedVersion": "1.70.0"
@@ -116,6 +117,15 @@
                 {
                     "domain": "wjla.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2319"
+                }
+            ]
+        },
+        "cookie": {
+            "state": "enabled",
+            "exceptions": [
+                {
+                    "domain": "legalandgeneral.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2491"
                 }
             ]
         },
@@ -510,7 +520,13 @@
                 "filterlist": {
                     "state": "enabled"
                 }
-            }
+            },
+            "exceptions": [
+                {
+                    "domain": "sueddeutsche.de",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2500"
+                }
+            ]
         },
         "navigatorInterface": {
             "state": "enabled"
@@ -794,6 +810,15 @@
                             }
                         ]
                     },
+                    "cquotient.com": {
+                        "rules": [
+                            {
+                                "rule": "api.cquotient.com/v3",
+                                "domains": ["grillagrills.com"],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2495"
+                            }
+                        ]
+                    },
                     "criteo.net": {
                         "rules": [
                             {
@@ -805,6 +830,11 @@
                                 "rule": "static.criteo.net/js/ld/publishertag.prebid.js",
                                 "domains": ["wp.pl"],
                                 "reason": "Adwall appears which reappears when dismissed. The adwall prevents interaction with the page."
+                            },
+                            {
+                                "rule": "static.criteo.net/js/ld/ld.js",
+                                "domains": ["jackssmallengines.com"],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2495"
                             }
                         ]
                     },
@@ -1005,6 +1035,17 @@
                 "useUnifiedFeedback": {
                     "state": "enabled",
                     "minSupportedVersion": "1.113.0"
+                },
+                "setAccessTokenCookieForSubscriptionDomains": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25
+                            }
+                        ]
+                    },
+                    "minSupportedVersion": "1.116.0"
                 }
             }
         },
@@ -1029,6 +1070,14 @@
                     "state": "internal"
                 }
             }
+        },
+        "maliciousSiteProtection": {
+            "state": "internal",
+            "settings": {
+                "hashPrefixUpdateFrequency": 20,
+                "filterSetUpdateFrequency": 720
+            },
+            "exceptions": []
         },
         "backgroundAgentPixelTest": {
             "state": "enabled",
