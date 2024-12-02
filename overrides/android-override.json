@@ -30,6 +30,37 @@
         "appTrackerProtection": {
             "state": "enabled"
         },
+        "blockList": {
+            "state": "enabled",
+            "exceptions": [],
+            "features": {
+                "tdsNextExperimentBaseline": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52200000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 50
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "temp/android-experiment-tds.json",
+                        "treatmentUrl": "temp/android-experiment-tds.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                }
+            }
+        },
         "brokenSitePrompt": {
             "state": "enabled",
             "minSupportedVersion": 52200000
