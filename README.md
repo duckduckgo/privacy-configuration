@@ -8,22 +8,61 @@ All feature files contain an `exceptions` property which contains a list of site
 
 This repo also contains the code to build and deploy the configuration files.
 These files (in the `generated` directory once built) are served from
-https://staticcdn.duckduckgo.com/trackerblocking/config/v2/...
+https://staticcdn.duckduckgo.com/trackerblocking/config/v4/...
 
 Please see the [Related Resources](#Related-Resources) section for a list of
 files used by each platform.
 
 **Deprecated Files**
 
-Please note the files `trackers-unprotected-temporary.txt`,
-`trackers-whitelist-temporary.txt`, `protections.json`, and
-`fingerprinting.json` in the `generated` directory, as well as `v1` config
+Please note the files `trackers-unprotected-temporary.txt` in the `generated` directory, as well as `v1` config
 files, are deprecated. These files are automatically generated and only used by
 legacy product versions.
 
 **Adding Unprotected Entries**
 
 Unprotected entries will disable all protections on a given site. This is only used in cases of severe web breakage where a root cause cannot be determined. To add an unprotected entry manually, update the `exceptions` of `features/unprotected-temporary.json`.
+
+## Installing
+
+Consider using [nvm](https://github.com/nvm-sh/nvm) to manage node versions, after installing in the project directory run:
+
+```
+nvm use
+```
+
+From the top-level root folder of this npm workspace, you can run the following npm commands:
+
+**Install dependencies**:
+
+Will install all the dependencies we need to build and run the project:
+```
+npm install
+```
+
+## Building
+
+To build locally the `generated` files, run:
+
+```
+npm run build
+```
+
+### Linting
+
+If you're seeing linting errors in automation run the following:
+
+```
+npm run lint-fix
+```
+
+### Testing
+
+To run the tests locally run the following:
+
+```
+npm run test
+```
 
 ## Related Resources
 
