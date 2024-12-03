@@ -2,7 +2,7 @@ import { CSSInjectFeatureSettings, Feature, SubFeature } from '../feature';
 
 type VersionSettings = {
     versions: AppVersionConfig[];
-}
+};
 
 type AppVersionConfig = {
     appVersion: number;
