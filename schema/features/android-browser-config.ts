@@ -1,9 +1,5 @@
 import { CSSInjectFeatureSettings, Feature, SubFeature } from '../feature';
 
-type VersionSettings = {
-    versions: AppVersionConfig[];
-};
-
 type AppVersionConfig = {
     appVersion: number;
     daysAfterBuild: number;
@@ -18,4 +14,18 @@ type FeatureLogged = {
     netP: boolean;
 };
 
-export type AndroidBrowserConfig<VersionType> = Feature<VersionSettings, VersionType>;
+// Any subfeatures that have typed `settings` should be defined here.
+// Subfeatures without settings (or just string:string mappings for settings) will be automatically validated.
+type SubFeatures<VersionType> = {
+    featuresRequestHeader?: SubFeature<
+        VersionType,
+        {
+            versions: AppVersionConfig[];
+        }
+    >;
+};
+
+export type AndroidBrowserConfig<VersionType> = Feature<
+    VersionType,
+    SubFeatures<VersionType> & Record<string, SubFeature<VersionType>>
+>;
