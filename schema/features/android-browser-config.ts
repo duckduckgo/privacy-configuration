@@ -25,7 +25,4 @@ type SubFeatures<VersionType> = {
     >;
 };
 
-export type AndroidBrowserConfig<VersionType> = Feature<
-    VersionType,
-    SubFeatures<VersionType> & Record<string, SubFeature<VersionType>>
->;
+export type AndroidBrowserConfig<VersionType> = Feature<VersionType, SubFeatures<VersionType> & Record<string, SubFeature<VersionType>>>;
