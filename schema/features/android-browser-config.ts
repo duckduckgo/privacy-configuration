@@ -1,5 +1,8 @@
 import { CSSInjectFeatureSettings, Feature, SubFeature } from '../feature';
 
+// Type of the feature `settings` object
+type SettingsType = undefined;
+
 type AppVersionConfig = {
     appVersion: number;
     daysAfterBuild: number;
@@ -25,4 +28,8 @@ type SubFeatures<VersionType> = {
     >;
 };
 
-export type AndroidBrowserConfig<VersionType> = Feature<VersionType, SubFeatures<VersionType> & Record<string, SubFeature<VersionType>>>;
+export type AndroidBrowserConfig<VersionType> = Feature<
+    SettingsType,
+    VersionType,
+    SubFeatures<VersionType> & Record<string, SubFeature<VersionType>>
+>;
