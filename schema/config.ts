@@ -6,6 +6,7 @@ import { WebCompatFeature } from './features/webcompat';
 import { DuckPlayerFeature } from './features/duckplayer';
 import { AutofillFeature } from './features/autofill';
 import { MessageBridgeFeature } from './features/message-bridge';
+import { AndroidBrowserConfig } from './features/android-browser-config';
 
 export { WebCompatSettings } from './features/webcompat';
 export { DuckPlayerSettings } from './features/duckplayer';
@@ -33,6 +34,7 @@ export type ConfigV4<VersionType> = {
         trackerAllowlist: TrackerAllowlistFeature<VersionType>;
         webCompat: WebCompatFeature<VersionType>;
         messageBridge: MessageBridgeFeature<VersionType>;
+        androidBrowserConfig: AndroidBrowserConfig<VersionType>;
     };
     unprotectedTemporary: SiteException[];
 };
