@@ -1035,6 +1035,17 @@
                 "useUnifiedFeedback": {
                     "state": "enabled",
                     "minSupportedVersion": "1.113.0"
+                },
+                "setAccessTokenCookieForSubscriptionDomains": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25
+                            }
+                        ]
+                    },
+                    "minSupportedVersion": "1.116.0"
                 }
             }
         },
@@ -1059,6 +1070,14 @@
                     "state": "internal"
                 }
             }
+        },
+        "maliciousSiteProtection": {
+            "state": "internal",
+            "settings": {
+                "hashPrefixUpdateFrequency": 20,
+                "filterSetUpdateFrequency": 720
+            },
+            "exceptions": []
         },
         "backgroundAgentPixelTest": {
             "state": "enabled",

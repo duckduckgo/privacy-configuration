@@ -42,9 +42,37 @@ describe('Config schema tests', () => {
             });
 
             it('all features should be named correctly', () => {
+                const grandfatheredFeatures = [
+                    'androidBrowserConfig',
+                    'androidNewStateKillSwitch',
+                    'windowsDownloadLink',
+                    'windowsExternalPreviewReleases',
+                    'windowsFireWindow',
+                    'windowsNewTabPageExperiment',
+                    'windowsPermissionUsage',
+                    'windowsPrecisionScroll',
+                    'windowsSpellChecker',
+                    'windowsStartupBoost',
+                    'windowsWaitlist',
+                    'windowsWebviewFailures',
+                ];
+                const deviceSpecificCheck = /(android|ios|windows|macos)/i;
                 const featureNameRegex = /^[a-zA-Z0-9]+$/;
                 for (const featureName of Object.keys(config.body.features)) {
                     expect(featureName).to.match(featureNameRegex);
+                    // Features should not have platform specific names so we can use the same config for all platforms.
+                    if (!grandfatheredFeatures.includes(featureName)) {
+                        expect(featureName).to.not.match(deviceSpecificCheck);
+                    }
+
+                    // All subfeatures should also be named correctly
+                    const feature = config.body.features[featureName];
+                    if (feature.features) {
+                        for (const subfeatureName of Object.keys(feature.features)) {
+                            expect(subfeatureName).to.match(featureNameRegex);
+                            expect(subfeatureName).to.not.match(deviceSpecificCheck);
+                        }
+                    }
                 }
             });
 

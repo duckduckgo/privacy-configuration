@@ -9,6 +9,7 @@ import { MessageBridgeFeature } from './features/message-bridge';
 import { APIModificationFeature } from './features/api-modification';
 import { FingerprintingHardwareFeature } from './features/fingerprinting-hardware';
 import { FingerprintingScreenSizeFeature } from './features/fingerprinting-screen-size';
+import { AndroidBrowserConfig } from './features/android-browser-config';
 
 export { WebCompatSettings } from './features/webcompat';
 export { DuckPlayerSettings } from './features/duckplayer';
@@ -39,6 +40,7 @@ export type ConfigV4<VersionType> = {
         messageBridge: MessageBridgeFeature<VersionType>;
         fingerprintingHardware?: FingerprintingHardwareFeature<VersionType>;
         fingerpringtingScreenSize?: FingerprintingScreenSizeFeature<VersionType>;
+        androidBrowserConfig: AndroidBrowserConfig<VersionType>;
     };
     unprotectedTemporary: SiteException[];
 };

@@ -27,6 +27,20 @@
                 }
             }
         },
+        "aiChat": {
+            "state": "disabled",
+            "features": {
+                "browsingToolbarShortcut": {
+                    "state": "disabled"
+                },
+                "addressBarShortcut": {
+                    "state": "disabled"
+                }
+            },
+            "settings": {
+                "aiChatURL": "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=4"
+            }
+        },
         "duckPlayer": {
             "state": "enabled",
             "features": {
@@ -215,7 +229,12 @@
         "autofillSurveys": {
             "state": "enabled",
             "settings": {
-                "surveys": []
+                "surveys": [
+                    {
+                        "id": "2024-12-04",
+                        "url": "https://selfserve.decipherinc.com/survey/selfserve/32ab/241201"
+                    }
+                ]
             }
         },
         "incontextSignup": {
@@ -565,6 +584,25 @@
                 "useUnifiedFeedback": {
                     "state": "enabled",
                     "minSupportedVersion": "7.136.0"
+                },
+                "setAccessTokenCookieForSubscriptionDomains": {
+                    "state": "disabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
+                },
+                "freeTrials": {
+                    "state": "internal"
                 }
             }
         },
@@ -582,16 +620,13 @@
                 }
             }
         },
-        "phishingDetection": {
+        "maliciousSiteProtection": {
             "state": "internal",
-            "features": {
-                "allowErrorPage": {
-                    "state": "internal"
-                },
-                "allowPreferencesToggle": {
-                    "state": "internal"
-                }
-            }
+            "settings": {
+                "hashPrefixUpdateFrequency": 20,
+                "filterSetUpdateFrequency": 720
+            },
+            "exceptions": []
         },
         "backgroundAgentPixelTest": {
             "state": "enabled",
