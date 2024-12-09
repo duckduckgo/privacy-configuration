@@ -6,13 +6,10 @@ import { WebCompatFeature } from './features/webcompat';
 import { DuckPlayerFeature } from './features/duckplayer';
 import { AutofillFeature } from './features/autofill';
 import { MessageBridgeFeature } from './features/message-bridge';
-<<<<<<< HEAD
 import { AndroidBrowserConfig } from './features/android-browser-config';
-=======
 import { APIModificationFeature } from './features/api-modification';
 import { FingerprintingHardwareFeature } from './features/fingerprinting-hardware';
 import { FingerprintingScreenSizeFeature } from './features/fingerprinting-screen-size';
->>>>>>> d0d7132 (Add API modification feature and respective schema for variadic features)
 
 export { WebCompatSettings } from './features/webcompat';
 export { DuckPlayerSettings } from './features/duckplayer';
