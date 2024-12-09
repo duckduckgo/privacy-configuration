@@ -54,6 +54,20 @@ type CSSInjectFeatureSettingsPatches = {
     }[];
 };
 
+/**
+ * Used in Content Scope Scripts to take config objects and turn them into values
+ */
+export type CSSConfigSetting = CSSConfigSettingSingle | CSSConfigSettingSingle[];
+
+type CSSConfigSettingSingle = {
+    type: 'undefined' | 'number' | 'string' | 'function' | 'boolean' | 'null' | 'array' | 'object';
+    functionName?: string;
+    value?: boolean | string | number;
+    criteria?: {
+        arch: string;
+    };
+};
+
 export type CSSInjectFeatureSettings<T> = T & CSSInjectFeatureSettingsPatches;
 
 export type GenericFeature = Feature<any, string | number>;
