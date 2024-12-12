@@ -49,7 +49,7 @@
             "exceptions": [],
             "features": {
                 "tdsNextExperimentBaseline": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": 52200000,
                     "rollout": {
                         "steps": [
@@ -74,7 +74,7 @@
                     ]
                 },
                 "tdsNextExperimentBaselineBackup": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": 52200000,
                     "rollout": {
                         "steps": [
@@ -86,6 +86,31 @@
                     "settings": {
                         "controlUrl": "current/android-tds.json",
                         "treatmentUrl": "temp/android-experiment-ab-tds.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 0
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 0
+                        }
+                    ]
+                },
+                "tdsNextExperimentNov24": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52200000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 2.5
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "current/android-tds.json",
+                        "treatmentUrl": "temp/android-experiment-ab2-tds.json"
                     },
                     "cohorts": [
                         {
