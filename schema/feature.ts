@@ -23,10 +23,13 @@ export type SubFeature<VersionType, SettingsType = Record<string, string>> = {
     rollout?: {
         steps: { percent: number }[];
     };
+    description?: string;
     targets?: {
         variantKey?: string;
         localeCountry?: string;
         localeLanguage?: string;
+        isReturningUser?: boolean;
+        isPrivacyProEligible?: boolean;
     }[];
     cohorts?: Cohort[];
     minSupportedVersion?: VersionType;
