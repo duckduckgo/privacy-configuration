@@ -27,6 +27,8 @@ export type SubFeature<VersionType, SettingsType = Record<string, string>> = {
         variantKey?: string;
         localeCountry?: string;
         localeLanguage?: string;
+        isReturningUser?: boolean;
+        isPrivacyProEligible?: boolean;
     }[];
     cohorts?: Cohort[];
     minSupportedVersion?: VersionType;
