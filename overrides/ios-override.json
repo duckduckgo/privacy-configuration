@@ -1,11 +1,19 @@
 {
     "features": {
         "adAttributionReporting": {
-            "state": "disabled",
-            "minSupportedVersion": "7.145.0",
+            "state": "enabled",
+            "minSupportedVersion": "7.146.0",
             "settings": {
                 "includeToken": false
             }
+        },
+        "additionalCampaignPixelParams": {
+            "state": "enabled",
+            "exceptions": [],
+            "settings": {
+                "origins": ["funnel_pro_iosrmf_announcement"]
+            },
+            "minSupportedVersion": "7.131.0"
         },
         "textZoom": {
             "state": "enabled"
@@ -220,6 +228,9 @@
                             }
                         ]
                     }
+                },
+                "partialFormSaves": {
+                    "state": "enabled"
                 }
             }
         },
@@ -229,12 +240,7 @@
         "autofillSurveys": {
             "state": "enabled",
             "settings": {
-                "surveys": [
-                    {
-                        "id": "2024-12-04",
-                        "url": "https://selfserve.decipherinc.com/survey/selfserve/32ab/241201"
-                    }
-                ]
+                "surveys": []
             }
         },
         "incontextSignup": {
@@ -352,10 +358,11 @@
                         "rules": [
                             {
                                 "rule": "securepubads.g.doubleclick.net/tag/js/gpt.js",
-                                "domains": ["solitaired.com", "uwbadgers.com"],
+                                "domains": ["solitaired.com", "uwbadgers.com", "asuracomic.net"],
                                 "reason": [
                                     "solitaired.com - https://github.com/duckduckgo/privacy-configuration/pull/2329",
-                                    "uwbadgers.com - https://github.com/duckduckgo/privacy-configuration/issues/1593"
+                                    "uwbadgers.com - https://github.com/duckduckgo/privacy-configuration/issues/1593",
+                                    "asuracomic.net - https://github.com/duckduckgo/privacy-configuration/pull/2571"
                                 ]
                             },
                             {
@@ -599,10 +606,22 @@
                                 "percent": 100
                             }
                         ]
-                    }
+                    },
+                    "minSupportedVersion": "7.148.0"
                 },
-                "freeTrials": {
-                    "state": "internal"
+                "privacyProFreeTrialJan25": {
+                    "state": "internal",
+                    "targets": [{ "localeCountry": "US" }],
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
                 }
             }
         },

@@ -23,10 +23,13 @@ export type SubFeature<VersionType, SettingsType = Record<string, string>> = {
     rollout?: {
         steps: { percent: number }[];
     };
+    description?: string;
     targets?: {
         variantKey?: string;
         localeCountry?: string;
         localeLanguage?: string;
+        isReturningUser?: boolean;
+        isPrivacyProEligible?: boolean;
     }[];
     cohorts?: Cohort[];
     minSupportedVersion?: VersionType;
@@ -52,6 +55,20 @@ type CSSInjectFeatureSettingsPatches = {
         domain: string | string[];
         patchSettings: Operation<string | object | number>[];
     }[];
+};
+
+/**
+ * Used in Content Scope Scripts to take config objects and turn them into values
+ */
+export type CSSConfigSetting = CSSConfigSettingSingle | CSSConfigSettingSingle[];
+
+type CSSConfigSettingSingle = {
+    type: 'undefined' | 'number' | 'string' | 'function' | 'boolean' | 'null' | 'array' | 'object';
+    functionName?: string;
+    value?: boolean | string | number;
+    criteria?: {
+        arch: string;
+    };
 };
 
 export type CSSInjectFeatureSettings<T> = T & CSSInjectFeatureSettingsPatches;

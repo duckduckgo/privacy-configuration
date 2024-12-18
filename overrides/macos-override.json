@@ -585,6 +585,9 @@
                 },
                 "credentialsImportPromotionForExistingUsers": {
                     "state": "enabled"
+                },
+                "partialFormSaves": {
+                    "state": "enabled"
                 }
             }
         },
@@ -699,6 +702,10 @@
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/988"
                     },
                     {
+                        "domain": "instructure.com",
+                        "reason": "Experimental mitigation to reduce breakage"
+                    },
+                    {
                         "domain": "web.whatsapp.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1780"
                     },
@@ -757,16 +764,16 @@
                     {
                         "domain": "mail.google.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1295"
+                    },
+                    {
+                        "domain": "teams.microsoft.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2557"
                     }
                 ],
                 "webViewDefault": [
                     {
                         "domain": "flysas.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1347"
-                    },
-                    {
-                        "domain": "facebook.com",
-                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1641"
                     },
                     {
                         "domain": "sas.dk",
@@ -861,10 +868,11 @@
                         "rules": [
                             {
                                 "rule": "securepubads.g.doubleclick.net/tag/js/gpt.js",
-                                "domains": ["solitaired.com", "uwbadgers.com"],
+                                "domains": ["solitaired.com", "uwbadgers.com", "asuracomic.net"],
                                 "reason": [
                                     "solitaired.com - https://github.com/duckduckgo/privacy-configuration/pull/2329",
-                                    "uwbadgers.com - https://github.com/duckduckgo/privacy-configuration/issues/1593"
+                                    "uwbadgers.com - https://github.com/duckduckgo/privacy-configuration/issues/1593",
+                                    "asuracomic.net - https://github.com/duckduckgo/privacy-configuration/pull/2571"
                                 ]
                             },
                             {
@@ -1056,11 +1064,14 @@
                     "minSupportedVersion": "1.113.0"
                 },
                 "setAccessTokenCookieForSubscriptionDomains": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "rollout": {
                         "steps": [
                             {
                                 "percent": 25
+                            },
+                            {
+                                "percent": 100
                             }
                         ]
                     },
@@ -1080,13 +1091,13 @@
             "state": "enabled"
         },
         "phishingDetection": {
-            "state": "internal",
+            "state": "disabled",
             "features": {
                 "allowErrorPage": {
-                    "state": "internal"
+                    "state": "disabled"
                 },
                 "allowPreferencesToggle": {
-                    "state": "internal"
+                    "state": "disabled"
                 }
             }
         },

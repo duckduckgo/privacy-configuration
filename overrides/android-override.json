@@ -35,7 +35,8 @@
                     "funnel_pro_androidrmf_announcement_privacy",
                     "funnel_pro_androidrmf_announcement_vpn",
                     "funnel_pro_androidrmf_announcement_holiday",
-                    "funnel_pro_androidrmf_announcement_wifi"
+                    "funnel_pro_androidrmf_announcement_wifi",
+                    "funnel_pro_androidrmf_announcement"
                 ]
             },
             "minSupportedVersion": 52100000
@@ -48,7 +49,7 @@
             "exceptions": [],
             "features": {
                 "tdsNextExperimentBaseline": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": 52200000,
                     "rollout": {
                         "steps": [
@@ -60,6 +61,106 @@
                     "settings": {
                         "controlUrl": "temp/android-experiment-tds.json",
                         "treatmentUrl": "temp/android-experiment-tds.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 0
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 0
+                        }
+                    ]
+                },
+                "tdsNextExperimentBaselineBackup": {
+                    "state": "disabled",
+                    "minSupportedVersion": 52200000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 2.5
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "current/android-tds.json",
+                        "treatmentUrl": "temp/android-experiment-ab-tds.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 0
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 0
+                        }
+                    ]
+                },
+                "tdsNextExperimentNov24": {
+                    "state": "disabled",
+                    "minSupportedVersion": 52200000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 2.5
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "current/android-tds.json",
+                        "treatmentUrl": "temp/android-experiment-ab2-tds.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 0
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 0
+                        }
+                    ]
+                },
+                "tdsNextExperimentDec24": {
+                    "state": "disabled",
+                    "minSupportedVersion": 52200000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 2.5
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "v5/current/android-tds.json",
+                        "treatmentUrl": "v5/temp/android-experiment-ab2-tds.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 0
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 0
+                        }
+                    ]
+                },
+                "tdsNextExperimentBaselineBackup2": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52220000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 50
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "v5/current/android-tds.json",
+                        "treatmentUrl": "v5/temp/android-experiment-ab2-tds.json"
                     },
                     "cohorts": [
                         {
@@ -223,6 +324,22 @@
             "state": "enabled",
             "minSupportedVersion": 51250000
         },
+        "auraExperiment": {
+            "state": "enabled",
+            "settings": {
+                "packages": [
+                    "com.aura.oobe.sliide",
+                    "com.tmobile.pr.adapt",
+                    "com.dish.wireless.installer",
+                    "com.tmobile.dm.cm",
+                    "com.sec.android.app.samsungapps",
+                    "com.sprint.ce.updater",
+                    "com.aura.oobe.solutions",
+                    "com.aura.oobe.motorola",
+                    "com.samsung.android.scloud"
+                ]
+            }
+        },
         "autoconsent": {
             "state": "enabled",
             "exceptions": [
@@ -288,6 +405,9 @@
                 "canIntegrateWebMessageBasedAutofillInWebView": {
                     "state": "disabled"
                 },
+                "partialFormSaves": {
+                    "state": "enabled"
+                },
                 "onByDefault": {
                     "state": "enabled",
                     "rollout": {
@@ -337,7 +457,7 @@
                                             "op": "add",
                                             "value": {
                                                 "settingsButton": {
-                                                    "shouldAutotap": false,
+                                                    "shouldAutotap": true,
                                                     "path": "/",
                                                     "selectors": ["a[href*='options']"],
                                                     "labelTexts": ["Password options"]
@@ -352,7 +472,7 @@
                                                     "labelTexts": ["Export"]
                                                 },
                                                 "signInButton": {
-                                                    "shouldAutotap": false,
+                                                    "shouldAutotap": true,
                                                     "path": "/intro",
                                                     "selectors": ["a[href*='ServiceLogin'][target='_top']"],
                                                     "labelTexts": ["Sign in"]
@@ -373,12 +493,7 @@
         "autofillSurveys": {
             "state": "enabled",
             "settings": {
-                "surveys": [
-                    {
-                        "id": "2024-12-04",
-                        "url": "https://selfserve.decipherinc.com/survey/selfserve/32ab/241200"
-                    }
-                ]
+                "surveys": []
             }
         },
         "androidBrowserConfig": {
@@ -431,8 +546,8 @@
                                 "featuresLogged": {
                                     "gpc": true,
                                     "cpm": true,
-                                    "appTp": true,
-                                    "netP": true
+                                    "appTp": false,
+                                    "netP": false
                                 }
                             }
                         ]
@@ -1416,7 +1531,36 @@
                     "state": "disabled"
                 },
                 "privacyProCta": {
-                    "state": "disabled"
+                    "state": "enabled"
+                },
+                "testPrivacyProOnboardingCopyNov24": {
+                    "state": "enabled",
+                    "description": "copy test in privacy pro onboarding dialog",
+                    "targets": [
+                        {
+                            "localeLanguage": "en",
+                            "isReturningUser": false,
+                            "isPrivacyProEligible": true
+                        }
+                    ],
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "protection",
+                            "weight": 1
+                        },
+                        {
+                            "name": "deal",
+                            "weight": 1
+                        },
+                        {
+                            "name": "step",
+                            "weight": 1
+                        }
+                    ]
                 }
             }
         },
