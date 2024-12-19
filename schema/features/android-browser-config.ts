@@ -13,7 +13,7 @@ type AppVersionConfig = {
 type FeatureLogged = {
     gpc: boolean;
     cpm: boolean;
-    appTp: boolean;
+    appTP: boolean;
     netP: boolean;
 };
 
