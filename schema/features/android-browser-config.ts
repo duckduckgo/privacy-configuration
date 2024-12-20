@@ -26,6 +26,13 @@ type SubFeatures<VersionType> = {
             versions: AppVersionConfig[];
         }
     >;
+    localStorage?: SubFeature<
+        VersionType,
+        {
+            domains: string[];
+            matchingRegex: string[];
+        }
+    >;
 };
 
 export type AndroidBrowserConfig<VersionType> = Feature<
