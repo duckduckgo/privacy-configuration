@@ -26,7 +26,7 @@ type SubFeatures<VersionType> = {
             versions: AppVersionConfig[];
         }
     >;
-    localStorage?: SubFeature<
+    webLocalStorage?: SubFeature<
         VersionType,
         {
             domains: string[];
