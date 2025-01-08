@@ -47,7 +47,6 @@ describe('Config schema tests', () => {
                     'androidNewStateKillSwitch',
                     'windowsDownloadLink',
                     'windowsExternalPreviewReleases',
-                    'windowsFullScreenMode',
                     'windowsFireWindow',
                     'windowsNewTabPageExperiment',
                     'windowsPermissionUsage',
