@@ -1,7 +1,7 @@
 {
     "features": {
         "apiManipulation": {
-            "state": "enabled",
+            "state": "disabled",
             "settings": {
                 "apiChanges": {
                     "Navigator.prototype.joinAdInterestGroup": {
@@ -113,10 +113,12 @@
                     "state": "enabled"
                 },
                 "credentialsImportPromotion": {
-                    "state": "disabled"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.98.0"
                 },
                 "credentialsImportPromotionForExistingUsers": {
-                    "state": "disabled"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.98.0"
                 },
                 "partialFormSaves": {
                     "state": "disabled"
@@ -417,11 +419,20 @@
             "state": "enabled"
         },
         "windowsFireWindow": {
-            "state": "disabled"
+            "state": "enabled",
+            "minSupportedVersion": "0.98.0"
         },
         "windowsNewTabPageExperiment": {
             "state": "enabled",
-            "minSupportedVersion": "0.96.0"
+            "minSupportedVersion": "0.96.0",
+            "features": {
+                "nextStepsWidget": {
+                    "state": "disabled"
+                }
+            }
+        },
+        "fullScreenMode": {
+            "state": "disabled"
         }
     },
     "unprotectedTemporary": []

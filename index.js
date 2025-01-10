@@ -132,7 +132,6 @@ const featuresToIncludeTempUnprotectedExceptions = [
     'fingerprintingHardware',
     'fingerprintingScreenSize',
     'fingerprintingTemporaryStorage',
-    'floc',
     'googleRejected',
     'gpc',
     'harmfulApis',

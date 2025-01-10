@@ -1236,11 +1236,12 @@
                 "rules": [
                     {
                         "rule": "google-analytics.com/analytics.js",
-                        "domains": ["doterra.com", "easyjet.com", "worlddutyfree.com", "saplinglearning.com"],
+                        "domains": ["doterra.com", "easyjet.com", "worlddutyfree.com", "saplinglearning.com", "bswift.com"],
                         "reason": [
                             "doterra.com - For doterra.com/login/loading, the page shows a loading indicator and never redirects.",
                             "easyjet.com - Clicking 'Show Worldwide flights' after entering parameters for a worldwide flight in the flight viewing form does nothing.",
-                            "worlddutyfree.com - https://github.com/duckduckgo/privacy-configuration/issues/1380"
+                            "worlddutyfree.com - https://github.com/duckduckgo/privacy-configuration/issues/1380",
+                            "bswift.com - https://github.com/duckduckgo/privacy-configuration/pull/2630"
                         ]
                     },
                     {
@@ -1335,6 +1336,7 @@
                         "domains": [
                             "abril.com.br",
                             "cosmicbook.news",
+                            "tesla.com",
                             "tradersync.com",
                             "thesimsresource.com",
                             "algomalegalclinic.com",
@@ -1348,6 +1350,7 @@
                         "reason": [
                             "https://github.com/duckduckgo/privacy-configuration/issues/929",
                             "cosmicbook.news - https://github.com/duckduckgo/privacy-configuration/issues/1578",
+                            "tesla.com - https://github.com/duckduckgo/privacy-configuration/pull/2608",
                             "tradersync.com - https://github.com/duckduckgo/privacy-configuration/issues/1687",
                             "thesimsresource.com - https://github.com/duckduckgo/privacy-configuration/issues/1706",
                             "algomalegalclinic.com - https://github.com/duckduckgo/privacy-configuration/issues/1822",
@@ -1990,6 +1993,15 @@
                         "rule": "cdn.accounts.nintendo.com/account/js/common.js",
                         "domains": ["nintendo.com"],
                         "reason": "Accounts page renders blank. Download buttons show loading stars and never finish loading. Pricing information doesn't load. Note that cdn.accounts.nintendo.com CNAMEs to star.accounts.nintendo.com.edgekey.net at the time of mitigation."
+                    }
+                ]
+            },
+            "nitropay.com": {
+                "rules": [
+                    {
+                        "rule": "nitropay.com/ads",
+                        "domains": ["maxroll.gg"],
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2607"
                     }
                 ]
             },

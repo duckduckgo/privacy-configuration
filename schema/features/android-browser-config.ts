@@ -13,7 +13,7 @@ type AppVersionConfig = {
 type FeatureLogged = {
     gpc: boolean;
     cpm: boolean;
-    appTp: boolean;
+    appTP: boolean;
     netP: boolean;
 };
 
@@ -24,6 +24,16 @@ type SubFeatures<VersionType> = {
         VersionType,
         {
             versions: AppVersionConfig[];
+        }
+    >;
+    // This subfeature allowlists web local storage when the fire button is pressed
+    webLocalStorage?: SubFeature<
+        VersionType,
+        {
+            // Domains to be allowlisted
+            domains: string[];
+            // Patterns to be matched in the WebView's LevelDB
+            matchingRegex: string[];
         }
     >;
 };

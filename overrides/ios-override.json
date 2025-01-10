@@ -1,7 +1,7 @@
 {
     "features": {
         "adAttributionReporting": {
-            "state": "enabled",
+            "state": "disabled",
             "minSupportedVersion": "7.146.0",
             "settings": {
                 "includeToken": false
@@ -42,6 +42,9 @@
                     "state": "disabled"
                 },
                 "addressBarShortcut": {
+                    "state": "disabled"
+                },
+                "deepLink": {
                     "state": "disabled"
                 }
             },
@@ -585,6 +588,23 @@
                 "isLaunchedOverride": {
                     "state": "disabled"
                 },
+                "isLaunchedROW": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "minSupportedVersion": "7.149.1"
+                },
                 "allowPurchase": {
                     "state": "enabled"
                 },
@@ -610,7 +630,7 @@
                     "minSupportedVersion": "7.148.0"
                 },
                 "privacyProFreeTrialJan25": {
-                    "state": "internal",
+                    "state": "disabled",
                     "targets": [{ "localeCountry": "US" }],
                     "cohorts": [
                         {

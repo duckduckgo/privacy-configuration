@@ -145,6 +145,14 @@
                 }
             }
         },
+        "htmlNewTabPage": {
+            "state": "internal",
+            "features": {
+                "isLaunched": {
+                    "state": "internal"
+                }
+            }
+        },
         "newTabContinueSetUp": {
             "state": "enabled",
             "settings": {
@@ -1030,6 +1038,23 @@
                 "isLaunchedOverride": {
                     "state": "disabled"
                 },
+                "isLaunchedROW": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "minSupportedVersion": "1.118.1"
+                },
                 "allowPurchase": {
                     "state": "enabled"
                 },
@@ -1102,7 +1127,7 @@
             }
         },
         "maliciousSiteProtection": {
-            "state": "internal",
+            "state": "enabled",
             "settings": {
                 "hashPrefixUpdateFrequency": 20,
                 "filterSetUpdateFrequency": 720

@@ -31,13 +31,7 @@
             "state": "enabled",
             "exceptions": [],
             "settings": {
-                "origins": [
-                    "funnel_pro_androidrmf_announcement_privacy",
-                    "funnel_pro_androidrmf_announcement_vpn",
-                    "funnel_pro_androidrmf_announcement_holiday",
-                    "funnel_pro_androidrmf_announcement_wifi",
-                    "funnel_pro_androidrmf_announcement"
-                ]
+                "origins": []
             },
             "minSupportedVersion": 52100000
         },
@@ -149,7 +143,7 @@
                     ]
                 },
                 "tdsNextExperimentBaselineBackup2": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": 52220000,
                     "rollout": {
                         "steps": [
@@ -165,11 +159,11 @@
                     "cohorts": [
                         {
                             "name": "control",
-                            "weight": 1
+                            "weight": 0
                         },
                         {
                             "name": "treatment",
-                            "weight": 1
+                            "weight": 0
                         }
                     ]
                 }
@@ -546,10 +540,54 @@
                                 "featuresLogged": {
                                     "gpc": true,
                                     "cpm": true,
-                                    "appTp": false,
+                                    "appTP": false,
+                                    "netP": false
+                                }
+                            },
+                            {
+                                "appVersion": 52220000,
+                                "daysAfterBuild": 6,
+                                "daysLogging": 28,
+                                "featuresLogged": {
+                                    "gpc": false,
+                                    "cpm": false,
+                                    "appTP": true,
+                                    "netP": false
+                                }
+                            },
+                            {
+                                "appVersion": 52230000,
+                                "daysAfterBuild": 6,
+                                "daysLogging": 10,
+                                "featuresLogged": {
+                                    "gpc": false,
+                                    "cpm": true,
+                                    "appTP": false,
+                                    "netP": false
+                                }
+                            },
+                            {
+                                "appVersion": 52231000,
+                                "daysAfterBuild": 6,
+                                "daysLogging": 10,
+                                "featuresLogged": {
+                                    "gpc": false,
+                                    "cpm": true,
+                                    "appTP": false,
                                     "netP": false
                                 }
                             }
+                        ]
+                    }
+                },
+                "webLocalStorage": {
+                    "state": "enabled",
+                    "settings": {
+                        "domains": ["duckduckgo.com"],
+                        "matchingRegex": [
+                            "^_https://([a-zA-Z0-9.-]+\\.)?{domain}\u0000\u0001.+$",
+                            "^META:https://([a-zA-Z0-9.-]+\\.)?{domain}$",
+                            "^METAACCESS:https://([a-zA-Z0-9.-]+\\.)?{domain}$"
                         ]
                     }
                 }
@@ -922,6 +960,10 @@
                 {
                     "domain": "instagram.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2182"
+                },
+                {
+                    "domain": "hyatt.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2613"
                 }
             ],
             "state": "enabled",
@@ -1483,7 +1525,21 @@
                     "minSupportedVersion": 51961000
                 },
                 "isLaunchedROW": {
-                    "state": "disabled"
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "minSupportedVersion": 52220000
                 },
                 "allowPurchase": {
                     "state": "enabled"
