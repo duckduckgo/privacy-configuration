@@ -39,7 +39,19 @@ type FullWebCompatOptions = CSSInjectFeatureSettings<{
     plainTextViewPort: StateToggle;
     modifyLocalStorage: {
         state: StateToggle;
-        changes: any[];
+        changes: {
+            key: string;
+            action: 'delete';
+        }[];
+    };
+    modifyCookies: {
+        state: StateToggle;
+        changes: {
+            key: string;
+            action: 'delete';
+            path?: string;
+            domain?: string;
+        }[];
     };
 }>;
 export type WebCompatSettings = Partial<FullWebCompatOptions>;

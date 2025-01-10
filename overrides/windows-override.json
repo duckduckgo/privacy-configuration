@@ -383,6 +383,30 @@
                 }
             }
         },
+        "webCompat": {
+            "state": "enabled",
+            "settings": {
+                "modifyCookies": {
+                    "state": "enabled",
+                    "changes": []
+                },
+                "domains": [
+                    {
+                        "domain": "msn.com",
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/modifyCookies/changes/-",
+                                "value": {
+                                    "key": "is_ms_teams_iframe",
+                                    "action": "delete"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
         "windowsSpellChecker": {
             "state": "enabled"
         },
