@@ -153,6 +153,7 @@ const featuresToIncludeTempUnprotectedExceptions = [
     'webCompat',
     'swipingTabs',
     'showOnAppLaunch',
+    'tabMultiSelection',
 ];
 function applyGlobalUnprotectedTempExceptionsToFeatures(key, baseConfig, globalExceptions) {
     if (featuresToIncludeTempUnprotectedExceptions.includes(key)) {
