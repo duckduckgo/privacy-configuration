@@ -503,10 +503,6 @@
                 {
                     "domain": "community.bitwarden.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/519"
-                },
-                {
-                    "domain": "docs.google.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2647"
                 }
             ],
             "settings": {
@@ -522,6 +518,16 @@
                     }
                 },
                 "domains": [
+                    {
+                        "domain": "docs.google.com",
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/windowSizing",
+                                "value": "disabled"
+                            }
+                        ]
+                    },
                     {
                         "domain": "www.cbsnews.com",
                         "patchSettings": [
