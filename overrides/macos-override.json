@@ -63,6 +63,9 @@
                 },
                 "enforceRoutes": {
                     "state": "enabled"
+                },
+                "appExclusions": {
+                    "state": "enabled"
                 }
             },
             "minSupportedVersion": "1.57.1"
@@ -212,10 +215,6 @@
                 {
                     "domain": "lastpass.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/533"
-                },
-                {
-                    "domain": "docs.google.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2647"
                 }
             ],
             "settings": {
@@ -231,6 +230,16 @@
                     }
                 },
                 "domains": [
+                    {
+                        "domain": "docs.google.com",
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/windowSizing",
+                                "value": "disabled"
+                            }
+                        ]
+                    },
                     {
                         "domain": "www.cbsnews.com",
                         "patchSettings": [
