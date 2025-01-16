@@ -149,7 +149,6 @@ const featuresToIncludeTempUnprotectedExceptions = [
     'trackingCookies3p',
     'trackingParameters',
     'unprotectedTemporary',
-    'userAgentRotation',
     'webCompat',
     'swipingTabs',
     'showOnAppLaunch',
