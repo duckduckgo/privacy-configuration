@@ -138,7 +138,6 @@ const featuresToIncludeTempUnprotectedExceptions = [
     'https',
     'navigatorCredentials',
     'navigatorInterface',
-    'newSettings',
     'nonTracking3pCookies',
     'performanceMetrics',
     'referrer',
