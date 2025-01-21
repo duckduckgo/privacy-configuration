@@ -73,6 +73,29 @@
                     "state": "disabled"
                 }
             }
+        },
+        "contentBlocking": {
+            "state": "enabled",
+            "features": {
+                "TDSRolloutBetaChannelJan2025": {
+                    "state": "enabled",
+                    "settings": {
+                        "controlUrl": "v6/current/extension-mv3-tds.json",
+                        "treatmentUrl": "v6/next/extension-mv3-tds.json"
+                    },
+                    "minSupportedVersion": "2025.1.20",
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                }
+            }
         }
     }
 }
