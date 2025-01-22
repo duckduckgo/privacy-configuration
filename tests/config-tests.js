@@ -42,7 +42,7 @@ describe('Config schema tests', () => {
             });
 
             it('all features should be named correctly', () => {
-                const grandfatheredFeatures = [
+                const legacyFeatures = [
                     'androidBrowserConfig',
                     'androidNewStateKillSwitch',
                     'windowsDownloadLink',
@@ -61,7 +61,7 @@ describe('Config schema tests', () => {
                 for (const featureName of Object.keys(config.body.features)) {
                     expect(featureName).to.match(featureNameRegex);
                     // Features should not have platform specific names so we can use the same config for all platforms.
-                    if (!grandfatheredFeatures.includes(featureName)) {
+                    if (!legacyFeatures.includes(featureName)) {
                         expect(featureName).to.not.match(deviceSpecificCheck);
                     }
 
@@ -78,9 +78,9 @@ describe('Config schema tests', () => {
 
             it('All features should have a corresponding feature file', () => {
                 // Note: We should not add more to this list, only remove
-                const grandfatheredFeatures = ['webViewBlobDownload', 'experimentTest', 'eme', 'clientContentFeatures'];
+                const legacyFeatures = ['webViewBlobDownload', 'experimentTest', 'eme', 'clientContentFeatures'];
                 for (const featureName of Object.keys(config.body.features)) {
-                    if (grandfatheredFeatures.includes(featureName)) {
+                    if (legacyFeatures.includes(featureName)) {
                         continue;
                     }
                     const dasherizedFeatureName = featureName.replace(/([a-z0-9])([A-Z0-9])/g, '$1-$2').toLowerCase();
