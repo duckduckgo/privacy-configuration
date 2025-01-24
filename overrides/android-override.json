@@ -5,15 +5,23 @@
             "exceptions": [],
             "features": {
                 "experimentTestAA": {
-                    "state": "disabled",
+                    "state": "enabled",
+                    "minSupportedVersion": 52240000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 20
+                            }
+                        ]
+                    },
                     "cohorts": [
                         {
                             "name": "control",
-                            "weight": 0
+                            "weight": 1
                         },
                         {
                             "name": "treatment",
-                            "weight": 0
+                            "weight": 1
                         }
                     ]
                 }
