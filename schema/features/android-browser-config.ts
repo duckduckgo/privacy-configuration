@@ -5,7 +5,7 @@ type SettingsType = undefined;
 
 type AppVersionConfig = {
     appVersion: number;
-    daysAfterBuild: number;
+    daysUntilLoggingStarts: number;
     daysLogging: number;
     featuresLogged: FeatureLogged;
 };
