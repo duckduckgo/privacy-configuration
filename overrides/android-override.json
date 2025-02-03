@@ -5,15 +5,7 @@
             "exceptions": [],
             "features": {
                 "experimentTestAA": {
-                    "state": "enabled",
-                    "minSupportedVersion": 52240000,
-                    "rollout": {
-                        "steps": [
-                            {
-                                "percent": 20
-                            }
-                        ]
-                    },
+                    "state": "disabled",
                     "cohorts": [
                         {
                             "name": "control",
@@ -39,11 +31,17 @@
             "state": "enabled",
             "exceptions": [],
             "settings": {
-                "origins": []
+                "origins": [
+                    "funnel_pro_androidrmf_announcement_privacy",
+                    "funnel_pro_androidrmf_announcement_vpn",
+                    "funnel_pro_androidrmf_announcement_holiday",
+                    "funnel_pro_androidrmf_announcement_wifi",
+                    "funnel_pro_androidrmf_announcement"
+                ]
             },
             "minSupportedVersion": 52100000
         },
-        "appTrackerProtection": {
+        "appTrackerProtection": 
             "state": "enabled"
         },
         "blockList": {
@@ -51,8 +49,8 @@
             "exceptions": [],
             "features": {
                 "tdsNextExperimentBaseline": {
-                    "state": "enabled",
-                    "minSupportedVersion": 52240000,
+                    "state": "disabled",
+                    "minSupportedVersion": 52200000,
                     "rollout": {
                         "steps": [
                             {
@@ -61,17 +59,17 @@
                         ]
                     },
                     "settings": {
-                        "controlUrl": "v5/temp/android-experiment-tds.json",
-                        "treatmentUrl": "v5/temp/android-experiment-tds.json"
+                        "controlUrl": "temp/android-experiment-tds.json",
+                        "treatmentUrl": "temp/android-experiment-tds.json"
                     },
                     "cohorts": [
                         {
                             "name": "control",
-                            "weight": 1
+                            "weight": 0
                         },
                         {
                             "name": "treatment",
-                            "weight": 1
+                            "weight": 0
                         }
                     ]
                 },
@@ -151,7 +149,7 @@
                     ]
                 },
                 "tdsNextExperimentBaselineBackup2": {
-                    "state": "disabled",
+                    "state": "enabled",
                     "minSupportedVersion": 52220000,
                     "rollout": {
                         "steps": [
@@ -167,11 +165,36 @@
                     "cohorts": [
                         {
                             "name": "control",
-                            "weight": 0
+                            "weight": 1
                         },
                         {
                             "name": "treatment",
-                            "weight": 0
+                            "weight": 1
+                        }
+                    ]
+                },
+                "tdsNextExperimentBaselineBackup3": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52240000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 50
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "v5/temp/android-experiment-tds.json",
+                        "treatmentUrl": "v5/temp/android-experiment-tds.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
                         }
                     ]
                 }
@@ -543,70 +566,15 @@
                         "versions": [
                             {
                                 "appVersion": 52210000,
-                                "daysUntilLoggingStarts": 6,
+                                "daysAfterBuild": 6,
                                 "daysLogging": 10,
                                 "featuresLogged": {
                                     "gpc": true,
                                     "cpm": true,
-                                    "appTP": false,
-                                    "netP": false
-                                }
-                            },
-                            {
-                                "appVersion": 52220000,
-                                "daysUntilLoggingStarts": 6,
-                                "daysLogging": 28,
-                                "featuresLogged": {
-                                    "gpc": false,
-                                    "cpm": false,
-                                    "appTP": true,
-                                    "netP": false
-                                }
-                            },
-                            {
-                                "appVersion": 52230000,
-                                "daysUntilLoggingStarts": 6,
-                                "daysLogging": 10,
-                                "featuresLogged": {
-                                    "gpc": false,
-                                    "cpm": true,
-                                    "appTP": false,
-                                    "netP": false
-                                }
-                            },
-                            {
-                                "appVersion": 52231000,
-                                "daysUntilLoggingStarts": 6,
-                                "daysLogging": 10,
-                                "featuresLogged": {
-                                    "gpc": false,
-                                    "cpm": true,
-                                    "appTP": false,
-                                    "netP": false
-                                }
-                            },
-                            {
-                                "appVersion": 52240000,
-                                "daysUntilLoggingStarts": 6,
-                                "daysLogging": 10,
-                                "featuresLogged": {
-                                    "gpc": false,
-                                    "cpm": true,
-                                    "appTP": false,
+                                    "appTp": false,
                                     "netP": false
                                 }
                             }
-                        ]
-                    }
-                },
-                "webLocalStorage": {
-                    "state": "internal",
-                    "settings": {
-                        "domains": ["duckduckgo.com"],
-                        "matchingRegex": [
-                            "^_https://([a-zA-Z0-9.-]+\\.)?{domain}\u0000\u0001.+$",
-                            "^META:https://([a-zA-Z0-9.-]+\\.)?{domain}$",
-                            "^METAACCESS:https://([a-zA-Z0-9.-]+\\.)?{domain}$"
                         ]
                     }
                 }
@@ -738,10 +706,6 @@
                 {
                     "domain": "chewy.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2154"
-                },
-                {
-                    "domain": "hyatt.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2637"
                 }
             ]
         },
@@ -983,10 +947,6 @@
                 {
                     "domain": "instagram.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2182"
-                },
-                {
-                    "domain": "hyatt.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2613"
                 }
             ],
             "state": "enabled",
@@ -1518,14 +1478,6 @@
                 {
                     "domain": "thrifty.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2527"
-                },
-                {
-                    "domain": "login.coinbase.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2660"
-                },
-                {
-                    "domain": "identity.docusign.net",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2660"
                 }
             ]
         },
@@ -1556,21 +1508,7 @@
                     "minSupportedVersion": 51961000
                 },
                 "isLaunchedROW": {
-                    "state": "enabled",
-                    "rollout": {
-                        "steps": [
-                            {
-                                "percent": 25
-                            },
-                            {
-                                "percent": 50
-                            },
-                            {
-                                "percent": 100
-                            }
-                        ]
-                    },
-                    "minSupportedVersion": 52220000
+                    "state": "disabled"
                 },
                 "allowPurchase": {
                     "state": "enabled"
@@ -1618,16 +1556,10 @@
                     "state": "disabled"
                 },
                 "privacyProCta": {
-                    "state": "enabled",
-                    "targets": [
-                        {
-                            "localeLanguage": "en",
-                            "localeCountry": "us"
-                        }
-                    ]
+                    "state": "enabled"
                 },
                 "testPrivacyProOnboardingCopyNov24": {
-                    "state": "disabled",
+                    "state": "enabled",
                     "description": "copy test in privacy pro onboarding dialog",
                     "targets": [
                         {
@@ -1639,19 +1571,19 @@
                     "cohorts": [
                         {
                             "name": "control",
-                            "weight": 0
+                            "weight": 1
                         },
                         {
                             "name": "protection",
-                            "weight": 0
+                            "weight": 1
                         },
                         {
                             "name": "deal",
-                            "weight": 0
+                            "weight": 1
                         },
                         {
                             "name": "step",
-                            "weight": 0
+                            "weight": 1
                         }
                     ]
                 }
@@ -1743,14 +1675,6 @@
         "showOnAppLaunch": {
             "state": "enabled"
         },
-        "tabManager": {
-            "state": "internal",
-            "features": {
-                "multiSelection": {
-                    "state": "disabled"
-                }
-            }
-        },
         "maliciousSiteProtection": {
             "state": "internal",
             "settings": {
@@ -1758,36 +1682,6 @@
                 "filterSetUpdateFrequency": 720
             },
             "exceptions": []
-        },
-        "bookmarksSorting": {
-            "state": "disabled"
-        },
-        "settingsPage": {
-            "state": "enabled",
-            "features": {
-                "newSettingsPage": {
-                    "state": "enabled",
-                    "minSupportedVersion": 52250000,
-                    "rollout": {
-                        "steps": [
-                            {
-                                "percent": 20
-                            }
-                        ]
-                    }
-                },
-                "newPrivacyProSection": {
-                    "state": "enabled",
-                    "minSupportedVersion": 52250000,
-                    "rollout": {
-                        "steps": [
-                            {
-                                "percent": 20
-                            }
-                        ]
-                    }
-                }
-            }
         }
     },
     "unprotectedTemporary": [],
@@ -1811,11 +1705,6 @@
             {
                 "desc": "Highlights onboarding experimental group",
                 "variantKey": "mx",
-                "weight": 0
-            },
-            {
-                "desc": "Aura experimental group",
-                "variantKey": "mq",
                 "weight": 0
             }
         ]
