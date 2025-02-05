@@ -76,7 +76,33 @@
         },
         "contentBlocking": {
             "state": "enabled",
-            "features": {}
+            "features": {
+                "TDSAAExperiment": {
+                    "state": "enabled",
+                    "settings": {
+                        "controlUrl": "v6/current/extension-mv3-tds.json",
+                        "treatmentUrl": "v6/temp/extension-mv3-tds.json"
+                    },
+                    "minSupportedVersion": "2025.2.3",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                }
+            }
         }
     }
 }
