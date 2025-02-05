@@ -102,7 +102,33 @@
         },
         "contentBlocking": {
             "state": "enabled",
-            "exceptions": []
+            "exceptions": [],
+            "features": {
+                "tdsNextExperimentBaseline": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 50
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "v5/temp/ios-tds.json",
+                        "treatmentUrl": "v5/temp/ios-tds-b.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                }
+            }
         },
         "history": {
             "state": "enabled",

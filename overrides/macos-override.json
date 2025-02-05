@@ -124,7 +124,33 @@
                     "domain": "wjla.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2319"
                 }
-            ]
+            ],
+            "features": {
+                "tdsNextExperimentBaseline": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 50
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "v6/temp/macos-tds.json",
+                        "treatmentUrl": "v6/temp/macos-tds-b.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                }
+            }
         },
         "cookie": {
             "state": "enabled",
