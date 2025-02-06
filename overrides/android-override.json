@@ -338,6 +338,11 @@
                 }
             ]
         },
+        "aiChat": {
+            "state": "internal",
+            "minSupportedVersion": 52250000,
+            "exceptions": []
+        },
         "ampLinks": {
             "state": "enabled",
             "exceptions": [
@@ -637,6 +642,7 @@
                 },
                 "webLocalStorage": {
                     "state": "internal",
+                    "minSupportedVersion": 52250000,
                     "settings": {
                         "domains": ["duckduckgo.com"],
                         "matchingRegex": [
@@ -827,6 +833,30 @@
         "incrementalRolloutTest": {
             "state": "enabled",
             "minSupportedVersion": 51670000
+        },
+        "messageBridge": {
+            "state": "enabled",
+            "exceptions": [],
+            "minSupportedVersion": 52250000,
+            "settings": {
+                "aiChat": "disabled",
+                "domains": [
+                    {
+                        "domain": "duckduckgo.com",
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/aiChat",
+                                "value": "enabled"
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        "navigatorInterface": {
+            "state": "enabled",
+            "minSupportedVersion": 52250000
         },
         "networkProtection": {
             "state": "enabled",
