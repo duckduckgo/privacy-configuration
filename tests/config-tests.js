@@ -109,6 +109,22 @@ describe('Config schema tests', () => {
                     }
                 }
             });
+
+            it('All experiment cohorts should be named correctly', () => {
+                const cohortNameRegex = /^[a-zA-Z0-9]+$/;
+                /** @type {Record<string, import('../schema/feature').GenericFeature>} */
+                const features = config.body.features;
+                for (const featureName of Object.keys(config.body.features)) {
+                    for (const subfeatureName of Object.keys(features[featureName].features || {})) {
+                        const subFeature = features[featureName].features[subfeatureName];
+                        if (subFeature.cohorts) {
+                            for (const cohort of subFeature.cohorts) {
+                                expect(cohort.name).to.match(cohortNameRegex);
+                            }
+                        }
+                    }
+                }
+            });
         });
     }
 

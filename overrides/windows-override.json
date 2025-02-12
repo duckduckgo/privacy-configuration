@@ -1,7 +1,7 @@
 {
     "features": {
         "apiManipulation": {
-            "state": "disabled",
+            "state": "enabled",
             "settings": {
                 "apiChanges": {
                     "Navigator.prototype.joinAdInterestGroup": {
@@ -72,6 +72,25 @@
                 "betaEndingDescription": "The free, beta period is ending soon."
             }
         },
+        "aiChat": {
+            "state": "enabled",
+            "features": {
+                "toolbarShortcut": {
+                    "state": "enabled"
+                },
+                "applicationMenuShortcut": {
+                    "state": "enabled"
+                }
+            },
+            "minSupportedVersion": "0.100.0",
+            "settings": {
+                "aiChatURL": "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=3",
+                "onboardingCookieName": "dcm",
+                "onboardingCookieDomain": "duckduckgo.com",
+                "aiChatURLIdentifiableQuery": "ia",
+                "aiChatURLIdentifiableQueryValue": "chat"
+            }
+        },
         "dbp": {
             "state": "enabled",
             "features": {
@@ -138,7 +157,7 @@
         },
         "autoconsent": {
             "state": "enabled",
-            "minSupportedVersion": "0.50.0",
+            "minSupportedVersion": "0.99.0",
             "features": {
                 "filterlist": {
                     "state": "disabled"
@@ -441,7 +460,7 @@
                     "state": "enabled"
                 },
                 "crashAutoRecovery": {
-                    "state": "enabled"
+                    "state": "disabled"
                 }
             }
         },
@@ -454,12 +473,19 @@
         },
         "windowsNewTabPageExperiment": {
             "state": "enabled",
-            "minSupportedVersion": "0.96.0",
+            "minSupportedVersion": "0.96.0"
+        },
+        "htmlNewTabPage": {
+            "state": "enabled",
             "features": {
+                "isLaunched": {
+                    "state": "enabled"
+                },
                 "nextStepsWidget": {
-                    "state": "disabled"
+                    "state": "enabled"
                 }
-            }
+            },
+            "minSupportedVersion": "0.100.0"
         },
         "addressBarTldNavOrSearch": {
             "state": "enabled",
@@ -468,6 +494,14 @@
         "fullScreenMode": {
             "state": "enabled",
             "minSupportedVersion": "0.99.0"
+        },
+        "burn": {
+            "state": "enabled",
+            "features": {
+                "useExtensionBasedBurn": {
+                    "state": "enabled"
+                }
+            }
         }
     },
     "unprotectedTemporary": []

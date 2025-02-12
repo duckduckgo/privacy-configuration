@@ -89,6 +89,9 @@
                 "aiChatURLIdentifiableQueryValue": "chat"
             }
         },
+        "autocompleteTabs": {
+            "state": "disabled"
+        },
         "dbp": {
             "state": "enabled",
             "features": {
@@ -122,7 +125,33 @@
                     "domain": "wjla.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2319"
                 }
-            ]
+            ],
+            "features": {
+                "tdsNextExperimentBaseline": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 50
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "v6/temp/macos-tds.json",
+                        "treatmentUrl": "v6/temp/macos-tds-b.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                }
+            }
         },
         "cookie": {
             "state": "enabled",
@@ -256,9 +285,6 @@
                 ]
             }
         },
-        "navigatorCredentials": {
-            "state": "enabled"
-        },
         "autoconsent": {
             "state": "enabled",
             "features": {
@@ -311,6 +337,15 @@
                     "state": "enabled"
                 },
                 "partialFormSaves": {
+                    "state": "enabled"
+                }
+            }
+        },
+        "htmlNewTabPage": {
+            "state": "enabled",
+            "minSupportedVersion": "1.125.0",
+            "features": {
+                "isLaunched": {
                     "state": "enabled"
                 }
             }
@@ -426,10 +461,6 @@
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/988"
                     },
                     {
-                        "domain": "instructure.com",
-                        "reason": "Experimental mitigation to reduce breakage"
-                    },
-                    {
                         "domain": "web.whatsapp.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1780"
                     },
@@ -512,7 +543,24 @@
         },
         "sync": {
             "state": "enabled",
-            "minSupportedVersion": "1.70.0"
+            "minSupportedVersion": "1.70.0",
+            "features": {
+                "level0ShowSync": {
+                    "state": "enabled"
+                },
+                "level1AllowDataSyncing": {
+                    "state": "enabled"
+                },
+                "level2AllowSetupFlows": {
+                    "state": "enabled"
+                },
+                "level3AllowCreateAccount": {
+                    "state": "enabled"
+                },
+                "seamlessAccountSwitching": {
+                    "state": "enabled"
+                }
+            }
         },
         "syncPromotion": {
             "state": "enabled",
@@ -844,6 +892,11 @@
         },
         "maliciousSiteProtection": {
             "state": "enabled",
+            "features": {
+                "onByDefault": {
+                    "state": "enabled"
+                }
+            },
             "settings": {
                 "hashPrefixUpdateFrequency": 20,
                 "filterSetUpdateFrequency": 720
@@ -870,25 +923,7 @@
                     }
                 }
             }
-        },
-        "maliciousSiteProtection": {
-            "state": "enabled",
-            "features": {
-                "onByDefault": {
-                    "state": "enabled"
-                }
-            },
-            "settings": {
-                "hashPrefixUpdateFrequency": 20,
-                "filterSetUpdateFrequency": 720
-            },
-            "exceptions": []
         }
     },
-    "unprotectedTemporary": [
-        {
-            "domain": "instructure.com",
-            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/2212"
-        }
-    ]
+    "unprotectedTemporary": []
 }

@@ -611,6 +611,21 @@
                 ]
             },
             {
+                "domain": "abcnews.go.com",
+                "rules": [
+                    {
+                        "selector": ".navigation",
+                        "type": "modify-style",
+                        "values": [
+                            {
+                                "property": "top",
+                                "value": "0px"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
                 "domain": "accuweather.com",
                 "rules": [
                     {
@@ -711,6 +726,15 @@
                     {
                         "selector": ".h12container",
                         "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "autoby.jp",
+                "rules": [
+                    {
+                        "selector": ".ad-center",
+                        "type": "hide-empty"
                     }
                 ]
             },
@@ -1651,6 +1675,10 @@
                         "type": "hide"
                     },
                     {
+                        "selector": "div:has(> iframe[src*='prid=19031497'])",
+                        "type": "hide"
+                    },
+                    {
                         "selector": "div:has(> iframe[src*='prid=19043282'])",
                         "type": "hide"
                     },
@@ -1719,6 +1747,15 @@
                     {
                         "selector": "#credential_picker_container",
                         "type": "override"
+                    }
+                ]
+            },
+            {
+                "domain": "handleidingen.com",
+                "rules": [
+                    {
+                        "selector": ".ad-container",
+                        "type": "hide-empty"
                     }
                 ]
             },
@@ -3473,6 +3510,15 @@
                     {
                         "selector": ".entry-ad",
                         "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "tdpri.com",
+                "rules": [
+                    {
+                        "selector": "[data-aa-adunit]",
+                        "type": "closest-empty"
                     }
                 ]
             }

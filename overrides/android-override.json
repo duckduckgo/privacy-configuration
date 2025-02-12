@@ -5,7 +5,15 @@
             "exceptions": [],
             "features": {
                 "experimentTestAA": {
-                    "state": "disabled",
+                    "state": "enabled",
+                    "minSupportedVersion": 52240000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 20
+                            }
+                        ]
+                    },
                     "cohorts": [
                         {
                             "name": "control",
@@ -166,6 +174,31 @@
                             "weight": 0
                         }
                     ]
+                },
+                "tdsNextExperimentBaselineBackup3": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52240000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 50
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "v5/temp/android-experiment-tds.json",
+                        "treatmentUrl": "v5/temp/android-experiment-tds.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
                 }
             }
         },
@@ -304,6 +337,11 @@
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1363"
                 }
             ]
+        },
+        "aiChat": {
+            "state": "enabled",
+            "minSupportedVersion": 52250000,
+            "exceptions": []
         },
         "ampLinks": {
             "state": "enabled",
@@ -587,12 +625,24 @@
                                     "appTP": false,
                                     "netP": false
                                 }
+                            },
+                            {
+                                "appVersion": 52250000,
+                                "daysUntilLoggingStarts": 9,
+                                "daysLogging": 10,
+                                "featuresLogged": {
+                                    "gpc": false,
+                                    "cpm": true,
+                                    "appTP": false,
+                                    "netP": false
+                                }
                             }
                         ]
                     }
                 },
                 "webLocalStorage": {
-                    "state": "internal",
+                    "state": "enabled",
+                    "minSupportedVersion": 52250000,
                     "settings": {
                         "domains": ["duckduckgo.com"],
                         "matchingRegex": [
@@ -783,6 +833,30 @@
         "incrementalRolloutTest": {
             "state": "enabled",
             "minSupportedVersion": 51670000
+        },
+        "messageBridge": {
+            "state": "enabled",
+            "exceptions": [],
+            "minSupportedVersion": 52250000,
+            "settings": {
+                "aiChat": "disabled",
+                "domains": [
+                    {
+                        "domain": "duckduckgo.com",
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/aiChat",
+                                "value": "enabled"
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        "navigatorInterface": {
+            "state": "enabled",
+            "minSupportedVersion": 52250000
         },
         "networkProtection": {
             "state": "enabled",
@@ -1019,6 +1093,16 @@
                                     "key": "keyToBeDeleted",
                                     "action": "delete"
                                 }
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "www.realestate.com.au",
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/notification/state",
+                                "value": "disabled"
                             }
                         ]
                     }
@@ -1572,7 +1656,15 @@
                     "minSupportedVersion": 52121000
                 },
                 "authApiV2": {
-                    "state": "disabled"
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            }
+                        ]
+                    },
+                    "minSupportedVersion": 52250000
                 },
                 "serpPromoCookie": {
                     "state": "disabled"
@@ -1752,7 +1844,8 @@
             "exceptions": []
         },
         "bookmarksSorting": {
-            "state": "disabled"
+            "state": "enabled",
+            "minSupportedVersion": 52250000
         },
         "settingsPage": {
             "state": "enabled",
@@ -1803,6 +1896,11 @@
             {
                 "desc": "Highlights onboarding experimental group",
                 "variantKey": "mx",
+                "weight": 0
+            },
+            {
+                "desc": "Aura experimental group",
+                "variantKey": "mq",
                 "weight": 0
             }
         ]

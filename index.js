@@ -136,7 +136,6 @@ const featuresToIncludeTempUnprotectedExceptions = [
     'gpc',
     'harmfulApis',
     'https',
-    'navigatorCredentials',
     'navigatorInterface',
     'nonTracking3pCookies',
     'performanceMetrics',
