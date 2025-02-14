@@ -729,10 +729,17 @@
             }
         },
         "maliciousSiteProtection": {
-            "state": "internal",
+            "state": "enabled",
             "features": {
                 "onByDefault": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            }
+                        ]
+                    }
                 }
             },
             "settings": {
