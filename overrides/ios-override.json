@@ -105,7 +105,7 @@
             "exceptions": [],
             "features": {
                 "tdsNextExperimentBaseline": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "rollout": {
                         "steps": [
                             {
@@ -116,6 +116,30 @@
                     "settings": {
                         "controlUrl": "v5/temp/ios-tds.json",
                         "treatmentUrl": "v5/temp/ios-tds-b.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 0
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 0
+                        }
+                    ]
+                },
+                "tdsNextExperimentFeb25": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 50
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "v5/current/ios-tds.json",
+                        "treatmentUrl": "v5/temp/ios-tds-ab-test.json"
                     },
                     "cohorts": [
                         {
