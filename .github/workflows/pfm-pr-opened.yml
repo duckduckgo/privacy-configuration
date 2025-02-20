@@ -1,0 +1,21 @@
+name: Asana Integration after pull request submitted
+
+on:
+    pull_request:
+        types: [opened, reopened]
+
+jobs:
+    process-internal-pr:
+        if: contains(join(github.event.pull_request.labels.*.name, ','), 'SBT-PFM')
+        name: Process internal Pull Request, adding PR link to Asana task if present
+        runs-on: ubuntu-latest
+        permissions:
+            issues: write
+        steps:
+            - name: Add comment in Asana task
+              uses: duckduckgo/native-github-asana-sync@v1.5
+              with:
+                  asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+                  trigger-phrase: '\*\*Asana Task/Github Issue:\*\*'
+                  action: 'add-asana-comment'
+                  is-pinned: true

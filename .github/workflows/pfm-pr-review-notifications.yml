@@ -1,0 +1,15 @@
+name: Update Asana on pull request reviewed
+
+on:
+    pull_request_review:
+        types: [submitted]
+
+jobs:
+    pr-reviewed:
+        name: Add PR reviewed comment to Asana task
+        uses: duckduckgo/native-github-asana-sync/.github/workflows/pr-review-notifications.yml@v1.5
+        if: contains(join(github.event.pull_request.labels.*.name, ','), 'SBT-PFM')
+        with:
+            trigger-phrase: '\*\*Asana Task/Github Issue:\*\*'
+        secrets:
+            asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
