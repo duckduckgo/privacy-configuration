@@ -76,7 +76,7 @@
                     ]
                 },
                 "tdsNextExperimentBaselineBackup4": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": 52250000,
                     "rollout": {
                         "steps": [
@@ -97,6 +97,31 @@
                         {
                             "name": "treatment",
                             "weight": 0
+                        }
+                    ]
+                },
+                "tdsNextExperimentBaselineBackup5": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52250000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 50
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "v5/temp/android-tds-backup5-a.json",
+                        "treatmentUrl": "v5/temp/android-tds-backup5-b.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
                         }
                     ]
                 }
