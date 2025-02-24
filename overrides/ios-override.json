@@ -105,7 +105,7 @@
             "exceptions": [],
             "features": {
                 "tdsNextExperimentBaseline": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "rollout": {
                         "steps": [
                             {
@@ -116,6 +116,30 @@
                     "settings": {
                         "controlUrl": "v5/temp/ios-tds.json",
                         "treatmentUrl": "v5/temp/ios-tds-b.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 0
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 0
+                        }
+                    ]
+                },
+                "tdsNextExperimentFeb25": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 50
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "v5/current/ios-tds.json",
+                        "treatmentUrl": "v5/temp/ios-tds-ab-test.json"
                     },
                     "cohorts": [
                         {
@@ -331,6 +355,10 @@
                     {
                         "domain": "ihg.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2383"
+                    },
+                    {
+                        "domain": "maxcomply.app",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2759"
                     }
                 ],
                 "ddgDefaultSites": [
@@ -358,6 +386,10 @@
                     {
                         "domain": "ihg.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2383"
+                    },
+                    {
+                        "domain": "maxcomply.app",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2759"
                     }
                 ],
                 "omitVersionSites": []
@@ -699,7 +731,22 @@
                     "minSupportedVersion": "7.148.0"
                 },
                 "privacyProFreeTrialJan25": {
-                    "state": "disabled",
+                    "state": "enabled",
+                    "targets": [{ "localeCountry": "US" }],
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ],
+                    "minSupportedVersion": "7.157.0"
+                },
+                "privacyProOnboardingCTAMarch25": {
+                    "state": "internal",
                     "targets": [{ "localeCountry": "US" }],
                     "cohorts": [
                         {
@@ -729,10 +776,17 @@
             }
         },
         "maliciousSiteProtection": {
-            "state": "internal",
+            "state": "enabled",
             "features": {
                 "onByDefault": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            }
+                        ]
+                    }
                 }
             },
             "settings": {
@@ -771,10 +825,5 @@
             }
         }
     },
-    "unprotectedTemporary": [
-        {
-            "domain": "instructure.com",
-            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/2212"
-        }
-    ]
+    "unprotectedTemporary": []
 }

@@ -50,133 +50,8 @@
             "state": "enabled",
             "exceptions": [],
             "features": {
-                "tdsNextExperimentBaseline": {
-                    "state": "disabled",
-                    "minSupportedVersion": 52200000,
-                    "rollout": {
-                        "steps": [
-                            {
-                                "percent": 50
-                            }
-                        ]
-                    },
-                    "settings": {
-                        "controlUrl": "temp/android-experiment-tds.json",
-                        "treatmentUrl": "temp/android-experiment-tds.json"
-                    },
-                    "cohorts": [
-                        {
-                            "name": "control",
-                            "weight": 0
-                        },
-                        {
-                            "name": "treatment",
-                            "weight": 0
-                        }
-                    ]
-                },
-                "tdsNextExperimentBaselineBackup": {
-                    "state": "disabled",
-                    "minSupportedVersion": 52200000,
-                    "rollout": {
-                        "steps": [
-                            {
-                                "percent": 2.5
-                            }
-                        ]
-                    },
-                    "settings": {
-                        "controlUrl": "current/android-tds.json",
-                        "treatmentUrl": "temp/android-experiment-ab-tds.json"
-                    },
-                    "cohorts": [
-                        {
-                            "name": "control",
-                            "weight": 0
-                        },
-                        {
-                            "name": "treatment",
-                            "weight": 0
-                        }
-                    ]
-                },
-                "tdsNextExperimentNov24": {
-                    "state": "disabled",
-                    "minSupportedVersion": 52200000,
-                    "rollout": {
-                        "steps": [
-                            {
-                                "percent": 2.5
-                            }
-                        ]
-                    },
-                    "settings": {
-                        "controlUrl": "current/android-tds.json",
-                        "treatmentUrl": "temp/android-experiment-ab2-tds.json"
-                    },
-                    "cohorts": [
-                        {
-                            "name": "control",
-                            "weight": 0
-                        },
-                        {
-                            "name": "treatment",
-                            "weight": 0
-                        }
-                    ]
-                },
-                "tdsNextExperimentDec24": {
-                    "state": "disabled",
-                    "minSupportedVersion": 52200000,
-                    "rollout": {
-                        "steps": [
-                            {
-                                "percent": 2.5
-                            }
-                        ]
-                    },
-                    "settings": {
-                        "controlUrl": "v5/current/android-tds.json",
-                        "treatmentUrl": "v5/temp/android-experiment-ab2-tds.json"
-                    },
-                    "cohorts": [
-                        {
-                            "name": "control",
-                            "weight": 0
-                        },
-                        {
-                            "name": "treatment",
-                            "weight": 0
-                        }
-                    ]
-                },
-                "tdsNextExperimentBaselineBackup2": {
-                    "state": "disabled",
-                    "minSupportedVersion": 52220000,
-                    "rollout": {
-                        "steps": [
-                            {
-                                "percent": 50
-                            }
-                        ]
-                    },
-                    "settings": {
-                        "controlUrl": "v5/current/android-tds.json",
-                        "treatmentUrl": "v5/temp/android-experiment-ab2-tds.json"
-                    },
-                    "cohorts": [
-                        {
-                            "name": "control",
-                            "weight": 0
-                        },
-                        {
-                            "name": "treatment",
-                            "weight": 0
-                        }
-                    ]
-                },
                 "tdsNextExperimentBaselineBackup3": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": 52240000,
                     "rollout": {
                         "steps": [
@@ -192,11 +67,36 @@
                     "cohorts": [
                         {
                             "name": "control",
-                            "weight": 1
+                            "weight": 0
                         },
                         {
                             "name": "treatment",
-                            "weight": 1
+                            "weight": 0
+                        }
+                    ]
+                },
+                "tdsNextExperimentBaselineBackup4": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52250000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 20
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "v5/current/android-tds.json",
+                        "treatmentUrl": "v5/temp/android-experiment-ab-tds.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 0
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 0
                         }
                     ]
                 }
@@ -337,6 +237,11 @@
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1363"
                 }
             ]
+        },
+        "aiChat": {
+            "state": "enabled",
+            "minSupportedVersion": 52250000,
+            "exceptions": []
         },
         "ampLinks": {
             "state": "enabled",
@@ -620,12 +525,24 @@
                                     "appTP": false,
                                     "netP": false
                                 }
+                            },
+                            {
+                                "appVersion": 52250000,
+                                "daysUntilLoggingStarts": 9,
+                                "daysLogging": 10,
+                                "featuresLogged": {
+                                    "gpc": false,
+                                    "cpm": true,
+                                    "appTP": false,
+                                    "netP": false
+                                }
                             }
                         ]
                     }
                 },
                 "webLocalStorage": {
-                    "state": "internal",
+                    "state": "enabled",
+                    "minSupportedVersion": 52250000,
                     "settings": {
                         "domains": ["duckduckgo.com"],
                         "matchingRegex": [
@@ -634,6 +551,9 @@
                             "^METAACCESS:https://([a-zA-Z0-9.-]+\\.)?{domain}$"
                         ]
                     }
+                },
+                "enableMaliciousSiteProtection": {
+                    "state": "internal"
                 }
             }
         },
@@ -816,6 +736,30 @@
         "incrementalRolloutTest": {
             "state": "enabled",
             "minSupportedVersion": 51670000
+        },
+        "messageBridge": {
+            "state": "enabled",
+            "exceptions": [],
+            "minSupportedVersion": 52250000,
+            "settings": {
+                "aiChat": "disabled",
+                "domains": [
+                    {
+                        "domain": "duckduckgo.com",
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/aiChat",
+                                "value": "enabled"
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        "navigatorInterface": {
+            "state": "enabled",
+            "minSupportedVersion": 52250000
         },
         "networkProtection": {
             "state": "enabled",
@@ -1012,6 +956,10 @@
                 {
                     "domain": "hyatt.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2613"
+                },
+                {
+                    "domain": "ctvnews.ca",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2766"
                 }
             ],
             "state": "enabled",
@@ -1561,6 +1509,10 @@
                 {
                     "domain": "identity.docusign.net",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2660"
+                },
+                {
+                    "domain": "appnebula.co",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2752"
                 }
             ]
         },
@@ -1620,6 +1572,12 @@
                         "steps": [
                             {
                                 "percent": 5
+                            },
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 20
                             }
                         ]
                     },
@@ -1666,35 +1624,6 @@
                         {
                             "localeLanguage": "en",
                             "localeCountry": "us"
-                        }
-                    ]
-                },
-                "testPrivacyProOnboardingCopyNov24": {
-                    "state": "disabled",
-                    "description": "copy test in privacy pro onboarding dialog",
-                    "targets": [
-                        {
-                            "localeLanguage": "en",
-                            "isReturningUser": false,
-                            "isPrivacyProEligible": true
-                        }
-                    ],
-                    "cohorts": [
-                        {
-                            "name": "control",
-                            "weight": 0
-                        },
-                        {
-                            "name": "protection",
-                            "weight": 0
-                        },
-                        {
-                            "name": "deal",
-                            "weight": 0
-                        },
-                        {
-                            "name": "step",
-                            "weight": 0
                         }
                     ]
                 }
@@ -1803,7 +1732,8 @@
             "exceptions": []
         },
         "bookmarksSorting": {
-            "state": "disabled"
+            "state": "enabled",
+            "minSupportedVersion": 52250000
         },
         "settingsPage": {
             "state": "enabled",
@@ -1814,7 +1744,7 @@
                     "rollout": {
                         "steps": [
                             {
-                                "percent": 20
+                                "percent": 100
                             }
                         ]
                     }
@@ -1825,7 +1755,7 @@
                     "rollout": {
                         "steps": [
                             {
-                                "percent": 20
+                                "percent": 100
                             }
                         ]
                     }

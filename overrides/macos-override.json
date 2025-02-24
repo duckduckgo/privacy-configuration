@@ -65,7 +65,8 @@
                     "state": "enabled"
                 },
                 "appExclusions": {
-                    "state": "disabled"
+                    "state": "enabled",
+                    "minSupportedVersion": "1.127.0"
                 }
             },
             "minSupportedVersion": "1.57.1"
@@ -441,10 +442,6 @@
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/988"
                     },
                     {
-                        "domain": "instructure.com",
-                        "reason": "Experimental mitigation to reduce breakage"
-                    },
-                    {
                         "domain": "web.whatsapp.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1780"
                     },
@@ -507,6 +504,10 @@
                     {
                         "domain": "teams.microsoft.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2557"
+                    },
+                    {
+                        "domain": "maxcomply.app",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2759"
                     }
                 ],
                 "webViewDefault": [
@@ -876,6 +877,11 @@
         },
         "maliciousSiteProtection": {
             "state": "enabled",
+            "features": {
+                "onByDefault": {
+                    "state": "enabled"
+                }
+            },
             "settings": {
                 "hashPrefixUpdateFrequency": 20,
                 "filterSetUpdateFrequency": 720
@@ -902,25 +908,7 @@
                     }
                 }
             }
-        },
-        "maliciousSiteProtection": {
-            "state": "enabled",
-            "features": {
-                "onByDefault": {
-                    "state": "enabled"
-                }
-            },
-            "settings": {
-                "hashPrefixUpdateFrequency": 20,
-                "filterSetUpdateFrequency": 720
-            },
-            "exceptions": []
         }
     },
-    "unprotectedTemporary": [
-        {
-            "domain": "instructure.com",
-            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/2212"
-        }
-    ]
+    "unprotectedTemporary": []
 }
