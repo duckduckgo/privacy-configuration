@@ -17,6 +17,10 @@ type FeatureMeta = {
     sampleExcludeRecords?: any;
 };
 
+/* Note this defaults to Record<string, string>
+   but individual features can and should define their own SubFeature schema type like:
+   https://github.com/duckduckgo/privacy-configuration/blob/4cc65fa5cc5244eef832440adfd40064c733e736/schema/features/android-browser-config.ts#L22-L39
+*/
 export type SubFeature<VersionType, SettingsType = Record<string, string>> = {
     state: FeatureState;
     settings?: SettingsType;
