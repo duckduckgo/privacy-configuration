@@ -1,7 +1,7 @@
 import { Feature, FeatureState } from '../feature';
 
 interface BrokerProtectionSettings {
-    useWebViewActionsV2: FeatureState;
+    useEnhancedCaptchaSystem: FeatureState;
 }
 
 export type BrokerProtectionFeature<VersionType> = Feature<BrokerProtectionSettings, VersionType>;
