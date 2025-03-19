@@ -1895,16 +1895,35 @@
             }
         },
         "defaultBrowserPrompts": {
-            "state": "internal",
+            "state": "enabled",
             "exceptions": [],
             "features": {
                 "defaultBrowserAdditionalPrompts202501": {
-                    "state": "internal",
+                    "state": "enabled",
+                    "minSupportedVersion": 52280000,
                     "settings": {
                         "activeDaysUntilStage1": "1",
                         "activeDaysUntilStage2": "4",
                         "activeDaysUntilStop": "11"
-                    }
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "variant1",
+                            "weight": 1
+                        },
+                        {
+                            "name": "variant2",
+                            "weight": 1
+                        },
+                        {
+                            "name": "variant3",
+                            "weight": 1
+                        }
+                    ]
                 }
             }
         }
