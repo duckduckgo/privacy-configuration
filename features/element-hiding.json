@@ -10,10 +10,6 @@
         {
             "domain": "duckduckgo.com",
             "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1236"
-        },
-        {
-            "domain": "openai.com",
-            "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2850"
         }
     ],
     "settings": {
@@ -112,7 +108,7 @@
                 "type": "hide-empty"
             },
             {
-                "selector": "[class*='ad-content']",
+                "selector": "[class^='ad-content']",
                 "type": "hide-empty"
             },
             {
@@ -1019,6 +1015,19 @@
                     {
                         "selector": ".TopBanner-container",
                         "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "coindesk.com",
+                "rules": [
+                    {
+                        "selector": ".animate-shimmer",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": "[data-freestar-ad='true']",
+                        "type": "closest-empty"
                     }
                 ]
             },
@@ -2252,6 +2261,15 @@
                     {
                         "selector": ".j-ad",
                         "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "messenger.com",
+                "rules": [
+                    {
+                        "selector": ".xw7yly9.xktsk01:has(div > a[href='https://www.facebook.com/help/messenger-app/597429858389632/'])",
+                        "type": "hide"
                     }
                 ]
             },
@@ -3698,6 +3716,23 @@
                 "rules": [
                     {
                         "selector": ".ad-slot-container",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "techxplore.com",
+                "rules": [
+                    {
+                        "selector": ".ads-placeholder-250",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".article-banner",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".article-sidebar-banner",
                         "type": "hide-empty"
                     }
                 ]
