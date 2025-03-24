@@ -67,6 +67,12 @@
                 "appExclusions": {
                     "state": "enabled",
                     "minSupportedVersion": "1.127.0"
+                },
+                "riskyDomainsProtection": {
+                    "state": "enabled"
+                },
+                "appStoreSystemExtension": {
+                    "state": "enabled"
                 }
             },
             "minSupportedVersion": "1.57.1"
@@ -117,6 +123,12 @@
                 }
             },
             "minSupportedVersion": "1.70.0"
+        },
+        "brokerProtection": {
+            "state": "enabled",
+            "settings": {
+                "useEnhancedCaptchaSystem": "disabled"
+            }
         },
         "contentBlocking": {
             "state": "enabled",
@@ -207,11 +219,11 @@
         "contextualOnboarding": {
             "state": "enabled"
         },
-        "experimentTest": {
+        "setAsDefaultAndAddToDock": {
             "state": "enabled",
-            "exceptions": [],
+            "minSupportedVersion": "1.130.0",
             "features": {
-                "experimentTestAA": {
+                "popoverVsBannerExperiment": {
                     "state": "enabled",
                     "cohorts": [
                         {
@@ -219,7 +231,11 @@
                             "weight": 1
                         },
                         {
-                            "name": "treatment",
+                            "name": "popover",
+                            "weight": 1
+                        },
+                        {
+                            "name": "banner",
                             "weight": 1
                         }
                     ]
@@ -351,6 +367,15 @@
         "htmlNewTabPage": {
             "state": "enabled",
             "minSupportedVersion": "1.125.0",
+            "features": {
+                "isLaunched": {
+                    "state": "enabled"
+                }
+            }
+        },
+        "htmlHistoryPage": {
+            "state": "enabled",
+            "minSupportedVersion": "1.130.0",
             "features": {
                 "isLaunched": {
                     "state": "enabled"
@@ -534,6 +559,22 @@
                     {
                         "domain": "maxcomply.app",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2759"
+                    },
+                    {
+                        "domain": "mercari.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2825"
+                    },
+                    {
+                        "domain": "ichard26.github.io",
+                        "reason": "Next PR fetch errors on DDG user agent"
+                    },
+                    {
+                        "domain": "app.lyssna.com",
+                        "reason": "Unsupported browser message"
+                    },
+                    {
+                        "domain": "ihg.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2872"
                     }
                 ],
                 "webViewDefault": [
@@ -758,8 +799,11 @@
                         "rules": [
                             {
                                 "rule": "npttech.com/advertising.js",
-                                "domains": ["blick.ch"],
-                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1520"
+                                "domains": ["blick.ch", "slate.com"],
+                                "reason": [
+                                    "blick.ch - https://github.com/duckduckgo/privacy-configuration/issues/1520",
+                                    "slate.com - slate.com - https://github.com/duckduckgo/privacy-configuration/pull/2879"
+                                ]
                             }
                         ]
                     },

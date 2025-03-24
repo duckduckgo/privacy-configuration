@@ -108,7 +108,7 @@
                 "type": "hide-empty"
             },
             {
-                "selector": "[class*='ad-content']",
+                "selector": "[class^='ad-content']",
                 "type": "hide-empty"
             },
             {
@@ -496,6 +496,10 @@
             {
                 "domain": "pocketbook.digital",
                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1365"
+            },
+            {
+                "domain": "bsrzepin.pl",
+                "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2821"
             }
         ],
         "hideTimeouts": [0, 100, 300, 500, 1000, 1500, 2000, 3000, 5000],
@@ -597,6 +601,15 @@
                     },
                     {
                         "selector": "#top-adhesion",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "aarp.org",
+                "rules": [
+                    {
+                        "selector": "[class*='AdBlock__container___']",
                         "type": "hide-empty"
                     }
                 ]
@@ -1006,6 +1019,19 @@
                 ]
             },
             {
+                "domain": "coindesk.com",
+                "rules": [
+                    {
+                        "selector": ".animate-shimmer",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": "[data-freestar-ad='true']",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
                 "domain": "coingecko.com",
                 "rules": [
                     {
@@ -1053,11 +1079,45 @@
                 ]
             },
             {
+                "domain": "cricbuzz.com",
+                "rules": [
+                    {
+                        "selector": "#loaderCon",
+                        "type": "modify-style",
+                        "values": [
+                            {
+                                "opacity": "1"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
                 "domain": "cyclingtips.com",
                 "rules": [
                     {
                         "selector": "[data-block-name='ads']",
                         "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "dailyboulder.com",
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    },
+                    {
+                        "selector": ".site-access-popup",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".site-access-inner",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".top-site-ad",
+                        "type": "hide-empty"
                     }
                 ]
             },
@@ -1752,6 +1812,10 @@
                         "type": "hide"
                     },
                     {
+                        "selector": "div:has(> iframe[src*='prid=19046509'])",
+                        "type": "hide"
+                    },
+                    {
                         "selector": "[aria-labelledby='promo-header']",
                         "type": "hide"
                     },
@@ -2050,6 +2114,19 @@
                 ]
             },
             {
+                "domain": "kutv.com",
+                "rules": [
+                    {
+                        "selector": "[class*='DisplayAdvert']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[class*='adBeforeContent']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
                 "domain": "leboncoin.fr",
                 "rules": [
                     {
@@ -2124,6 +2201,22 @@
                 ]
             },
             {
+                "domain": "lowes.com",
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    },
+                    {
+                        "selector": "[class*='__GAMWrapper-']",
+                        "type": "override"
+                    },
+                    {
+                        "selector": ".gam-wrapper",
+                        "type": "override"
+                    }
+                ]
+            },
+            {
                 "domain": "macrumors.com",
                 "rules": [
                     {
@@ -2168,6 +2261,15 @@
                     {
                         "selector": ".j-ad",
                         "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "messenger.com",
+                "rules": [
+                    {
+                        "selector": ".xw7yly9.xktsk01:has(div > a[href='https://www.facebook.com/help/messenger-app/597429858389632/'])",
+                        "type": "hide"
                     }
                 ]
             },
@@ -2871,6 +2973,9 @@
                 "domain": "slate.com",
                 "rules": [
                     {
+                        "type": "disable-default"
+                    },
+                    {
                         "selector": ".slate-ad",
                         "type": "hide-empty"
                     },
@@ -3505,6 +3610,15 @@
                 ]
             },
             {
+                "domain": "youtube.com",
+                "rules": [
+                    {
+                        "selector": "ytm-promoted-sparkles-web-renderer",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
                 "domain": "first-party.site",
                 "rules": [
                     {
@@ -3569,6 +3683,59 @@
                 "rules": [
                     {
                         "selector": ".wpb_wrapper",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "aucfree.com",
+                "rules": [
+                    {
+                        "selector": "#pcarticle_bb",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "seriouseats.com",
+                "rules": [
+                    {
+                        "selector": "[class*='mm-ads-leaderboard']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "inside-games.jp",
+                "rules": [
+                    {
+                        "selector": ".header-ad",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "tradera.com",
+                "rules": [
+                    {
+                        "selector": ".ad-slot-container",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "techxplore.com",
+                "rules": [
+                    {
+                        "selector": ".ads-placeholder-250",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".article-banner",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".article-sidebar-banner",
                         "type": "hide-empty"
                     }
                 ]

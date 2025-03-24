@@ -116,6 +116,12 @@
             },
             "minSupportedVersion": "0.64.0"
         },
+        "brokerProtection": {
+            "state": "enabled",
+            "settings": {
+                "useEnhancedCaptchaSystem": "disabled"
+            }
+        },
         "windowsPermissionUsage": {
             "state": "enabled"
         },
@@ -140,7 +146,7 @@
                     "minSupportedVersion": "0.98.0"
                 },
                 "partialFormSaves": {
-                    "state": "disabled"
+                    "state": "enabled"
                 }
             }
         },
@@ -360,6 +366,15 @@
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/2042"
                             }
                         ]
+                    },
+                    "npttech.com": {
+                        "rules": [
+                            {
+                                "rule": "npttech.com/advertising.js",
+                                "domains": ["slate.com"],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2879"
+                            }
+                        ]
                     }
                 }
             }
@@ -490,6 +505,10 @@
             },
             "minSupportedVersion": "0.100.0"
         },
+        "htmlHistoryPage": {
+            "state": "enabled",
+            "minSupportedVersion": "0.105.0"
+        },
         "addressBarTldNavOrSearch": {
             "state": "enabled",
             "minSupportedVersion": "0.100.0"
@@ -505,6 +524,15 @@
                     "state": "enabled"
                 }
             }
+        },
+        "maliciousSiteProtection": {
+            "state": "enabled",
+            "minSupportedVersion": "0.104.3",
+            "settings": {
+                "hashPrefixUpdateFrequency": 20,
+                "filterSetUpdateFrequency": 720
+            },
+            "exceptions": []
         }
     },
     "unprotectedTemporary": []
