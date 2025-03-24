@@ -163,7 +163,7 @@
                     ]
                 },
                 "tdsNextExperimentMar25": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "rollout": {
                         "steps": [
                             {
@@ -183,6 +183,30 @@
                         {
                             "name": "treatment",
                             "weight": 0
+                        }
+                    ]
+                },
+                "tdsNextExperimentApr25": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "v5/temp/tdsnextexperimentapr25-tds-control.json",
+                        "treatmentUrl": "v5/temp/tdsnextexperimentapr25-tds-treatment.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
                         }
                     ]
                 }
