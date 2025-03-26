@@ -25,13 +25,12 @@ export type DuckPlayerSettings = CSSInjectFeatureSettings<{
                 allowedEventTargets: string[];
                 videoElement: string;
                 videoElementContainer: string;
+                drawerContainer?: string;
             };
             thumbnailOverlays: StateObject;
             clickInterception: StateObject;
             videoOverlays: StateObject;
-            ui: {
-                variant: 'default' | 'drawer'
-            }
+            videoDrawer?: StateObject;
         };
         serpProxy: StateObject;
     };
