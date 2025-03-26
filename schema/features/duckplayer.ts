@@ -29,6 +29,9 @@ export type DuckPlayerSettings = CSSInjectFeatureSettings<{
             thumbnailOverlays: StateObject;
             clickInterception: StateObject;
             videoOverlays: StateObject;
+            ui: {
+                variant: 'default' | 'drawer'
+            }
         };
         serpProxy: StateObject;
     };
