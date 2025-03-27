@@ -1,5 +1,4 @@
 import { Feature, CSSInjectFeatureSettings } from '../feature';
-import { Operation } from '../json-patch';
 
 type State = 'enabled' | 'disabled';
 type StateObject = {

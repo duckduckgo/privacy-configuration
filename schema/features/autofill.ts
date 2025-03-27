@@ -1,4 +1,4 @@
-import { CSSInjectFeatureSettings, Feature, SubFeature } from '../feature';
+import { Feature, SubFeature } from '../feature';
 import { Operation } from '../json-patch';
 
 // Type of the feature `settings` object
@@ -17,6 +17,25 @@ type ImportFromGooglePasswordManager = {
     signInButton: ButtonConfig;
 };
 
+type FormBoundarySetting = {
+    selector: string;
+    inputs: string[];
+};
+
+type FormTypeSetting = {
+    selector: string;
+    type: 'credentials.username.new' | 'credentials.password.new';
+    inputs: {
+        selector: string;
+        type: 'credentials.username.new' | 'credentials.password.new';
+    }[];
+};
+
+type SiteSpecificFixes = {
+    formBoundarySettings: FormBoundarySetting[];
+    formTypeSettings: FormTypeSetting[];
+};
+
 // Any subfeatures that have typed `settings` should be defined here.
 // Subfeatures without settings (or just string:string mappings for settings) will be automatically validated.
 type SubFeatures<VersionType> = {
@@ -28,6 +47,17 @@ type SubFeatures<VersionType> = {
                 domains: {
                     domain: string | string[];
                     patchSettings: Operation<ImportFromGooglePasswordManager>[];
+                }[];
+            };
+        }
+    >;
+    siteSpecificFixes?: SubFeature<
+        VersionType,
+        {
+            javascriptConfig: {
+                domains: {
+                    domain: string | string[];
+                    patchSettings: Operation<SiteSpecificFixes>[];
                 }[];
             };
         }
