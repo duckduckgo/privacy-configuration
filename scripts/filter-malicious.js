@@ -39,6 +39,10 @@ class ConfigProcessor {
         }
     }
 
+    /* 
+        Is this domain still in our dataset? 
+        If not, we can safely remove it from the config.
+    */
     async checkDomainMatch(domain, platform) {
         const hashPrefix = this.generateHashPrefix(domain);
         const url = `${this.apiBaseUrl}/${platform}/matches?hashPrefix=${hashPrefix}`;
@@ -54,6 +58,10 @@ class ConfigProcessor {
         }
     }
 
+    /*
+        For each built configuration, check if any exceptions are no longer in our dataset.
+        And update the local configs accordingly to remove them everywhere.
+    */
     async processConfigurations() {
         let anyUpdates = false;
         for (const platform of this.platforms) {
@@ -65,12 +73,13 @@ class ConfigProcessor {
             }
 
             const exceptions = config.features.maliciousSiteProtection.exceptions || [];
+            // Check for stale exceptions
             const updatedExceptions = await this.getUpdatedExceptions(exceptions, platform.name);
 
             // Update platform config if any exceptions were removed
             anyUpdates = (await this.updateOverrideConfig(updatedExceptions, platform)) || anyUpdates;
 
-            // Update default config if necessary
+            // Update default config as well
             anyUpdates = (await this.updateDefaultConfig(updatedExceptions)) || anyUpdates;
         }
 
@@ -79,6 +88,10 @@ class ConfigProcessor {
         }
     }
 
+    /*
+        Check if each exception domain is still in our dataset.
+        If it is, add it to the updated exceptions.
+    */
     async getUpdatedExceptions(exceptions, platformName) {
         const updatedExceptions = [];
         for (const exception of exceptions) {
@@ -90,6 +103,9 @@ class ConfigProcessor {
         return updatedExceptions;
     }
 
+    /*
+        Update the platform override config with the removed exceptions.
+    */
     async updateOverrideConfig(updatedExceptions, platform) {
         const overridePath = path.join(this.inputPath, platform.overrideFile);
         const overrideConfig = await this.loadConfig(overridePath);
@@ -101,12 +117,15 @@ class ConfigProcessor {
                 overrideConfig.features.maliciousSiteProtection.exceptions = updatedOverrideExceptions;
                 await this.saveConfig(overridePath, overrideConfig);
                 console.log(`Updated ${platform.overrideFile} with removed exceptions.`);
-                return true; // Indicate that an update was made
+                return true; 
             }
         }
-        return false; // No update made
+        return false;
     }
 
+    /*
+        Update the default config with the removed exceptions.
+    */
     async updateDefaultConfig(updatedExceptions) {
         const defaultConfig = await this.loadConfig(this.defaultConfig);
         if (defaultConfig?.exceptions) {
@@ -117,10 +136,10 @@ class ConfigProcessor {
                 defaultConfig.exceptions = updatedDefaultExceptions;
                 await this.saveConfig(this.defaultConfig, defaultConfig);
                 console.log(`Updated ${this.defaultConfig} with removed default exceptions.`);
-                return true; // Indicate that an update was made
+                return true; 
             }
         }
-        return false; // No update made
+        return false;
     }
 }
 
