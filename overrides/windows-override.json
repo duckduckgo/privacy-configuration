@@ -1,7 +1,7 @@
 {
     "features": {
         "apiManipulation": {
-            "state": "enabled",
+            "state": "disabled",
             "settings": {
                 "apiChanges": {
                     "Navigator.prototype.joinAdInterestGroup": {
@@ -171,13 +171,8 @@
             }
         },
         "googleRejected": {
-            "state": "enabled",
-            "exceptions": [
-                {
-                    "domain": "hyatt.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2638"
-                }
-            ]
+            "state": "disabled",
+            "exceptions": []
         },
         "navigatorInterface": {
             "state": "enabled"
@@ -206,7 +201,7 @@
             "state": "enabled"
         },
         "fingerprintingScreenSize": {
-            "state": "enabled",
+            "state": "disabled",
             "minSupportedVersion": "0.88.3"
         },
         "fingerprintingHardware": {
@@ -255,6 +250,10 @@
                     {
                         "domain": "payments.google.com",
                         "reason": "After sign-in for Google Pay flows (after flickering is resolved), blocking this causes the loading spinner to spin indefinitely, and the payment flow cannot proceed."
+                    },
+                    {
+                        "domain": "disneyplus.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2906"
                     }
                 ],
                 "firstPartyTrackerCookiePolicy": {
