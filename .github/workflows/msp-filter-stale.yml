@@ -28,13 +28,15 @@ jobs:
             echo "No updates found. Exiting with success."
             exit 0
           fi 
-          echo "TEMPLATE=$TEMPLATE" >> $GITHUB_ENV
+          echo "TEMPLATE<<EOF" >> $GITHUB_ENV
+          echo "$TEMPLATE" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
           PR_BODY="${TEMPLATE//\{\{date\}\}/$DATE}"
           echo "PR_BODY<<EOF" >> $GITHUB_ENV
           echo "$PR_BODY" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
           npm run lint-fix
-      - name: Create PR with updated configs
+            - name: Create PR with updated configs
         uses: peter-evans/create-pull-request@88bf0de51c7487d91e1abbb4899332e602c58bbf
         id: create-pr
         with:
