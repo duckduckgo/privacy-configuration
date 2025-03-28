@@ -146,7 +146,30 @@
                     "minSupportedVersion": "0.98.0"
                 },
                 "partialFormSaves": {
-                    "state": "enabled"
+                    "state": "enabled",
+                    "settings": {}
+                },
+                "siteSpecificFixes": {
+                    "state": "disabled",
+                    "settings": {
+                        "javascriptConfig": {
+                            "domains": [
+                                {
+                                    "domain": ["localhost"],
+                                    "patchSettings": [
+                                        {
+                                            "path": "",
+                                            "op": "add",
+                                            "value": {
+                                                "formTypeSettings": [],
+                                                "formBoundarySettings": []
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    }
                 }
             }
         },

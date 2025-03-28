@@ -18,20 +18,16 @@ type ImportFromGooglePasswordManager = {
 };
 
 type FormBoundarySetting = {
-    selector: string;
-    inputs: string[];
+    formSelector: string;
+    inputsSelectors: string[];
 };
 
 type FormTypeSetting = {
     selector: string;
     type: 'login' | 'signup';
-    inputs: {
-        selector: string;
-        type: 'identities.emailAddress' | 'credentials.password.new' | 'credentials.username' | 'credentials.password.current';
-    }[];
 };
 
-type SiteSpecificFixes = {
+export type SiteSpecificFixes = {
     formBoundarySettings: FormBoundarySetting[];
     formTypeSettings: FormTypeSetting[];
 };
