@@ -24,10 +24,10 @@ type FormBoundarySetting = {
 
 type FormTypeSetting = {
     selector: string;
-    type: 'credentials.username.new' | 'credentials.password.new';
+    type: 'login' | 'signup';
     inputs: {
         selector: string;
-        type: 'credentials.username.new' | 'credentials.password.new';
+        type: 'identities.emailAddress' | 'credentials.password.new' | 'credentials.username' | 'credentials.password.current';
     }[];
 };
 
