@@ -77,25 +77,6 @@
             },
             "minSupportedVersion": "1.57.1"
         },
-        "messageBridge": {
-            "exceptions": [],
-            "settings": {
-                "aiChat": "disabled",
-                "domains": [
-                    {
-                        "domain": "duckduckgo.com",
-                        "patchSettings": [
-                            {
-                                "op": "replace",
-                                "path": "/aiChat",
-                                "value": "enabled"
-                            }
-                        ]
-                    }
-                ]
-            },
-            "state": "enabled"
-        },
         "aiChat": {
             "state": "enabled",
             "features": {
@@ -991,7 +972,12 @@
                 "hashPrefixUpdateFrequency": 20,
                 "filterSetUpdateFrequency": 720
             },
-            "exceptions": []
+            "exceptions": [
+                {
+                    "domain": "example-macos-override.com",
+                    "reason": "Test2."
+                }
+            ]
         },
         "backgroundAgentPixelTest": {
             "state": "enabled",
