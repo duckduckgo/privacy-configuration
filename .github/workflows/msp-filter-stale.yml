@@ -31,7 +31,7 @@ jobs:
                   echo "TEMPLATE=$TEMPLATE" >> $GITHUB_ENV
                   PR_BODY="${TEMPLATE//\{\{date\}\}/$DATE}"
                   echo "PR_BODY<<EOF" >> $GITHUB_ENV
-                  echo "$PR_BODY" >> $GITHUB_ENV
+                  echo -e "$PR_BODY" >> $GITHUB_ENV
                   echo "EOF" >> $GITHUB_ENV
                   npm run lint-fix
             - name: Create PR with updated configs
