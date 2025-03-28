@@ -65,6 +65,9 @@ class ConfigProcessor {
     async processConfigurations() {
         let anyUpdates = false;
         const removedDomains = new Set();
+        let prBody = `This PR removes stale exemptions from the malicious site protection feature. `;
+        prBody += `Domains that are not longer in our dataset can be safely removed.\\n\\n`;
+        prBody += `Removed domains:\\n`;
 
         for (const platform of this.platforms) {
             const configPath = path.join(this.outputPath, platform.configFile);
@@ -76,10 +79,12 @@ class ConfigProcessor {
 
             const exceptions = config.features.maliciousSiteProtection.exceptions || [];
             // Check for stale exceptions
-            const updatedExceptions = await this.getUpdatedExceptions(exceptions, platform.name);
+            const [updatedExceptions, removedExceptions] = await this.getUpdatedExceptions(exceptions, platform.name);
 
-            // Track deduplicated domains
-            updatedExceptions.forEach((exception) => removedDomains.add(exception.domain));
+            // Add removed domains to the PR body
+            removedExceptions.forEach((exception) => {
+                removedDomains.add(exception.domain);
+            });
 
             // Update platform config if any exceptions were removed
             anyUpdates = (await this.updateOverrideConfig(updatedExceptions, platform)) || anyUpdates;
@@ -93,10 +98,6 @@ class ConfigProcessor {
             return;
         }
 
-        // Print PR Body
-        let prBody = `This PR removes stale exemptions from the malicious site protection feature.\\n`;
-        prBody += `Domains that are not longer in our dataset can be safely removed.\\n`;
-        prBody += `Removed domains:\\n`;
         removedDomains.forEach((domain) => {
             prBody += ` - ${domain}\\n`;
         });
@@ -109,13 +110,16 @@ class ConfigProcessor {
     */
     async getUpdatedExceptions(exceptions, platformName) {
         const updatedExceptions = [];
+        const removedExceptions = [];
         for (const exception of exceptions) {
             const inDataset = await this.checkDomainMatch(exception.domain, platformName);
             if (inDataset) {
                 updatedExceptions.push(exception);
+            } else {
+                removedExceptions.push(exception);
             }
         }
-        return updatedExceptions;
+        return [updatedExceptions, removedExceptions];
     }
 
     /*
