@@ -29,12 +29,11 @@ jobs:
                   exit 0
                 fi 
                 echo "TEMPLATE=$TEMPLATE" >> $GITHUB_ENV
-                # Escape newlines in TEMPLATE for proper environment variable formatting
                 PR_BODY="${TEMPLATE//\{\{date\}\}/$DATE}"
-                PR_BODY="${PR_BODY//'%'/'%25'}"
-                PR_BODY="${PR_BODY//$'\n'/'%0A'}"
-                PR_BODY="${PR_BODY//$'\r'/'%0D'}"
-                echo "PR_BODY=$PR_BODY" >> $GITHUB_ENV
+                PR_BODY="${PR_BODY//\\n/$'\n'}" # Replace escaped newlines with actual newlines
+                echo "PR_BODY<<EOF" >> $GITHUB_ENV
+                echo "$PR_BODY" >> $GITHUB_ENV
+                echo "EOF" >> $GITHUB_ENV
                 npm run lint-fix
             - name: Create PR with updated configs
               uses: peter-evans/create-pull-request@88bf0de51c7487d91e1abbb4899332e602c58bbf
@@ -45,5 +44,6 @@ jobs:
                       ./
                   commit-message: Remove stale exemptions from malicious site protection
                   branch: remove-stale-exemptions-${{ env.DATE }}
-                  title: Remove stale exemptions as of ${{ env.DATE }}
-                  body: '${{ env.PR_BODY }}'
+                  body: |
+                    ${{ env.PR_BODY }}
+
