@@ -19,6 +19,7 @@ jobs:
               run: |
                   cd ./privacy-configuration/
                   npm i 
+                  npm run build
                   DATE="$(date -u +'%Y-%m-%d')"
                   echo "DATE=$DATE" >> $GITHUB_ENV
                   TEMPLATE="$(node ./scripts/filter-malicious.js)"
