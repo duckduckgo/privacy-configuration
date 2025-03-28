@@ -21,10 +21,11 @@ jobs:
                   DATE="$(date -u +'%Y-%m-%d')"
                   echo "DATE=$DATE" >> $GITHUB_ENV
                   TEMPLATE="$(node ./scripts/filter-malicious.js)"
-                  if [ $? -eq 1 ]; then
-                    echo "No updates found, exiting"
-                    exit 0
-                  fi
+                  # If TEMPLATE contains 'No updates' then exit with success
+                  if [[ $TEMPLATE == *"No updates"* ]]; then
+                      echo "No updates found. Exiting with success."
+                      exit 0
+                  fi 
                   echo "TEMPLATE=$TEMPLATE" >> $GITHUB_ENV
                   PR_BODY="${TEMPLATE//\{\{date\}\}/$REVISION}"
                   echo "PR_BODY<<EOF" >> $GITHUB_ENV

@@ -90,7 +90,7 @@ class ConfigProcessor {
 
         if (!anyUpdates) {
             console.log('No updates were made to any configurations.');
-            process.exit(1);
+            return;
         }
 
         // Print PR Body
