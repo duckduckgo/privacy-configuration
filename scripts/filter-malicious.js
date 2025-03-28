@@ -94,9 +94,9 @@ class ConfigProcessor {
         }
 
         // Print PR Body
-        let prBody = `This PR removes stale exemptions from the malicious site protection feature. 
-            Domains that are not longer in our dataset can be safely removed.
-            Removed domains:`
+        let prBody = `This PR removes stale exemptions from the malicious site protection feature.\n`;
+        prBody += `Domains that are not longer in our dataset can be safely removed.`;
+        prBody += `Removed domains:\n`
         removedDomains.forEach((domain) => prBody += ` - ${domain}\n`);
         console.log(prBody);
     }
