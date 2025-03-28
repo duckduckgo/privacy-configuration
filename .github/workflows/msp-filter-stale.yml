@@ -1,9 +1,8 @@
 name: Remove stale exceptions from malicious site protection feature.
 
 on:
-    push:
-        branches:
-            - tespach/malicious-site-filter
+    schedule:
+        - cron: '0 0 * * *' # Run every day at midnight UTC
 
 jobs:
     update_data:
@@ -43,6 +42,7 @@ jobs:
                   add-paths: |
                       ./
                   commit-message: Remove stale exemptions from malicious site protection
+                  assignees: not-a-rootkit
                   branch: remove-stale-exemptions-${{ env.DATE }}
                   body: |
                       ${{ env.PR_BODY }}
