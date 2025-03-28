@@ -1,9 +1,9 @@
 name: Remove stale exceptions from malicious site protection feature.
 
 on:
-  push:
-      branches:
-          - tespach/malicious-site-filter
+    push:
+        branches:
+            - tespach/malicious-site-filter
 
 jobs:
     update_data:
@@ -13,6 +13,7 @@ jobs:
               uses: actions/checkout@v4
               with:
                   repository: duckduckgo/privacy-configuration
+                  branch: tespach/test-malicious-site-filter
                   path: privacy-configuration/
             - name: Execute Update Script
               run: |
