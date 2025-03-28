@@ -94,10 +94,11 @@ class ConfigProcessor {
         }
 
         // Print PR Body
-        console.log(`This PR removes stale exemptions from the malicious site protection feature. 
+        let prBody = `This PR removes stale exemptions from the malicious site protection feature. 
             Domains that are not longer in our dataset can be safely removed.
-            Removed domains:`);
-        removedDomains.forEach((domain) => console.log(` - ${domain}`));
+            Removed domains:`
+        removedDomains.forEach((domain) => prBody += ` - ${domain}\n`);
+        console.log(prBody);
     }
 
     /*
@@ -128,7 +129,6 @@ class ConfigProcessor {
             if (updatedOverrideExceptions.length !== overrideConfig.features.maliciousSiteProtection.exceptions.length) {
                 overrideConfig.features.maliciousSiteProtection.exceptions = updatedOverrideExceptions;
                 await this.saveConfig(overridePath, overrideConfig);
-                console.log(`Updated ${platform.overrideFile} with removed exceptions.`);
                 return true;
             }
         }
@@ -147,7 +147,6 @@ class ConfigProcessor {
             if (updatedDefaultExceptions.length !== defaultConfig.exceptions.length) {
                 defaultConfig.exceptions = updatedDefaultExceptions;
                 await this.saveConfig(this.defaultConfig, defaultConfig);
-                console.log(`Updated ${this.defaultConfig} with removed default exceptions.`);
                 return true;
             }
         }
