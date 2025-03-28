@@ -116,7 +116,7 @@ class ConfigProcessor {
             if (inDataset) {
                 updatedExceptions.push(exception);
             } else {
-                removedExceptions.push(exception.domain);
+                removedExceptions.push(exception);
             }
         }
         return [updatedExceptions, removedExceptions];
