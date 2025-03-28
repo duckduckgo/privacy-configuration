@@ -1,0 +1,41 @@
+name: Remove stale exceptions from malicious site protection feature.
+
+on:
+    workflow_dispatch:
+
+jobs:
+    update_data:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+              with:
+                  repository: duckduckgo/privacy-configuration
+                  path: privacy-configuration/
+            - name: Execute Update Script
+              run: |
+                  cd ./privacy-configuration/
+                  npm i 
+                  DATE="$(date -u +'%Y-%m-%d')"
+                  echo "DATE=$DATE" >> $GITHUB_ENV
+                  TEMPLATE="$(node ./scripts/filter-malicious.js)"
+                  if [ $? -eq 1 ]; then
+                    echo "No updates found, exiting"
+                    exit 0
+                  fi
+                  echo "TEMPLATE=$TEMPLATE" >> $GITHUB_ENV
+                  PR_BODY="${TEMPLATE//\{\{date\}\}/$REVISION}"
+                  echo "PR_BODY<<EOF" >> $GITHUB_ENV
+                  echo "$PR_BODY" >> $GITHUB_ENV
+                  echo "EOF" >> $GITHUB_ENV
+            - name: Create PR with updated configs
+              uses: peter-evans/create-pull-request@88bf0de51c7487d91e1abbb4899332e602c58bbf
+              id: create-pr
+              with:
+                  path: privacy-configuration/
+                  add-paths: |
+                      ./
+                  commit-message: Remove stale exemptions from malicious site protection
+                  branch: remove-stale-exemptions-${{ env.DATE }}
+                  title: Remove stale exemptions as of ${{ env.DATE }}
+                  body: '${{ env.PR_BODY }}'

@@ -64,6 +64,8 @@ class ConfigProcessor {
     */
     async processConfigurations() {
         let anyUpdates = false;
+        const removedDomains = new Set();
+
         for (const platform of this.platforms) {
             const configPath = path.join(this.outputPath, platform.configFile);
             const config = await this.loadConfig(configPath);
@@ -76,6 +78,9 @@ class ConfigProcessor {
             // Check for stale exceptions
             const updatedExceptions = await this.getUpdatedExceptions(exceptions, platform.name);
 
+            // Track deduplicated domains
+            updatedExceptions.forEach((exception) => removedDomains.add(exception.domain));
+
             // Update platform config if any exceptions were removed
             anyUpdates = (await this.updateOverrideConfig(updatedExceptions, platform)) || anyUpdates;
 
@@ -85,7 +90,14 @@ class ConfigProcessor {
 
         if (!anyUpdates) {
             console.log('No updates were made to any configurations.');
+            process.exit(1);
         }
+
+        // Print PR Body
+        console.log(`This PR removes stale exemptions from the malicious site protection feature. 
+            Domains that are not longer in our dataset can be safely removed.
+            Removed domains:`);
+        removedDomains.forEach((domain) => console.log(` - ${domain}`));
     }
 
     /*
@@ -117,7 +129,7 @@ class ConfigProcessor {
                 overrideConfig.features.maliciousSiteProtection.exceptions = updatedOverrideExceptions;
                 await this.saveConfig(overridePath, overrideConfig);
                 console.log(`Updated ${platform.overrideFile} with removed exceptions.`);
-                return true; 
+                return true;
             }
         }
         return false;
@@ -136,7 +148,7 @@ class ConfigProcessor {
                 defaultConfig.exceptions = updatedDefaultExceptions;
                 await this.saveConfig(this.defaultConfig, defaultConfig);
                 console.log(`Updated ${this.defaultConfig} with removed default exceptions.`);
-                return true; 
+                return true;
             }
         }
         return false;
