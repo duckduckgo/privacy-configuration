@@ -55,6 +55,7 @@ describe('Config schema tests', () => {
                     'windowsStartupBoost',
                     'windowsWaitlist',
                     'windowsWebviewFailures',
+                    'windowsWebViewPermissionsSavesInProfile',
                 ];
                 const deviceSpecificCheck = /(android|ios|windows|macos)/i;
                 const featureNameRegex = /^[a-zA-Z0-9]+$/;
