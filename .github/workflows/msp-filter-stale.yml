@@ -1,0 +1,49 @@
+name: Remove stale exceptions from malicious site protection feature.
+
+on:
+    schedule:
+        - cron: '0 0 * * *' # Run every day at midnight UTC
+
+jobs:
+    update_data:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+              with:
+                  repository: duckduckgo/privacy-configuration
+                  path: privacy-configuration/
+            - name: Execute Update Script
+              run: |
+                  cd ./privacy-configuration/
+                  npm i 
+                  npm run build
+                  DATE="$(date -u +'%Y-%m-%d')"
+                  echo "DATE=$DATE" >> $GITHUB_ENV
+                  TEMPLATE="$(node ./scripts/filter-malicious.js)"
+                  # If TEMPLATE contains 'No updates' then exit with success
+                  if [[ $TEMPLATE == *"No updates"* ]]; then
+                    echo "No updates found. Exiting with success."
+                    exit 0
+                  fi 
+                  echo "TEMPLATE=$TEMPLATE" >> $GITHUB_ENV
+                  PR_BODY="${TEMPLATE//\{\{date\}\}/$DATE}"
+                  PR_BODY="${PR_BODY//\\n/$'\n'}" # Replace escaped newlines with actual newlines
+                  echo "PR_BODY<<EOF" >> $GITHUB_ENV
+                  echo "$PR_BODY" >> $GITHUB_ENV
+                  echo "EOF" >> $GITHUB_ENV
+                  npm run lint-fix
+            - name: Create PR with updated configs
+              uses: peter-evans/create-pull-request@88bf0de51c7487d91e1abbb4899332e602c58bbf
+              id: create-pr
+              with:
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  path: privacy-configuration/
+                  add-paths: |
+                      ./
+                  commit-message: Remove stale exemptions from malicious site protection
+                  assignees: not-a-rootkit
+                  branch: remove-stale-exemptions-${{ env.DATE }}
+                  title: Remove stale exemptions from malicious site protection - ${{ env.DATE }}
+                  body: |
+                      ${{ env.PR_BODY }}
