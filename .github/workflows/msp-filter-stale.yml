@@ -37,6 +37,7 @@ jobs:
               uses: peter-evans/create-pull-request@88bf0de51c7487d91e1abbb4899332e602c58bbf
               id: create-pr
               with:
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
                   path: privacy-configuration/
                   add-paths: |
                       ./
