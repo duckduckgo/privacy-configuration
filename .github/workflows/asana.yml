@@ -13,6 +13,9 @@ on:
 jobs:
     sync:
         runs-on: ubuntu-latest
+        concurrency:
+          group: asana-sync
+          cancel-in-progress: false
         steps:
             - uses: actions/checkout@v4
             - uses: duckduckgo/action-asana-sync@v9
