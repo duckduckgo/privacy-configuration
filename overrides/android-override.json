@@ -539,7 +539,8 @@
                     "state": "enabled"
                 },
                 "enableMaliciousSiteProtection": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": 52290000
                 }
             }
         },
@@ -1856,12 +1857,24 @@
             }
         },
         "maliciousSiteProtection": {
-            "state": "internal",
+            "state": "enabled",
             "settings": {
                 "hashPrefixUpdateFrequency": 20,
                 "filterSetUpdateFrequency": 720
             },
-            "exceptions": []
+            "features": {
+                "visibleAndOnByDefault": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52290000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            }
+                        ]
+                    }
+                }
+            }
         },
         "bookmarksSorting": {
             "state": "enabled",
