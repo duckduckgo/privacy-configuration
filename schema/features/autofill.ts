@@ -17,19 +17,14 @@ type ImportFromGooglePasswordManager = {
     signInButton: ButtonConfig;
 };
 
-type FormBoundarySetting = {
-    formSelector: string;
-    inputsSelectors: string[];
-};
-
 type FormTypeSetting = {
     selector: string;
     type: 'login' | 'signup';
 };
 
 export type SiteSpecificFixes = {
-    formBoundarySettings: FormBoundarySetting[];
-    formTypeSettings: FormTypeSetting[];
+    formBoundarySelector?: string;
+    formTypeSettings?: FormTypeSetting[];
 };
 
 // Any subfeatures that have typed `settings` should be defined here.
