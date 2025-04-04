@@ -1,4 +1,4 @@
-import { CSSInjectFeatureSettings, Feature, SubFeature } from '../feature';
+import { Feature, SubFeature } from '../feature';
 
 // Type of the feature `settings` object
 type SettingsType = undefined;
