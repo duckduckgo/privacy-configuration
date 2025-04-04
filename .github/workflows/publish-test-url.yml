@@ -6,61 +6,61 @@ on:
     merge_group:
 
 jobs:
-  publish-config:
-    runs-on: ubuntu-latest
+    publish-config:
+        runs-on: ubuntu-latest
 
-    steps:
-    - name: Checkout the repository
-      uses: actions/checkout@v4
-    - name: Use Node.js 20
-      uses: actions/setup-node@v4
-      with:
-          node-version: 20.x
-    - name: Install dependencies
-      run: npm ci
-    - uses: ./
-    - name: build
-      run: npm run build
+        steps:
+            - name: Checkout the repository
+              uses: actions/checkout@v4
+            - name: Use Node.js 20
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 20.x
+            - name: Install dependencies
+              run: npm ci
+            - uses: ./
+            - name: build
+              run: npm run build
 
-    - name: Checkout preview-pages branch
-      uses: actions/checkout@v4
-      with:
-        ref: preview-pages
-        path: pages-branch
-        token: ${{ secrets.GITHUB_TOKEN }}
+            - name: Checkout preview-pages branch
+              uses: actions/checkout@v4
+              with:
+                  ref: preview-pages
+                  path: pages-branch
+                  token: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Copy PR content into pages branch
-      run: |
-        PR_DIR="pr-${{ github.event.pull_request.number }}"
-        TARGET_DIR="pages-branch/$PR_DIR"
-        rm -rf "$TARGET_DIR"
-        mkdir -p "$TARGET_DIR"
-        cp -r generated/* "$TARGET_DIR"
-        cd pages-branch
-        git config user.name "github-actions"
-        git config user.email "actions@github.com"
-        git add .
-        git commit -m "Publish config for PR #${{ github.event.pull_request.number }}" || echo "No changes to commit"
-        git push origin preview-pages
+            - name: Copy PR content into pages branch
+              run: |
+                  PR_DIR="pr-${{ github.event.pull_request.number }}"
+                  TARGET_DIR="pages-branch/$PR_DIR"
+                  rm -rf "$TARGET_DIR"
+                  mkdir -p "$TARGET_DIR"
+                  cp -r generated/* "$TARGET_DIR"
+                  cd pages-branch
+                  git config user.name "github-actions"
+                  git config user.email "actions@github.com"
+                  git add .
+                  git commit -m "Publish config for PR #${{ github.event.pull_request.number }}" || echo "No changes to commit"
+                  git push origin preview-pages
 
-    - name: Comment preview link on PR
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        PR_NUMBER=${{ github.event.pull_request.number }}
-        REPO=${{ github.repository }}
-        REPO_NAME=$(basename "$REPO")
-        TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
-        PREVIEW_URL="https://${{ github.repository_owner }}.github.io/${REPO_NAME}/pr-${PR_NUMBER}/v4/windows-config.json"
-        COMMENT=$(cat <<EOF
-        🔗 [Preview Config for PR #${PR_NUMBER}](${PREVIEW_URL})
-        
-        _Last updated: ${TIMESTAMP}_
-        EOF
-        )
-        EXISTING_COMMENT_ID=$(gh pr view "$PR_NUMBER" --json comments --jq '.comments[] | select(.body | contains("Preview Config for PR")) | .id')
-        if [ -n "$EXISTING_COMMENT_ID" ]; then
-          gh pr comment "$PR_NUMBER" --comment-id "$EXISTING_COMMENT_ID" --body "$COMMENT"
-        else
-          gh pr comment "$PR_NUMBER" --body "$COMMENT"
-        fi
+            - name: Comment preview link on PR
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  PR_NUMBER=${{ github.event.pull_request.number }}
+                  REPO=${{ github.repository }}
+                  REPO_NAME=$(basename "$REPO")
+                  TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
+                  PREVIEW_URL="https://${{ github.repository_owner }}.github.io/${REPO_NAME}/pr-${PR_NUMBER}/v4/windows-config.json"
+                  COMMENT=$(cat <<EOF
+                  🔗 [Preview Config for PR #${PR_NUMBER}](${PREVIEW_URL})
+
+                  _Last updated: ${TIMESTAMP}_
+                  EOF
+                  )
+                  EXISTING_COMMENT_ID=$(gh pr view "$PR_NUMBER" --json comments --jq '.comments[] | select(.body | contains("Preview Config for PR")) | .id')
+                  if [ -n "$EXISTING_COMMENT_ID" ]; then
+                    gh pr comment "$PR_NUMBER" --comment-id "$EXISTING_COMMENT_ID" --body "$COMMENT"
+                  else
+                    gh pr comment "$PR_NUMBER" --body "$COMMENT"
+                  fi
