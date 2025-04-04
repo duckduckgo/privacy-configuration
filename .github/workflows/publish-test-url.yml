@@ -47,14 +47,14 @@ jobs:
               id: generate_preview_links
               run: |
                   PR_NUMBER=${{ github.event.pull_request.number || 'unknown' }}
-                  PREVIEW_LINKS=$(
-                  find generated/v4 -type f | while read -r file; do
+                  PREVIEW_LINKS=$(find generated/v4 -type f | while read -r file; do
                     RELATIVE_PATH=${file#generated/v4/}
                     echo "- [${RELATIVE_PATH}](https://${{ github.repository_owner }}.github.io/$(basename "${{ github.repository }}")/pr-${PR_NUMBER}/v4/${RELATIVE_PATH})"
-                  done
-                  )
+                  done)
                   LAST_UPDATED=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
-                  echo "preview_links=$PREVIEW_LINKS" >> $GITHUB_OUTPUT
+                  echo "preview_links<<EOF" >> $GITHUB_OUTPUT
+                  echo "$PREVIEW_LINKS" >> $GITHUB_OUTPUT
+                  echo "EOF" >> $GITHUB_OUTPUT
                   echo "last_updated=$LAST_UPDATED" >> $GITHUB_OUTPUT
 
             - name: Comment preview link on PR
@@ -65,6 +65,7 @@ jobs:
                   token: ${{ secrets.GITHUB_TOKEN }}
                   repository: ${{ github.repository }}
                   issue-number: ${{ github.event.pull_request.number }}
+                  edit-mode: replace
                   body: |
                       🔗 **Preview Config for PR #${{ github.event.pull_request.number }}**
 
