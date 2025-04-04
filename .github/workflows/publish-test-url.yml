@@ -43,33 +43,30 @@ jobs:
                   git commit -m "Publish config for PR #${{ github.event.pull_request.number }}" || echo "No changes to commit"
                   git push origin preview-pages
 
+            - name: Generate preview links
+              id: generate_preview_links
+              run: |
+                  PREVIEW_LINKS=$(
+                  find generated/v4 -type f | while read -r file; do
+                    RELATIVE_PATH=${file#generated/v4/}
+                    echo "- [${RELATIVE_PATH}](https://${{ github.repository_owner }}.github.io/$(basename "${{ github.repository }}")/pr-${{ github.event.pull_request.number }}/v4/${RELATIVE_PATH})"
+                  done
+                  )
+                  LAST_UPDATED=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
+                  echo "preview_links=$PREVIEW_LINKS" >> $GITHUB_OUTPUT
+                  echo "last_updated=$LAST_UPDATED" >> $GITHUB_OUTPUT
+
             - name: Comment preview link on PR
               env:
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              run: |
-                  PR_NUMBER=${{ github.event.pull_request.number }}
-                  REPO=${{ github.repository }}
-                  REPO_NAME=$(basename "$REPO")
-                  TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
-                  PREVIEW_BASE_URL="https://${{ github.repository_owner }}.github.io/${REPO_NAME}/pr-${PR_NUMBER}/v4"
+              uses: peter-evans/create-or-update-comment@v4
+              with:
+                  token: ${{ secrets.GITHUB_TOKEN }}
+                  repository: ${{ github.repository }}
+                  issue-number: ${{ github.event.pull_request.number }}
+                  body: |
+                      🔗 **Preview Config for PR #${{ github.event.pull_request.number }}**
 
-                  LINKS=$(find generated/v4 -type f | while read -r file; do
-                    RELATIVE_PATH=${file#generated/v4/}
-                    echo "- [${RELATIVE_PATH}](${PREVIEW_BASE_URL}/${RELATIVE_PATH})"
-                  done)
+                      ${{ steps.generate_preview_links.outputs.preview_links }}
 
-                  COMMENT=$(cat <<EOF
-                  🔗 **Preview Config for PR #${PR_NUMBER}**
-
-                  $LINKS
-
-                  _Last updated: ${TIMESTAMP}_
-                  EOF
-                  )
-
-                  EXISTING_COMMENT_ID=$(gh pr view "$PR_NUMBER" --json comments --jq '.comments[] | select(.body | contains("Preview Config for PR")) | .id')
-                  if [ -n "$EXISTING_COMMENT_ID" ]; then
-                    gh pr comment "$PR_NUMBER" --comment-id "$EXISTING_COMMENT_ID" --body "$COMMENT"
-                  else
-                    gh pr comment "$PR_NUMBER" --body "$COMMENT"
-                  fi
+                      _Last updated: ${{ steps.generate_preview_links.outputs.last_updated }}_
