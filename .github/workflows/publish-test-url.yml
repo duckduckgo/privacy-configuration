@@ -51,13 +51,22 @@ jobs:
                   REPO=${{ github.repository }}
                   REPO_NAME=$(basename "$REPO")
                   TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
-                  PREVIEW_URL="https://${{ github.repository_owner }}.github.io/${REPO_NAME}/pr-${PR_NUMBER}/v4/windows-config.json"
+                  PREVIEW_BASE_URL="https://${{ github.repository_owner }}.github.io/${REPO_NAME}/pr-${PR_NUMBER}/v4"
+
+                  LINKS=$(find generated/v4 -type f | while read -r file; do
+                    RELATIVE_PATH=${file#generated/v4/}
+                    echo "- [${RELATIVE_PATH}](${PREVIEW_BASE_URL}/${RELATIVE_PATH})"
+                  done)
+
                   COMMENT=$(cat <<EOF
-                  🔗 [Preview Config for PR #${PR_NUMBER}](${PREVIEW_URL})
+                  🔗 **Preview Config for PR #${PR_NUMBER}**
+
+                  $LINKS
 
                   _Last updated: ${TIMESTAMP}_
                   EOF
                   )
+
                   EXISTING_COMMENT_ID=$(gh pr view "$PR_NUMBER" --json comments --jq '.comments[] | select(.body | contains("Preview Config for PR")) | .id')
                   if [ -n "$EXISTING_COMMENT_ID" ]; then
                     gh pr comment "$PR_NUMBER" --comment-id "$EXISTING_COMMENT_ID" --body "$COMMENT"
