@@ -8,7 +8,9 @@ on:
 jobs:
     publish-config:
         runs-on: ubuntu-latest
-
+        concurrency:
+            group: asana-sync
+            cancel-in-progress: false
         steps:
             - name: Checkout the repository
               uses: actions/checkout@v4
