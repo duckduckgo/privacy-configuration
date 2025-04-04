@@ -168,6 +168,61 @@ function isFeatureMissingState(feature) {
     return !('state' in feature);
 }
 
+// We previously rolled out all features to all platforms, so this is a safety whilst we deprecate that behavior.
+// Don't add new items to this list, we should just add fearures to overrides/ files instead with explicit state.
+const legacyDisabledFeatures = [
+    'androidBrowserConfig',
+    'androidNewStateKillSwitch',
+    'ampLinks',
+    'appTrackerProtection',
+    'auraExperiment',
+    'autoconsent',
+    'bookmarksSorting',
+    'brokenSiteReportExperiment',
+    'changeOmnibarPosition',
+    'clickToLoad',
+    'clickToPlay',
+    'clientBrandHint',
+    'contextualOnboarding',
+    'cookie',
+    'customUserAgent',
+    'duckPlayer',
+    'exceptionHandler',
+    'extendedOnboarding',
+    'fingerprintingBattery',
+    'fingerprintingCanvas',
+    'fingerprintingTemporaryStorage',
+    'googleRejected',
+    'harmfulApis',
+    'incontextSignup',
+    'mediaPlaybackRequiresUserGesture',
+    'messageBridge',
+    'newTabContinueSetUp',
+    'nonTracking3pCookies',
+    'privacyDashboard',
+    'referrer',
+    'serviceworkerInitiatedRequests',
+    'settingsPage',
+    'showOnAppLaunch',
+    'swipingTabs',
+    'tabManager',
+    'textZoom',
+    'trackingCookies1p',
+    'trackingCookies3p',
+    'voiceSearch',
+    'webViewBlobDownload',
+    'windowsDownloadLink',
+    'windowsExternalPreviewReleases',
+    'windowsFireWindow',
+    'windowsPermissionUsage',
+    'windowsPrecisionScroll',
+    'windowsSpellChecker',
+    'windowsStartupBoost',
+    'windowsWaitlist',
+    'windowsWebViewPermissionsSavesInProfile',
+    'windowsWebviewFailures',
+];
+
 // Handle platform specific overrides and write configs to disk
 async function buildPlatforms() {
     const platformConfigs = {};
@@ -241,8 +296,13 @@ async function buildPlatforms() {
                 }
             }
 
-            if (isFeatureMissingState(platformConfig.features[key])) {
-                platformConfig.features[key].state = 'disabled';
+            if (isFeatureMissingState(platformConfig.features[key], key)) {
+                if (legacyDisabledFeatures.includes(key)) {
+                    platformConfig.features[key].state = 'disabled';
+                } else {
+                    // Remove the feature if we're not explicitly enabling it in overrides/
+                    delete platformConfig.features[key];
+                }
             }
         }
 
@@ -253,9 +313,6 @@ async function buildPlatforms() {
             }
 
             platformConfig.features[key] = { ...platformOverride.features[key] };
-            if (isFeatureMissingState(platformConfig.features[key])) {
-                platformConfig.features[key].state = 'disabled';
-            }
         }
 
         // Remove appTP feature from platforms that don't use it since it's a large feature
