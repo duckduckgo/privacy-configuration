@@ -51,6 +51,11 @@ jobs:
         REPO=${{ github.repository }}
         REPO_NAME=$(basename "$REPO")
         TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
-        PREVIEW_URL="https://${{ github.repository_owner }}.github.io/${REPO_NAME}/pr-${PR_NUMBER}/"
-        COMMENT="🔗 [Preview Config for PR #${PR_NUMBER}](${PREVIEW_URL})\n\n_Last updated: ${TIMESTAMP}_"
-        gh pr comment "$PR_NUMBER" --body "$COMMENT"
+        PREVIEW_URL="https://${{ github.repository_owner }}.github.io/${REPO_NAME}/pr-${PR_NUMBER}/v4/windows-config.json"
+                COMMENT=$(cat <<EOF
+        🔗 [Preview Config for PR #${PR_NUMBER}](${PREVIEW_URL})
+        
+        _Last updated: ${TIMESTAMP}_
+        EOF
+                )
+                gh pr comment "$PR_NUMBER" --body "$COMMENT"
