@@ -52,10 +52,15 @@ jobs:
         REPO_NAME=$(basename "$REPO")
         TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
         PREVIEW_URL="https://${{ github.repository_owner }}.github.io/${REPO_NAME}/pr-${PR_NUMBER}/v4/windows-config.json"
-                COMMENT=$(cat <<EOF
+        COMMENT=$(cat <<EOF
         🔗 [Preview Config for PR #${PR_NUMBER}](${PREVIEW_URL})
         
         _Last updated: ${TIMESTAMP}_
         EOF
-                )
-                gh pr comment "$PR_NUMBER" --body "$COMMENT"
+        )
+        EXISTING_COMMENT_ID=$(gh pr view "$PR_NUMBER" --json comments --jq '.comments[] | select(.body | contains("Preview Config for PR")) | .id')
+        if [ -n "$EXISTING_COMMENT_ID" ]; then
+          gh pr comment "$PR_NUMBER" --comment-id "$EXISTING_COMMENT_ID" --body "$COMMENT"
+        else
+          gh pr comment "$PR_NUMBER" --body "$COMMENT"
+        fi
