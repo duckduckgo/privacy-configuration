@@ -1,157 +1,5 @@
 {
     "features": {
-        "attributedMetrics": {
-            "state": "internal",
-            "minSupportedVersion": "1.168.0",
-            "exceptions": [],
-            "features": {
-                "emitAllMetrics": {
-                    "state": "internal"
-                },
-                "retention": {
-                    "state": "internal"
-                },
-                "canEmitRetention": {
-                    "state": "internal"
-                },
-                "searchDaysAvg": {
-                    "state": "internal"
-                },
-                "canEmitSearchDaysAvg": {
-                    "state": "internal"
-                },
-                "searchCountAvg": {
-                    "state": "internal"
-                },
-                "canEmitSearchCountAvg": {
-                    "state": "internal"
-                },
-                "adClickCountAvg": {
-                    "state": "internal"
-                },
-                "canEmitAdClickCountAvg": {
-                    "state": "internal"
-                },
-                "aiUsageAvg": {
-                    "state": "internal"
-                },
-                "canEmitAIUsageAvg": {
-                    "state": "internal"
-                },
-                "subscriptionRetention": {
-                    "state": "internal"
-                },
-                "canEmitSubscriptionRetention": {
-                    "state": "internal"
-                },
-                "syncDevices": {
-                    "state": "internal"
-                },
-                "canEmitSyncDevices": {
-                    "state": "internal"
-                },
-                "sendOriginParam": {
-                    "state": "internal",
-                    "settings": {
-                        "originCampaignSubstrings": [
-                            "paid"
-                        ]
-                    }
-                }
-            },
-            "settings": {
-                "attributed_metric_retention_week": {
-                    "buckets": [
-                        1,
-                        2,
-                        3
-                    ],
-                    "version": 1
-                },
-                "attributed_metric_retention_month": {
-                    "buckets": [
-                        2,
-                        3,
-                        4,
-                        5
-                    ],
-                    "version": 1
-                },
-                "attributed_metric_active_past_week": {
-                    "buckets": [
-                        2,
-                        4
-                    ],
-                    "version": 1
-                },
-                "attributed_metric_average_searches_past_week_first_month": {
-                    "buckets": [
-                        5,
-                        9
-                    ],
-                    "version": 1
-                },
-                "attributed_metric_average_searches_past_week": {
-                    "buckets": [
-                        5,
-                        9
-                    ],
-                    "version": 1
-                },
-                "attributed_metric_average_ad_clicks_past_week": {
-                    "buckets": [
-                        2,
-                        5
-                    ],
-                    "version": 1
-                },
-                "attributed_metric_average_duck_ai_usage_past_week": {
-                    "buckets": [
-                        5,
-                        9
-                    ],
-                    "version": 1
-                },
-                "attributed_metric_subscribed": {
-                    "buckets": [
-                        0,
-                        1
-                    ],
-                    "version": 1
-                },
-                "attributed_metric_synced_device": {
-                    "buckets": [1],
-                    "version": 1
-                }
-            }
-        },
-        "experimentalTheming": {
-            "state": "enabled",
-            "exceptions": [],
-            "minSupportedVersion": "1.143.0",
-            "features": {
-                "visualUpdates": {
-                    "state": "enabled",
-                    "minSupportedVersion": "1.143.0",
-                    "rollout": {
-                        "steps": [
-                            {
-                                "percent": 5
-                            },
-                            {
-                                "percent": 25
-                            },
-                            {
-                                "percent": 50
-                            },
-                            {
-                                "percent": 100
-                            }
-                        ]
-                    }
-                }
-            }
-        },
         "incrementalRolloutTest": {
             "state": "enabled",
             "features": {
@@ -175,86 +23,6 @@
         },
         "brokenSitePrompt": {
             "state": "enabled"
-        },
-        "contentScopeExperiments": {
-            "exceptions": [],
-            "state": "enabled",
-            "features": {
-                "fingerprintingCanvas": {
-                    "state": "disabled",
-                    "rollout": {
-                        "steps": [
-                            {
-                                "percent": 25
-                            },
-                            {
-                                "percent": 100
-                            }
-                        ]
-                    },
-                    "cohorts": [
-                        {
-                            "name": "control",
-                            "weight": 1
-                        },
-                        {
-                            "name": "treatment",
-                            "weight": 1
-                        }
-                    ]
-                },
-                "scriptletExperiment": {
-                    "state": "disabled",
-                    "minSupportedVersion": "1.145.0",
-                    "rollout": {
-                        "steps": [
-                            {
-                                "percent": 10
-                            },
-                            {
-                                "percent": 25
-                            },
-                            {
-                                "percent": 50
-                            },
-                            {
-                                "percent": 100
-                            }
-                        ]
-                    },
-                    "cohorts": [
-                        {
-                            "name": "control",
-                            "weight": 1
-                        },
-                        {
-                            "name": "treatment",
-                            "weight": 1
-                        }
-                    ]
-                },
-                "webNotificationsFixExperiment": {
-                    "state": "enabled",
-                    "minSupportedVersion": "1.168.0",
-                    "rollout": {
-                        "steps": [
-                            {
-                                "percent": 10
-                            }
-                        ]
-                    },
-                    "cohorts": [
-                        {
-                            "name": "control",
-                            "weight": 1
-                        },
-                        {
-                            "name": "treatment",
-                            "weight": 1
-                        }
-                    ]
-                }
-            }
         },
         "networkProtection": {
             "state": "enabled",
@@ -305,10 +73,6 @@
                 },
                 "appStoreSystemExtension": {
                     "state": "enabled"
-                },
-                "appStoreSystemExtensionMessage": {
-                    "state": "enabled",
-                    "minSupportedVersion": "1.137.0"
                 }
             },
             "minSupportedVersion": "1.57.1"
@@ -317,29 +81,13 @@
             "exceptions": [],
             "settings": {
                 "aiChat": "disabled",
-                "subscriptions": "disabled",
-                "serpSettings": "disabled",
                 "domains": [
                     {
-                        "domain": [
-                            "duckduckgo.com",
-                            "duck.co",
-                            "duck.ai"
-                        ],
+                        "domain": "duckduckgo.com",
                         "patchSettings": [
                             {
                                 "op": "replace",
                                 "path": "/aiChat",
-                                "value": "enabled"
-                            },
-                            {
-                                "op": "replace",
-                                "path": "/subscriptions",
-                                "value": "enabled"
-                            },
-                            {
-                                "op": "replace",
-                                "path": "/serpSettings",
                                 "value": "enabled"
                             }
                         ]
@@ -348,71 +96,13 @@
             },
             "state": "enabled"
         },
-        "duckAiListener": {
-            "state": "enabled",
-            "settings": {
-                "additionalCheck": "disabled",
-                "conditionalChanges": [
-                    {
-                        "condition": {
-                            "internal": true,
-                            "maxSupportedVersion": "1.160.0"
-                        },
-                        "patchSettings": [
-                            {
-                                "op": "replace",
-                                "path": "/additionalCheck",
-                                "value": "enabled"
-                            }
-                        ]
-                    }
-                ]
-            }
-        },
         "aiChat": {
             "state": "enabled",
             "features": {
                 "toolbarShortcut": {
                     "state": "enabled"
                 },
-                "pageContext": {
-                    "state": "internal",
-                    "minSupportedVersion": "1.157.0"
-                },
                 "applicationMenuShortcut": {
-                    "state": "enabled"
-                },
-                "sidebar": {
-                    "state": "enabled",
-                    "minSupportedVersion": "1.148.0"
-                },
-                "textSummarization": {
-                    "state": "enabled",
-                    "minSupportedVersion": "1.150.0"
-                },
-                "textTranslation": {
-                    "state": "enabled",
-                    "minSupportedVersion": "1.157.0"
-                },
-                "globalToggle": {
-                    "state": "enabled",
-                    "minSupportedVersion": "1.157.0"
-                },
-                "improvements": {
-                    "state": "enabled",
-                    "minSupportedVersion": "1.161.0"
-                },
-                "keepSession": {
-                    "state": "enabled",
-                    "minSupportedVersion": "1.161.0",
-                    "settings": {
-                        "sessionTimeoutMinutes": 60
-                    }
-                },
-                "standaloneMigration": {
-                    "state": "disabled"
-                },
-                "showHideAiGeneratedImages": {
                     "state": "enabled"
                 }
             },
@@ -422,17 +112,6 @@
                 "onboardingCookieDomain": "duckduckgo.com",
                 "aiChatURLIdentifiableQuery": "ia",
                 "aiChatURLIdentifiableQueryValue": "chat"
-            }
-        },
-        "duckAiDataClearing": {
-            "exceptions": [],
-            "state": "enabled",
-            "settings": {
-                "chatsLocalStorageKeys": ["savedAIChats"],
-                "chatImagesIndexDbNameObjectStoreNamePairs": [[
-                        "savedAIChatData",
-                        "chat-images"
-                    ]]
             }
         },
         "autocompleteTabs": {
@@ -459,36 +138,16 @@
                 },
                 "freemium": {
                     "state": "enabled",
-                    "minSupportedVersion": "1.114.0",
-                    "targets": [
-                        {
-                            "localeCountry": "US"
-                        }
-                    ]
-                },
-                "remoteBrokerDelivery": {
-                    "state": "enabled",
-                    "minSupportedVersion": "1.140.0"
-                },
-                "emailConfirmationDecoupling": {
-                    "state": "enabled",
-                    "minSupportedVersion": "1.160.0",
-                    "rollout": {
-                        "steps": [
-                            {
-                                "percent": 5
-                            },
-                            {
-                                "percent": 100
-                            }
-                        ]
-                    }
+                    "minSupportedVersion": "1.114.0"
                 }
             },
             "minSupportedVersion": "1.70.0"
         },
         "brokerProtection": {
-            "state": "enabled"
+            "state": "enabled",
+            "settings": {
+                "useEnhancedCaptchaSystem": "disabled"
+            }
         },
         "contentBlocking": {
             "state": "enabled",
@@ -499,42 +158,18 @@
                 }
             ],
             "features": {
-                "tdsNextExperiment004": {
+                "tdsNextExperimentBaseline": {
                     "state": "disabled",
                     "rollout": {
                         "steps": [
                             {
-                                "percent": 25
+                                "percent": 50
                             }
                         ]
                     },
                     "settings": {
-                        "controlUrl": "v6/experiments/202511v1-macos-tds-control.json",
-                        "treatmentUrl": "v6/experiments/202511v1-macos-tds-treatment.json"
-                    },
-                    "cohorts": [
-                        {
-                            "name": "control",
-                            "weight": 1
-                        },
-                        {
-                            "name": "treatment",
-                            "weight": 1
-                        }
-                    ]
-                },
-                "tdsNextExperiment005": {
-                    "state": "disabled",
-                    "rollout": {
-                        "steps": [
-                            {
-                                "percent": 100
-                            }
-                        ]
-                    },
-                    "settings": {
-                        "controlUrl": "v6/experiments/202511v2-macos-tds-control.json",
-                        "treatmentUrl": "v6/experiments/202511v2-macos-tds-treatment.json"
+                        "controlUrl": "v6/temp/macos-tds.json",
+                        "treatmentUrl": "v6/temp/macos-tds-b.json"
                     },
                     "cohorts": [
                         {
@@ -578,9 +213,6 @@
                     "settings": {
                         "signInRequiredSelector": "[href*=\"//support.google.com/youtube/answer/3037019\"]"
                     }
-                },
-                "nativeUI": {
-                    "state": "disabled"
                 }
             }
         },
@@ -609,16 +241,9 @@
         "setAsDefaultAndAddToDock": {
             "state": "enabled",
             "minSupportedVersion": "1.130.0",
-            "settings": {
-                "firstPopoverDelayDays": 14,
-                "bannerAfterPopoverDelayDays": 14,
-                "bannerRepeatIntervalDays": 14,
-                "inactiveModalNumberOfDaysSinceInstall": 28,
-                "inactiveModalNumberOfInactiveDays": 7
-            },
             "features": {
                 "popoverVsBannerExperiment": {
-                    "state": "disabled",
+                    "state": "enabled",
                     "cohorts": [
                         {
                             "name": "control",
@@ -633,13 +258,6 @@
                             "weight": 1
                         }
                     ]
-                },
-                "scheduledDefaultBrowserAndDockPrompts": {
-                    "state": "enabled",
-                    "minSupportedVersion": "1.143.0"
-                },
-                "scheduledDefaultBrowserAndDockPromptsInactiveUser": {
-                    "state": "enabled"
                 }
             }
         },
@@ -671,12 +289,13 @@
                     "state": "disabled",
                     "handlerStrategies": {
                         "reflect": [
-                            "contentScopeScripts",
                             "trackerDetectedMessage",
                             "printHandler",
                             "specialPages"
                         ],
-                        "polyfill": ["*"],
+                        "polyfill": [
+                            "*"
+                        ],
                         "undefined": []
                     }
                 },
@@ -707,23 +326,6 @@
                             {
                                 "op": "replace",
                                 "path": "/messageHandlers/state",
-                                "value": "enabled"
-                            }
-                        ]
-                    }
-                ],
-                "conditionalChanges": [
-                    {
-                        "condition": {
-                            "experiment": {
-                                "experimentName": "webNotificationsFixExperiment",
-                                "cohort": "treatment"
-                            }
-                        },
-                        "patchSettings": [
-                            {
-                                "op": "add",
-                                "path": "/webNotifications",
                                 "value": "enabled"
                             }
                         ]
@@ -776,9 +378,6 @@
                 "unknownUsernameCategorization": {
                     "state": "enabled"
                 },
-                "passwordVariantCategorization": {
-                    "state": "enabled"
-                },
                 "credentialsImportPromotion": {
                     "state": "enabled"
                 },
@@ -787,322 +386,6 @@
                 },
                 "partialFormSaves": {
                     "state": "enabled"
-                },
-                "siteSpecificFixes": {
-                    "state": "enabled",
-                    "settings": {
-                        "formTypeSettings": [],
-                        "inputTypeSettings": [],
-                        "formBoundarySelector": "",
-                        "failsafeSettings": {},
-                        "domains": [
-                            {
-                                "domain": ["ring.com"],
-                                "patchSettings": [
-                                    {
-                                        "path": "/formTypeSettings/-",
-                                        "op": "add",
-                                        "value": {
-                                            "selector": "body > main > section > form:nth-child(2)",
-                                            "type": "signup"
-                                        }
-                                    }
-                                ]
-                            },
-                            {
-                                "domain": ["coolors.co"],
-                                "patchSettings": [
-                                    {
-                                        "path": "/failsafeSettings/maxInputsPerPage",
-                                        "op": "add",
-                                        "value": 110
-                                    }
-                                ]
-                            },
-                            {
-                                "domain": ["www.joinblvd.com"],
-                                "patchSettings": [
-                                    {
-                                        "path": "/formTypeSettings/-",
-                                        "op": "add",
-                                        "value": {
-                                            "selector": "blvd-wizard-step form",
-                                            "type": "signup"
-                                        }
-                                    }
-                                ]
-                            },
-                            {
-                                "domain": ["alibris.com"],
-                                "patchSettings": [
-                                    {
-                                        "path": "/formTypeSettings/-",
-                                        "op": "add",
-                                        "value": {
-                                            "selector": "form[action*=\"Guest\"]",
-                                            "type": "signup"
-                                        }
-                                    },
-                                    {
-                                        "path": "/formTypeSettings/-",
-                                        "op": "add",
-                                        "value": {
-                                            "selector": "form[action*=\"CreateAccount\"]",
-                                            "type": "signup"
-                                        }
-                                    }
-                                ]
-                            },
-                            {
-                                "domain": ["areaclientes.orange.es"],
-                                "patchSettings": [
-                                    {
-                                        "path": "/formTypeSettings/-",
-                                        "op": "add",
-                                        "value": {
-                                            "selector": "form",
-                                            "type": "login"
-                                        }
-                                    }
-                                ]
-                            },
-                            {
-                                "domain": [
-                                    "estore.archives.gov",
-                                    "localhost"
-                                ],
-                                "patchSettings": [
-                                    {
-                                        "path": "/formTypeSettings/-",
-                                        "op": "add",
-                                        "value": {
-                                            "selector": "fieldset[id='ucContentMiddleCenter_fldLogin']",
-                                            "type": "login"
-                                        }
-                                    }
-                                ]
-                            },
-                            {
-                                "domain": [
-                                    "zendesk.com",
-                                    "localhost"
-                                ],
-                                "patchSettings": [
-                                    {
-                                        "path": "/inputTypeSettings/-",
-                                        "op": "add",
-                                        "value": {
-                                            "selector": "#\\:r0\\:\\-\\-input",
-                                            "type": "credentials.username"
-                                        }
-                                    }
-                                ]
-                            },
-                            {
-                                "domain": ["cvs.com"],
-                                "patchSettings": [
-                                    {
-                                        "path": "/inputTypeSettings/-",
-                                        "op": "add",
-                                        "value": {
-                                            "selector": "profile-lookup[app-name='account-login'] input[type='text']",
-                                            "type": "credentials.username"
-                                        }
-                                    }
-                                ]
-                            },
-                            {
-                                "domain": ["att.com"],
-                                "patchSettings": [
-                                    {
-                                        "path": "/inputTypeSettings/-",
-                                        "op": "add",
-                                        "value": {
-                                            "selector": "input[name='Expiration Month']",
-                                            "type": "creditCards.expiration"
-                                        }
-                                    }
-                                ]
-                            },
-                            {
-                                "domain": ["gamestop.com"],
-                                "patchSettings": [
-                                    {
-                                        "path": "/inputTypeSettings/-",
-                                        "op": "add",
-                                        "value": {
-                                            "selector": "input[name='dwfrm_profile_customer_email']",
-                                            "type": "identities.emailAddress"
-                                        }
-                                    },
-                                    {
-                                        "path": "/inputTypeSettings/-",
-                                        "op": "add",
-                                        "value": {
-                                            "selector": "input[name='dwfrm_profile_login_password']",
-                                            "type": "credentials.password.new"
-                                        }
-                                    }
-                                ]
-                            },
-                            {
-                                "domain": ["asana.com"],
-                                "patchSettings": [
-                                    {
-                                        "path": "/inputTypeSettings/-",
-                                        "op": "add",
-                                        "value": {
-                                            "selector": "input.TextInputBase.TokenizerInput-input[data-testid='tokenizer-input'][placeholder='Name or email']",
-                                            "type": "unknown"
-                                        }
-                                    }
-                                ]
-                            },
-                            {
-                                "domain": ["portal.vectorsecurity.com"],
-                                "patchSettings": [
-                                    {
-                                        "path": "/formTypeSettings/-",
-                                        "op": "add",
-                                        "value": {
-                                            "selector": "form[method='post'][action='/index']",
-                                            "type": "login"
-                                        }
-                                    }
-                                ]
-                            },
-                            {
-                                "domain": ["reddit.com"],
-                                "patchSettings": [
-                                    {
-                                        "path": "/formTypeSettings/-",
-                                        "op": "add",
-                                        "value": {
-                                            "selector": "rpl-modal-card.settings-row-modal-card[id*='settings-mfa-enable-password']",
-                                            "type": "login"
-                                        }
-                                    }
-                                ]
-                            },
-                            {
-                                "domain": ["netflix.com"],
-                                "patchSettings": [
-                                    {
-                                        "path": "/formTypeSettings/-",
-                                        "op": "add",
-                                        "value": {
-                                            "selector": "div[data-uia='web-login-form']",
-                                            "type": "login"
-                                        }
-                                    },
-                                    {
-                                        "path": "/formBoundarySelector",
-                                        "op": "replace",
-                                        "value": "div[data-uia='web-login-form']"
-                                    }
-                                ]
-                            },
-                            {
-                                "domain": ["aa.com"],
-                                "patchSettings": [
-                                    {
-                                        "path": "/formBoundarySelector",
-                                        "op": "replace",
-                                        "value": "adc-card.adc-card"
-                                    }
-                                ]
-                            },
-                            {
-                                "domain": [
-                                    "bet365.bet.br",
-                                    "bet365.com"
-                                ],
-                                "patchSettings": [
-                                    {
-                                        "path": "/formBoundarySelector",
-                                        "op": "replace",
-                                        "value": "div[style*=transform] > div"
-                                    }
-                                ]
-                            },
-                            {
-                                "domain": ["order.yodobashi.com"],
-                                "patchSettings": [
-                                    {
-                                        "path": "/formTypeSettings/-",
-                                        "op": "add",
-                                        "value": {
-                                            "selector": ".loginSelectUnit.slctInputUnit",
-                                            "type": "login"
-                                        }
-                                    },
-                                    {
-                                        "path": "/formBoundarySelector",
-                                        "op": "replace",
-                                        "value": ".loginSelectUnit.slctInputUnit"
-                                    }
-                                ]
-                            },
-                            {
-                                "domain": [
-                                    "accounts.google.com"
-                                ],
-                                "patchSettings": [
-                                    {
-                                        "path": "/formBoundarySelector",
-                                        "op": "replace",
-                                        "value": "c-wiz > main"
-                                    },
-                                    {
-                                        "path": "/formTypeSettings/-",
-                                        "op": "add",
-                                        "value": {
-                                            "selector": "c-wiz[data-p*=ServiceLogin] > main",
-                                            "type": "login"
-                                        }
-                                    }
-                                ]
-                            },
-                            {
-                                "domain": [
-                                    "challenge.spotify.com"
-                                ],
-                                "patchSettings": [
-                                    {
-                                        "path": "/inputTypeSettings/-",
-                                        "op": "add",
-                                        "value": {
-                                            "selector": "input[inputmode=\"numeric\"]",
-                                            "type": "unknown"
-                                        }
-                                    }
-                                ]
-                            },
-                            {
-                                "domain": [
-                                    "login.coinbase.com"
-                                ],
-                                "patchSettings": [
-                                    {
-                                        "path": "/inputTypeSettings/-",
-                                        "op": "add",
-                                        "value": {
-                                            "selector": "input[data-testid='unified-login-email-prompt-input']",
-                                            "type": "credentials.username"
-                                        }
-                                    },
-                                    {
-                                        "path": "/inputTypeSettings/-",
-                                        "op": "add",
-                                        "value": {
-                                            "selector": "span[data-testid='input-interactable-area'] input[type='email']",
-                                            "type": "identities.emailAddress"
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    }
                 }
             }
         },
@@ -1112,22 +395,6 @@
             "features": {
                 "isLaunched": {
                     "state": "enabled"
-                },
-                "nextStepsWidget": {
-                    "state": "disabled"
-                },
-                "omnibar": {
-                    "state": "enabled",
-                    "minSupportedVersion": "1.157.0"
-                },
-                "newTabPagePerTab": {
-                    "state": "disabled"
-                },
-                "newTabPageTabIDs": {
-                    "state": "enabled"
-                },
-                "autoconsentStats": {
-                    "state": "internal"
                 }
             }
         },
@@ -1139,23 +406,6 @@
                     "state": "enabled"
                 }
             }
-        },
-        "shortHistoryMenu": {
-            "state": "enabled"
-        },
-        "disableFireAnimation": {
-            "state": "enabled"
-        },
-        "openFireWindowByDefault": {
-            "state": "enabled"
-        },
-        "feedbackForm": {
-            "state": "enabled"
-        },
-        "updatesWontAutomaticallyRestartApp": {
-            "state": "disabled",
-            "exceptions": [],
-            "minSupportedVersion": "1.161.0"
         },
         "incontextSignup": {
             "state": "enabled"
@@ -1174,9 +424,6 @@
             "minSupportedVersion": "0.22.3"
         },
         "performanceMetrics": {
-            "state": "enabled"
-        },
-        "breakageReporting": {
             "state": "enabled"
         },
         "fingerprintingHardware": {
@@ -1246,14 +493,6 @@
                 {
                     "domain": "zoom.us",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1635"
-                },
-                {
-                    "domain": "vox.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3510"
-                },
-                {
-                    "domain": "wetter.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3366"
                 }
             ]
         },
@@ -1274,10 +513,6 @@
             "settings": {
                 "defaultPolicy": "brand",
                 "defaultSites": [
-                    {
-                        "domain": "xploretv.at",
-                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3572"
-                    },
                     {
                         "domain": "chase.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/988"
@@ -1355,10 +590,6 @@
                         "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2825"
                     },
                     {
-                        "domain": "mercari.jp",
-                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2825"
-                    },
-                    {
                         "domain": "ichard26.github.io",
                         "reason": "Next PR fetch errors on DDG user agent"
                     },
@@ -1369,26 +600,6 @@
                     {
                         "domain": "ihg.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2872"
-                    },
-                    {
-                        "domain": "routenote.com",
-                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3055"
-                    },
-                    {
-                        "domain": "sfr.fr",
-                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3338"
-                    },
-                    {
-                        "domain": "doublelist.com",
-                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3539"
-                    },
-                    {
-                        "domain": "getmydisneyvisa.com",
-                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3594"
-                    },
-                    {
-                        "domain": "arcteryx.com",
-                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3701"
                     }
                 ],
                 "webViewDefault": [
@@ -1425,37 +636,6 @@
                 },
                 "seamlessAccountSwitching": {
                     "state": "enabled"
-                },
-                "exchangeKeysToSyncWithAnotherDevice": {
-                    "state": "enabled"
-                },
-                "syncSetupBarcodeIsUrlBased": {
-                    "state": "enabled"
-                },
-                "newSyncEntryPoints": {
-                    "state": "enabled",
-                    "minSupportedVersion": "1.156.0",
-                    "rollout": {
-                        "steps": [
-                            {
-                                "percent": 25.0
-                            },
-                            {
-                                "percent": 50.0
-                            },
-                            {
-                                "percent": 100.0
-                            }
-                        ]
-                    }
-                },
-                "syncCreditCards": {
-                    "state": "enabled",
-                    "minSupportedVersion": "1.163.0"
-                },
-                "syncIdentities": {
-                    "state": "enabled",
-                    "minSupportedVersion": "1.163.0"
                 }
             }
         },
@@ -1473,6 +653,12 @@
         "privacyDashboard": {
             "state": "enabled",
             "features": {
+                "highlightedProtectionsToggle": {
+                    "state": "disabled",
+                    "rollout": {
+                        "steps": []
+                    }
+                },
                 "toggleReports": {
                     "state": "enabled"
                 }
@@ -1481,11 +667,24 @@
         "trackerAllowlist": {
             "settings": {
                 "allowlistedTrackers": {
+                    "2mdn.net": {
+                        "rules": [
+                            {
+                                "rule": "2mdn.net",
+                                "domains": [
+                                    "crunchyroll.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1888"
+                            }
+                        ]
+                    },
                     "appboycdn.com": {
                         "rules": [
                             {
                                 "rule": "js.appboycdn.com/web-sdk/3.1/appboy.min.js",
-                                "domains": ["edx.org"],
+                                "domains": [
+                                    "edx.org"
+                                ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1596"
                             }
                         ]
@@ -1494,7 +693,9 @@
                         "rules": [
                             {
                                 "rule": "api.cquotient.com/v3",
-                                "domains": ["grillagrills.com"],
+                                "domains": [
+                                    "grillagrills.com"
+                                ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2495"
                             }
                         ]
@@ -1503,17 +704,23 @@
                         "rules": [
                             {
                                 "rule": "static.criteo.net/js/ld/publishertag.js",
-                                "domains": ["wp.pl"],
+                                "domains": [
+                                    "wp.pl"
+                                ],
                                 "reason": "Adwall appears which reappears when dismissed. The adwall prevents interaction with the page."
                             },
                             {
                                 "rule": "static.criteo.net/js/ld/publishertag.prebid.js",
-                                "domains": ["wp.pl"],
+                                "domains": [
+                                    "wp.pl"
+                                ],
                                 "reason": "Adwall appears which reappears when dismissed. The adwall prevents interaction with the page."
                             },
                             {
                                 "rule": "static.criteo.net/js/ld/ld.js",
-                                "domains": ["jackssmallengines.com"],
+                                "domains": [
+                                    "jackssmallengines.com"
+                                ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2495"
                             }
                         ]
@@ -1535,7 +742,9 @@
                             },
                             {
                                 "rule": "www3.doubleclick.net",
-                                "domains": ["scrolller.com"],
+                                "domains": [
+                                    "scrolller.com"
+                                ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1968"
                             }
                         ]
@@ -1544,7 +753,9 @@
                         "rules": [
                             {
                                 "rule": "facebook.com",
-                                "domains": ["nextdoor.com"],
+                                "domains": [
+                                    "nextdoor.com"
+                                ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1190"
                             }
                         ]
@@ -1553,8 +764,12 @@
                         "rules": [
                             {
                                 "rule": "connect.facebook.net/en_UK/sdk.js",
-                                "domains": ["globalcyclingnetwork.com"],
-                                "reason": ["https://github.com/duckduckgo/privacy-configuration/issues/1568"]
+                                "domains": [
+                                    "globalcyclingnetwork.com"
+                                ],
+                                "reason": [
+                                    "https://github.com/duckduckgo/privacy-configuration/issues/1568"
+                                ]
                             },
                             {
                                 "rule": "connect.facebook.net/en_US/sdk.js",
@@ -1571,7 +786,9 @@
                             },
                             {
                                 "rule": "facebook.net",
-                                "domains": ["nextdoor.com"],
+                                "domains": [
+                                    "nextdoor.com"
+                                ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1190"
                             }
                         ]
@@ -1580,7 +797,9 @@
                         "rules": [
                             {
                                 "rule": "wp.hit.gemius.pl/xgemius.js",
-                                "domains": ["wp.pl"],
+                                "domains": [
+                                    "wp.pl"
+                                ],
                                 "reason": "Adwall appears which reappears when dismissed. The adwall prevents interaction with the page."
                             }
                         ]
@@ -1589,7 +808,9 @@
                         "rules": [
                             {
                                 "rule": "marketingplatform.google.com/about/enterprise",
-                                "domains": ["scrolller.com"],
+                                "domains": [
+                                    "scrolller.com"
+                                ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1968"
                             }
                         ]
@@ -1598,8 +819,12 @@
                         "rules": [
                             {
                                 "rule": "imasdk.googleapis.com/js/sdkloader/ima3.js",
-                                "domains": ["<all>"],
-                                "reason": ["https://github.com/duckduckgo/privacy-configuration/issues/1965"]
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": [
+                                    "https://github.com/duckduckgo/privacy-configuration/issues/1965"
+                                ]
                             }
                         ]
                     },
@@ -1622,7 +847,9 @@
                         "rules": [
                             {
                                 "rule": "google-analytics.com/analytics.js",
-                                "domains": ["edx.org"],
+                                "domains": [
+                                    "edx.org"
+                                ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1596"
                             }
                         ]
@@ -1631,7 +858,9 @@
                         "rules": [
                             {
                                 "rule": "monetate.net",
-                                "domains": ["kleen-ritecorp.com"],
+                                "domains": [
+                                    "kleen-ritecorp.com"
+                                ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1231"
                             }
                         ]
@@ -1655,7 +884,9 @@
                         "rules": [
                             {
                                 "rule": "go.skimresources.com/",
-                                "domains": ["www.lotustalk.com"],
+                                "domains": [
+                                    "www.lotustalk.com"
+                                ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/2031"
                             }
                         ]
@@ -1664,7 +895,9 @@
                         "rules": [
                             {
                                 "rule": "tags.tiqcdn.com/utag/",
-                                "domains": ["<all>"],
+                                "domains": [
+                                    "<all>"
+                                ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1534"
                             }
                         ]
@@ -1764,63 +997,6 @@
                         ]
                     },
                     "minSupportedVersion": "1.116.0"
-                },
-                "privacyProAuthV2": {
-                    "state": "enabled",
-                    "rollout": {
-                        "steps": [
-                            {
-                                "percent": 5
-                            },
-                            {
-                                "percent": 15
-                            },
-                            {
-                                "percent": 30
-                            },
-                            {
-                                "percent": 60
-                            },
-                            {
-                                "percent": 100
-                            }
-                        ]
-                    },
-                    "minSupportedVersion": "1.139.0"
-                },
-                "privacyProFreeTrial": {
-                    "state": "enabled"
-                },
-                "vpnToolbarUpsell": {
-                    "state": "enabled"
-                },
-                "subscriptionRebranding": {
-                    "state": "enabled",
-                    "minSupportedVersion": "1.153.0"
-                },
-                "paidAIChat": {
-                    "state": "enabled",
-                    "minSupportedVersion": "1.153.0"
-                },
-                "winBackOffer": {
-                    "state": "enabled",
-                    "minSupportedVersion": "1.165.0",
-                    "targets": [
-                        {
-                            "localeCountry": "US"
-                        }
-                    ]
-                },
-                "blackFridayCampaign": {
-                    "state": "disabled",
-                    "targets": [
-                        {
-                            "localeCountry": "US"
-                        }
-                    ],
-                    "settings": {
-                        "discountPercent": "40"
-                    }
                 }
             }
         },
@@ -1896,135 +1072,6 @@
                             }
                         ]
                     }
-                }
-            }
-        },
-        "tabCrashRecovery": {
-            "state": "enabled",
-            "minSupportedVersion": "1.137.0"
-        },
-        "delayedWebviewPresentation": {
-            "state": "internal"
-        },
-        "macOSBrowserConfig": {
-            "state": "enabled",
-            "features": {
-                "willSoonDropBigSurSupport": {
-                    "state": "enabled"
-                },
-                "hangReporting": {
-                    "state": "disabled"
-                },
-                "unifiedURLPredictor": {
-                    "state": "enabled",
-                    "minSupportedVersion": "1.162.0"
-                },
-                "appStoreUpdateFlow": {
-                    "state": "enabled"
-                },
-                "webKitPerformanceReporting": {
-                    "state": "enabled"
-                },
-                "pinnedTabsViewRewrite": {
-                    "state": "enabled",
-                    "minSupportedVersion": "1.166.0"
-                }
-            }
-        },
-        "pageContext": {
-            "state": "enabled",
-            "exceptions": [],
-            "settings": {
-                "additionalCheck": "disabled",
-                "maxContentLength": 9500,
-                "mainContentSelector": "main, article, .content, .main, #content, #main",
-                "excludeSelectors": [
-                    ".ad",
-                    ".sidebar",
-                    ".footer",
-                    ".nav",
-                    ".header",
-                    ".banner",
-                    ".popup"
-                ],
-                "conditionalChanges": [
-                    {
-                        "condition": {
-                            "internal": true
-                        },
-                        "patchSettings": [
-                            {
-                                "op": "replace",
-                                "path": "/additionalCheck",
-                                "value": "enabled"
-                            }
-                        ]
-                    },
-                    {
-                        "condition": {
-                            "domain": "nba.com"
-                        },
-                        "patchSettings": [
-                            {
-                                "op": "replace",
-                                "path": "/mainContentSelector",
-                                "value": "main"
-                            }
-                        ]
-                    },
-                    {
-                        "condition": {
-                            "domain": "reddit.com"
-                        },
-                        "patchSettings": [
-                            {
-                                "op": "add",
-                                "path": "/excludeSelectors/-",
-                                "value": "shreddit-comments-page-ad"
-                            }
-                        ]
-                    }
-                ]
-            }
-        },
-        "popupBlocking": {
-            "state": "enabled",
-            "minSupportedVersion": "1.168.0",
-            "exceptions": [],
-            "settings": {
-                "userInitiatedPopupThreshold": 6.0,
-                "allowlist": [
-                    "duckduckgo.com",
-                    "amazon.com",
-                    "becu.org",
-                    "capitalone.com",
-                    "chase.com",
-                    "github.com",
-                    "google.com",
-                    "googleusercontent.com",
-                    "guitarcenter.com",
-                    "live.com",
-                    "microsoftonline.com",
-                    "msn.com",
-                    "office.com",
-                    "pnc.com",
-                    "reddit.com",
-                    "techtitute.com",
-                    "ups.com",
-                    "userinterviews.com",
-                    "zoom.com",
-                    "zoom.us",
-                    "zoomgov.com"
-                ]
-            }
-        },
-        "dataImport": {
-            "state": "enabled",
-            "exceptions": [],
-            "features": {
-                "newDataImportExperience": {
-                    "state": "enabled",
-                    "minSupportedVersion": "1.169.0"
                 }
             }
         }

@@ -1,7 +1,53 @@
-import fs from 'fs';
-import * as diff from 'diff';
-import { CURRENT_CONFIG_VERSION } from '../../constants.js';
-import { readFilesRecursively, mungeFileContents } from '../../automation-utils.js';
+const fs = require('fs');
+const path = require('path');
+const diff = require('diff');
+const { CURRENT_CONFIG_VERSION } = require('../../constants');
+
+function readFilesRecursively(directory) {
+    const filenames = fs.readdirSync(directory);
+    const files = {};
+
+    filenames.forEach((filename) => {
+        const filePath = path.join(directory, filename);
+        const fileStats = fs.statSync(filePath);
+
+        if (fileStats.isDirectory()) {
+            const nestedFiles = readFilesRecursively(filePath);
+            for (const [
+                nestedFilePath,
+                nestedFileContent,
+            ] of Object.entries(nestedFiles)) {
+                files[path.join(filename, nestedFilePath)] = nestedFileContent;
+            }
+        } else {
+            files[filename] = fs.readFileSync(filePath, 'utf-8');
+        }
+    });
+
+    return files;
+}
+
+/**
+ * Removes superfluous info from the file contents to improve diff readability
+ * @param {string} fileContent
+ * @param {string} filePath
+ * @returns {string}
+ */
+function mungeFileContents(fileContent, filePath) {
+    if (filePath.endsWith('.json')) {
+        const fileJSON = JSON.parse(fileContent);
+        delete fileJSON.version;
+        if ('features' in fileJSON) {
+            for (const key of Object.keys(fileJSON.features)) {
+                if ('hash' in fileJSON.features[key]) {
+                    delete fileJSON.features[key].hash;
+                }
+            }
+        }
+        return JSON.stringify(fileJSON, null, 4);
+    }
+    return fileContent;
+}
 
 function displayDiffs(dir1Files, dir2Files, isOpen) {
     const rollupGrouping = {};
@@ -68,46 +114,16 @@ ${fileDiff}
         .map((key) => {
             const rollup = rollupGrouping[key];
             let outString = '';
-            let title;
-
-            // Create descriptive title based on file count and type
-            if (rollup.files.length === 1) {
-                title = rollup.files[0];
-            } else {
-                const fileCount = rollup.files.length;
-                if (key === 'identical') {
-                    title = `${fileCount} files identical`;
-                } else if (key === 'old 1') {
-                    title = `${fileCount} files only in old changeset`;
-                } else if (key === 'new 2') {
-                    title = `${fileCount} files only in new changeset`;
-                } else {
-                    title = `${fileCount} files changed`;
-                }
-            }
-
+            let title = rollup.files[0];
             // If there's more than one file in the rollup, list them
             if (rollup.files.length > 1) {
+                title += ` (${rollup.files.length - 1} more)`;
                 outString += '\n';
                 for (const file of rollup.files) {
                     outString += `- ${file}\n`;
                 }
-
-                // Simple replacement of the last filename with additional info
-                if (rollup.string.includes('```diff')) {
-                    const lastFileName = rollup.files[rollup.files.length - 1];
-                    const modifiedDiff = rollup.string.replace(
-                        `--- ${lastFileName}`,
-                        `--- ${lastFileName} (and ${rollup.files.length - 1} other files)`,
-                    );
-                    outString += '\n\n' + modifiedDiff;
-                } else {
-                    outString += '\n\n' + rollup.string;
-                }
-            } else {
-                outString += '\n\n' + rollup.string;
             }
-
+            outString += '\n\n' + rollup.string;
             return renderDetails(title, outString, isOpen);
         })
         .join('\n');
@@ -162,6 +178,6 @@ for (const [
     files,
 ] of Object.entries(sections)) {
     const isOpen = section === 'latest';
-    const fileOut = displayDiffs(files.dir1 || {}, files.dir2 || {}, isOpen);
+    const fileOut = displayDiffs(files.dir1, files.dir2, isOpen);
     console.log(renderDetails(section, fileOut, isOpen));
 }
