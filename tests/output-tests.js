@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const expect = require('chai').expect;
-const { CURRENT_CONFIG_VERSION } = require('../constants.js');
+const { CURRENT_CONFIG_VERSION } = require('../constants.json');
 
 function loadJSON(pathFromRoot) {
     return JSON.parse(fs.readFileSync(path.join(__dirname, '..', pathFromRoot), 'utf-8'));

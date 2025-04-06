@@ -3,7 +3,7 @@ const fs = require('fs');
 const { createValidator, formatErrors } = require('./schema-validation');
 const platforms = require('./../platforms').map((item) => item.replace('browsers/', 'extension-'));
 const immutableJSONPatch = require('immutable-json-patch').immutableJSONPatch;
-const { CURRENT_CONFIG_VERSION } = require('../constants.js');
+const { CURRENT_CONFIG_VERSION } = require('../constants.json');
 
 const androidCurrentConfig = `v${CURRENT_CONFIG_VERSION}/android-config.json`;
 const platformSpecificSchemas = {

@@ -2,7 +2,7 @@ const fs = require('fs').promises;
 const path = require('path');
 const fetch = require('node-fetch').default;
 const crypto = require('crypto');
-const { CURRENT_CONFIG_VERSION } = require('../constants.js');
+const { CURRENT_CONFIG_VERSION } = require('../constants.json');
 
 class ConfigProcessor {
     constructor(options = {}) {
