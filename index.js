@@ -2,7 +2,7 @@ const fs = require('fs');
 
 const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 
-const { addCnameEntriesToAllowlist, inlineReasonArrays, mergeAllowlistedTrackers, addHashToFeatures, stripReasons } = require('./util');
+const { addCnameEntriesToAllowlist, inlineReasonArrays, mergeAllowlistedTrackers, addHashToFeatures, versionToInt } = require('./util');
 
 const { OVERRIDE_DIR, GENERATED_DIR, LISTS_DIR, BROWSERS_SUBDIR, CURRENT_CONFIG_VERSION } = require('./constants');
 
@@ -12,8 +12,9 @@ const defaultConfig = {
     features: {},
     unprotectedTemporary: [],
 };
+// Drop support here.
 // Env flag that can be used to override stripping of 'reason' strings from the config.
-const keepReasons = process.argv.includes('--keep-reasons');
+// const keepReasons = process.argv.includes('--keep-reasons');
 
 const platforms = require('./platforms');
 const compatibility = require('./compatibility');
@@ -54,10 +55,6 @@ function writeConfigToDisk(platform, config) {
         const version = `v${i}`;
         mkdirIfNeeded(`${GENERATED_DIR}/${version}`);
 
-        if (i === CURRENT_CONFIG_VERSION && !keepReasons) {
-            stripReasons(config);
-        }
-
         if (!prevConfig) {
             prevConfig = config;
         } else {
@@ -68,7 +65,13 @@ function writeConfigToDisk(platform, config) {
             prevConfig = compatibility.compatFunctions[version](prevConfig, unmodifiedConfig);
         }
 
-        const compatConfig = JSON.parse(JSON.stringify(prevConfig));
+        let compatConfig = JSON.parse(JSON.stringify(prevConfig));
+        // These methods allow us to add new deletions to config that don't impact older ones
+        for (const method in compatibility.outputFilterFunctions) {
+            if (versionToInt(method) <= i) {
+                compatConfig = compatibility.outputFilterFunctions[method](compatConfig);
+            }
+        }
         addHashToFeatures(compatConfig);
 
         compatibility.removeEolFeatures(compatConfig, i);

@@ -1,6 +1,11 @@
 const tldts = require('tldts');
 const crypto = require('crypto');
 
+function versionToInt(version) {
+    // convert v2 to 2
+    return parseInt(version.replace('v', ''));
+}
+
 function getAllowlistedRule(rules, rulePath) {
     return rules.find(function (x) {
         return x.rule === rulePath;
@@ -183,6 +188,7 @@ function stripReasons(config) {
 }
 
 module.exports = {
+    versionToInt,
     addAllowlistRule,
     addCnameEntriesToAllowlist,
     inlineReasonArrays,

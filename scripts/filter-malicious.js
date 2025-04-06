@@ -2,11 +2,12 @@ const fs = require('fs').promises;
 const path = require('path');
 const fetch = require('node-fetch').default;
 const crypto = require('crypto');
+const { CURRENT_CONFIG_VERSION } = require('../constants.js');
 
 class ConfigProcessor {
     constructor(options = {}) {
         this.apiBaseUrl = options.apiBaseUrl || 'https://duckduckgo.com/api/protection/v2';
-        this.outputPath = options.outputPath || 'generated/v4/';
+        this.outputPath = options.outputPath || `generated/v${CURRENT_CONFIG_VERSION}/`;
         this.inputPath = options.inputPath || 'overrides/';
         this.defaultConfig = options.defaultConfig || 'features/malicious-site-protection.json';
         this.platforms = [

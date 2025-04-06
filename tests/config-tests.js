@@ -3,17 +3,19 @@ const fs = require('fs');
 const { createValidator, formatErrors } = require('./schema-validation');
 const platforms = require('./../platforms').map((item) => item.replace('browsers/', 'extension-'));
 const immutableJSONPatch = require('immutable-json-patch').immutableJSONPatch;
+const { CURRENT_CONFIG_VERSION } = require('../constants.js');
 
+const androidCurrentConfig = `v${CURRENT_CONFIG_VERSION}/android-config.json`;
 const platformSpecificSchemas = {
-    'v4/android-config.json': 'AndroidV4Config',
+    [androidCurrentConfig]: `AndroidLatestConfig`,
     'v3/android-config.json': 'LegacyAndroidConfig',
 };
 
 // Test the latest 2 versions of each platform
 const latestConfigs = platforms.map((plat) => {
     return {
-        name: `v4/${plat}-config.json`,
-        body: JSON.parse(fs.readFileSync(`./generated/v4/${plat}-config.json`)),
+        name: `v${CURRENT_CONFIG_VERSION}/${plat}-config.json`,
+        body: JSON.parse(fs.readFileSync(`./generated/v${CURRENT_CONFIG_VERSION}/${plat}-config.json`)),
     };
 });
 
@@ -37,7 +39,7 @@ describe('Config schema tests', () => {
             });
 
             it('should validate against the full configV4 schema', () => {
-                const validate = createValidator(platformSpecificSchemas[config.name] || 'GenericV4Config');
+                const validate = createValidator(platformSpecificSchemas[config.name] || 'GenericLatestConfig');
                 expect(validate(config.body)).to.be.equal(true, formatErrors(validate.errors));
             });
 
@@ -91,7 +93,7 @@ describe('Config schema tests', () => {
             });
 
             it('All patchSettings should also be valid', () => {
-                const validate = createValidator(platformSpecificSchemas[config.name] || 'GenericV4Config');
+                const validate = createValidator(platformSpecificSchemas[config.name] || 'GenericLatestConfig');
                 for (const featureName of Object.keys(config.body.features)) {
                     const feature = config.body.features[featureName];
                     if (feature?.settings?.domains) {
