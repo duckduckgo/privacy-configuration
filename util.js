@@ -31,7 +31,11 @@ function addDomainRules(allowlist, domain, rule) {
 
 function addAllowlistRule(allowlist, rule) {
     const dom = tldts.getDomain(rule.rule);
-    addDomainRules(allowlist, dom, { rules: [rule] });
+    addDomainRules(allowlist, dom, {
+        rules: [
+            rule,
+        ],
+    });
 }
 
 function addPathRule(rules, rule) {
@@ -42,7 +46,9 @@ function addPathRule(rules, rule) {
     }
     existing.domains = Array.from(new Set(existing.domains.concat(rule.domains).sort()));
     if (existing.domains.includes('<all>')) {
-        existing.domains = ['<all>'];
+        existing.domains = [
+            '<all>',
+        ];
     }
 
     if (existing.reason === undefined) {
@@ -53,7 +59,9 @@ function addPathRule(rules, rule) {
     const newReason = rule.reason;
     if (!reasons.includes(rule.reason)) {
         existing.reason = reasons
-            .concat([newReason])
+            .concat([
+                newReason,
+            ])
             .filter(function (x) {
                 return x !== '';
             })
@@ -90,7 +98,10 @@ function inlineReasonArrays(data) {
         return data.map(inlineReasonArrays);
     } else if (typeof data === 'object' && data !== null) {
         const res = {};
-        for (const [k, v] of Object.entries(data)) {
+        for (const [
+            k,
+            v,
+        ] of Object.entries(data)) {
             if (k === 'reason') {
                 // we collapse list 'reason' field values into a single string
                 res[k] = Array.isArray(v) ? v.join(' ') : v;
@@ -109,7 +120,12 @@ function inlineReasonArrays(data) {
  */
 function getCnameSources(tds, cnameTarget) {
     return Object.entries(tds.cnames)
-        .filter(([k, v]) => v.endsWith(cnameTarget))
+        .filter(
+            ([
+                k,
+                v,
+            ]) => v.endsWith(cnameTarget),
+        )
         .map((kv) => kv[0]);
 }
 

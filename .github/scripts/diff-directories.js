@@ -13,7 +13,10 @@ function readFilesRecursively(directory) {
 
         if (fileStats.isDirectory()) {
             const nestedFiles = readFilesRecursively(filePath);
-            for (const [nestedFilePath, nestedFileContent] of Object.entries(nestedFiles)) {
+            for (const [
+                nestedFilePath,
+                nestedFileContent,
+            ] of Object.entries(nestedFiles)) {
                 files[path.join(filename, nestedFilePath)] = nestedFileContent;
             }
         } else {
@@ -64,7 +67,10 @@ function displayDiffs(dir1Files, dir2Files, isOpen) {
         rollupGrouping[summary].files.push(fileName);
         rollupGrouping[summary].string = string;
     }
-    for (const [filePath, fileContent] of Object.entries(dir1Files)) {
+    for (const [
+        filePath,
+        fileContent,
+    ] of Object.entries(dir1Files)) {
         let diffOut = '';
         let compareOut;
         if (filePath in dir2Files) {
@@ -145,7 +151,10 @@ const sections = {
     latest: {},
 };
 function sortFiles(dirFiles, dirName) {
-    for (const [filePath, fileContent] of Object.entries(dirFiles)) {
+    for (const [
+        filePath,
+        fileContent,
+    ] of Object.entries(dirFiles)) {
         if (filePath.startsWith(`v${CURRENT_CONFIG_VERSION}`)) {
             sections.latest[dirName] = sections.latest[dirName] || {};
             sections.latest[dirName][filePath] = fileContent;
@@ -164,7 +173,10 @@ if (!fs.existsSync(`${dir1}/v${CURRENT_CONFIG_VERSION}`)) {
 sortFiles(readFilesRecursively(dir1), 'dir1');
 sortFiles(readFilesRecursively(dir2), 'dir2');
 
-for (const [section, files] of Object.entries(sections)) {
+for (const [
+    section,
+    files,
+] of Object.entries(sections)) {
     const isOpen = section === 'latest';
     const fileOut = displayDiffs(files.dir1, files.dir2, isOpen);
     console.log(renderDetails(section, fileOut, isOpen));

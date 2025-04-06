@@ -81,7 +81,12 @@ describe('Config schema tests', () => {
 
             it('All features should have a corresponding feature file', () => {
                 // Note: We should not add more to this list, only remove
-                const legacyFeatures = ['webViewBlobDownload', 'experimentTest', 'eme', 'clientContentFeatures'];
+                const legacyFeatures = [
+                    'webViewBlobDownload',
+                    'experimentTest',
+                    'eme',
+                    'clientContentFeatures',
+                ];
                 for (const featureName of Object.keys(config.body.features)) {
                     if (legacyFeatures.includes(featureName)) {
                         continue;

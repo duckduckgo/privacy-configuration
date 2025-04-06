@@ -198,7 +198,13 @@ async function buildPlatforms() {
                     }
 
                     // ensure certain settings are treated as additive, and aren't overwritten
-                    if (['customUserAgent', 'trackerAllowlist'].includes(key) && platformKey === 'settings') {
+                    if (
+                        [
+                            'customUserAgent',
+                            'trackerAllowlist',
+                        ].includes(key) &&
+                        platformKey === 'settings'
+                    ) {
                         const settings = {};
                         const overrideSettings = platformOverride.features[key][platformKey];
                         for (const settingsKey in overrideSettings) {
@@ -206,7 +212,12 @@ async function buildPlatforms() {
                             if (settingsKey === 'allowlistedTrackers') {
                                 settings[settingsKey] = mergeAllowlistedTrackers(baseSettings || {}, overrideSettings[settingsKey]);
                                 continue;
-                            } else if (['omitVersionSites', 'omitApplicationSites'].includes(settingsKey)) {
+                            } else if (
+                                [
+                                    'omitVersionSites',
+                                    'omitApplicationSites',
+                                ].includes(settingsKey)
+                            ) {
                                 settings[settingsKey] = baseSettings.concat(overrideSettings[settingsKey]);
                                 continue;
                             }
@@ -290,6 +301,8 @@ async function buildPlatforms() {
 
 buildPlatforms().then((platformConfigs) => {
     // Generate legacy Safari format
-    const legacyTextDomains = [...unprotectedDomains].join('\n');
+    const legacyTextDomains = [
+        ...unprotectedDomains,
+    ].join('\n');
     fs.writeFileSync(`${GENERATED_DIR}/trackers-unprotected-temporary.txt`, legacyTextDomains);
 });
