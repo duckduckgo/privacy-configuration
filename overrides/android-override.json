@@ -1842,8 +1842,23 @@
             }
         },
         "swipingTabs": {
-            "state": "internal",
-            "minSupportedVersion": 52271000
+            "state": "enabled",
+            "minSupportedVersion": 52290000,
+            "features": {
+                "onForInternalUsers": {
+                    "state": "internal"
+                },
+                "onForExternalUsers": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 20
+                            }
+                        ]
+                    }
+                }
+            }
         },
         "showOnAppLaunch": {
             "state": "enabled"
