@@ -115,7 +115,7 @@ const listData = JSON.parse(fs.readFileSync(`${LISTS_DIR}/${unprotectedListName}
 addExceptionsToUnprotected(listData.exceptions);
 addExceptionsToUnprotected(defaultConfig.features.contentBlocking.exceptions);
 
-// Exclude selected features from the global unprotected-temporary.json domain exceptions
+// Include global unprotected-temporary.json exceptions into selected features domain exceptions
 const featuresToIncludeTempUnprotectedExceptions = [
     'ampLinks',
     'autoconsent',
