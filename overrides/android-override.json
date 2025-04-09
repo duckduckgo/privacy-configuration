@@ -359,24 +359,28 @@
                     }
                 },
                 "siteSpecificFixes": {
-                    "state": "disabled",
+                    "state": "enabled",
                     "settings": {
-                        "javascriptConfig": {
-                            "domains": [
-                                {
-                                    "domain": ["account.samsung.com", "localhost"],
-                                    "patchSettings": [
-                                        {
-                                            "path": "",
-                                            "op": "add",
-                                            "value": {
-                                                "formBoundarySelector": ".MuiBox-root.css-1yuulih"
-                                            }
+                        "domains": [
+                            {
+                                "domain": ["estore.archives.gov", "localhost"],
+                                "patchSettings": [
+                                    {
+                                        "path": "",
+                                        "op": "add",
+                                        "value": {
+                                            "formTypeSettings": [
+                                                {
+                                                    "selector": "fieldset[id='ucContentMiddleCenter_fldLogin']",
+                                                    "type": "login"
+                                                }
+                                            ],
+                                            "formBoundarySelector": "#ucContentMiddleCenter_fldLogin"
                                         }
-                                    ]
-                                }
-                            ]
-                        }
+                                    }
+                                ]
+                            }
+                        ]
                     }
                 },
                 "canImportFromGooglePasswordManager": {

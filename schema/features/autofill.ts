@@ -45,12 +45,10 @@ type SubFeatures<VersionType> = {
     siteSpecificFixes?: SubFeature<
         VersionType,
         {
-            javascriptConfig: {
-                domains: {
-                    domain: string | string[];
-                    patchSettings: Operation<SiteSpecificFixes>[];
-                }[];
-            };
+            domains: {
+                domain: string | string[];
+                patchSettings: Operation<SiteSpecificFixes>[];
+            }[];
         }
     >;
 };
