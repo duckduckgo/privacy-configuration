@@ -215,6 +215,10 @@
         },
         "aiChat": {
             "state": "enabled",
+            "settings": {
+                "aiChatBangs": ["!ai", "!aichat", "!chat", "!duckai"],
+                "aiChatBangRegex": "^(?!({bangs})$)(?=.*({bangs})(?=$|\\s)).+$"
+            },
             "minSupportedVersion": 52250000,
             "exceptions": []
         },
@@ -436,6 +440,24 @@
                 "surveys": []
             }
         },
+        "autofillService": {
+            "state": "enabled",
+            "minSupportedVersion": 52290000,
+            "features": {
+                "canUpdateAppToDomainDataset": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52290000
+                },
+                "canMapAppToDomain": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52290000
+                },
+                "canAutofillInsideDDG": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52290000
+                }
+            }
+        },
         "androidBrowserConfig": {
             "state": "enabled",
             "features": {
@@ -544,6 +566,17 @@
                                     "appTP": false,
                                     "netP": false
                                 }
+                            },
+                            {
+                                "appVersion": 52290000,
+                                "daysUntilLoggingStarts": 8,
+                                "daysLogging": 10,
+                                "featuresLogged": {
+                                    "gpc": false,
+                                    "cpm": false,
+                                    "appTP": false,
+                                    "netP": false
+                                }
                             }
                         ]
                     }
@@ -564,7 +597,11 @@
                     "state": "enabled"
                 },
                 "enableMaliciousSiteProtection": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": 52290000
+                },
+                "httpError5xxPixel": {
+                    "state": "enabled"
                 }
             }
         },
@@ -575,10 +612,7 @@
             "state": "enabled"
         },
         "brokerProtection": {
-            "state": "enabled",
-            "settings": {
-                "useEnhancedCaptchaSystem": "disabled"
-            }
+            "state": "enabled"
         },
         "customUserAgent": {
             "state": "enabled",
@@ -714,7 +748,7 @@
                             "state": "enabled"
                         },
                         "videoDrawer": {
-                            "state": "enabled"
+                            "state": "disabled"
                         }
                     },
                     "serpProxy": {
@@ -1866,27 +1900,54 @@
             }
         },
         "swipingTabs": {
-            "state": "internal",
-            "minSupportedVersion": 52271000
+            "state": "disabled",
+            "minSupportedVersion": 52290000,
+            "features": {
+                "onForInternalUsers": {
+                    "state": "internal"
+                },
+                "onForExternalUsers": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 20
+                            }
+                        ]
+                    }
+                }
+            }
         },
         "showOnAppLaunch": {
             "state": "enabled"
         },
         "tabManager": {
-            "state": "internal",
+            "state": "enabled",
             "features": {
                 "multiSelection": {
-                    "state": "disabled"
+                    "state": "enabled"
                 }
             }
         },
         "maliciousSiteProtection": {
-            "state": "internal",
+            "state": "enabled",
             "settings": {
                 "hashPrefixUpdateFrequency": 20,
                 "filterSetUpdateFrequency": 720
             },
-            "exceptions": []
+            "features": {
+                "visibleAndOnByDefault": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52290000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            }
+                        ]
+                    }
+                }
+            }
         },
         "bookmarksSorting": {
             "state": "enabled",
@@ -1934,19 +1995,19 @@
                     "cohorts": [
                         {
                             "name": "control",
-                            "weight": 1
+                            "weight": 0
                         },
                         {
                             "name": "variant1",
-                            "weight": 1
+                            "weight": 0
                         },
                         {
                             "name": "variant2",
-                            "weight": 1
+                            "weight": 0
                         },
                         {
                             "name": "variant3",
-                            "weight": 1
+                            "weight": 0
                         }
                     ]
                 }
