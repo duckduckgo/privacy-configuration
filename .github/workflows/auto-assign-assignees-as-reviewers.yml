@@ -26,17 +26,8 @@ jobs:
                         pull_number: context.payload.pull_request.number,
                       });
 
-                      return {
-                        assignees: pr.data.assignees.map(a => a.login)
-                      };
-                  result-encoding: string
+                      const assignees = pr.data.assignees.map(a => a.login)
 
-            - name: Request review from assignees
-              if: steps.pr.outputs.result != '[]'
-              uses: actions/github-script@v7
-              with:
-                  script: |
-                      const assignees = ${{ steps.pr.outputs.result }}.assignees;
                       if (assignees.length > 0) {
                         await github.rest.pulls.requestReviewers({
                           owner: context.repo.owner,
