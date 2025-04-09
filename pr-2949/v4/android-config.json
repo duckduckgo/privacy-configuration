@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1743949639199,
+    "version": 1744186992992,
     "features": {
         "adAttributionReporting": {
             "state": "disabled",
@@ -277,10 +277,14 @@
                     "state": "enabled"
                 },
                 "enableMaliciousSiteProtection": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": 52290000
+                },
+                "httpError5xxPixel": {
+                    "state": "enabled"
                 }
             },
-            "hash": "2241a6a6d509d3cecbda6e5ebc68b85b"
+            "hash": "c4b1b06def96613c5b16a3e342d11137"
         },
         "androidNewStateKillSwitch": {
             "exceptions": [],
@@ -1634,6 +1638,26 @@
             "exceptions": [],
             "hash": "9ae27f0fb5a6f7db96b239b4def3b5b6"
         },
+        "autofillService": {
+            "exceptions": [],
+            "state": "enabled",
+            "minSupportedVersion": 52290000,
+            "features": {
+                "canUpdateAppToDomainDataset": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52290000
+                },
+                "canMapAppToDomain": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52290000
+                },
+                "canAutofillInsideDDG": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52290000
+                }
+            },
+            "hash": "9a5a2a9accb5bc95588840011ee7bb53"
+        },
         "autofillSurveys": {
             "state": "enabled",
             "settings": {
@@ -1866,10 +1890,7 @@
         "brokerProtection": {
             "state": "enabled",
             "exceptions": [],
-            "settings": {
-                "useEnhancedCaptchaSystem": "disabled"
-            },
-            "hash": "dab6dd0487212f8a3dbb6c251991cc30"
+            "hash": "697382e31649d84b01166f1dc6f790d6"
         },
         "burn": {
             "state": "enabled",
@@ -7426,7 +7447,7 @@
             "hash": "fd7589775ea060fe79fe0821d60be880"
         },
         "maliciousSiteProtection": {
-            "state": "internal",
+            "state": "enabled",
             "exceptions": [
                 {
                     "domain": "broken.third-party.site"
@@ -7439,7 +7460,20 @@
                 "hashPrefixUpdateFrequency": 20,
                 "filterSetUpdateFrequency": 720
             },
-            "hash": "4858ee29b5451b76b93ae0bf0abd0c88"
+            "features": {
+                "visibleAndOnByDefault": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52290000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            }
+                        ]
+                    }
+                }
+            },
+            "hash": "2f91cbdeab973d25db703bec8caa17fe"
         },
         "marketplaceAdPostback": {
             "state": "disabled",
@@ -8349,9 +8383,24 @@
                     "domain": "flexmls.com"
                 }
             ],
-            "state": "internal",
-            "minSupportedVersion": 52271000,
-            "hash": "42fc13c39d6659a09a70e0d8f3c642c0"
+            "state": "disabled",
+            "minSupportedVersion": 52290000,
+            "features": {
+                "onForInternalUsers": {
+                    "state": "internal"
+                },
+                "onForExternalUsers": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 20
+                            }
+                        ]
+                    }
+                }
+            },
+            "hash": "844dddde4be949b5b426452c30117d6b"
         },
         "syncPromotion": {
             "state": "enabled",
@@ -8457,6 +8506,16 @@
                             }
                         ]
                     },
+                    "acdn.no": {
+                        "rules": [
+                            {
+                                "rule": "acdn.no",
+                                "domains": [
+                                    "nettavisen.no"
+                                ]
+                            }
+                        ]
+                    },
                     "acsbapp.com": {
                         "rules": [
                             {
@@ -8538,6 +8597,16 @@
                                 "rule": "publisher.adlightning.com/user-api/session/",
                                 "domains": [
                                     "boltive.com"
+                                ]
+                            }
+                        ]
+                    },
+                    "adnami.io": {
+                        "rules": [
+                            {
+                                "rule": "adnami.io",
+                                "domains": [
+                                    "nettavisen.no"
                                 ]
                             }
                         ]
@@ -12078,7 +12147,7 @@
                     "domain": "flexmls.com"
                 }
             ],
-            "hash": "2bb6f4e671488f60d6737a207c48a7db"
+            "hash": "1dc82947d775d398d99106e3f369eec1"
         },
         "trackingCookies1p": {
             "settings": {

@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1743949639199,
+    "version": 1744186992992,
     "features": {
         "adAttributionReporting": {
             "state": "disabled",
@@ -872,6 +872,11 @@
             "exceptions": [],
             "hash": "ebf35854bdf33091c165b35d418d5707"
         },
+        "autofillService": {
+            "exceptions": [],
+            "state": "disabled",
+            "hash": "728493ef7a1488e4781656d3f9db84aa"
+        },
         "autofillSurveys": {
             "state": "enabled",
             "settings": {},
@@ -902,10 +907,10 @@
                     "minSupportedVersion": "0.98.0"
                 },
                 "partialFormSaves": {
-                    "state": "enabled"
+                    "state": "disabled"
                 }
             },
-            "hash": "75270f19afe55ea509c1421ab569db52"
+            "hash": "ebf46f1a04c64d1724b8ee6c7b2746ae"
         },
         "backgroundAgentPixelTest": {
             "state": "disabled",
@@ -980,10 +985,7 @@
         "brokerProtection": {
             "state": "enabled",
             "exceptions": [],
-            "settings": {
-                "useEnhancedCaptchaSystem": "disabled"
-            },
-            "hash": "dab6dd0487212f8a3dbb6c251991cc30"
+            "hash": "697382e31649d84b01166f1dc6f790d6"
         },
         "burn": {
             "state": "enabled",
@@ -2136,11 +2138,15 @@
                 {
                     "domain": "legalandgeneral.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2491"
+                },
+                {
+                    "domain": "desjardins.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2946"
                 }
             ],
             "state": "enabled",
             "minSupportedVersion": "0.36.0",
-            "hash": "265dce8320eb951d1b0d9406bf50ce7c"
+            "hash": "789a00489a8e12fa729929cd9722e29b"
         },
         "customUserAgent": {
             "settings": {
@@ -7371,6 +7377,17 @@
                             }
                         ]
                     },
+                    "acdn.no": {
+                        "rules": [
+                            {
+                                "rule": "acdn.no",
+                                "domains": [
+                                    "nettavisen.no"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2960"
+                            }
+                        ]
+                    },
                     "acsbapp.com": {
                         "rules": [
                             {
@@ -7463,6 +7480,17 @@
                                     "boltive.com"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1813"
+                            }
+                        ]
+                    },
+                    "adnami.io": {
+                        "rules": [
+                            {
+                                "rule": "adnami.io",
+                                "domains": [
+                                    "nettavisen.no"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2960"
                             }
                         ]
                     },
@@ -11380,7 +11408,7 @@
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2228"
                 }
             ],
-            "hash": "beaa4ee3bd69cd6e9fd7bed110a4e0a0"
+            "hash": "c1c69ac98bab03185db809718d973f78"
         },
         "trackingCookies1p": {
             "settings": {

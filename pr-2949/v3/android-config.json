@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1743949639199,
+    "version": 1744186992992,
     "features": {
         "adAttributionReporting": {
             "state": "disabled",
@@ -286,10 +286,14 @@
                     "state": "enabled"
                 },
                 "enableMaliciousSiteProtection": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": 52290000
+                },
+                "httpError5xxPixel": {
+                    "state": "enabled"
                 }
             },
-            "hash": "2241a6a6d509d3cecbda6e5ebc68b85b"
+            "hash": "c4b1b06def96613c5b16a3e342d11137"
         },
         "androidNewStateKillSwitch": {
             "exceptions": [],
@@ -1771,6 +1775,26 @@
             "exceptions": [],
             "hash": "9ae27f0fb5a6f7db96b239b4def3b5b6"
         },
+        "autofillService": {
+            "exceptions": [],
+            "state": "enabled",
+            "minSupportedVersion": 52290000,
+            "features": {
+                "canUpdateAppToDomainDataset": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52290000
+                },
+                "canMapAppToDomain": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52290000
+                },
+                "canAutofillInsideDDG": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52290000
+                }
+            },
+            "hash": "9a5a2a9accb5bc95588840011ee7bb53"
+        },
         "autofillSurveys": {
             "state": "enabled",
             "settings": {
@@ -2011,10 +2035,7 @@
         "brokerProtection": {
             "state": "enabled",
             "exceptions": [],
-            "settings": {
-                "useEnhancedCaptchaSystem": "disabled"
-            },
-            "hash": "dab6dd0487212f8a3dbb6c251991cc30"
+            "hash": "697382e31649d84b01166f1dc6f790d6"
         },
         "burn": {
             "state": "enabled",
@@ -7951,7 +7972,7 @@
             "hash": "fd7589775ea060fe79fe0821d60be880"
         },
         "maliciousSiteProtection": {
-            "state": "internal",
+            "state": "enabled",
             "exceptions": [
                 {
                     "domain": "broken.third-party.site",
@@ -7966,7 +7987,20 @@
                 "hashPrefixUpdateFrequency": 20,
                 "filterSetUpdateFrequency": 720
             },
-            "hash": "4d4651fb765039a2ea41c1ad0b6774e3"
+            "features": {
+                "visibleAndOnByDefault": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52290000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            }
+                        ]
+                    }
+                }
+            },
+            "hash": "4d2be88a9af638a1884dac040f4a6bc7"
         },
         "marketplaceAdPostback": {
             "state": "disabled",
@@ -9018,9 +9052,24 @@
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2228"
                 }
             ],
-            "state": "internal",
-            "minSupportedVersion": 52271000,
-            "hash": "95060477caa9ba2b8e01a554da51d025"
+            "state": "disabled",
+            "minSupportedVersion": 52290000,
+            "features": {
+                "onForInternalUsers": {
+                    "state": "internal"
+                },
+                "onForExternalUsers": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 20
+                            }
+                        ]
+                    }
+                }
+            },
+            "hash": "921419b8bb38f24bf6fc4e2a424cee64"
         },
         "syncPromotion": {
             "state": "enabled",
@@ -9130,6 +9179,17 @@
                             }
                         ]
                     },
+                    "acdn.no": {
+                        "rules": [
+                            {
+                                "rule": "acdn.no",
+                                "domains": [
+                                    "nettavisen.no"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2960"
+                            }
+                        ]
+                    },
                     "acsbapp.com": {
                         "rules": [
                             {
@@ -9222,6 +9282,17 @@
                                     "boltive.com"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1813"
+                            }
+                        ]
+                    },
+                    "adnami.io": {
+                        "rules": [
+                            {
+                                "rule": "adnami.io",
+                                "domains": [
+                                    "nettavisen.no"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2960"
                             }
                         ]
                     },
@@ -13142,7 +13213,7 @@
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2228"
                 }
             ],
-            "hash": "e2e1bd4c4aef775ddb1555a8f0764d3e"
+            "hash": "d2152918abd2a3d3558db22725b9c3cd"
         },
         "trackingCookies1p": {
             "settings": {
