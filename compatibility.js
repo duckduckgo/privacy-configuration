@@ -1,8 +1,4 @@
-function versionToInt(version) {
-    // convert v2 to 2
-    return parseInt(version.replace('v', ''));
-}
-
+const { versionToInt, stripReasons } = require('./util.js');
 /**
  * Remove features from `config` that have reached their end of life.
  * This function will also remove the `eol` key from features when it
@@ -117,9 +113,53 @@ const compatFunctions = {
 
         return v3Config;
     },
+    v4: (config) => {
+        // Breaking changes: none
+        const v4Config = JSON.parse(JSON.stringify(config));
+
+        // Remove exceptions from sub-features
+        for (const feature of Object.keys(v4Config.features)) {
+            const subFeatures = v4Config.features[feature].features;
+            if (subFeatures) {
+                for (const subFeature of Object.keys(subFeatures)) {
+                    if (subFeatures[subFeature].exceptions) {
+                        delete subFeatures[subFeature].exceptions;
+                    }
+                }
+            }
+        }
+        // Remove description, rollout and targets from parent features
+        for (const feature of Object.keys(v4Config.features)) {
+            if (v4Config.features[feature].description) {
+                delete v4Config.features[feature].description;
+            }
+            if (v4Config.features[feature].rollout) {
+                delete v4Config.features[feature].rollout;
+            }
+            if (v4Config.features[feature].targets) {
+                delete v4Config.features[feature].targets;
+            }
+        }
+        // Ensure exceptions key is present for parent features
+        for (const feature of Object.keys(v4Config.features)) {
+            if (!v4Config.features[feature].exceptions) {
+                v4Config.features[feature].exceptions = [];
+            }
+        }
+
+        return v4Config;
+    },
+};
+
+const outputFilterFunctions = {
+    v4: (config) => {
+        stripReasons(config);
+        return config;
+    },
 };
 
 module.exports = {
     removeEolFeatures,
+    outputFilterFunctions,
     compatFunctions,
 };

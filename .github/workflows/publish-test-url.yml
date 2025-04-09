@@ -47,9 +47,23 @@ jobs:
               id: generate_preview_links
               run: |
                   PR_NUMBER=${{ github.event.pull_request.number || 'unknown' }}
+                  // Import the config file
+                  CONFIG_FILE="generated/v4/config.json"
+                  if [ ! -f "$CONFIG_FILE" ]; then
+                      echo "Config file not found: $CONFIG_FILE"
+                      exit 1
+                  fi
+                  // Read the config file
+                  CONFIG_CONTENT=$(cat "$CONFIG_FILE")
+                  // Extract the config name
+                  CURRENT_CONFIG_VERSION=$(echo "$CONFIG_CONTENT" | jq -r '.CURRENT_CONFIG_VERSION')
+                  if [ -z "$CURRENT_CONFIG_VERSION" ]; then
+                      echo "Config name not found in $CONFIG_FILE"
+                      exit 1
+                  fi
                   PREVIEW_LINKS=$(find generated/v4 -type f | while read -r file; do
                     RELATIVE_PATH=${file#generated/v4/}
-                    echo "- [${RELATIVE_PATH}](https://${{ github.repository_owner }}.github.io/$(basename "${{ github.repository }}")/pr-${PR_NUMBER}/v4/${RELATIVE_PATH})"
+                    echo "- [${RELATIVE_PATH}](https://${{ github.repository_owner }}.github.io/$(basename "${{ github.repository }}")/pr-${PR_NUMBER}/v${CURRENT_CONFIG_VERSION}/${RELATIVE_PATH})"
                   done)
                   LAST_UPDATED=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
                   echo "preview_links<<EOF" >> $GITHUB_OUTPUT

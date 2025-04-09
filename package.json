@@ -4,7 +4,7 @@
   "description": "Build scripts and generated files for privacy feature configuration",
   "main": "index.js",
   "scripts": {
-    "test": "npm run lint && npm run tsc && npm run build && npm run unit-tests",
+    "test": "npm run build && npm run unit-tests && npm run lint && npm run tsc",
     "lint": "eslint . && prettier . --check",
     "lint-fix": "eslint . --fix && prettier . --write",
     "tsc": "tsc",
@@ -30,6 +30,7 @@
   "dependencies": {
     "eslint-plugin-json": "^4.0.1",
     "node-fetch": "^3.3.2",
+    "prettier-plugin-multiline-arrays": "^4.0.3",
     "tldts": "^6.1.71"
   }
 }
