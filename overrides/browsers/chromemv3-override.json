@@ -77,6 +77,28 @@
         "contentBlocking": {
             "state": "enabled",
             "features": {}
+        },
+        "incrementalRolloutTest": {
+            "state": "disabled",
+            "features": {
+                "AAApril2025": {
+                    "state": "enabled",
+                    "minSupportedVersion": "2025.4.2",
+                    "rollout": {
+                        "steps": [{ "percent": 50 }]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                }
+            }
         }
     }
 }
