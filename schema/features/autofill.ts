@@ -17,18 +17,20 @@ type ImportFromGooglePasswordManager = {
     signInButton: ButtonConfig;
 };
 
-type FormTypeSetting = {
+export type FormTypeSetting = {
     selector: string;
     type: 'login' | 'signup';
 };
 
-type InputTypeSetting = {
+export type InputTypeSetting = {
     selector: string;
     type: string;
 };
 
+export type FormBoundarySelector = string;
+
 export type SiteSpecificFixes = {
-    formBoundarySelector?: string;
+    formBoundarySelector?: FormBoundarySelector;
     formTypeSettings?: FormTypeSetting[];
     inputTypeSettings?: InputTypeSetting[];
 };
