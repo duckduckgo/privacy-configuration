@@ -22,9 +22,15 @@ type FormTypeSetting = {
     type: 'login' | 'signup';
 };
 
+type InputTypeSetting = {
+    selector: string;
+    type: string;
+};
+
 export type SiteSpecificFixes = {
     formBoundarySelector?: string;
     formTypeSettings?: FormTypeSetting[];
+    inputTypeSettings?: InputTypeSetting[];
 };
 
 // Any subfeatures that have typed `settings` should be defined here.
