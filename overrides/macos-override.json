@@ -377,6 +377,30 @@
                 },
                 "partialFormSaves": {
                     "state": "enabled"
+                },
+                "siteSpecificFixes": {
+                    "state": "enabled",
+                    "settings": {
+                        "domains": [
+                            {
+                                "domain": ["zendesk.com", "localhost"],
+                                "patchSettings": [
+                                    {
+                                        "path": "",
+                                        "op": "add",
+                                        "value": {
+                                            "inputTypeSettings": [
+                                                {
+                                                    "selector": "#\\:r0\\:\\-\\-input",
+                                                    "type": "credentials.username"
+                                                }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
                 }
             }
         },
