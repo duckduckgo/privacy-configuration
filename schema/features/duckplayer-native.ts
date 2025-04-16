@@ -6,7 +6,7 @@ export type DuckPlayerNativeSettings = CSSInjectFeatureSettings<{
         signInRequiredError: string;
         videoElement: string;
         videoElementContainer: string;
-    }
+    };
 }>;
 
 export type DuckPlayerNativeFeature<VersionType> = Feature<DuckPlayerNativeSettings, VersionType>;
