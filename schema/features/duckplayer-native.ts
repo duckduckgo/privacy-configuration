@@ -2,9 +2,10 @@ import { Feature, CSSInjectFeatureSettings } from '../feature';
 
 export type DuckPlayerNativeSettings = CSSInjectFeatureSettings<{
     selectors: {
+        errorContainer: string;
+        signInRequiredError: string;
         videoElement: string;
         videoElementContainer: string;
-        signInRequiredError: string;
     }
 }>;
 
