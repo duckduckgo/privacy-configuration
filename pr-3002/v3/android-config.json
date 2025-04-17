@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1744819368456,
+    "version": 1744885266436,
     "features": {
         "adAttributionReporting": {
             "state": "disabled",
@@ -1649,10 +1649,6 @@
                 {
                     "domain": "kvb.koeln",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2808"
-                },
-                {
-                    "domain": "brewser.beer",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2996"
                 }
             ],
             "settings": {
@@ -1823,7 +1819,7 @@
                     }
                 }
             },
-            "hash": "cc9d27bba4978ca9bb296b4c204496a4"
+            "hash": "0652b118ac4b3ecacab6e8239a6b6e73"
         },
         "autofillBreakageReporter": {
             "state": "enabled",
@@ -3374,11 +3370,12 @@
                     "errorContainer": "body",
                     "signInRequiredError": "[href*=\"//support.google.com/youtube/answer/3037019\"]",
                     "videoElement": "#player video",
-                    "videoElementContainer": "#player .html5-video-player"
+                    "videoElementContainer": "#player .html5-video-player",
+                    "youtubeError": ".ytp-error"
                 },
                 "domains": []
             },
-            "hash": "e8ce3224ddbe6fa580164dcbbf5dcf4d"
+            "hash": "e7dd5996eb19b2b93f0012b3576fc396"
         },
         "duckPlayer": {
             "exceptions": [],
@@ -9639,6 +9636,17 @@
                             }
                         ]
                     },
+                    "atlassian.com": {
+                        "rules": [
+                            {
+                                "rule": "jsd-widget.atlassian.com/assets/iframe.js",
+                                "domains": [
+                                    "brewser.beer"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3003"
+                            }
+                        ]
+                    },
                     "att.com": {
                         "rules": [
                             {
@@ -13481,7 +13489,7 @@
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2228"
                 }
             ],
-            "hash": "c04075d3b47dfc1b4e7cdfc722f63ab2"
+            "hash": "108b538ac1e907dac5ed5bb3a688070f"
         },
         "trackingCookies1p": {
             "settings": {
