@@ -24,6 +24,32 @@
         "brokenSitePrompt": {
             "state": "enabled"
         },
+        "contentScopeExperiments": {
+            "exceptions": [],
+            "state": "enabled",
+            "features": {
+                "fingerprintingCanvas": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 50
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                }
+            }
+        },
         "networkProtection": {
             "state": "enabled",
             "features": {
