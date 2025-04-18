@@ -92,21 +92,28 @@ describe('Config schema tests', () => {
 
             it('All patchSettings should also be valid', () => {
                 const validate = createValidator(platformSpecificSchemas[config.name] || 'GenericV4Config');
+                function applyPatchAndValidate(featureName, feature, conditionalChange, config) {
+                    for (const change of conditionalChange) {
+                        if (!change.patchSettings) {
+                            continue;
+                        }
+                        let featureSettings = feature.settings;
+                        featureSettings = immutableJSONPatch(featureSettings, change.patchSettings);
+                        // Clone config and check the schema with the patched featureSettings
+                        const clonedConfig = JSON.parse(JSON.stringify(config.body));
+                        expect(clonedConfig.features[featureName].settings).to.not.be.equal(featureSettings);
+                        clonedConfig.features[featureName].settings = featureSettings;
+                        expect(validate(clonedConfig)).to.be.equal(true, formatErrors(validate.errors));
+                    }
+                }
+
                 for (const featureName of Object.keys(config.body.features)) {
                     const feature = config.body.features[featureName];
+                    if (feature?.settings?.conditionalChanges) {
+                        applyPatchAndValidate(featureName, feature, feature.settings.conditionalChanges, config);
+                    }
                     if (feature?.settings?.domains) {
-                        for (const domain of feature.settings.domains) {
-                            if (!domain.patchSettings) {
-                                continue;
-                            }
-                            let featureSettings = feature.settings;
-                            featureSettings = immutableJSONPatch(featureSettings, domain.patchSettings);
-                            // Clone config and check the schema with the patched featureSettings
-                            const clonedConfig = JSON.parse(JSON.stringify(config.body));
-                            expect(clonedConfig.features[featureName].settings).to.not.be.equal(featureSettings);
-                            clonedConfig.features[featureName].settings = featureSettings;
-                            expect(validate(clonedConfig)).to.be.equal(true, formatErrors(validate.errors));
-                        }
+                        applyPatchAndValidate(featureName, feature, feature.settings.domains, config);
                     }
                 }
             });
