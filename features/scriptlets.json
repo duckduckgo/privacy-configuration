@@ -1,0 +1,34 @@
+{
+    "_meta": {
+        "description": "Run Adguard scriptlets."
+    },
+    "state": "enabled",
+    "exceptions": [],
+    "settings": {
+        "scriptlets": [
+            {
+                "name": "trustedSetAttr",
+                "attrs": {
+                    "selector": "a",
+                    "attr": "href",
+                    "value": "#"
+                }
+            },
+            {
+                "name": "setCookie",
+                "attrs": {
+                    "domain": "example.com",
+                    "name": "test",
+                    "value": "testValue"
+                }
+            },
+            {
+                "name": "removeCookie",
+                "attrs": {
+                    "domain": "example.com",
+                    "match": "test"
+                }
+            }
+        ]
+    }
+}
