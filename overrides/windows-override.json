@@ -1,52 +1,17 @@
 {
     "features": {
         "apiManipulation": {
-            "state": "disabled",
+            "state": "enabled",
             "settings": {
                 "apiChanges": {
-                    "Navigator.prototype.joinAdInterestGroup": {
-                        "type": "remove"
+                    "Navigator.prototype.deviceMemory": {
+                        "type": "descriptor",
+                        "getterValue": {
+                            "type": "number",
+                            "value": 8
+                        }
                     },
-                    "Navigator.prototype.leaveAdInterestGroup": {
-                        "type": "remove"
-                    },
-                    "Navigator.prototype.clearOriginJoinedAdInterestGroups": {
-                        "type": "remove"
-                    },
-                    "Navigator.prototype.updateAdInterestGroups": {
-                        "type": "remove"
-                    },
-                    "Navigator.prototype.createAuctionNonce": {
-                        "type": "remove"
-                    },
-                    "Navigator.prototype.runAdAuction": {
-                        "type": "remove"
-                    },
-                    "Navigator.prototype.adAuctionComponents": {
-                        "type": "remove"
-                    },
-                    "Navigator.prototype.deprecatedURNToURL": {
-                        "type": "remove"
-                    },
-                    "Navigator.prototype.deprecatedReplaceInURN": {
-                        "type": "remove"
-                    },
-                    "Navigator.prototype.getInterestGroupAdAuctionData": {
-                        "type": "remove"
-                    },
-                    "Navigator.prototype.createAdRequest": {
-                        "type": "remove"
-                    },
-                    "Navigator.prototype.finalizeAd": {
-                        "type": "remove"
-                    },
-                    "Navigator.prototype.canLoadAdAuctionFencedFrame": {
-                        "type": "remove"
-                    },
-                    "Navigator.prototype.deprecatedRunAdAuctionEnforcesKAnonymity": {
-                        "type": "remove"
-                    },
-                    "Navigator.prototype.protectedAudience": {
+                    "Navigator.prototype.keyboard": {
                         "type": "descriptor",
                         "getterValue": {
                             "type": "undefined"
@@ -101,14 +66,7 @@
                     "state": "enabled"
                 },
                 "waitlist": {
-                    "state": "disabled",
-                    "rollout": {
-                        "steps": [
-                            {
-                                "percent": 3
-                            }
-                        ]
-                    }
+                    "state": "disabled"
                 }
             },
             "settings": {
@@ -120,10 +78,7 @@
             "minSupportedVersion": "0.64.0"
         },
         "brokerProtection": {
-            "state": "enabled",
-            "settings": {
-                "useEnhancedCaptchaSystem": "disabled"
-            }
+            "state": "enabled"
         },
         "windowsPermissionUsage": {
             "state": "enabled"
@@ -149,7 +104,7 @@
                     "minSupportedVersion": "0.98.0"
                 },
                 "partialFormSaves": {
-                    "state": "enabled"
+                    "state": "disabled"
                 }
             }
         },
@@ -214,7 +169,7 @@
             "minSupportedVersion": "0.88.3"
         },
         "fingerprintingHardware": {
-            "state": "enabled",
+            "state": "disabled",
             "minSupportedVersion": "0.88.3",
             "exceptions": [
                 {
@@ -240,6 +195,10 @@
                 {
                     "domain": "legalandgeneral.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2491"
+                },
+                {
+                    "domain": "desjardins.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2946"
                 }
             ],
             "state": "enabled",
@@ -545,6 +504,12 @@
         "windowsWebViewPermissionsSavesInProfile": {
             "state": "disabled",
             "exceptions": []
+        },
+        "brokenSitePrompt": {
+            "state": "enabled"
+        },
+        "downloadManager": {
+            "state": "disabled"
         }
     },
     "unprotectedTemporary": []

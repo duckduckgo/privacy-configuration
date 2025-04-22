@@ -76,29 +76,25 @@
         },
         "contentBlocking": {
             "state": "enabled",
+            "features": {}
+        },
+        "incrementalRolloutTest": {
+            "state": "disabled",
             "features": {
-                "TDSAAExperiment3": {
+                "AAApril2025": {
                     "state": "enabled",
-                    "settings": {
-                        "aUrl": "v6/temp/extension-mv3-tds-a.json",
-                        "bUrl": "v6/temp/extension-mv3-tds-b.json"
-                    },
-                    "minSupportedVersion": "2025.2.20",
+                    "minSupportedVersion": "2025.4.2",
                     "rollout": {
-                        "steps": [
-                            {
-                                "percent": 50
-                            }
-                        ]
+                        "steps": [{ "percent": 50 }]
                     },
                     "cohorts": [
                         {
-                            "name": "b",
-                            "weight": 0
+                            "name": "control",
+                            "weight": 1
                         },
                         {
-                            "name": "a",
-                            "weight": 0
+                            "name": "treatment",
+                            "weight": 1
                         }
                     ]
                 }

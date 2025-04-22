@@ -115,7 +115,7 @@
             }
         },
         "autocompleteTabs": {
-            "state": "disabled"
+            "minSupportedVersion": "1.134.0"
         },
         "dbp": {
             "state": "enabled",
@@ -144,10 +144,7 @@
             "minSupportedVersion": "1.70.0"
         },
         "brokerProtection": {
-            "state": "enabled",
-            "settings": {
-                "useEnhancedCaptchaSystem": "disabled"
-            }
+            "state": "enabled"
         },
         "contentBlocking": {
             "state": "enabled",
@@ -380,6 +377,30 @@
                 },
                 "partialFormSaves": {
                     "state": "enabled"
+                },
+                "siteSpecificFixes": {
+                    "state": "enabled",
+                    "settings": {
+                        "domains": [
+                            {
+                                "domain": ["zendesk.com", "localhost"],
+                                "patchSettings": [
+                                    {
+                                        "path": "",
+                                        "op": "add",
+                                        "value": {
+                                            "inputTypeSettings": [
+                                                {
+                                                    "selector": "#\\:r0\\:\\-\\-input",
+                                                    "type": "credentials.username"
+                                                }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
                 }
             }
         },
@@ -584,6 +605,10 @@
                         "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2825"
                     },
                     {
+                        "domain": "mercari.jp",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2825"
+                    },
+                    {
                         "domain": "ichard26.github.io",
                         "reason": "Next PR fetch errors on DDG user agent"
                     },
@@ -630,6 +655,9 @@
                 },
                 "seamlessAccountSwitching": {
                     "state": "enabled"
+                },
+                "exchangeKeysToSyncWithAnotherDevice": {
+                    "state": "enabled"
                 }
             }
         },
@@ -647,12 +675,6 @@
         "privacyDashboard": {
             "state": "enabled",
             "features": {
-                "highlightedProtectionsToggle": {
-                    "state": "disabled",
-                    "rollout": {
-                        "steps": []
-                    }
-                },
                 "toggleReports": {
                     "state": "enabled"
                 }
