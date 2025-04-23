@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1745242597765,
+    "version": 1745400575298,
     "features": {
         "adAttributionReporting": {
             "state": "disabled",
@@ -217,9 +217,6 @@
                 },
                 {
                     "domain": "larazon.es"
-                },
-                {
-                    "domain": "motherdenim.com"
                 },
                 {
                     "domain": "nationalgrid.co.uk"
@@ -579,6 +576,9 @@
                     "domain": "outdooraccess-scotland.scot"
                 },
                 {
+                    "domain": "kerknet.be"
+                },
+                {
                     "domain": "marvel.com"
                 },
                 {
@@ -760,7 +760,7 @@
                     }
                 }
             },
-            "hash": "a331acc5969797c1ef38a4aa9e154861"
+            "hash": "1e3702f6112b39709e07e38444805139"
         },
         "autofillBreakageReporter": {
             "state": "enabled",
@@ -1806,6 +1806,33 @@
             },
             "hash": "c2785a96684f75f86fa0a37a1d430d63"
         },
+        "contentScopeExperiments": {
+            "state": "enabled",
+            "exceptions": [],
+            "features": {
+                "fingerprintingCanvas": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                }
+            },
+            "hash": "575351f24585295a2c4216155c53ad46"
+        },
         "contextualOnboarding": {
             "exceptions": [],
             "state": "disabled",
@@ -1957,6 +1984,11 @@
             "hash": "113933668f41d71c56316e5debf1fb5b"
         },
         "defaultBrowserPrompts": {
+            "state": "disabled",
+            "exceptions": [],
+            "hash": "c292bb627849854515cebbded288ef5a"
+        },
+        "downloadManager": {
             "state": "disabled",
             "exceptions": [],
             "hash": "c292bb627849854515cebbded288ef5a"
@@ -6839,6 +6871,10 @@
                     },
                     "minSupportedVersion": "7.148.0"
                 },
+                "privacyProAuthV2": {
+                    "state": "internal",
+                    "minSupportedVersion": "7.164.0"
+                },
                 "privacyProFreeTrialJan25": {
                     "state": "disabled",
                     "targets": [
@@ -6878,9 +6914,14 @@
                     "minSupportedVersion": "7.163.0"
                 }
             },
-            "hash": "bea823da92a1dd39f5b41c84f39bbf4b"
+            "hash": "45b54779108395c8e9c03b92f059da40"
         },
         "privacyProtectionsPopup": {
+            "state": "disabled",
+            "exceptions": [],
+            "hash": "c292bb627849854515cebbded288ef5a"
+        },
+        "quickNavTldLookup": {
             "state": "disabled",
             "exceptions": [],
             "hash": "c292bb627849854515cebbded288ef5a"
@@ -6998,7 +7039,7 @@
                         "name": "setConstant",
                         "attrs": {
                             "property": "test",
-                            "value": "test"
+                            "value": "no"
                         }
                     },
                     {
@@ -7030,7 +7071,7 @@
                     }
                 ]
             },
-            "hash": "6bf7523b9723afdbb3eb2a5a245a5280"
+            "hash": "e2e99809deedf9477a98a9421d86650e"
         },
         "sendFullPackageInstallSource": {
             "state": "enabled",
@@ -7121,11 +7162,14 @@
                 },
                 "seamlessAccountSwitching": {
                     "state": "enabled"
+                },
+                "exchangeKeysToSyncWithAnotherDevice": {
+                    "state": "enabled"
                 }
             },
             "exceptions": [],
             "minSupportedVersion": "7.104.0",
-            "hash": "7b1c6fc4e5b9b72f8dabc9306a092d65"
+            "hash": "ef41f9656524eafe4b723341eb1fa7e7"
         },
         "tabManager": {
             "exceptions": [],
@@ -7482,6 +7526,12 @@
                                 "rule": "aax.amazon-adsystem.com/e/dtb/bid",
                                 "domains": [
                                     "cleveland.com"
+                                ]
+                            },
+                            {
+                                "rule": "client.aps.amazon-adsystem.com/publisher.js",
+                                "domains": [
+                                    "ign.com"
                                 ]
                             }
                         ]
@@ -7905,6 +7955,16 @@
                                 "rule": "convertexperiments.com",
                                 "domains": [
                                     "ground.news"
+                                ]
+                            }
+                        ]
+                    },
+                    "convertkit.com": {
+                        "rules": [
+                            {
+                                "rule": "convertkit.com",
+                                "domains": [
+                                    "kit.com"
                                 ]
                             }
                         ]
@@ -9252,6 +9312,16 @@
                                 "domains": [
                                     "cox.com",
                                     "cox.net"
+                                ]
+                            }
+                        ]
+                    },
+                    "improvedigital.com": {
+                        "rules": [
+                            {
+                                "rule": "hb.improvedigital.com/pbw/prebid/prebid-idhb-v8.51a.min.js",
+                                "domains": [
+                                    "fun.chicagotribune.com"
                                 ]
                             }
                         ]
@@ -10932,6 +11002,16 @@
                             }
                         ]
                     },
+                    "yieldlove.com": {
+                        "rules": [
+                            {
+                                "rule": "cdn-a.yieldlove.com/v2/yieldlove.js",
+                                "domains": [
+                                    "whatismyip.com"
+                                ]
+                            }
+                        ]
+                    },
                     "yotpo.com": {
                         "rules": [
                             {
@@ -11076,7 +11156,7 @@
                     "domain": "flexmls.com"
                 }
             ],
-            "hash": "e8105ec27349370b4a1d2930fb3960f6"
+            "hash": "48344eeb84af21485de6b710e01b7d84"
         },
         "trackingCookies1p": {
             "settings": {

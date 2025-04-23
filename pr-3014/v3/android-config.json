@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1745242597765,
+    "version": 1745400575298,
     "features": {
         "adAttributionReporting": {
             "state": "disabled",
@@ -821,6 +821,10 @@
                             "reason": "App loads websites"
                         },
                         {
+                            "packageName": "com.hyundai.bluelink.eu.ux20",
+                            "reason": "Users report app issues with AppTP enabled"
+                        },
+                        {
                             "packageName": "com.kiwibrowser.browser",
                             "reason": "App loads websites"
                         },
@@ -903,6 +907,10 @@
                         {
                             "packageName": "com.sec.android.app.sbrowser.beta",
                             "reason": "App loads websites"
+                        },
+                        {
+                            "packageName": "com.stationdm.bluelink",
+                            "reason": "Users report app issues with AppTP enabled"
                         },
                         {
                             "packageName": "com.strava",
@@ -1083,7 +1091,7 @@
             },
             "exceptions": [],
             "state": "enabled",
-            "hash": "259368c2a1d67aa57b71149336c88f29"
+            "hash": "2b4e3cac8821f09dbb891d6eff39d9d5"
         },
         "auraExperiment": {
             "exceptions": [],
@@ -1144,10 +1152,6 @@
                 },
                 {
                     "domain": "larazon.es",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/326"
-                },
-                {
-                    "domain": "motherdenim.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/326"
                 },
                 {
@@ -1627,6 +1631,10 @@
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2993"
                 },
                 {
+                    "domain": "kerknet.be",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3021"
+                },
+                {
                     "domain": "marvel.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1194"
                 },
@@ -1823,7 +1831,7 @@
                     }
                 }
             },
-            "hash": "0652b118ac4b3ecacab6e8239a6b6e73"
+            "hash": "81a8d87f8c10e402ae61f5e5b84e92cf"
         },
         "autofillBreakageReporter": {
             "state": "enabled",
@@ -3159,6 +3167,11 @@
             ],
             "hash": "a29028327d3b74f000c32de521377f74"
         },
+        "contentScopeExperiments": {
+            "state": "disabled",
+            "exceptions": [],
+            "hash": "c292bb627849854515cebbded288ef5a"
+        },
         "contextualOnboarding": {
             "exceptions": [],
             "state": "disabled",
@@ -3365,6 +3378,11 @@
                 }
             },
             "hash": "33a107dac335233fcbc641c670c532ba"
+        },
+        "downloadManager": {
+            "state": "disabled",
+            "exceptions": [],
+            "hash": "c292bb627849854515cebbded288ef5a"
         },
         "duckPlayer": {
             "exceptions": [],
@@ -8901,6 +8919,11 @@
             "exceptions": [],
             "hash": "c292bb627849854515cebbded288ef5a"
         },
+        "quickNavTldLookup": {
+            "state": "disabled",
+            "exceptions": [],
+            "hash": "c292bb627849854515cebbded288ef5a"
+        },
         "referrer": {
             "exceptions": [
                 {
@@ -9033,7 +9056,7 @@
                         "name": "setConstant",
                         "attrs": {
                             "property": "test",
-                            "value": "test"
+                            "value": "no"
                         }
                     },
                     {
@@ -9065,7 +9088,7 @@
                     }
                 ]
             },
-            "hash": "6bf7523b9723afdbb3eb2a5a245a5280"
+            "hash": "e2e99809deedf9477a98a9421d86650e"
         },
         "sendFullPackageInstallSource": {
             "state": "enabled",
@@ -9171,7 +9194,7 @@
         },
         "swipingTabs": {
             "exceptions": [],
-            "state": "enabled",
+            "state": "disabled",
             "minSupportedVersion": 52300000,
             "features": {
                 "enabledForUsers": {
@@ -9191,7 +9214,7 @@
                     "state": "disabled"
                 }
             },
-            "hash": "f93f54e31d23584444d3af02a5d45e6c"
+            "hash": "46975f59443ca449488331edf065a2e8"
         },
         "syncPromotion": {
             "state": "enabled",
@@ -9620,6 +9643,13 @@
                                     "cleveland.com"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/3006"
+                            },
+                            {
+                                "rule": "client.aps.amazon-adsystem.com/publisher.js",
+                                "domains": [
+                                    "ign.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3030"
                             }
                         ]
                     },
@@ -10101,6 +10131,17 @@
                                     "ground.news"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2979"
+                            }
+                        ]
+                    },
+                    "convertkit.com": {
+                        "rules": [
+                            {
+                                "rule": "convertkit.com",
+                                "domains": [
+                                    "kit.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3024"
                             }
                         ]
                     },
@@ -11543,6 +11584,17 @@
                                     "cox.net"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/948"
+                            }
+                        ]
+                    },
+                    "improvedigital.com": {
+                        "rules": [
+                            {
+                                "rule": "hb.improvedigital.com/pbw/prebid/prebid-idhb-v8.51a.min.js",
+                                "domains": [
+                                    "fun.chicagotribune.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3023"
                             }
                         ]
                     },
@@ -13403,6 +13455,17 @@
                             }
                         ]
                     },
+                    "yieldlove.com": {
+                        "rules": [
+                            {
+                                "rule": "cdn-a.yieldlove.com/v2/yieldlove.js",
+                                "domains": [
+                                    "whatismyip.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3022"
+                            }
+                        ]
+                    },
                     "yotpo.com": {
                         "rules": [
                             {
@@ -13565,7 +13628,7 @@
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2228"
                 }
             ],
-            "hash": "81658044efe5a41dff678f01cf61eb9a"
+            "hash": "b6bee93240e3cef47ad7efb18ced7a4d"
         },
         "trackingCookies1p": {
             "settings": {
@@ -13739,10 +13802,6 @@
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2182"
                 },
                 {
-                    "domain": "ctvnews.ca",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2766"
-                },
-                {
                     "domain": "skechers.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2827"
                 },
@@ -13905,7 +13964,7 @@
                     }
                 },
                 "mediaSession": "enabled",
-                "presentation": "enabled",
+                "presentation": "disabled",
                 "viewportWidth": "enabled",
                 "webShare": "enabled",
                 "screenLock": "enabled",
@@ -13915,7 +13974,7 @@
                     "changes": []
                 }
             },
-            "hash": "adfa63d8b047a43e56da587d54e2f9c4"
+            "hash": "cd56cc4ab3ceca540b63b5a3611642a6"
         },
         "webViewStateRestoration": {
             "state": "disabled",

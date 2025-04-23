@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1745242597765,
+    "version": 1745400575298,
     "features": {
         "adAttributionReporting": {
             "state": "disabled",
@@ -208,9 +208,6 @@
                 },
                 {
                     "domain": "larazon.es"
-                },
-                {
-                    "domain": "motherdenim.com"
                 },
                 {
                     "domain": "nationalgrid.co.uk"
@@ -570,6 +567,9 @@
                     "domain": "outdooraccess-scotland.scot"
                 },
                 {
+                    "domain": "kerknet.be"
+                },
+                {
                     "domain": "marvel.com"
                 },
                 {
@@ -737,7 +737,7 @@
                     "state": "disabled"
                 }
             },
-            "hash": "f5c6d119e1658d01b9818c940eae4718"
+            "hash": "6a5ef71f3f72a3795c4e020031d6cf4c"
         },
         "autofillBreakageReporter": {
             "state": "disabled",
@@ -1702,6 +1702,33 @@
             },
             "hash": "5fc4eb8ffcdc72d26ec601f7354ebcf6"
         },
+        "contentScopeExperiments": {
+            "state": "enabled",
+            "exceptions": [],
+            "features": {
+                "fingerprintingCanvas": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                }
+            },
+            "hash": "575351f24585295a2c4216155c53ad46"
+        },
         "contextualOnboarding": {
             "exceptions": [],
             "state": "enabled",
@@ -1927,6 +1954,11 @@
             "hash": "64fad9d9443db37003211559f9433b2a"
         },
         "defaultBrowserPrompts": {
+            "state": "disabled",
+            "exceptions": [],
+            "hash": "c292bb627849854515cebbded288ef5a"
+        },
+        "downloadManager": {
             "state": "disabled",
             "exceptions": [],
             "hash": "c292bb627849854515cebbded288ef5a"
@@ -6869,11 +6901,20 @@
                         ]
                     },
                     "minSupportedVersion": "1.116.0"
+                },
+                "privacyProAuthV2": {
+                    "state": "internal",
+                    "minSupportedVersion": "1.133.0"
                 }
             },
-            "hash": "9738cff7f6a81e78fa9a0dfbd1dc99d6"
+            "hash": "a4343dad6dd63ad1069af95283c5190d"
         },
         "privacyProtectionsPopup": {
+            "state": "disabled",
+            "exceptions": [],
+            "hash": "c292bb627849854515cebbded288ef5a"
+        },
+        "quickNavTldLookup": {
             "state": "disabled",
             "exceptions": [],
             "hash": "c292bb627849854515cebbded288ef5a"
@@ -6991,7 +7032,7 @@
                         "name": "setConstant",
                         "attrs": {
                             "property": "test",
-                            "value": "test"
+                            "value": "no"
                         }
                     },
                     {
@@ -7023,7 +7064,7 @@
                     }
                 ]
             },
-            "hash": "6bf7523b9723afdbb3eb2a5a245a5280"
+            "hash": "e2e99809deedf9477a98a9421d86650e"
         },
         "sendFullPackageInstallSource": {
             "state": "enabled",
@@ -7498,6 +7539,12 @@
                                 "domains": [
                                     "cleveland.com"
                                 ]
+                            },
+                            {
+                                "rule": "client.aps.amazon-adsystem.com/publisher.js",
+                                "domains": [
+                                    "ign.com"
+                                ]
                             }
                         ]
                     },
@@ -7920,6 +7967,16 @@
                                 "rule": "convertexperiments.com",
                                 "domains": [
                                     "ground.news"
+                                ]
+                            }
+                        ]
+                    },
+                    "convertkit.com": {
+                        "rules": [
+                            {
+                                "rule": "convertkit.com",
+                                "domains": [
+                                    "kit.com"
                                 ]
                             }
                         ]
@@ -9310,6 +9367,16 @@
                                 "domains": [
                                     "cox.com",
                                     "cox.net"
+                                ]
+                            }
+                        ]
+                    },
+                    "improvedigital.com": {
+                        "rules": [
+                            {
+                                "rule": "hb.improvedigital.com/pbw/prebid/prebid-idhb-v8.51a.min.js",
+                                "domains": [
+                                    "fun.chicagotribune.com"
                                 ]
                             }
                         ]
@@ -10990,6 +11057,16 @@
                             }
                         ]
                     },
+                    "yieldlove.com": {
+                        "rules": [
+                            {
+                                "rule": "cdn-a.yieldlove.com/v2/yieldlove.js",
+                                "domains": [
+                                    "whatismyip.com"
+                                ]
+                            }
+                        ]
+                    },
                     "yotpo.com": {
                         "rules": [
                             {
@@ -11134,7 +11211,7 @@
                     "domain": "flexmls.com"
                 }
             ],
-            "hash": "126743f28ef94bf34b2a6c549809875c"
+            "hash": "4e1061b631ab030d61bed9e56261ec45"
         },
         "trackingCookies1p": {
             "settings": {

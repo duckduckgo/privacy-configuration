@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1745242597765,
+    "version": 1745400575298,
     "features": {
         "adAttributionReporting": {
             "state": "disabled",
@@ -225,10 +225,6 @@
                 },
                 {
                     "domain": "larazon.es",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/326"
-                },
-                {
-                    "domain": "motherdenim.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/326"
                 },
                 {
@@ -708,6 +704,10 @@
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2993"
                 },
                 {
+                    "domain": "kerknet.be",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3021"
+                },
+                {
                     "domain": "marvel.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1194"
                 },
@@ -879,7 +879,7 @@
                     "state": "disabled"
                 }
             },
-            "hash": "4b209c9b6a4928fe898b594a530ab921"
+            "hash": "dce5cde988c0d2663eea1d95e4488559"
         },
         "autofillBreakageReporter": {
             "state": "disabled",
@@ -2092,6 +2092,33 @@
             },
             "hash": "5cb296b161f59574a7b0927eed6813df"
         },
+        "contentScopeExperiments": {
+            "state": "enabled",
+            "exceptions": [],
+            "features": {
+                "fingerprintingCanvas": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                }
+            },
+            "hash": "575351f24585295a2c4216155c53ad46"
+        },
         "contextualOnboarding": {
             "exceptions": [],
             "state": "enabled",
@@ -2328,6 +2355,11 @@
             "hash": "64fad9d9443db37003211559f9433b2a"
         },
         "defaultBrowserPrompts": {
+            "state": "disabled",
+            "exceptions": [],
+            "hash": "c292bb627849854515cebbded288ef5a"
+        },
+        "downloadManager": {
             "state": "disabled",
             "exceptions": [],
             "hash": "c292bb627849854515cebbded288ef5a"
@@ -7414,11 +7446,20 @@
                         ]
                     },
                     "minSupportedVersion": "1.116.0"
+                },
+                "privacyProAuthV2": {
+                    "state": "internal",
+                    "minSupportedVersion": "1.133.0"
                 }
             },
-            "hash": "9738cff7f6a81e78fa9a0dfbd1dc99d6"
+            "hash": "a4343dad6dd63ad1069af95283c5190d"
         },
         "privacyProtectionsPopup": {
+            "state": "disabled",
+            "exceptions": [],
+            "hash": "c292bb627849854515cebbded288ef5a"
+        },
+        "quickNavTldLookup": {
             "state": "disabled",
             "exceptions": [],
             "hash": "c292bb627849854515cebbded288ef5a"
@@ -7554,7 +7595,7 @@
                         "name": "setConstant",
                         "attrs": {
                             "property": "test",
-                            "value": "test"
+                            "value": "no"
                         }
                     },
                     {
@@ -7586,7 +7627,7 @@
                     }
                 ]
             },
-            "hash": "6bf7523b9723afdbb3eb2a5a245a5280"
+            "hash": "e2e99809deedf9477a98a9421d86650e"
         },
         "sendFullPackageInstallSource": {
             "state": "enabled",
@@ -8102,6 +8143,13 @@
                                     "cleveland.com"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/3006"
+                            },
+                            {
+                                "rule": "client.aps.amazon-adsystem.com/publisher.js",
+                                "domains": [
+                                    "ign.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3030"
                             }
                         ]
                     },
@@ -8579,6 +8627,17 @@
                                     "ground.news"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2979"
+                            }
+                        ]
+                    },
+                    "convertkit.com": {
+                        "rules": [
+                            {
+                                "rule": "convertkit.com",
+                                "domains": [
+                                    "kit.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3024"
                             }
                         ]
                     },
@@ -10096,6 +10155,17 @@
                                     "cox.net"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/948"
+                            }
+                        ]
+                    },
+                    "improvedigital.com": {
+                        "rules": [
+                            {
+                                "rule": "hb.improvedigital.com/pbw/prebid/prebid-idhb-v8.51a.min.js",
+                                "domains": [
+                                    "fun.chicagotribune.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3023"
                             }
                         ]
                     },
@@ -11970,6 +12040,17 @@
                             }
                         ]
                     },
+                    "yieldlove.com": {
+                        "rules": [
+                            {
+                                "rule": "cdn-a.yieldlove.com/v2/yieldlove.js",
+                                "domains": [
+                                    "whatismyip.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3022"
+                            }
+                        ]
+                    },
                     "yotpo.com": {
                         "rules": [
                             {
@@ -12132,7 +12213,7 @@
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2228"
                 }
             ],
-            "hash": "f34d41060d3b3b6988f6ab20d8371481"
+            "hash": "e1c1d28e5a68b87c75bebbe6d3526dcc"
         },
         "trackingCookies1p": {
             "settings": {
