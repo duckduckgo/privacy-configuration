@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1745444424119,
+    "version": 1745448685379,
     "features": {
         "adAttributionReporting": {
             "state": "disabled",
@@ -9094,9 +9094,43 @@
                             "property": "test"
                         }
                     }
+                ],
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "type": "url",
+                            "url": {
+                                "match": "xnxx.com"
+                            }
+                        },
+                        "changes": [
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "preventAddEventListener",
+                                    "attrs": {
+                                        "typeSearch": "DOMContentLoaded",
+                                        "listenerSearch": "/dyn\\.ads|loadAdsDelayed/"
+                                    }
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "setConstant",
+                                    "attrs": {
+                                        "property": "xv.sda.pp.init",
+                                        "value": "noopFunc"
+                                    }
+                                }
+                            }
+                        ]
+                    }
                 ]
             },
-            "hash": "998d97750dafb35b08f049aa5259ffe3"
+            "hash": "da42ce151f0c86b84cac4fc544f7563d"
         },
         "sendFullPackageInstallSource": {
             "state": "enabled",
