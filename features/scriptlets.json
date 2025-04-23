@@ -43,9 +43,7 @@
                     "textMatch": "More information...",
                     "pattern": "...",
                     "replacement": "!",
-                    "extraArgs": [
-                        "verbose"
-                    ]
+                    "extraArgs": ["verbose"]
                 }
             },
             {
@@ -66,6 +64,40 @@
                 "attrs": {
                     "property": "test"
                 }
+            }
+        ],
+        "conditionalChanges": [
+            {
+                "condition": {
+                    "type": "url",
+                    "url": {
+                        "match": "xnxx.com"
+                    }
+                },
+                "changes": [
+                    {
+                        "op": "add",
+                        "path": "/scriptlets/-",
+                        "value": {
+                            "name": "preventAddEventListener",
+                            "attrs": {
+                                "typeSearch": "DOMContentLoaded",
+                                "listenerSearch": "/dyn\\.ads|loadAdsDelayed/"
+                            }
+                        }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/scriptlets/-",
+                        "value": {
+                            "name": "setConstant",
+                            "attrs": {
+                                "property": "xv.sda.pp.init",
+                                "value": "noopFunc"
+                            }
+                        }
+                    }
+                ]
             }
         ]
     }
