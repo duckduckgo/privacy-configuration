@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1745448723789,
+    "version": 1745449241211,
     "features": {
         "adAttributionReporting": {
             "state": "disabled",
@@ -7573,45 +7573,10 @@
             "settings": {
                 "scriptlets": [
                     {
-                        "name": "trustedSetAttr",
-                        "attrs": {
-                            "selector": "a",
-                            "attr": "href",
-                            "value": "#"
-                        }
-                    },
-                    {
-                        "name": "setCookie",
-                        "attrs": {
-                            "domain": "example.com",
-                            "name": "test",
-                            "value": "accepted"
-                        }
-                    },
-                    {
-                        "name": "removeCookie",
-                        "attrs": {
-                            "domain": "example.com",
-                            "match": "bloop"
-                        }
-                    },
-                    {
                         "name": "setConstant",
                         "attrs": {
                             "property": "test",
                             "value": "no"
-                        }
-                    },
-                    {
-                        "name": "trustedReplaceNodeText",
-                        "attrs": {
-                            "nodeName": "a",
-                            "textMatch": "More information...",
-                            "pattern": "...",
-                            "replacement": "!",
-                            "extraArgs": [
-                                "verbose"
-                            ]
                         }
                     },
                     {
@@ -7635,6 +7600,67 @@
                     }
                 ],
                 "conditionalChanges": [
+                    {
+                        "condition": {
+                            "type": "url",
+                            "url": {
+                                "match": "example.com"
+                            }
+                        },
+                        "changes": [
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "trustedReplaceNodeText",
+                                    "attrs": {
+                                        "nodeName": "a",
+                                        "textMatch": "More information...",
+                                        "pattern": "...",
+                                        "replacement": "!",
+                                        "extraArgs": [
+                                            "verbose"
+                                        ]
+                                    }
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "trustedSetAttr",
+                                    "attrs": {
+                                        "selector": "a",
+                                        "attr": "href",
+                                        "value": "#"
+                                    }
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "setCookie",
+                                    "attrs": {
+                                        "domain": "example.com",
+                                        "name": "test",
+                                        "value": "accepted"
+                                    }
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "removeCookie",
+                                    "attrs": {
+                                        "domain": "example.com",
+                                        "match": "bloop"
+                                    }
+                                }
+                            }
+                        ]
+                    },
                     {
                         "condition": {
                             "type": "url",
@@ -7669,7 +7695,7 @@
                     }
                 ]
             },
-            "hash": "da42ce151f0c86b84cac4fc544f7563d"
+            "hash": "9b0bc89e095b92f26455dbbe9aae4613"
         },
         "sendFullPackageInstallSource": {
             "state": "enabled",
