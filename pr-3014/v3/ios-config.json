@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1745400575298,
+    "version": 1745442564341,
     "features": {
         "adAttributionReporting": {
             "state": "disabled",
@@ -716,6 +716,10 @@
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3021"
                 },
                 {
+                    "domain": "medscape.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3036"
+                },
+                {
                     "domain": "marvel.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1194"
                 },
@@ -901,7 +905,7 @@
                     }
                 }
             },
-            "hash": "0ee38e2c3d78ad34f7eba0f1c8cebde4"
+            "hash": "658802021d6dc1c2d5b1fef71a1543a4"
         },
         "autofillBreakageReporter": {
             "state": "enabled",
@@ -7595,11 +7599,15 @@
                         }
                     },
                     {
-                        "name": "replaceNodeText",
+                        "name": "trustedReplaceNodeText",
                         "attrs": {
-                            "node": "a",
+                            "nodeName": "a",
+                            "textMatch": "test",
                             "pattern": "test",
-                            "replacement": "test"
+                            "replacement": "test2",
+                            "extraArgs": [
+                                "verbose"
+                            ]
                         }
                     },
                     {
@@ -7623,7 +7631,7 @@
                     }
                 ]
             },
-            "hash": "e2e99809deedf9477a98a9421d86650e"
+            "hash": "e8f1c89a50e938edfcafd44e64f6da06"
         },
         "sendFullPackageInstallSource": {
             "state": "enabled",

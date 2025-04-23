@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1745400575298,
+    "version": 1745442564341,
     "features": {
         "adAttributionReporting": {
             "state": "disabled",
@@ -566,6 +566,9 @@
                     "domain": "kerknet.be"
                 },
                 {
+                    "domain": "medscape.com"
+                },
+                {
                     "domain": "marvel.com"
                 },
                 {
@@ -743,7 +746,7 @@
                 ]
             },
             "state": "disabled",
-            "hash": "22fd69e8bc66589ab7e715498dd21505"
+            "hash": "e7402306584dafd332844cc3ff178121"
         },
         "autofillBreakageReporter": {
             "state": "disabled",
@@ -6925,11 +6928,15 @@
                         }
                     },
                     {
-                        "name": "replaceNodeText",
+                        "name": "trustedReplaceNodeText",
                         "attrs": {
-                            "node": "a",
+                            "nodeName": "a",
+                            "textMatch": "test",
                             "pattern": "test",
-                            "replacement": "test"
+                            "replacement": "test2",
+                            "extraArgs": [
+                                "verbose"
+                            ]
                         }
                     },
                     {
@@ -6953,7 +6960,7 @@
                     }
                 ]
             },
-            "hash": "e2e99809deedf9477a98a9421d86650e"
+            "hash": "e8f1c89a50e938edfcafd44e64f6da06"
         },
         "sendFullPackageInstallSource": {
             "state": "enabled",

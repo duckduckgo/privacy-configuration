@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1745400575298,
+    "version": 1745442564341,
     "features": {
         "adAttributionReporting": {
             "state": "disabled",
@@ -1635,6 +1635,10 @@
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3021"
                 },
                 {
+                    "domain": "medscape.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3036"
+                },
+                {
                     "domain": "marvel.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1194"
                 },
@@ -1831,7 +1835,7 @@
                     }
                 }
             },
-            "hash": "81a8d87f8c10e402ae61f5e5b84e92cf"
+            "hash": "465588f9ae9624bf1951201eaf660ba9"
         },
         "autofillBreakageReporter": {
             "state": "enabled",
@@ -8903,16 +8907,16 @@
                     "cohorts": [
                         {
                             "name": "control",
-                            "weight": 1
+                            "weight": 0
                         },
                         {
                             "name": "treatment",
-                            "weight": 1
+                            "weight": 0
                         }
                     ]
                 }
             },
-            "hash": "4ac638e3a08eaa009e0dd6537138676b"
+            "hash": "90bf160377e499942361fede78fe5ca8"
         },
         "privacyProtectionsPopup": {
             "state": "disabled",
@@ -9060,11 +9064,15 @@
                         }
                     },
                     {
-                        "name": "replaceNodeText",
+                        "name": "trustedReplaceNodeText",
                         "attrs": {
-                            "node": "a",
+                            "nodeName": "a",
+                            "textMatch": "test",
                             "pattern": "test",
-                            "replacement": "test"
+                            "replacement": "test2",
+                            "extraArgs": [
+                                "verbose"
+                            ]
                         }
                     },
                     {
@@ -9088,7 +9096,7 @@
                     }
                 ]
             },
-            "hash": "e2e99809deedf9477a98a9421d86650e"
+            "hash": "e8f1c89a50e938edfcafd44e64f6da06"
         },
         "sendFullPackageInstallSource": {
             "state": "enabled",
