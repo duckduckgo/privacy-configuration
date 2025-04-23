@@ -1,5 +1,7 @@
 const tldts = require('tldts');
 const crypto = require('crypto');
+const fs = require('fs');
+const { LISTS_DIR, UNPROTECTED_LIST_NAME } = require('./constants');
 
 function getAllowlistedRule(rules, rulePath) {
     return rules.find(function (x) {
@@ -54,6 +56,24 @@ function addPathRule(rules, rule) {
             })
             .join('; ');
     }
+}
+
+function getBaseFeatureConfigs() {
+    const features = {};
+    // Grab all exception lists
+    const jsonListNames = fs.readdirSync(LISTS_DIR).filter((listName) => {
+        return listName !== UNPROTECTED_LIST_NAME && listName !== '_template.json';
+    });
+    for (const jsonList of jsonListNames) {
+        const listData = JSON.parse(fs.readFileSync(`${LISTS_DIR}/${jsonList}`));
+        const configKey = jsonList.replace(/[.]json$/, '').replace(/-([a-z0-9])/g, function (g) {
+            return g[1].toUpperCase();
+        });
+
+        delete listData._meta;
+        features[configKey] = listData;
+    }
+    return features;
 }
 
 function mergeAllowlistedTrackers(t1, t2) {
@@ -189,4 +209,5 @@ module.exports = {
     mergeAllowlistedTrackers,
     addHashToFeatures,
     stripReasons,
+    getBaseFeatureConfigs,
 };
