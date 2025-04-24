@@ -136,6 +136,42 @@
                         }
                     }
                 ]
+            },
+            {
+                "condition": {
+                    "domain": "redtube.com"
+                },
+                "patchSettings": [
+                    {
+                        "op": "add",
+                        "path": "/scriptlets/-",
+                        "value": {
+                            "name": "preventWindowOpen"
+                        }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/scriptlets/-",
+                        "value": {
+                            "name": "abortCurrentInlineScript",
+                            "attrs": {
+                                "property": "Object.defineProperty",
+                                "search": "trafficjunky"
+                            }
+                        }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/scriptlets/-",
+                        "value": {
+                            "name": "setConstant",
+                            "attrs": {
+                                "property": "page_params.holiday_promo",
+                                "value": true
+                            }
+                        }
+                    }
+                ]
             }
         ]
     }
