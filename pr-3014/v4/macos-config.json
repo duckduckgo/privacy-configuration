@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1745496152983,
+    "version": 1745497750864,
     "features": {
         "adAttributionReporting": {
             "state": "disabled",
@@ -7185,10 +7185,50 @@
                                 }
                             }
                         ]
+                    },
+                    {
+                        "condition": {
+                            "domain": "spankbang.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "setConstant",
+                                    "attrs": {
+                                        "property": "BJSShowUnder",
+                                        "value": {}
+                                    }
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "setConstant",
+                                    "attrs": {
+                                        "property": "BJSShowUnder.bindTo",
+                                        "value": "noopFunc"
+                                    }
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "setConstant",
+                                    "attrs": {
+                                        "property": "BJSShowUnder.add",
+                                        "value": "noopFunc"
+                                    }
+                                }
+                            }
+                        ]
                     }
                 ]
             },
-            "hash": "52a9cf43a8c08f6736b5296bb7e54655"
+            "hash": "13d7405cb30a6d279498220fa12847c8"
         },
         "sendFullPackageInstallSource": {
             "state": "enabled",
