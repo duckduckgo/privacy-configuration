@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1745493335394,
+    "version": 1745496152983,
     "features": {
         "adAttributionReporting": {
             "state": "disabled",
@@ -1500,6 +1500,9 @@
                     "domain": "medscape.com"
                 },
                 {
+                    "domain": "telekom.de"
+                },
+                {
                     "domain": "marvel.com"
                 },
                 {
@@ -1690,7 +1693,7 @@
                     }
                 }
             },
-            "hash": "cba06996ac9442759ea8c9ab9deef34a"
+            "hash": "35fbdb2eea8b1adf3a44dde0e29d0930"
         },
         "autofillBreakageReporter": {
             "state": "enabled",
@@ -8499,10 +8502,51 @@
                                 }
                             }
                         ]
+                    },
+                    {
+                        "condition": [
+                            {
+                                "domain": "redtube.com"
+                            },
+                            {
+                                "domain": "redtube.net"
+                            }
+                        ],
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "preventWindowOpen"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "abortCurrentInlineScript",
+                                    "attrs": {
+                                        "property": "Object.defineProperty",
+                                        "search": "trafficjunky"
+                                    }
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "setConstant",
+                                    "attrs": {
+                                        "property": "page_params.holiday_promo",
+                                        "value": true
+                                    }
+                                }
+                            }
+                        ]
                     }
                 ]
             },
-            "hash": "eee0488146f62692799edce36ae845de"
+            "hash": "52a9cf43a8c08f6736b5296bb7e54655"
         },
         "sendFullPackageInstallSource": {
             "state": "enabled",

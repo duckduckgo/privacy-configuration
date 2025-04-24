@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1745493335394,
+    "version": 1745496152983,
     "features": {
         "adAttributionReporting": {
             "state": "disabled",
@@ -569,6 +569,9 @@
                     "domain": "medscape.com"
                 },
                 {
+                    "domain": "telekom.de"
+                },
+                {
                     "domain": "marvel.com"
                 },
                 {
@@ -747,7 +750,7 @@
                 ]
             },
             "state": "disabled",
-            "hash": "ab9f3e7d3e7a68c109a41f2f9990e674"
+            "hash": "2b9fcc58690bd4d63384294acfdac032"
         },
         "autofillBreakageReporter": {
             "state": "disabled",
@@ -7027,10 +7030,51 @@
                                 }
                             }
                         ]
+                    },
+                    {
+                        "condition": [
+                            {
+                                "domain": "redtube.com"
+                            },
+                            {
+                                "domain": "redtube.net"
+                            }
+                        ],
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "preventWindowOpen"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "abortCurrentInlineScript",
+                                    "attrs": {
+                                        "property": "Object.defineProperty",
+                                        "search": "trafficjunky"
+                                    }
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "setConstant",
+                                    "attrs": {
+                                        "property": "page_params.holiday_promo",
+                                        "value": true
+                                    }
+                                }
+                            }
+                        ]
                     }
                 ]
             },
-            "hash": "eee0488146f62692799edce36ae845de"
+            "hash": "52a9cf43a8c08f6736b5296bb7e54655"
         },
         "sendFullPackageInstallSource": {
             "state": "enabled",
