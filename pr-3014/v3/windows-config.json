@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1745449747678,
+    "version": 1745493335394,
     "features": {
         "adAttributionReporting": {
             "state": "disabled",
@@ -744,7 +744,8 @@
             ],
             "settings": {
                 "disabledCMPs": [
-                    "healthline-media"
+                    "healthline-media",
+                    "paypal-us"
                 ],
                 "filterlistExceptions": [
                     "google.ae",
@@ -898,7 +899,7 @@
                     "state": "disabled"
                 }
             },
-            "hash": "b0bd43191c8e871d2c3f37adb0c03320"
+            "hash": "ea1792b179f863871c2c99c6995ed11a"
         },
         "autofillBreakageReporter": {
             "state": "disabled",
@@ -7352,10 +7353,28 @@
                                 }
                             }
                         ]
+                    },
+                    {
+                        "condition": {
+                            "domain": "pornhub.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "setCookie",
+                                    "attrs": {
+                                        "name": "views",
+                                        "value": "1"
+                                    }
+                                }
+                            }
+                        ]
                     }
                 ]
             },
-            "hash": "f23275446f3c650c193e357d602cc2df"
+            "hash": "eee0488146f62692799edce36ae845de"
         },
         "sendFullPackageInstallSource": {
             "state": "enabled",
