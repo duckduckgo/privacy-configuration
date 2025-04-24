@@ -177,6 +177,46 @@
                         }
                     }
                 ]
+            },
+            {
+                "condition": {
+                    "domain": "spankbang.com"
+                },
+                "patchSettings": [
+                    {
+                        "op": "add",
+                        "path": "/scriptlets/-",
+                        "value": {
+                            "name": "setConstant",
+                            "attrs": {
+                                "property": "BJSShowUnder",
+                                "value": {}
+                            }
+                        }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/scriptlets/-",
+                        "value": {
+                            "name": "setConstant",
+                            "attrs": {
+                                "property": "BJSShowUnder.bindTo",
+                                "value": "noopFunc"
+                            }
+                        }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/scriptlets/-",
+                        "value": {
+                            "name": "setConstant",
+                            "attrs": {
+                                "property": "BJSShowUnder.add",
+                                "value": "noopFunc"
+                            }
+                        }
+                    }
+                ]
             }
         ]
     }
