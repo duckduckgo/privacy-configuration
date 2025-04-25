@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1745415048708,
+    "version": 1745600149932,
     "features": {
         "adAttributionReporting": {
             "state": "disabled",
@@ -588,6 +588,9 @@
                     "domain": "medscape.com"
                 },
                 {
+                    "domain": "telekom.de"
+                },
+                {
                     "domain": "marvel.com"
                 },
                 {
@@ -602,7 +605,8 @@
             ],
             "settings": {
                 "disabledCMPs": [
-                    "healthline-media"
+                    "healthline-media",
+                    "paypal-us"
                 ],
                 "filterlistExceptions": [
                     "google.ae",
@@ -756,7 +760,7 @@
                     "state": "disabled"
                 }
             },
-            "hash": "edef33284d69b6644fa198b29bd05c6a"
+            "hash": "5d29066fccfdda378ef237b4b1a85729"
         },
         "autofillBreakageReporter": {
             "state": "disabled",
@@ -808,6 +812,25 @@
                         "domains": [
                             {
                                 "domain": [
+                                    "areaclientes.orange.es"
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "",
+                                        "op": "add",
+                                        "value": {
+                                            "formTypeSettings": [
+                                                {
+                                                    "selector": "form",
+                                                    "type": "login"
+                                                }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": [
                                     "estore.archives.gov",
                                     "localhost"
                                 ],
@@ -851,7 +874,7 @@
                     }
                 }
             },
-            "hash": "5dd92eeb5f1a5cfc6757d7edc7eb307f"
+            "hash": "d718b477c93269fa1eca67a2001cf1d6"
         },
         "backgroundAgentPixelTest": {
             "state": "disabled",
@@ -1665,12 +1688,16 @@
             "hash": "6822c74819d58d2ea1c67b8044828e49"
         },
         "clientBrandHint": {
-            "exceptions": [],
+            "exceptions": [
+                {
+                    "domain": "ee.co.uk"
+                }
+            ],
             "settings": {
                 "domains": []
             },
             "state": "enabled",
-            "hash": "79fe452b2a1f479f2d85dd51ba6161bf"
+            "hash": "1c48442d151debf6a5b7929e41d6edc6"
         },
         "contentBlocking": {
             "state": "enabled",
@@ -2276,6 +2303,10 @@
                     },
                     {
                         "selector": ".ad-current",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".ad-frame",
                         "type": "hide-empty"
                     },
                     {
@@ -5812,7 +5843,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "86d8a4761c419eba0a9f180fd977d0cf"
+            "hash": "86c95cf83c3e8a62102c8f3a0bf45f0a"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -6818,6 +6849,11 @@
             },
             "exceptions": [],
             "hash": "c0684a6bad7c197b474853fbbc57392c"
+        },
+        "tabCrashRecovery": {
+            "state": "disabled",
+            "exceptions": [],
+            "hash": "c292bb627849854515cebbded288ef5a"
         },
         "tabManager": {
             "exceptions": [],
@@ -8006,6 +8042,7 @@
                                 "rule": "pubads.g.doubleclick.net/gampad/ads",
                                 "domains": [
                                     "crunchyroll.com",
+                                    "iheart.com",
                                     "nhl.com",
                                     "pch.com",
                                     "rocketnews24.com",
@@ -8936,7 +8973,7 @@
                             {
                                 "rule": "hb.improvedigital.com/pbw/prebid/prebid-idhb-v8.51a.min.js",
                                 "domains": [
-                                    "fun.chicagotribune.com"
+                                    "chicagotribune.com"
                                 ]
                             }
                         ]
@@ -10765,7 +10802,7 @@
                     "domain": "flexmls.com"
                 }
             ],
-            "hash": "66947d91a38c9fef459b634fd1b8b5f4"
+            "hash": "259c2bc891390c1f37dff8e06ccfe77e"
         },
         "trackingCookies1p": {
             "settings": {

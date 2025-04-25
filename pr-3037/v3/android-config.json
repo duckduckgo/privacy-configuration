@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1745415048708,
+    "version": 1745600149932,
     "features": {
         "adAttributionReporting": {
             "state": "disabled",
@@ -96,10 +96,11 @@
                     "!chat",
                     "!duckai"
                 ],
-                "aiChatBangRegex": "^(?!({bangs})$)(?=.*({bangs})(?=$|\\s)).+$"
+                "aiChatBangRegex": "^(?!({bangs})$)(?=.*({bangs})(?=$|\\s)).+$",
+                "addressBarEntryPoint": true
             },
             "minSupportedVersion": 52250000,
-            "hash": "361dfa3b6747d35a93608001cc2bfaf6"
+            "hash": "285731b5d998ec0cdd5389fb36b78a1a"
         },
         "ampLinks": {
             "exceptions": [
@@ -313,9 +314,17 @@
                 },
                 "httpError5xxPixel": {
                     "state": "enabled"
+                },
+                "omnibarAnimation": {
+                    "state": "enabled",
+                    "settings": {
+                        "changeBoundsDuration": 400,
+                        "fadeDuration": 200,
+                        "tension": 1
+                    }
                 }
             },
-            "hash": "a64c7f99ca6154f45e16d819ba06a4c3"
+            "hash": "2e4500a7c88c888e7fbdd308982f33bd"
         },
         "androidNewStateKillSwitch": {
             "exceptions": [],
@@ -1639,6 +1648,10 @@
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3036"
                 },
                 {
+                    "domain": "telekom.de",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3039"
+                },
+                {
                     "domain": "marvel.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1194"
                 },
@@ -1669,7 +1682,8 @@
             ],
             "settings": {
                 "disabledCMPs": [
-                    "healthline-media"
+                    "healthline-media",
+                    "paypal-us"
                 ],
                 "filterlistExceptions": [
                     "google.ae",
@@ -1835,7 +1849,7 @@
                     }
                 }
             },
-            "hash": "465588f9ae9624bf1951201eaf660ba9"
+            "hash": "0555fbf7d25984e6890c309fed2b45db"
         },
         "autofillBreakageReporter": {
             "state": "enabled",
@@ -1959,6 +1973,25 @@
                         "domains": [
                             {
                                 "domain": [
+                                    "areaclientes.orange.es"
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "",
+                                        "op": "add",
+                                        "value": {
+                                            "formTypeSettings": [
+                                                {
+                                                    "selector": "form",
+                                                    "type": "login"
+                                                }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": [
                                     "estore.archives.gov",
                                     "localhost"
                                 ],
@@ -2057,7 +2090,7 @@
                     }
                 }
             },
-            "hash": "fffea0e96fbb8c76f2a26aecd7553a63"
+            "hash": "9de25aaacc240357f11894f9cf986ebc"
         },
         "backgroundAgentPixelTest": {
             "state": "disabled",
@@ -3811,6 +3844,10 @@
                     },
                     {
                         "selector": ".ad-current",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".ad-frame",
                         "type": "hide-empty"
                     },
                     {
@@ -7347,7 +7384,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "a821ca439c4c2a0703f953790c34ddeb"
+            "hash": "5327518fb9d921fea788677a367f9af0"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -9210,6 +9247,11 @@
             "minSupportedVersion": 51850000,
             "hash": "7e9ab46c5320de3223f1a7eb17684c1b"
         },
+        "tabCrashRecovery": {
+            "state": "disabled",
+            "exceptions": [],
+            "hash": "c292bb627849854515cebbded288ef5a"
+        },
         "tabManager": {
             "exceptions": [],
             "state": "enabled",
@@ -10532,12 +10574,13 @@
                                 "rule": "pubads.g.doubleclick.net/gampad/ads",
                                 "domains": [
                                     "crunchyroll.com",
+                                    "iheart.com",
                                     "nhl.com",
                                     "pch.com",
                                     "rocketnews24.com",
                                     "viki.com"
                                 ],
-                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1185,rocketnews24.com - https://github.com/duckduckgo/privacy-configuration/issues/846,crunchyroll.com - https://github.com/duckduckgo/privacy-configuration/issues/1140,pch.com - https://github.com/duckduckgo/privacy-configuration/pull/2793"
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1185,rocketnews24.com - https://github.com/duckduckgo/privacy-configuration/issues/846,crunchyroll.com - https://github.com/duckduckgo/privacy-configuration/issues/1140,pch.com - https://github.com/duckduckgo/privacy-configuration/pull/2793,iheart.com - https://github.com/duckduckgo/privacy-configuration/pull/3040"
                             },
                             {
                                 "rule": "pubads.g.doubleclick.net/ssai/event/",
@@ -11550,7 +11593,7 @@
                             {
                                 "rule": "hb.improvedigital.com/pbw/prebid/prebid-idhb-v8.51a.min.js",
                                 "domains": [
-                                    "fun.chicagotribune.com"
+                                    "chicagotribune.com"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3023"
                             }
@@ -13586,7 +13629,7 @@
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2228"
                 }
             ],
-            "hash": "b6bee93240e3cef47ad7efb18ced7a4d"
+            "hash": "580566991f4b72bf53770a7f5f576e9b"
         },
         "trackingCookies1p": {
             "settings": {

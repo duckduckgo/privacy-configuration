@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1745415048708,
+    "version": 1745600149932,
     "features": {
         "adAttributionReporting": {
             "state": "disabled",
@@ -720,6 +720,10 @@
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3036"
                 },
                 {
+                    "domain": "telekom.de",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3039"
+                },
+                {
                     "domain": "marvel.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1194"
                 },
@@ -738,7 +742,8 @@
             ],
             "settings": {
                 "disabledCMPs": [
-                    "healthline-media"
+                    "healthline-media",
+                    "paypal-us"
                 ],
                 "filterlistExceptions": [
                     "google.ae",
@@ -905,7 +910,7 @@
                     }
                 }
             },
-            "hash": "658802021d6dc1c2d5b1fef71a1543a4"
+            "hash": "98618c6a0ff9895cf290b9134f289102"
         },
         "autofillBreakageReporter": {
             "state": "enabled",
@@ -964,6 +969,25 @@
                     "state": "enabled",
                     "settings": {
                         "domains": [
+                            {
+                                "domain": [
+                                    "areaclientes.orange.es"
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "",
+                                        "op": "add",
+                                        "value": {
+                                            "formTypeSettings": [
+                                                {
+                                                    "selector": "form",
+                                                    "type": "login"
+                                                }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            },
                             {
                                 "domain": [
                                     "estore.archives.gov",
@@ -1045,7 +1069,7 @@
                     "state": "enabled"
                 }
             },
-            "hash": "795f2a877055080feae3f5b82994fc63"
+            "hash": "4c9f1c355be598e73e94e464727a75a7"
         },
         "backgroundAgentPixelTest": {
             "state": "enabled",
@@ -2854,6 +2878,10 @@
                     },
                     {
                         "selector": ".ad-current",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".ad-frame",
                         "type": "hide-empty"
                     },
                     {
@@ -6390,7 +6418,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "a821ca439c4c2a0703f953790c34ddeb"
+            "hash": "5327518fb9d921fea788677a367f9af0"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -7712,6 +7740,11 @@
             "exceptions": [],
             "minSupportedVersion": "7.104.0",
             "hash": "ef41f9656524eafe4b723341eb1fa7e7"
+        },
+        "tabCrashRecovery": {
+            "state": "disabled",
+            "exceptions": [],
+            "hash": "c292bb627849854515cebbded288ef5a"
         },
         "tabManager": {
             "exceptions": [],
@@ -9053,12 +9086,13 @@
                                 "rule": "pubads.g.doubleclick.net/gampad/ads",
                                 "domains": [
                                     "crunchyroll.com",
+                                    "iheart.com",
                                     "nhl.com",
                                     "pch.com",
                                     "rocketnews24.com",
                                     "viki.com"
                                 ],
-                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1185,rocketnews24.com - https://github.com/duckduckgo/privacy-configuration/issues/846,crunchyroll.com - https://github.com/duckduckgo/privacy-configuration/issues/1140,pch.com - https://github.com/duckduckgo/privacy-configuration/pull/2793"
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1185,rocketnews24.com - https://github.com/duckduckgo/privacy-configuration/issues/846,crunchyroll.com - https://github.com/duckduckgo/privacy-configuration/issues/1140,pch.com - https://github.com/duckduckgo/privacy-configuration/pull/2793,iheart.com - https://github.com/duckduckgo/privacy-configuration/pull/3040"
                             },
                             {
                                 "rule": "pubads.g.doubleclick.net/ssai/event/",
@@ -10075,7 +10109,7 @@
                             {
                                 "rule": "hb.improvedigital.com/pbw/prebid/prebid-idhb-v8.51a.min.js",
                                 "domains": [
-                                    "fun.chicagotribune.com"
+                                    "chicagotribune.com"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3023"
                             }
@@ -12125,7 +12159,7 @@
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2228"
                 }
             ],
-            "hash": "62e306e1bc8c2a394e683cc1ac35e018"
+            "hash": "d5b8e04ef7a7dd490fc3d5dc3b420d0f"
         },
         "trackingCookies1p": {
             "settings": {

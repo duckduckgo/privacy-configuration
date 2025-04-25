@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1745415048708,
+    "version": 1745600149932,
     "features": {
         "adAttributionReporting": {
             "state": "disabled",
@@ -712,6 +712,10 @@
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3036"
                 },
                 {
+                    "domain": "telekom.de",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3039"
+                },
+                {
                     "domain": "marvel.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1194"
                 },
@@ -750,7 +754,8 @@
             ],
             "settings": {
                 "disabledCMPs": [
-                    "healthline-media"
+                    "healthline-media",
+                    "paypal-us"
                 ],
                 "filterlistExceptions": [
                     "google.ae",
@@ -898,7 +903,7 @@
                 ]
             },
             "state": "disabled",
-            "hash": "f220b195ed0a484e3ba6941f70e96e22"
+            "hash": "cc42228a2f1610be851e7879253891ca"
         },
         "autofillBreakageReporter": {
             "state": "disabled",
@@ -2679,6 +2684,10 @@
                     },
                     {
                         "selector": ".ad-current",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".ad-frame",
                         "type": "hide-empty"
                     },
                     {
@@ -6215,7 +6224,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "f1773a51ef367b854308d57ea7629b31"
+            "hash": "a42097b46fc6c737809944a88b438d2b"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -7683,6 +7692,11 @@
             "exceptions": [],
             "hash": "9251a073cc34d87ef70ecba57a4af651"
         },
+        "tabCrashRecovery": {
+            "state": "disabled",
+            "exceptions": [],
+            "hash": "c292bb627849854515cebbded288ef5a"
+        },
         "tabManager": {
             "exceptions": [],
             "state": "disabled",
@@ -9007,12 +9021,13 @@
                                 "rule": "pubads.g.doubleclick.net/gampad/ads",
                                 "domains": [
                                     "crunchyroll.com",
+                                    "iheart.com",
                                     "nhl.com",
                                     "pch.com",
                                     "rocketnews24.com",
                                     "viki.com"
                                 ],
-                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1185,rocketnews24.com - https://github.com/duckduckgo/privacy-configuration/issues/846,crunchyroll.com - https://github.com/duckduckgo/privacy-configuration/issues/1140,pch.com - https://github.com/duckduckgo/privacy-configuration/pull/2793"
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1185,rocketnews24.com - https://github.com/duckduckgo/privacy-configuration/issues/846,crunchyroll.com - https://github.com/duckduckgo/privacy-configuration/issues/1140,pch.com - https://github.com/duckduckgo/privacy-configuration/pull/2793,iheart.com - https://github.com/duckduckgo/privacy-configuration/pull/3040"
                             },
                             {
                                 "rule": "pubads.g.doubleclick.net/ssai/event/",
@@ -10039,7 +10054,7 @@
                             {
                                 "rule": "hb.improvedigital.com/pbw/prebid/prebid-idhb-v8.51a.min.js",
                                 "domains": [
-                                    "fun.chicagotribune.com"
+                                    "chicagotribune.com"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3023"
                             }
@@ -12088,7 +12103,7 @@
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/794"
                 }
             ],
-            "hash": "1feded8e9f4391147ae68939fd51e322"
+            "hash": "e1ae2db9c4da518cb93227e1efd31961"
         },
         "trackingCookies1p": {
             "settings": {

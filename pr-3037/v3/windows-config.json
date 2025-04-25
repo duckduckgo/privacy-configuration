@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1745415048708,
+    "version": 1745600149932,
     "features": {
         "adAttributionReporting": {
             "state": "disabled",
@@ -726,6 +726,10 @@
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3036"
                 },
                 {
+                    "domain": "telekom.de",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3039"
+                },
+                {
                     "domain": "marvel.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1194"
                 },
@@ -744,7 +748,8 @@
             ],
             "settings": {
                 "disabledCMPs": [
-                    "healthline-media"
+                    "healthline-media",
+                    "paypal-us"
                 ],
                 "filterlistExceptions": [
                     "google.ae",
@@ -898,7 +903,7 @@
                     "state": "disabled"
                 }
             },
-            "hash": "b0bd43191c8e871d2c3f37adb0c03320"
+            "hash": "0fd845d5e387ca24ec962c2f65fc835a"
         },
         "autofillBreakageReporter": {
             "state": "disabled",
@@ -951,6 +956,25 @@
                         "domains": [
                             {
                                 "domain": [
+                                    "areaclientes.orange.es"
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "",
+                                        "op": "add",
+                                        "value": {
+                                            "formTypeSettings": [
+                                                {
+                                                    "selector": "form",
+                                                    "type": "login"
+                                                }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": [
                                     "estore.archives.gov",
                                     "localhost"
                                 ],
@@ -994,7 +1018,7 @@
                     }
                 }
             },
-            "hash": "36f016068c6bdae0fa24d539a610cafe"
+            "hash": "9f05bb8cf8875862c0b3b762bd72160b"
         },
         "backgroundAgentPixelTest": {
             "state": "disabled",
@@ -2042,12 +2066,17 @@
             "hash": "0b285cefe9f933daf9239a7dae658825"
         },
         "clientBrandHint": {
-            "exceptions": [],
+            "exceptions": [
+                {
+                    "domain": "ee.co.uk",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3041"
+                }
+            ],
             "settings": {
                 "domains": []
             },
             "state": "enabled",
-            "hash": "79fe452b2a1f479f2d85dd51ba6161bf"
+            "hash": "c53dff0b6b0201e8da79b8827f1577ac"
         },
         "contentBlocking": {
             "state": "enabled",
@@ -2680,6 +2709,10 @@
                     },
                     {
                         "selector": ".ad-current",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".ad-frame",
                         "type": "hide-empty"
                     },
                     {
@@ -6216,7 +6249,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "a821ca439c4c2a0703f953790c34ddeb"
+            "hash": "5327518fb9d921fea788677a367f9af0"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -7373,6 +7406,11 @@
             },
             "exceptions": [],
             "hash": "c0684a6bad7c197b474853fbbc57392c"
+        },
+        "tabCrashRecovery": {
+            "state": "disabled",
+            "exceptions": [],
+            "hash": "c292bb627849854515cebbded288ef5a"
         },
         "tabManager": {
             "exceptions": [],
@@ -8680,12 +8718,13 @@
                                 "rule": "pubads.g.doubleclick.net/gampad/ads",
                                 "domains": [
                                     "crunchyroll.com",
+                                    "iheart.com",
                                     "nhl.com",
                                     "pch.com",
                                     "rocketnews24.com",
                                     "viki.com"
                                 ],
-                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1185,rocketnews24.com - https://github.com/duckduckgo/privacy-configuration/issues/846,crunchyroll.com - https://github.com/duckduckgo/privacy-configuration/issues/1140,pch.com - https://github.com/duckduckgo/privacy-configuration/pull/2793"
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1185,rocketnews24.com - https://github.com/duckduckgo/privacy-configuration/issues/846,crunchyroll.com - https://github.com/duckduckgo/privacy-configuration/issues/1140,pch.com - https://github.com/duckduckgo/privacy-configuration/pull/2793,iheart.com - https://github.com/duckduckgo/privacy-configuration/pull/3040"
                             },
                             {
                                 "rule": "pubads.g.doubleclick.net/ssai/event/",
@@ -9698,7 +9737,7 @@
                             {
                                 "rule": "hb.improvedigital.com/pbw/prebid/prebid-idhb-v8.51a.min.js",
                                 "domains": [
-                                    "fun.chicagotribune.com"
+                                    "chicagotribune.com"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3023"
                             }
@@ -11742,7 +11781,7 @@
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2228"
                 }
             ],
-            "hash": "d867a30bf2f66c229118083230fddaeb"
+            "hash": "ee98df51a2307f2d83216f6e0cb8ed3e"
         },
         "trackingCookies1p": {
             "settings": {

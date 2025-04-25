@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1745415048708,
+    "version": 1745600149932,
     "features": {
         "adAttributionReporting": {
             "state": "disabled",
@@ -582,6 +582,9 @@
                     "domain": "medscape.com"
                 },
                 {
+                    "domain": "telekom.de"
+                },
+                {
                     "domain": "marvel.com"
                 },
                 {
@@ -596,7 +599,8 @@
             ],
             "settings": {
                 "disabledCMPs": [
-                    "healthline-media"
+                    "healthline-media",
+                    "paypal-us"
                 ],
                 "filterlistExceptions": [
                     "google.ae",
@@ -763,7 +767,7 @@
                     }
                 }
             },
-            "hash": "0fdf7f7aaccf7121c01b9351b59791d5"
+            "hash": "ced106cce895683250b83bfcf8744067"
         },
         "autofillBreakageReporter": {
             "state": "enabled",
@@ -821,6 +825,25 @@
                     "state": "enabled",
                     "settings": {
                         "domains": [
+                            {
+                                "domain": [
+                                    "areaclientes.orange.es"
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "",
+                                        "op": "add",
+                                        "value": {
+                                            "formTypeSettings": [
+                                                {
+                                                    "selector": "form",
+                                                    "type": "login"
+                                                }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            },
                             {
                                 "domain": [
                                     "estore.archives.gov",
@@ -902,7 +925,7 @@
                     "state": "enabled"
                 }
             },
-            "hash": "e3999c805647a9855b50e8116d53d768"
+            "hash": "1229a25b5d86c87319be3c44ee6929a6"
         },
         "backgroundAgentPixelTest": {
             "state": "enabled",
@@ -2447,6 +2470,10 @@
                     },
                     {
                         "selector": ".ad-current",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".ad-frame",
                         "type": "hide-empty"
                     },
                     {
@@ -5983,7 +6010,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "86d8a4761c419eba0a9f180fd977d0cf"
+            "hash": "86c95cf83c3e8a62102c8f3a0bf45f0a"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -7155,6 +7182,11 @@
             "exceptions": [],
             "minSupportedVersion": "7.104.0",
             "hash": "ef41f9656524eafe4b723341eb1fa7e7"
+        },
+        "tabCrashRecovery": {
+            "state": "disabled",
+            "exceptions": [],
+            "hash": "c292bb627849854515cebbded288ef5a"
         },
         "tabManager": {
             "exceptions": [],
@@ -8374,6 +8406,7 @@
                                 "rule": "pubads.g.doubleclick.net/gampad/ads",
                                 "domains": [
                                     "crunchyroll.com",
+                                    "iheart.com",
                                     "nhl.com",
                                     "pch.com",
                                     "rocketnews24.com",
@@ -9306,7 +9339,7 @@
                             {
                                 "rule": "hb.improvedigital.com/pbw/prebid/prebid-idhb-v8.51a.min.js",
                                 "domains": [
-                                    "fun.chicagotribune.com"
+                                    "chicagotribune.com"
                                 ]
                             }
                         ]
@@ -11141,7 +11174,7 @@
                     "domain": "flexmls.com"
                 }
             ],
-            "hash": "48344eeb84af21485de6b710e01b7d84"
+            "hash": "ae26e764148dc9e5e81e282117db5cde"
         },
         "trackingCookies1p": {
             "settings": {
