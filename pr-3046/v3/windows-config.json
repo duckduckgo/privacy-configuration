@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1745517902185,
+    "version": 1745590894264,
     "features": {
         "adAttributionReporting": {
             "state": "disabled",
@@ -1999,12 +1999,17 @@
             "hash": "0b285cefe9f933daf9239a7dae658825"
         },
         "clientBrandHint": {
-            "exceptions": [],
+            "exceptions": [
+                {
+                    "domain": "ee.co.uk",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3041"
+                }
+            ],
             "settings": {
                 "domains": []
             },
             "state": "enabled",
-            "hash": "79fe452b2a1f479f2d85dd51ba6161bf"
+            "hash": "c53dff0b6b0201e8da79b8827f1577ac"
         },
         "contentBlocking": {
             "state": "enabled",
@@ -2637,6 +2642,10 @@
                     },
                     {
                         "selector": ".ad-current",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".ad-frame",
                         "type": "hide-empty"
                     },
                     {
@@ -6173,7 +6182,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "a821ca439c4c2a0703f953790c34ddeb"
+            "hash": "5327518fb9d921fea788677a367f9af0"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -7032,16 +7041,6 @@
             "state": "disabled",
             "hash": "874aa7b2ff6c2b6ba376a01dfa1ce9d0"
         },
-        "omnibarAnimation": {
-            "exceptions": [],
-            "settings": {
-                "changeBoundsDuration": 400,
-                "fadeDuration": 200,
-                "tension": 1
-            },
-            "state": "disabled",
-            "hash": "1edf1aa98651b5e2686c377407c55864"
-        },
         "performanceMetrics": {
             "state": "disabled",
             "exceptions": [
@@ -7340,6 +7339,11 @@
             },
             "exceptions": [],
             "hash": "c0684a6bad7c197b474853fbbc57392c"
+        },
+        "tabCrashRecovery": {
+            "state": "disabled",
+            "exceptions": [],
+            "hash": "c292bb627849854515cebbded288ef5a"
         },
         "tabManager": {
             "exceptions": [],

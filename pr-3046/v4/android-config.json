@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1745517902185,
+    "version": 1745590894264,
     "features": {
         "adAttributionReporting": {
             "state": "disabled",
@@ -305,9 +305,17 @@
                 },
                 "httpError5xxPixel": {
                     "state": "enabled"
+                },
+                "omnibarAnimation": {
+                    "state": "enabled",
+                    "settings": {
+                        "changeBoundsDuration": 400,
+                        "fadeDuration": 200,
+                        "tension": 1
+                    }
                 }
             },
-            "hash": "a64c7f99ca6154f45e16d819ba06a4c3"
+            "hash": "2e4500a7c88c888e7fbdd308982f33bd"
         },
         "androidNewStateKillSwitch": {
             "exceptions": [],
@@ -3379,6 +3387,10 @@
                     },
                     {
                         "selector": ".ad-current",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".ad-frame",
                         "type": "hide-empty"
                     },
                     {
@@ -6915,7 +6927,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "86d8a4761c419eba0a9f180fd977d0cf"
+            "hash": "86c95cf83c3e8a62102c8f3a0bf45f0a"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -8083,16 +8095,6 @@
             "state": "disabled",
             "hash": "8b21215291e766b96894e9359c8fd651"
         },
-        "omnibarAnimation": {
-            "exceptions": [],
-            "settings": {
-                "changeBoundsDuration": 400,
-                "fadeDuration": 200,
-                "tension": 1
-            },
-            "state": "enabled",
-            "hash": "8d22a2279cf0dbd9931b7925b3f4e895"
-        },
         "performanceMetrics": {
             "state": "disabled",
             "exceptions": [
@@ -8533,6 +8535,11 @@
             "exceptions": [],
             "minSupportedVersion": 51850000,
             "hash": "7e9ab46c5320de3223f1a7eb17684c1b"
+        },
+        "tabCrashRecovery": {
+            "state": "disabled",
+            "exceptions": [],
+            "hash": "c292bb627849854515cebbded288ef5a"
         },
         "tabManager": {
             "exceptions": [],
