@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1746112933740,
+    "version": 1746204324580,
     "features": {
         "adAttributionReporting": {
             "state": "disabled",
@@ -1841,10 +1841,10 @@
             "hash": "c292bb627849854515cebbded288ef5a"
         },
         "downloadManager": {
-            "state": "enabled",
+            "state": "disabled",
             "exceptions": [],
-            "minSupportedVersion": "0.110.5",
-            "hash": "4215355555818a36d7d1c03428afac8d"
+            "minSupportedVersion": "0.111.0",
+            "hash": "dfa1f0a1ceb7fdc567f3b8555e695316"
         },
         "duckPlayer": {
             "exceptions": [],
@@ -3435,24 +3435,8 @@
                                 "type": "hide-empty"
                             },
                             {
-                                "selector": ".global-nav-view, .global-nav-view .global-nav-content",
-                                "type": "modify-style",
-                                "values": [
-                                    {
-                                        "property": "margin-top",
-                                        "value": "0px"
-                                    }
-                                ]
-                            },
-                            {
-                                "selector": ".search-subnav-slender-view, .search-slender-advanced-panel-view",
-                                "type": "modify-style",
-                                "values": [
-                                    {
-                                        "property": "top",
-                                        "value": "0px"
-                                    }
-                                ]
+                                "selector": "[class*='-ad-container']",
+                                "type": "override"
                             }
                         ]
                     },
@@ -4944,6 +4928,10 @@
                             {
                                 "selector": ".ad-area",
                                 "type": "hide-empty"
+                            },
+                            {
+                                "selector": "[data-qa='AdSlot-Container']",
+                                "type": "closest-empty"
                             }
                         ]
                     },
@@ -5783,7 +5771,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "86c95cf83c3e8a62102c8f3a0bf45f0a"
+            "hash": "149ede95a230337593852529edb79e43"
         },
         "exceptionHandler": {
             "exceptions": [

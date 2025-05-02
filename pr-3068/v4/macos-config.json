@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1746112933740,
+    "version": 1746204324580,
     "features": {
         "adAttributionReporting": {
             "state": "disabled",
@@ -1688,18 +1688,18 @@
                 }
             ],
             "features": {
-                "tdsNextExperimentBaseline": {
-                    "state": "disabled",
+                "tdsNextExperimentMay25": {
+                    "state": "enabled",
                     "rollout": {
                         "steps": [
                             {
-                                "percent": 50
+                                "percent": 25
                             }
                         ]
                     },
                     "settings": {
-                        "controlUrl": "v6/temp/macos-tds.json",
-                        "treatmentUrl": "v6/temp/macos-tds-b.json"
+                        "controlUrl": "v6/temp/macos-tdsnextexperimentmay25-tds-control.json",
+                        "treatmentUrl": "v6/temp/macos-tdsnextexperimentmay25-tds-treatment.json"
                     },
                     "cohorts": [
                         {
@@ -1713,7 +1713,7 @@
                     ]
                 }
             },
-            "hash": "5fc4eb8ffcdc72d26ec601f7354ebcf6"
+            "hash": "78dcd014bfc6918c04eb7a53621b237b"
         },
         "contentScopeExperiments": {
             "state": "enabled",
@@ -3575,24 +3575,8 @@
                                 "type": "hide-empty"
                             },
                             {
-                                "selector": ".global-nav-view, .global-nav-view .global-nav-content",
-                                "type": "modify-style",
-                                "values": [
-                                    {
-                                        "property": "margin-top",
-                                        "value": "0px"
-                                    }
-                                ]
-                            },
-                            {
-                                "selector": ".search-subnav-slender-view, .search-slender-advanced-panel-view",
-                                "type": "modify-style",
-                                "values": [
-                                    {
-                                        "property": "top",
-                                        "value": "0px"
-                                    }
-                                ]
+                                "selector": "[class*='-ad-container']",
+                                "type": "override"
                             }
                         ]
                     },
@@ -5084,6 +5068,10 @@
                             {
                                 "selector": ".ad-area",
                                 "type": "hide-empty"
+                            },
+                            {
+                                "selector": "[data-qa='AdSlot-Container']",
+                                "type": "closest-empty"
                             }
                         ]
                     },
@@ -5923,7 +5911,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "693682fb8295d98b311a3e00894cd8d1"
+            "hash": "ad6bcadd6f0b2a42e041d469540d9b19"
         },
         "exceptionHandler": {
             "exceptions": [

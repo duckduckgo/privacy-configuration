@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1746112933740,
+    "version": 1746204324580,
     "features": {
         "adAttributionReporting": {
             "state": "disabled",
@@ -74,12 +74,10 @@
             "state": "enabled",
             "exceptions": [],
             "settings": {
-                "origins": [
-                    "funnel_newtab_android_intlannouncement"
-                ]
+                "origins": []
             },
             "minSupportedVersion": 52100000,
-            "hash": "c85409875e14b3ca9aa344a9f831ef57"
+            "hash": "b1026749fc24d25416bd5d2b48fcb1db"
         },
         "addressBarTldNavOrSearch": {
             "state": "disabled",
@@ -1720,23 +1718,23 @@
         },
         "autofillService": {
             "exceptions": [],
-            "state": "enabled",
+            "state": "disabled",
             "minSupportedVersion": 52290000,
             "features": {
                 "canUpdateAppToDomainDataset": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": 52290000
                 },
                 "canMapAppToDomain": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": 52290000
                 },
                 "canAutofillInsideDDG": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": 52290000
                 }
             },
-            "hash": "9a5a2a9accb5bc95588840011ee7bb53"
+            "hash": "78d0a537012678fced71e39cab235429"
         },
         "autofillSurveys": {
             "state": "enabled",
@@ -1904,9 +1902,12 @@
                             ]
                         }
                     }
+                },
+                "createAsyncPreferences": {
+                    "state": "disabled"
                 }
             },
-            "hash": "eb99297c96f2460dd494f490fbe368bb"
+            "hash": "f1491ccf34542f170d3d8826f3041d83"
         },
         "backgroundAgentPixelTest": {
             "state": "disabled",
@@ -4585,24 +4586,8 @@
                                 "type": "hide-empty"
                             },
                             {
-                                "selector": ".global-nav-view, .global-nav-view .global-nav-content",
-                                "type": "modify-style",
-                                "values": [
-                                    {
-                                        "property": "margin-top",
-                                        "value": "0px"
-                                    }
-                                ]
-                            },
-                            {
-                                "selector": ".search-subnav-slender-view, .search-slender-advanced-panel-view",
-                                "type": "modify-style",
-                                "values": [
-                                    {
-                                        "property": "top",
-                                        "value": "0px"
-                                    }
-                                ]
+                                "selector": "[class*='-ad-container']",
+                                "type": "override"
                             }
                         ]
                     },
@@ -6094,6 +6079,10 @@
                             {
                                 "selector": ".ad-area",
                                 "type": "hide-empty"
+                            },
+                            {
+                                "selector": "[data-qa='AdSlot-Container']",
+                                "type": "closest-empty"
                             }
                         ]
                     },
@@ -6933,7 +6922,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "86c95cf83c3e8a62102c8f3a0bf45f0a"
+            "hash": "149ede95a230337593852529edb79e43"
         },
         "exceptionHandler": {
             "exceptions": [
