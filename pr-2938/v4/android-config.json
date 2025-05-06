@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1746522004551,
+    "version": 1746522167849,
     "features": {
         "adAttributionReporting": {
             "state": "disabled",
@@ -1516,6 +1516,15 @@
                     "domain": "homeoffice.gov.uk"
                 },
                 {
+                    "domain": "riga-airport.com"
+                },
+                {
+                    "domain": "istore.co.za"
+                },
+                {
+                    "domain": "visiter-cinque-terre.com"
+                },
+                {
                     "domain": "marvel.com"
                 },
                 {
@@ -1706,7 +1715,7 @@
                     }
                 }
             },
-            "hash": "3e7adac22f38785a829866681518d996"
+            "hash": "c8777341f80b40021735e4540229e72f"
         },
         "autofillBreakageReporter": {
             "state": "enabled",
@@ -1923,8 +1932,8 @@
             "state": "enabled",
             "exceptions": [],
             "features": {
-                "tdsNextExperimentMar25": {
-                    "state": "disabled",
+                "tdsNextExperimentMay25": {
+                    "state": "enabled",
                     "minSupportedVersion": 52250000,
                     "rollout": {
                         "steps": [
@@ -1934,22 +1943,22 @@
                         ]
                     },
                     "settings": {
-                        "controlUrl": "v5/temp/march25-tds-a.json",
-                        "treatmentUrl": "v5/temp/march25-tds-b.json"
+                        "controlUrl": "v5/temp/android-tdsnextexperimentmay25-tds-control.json",
+                        "treatmentUrl": "v5/temp/android-tdsnextexperimentmay25-tds-treatment.json"
                     },
                     "cohorts": [
                         {
                             "name": "control",
-                            "weight": 0
+                            "weight": 1
                         },
                         {
                             "name": "treatment",
-                            "weight": 0
+                            "weight": 1
                         }
                     ]
                 }
             },
-            "hash": "d0e70d4ef4acfbc098fecffa94ff12b7"
+            "hash": "bd75fc3c416ed508b9331a08e9ee59f2"
         },
         "bookmarksSorting": {
             "exceptions": [],
@@ -4292,6 +4301,10 @@
                             {
                                 "selector": ".mol-ads-label-container",
                                 "type": "closest-empty"
+                            },
+                            {
+                                "selector": "#stickyAdsContainer",
+                                "type": "hide-empty"
                             }
                         ]
                     },
@@ -6918,11 +6931,20 @@
                                 "type": "hide-empty"
                             }
                         ]
+                    },
+                    {
+                        "domain": "thedrive.com",
+                        "rules": [
+                            {
+                                "selector": "#pw-top-right-sidebar-aib",
+                                "type": "hide-empty"
+                            }
+                        ]
                     }
                 ]
             },
             "state": "enabled",
-            "hash": "149ede95a230337593852529edb79e43"
+            "hash": "a09a415a775d2e7e498cfcfdcd4c9363"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -7596,6 +7618,9 @@
                             },
                             {
                                 "percent": 25
+                            },
+                            {
+                                "percent": 50
                             }
                         ]
                     }
@@ -7604,7 +7629,7 @@
                     "state": "disabled"
                 }
             },
-            "hash": "246a135a6919287d899abca93b826c2e"
+            "hash": "d9b0b65a01153652afaaac14e94e7ea9"
         },
         "marketplaceAdPostback": {
             "state": "disabled",

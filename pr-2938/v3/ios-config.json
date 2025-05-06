@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1746522004551,
+    "version": 1746522167849,
     "features": {
         "adAttributionReporting": {
             "state": "disabled",
@@ -732,6 +732,18 @@
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3056"
                 },
                 {
+                    "domain": "riga-airport.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3076"
+                },
+                {
+                    "domain": "istore.co.za",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3082"
+                },
+                {
+                    "domain": "visiter-cinque-terre.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3086"
+                },
+                {
                     "domain": "marvel.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1194"
                 },
@@ -918,7 +930,7 @@
                     }
                 }
             },
-            "hash": "a9ca4498302fe2a36f162287abe9a0f1"
+            "hash": "dc6129a3d2c80da4769816a335b3569c"
         },
         "autofillBreakageReporter": {
             "state": "enabled",
@@ -2110,56 +2122,8 @@
                 }
             ],
             "features": {
-                "tdsNextExperimentBaseline": {
-                    "state": "disabled",
-                    "rollout": {
-                        "steps": [
-                            {
-                                "percent": 50
-                            }
-                        ]
-                    },
-                    "settings": {
-                        "controlUrl": "v5/temp/ios-tds.json",
-                        "treatmentUrl": "v5/temp/ios-tds-b.json"
-                    },
-                    "cohorts": [
-                        {
-                            "name": "control",
-                            "weight": 0
-                        },
-                        {
-                            "name": "treatment",
-                            "weight": 0
-                        }
-                    ]
-                },
-                "tdsNextExperimentFeb25": {
-                    "state": "disabled",
-                    "rollout": {
-                        "steps": [
-                            {
-                                "percent": 50
-                            }
-                        ]
-                    },
-                    "settings": {
-                        "controlUrl": "v5/current/ios-tds.json",
-                        "treatmentUrl": "v5/temp/ios-tds-ab-test.json"
-                    },
-                    "cohorts": [
-                        {
-                            "name": "control",
-                            "weight": 0
-                        },
-                        {
-                            "name": "treatment",
-                            "weight": 0
-                        }
-                    ]
-                },
-                "tdsNextExperimentMar25": {
-                    "state": "disabled",
+                "tdsNextExperimentMay25": {
+                    "state": "enabled",
                     "rollout": {
                         "steps": [
                             {
@@ -2168,46 +2132,22 @@
                         ]
                     },
                     "settings": {
-                        "controlUrl": "v5/temp/tdsnextexperimentmar25-tds-control.json",
-                        "treatmentUrl": "v5/temp/tdsnextexperimentmar25-tds-treatment.json"
+                        "controlUrl": "v5/temp/ios-tdsnextexperimentmay25-tds-control.json",
+                        "treatmentUrl": "v5/temp/ios-tdsnextexperimentmay25-tds-treatment.json"
                     },
                     "cohorts": [
                         {
                             "name": "control",
-                            "weight": 0
+                            "weight": 1
                         },
                         {
                             "name": "treatment",
-                            "weight": 0
-                        }
-                    ]
-                },
-                "tdsNextExperimentApr25": {
-                    "state": "disabled",
-                    "rollout": {
-                        "steps": [
-                            {
-                                "percent": 100
-                            }
-                        ]
-                    },
-                    "settings": {
-                        "controlUrl": "v5/temp/tdsnextexperimentapr25-tds-control.json",
-                        "treatmentUrl": "v5/temp/tdsnextexperimentapr25-tds-treatment.json"
-                    },
-                    "cohorts": [
-                        {
-                            "name": "control",
-                            "weight": 0
-                        },
-                        {
-                            "name": "treatment",
-                            "weight": 0
+                            "weight": 1
                         }
                     ]
                 }
             },
-            "hash": "be213f5f58379121ab77be82c82b2b42"
+            "hash": "cdaefde6f2bccdd7bb894b55c4404374"
         },
         "contentScopeExperiments": {
             "state": "enabled",
@@ -3720,6 +3660,10 @@
                             {
                                 "selector": ".mol-ads-label-container",
                                 "type": "closest-empty"
+                            },
+                            {
+                                "selector": "#stickyAdsContainer",
+                                "type": "hide-empty"
                             }
                         ]
                     },
@@ -6346,11 +6290,20 @@
                                 "type": "hide-empty"
                             }
                         ]
+                    },
+                    {
+                        "domain": "thedrive.com",
+                        "rules": [
+                            {
+                                "selector": "#pw-top-right-sidebar-aib",
+                                "type": "hide-empty"
+                            }
+                        ]
                     }
                 ]
             },
             "state": "enabled",
-            "hash": "1f5928d9a19460cb412f16663617e214"
+            "hash": "12f37695025fa881190fdf01053e3084"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -7443,7 +7396,7 @@
                     "minSupportedVersion": "7.157.0"
                 },
                 "privacyProOnboardingCTAMarch25": {
-                    "state": "disabled",
+                    "state": "enabled",
                     "targets": [
                         {
                             "localeCountry": "US"
@@ -7456,13 +7409,13 @@
                         },
                         {
                             "name": "treatment",
-                            "weight": 0
+                            "weight": 1
                         }
                     ],
                     "minSupportedVersion": "7.163.0"
                 }
             },
-            "hash": "21e4e86af35270a147531810d935b037"
+            "hash": "be16fdbde60454c90485e4f42808a8ff"
         },
         "privacyProtectionsPopup": {
             "state": "disabled",

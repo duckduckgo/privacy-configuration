@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1746522004551,
+    "version": 1746522167849,
     "features": {
         "adAttributionReporting": {
             "state": "disabled",
@@ -1658,6 +1658,18 @@
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3056"
                 },
                 {
+                    "domain": "riga-airport.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3076"
+                },
+                {
+                    "domain": "istore.co.za",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3082"
+                },
+                {
+                    "domain": "visiter-cinque-terre.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3086"
+                },
+                {
                     "domain": "marvel.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1194"
                 },
@@ -1855,7 +1867,7 @@
                     }
                 }
             },
-            "hash": "ce65623eef74c2941ccf2a82bfcfd67f"
+            "hash": "4bfd4d93f970ea5738891547de1c8c6d"
         },
         "autofillBreakageReporter": {
             "state": "enabled",
@@ -2076,8 +2088,8 @@
             "state": "enabled",
             "exceptions": [],
             "features": {
-                "tdsNextExperimentMar25": {
-                    "state": "disabled",
+                "tdsNextExperimentMay25": {
+                    "state": "enabled",
                     "minSupportedVersion": 52250000,
                     "rollout": {
                         "steps": [
@@ -2087,22 +2099,22 @@
                         ]
                     },
                     "settings": {
-                        "controlUrl": "v5/temp/march25-tds-a.json",
-                        "treatmentUrl": "v5/temp/march25-tds-b.json"
+                        "controlUrl": "v5/temp/android-tdsnextexperimentmay25-tds-control.json",
+                        "treatmentUrl": "v5/temp/android-tdsnextexperimentmay25-tds-treatment.json"
                     },
                     "cohorts": [
                         {
                             "name": "control",
-                            "weight": 0
+                            "weight": 1
                         },
                         {
                             "name": "treatment",
-                            "weight": 0
+                            "weight": 1
                         }
                     ]
                 }
             },
-            "hash": "d0e70d4ef4acfbc098fecffa94ff12b7"
+            "hash": "bd75fc3c416ed508b9331a08e9ee59f2"
         },
         "bookmarksSorting": {
             "exceptions": [],
@@ -4712,6 +4724,10 @@
                             {
                                 "selector": ".mol-ads-label-container",
                                 "type": "closest-empty"
+                            },
+                            {
+                                "selector": "#stickyAdsContainer",
+                                "type": "hide-empty"
                             }
                         ]
                     },
@@ -7338,11 +7354,20 @@
                                 "type": "hide-empty"
                             }
                         ]
+                    },
+                    {
+                        "domain": "thedrive.com",
+                        "rules": [
+                            {
+                                "selector": "#pw-top-right-sidebar-aib",
+                                "type": "hide-empty"
+                            }
+                        ]
                     }
                 ]
             },
             "state": "enabled",
-            "hash": "1f5928d9a19460cb412f16663617e214"
+            "hash": "12f37695025fa881190fdf01053e3084"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -8136,6 +8161,9 @@
                             },
                             {
                                 "percent": 25
+                            },
+                            {
+                                "percent": 50
                             }
                         ]
                     }
@@ -8144,7 +8172,7 @@
                     "state": "disabled"
                 }
             },
-            "hash": "b9221ac32db272d5f45f8304b31f2f7b"
+            "hash": "1337dd0ea9efd535a64904af03acfbe5"
         },
         "marketplaceAdPostback": {
             "state": "disabled",

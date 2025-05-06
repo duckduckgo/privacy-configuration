@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1746522004551,
+    "version": 1746522167849,
     "features": {
         "adAttributionReporting": {
             "state": "disabled",
@@ -591,6 +591,15 @@
                     "domain": "homeoffice.gov.uk"
                 },
                 {
+                    "domain": "riga-airport.com"
+                },
+                {
+                    "domain": "istore.co.za"
+                },
+                {
+                    "domain": "visiter-cinque-terre.com"
+                },
+                {
                     "domain": "marvel.com"
                 },
                 {
@@ -773,7 +782,7 @@
                     }
                 }
             },
-            "hash": "481f421355d920c90a58f0be3621a58a"
+            "hash": "eded00746148bcfd2adf39a15b57a233"
         },
         "autofillBreakageReporter": {
             "state": "enabled",
@@ -1720,56 +1729,8 @@
                 }
             ],
             "features": {
-                "tdsNextExperimentBaseline": {
-                    "state": "disabled",
-                    "rollout": {
-                        "steps": [
-                            {
-                                "percent": 50
-                            }
-                        ]
-                    },
-                    "settings": {
-                        "controlUrl": "v5/temp/ios-tds.json",
-                        "treatmentUrl": "v5/temp/ios-tds-b.json"
-                    },
-                    "cohorts": [
-                        {
-                            "name": "control",
-                            "weight": 0
-                        },
-                        {
-                            "name": "treatment",
-                            "weight": 0
-                        }
-                    ]
-                },
-                "tdsNextExperimentFeb25": {
-                    "state": "disabled",
-                    "rollout": {
-                        "steps": [
-                            {
-                                "percent": 50
-                            }
-                        ]
-                    },
-                    "settings": {
-                        "controlUrl": "v5/current/ios-tds.json",
-                        "treatmentUrl": "v5/temp/ios-tds-ab-test.json"
-                    },
-                    "cohorts": [
-                        {
-                            "name": "control",
-                            "weight": 0
-                        },
-                        {
-                            "name": "treatment",
-                            "weight": 0
-                        }
-                    ]
-                },
-                "tdsNextExperimentMar25": {
-                    "state": "disabled",
+                "tdsNextExperimentMay25": {
+                    "state": "enabled",
                     "rollout": {
                         "steps": [
                             {
@@ -1778,46 +1739,22 @@
                         ]
                     },
                     "settings": {
-                        "controlUrl": "v5/temp/tdsnextexperimentmar25-tds-control.json",
-                        "treatmentUrl": "v5/temp/tdsnextexperimentmar25-tds-treatment.json"
+                        "controlUrl": "v5/temp/ios-tdsnextexperimentmay25-tds-control.json",
+                        "treatmentUrl": "v5/temp/ios-tdsnextexperimentmay25-tds-treatment.json"
                     },
                     "cohorts": [
                         {
                             "name": "control",
-                            "weight": 0
+                            "weight": 1
                         },
                         {
                             "name": "treatment",
-                            "weight": 0
-                        }
-                    ]
-                },
-                "tdsNextExperimentApr25": {
-                    "state": "disabled",
-                    "rollout": {
-                        "steps": [
-                            {
-                                "percent": 100
-                            }
-                        ]
-                    },
-                    "settings": {
-                        "controlUrl": "v5/temp/tdsnextexperimentapr25-tds-control.json",
-                        "treatmentUrl": "v5/temp/tdsnextexperimentapr25-tds-treatment.json"
-                    },
-                    "cohorts": [
-                        {
-                            "name": "control",
-                            "weight": 0
-                        },
-                        {
-                            "name": "treatment",
-                            "weight": 0
+                            "weight": 1
                         }
                     ]
                 }
             },
-            "hash": "c2785a96684f75f86fa0a37a1d430d63"
+            "hash": "d1e88bad64a4bbe4c7abd51eb5667dc0"
         },
         "contentScopeExperiments": {
             "state": "enabled",
@@ -3310,6 +3247,10 @@
                             {
                                 "selector": ".mol-ads-label-container",
                                 "type": "closest-empty"
+                            },
+                            {
+                                "selector": "#stickyAdsContainer",
+                                "type": "hide-empty"
                             }
                         ]
                     },
@@ -5936,11 +5877,20 @@
                                 "type": "hide-empty"
                             }
                         ]
+                    },
+                    {
+                        "domain": "thedrive.com",
+                        "rules": [
+                            {
+                                "selector": "#pw-top-right-sidebar-aib",
+                                "type": "hide-empty"
+                            }
+                        ]
                     }
                 ]
             },
             "state": "enabled",
-            "hash": "149ede95a230337593852529edb79e43"
+            "hash": "a09a415a775d2e7e498cfcfdcd4c9363"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -6905,7 +6855,7 @@
                     "minSupportedVersion": "7.157.0"
                 },
                 "privacyProOnboardingCTAMarch25": {
-                    "state": "disabled",
+                    "state": "enabled",
                     "targets": [
                         {
                             "localeCountry": "US"
@@ -6918,13 +6868,13 @@
                         },
                         {
                             "name": "treatment",
-                            "weight": 0
+                            "weight": 1
                         }
                     ],
                     "minSupportedVersion": "7.163.0"
                 }
             },
-            "hash": "21e4e86af35270a147531810d935b037"
+            "hash": "be16fdbde60454c90485e4f42808a8ff"
         },
         "privacyProtectionsPopup": {
             "state": "disabled",
