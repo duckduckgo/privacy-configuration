@@ -35,6 +35,13 @@ export type SiteSpecificFixes = {
     inputTypeSettings?: InputTypeSetting[];
 };
 
+export type BrowserImportSubFeatures<VersionType> = {
+    chrome?: SubFeature<VersionType>;
+    brave?: SubFeature<VersionType>;
+    edge?: SubFeature<VersionType>;
+    vivaldi?: SubFeature<VersionType>;
+};
+
 // Any subfeatures that have typed `settings` should be defined here.
 // Subfeatures without settings (or just string:string mappings for settings) will be automatically validated.
 type SubFeatures<VersionType> = {
@@ -59,6 +66,14 @@ type SubFeatures<VersionType> = {
             }[];
         }
     >;
+    browserMultiStepImport?: SubFeature<VersionType> & {
+        features?: {
+            chrome?: SubFeature<VersionType>;
+            brave?: SubFeature<VersionType>;
+            edge?: SubFeature<VersionType>;
+            vivaldi?: SubFeature<VersionType>;
+        };
+    };
 };
 
 export type AutofillFeature<VersionType> = Feature<
