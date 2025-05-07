@@ -143,6 +143,7 @@ const featuresToIncludeTempUnprotectedExceptions = [
 ];
 function applyGlobalUnprotectedTempExceptionsToFeatures(key, baseConfig, globalExceptions) {
     if (featuresToIncludeTempUnprotectedExceptions.includes(key)) {
+        baseConfig.features[key].exceptions = baseConfig.features[key].exceptions || [];
         baseConfig.features[key].exceptions = baseConfig.features[key].exceptions.concat(globalExceptions);
     }
 }
@@ -184,6 +185,7 @@ async function buildPlatforms() {
                     }
 
                     // ensure certain settings are treated as additive, and aren't overwritten
+                    /* TODO restore elsewhere
                     if (['customUserAgent', 'trackerAllowlist'].includes(key) && platformKey === 'settings') {
                         const settings = {};
                         const overrideSettings = platformOverride.features[key][platformKey];
@@ -204,8 +206,9 @@ async function buildPlatforms() {
                         // are disabled/enabled correctly (and disabled by default).
                         continue;
                     } else {
+                    */
                         platformConfig.features[key][platformKey] = platformOverride.features[key][platformKey];
-                    }
+                    // }
                 }
 
                 if (platformOverride.features[key].exceptions) {
@@ -219,6 +222,7 @@ async function buildPlatforms() {
             }
 
             // Ensure the correct enabled state for Click to Load entities.
+             /* TODO restore elsewhere
             if (key === 'clickToLoad' || key === 'clickToPlay') {
                 const clickToLoadSettings = platformConfig?.features?.[key]?.settings;
                 if (clickToLoadSettings) {
@@ -229,6 +233,7 @@ async function buildPlatforms() {
                     }
                 }
             }
+            */
 
             if (isFeatureMissingState(platformConfig.features[key])) {
                 platformConfig.features[key].state = 'disabled';
@@ -248,9 +253,11 @@ async function buildPlatforms() {
         }
 
         // Remove appTP feature from platforms that don't use it since it's a large feature
+         /* TODO restore elsewhere
         if ('appTrackerProtection' in platformConfig.features && platformConfig.features.appTrackerProtection.state === 'disabled') {
             delete platformConfig.features.appTrackerProtection;
         }
+        */
 
         if (platformOverride.unprotectedTemporary) {
             addExceptionsToUnprotected(platformOverride.unprotectedTemporary);
