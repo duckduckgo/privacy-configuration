@@ -110,7 +110,12 @@ describe('Config schema tests', () => {
                     }
                 }
 
+                const legacyFeatures = ['networkProtection'];
                 for (const featureName of Object.keys(config.body.features)) {
+                    // Ignore a non C-S-S feature that uses "domains"
+                    if (legacyFeatures.includes(featureName)) {
+                        continue;
+                    }
                     const feature = config.body.features[featureName];
                     if (feature?.settings?.conditionalChanges) {
                         applyPatchAndValidate(featureName, feature, feature.settings.conditionalChanges, config);
