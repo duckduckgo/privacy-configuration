@@ -175,9 +175,7 @@ export function addHashToFeatures(config) {
  */
 export function stripReasons(config) {
     for (const key of Object.keys(config.features)) {
-        if (!config.features[key].exceptions) {
-            continue;
-        }
+        config.features[key].exceptions = config.features[key].exceptions || [];
         for (const exception of config.features[key].exceptions) {
             delete exception.reason;
         }
