@@ -152,26 +152,28 @@ describe('Config schema tests', () => {
 });
 
 describe('Config schema tests', () => {
-    const baseFeatures = getBaseFeatureConfigs();
-    for (const platform of platforms) {
-        const overrideConfig = JSON.parse(fs.readFileSync(path.join(__dirname, `/../overrides/${platform}-override.json`), 'utf-8'));
-        // Skip over extension platforms:
-        if (platform.startsWith('browsers/')) {
-            continue;
-        }
-        for (const [featureName, baseFeature] of Object.entries(baseFeatures)) {
-            const overrideFeature = overrideConfig.features[featureName];
-            // Skip over if we have no override for this feature
-            if (!overrideFeature) continue;
-            if (!('features' in overrideFeature)) continue;
-            // Skip over if we have no subfeatures
-            if (!('features' in baseFeature)) continue;
-            for (const [subFeatureName] of Object.entries(baseFeature.features)) {
-                expect(overrideFeature.features[subFeatureName]).to.be.an(
-                    'object',
-                    `Missing override for ${platform} ${featureName}.${subFeatureName}`,
-                );
+    it('All subfeatures must be defined in their overrides files if they apply', () => {
+        const baseFeatures = getBaseFeatureConfigs();
+        for (const platform of platforms) {
+            const overrideConfig = JSON.parse(fs.readFileSync(path.join(__dirname, `/../overrides/${platform}-override.json`), 'utf-8'));
+            // Skip over extension platforms:
+            if (platform.startsWith('browsers/')) {
+                continue;
+            }
+            for (const [featureName, baseFeature] of Object.entries(baseFeatures)) {
+                const overrideFeature = overrideConfig.features[featureName];
+                // Skip over if we have no override for this feature
+                if (!overrideFeature) continue;
+                if (!('features' in overrideFeature)) continue;
+                // Skip over if we have no subfeatures
+                if (!('features' in baseFeature)) continue;
+                for (const [subFeatureName] of Object.entries(baseFeature.features)) {
+                    expect(overrideFeature.features[subFeatureName]).to.be.an(
+                        'object',
+                        `Missing override for ${platform} ${featureName}.${subFeatureName}`,
+                    );
+                }
             }
         }
-    }
+    });
 });
