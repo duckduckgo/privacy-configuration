@@ -16,7 +16,9 @@ const { OVERRIDE_DIR, GENERATED_DIR, LISTS_DIR, BROWSERS_SUBDIR, CURRENT_CONFIG_
 const defaultConfig = {
     readme: 'https://github.com/duckduckgo/privacy-configuration',
     version: Date.now(),
-    features: getBaseFeatureConfigs(),
+    meta: {
+        features: getBaseFeatureConfigs(),
+    },
     unprotectedTemporary: [],
 };
 // Env flag that can be used to override stripping of 'reason' strings from the config.
@@ -104,7 +106,8 @@ function addExceptionsToUnprotected(exceptions) {
 
 const listData = JSON.parse(fs.readFileSync(`${LISTS_DIR}/${UNPROTECTED_LIST_NAME}`));
 addExceptionsToUnprotected(listData.exceptions);
-addExceptionsToUnprotected(defaultConfig.features.contentBlocking.exceptions);
+// TODO add back:
+// addExceptionsToUnprotected(defaultConfig.features.contentBlocking.exceptions);
 
 // Include global unprotected-temporary.json exceptions into selected features domain exceptions
 const featuresToIncludeTempUnprotectedExceptions = [
@@ -147,9 +150,11 @@ function applyGlobalUnprotectedTempExceptionsToFeatures(key, baseConfig, globalE
         baseConfig.features[key].exceptions = baseConfig.features[key].exceptions.concat(globalExceptions);
     }
 }
+/** TODO add back
 for (const key of Object.keys(defaultConfig.features)) {
     applyGlobalUnprotectedTempExceptionsToFeatures(key, defaultConfig, listData.exceptions);
 }
+*/
 
 // Create generated directory
 mkdirIfNeeded(GENERATED_DIR);
@@ -173,6 +178,8 @@ async function buildPlatforms() {
         if (platform.includes(BROWSERS_SUBDIR)) {
             platformConfig = JSON.parse(JSON.stringify(platformConfigs.extension));
         }
+
+        platformConfig.features = platformConfig.features || {};
 
         // Handle feature overrides
         const platformOverride = JSON.parse(fs.readFileSync(overridePath)); // throws error on missing platform file
