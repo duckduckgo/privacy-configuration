@@ -28,10 +28,25 @@ const previousConfigs = platformOutput.map((plat) => {
 });
 // Used to keep track if a schema test failed and skip others to simplify the output.
 let aSchemaTestFailed = false;
+let outputContext;
 
 describe('Config schema tests', () => {
     for (const config of latestConfigs) {
         describe(`${config.name}`, () => {
+            before('should validate against the full configV4 schema', () => {
+                const validate = createValidator(platformSpecificSchemas[config.name] || 'GenericV4Config');
+                const validateResult = validate(config.body);
+                outputContext = `JSON Schema validation failed:\n${formatErrors(validate.errors)} Check ${config.name} output against the schema/`;
+                if (!validateResult) {
+                    aSchemaTestFailed = true;
+                }
+            });
+
+            it('should validate against the full configV4 schema', () => {
+                // Test runs in before()
+                expect(!!aSchemaTestFailed).to.be.equal(true, outputContext);
+            });
+            
             // appTrackerProtection should only be on the Android config since it is a large feature
             const shouldContainAppTP = config.name.split('/')[1] === 'android-config.json';
             it('should contain appTrackerProtection or not', () => {
@@ -39,16 +54,6 @@ describe('Config schema tests', () => {
                     shouldContainAppTP,
                     `appTrackerProtection expected: ${shouldContainAppTP}`,
                 );
-            });
-
-            it('should validate against the full configV4 schema', () => {
-                const validate = createValidator(platformSpecificSchemas[config.name] || 'GenericV4Config');
-                const validateResult = validate(config.body);
-                const outputContext = `JSON Schema validation failed:\n${formatErrors(validate.errors)} Check ${config.name} output against the schema/`;
-                expect(validateResult).to.be.equal(true, outputContext);
-                if (!validateResult) {
-                    aSchemaTestFailed = true;
-                }
             });
 
             it('all features should be named correctly', () => {
