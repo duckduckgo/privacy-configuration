@@ -70,7 +70,7 @@ const compatFunctions = {
 
         return v2Config;
     },
-    v3: (config, unmodifiedConfig) => {
+    v3: (config, unmodifiedConfig, platform) => {
         // Breaking changes: none, reasons stripped starting in v4
 
         const v3Config = JSON.parse(JSON.stringify(config));
@@ -111,6 +111,25 @@ const compatFunctions = {
                         v3Config.features[key].settings.omitVersionSites,
                         unmodifiedConfig.features[key].settings.omitVersionSites,
                     );
+                }
+            }
+        }
+
+        // Change "internal" feature + sub-feature state to "disabled" for the
+        // v3 Windows config. Older versions of the Windows browser cannot parse
+        // configurations that use the "internal" state.
+        if (platform === 'windows') {
+            for (const feature of Object.values(v3Config.features)) {
+                if (feature.state === 'internal') {
+                    feature.state = 'disabled';
+                }
+
+                if (feature.features) {
+                    for (const subFeature of Object.values(feature.features)) {
+                        if (subFeature.state === 'internal') {
+                            subFeature.state = 'disabled';
+                        }
+                    }
                 }
             }
         }
