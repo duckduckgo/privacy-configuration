@@ -100,7 +100,7 @@ describe('Config schema tests', () => {
                 }
             });
 
-            it('All patchSettings should also be valid', () => {
+            it('All patchSettings should also be valid', function () {
                 if (aSchemaTestFailed) {
                     console.error('Skipping other validation checks until main config is valid');
                     this.skip();
@@ -166,7 +166,7 @@ describe('Config schema tests', () => {
                 );
             });
 
-            it('should validate against the legacy schema', () => {
+            it('should validate against the legacy schema', function () {
                 if (aSchemaTestFailed) {
                     console.error('Skipping other validation checks until main config is valid');
                     this.skip();
