@@ -7,6 +7,7 @@ export type DuckPlayerNativeSettings = CSSInjectFeatureSettings<{
         videoElement: string;
         videoElementContainer: string;
         youtubeError: string;
+        adShowing: string;
     };
 }>;
 
