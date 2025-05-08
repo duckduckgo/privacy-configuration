@@ -26,6 +26,8 @@ const previousConfigs = platformOutput.map((plat) => {
         body: JSON.parse(fs.readFileSync(`./generated/v3/${plat}-config.json`)),
     };
 });
+// Used to keep track if a schema test failed and skip others to simplify the output.
+let aSchemaTestFailed = false;
 
 describe('Config schema tests', () => {
     for (const config of latestConfigs) {
@@ -41,7 +43,12 @@ describe('Config schema tests', () => {
 
             it('should validate against the full configV4 schema', () => {
                 const validate = createValidator(platformSpecificSchemas[config.name] || 'GenericV4Config');
-                expect(validate(config.body)).to.be.equal(true, formatErrors(validate.errors));
+                const validateResult = validate(config.body)
+                const outputContext = `JSON Schema validation failed:\n${formatErrors(validate.errors)} Check ${config.name} output against the schema/`;
+                expect(validateResult).to.be.equal(true, outputContext);
+                if (!validateResult) {
+                    aSchemaTestFailed = true;
+                }
             });
 
             it('all features should be named correctly', () => {
@@ -94,6 +101,10 @@ describe('Config schema tests', () => {
             });
 
             it('All patchSettings should also be valid', () => {
+                if (aSchemaTestFailed) {
+                    console.error('Skipping other validation checks until main config is valid');
+                    this.skip();
+                }
                 const validate = createValidator(platformSpecificSchemas[config.name] || 'GenericV4Config');
                 function applyPatchAndValidate(featureName, feature, conditionalChange, config) {
                     for (const change of conditionalChange) {
@@ -156,6 +167,10 @@ describe('Config schema tests', () => {
             });
 
             it('should validate against the legacy schema', () => {
+                if (aSchemaTestFailed) {
+                    console.error('Skipping other validation checks until main config is valid');
+                    this.skip();
+                }
                 const validate = createValidator(platformSpecificSchemas[config.name] || 'LegacyConfig');
                 expect(validate(config.body)).to.be.equal(true, formatErrors(validate.errors));
             });
