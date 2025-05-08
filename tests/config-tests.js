@@ -33,7 +33,7 @@ let outputContext;
 describe('Config schema tests', () => {
     for (const config of latestConfigs) {
         describe(`${config.name}`, () => {
-            before('should validate against the full configV4 schema', () => {
+            before(() => {
                 const validate = createValidator(platformSpecificSchemas[config.name] || 'GenericV4Config');
                 const validateResult = validate(config.body);
                 outputContext = `JSON Schema validation failed:\n${formatErrors(validate.errors)} Check ${config.name} output against the schema/`;
