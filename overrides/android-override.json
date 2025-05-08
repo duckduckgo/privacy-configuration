@@ -2092,6 +2092,54 @@
                     ]
                 }
             }
+        },
+        "tileSwitcherAnimation": {
+            "state": "enabled",
+            "minSupportedVersion": 52320000
+        },
+        "senseOfProtection": {
+            "state": "enabled",
+            "exceptions": [],
+            "minSupportedVersion": 52320000,
+            "features": {
+                "senseOfProtectionNewUserExperimentApr25": {
+                    "state": "enabled",
+                    "target" : {
+                        "isReturningUser" : false
+                    },
+                    "cohorts": [
+                        {
+                            "name": "modifiedControl",
+                            "weight": 1
+                        },
+                        {
+                            "name": "variant1",
+                            "weight": 1
+                        },
+                        {
+                            "name": "variant2",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "senseOfProtectionExistingUserExperimentApr25": {
+                    "state": "enabled",
+                    "cohorts": [
+                        {
+                            "name": "modifiedControl",
+                            "weight": 1
+                        },
+                        {
+                            "name": "variant1",
+                            "weight": 1
+                        },
+                        {
+                            "name": "variant2",
+                            "weight": 1
+                        }
+                    ]
+                }
+            }
         }
     },
     "unprotectedTemporary": [],
