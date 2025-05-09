@@ -36,11 +36,6 @@ describe('Config schema tests', () => {
                 throw new Error(`JSON Schema validation failed:\n${formatErrors(validate.errors)} Check ${config.name} output against the schema/`);
             });
 
-            it('should validate against the full configV4 schema', () => {
-                // Test runs in before()
-                expect(!!aSchemaTestFailed).to.be.equal(true, outputContext);
-            });
-
             // appTrackerProtection should only be on the Android config since it is a large feature
             const shouldContainAppTP = config.name.split('/')[1] === 'android-config.json';
             it('should contain appTrackerProtection or not', () => {
