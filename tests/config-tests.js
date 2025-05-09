@@ -34,7 +34,9 @@ describe('Config schema tests', () => {
                 const validate = createValidator(platformSpecificSchemas[config.name] || 'GenericV4Config');
                 const validateResult = validate(config.body);
                 if (!validateResult) {
-                    throw new Error(`JSON Schema validation failed:\n${formatErrors(validate.errors)} Check ${config.name} output against the schema/`);
+                    throw new Error(
+                        `JSON Schema validation failed:\n${formatErrors(validate.errors)} Check ${config.name} output against the schema/`
+                    );
                 }
             });
 
