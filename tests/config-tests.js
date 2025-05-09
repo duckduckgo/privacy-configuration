@@ -33,7 +33,9 @@ describe('Config schema tests', () => {
             before(() => {
                 const validate = createValidator(platformSpecificSchemas[config.name] || 'GenericV4Config');
                 const validateResult = validate(config.body);
-                throw new Error(`JSON Schema validation failed:\n${formatErrors(validate.errors)} Check ${config.name} output against the schema/`);
+                if (!validateResult) {
+                    throw new Error(`JSON Schema validation failed:\n${formatErrors(validate.errors)} Check ${config.name} output against the schema/`);
+                }
             });
 
             // appTrackerProtection should only be on the Android config since it is a large feature
