@@ -449,7 +449,7 @@
                                 "domain": ["areaclientes.orange.es"],
                                 "patchSettings": [
                                     {
-                                        "path": "",
+                                        "path": "formSettings",
                                         "op": "add",
                                         "value": {
                                             "formTypeSettings": [
@@ -466,7 +466,7 @@
                                 "domain": ["estore.archives.gov", "localhost"],
                                 "patchSettings": [
                                     {
-                                        "path": "",
+                                        "path": "/formSettings",
                                         "op": "add",
                                         "value": {
                                             "formTypeSettings": [
@@ -484,7 +484,7 @@
                                 "domain": ["zendesk.com", "localhost"],
                                 "patchSettings": [
                                     {
-                                        "path": "",
+                                        "path": "inputTypeSettings",
                                         "op": "add",
                                         "value": {
                                             "inputTypeSettings": [
@@ -501,12 +501,12 @@
                                 "domain": ["att.com"],
                                 "patchSettings": [
                                     {
-                                        "path": "",
+                                        "path": "inputTypeSettings",
                                         "op": "add",
                                         "value": {
                                             "inputTypeSettings": [
                                                 {
-                                                    "selector": "div[name='Expiration Month'][aria\\-label='tel EXPIRATION']",
+                                                    "selector": "input[name='Expiration Month']",
                                                     "type": "creditCards.expiration"
                                                 }
                                             ]
@@ -978,7 +978,11 @@
                 },
                 "privacyProFreeTrialJan25": {
                     "state": "disabled",
-                    "targets": [{ "localeCountry": "US" }],
+                    "targets": [
+                        {
+                            "localeCountry": "US"
+                        }
+                    ],
                     "cohorts": [
                         {
                             "name": "control",
@@ -993,7 +997,11 @@
                 },
                 "privacyProOnboardingCTAMarch25": {
                     "state": "disabled",
-                    "targets": [{ "localeCountry": "US" }],
+                    "targets": [
+                        {
+                            "localeCountry": "US"
+                        }
+                    ],
                     "cohorts": [
                         {
                             "name": "control",
