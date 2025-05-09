@@ -34,6 +34,9 @@
                         "steps": [
                             {
                                 "percent": 25
+                            },
+                            {
+                                "percent": 100
                             }
                         ]
                     },
@@ -181,18 +184,18 @@
                 }
             ],
             "features": {
-                "tdsNextExperimentBaseline": {
-                    "state": "disabled",
+                "tdsNextExperimentMay25": {
+                    "state": "enabled",
                     "rollout": {
                         "steps": [
                             {
-                                "percent": 50
+                                "percent": 25
                             }
                         ]
                     },
                     "settings": {
-                        "controlUrl": "v6/temp/macos-tds.json",
-                        "treatmentUrl": "v6/temp/macos-tds-b.json"
+                        "controlUrl": "v6/temp/macos-tdsnextexperimentmay25-tds-control.json",
+                        "treatmentUrl": "v6/temp/macos-tdsnextexperimentmay25-tds-treatment.json"
                     },
                     "cohorts": [
                         {
@@ -236,6 +239,9 @@
                     "settings": {
                         "signInRequiredSelector": "[href*=\"//support.google.com/youtube/answer/3037019\"]"
                     }
+                },
+                "nativeUI": {
+                    "state": "disabled"
                 }
             }
         },
@@ -488,6 +494,9 @@
             "features": {
                 "isLaunched": {
                     "state": "enabled"
+                },
+                "nextStepsWidget": {
+                    "state": "disabled"
                 }
             }
         },
@@ -697,6 +706,10 @@
                     {
                         "domain": "ihg.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2872"
+                    },
+                    {
+                        "domain": "routenote.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3055"
                     }
                 ],
                 "webViewDefault": [
@@ -1120,6 +1133,13 @@
                     }
                 }
             }
+        },
+        "tabCrashRecovery": {
+            "state": "enabled",
+            "minSupportedVersion": "1.137.0"
+        },
+        "delayedWebviewPresentation": {
+            "state": "internal"
         }
     },
     "unprotectedTemporary": []

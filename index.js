@@ -2,14 +2,21 @@ const fs = require('fs');
 
 const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 
-const { addCnameEntriesToAllowlist, inlineReasonArrays, mergeAllowlistedTrackers, addHashToFeatures, stripReasons } = require('./util');
+const {
+    addCnameEntriesToAllowlist,
+    inlineReasonArrays,
+    mergeAllowlistedTrackers,
+    addHashToFeatures,
+    stripReasons,
+    getBaseFeatureConfigs,
+} = require('./util');
 
-const { OVERRIDE_DIR, GENERATED_DIR, LISTS_DIR, BROWSERS_SUBDIR, CURRENT_CONFIG_VERSION } = require('./constants');
+const { OVERRIDE_DIR, GENERATED_DIR, LISTS_DIR, BROWSERS_SUBDIR, CURRENT_CONFIG_VERSION, UNPROTECTED_LIST_NAME } = require('./constants');
 
 const defaultConfig = {
     readme: 'https://github.com/duckduckgo/privacy-configuration',
     version: Date.now(),
-    features: {},
+    features: getBaseFeatureConfigs(),
     unprotectedTemporary: [],
 };
 // Env flag that can be used to override stripping of 'reason' strings from the config.
@@ -72,7 +79,7 @@ function writeConfigToDisk(platform, config) {
         addHashToFeatures(compatConfig);
 
         compatibility.removeEolFeatures(compatConfig, i);
-        fs.writeFileSync(`${GENERATED_DIR}/${version}/${configName}-config.json`, JSON.stringify(compatConfig, null, 4));
+        fs.writeFileSync(`${GENERATED_DIR}/${version}/${configName}-config.json`, JSON.stringify(compatConfig));
     }
 }
 
@@ -87,22 +94,6 @@ function mkdirIfNeeded(dir) {
     }
 }
 
-const unprotectedListName = 'unprotected-temporary.json';
-
-// Grab all exception lists
-const jsonListNames = fs.readdirSync(LISTS_DIR).filter((listName) => {
-    return listName !== unprotectedListName && listName !== '_template.json';
-});
-for (const jsonList of jsonListNames) {
-    const listData = JSON.parse(fs.readFileSync(`${LISTS_DIR}/${jsonList}`));
-    const configKey = jsonList.replace(/[.]json$/, '').replace(/-([a-z0-9])/g, function (g) {
-        return g[1].toUpperCase();
-    });
-
-    delete listData._meta;
-    defaultConfig.features[configKey] = listData;
-}
-
 const unprotectedDomains = new Set();
 function addExceptionsToUnprotected(exceptions) {
     for (const exception of exceptions) {
@@ -111,7 +102,7 @@ function addExceptionsToUnprotected(exceptions) {
     return exceptions.map((obj) => obj.domain);
 }
 
-const listData = JSON.parse(fs.readFileSync(`${LISTS_DIR}/${unprotectedListName}`));
+const listData = JSON.parse(fs.readFileSync(`${LISTS_DIR}/${UNPROTECTED_LIST_NAME}`));
 addExceptionsToUnprotected(listData.exceptions);
 addExceptionsToUnprotected(defaultConfig.features.contentBlocking.exceptions);
 
