@@ -370,7 +370,7 @@
                                 "domain": ["areaclientes.orange.es"],
                                 "patchSettings": [
                                     {
-                                        "path": "",
+                                        "path": "formSettings",
                                         "op": "add",
                                         "value": {
                                             "formTypeSettings": [
@@ -387,7 +387,7 @@
                                 "domain": ["estore.archives.gov", "localhost"],
                                 "patchSettings": [
                                     {
-                                        "path": "",
+                                        "path": "formSettings",
                                         "op": "add",
                                         "value": {
                                             "formTypeSettings": [
@@ -405,13 +405,30 @@
                                 "domain": ["zendesk.com", "localhost"],
                                 "patchSettings": [
                                     {
-                                        "path": "",
+                                        "path": "formSettings",
                                         "op": "add",
                                         "value": {
                                             "inputTypeSettings": [
                                                 {
                                                     "selector": "#\\:r0\\:\\-\\-input",
                                                     "type": "credentials.username"
+                                                }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": ["att.com"],
+                                "patchSettings": [
+                                    {
+                                        "path": "inputTypeSettings",
+                                        "op": "add",
+                                        "value": {
+                                            "inputTypeSettings": [
+                                                {
+                                                    "selector": "input[name='Expiration Month']",
+                                                    "type": "creditCards.expiration"
                                                 }
                                             ]
                                         }
