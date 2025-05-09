@@ -76,14 +76,14 @@
         },
         "contentBlocking": {
             "state": "enabled",
-            "features": {}
-        },
-        "incrementalRolloutTest": {
-            "state": "disabled",
             "features": {
-                "AAApril2025": {
+                "TDSaaexperiment4": {
                     "state": "enabled",
                     "minSupportedVersion": "2025.4.2",
+                    "settings": {
+                        "controlUrl": "v6/temp/extension-mv3-tds-a.json",
+                        "treatmentUrl": "v6/temp/extension-mv3-tds-b.json"
+                    },
                     "rollout": {
                         "steps": [{ "percent": 50 }]
                     },
@@ -99,6 +99,10 @@
                     ]
                 }
             }
+        },
+        "incrementalRolloutTest": {
+            "state": "disabled",
+            "features": {}
         }
     }
 }

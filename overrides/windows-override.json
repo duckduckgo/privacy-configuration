@@ -31,6 +31,12 @@
                 },
                 "allowBlockMalware": {
                     "state": "enabled"
+                },
+                "userTips": {
+                    "state": "disabled"
+                },
+                "enforceRoutes": {
+                    "state": "disabled"
                 }
             },
             "settings": {
@@ -66,6 +72,9 @@
                     "state": "enabled"
                 },
                 "waitlist": {
+                    "state": "disabled"
+                },
+                "freemium": {
                     "state": "disabled"
                 }
             },
@@ -234,7 +243,89 @@
                     "settings": {
                         "signInRequiredSelector": "[href*=\"//support.google.com/youtube/answer/3037019\"]"
                     }
+                },
+                "nativeUI": {
+                    "state": "disabled"
                 }
+            },
+            "settings": {
+                "tryDuckPlayerLink": "https://www.youtube.com/watch?v=yKWIA-Pys4c",
+                "duckPlayerDisabledHelpPageLink": "https://duckduckgo.com/duckduckgo-help-pages/duck-player",
+                "youtubePath": "watch",
+                "youtubeEmbedUrl": "youtube-nocookie.com",
+                "youTubeUrl": "youtube.com",
+                "youTubeReferrerHeaders": ["Referer"],
+                "youTubeReferrerQueryParams": ["embeds_referring_euri"],
+                "youTubeVideoIDQueryParam": "v",
+                "overlays": {
+                    "youtube": {
+                        "state": "disabled",
+                        "selectors": {
+                            "thumbLink": "a[href^='/watch']",
+                            "excludedRegions": ["#playlist", "ytd-movie-renderer", "ytd-grid-movie-renderer"],
+                            "videoElement": "#player video",
+                            "videoElementContainer": "#player .html5-video-player",
+                            "hoverExcluded": [],
+                            "clickExcluded": ["ytd-thumbnail-overlay-toggle-button-renderer"],
+                            "allowedEventTargets": [
+                                ".ytp-inline-preview-scrim",
+                                ".ytd-video-preview",
+                                "#thumbnail-container",
+                                "#video-title-link",
+                                "#video-title",
+                                "video.video-stream.html5-main-video"
+                            ],
+                            "drawerContainer": "body"
+                        },
+                        "thumbnailOverlays": {
+                            "state": "enabled"
+                        },
+                        "clickInterception": {
+                            "state": "enabled"
+                        },
+                        "videoOverlays": {
+                            "state": "enabled"
+                        },
+                        "videoDrawer": {
+                            "state": "disabled"
+                        }
+                    },
+                    "serpProxy": {
+                        "state": "disabled"
+                    }
+                },
+                "domains": [
+                    {
+                        "domain": "www.youtube.com",
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/overlays/youtube/state",
+                                "value": "enabled"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "duckduckgo.com",
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/overlays/serpProxy/state",
+                                "value": "enabled"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "m.youtube.com",
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/overlays/youtube/state",
+                                "value": "enabled"
+                            }
+                        ]
+                    }
+                ]
             }
         },
         "elementHiding": {
@@ -426,7 +517,13 @@
             "state": "disabled"
         },
         "clientBrandHint": {
-            "state": "enabled"
+            "state": "enabled",
+            "exceptions": [
+                {
+                    "domain": "ee.co.uk",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3041"
+                }
+            ]
         },
         "privacyPro": {
             "state": "enabled",
@@ -467,6 +564,9 @@
                 "authApiV2": {
                     "state": "disabled"
                 }
+            },
+            "settings": {
+                "authApiV2NonStableRollout": false
             }
         },
         "webCompat": {
@@ -585,7 +685,8 @@
             "state": "enabled"
         },
         "downloadManager": {
-            "state": "disabled"
+            "state": "disabled",
+            "minSupportedVersion": "0.111.0"
         },
         "quickNavTldLookup": {
             "state": "enabled",

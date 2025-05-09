@@ -54,9 +54,18 @@ export type Feature<
     minSupportedVersion?: VersionType;
 };
 
+type ConditionBlock = {
+    domain?: string;
+    urlPattern?: string;
+};
+
 type CSSInjectFeatureSettingsPatches = {
-    domains: {
+    domains?: {
         domain: string | string[];
+        patchSettings: Operation<string | object | number>[];
+    }[];
+    conditionalChanges?: {
+        condition: ConditionBlock | ConditionBlock[];
         patchSettings: Operation<string | object | number>[];
     }[];
 };

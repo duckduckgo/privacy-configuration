@@ -10,6 +10,7 @@ import { AndroidBrowserConfig } from './features/android-browser-config';
 import { APIModificationFeature } from './features/api-modification';
 import { FingerprintingHardwareFeature } from './features/fingerprinting-hardware';
 import { FingerprintingScreenSizeFeature } from './features/fingerprinting-screen-size';
+import { NetworkProtection } from './features/network-protection';
 
 export { WebCompatSettings } from './features/webcompat';
 export { DuckPlayerSettings } from './features/duckplayer';
@@ -41,6 +42,7 @@ export type ConfigV4<VersionType> = {
         androidBrowserConfig: AndroidBrowserConfig<VersionType>;
         fingerprintingHardware?: FingerprintingHardwareFeature<VersionType>;
         fingerpringtingScreenSize?: FingerprintingScreenSizeFeature<VersionType>;
+        networkProtection?: NetworkProtection<VersionType>;
     };
     unprotectedTemporary: SiteException[];
 };

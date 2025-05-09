@@ -875,12 +875,13 @@
                     },
                     {
                         "rule": "pubads.g.doubleclick.net/gampad/ads",
-                        "domains": ["nhl.com", "viki.com", "rocketnews24.com", "crunchyroll.com", "pch.com"],
+                        "domains": ["nhl.com", "viki.com", "rocketnews24.com", "crunchyroll.com", "pch.com", "iheart.com"],
                         "reason": [
                             "https://github.com/duckduckgo/privacy-configuration/issues/1185",
                             "rocketnews24.com - https://github.com/duckduckgo/privacy-configuration/issues/846",
                             "crunchyroll.com - https://github.com/duckduckgo/privacy-configuration/issues/1140",
-                            "pch.com - https://github.com/duckduckgo/privacy-configuration/pull/2793"
+                            "pch.com - https://github.com/duckduckgo/privacy-configuration/pull/2793",
+                            "iheart.com - https://github.com/duckduckgo/privacy-configuration/pull/3040"
                         ]
                     },
                     {
@@ -1123,8 +1124,11 @@
                     },
                     {
                         "rule": "doubleclick.net",
-                        "domains": ["rocketnews24.com"],
-                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/846"
+                        "domains": ["rocketnews24.com", "wunderground.com"],
+                        "reason": [
+                            "rocketnews24.com - https://github.com/duckduckgo/privacy-configuration/issues/846",
+                            "wunderground.com - https://github.com/duckduckgo/privacy-configuration/pull/3096"
+                        ]
                     },
                     {
                         "rule": "https://googleads.g.doubleclick.net/ads/preferences/naioptout",
@@ -1620,7 +1624,8 @@
                             "ljsilvers.com",
                             "newsweek.com",
                             "vizio.com",
-                            "wps.com"
+                            "wps.com",
+                            "comparethemarket.com"
                         ],
                         "reason": [
                             "https://github.com/duckduckgo/privacy-configuration/issues/929",
@@ -1856,6 +1861,11 @@
                         "rule": "www.gstatic.com/_/mss/boq-identity/_/js",
                         "domains": ["<all>"],
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/489"
+                    },
+                    {
+                        "rule": "www.gstatic.com/flutter-canvaskit",
+                        "domains": ["nimblerx.com"],
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3058"
                     }
                 ]
             },
@@ -1945,7 +1955,7 @@
                 "rules": [
                     {
                         "rule": "hb.improvedigital.com/pbw/prebid/prebid-idhb-v8.51a.min.js",
-                        "domains": ["fun.chicagotribune.com"],
+                        "domains": ["chicagotribune.com"],
                         "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3023"
                     }
                 ]
@@ -3293,8 +3303,11 @@
                 "rules": [
                     {
                         "rule": "cdn.weglot.com/weglot.min.js",
-                        "domains": ["cherrycreekschools.org"],
-                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/2968"
+                        "domains": ["cherrycreekschools.org", "myavista.com"],
+                        "reason": [
+                            "cherrycreekschools.org - https://github.com/duckduckgo/privacy-configuration/issues/2968",
+                            "myavista.com - https://github.com/duckduckgo/privacy-configuration/pull/3057"
+                        ]
                     }
                 ]
             },
@@ -3541,6 +3554,24 @@
                         "rule": "hsappstatic.net",
                         "domains": ["<all>"],
                         "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3007"
+                    }
+                ]
+            },
+            "bounceexchange.com": {
+                "rules": [
+                    {
+                        "rule": "bounceexchange.com",
+                        "domains": ["payment.nba.com"],
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3108"
+                    }
+                ]
+            },
+            "wknd.ai": {
+                "rules": [
+                    {
+                        "rule": "tag.wknd.ai",
+                        "domains": ["payment.nba.com"],
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3108"
                     }
                 ]
             }
