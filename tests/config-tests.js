@@ -35,7 +35,7 @@ describe('Config schema tests', () => {
                 const validateResult = validate(config.body);
                 if (!validateResult) {
                     throw new Error(
-                        `JSON Schema validation failed:\n${formatErrors(validate.errors)} Check ${config.name} output against the schema/`
+                        `JSON Schema validation failed:\n${formatErrors(validate.errors)} Check ${config.name} output against the schema/`,
                     );
                 }
             });
