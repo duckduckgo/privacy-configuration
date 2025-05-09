@@ -380,15 +380,11 @@
                                 "domain": ["areaclientes.orange.es"],
                                 "patchSettings": [
                                     {
-                                        "path": "formSettings",
+                                        "path": "/formTypeSettings/-",
                                         "op": "add",
                                         "value": {
-                                            "formTypeSettings": [
-                                                {
-                                                    "selector": "form",
-                                                    "type": "login"
-                                                }
-                                            ]
+                                            "selector": "form",
+                                            "type": "login"
                                         }
                                     }
                                 ]
@@ -397,16 +393,11 @@
                                 "domain": ["estore.archives.gov", "localhost"],
                                 "patchSettings": [
                                     {
-                                        "path": "formSettings",
+                                        "path": "/formTypeSettings/-",
                                         "op": "add",
                                         "value": {
-                                            "formTypeSettings": [
-                                                {
-                                                    "selector": "fieldset[id='ucContentMiddleCenter_fldLogin']",
-                                                    "type": "login"
-                                                }
-                                            ],
-                                            "formBoundarySelector": "#ucContentMiddleCenter_fldLogin"
+                                            "selector": "fieldset[id='ucContentMiddleCenter_fldLogin']",
+                                            "type": "login"
                                         }
                                     }
                                 ]
@@ -415,15 +406,11 @@
                                 "domain": ["zendesk.com", "localhost"],
                                 "patchSettings": [
                                     {
-                                        "path": "inputTypeSettings",
+                                        "path": "/inputTypeSettings/-",
                                         "op": "add",
                                         "value": {
-                                            "inputTypeSettings": [
-                                                {
-                                                    "selector": "#\\:r0\\:\\-\\-input",
-                                                    "type": "credentials.username"
-                                                }
-                                            ]
+                                            "selector": "#\\:r0\\:\\-\\-input",
+                                            "type": "credentials.username"
                                         }
                                     }
                                 ]
@@ -432,15 +419,11 @@
                                 "domain": ["att.com"],
                                 "patchSettings": [
                                     {
-                                        "path": "inputTypeSettings",
+                                        "path": "/inputTypeSettings/-",
                                         "op": "add",
                                         "value": {
-                                            "inputTypeSettings": [
-                                                {
-                                                    "selector": "input[name='Expiration Month']",
-                                                    "type": "creditCards.expiration"
-                                                }
-                                            ]
+                                            "selector": "input[name='Expiration Month']",
+                                            "type": "creditCards.expiration"
                                         }
                                     }
                                 ]
@@ -449,19 +432,19 @@
                                 "domain": ["gamestop.com"],
                                 "patchSettings": [
                                     {
-                                        "path": "inputTypeSettings",
+                                        "path": "/inputTypeSettings/-",
                                         "op": "add",
                                         "value": {
-                                            "inputTypeSettings": [
-                                                {
-                                                    "selector": "input[id='\\:r3\\:']",
-                                                    "type": "identities.emailAddress"
-                                                },
-                                                {
-                                                    "selector": "input[id='\\:r5\\:']",
-                                                    "type": "credentials.password.new"
-                                                }
-                                            ]
+                                            "selector": "input[id='\\:r3\\:']",
+                                            "type": "identities.emailAddress"
+                                        }
+                                    },
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input[id='\\:r5\\:']",
+                                            "type": "credentials.password.new"
                                         }
                                     }
                                 ]
@@ -470,11 +453,9 @@
                                 "domain": ["temu.com"],
                                 "patchSettings": [
                                     {
-                                        "path": "formSettings",
-                                        "op": "add",
-                                        "value": {
-                                            "formBoundarySelector": "#main > .container > :nth-child(2)"
-                                        }
+                                        "path": "/formBoundarySelector",
+                                        "op": "replace",
+                                        "value": "#main > .container > :nth-child(2)"
                                     }
                                 ]
                             }
