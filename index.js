@@ -16,7 +16,9 @@ const { OVERRIDE_DIR, GENERATED_DIR, LISTS_DIR, BROWSERS_SUBDIR, CURRENT_CONFIG_
 const defaultConfig = {
     readme: 'https://github.com/duckduckgo/privacy-configuration',
     version: Date.now(),
-    features: getBaseFeatureConfigs(),
+    meta: {
+        features: getBaseFeatureConfigs(),
+    },
     unprotectedTemporary: [],
 };
 // Env flag that can be used to override stripping of 'reason' strings from the config.
@@ -104,7 +106,8 @@ function addExceptionsToUnprotected(exceptions) {
 
 const listData = JSON.parse(fs.readFileSync(`${LISTS_DIR}/${UNPROTECTED_LIST_NAME}`));
 addExceptionsToUnprotected(listData.exceptions);
-addExceptionsToUnprotected(defaultConfig.features.contentBlocking.exceptions);
+// TODO add back:
+// addExceptionsToUnprotected(defaultConfig.features.contentBlocking.exceptions);
 
 // Include global unprotected-temporary.json exceptions into selected features domain exceptions
 const featuresToIncludeTempUnprotectedExceptions = [
@@ -143,12 +146,15 @@ const featuresToIncludeTempUnprotectedExceptions = [
 ];
 function applyGlobalUnprotectedTempExceptionsToFeatures(key, baseConfig, globalExceptions) {
     if (featuresToIncludeTempUnprotectedExceptions.includes(key)) {
+        baseConfig.features[key].exceptions = baseConfig.features[key].exceptions || [];
         baseConfig.features[key].exceptions = baseConfig.features[key].exceptions.concat(globalExceptions);
     }
 }
+/** TODO add back
 for (const key of Object.keys(defaultConfig.features)) {
     applyGlobalUnprotectedTempExceptionsToFeatures(key, defaultConfig, listData.exceptions);
 }
+*/
 
 // Create generated directory
 mkdirIfNeeded(GENERATED_DIR);
@@ -173,6 +179,8 @@ async function buildPlatforms() {
             platformConfig = JSON.parse(JSON.stringify(platformConfigs.extension));
         }
 
+        platformConfig.features = platformConfig.features || {};
+
         // Handle feature overrides
         const platformOverride = JSON.parse(fs.readFileSync(overridePath)); // throws error on missing platform file
         for (const key of Object.keys(platformConfig.features)) {
@@ -184,6 +192,7 @@ async function buildPlatforms() {
                     }
 
                     // ensure certain settings are treated as additive, and aren't overwritten
+                    /* TODO restore elsewhere
                     if (['customUserAgent', 'trackerAllowlist'].includes(key) && platformKey === 'settings') {
                         const settings = {};
                         const overrideSettings = platformOverride.features[key][platformKey];
@@ -204,8 +213,9 @@ async function buildPlatforms() {
                         // are disabled/enabled correctly (and disabled by default).
                         continue;
                     } else {
+                    */
                         platformConfig.features[key][platformKey] = platformOverride.features[key][platformKey];
-                    }
+                    // }
                 }
 
                 if (platformOverride.features[key].exceptions) {
@@ -219,6 +229,7 @@ async function buildPlatforms() {
             }
 
             // Ensure the correct enabled state for Click to Load entities.
+             /* TODO restore elsewhere
             if (key === 'clickToLoad' || key === 'clickToPlay') {
                 const clickToLoadSettings = platformConfig?.features?.[key]?.settings;
                 if (clickToLoadSettings) {
@@ -229,6 +240,7 @@ async function buildPlatforms() {
                     }
                 }
             }
+            */
 
             if (isFeatureMissingState(platformConfig.features[key])) {
                 platformConfig.features[key].state = 'disabled';
@@ -248,9 +260,11 @@ async function buildPlatforms() {
         }
 
         // Remove appTP feature from platforms that don't use it since it's a large feature
+         /* TODO restore elsewhere
         if ('appTrackerProtection' in platformConfig.features && platformConfig.features.appTrackerProtection.state === 'disabled') {
             delete platformConfig.features.appTrackerProtection;
         }
+        */
 
         if (platformOverride.unprotectedTemporary) {
             addExceptionsToUnprotected(platformOverride.unprotectedTemporary);
