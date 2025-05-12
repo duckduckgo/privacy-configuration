@@ -1,24 +1,8 @@
 name: Remove stale exceptions from malicious site protection feature.
 
 on:
-    workflow_dispatch:
-        inputs:
-            run:
-                description: 'Run the workflow'
-                required: true
-                default: 'yes'
-                type: choice
-                options:
-                    - yes
-                    - no
     schedule:
         - cron: '0 0 * * 0' # Every Sunday at midnight UTC
-
-    push:
-        branches:
-            - main
-            - tespach/test-pr-creation
-            - tespach/fix-malsite-duplicates
 
 jobs:
     update_data:
@@ -29,7 +13,6 @@ jobs:
               with:
                   repository: duckduckgo/privacy-configuration
                   path: privacy-configuration/
-                  ref: tespach/test-pr-creation
             - name: Execute Update Script
               run: |
                   cd ./privacy-configuration/
