@@ -6,7 +6,7 @@ const _ = require('lodash'); // Add this import
 
 // Rate limit fetch to 30 requests per second using a promise queue
 // https://thoughtspile.github.io/2018/07/07/rate-limit-promises/
-const resolveAfter = (ms) => new Promise((ok) => setTimeout(ok, ms));
+const resolveAfter = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 function rateLimit1(fn, msPerOp) {
     let wait = Promise.resolve();
