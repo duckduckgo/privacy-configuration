@@ -1,8 +1,12 @@
 name: Remove stale exceptions from malicious site protection feature.
 
 on:
-    schedule:
-        - cron: '0 0 * * *' # Run every day at midnight UTC
+    commit:
+        branches:
+            - tespach/fix-malsite-duplicates
+    # schedule:
+    #     - cron: '0 0 * * *' # Run every day at midnight UTC
+
 
 jobs:
     update_data:
@@ -13,6 +17,7 @@ jobs:
               with:
                   repository: duckduckgo/privacy-configuration
                   path: privacy-configuration/
+                  ref: tespach/test-pr-creation
             - name: Execute Update Script
               run: |
                   cd ./privacy-configuration/
