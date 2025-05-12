@@ -1,7 +1,8 @@
 name: Remove stale exceptions from malicious site protection feature.
 
 on:
-    commit:
+    pull_request:
+        types: [opened, synchronize, reopened]
         branches:
             - tespach/fix-malsite-duplicates
     # schedule:
