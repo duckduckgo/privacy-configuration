@@ -82,11 +82,6 @@ class ConfigProcessor {
                         'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.3.1 Safari/605.1.15 Ddg/18.3.1',
                 },
             });
-            console.log(response.ok, response.status);
-            if (response.status === 403) {
-                console.error('Rate limit exceeded. Please try again later.');
-                return false;
-            }
             if (!response.ok) return false;
 
             const data = await response.json();
@@ -140,6 +135,11 @@ class ConfigProcessor {
         removedDomains.forEach((domain) => {
             prBody += ` - ${domain}\\n`;
         });
+
+        // PR ID is a first half of the hash of the sorted list of removed domains
+        const prId = crypto.createHash('sha256').update(Array.from(removedDomains).sort().join(',')).digest('hex').slice(0, 16);
+        prBody += `\\nPR ID: ${prId}\\n`;
+        prBody += `\\nThis PR is auto-generated. Please do not edit it manually.`;
         console.log(prBody);
     }
 
@@ -152,7 +152,6 @@ class ConfigProcessor {
         const removedExceptions = [];
         for (const exception of exceptions) {
             const inDataset = await this.checkDomainMatch(exception.domain, platformName);
-            console.log(`Domain ${exception.domain} is ${inDataset ? 'in' : 'not in'} the dataset.`);
             if (inDataset) {
                 updatedExceptions.push(exception);
             } else {

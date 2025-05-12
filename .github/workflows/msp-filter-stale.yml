@@ -29,40 +29,11 @@ jobs:
                   echo "TEMPLATE=$TEMPLATE" >> $GITHUB_ENV
                   PR_BODY="${TEMPLATE//\{\{date\}\}/$DATE}"
                   PR_BODY="${PR_BODY//\\n/$'\n'}" # Replace escaped newlines with actual newlines
+                  PR_ID="$(echo "$PR_BODY" | grep 'PR ID: ' | cut -d' ' -f3)"
                   echo "PR_BODY<<EOF" >> $GITHUB_ENV
                   echo "$PR_BODY" >> $GITHUB_ENV
                   echo "EOF" >> $GITHUB_ENV
                   npm run lint-fix
-
-            - name: Find potential duplicate PRs for this entry
-              id: find-duplicates
-              run: |
-                  cd ./privacy-configuration/
-                  # Get the list of open PRs
-                  OPEN_PRS=$(gh pr list --state open --json number,title,body,createdAt,updatedAt,headRefName --jq '.[] | select(.title | contains("Remove stale exemptions from malicious site protection")) | .headRefName')
-                  # Check if the body of the PR contains the same template as the current one
-                  for pr in $OPEN_PRS; do
-                      # Get the body of the PR
-                      PR_BODY=$(gh pr view $pr --json body --jq '.body')
-                      # Check if the body contains the same template
-                      if [[ "$PR_BODY" == *"$TEMPLATE"* ]]; then
-                          echo "Duplicate PR found: $pr"
-                          echo "duplicate_pr=$pr" >> $GITHUB_ENV
-                          exit 0
-                      fi
-                  done
-                  echo "No duplicate PR found."
-
-            - name: Check for duplicate PR
-              if: steps.find-duplicates.outputs.duplicate_pr == ''
-              run: |
-                  echo "No duplicate PR found. Proceeding to create a new PR."
-            
-            - name: Handle duplicate PR
-              if: steps.find-duplicates.outputs.duplicate_pr != ''
-              run: |
-                  echo "Duplicate PR found. Exiting with success."
-                  exit 0
             - name: Create PR with updated configs
               uses: peter-evans/create-pull-request@88bf0de51c7487d91e1abbb4899332e602c58bbf
               id: create-pr
