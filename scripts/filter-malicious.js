@@ -2,6 +2,35 @@ const fs = require('fs').promises;
 const path = require('path');
 const fetch = require('node-fetch').default;
 const crypto = require('crypto');
+const _ = require('lodash'); // Add this import
+
+// Rate limit fetch to 30 requests per second using a promise queue
+// https://thoughtspile.github.io/2018/07/07/rate-limit-promises/
+const resolveAfter = (ms) => new Promise((ok) => setTimeout(ok, ms));
+
+function rateLimit1(fn, msPerOp) {
+    let wait = Promise.resolve();
+    return (...a) => {
+        const res = wait.then(() => fn(...a));
+        wait = wait.then(() => resolveAfter(msPerOp));
+        return res;
+    };
+}
+
+function rateLimit(fn, windowMs, reqInWindow = 1) {
+    // A battery of 1-rate-limiters
+    const queue = _.range(reqInWindow).map(() => rateLimit1(fn, windowMs));
+    // Circular queue cursor
+    let i = 0;
+    return (...a) => {
+        // to enqueue, we move the cursor...
+        i = (i + 1) % reqInWindow;
+        // and return the rate-limited operation.
+        return queue[i](...a);
+    };
+}
+
+const slowFetch = rateLimit(fetch, 1000, 30);
 
 class ConfigProcessor {
     constructor(options = {}) {
@@ -47,7 +76,17 @@ class ConfigProcessor {
         const hashPrefix = this.generateHashPrefix(domain);
         const url = `${this.apiBaseUrl}/${platform}/matches?hashPrefix=${hashPrefix}`;
         try {
-            const response = await fetch(url);
+            const response = await slowFetch(url, {
+                headers: {
+                    'User-Agent':
+                        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.3.1 Safari/605.1.15 Ddg/18.3.1',
+                },
+            });
+            console.log(response.ok, response.status);
+            if (response.status === 403) {
+                console.error('Rate limit exceeded. Please try again later.');
+                return false;
+            }
             if (!response.ok) return false;
 
             const data = await response.json();
@@ -113,6 +152,7 @@ class ConfigProcessor {
         const removedExceptions = [];
         for (const exception of exceptions) {
             const inDataset = await this.checkDomainMatch(exception.domain, platformName);
+            console.log(`Domain ${exception.domain} is ${inDataset ? 'in' : 'not in'} the dataset.`);
             if (inDataset) {
                 updatedExceptions.push(exception);
             } else {
