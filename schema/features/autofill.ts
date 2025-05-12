@@ -53,6 +53,9 @@ type SubFeatures<VersionType> = {
     siteSpecificFixes?: SubFeature<
         VersionType,
         {
+            formBoundarySelector?: string;
+            formTypeSettings?: FormTypeSetting[];
+            inputTypeSettings?: InputTypeSetting[];
             domains: {
                 domain: string | string[];
                 patchSettings: Operation<SiteSpecificFixes>[];
