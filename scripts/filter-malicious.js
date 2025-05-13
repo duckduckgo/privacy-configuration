@@ -2,6 +2,35 @@ const fs = require('fs').promises;
 const path = require('path');
 const fetch = require('node-fetch').default;
 const crypto = require('crypto');
+const _ = require('lodash'); // Add this import
+
+// Rate limit fetch to 30 requests per second using a promise queue
+// https://thoughtspile.github.io/2018/07/07/rate-limit-promises/
+const resolveAfter = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+function rateLimit1(fn, msPerOp) {
+    let wait = Promise.resolve();
+    return (...a) => {
+        const res = wait.then(() => fn(...a));
+        wait = wait.then(() => resolveAfter(msPerOp));
+        return res;
+    };
+}
+
+function rateLimit(fn, windowMs, reqInWindow = 1) {
+    // A battery of 1-rate-limiters
+    const queue = _.range(reqInWindow).map(() => rateLimit1(fn, windowMs));
+    // Circular queue cursor
+    let i = 0;
+    return (...a) => {
+        // to enqueue, we move the cursor...
+        i = (i + 1) % reqInWindow;
+        // and return the rate-limited operation.
+        return queue[i](...a);
+    };
+}
+
+const slowFetch = rateLimit(fetch, 1000, 30);
 
 class ConfigProcessor {
     constructor(options = {}) {
@@ -47,7 +76,12 @@ class ConfigProcessor {
         const hashPrefix = this.generateHashPrefix(domain);
         const url = `${this.apiBaseUrl}/${platform}/matches?hashPrefix=${hashPrefix}`;
         try {
-            const response = await fetch(url);
+            const response = await slowFetch(url, {
+                headers: {
+                    'User-Agent':
+                        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.3.1 Safari/605.1.15 Ddg/18.3.1',
+                },
+            });
             if (!response.ok) return false;
 
             const data = await response.json();
@@ -101,6 +135,11 @@ class ConfigProcessor {
         removedDomains.forEach((domain) => {
             prBody += ` - ${domain}\\n`;
         });
+
+        // PR ID is a first half of the hash of the sorted list of removed domains
+        const prId = crypto.createHash('sha256').update(Array.from(removedDomains).sort().join(',')).digest('hex').slice(0, 16);
+        prBody += `\\nPR ID: ${prId}\\n`;
+        prBody += `\\nThis PR is auto-generated. Please do not edit it manually.`;
         console.log(prBody);
     }
 
