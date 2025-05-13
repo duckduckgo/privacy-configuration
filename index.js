@@ -14,11 +14,12 @@ import { OVERRIDE_DIR, GENERATED_DIR, LISTS_DIR, BROWSERS_SUBDIR, CURRENT_CONFIG
 
 import platforms from './platforms.js';
 import { compatFunctions, removeEolFeatures } from './compatibility.js';
+import { immutableJSONPatch } from 'immutable-json-patch';
 
 const defaultConfig = {
     readme: 'https://github.com/duckduckgo/privacy-configuration',
     version: Date.now(),
-    meta: {
+    reference: {
         features: getBaseFeatureConfigs(),
     },
     unprotectedTemporary: [],
@@ -257,6 +258,15 @@ async function buildPlatforms() {
             if (isFeatureMissingState(platformConfig.features[key])) {
                 platformConfig.features[key].state = 'disabled';
             }
+            const feature = platformConfig.features[key];
+            feature.reference = defaultConfig.reference;
+            if ('patchFeature' in feature) {
+                console.log(`Patching feature ${key} for ${platform}`, feature.patchFeature, JSON.stringify(platformOverride.features[key], null, 2), JSON.stringify(defaultConfig.reference.features[key], null, 2));
+                platformConfig.features[key] = immutableJSONPatch(feature, feature.patchFeature);
+                console.log('Patching feature', platformConfig.features[key]);
+            }
+            delete feature.patchFeature;
+            delete feature.reference;
         }
 
         // Remove appTP feature from platforms that don't use it since it's a large feature
@@ -279,6 +289,7 @@ async function buildPlatforms() {
 
         addCnameEntriesToAllowlist(tds, platformConfig.features.trackerAllowlist.settings.allowlistedTrackers);
         platformConfig = inlineReasonArrays(platformConfig);
+        delete platformConfig.reference;
         platformConfigs[platform] = platformConfig;
 
         // Write config to disk
