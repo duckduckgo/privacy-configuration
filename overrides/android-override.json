@@ -486,7 +486,7 @@
                                         "path": "/inputTypeSettings/-",
                                         "op": "add",
                                         "value": {
-                                            "selector": "input[id='\\:r3\\:']",
+                                            "selector": "input[name='dwfrm_profile_customer_email']",
                                             "type": "identities.emailAddress"
                                         }
                                     },
@@ -506,7 +506,15 @@
                                     {
                                         "path": "/formBoundarySelector",
                                         "op": "replace",
-                                        "value": "#main > .container > :nth-child(2)"
+                                        "value": "div[aria-modal='true'][role='dialog']"
+                                    },
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "div[aria-modal='true'][role='dialog']",
+                                            "type": "signup"
+                                        }
                                     }
                                 ]
                             }
