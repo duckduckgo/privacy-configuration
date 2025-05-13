@@ -1,4 +1,4 @@
-import { Feature, SubFeature } from '../feature';
+import { CSSInjectFeatureSettings, Feature, SubFeature } from '../feature';
 import { Operation } from '../json-patch';
 
 // Type of the feature `settings` object
@@ -38,6 +38,7 @@ export type SiteSpecificFixes = {
 // Any subfeatures that have typed `settings` should be defined here.
 // Subfeatures without settings (or just string:string mappings for settings) will be automatically validated.
 type SubFeatures<VersionType> = {
+    // Do not copy this schema, it's not standard. Use siteSpecificFixes instead.
     canImportFromGooglePasswordManager?: SubFeature<
         VersionType,
         {
@@ -50,18 +51,7 @@ type SubFeatures<VersionType> = {
             };
         }
     >;
-    siteSpecificFixes?: SubFeature<
-        VersionType,
-        {
-            formBoundarySelector?: string;
-            formTypeSettings?: FormTypeSetting[];
-            inputTypeSettings?: InputTypeSetting[];
-            domains: {
-                domain: string | string[];
-                patchSettings: Operation<SiteSpecificFixes>[];
-            }[];
-        }
-    >;
+    siteSpecificFixes?: SubFeature<VersionType, CSSInjectFeatureSettings<SiteSpecificFixes>>;
 };
 
 export type AutofillFeature<VersionType> = Feature<
