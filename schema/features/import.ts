@@ -1,9 +1,7 @@
 import { Feature, SubFeature } from '../feature';
 
-// Type of the feature `settings` object
-type SettingsType = undefined;
+type SettingsType = Record<string, never>;
 
-// Any subfeatures that have typed `settings` should be defined here.
 type SubFeatures<VersionType> = {
     browserMultiStepImport?: SubFeature<
         VersionType,
