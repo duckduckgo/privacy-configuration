@@ -32,14 +32,14 @@ export type ConfigV4<VersionType> = {
     features: Record<string, Feature<any, VersionType>> & {
         // These features have typed settings
         apiModification?: APIModificationFeature<VersionType>;
-        autoconsent: AutoconsentFeature<VersionType>;
-        autofill: AutofillFeature<VersionType>;
-        cookie: CookieFeature<VersionType>;
-        duckPlayer: DuckPlayerFeature<VersionType>;
-        trackerAllowlist: TrackerAllowlistFeature<VersionType>;
-        webCompat: WebCompatFeature<VersionType>;
-        messageBridge: MessageBridgeFeature<VersionType>;
-        androidBrowserConfig: AndroidBrowserConfig<VersionType>;
+        autoconsent?: AutoconsentFeature<VersionType>;
+        autofill?: AutofillFeature<VersionType>;
+        cookie?: CookieFeature<VersionType>;
+        duckPlayer?: DuckPlayerFeature<VersionType>;
+        trackerAllowlist?: TrackerAllowlistFeature<VersionType>;
+        webCompat?: WebCompatFeature<VersionType>;
+        messageBridge?: MessageBridgeFeature<VersionType>;
+        androidBrowserConfig?: AndroidBrowserConfig<VersionType>;
         fingerprintingHardware?: FingerprintingHardwareFeature<VersionType>;
         fingerpringtingScreenSize?: FingerprintingScreenSizeFeature<VersionType>;
         networkProtection?: NetworkProtection<VersionType>;
