@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import diff from 'diff';
+import * as diff from 'diff';
 import { CURRENT_CONFIG_VERSION } from '../../constants.js';
 
 function readFilesRecursively(directory) {
