@@ -11,7 +11,7 @@ function versionToInt(version) {
  * @param {object} config - the config object to remove eol features from
  * @param {int} version - the version of the config object
  */
-function removeEolFeatures(config, version) {
+export function removeEolFeatures(config, version) {
     for (const feature of Object.keys(config.features)) {
         const eol = config.features[feature].eol;
         if (!eol) {
@@ -38,7 +38,7 @@ function removeEolFeatures(config, version) {
  * param {object} config - the config object to convert. This config should be one version higher than the target version.
  * return {object} - The converted config object
  */
-const compatFunctions = {
+export const compatFunctions = {
     v1: (config) => {
         // Breaking changes: minSupportedVersion key in features
 
@@ -136,9 +136,4 @@ const compatFunctions = {
 
         return v3Config;
     },
-};
-
-module.exports = {
-    removeEolFeatures,
-    compatFunctions,
 };

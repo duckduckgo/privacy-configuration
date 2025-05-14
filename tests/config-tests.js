@@ -1,11 +1,12 @@
-const expect = require('chai').expect;
-const fs = require('fs');
-const path = require('path');
-const { createValidator, formatErrors } = require('./schema-validation');
-const platforms = require('./../platforms');
+import { expect } from 'chai';
+import fs from 'fs';
+import path from 'path';
+import { createValidator, formatErrors } from './schema-validation.js';
+import platforms from './../platforms.js';
+import { immutableJSONPatch } from 'immutable-json-patch';
+import { getBaseFeatureConfigs } from '../util.js';
+
 const platformOutput = platforms.map((item) => item.replace('browsers/', 'extension-'));
-const immutableJSONPatch = require('immutable-json-patch').immutableJSONPatch;
-const { getBaseFeatureConfigs } = require('../util');
 
 const platformSpecificSchemas = {
     'v4/android-config.json': 'AndroidV4Config',
@@ -167,6 +168,7 @@ describe('Config schema tests', () => {
     it('All subfeatures must be defined in their overrides files if they apply', () => {
         const baseFeatures = getBaseFeatureConfigs();
         for (const platform of platforms) {
+            const __dirname = path.dirname(new URL(import.meta.url).pathname);
             const overrideConfig = JSON.parse(fs.readFileSync(path.join(__dirname, `/../overrides/${platform}-override.json`), 'utf-8'));
             // Skip over extension platforms:
             if (platform.startsWith('browsers/')) {

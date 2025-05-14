@@ -1,8 +1,9 @@
-const fs = require('fs');
-const path = require('path');
-const expect = require('chai').expect;
+import fs from 'fs';
+import path from 'path';
+import { expect } from 'chai';
 
 function loadJSON(pathFromRoot) {
+    const __dirname = path.dirname(new URL(import.meta.url).pathname);
     return JSON.parse(fs.readFileSync(path.join(__dirname, '..', pathFromRoot), 'utf-8'));
 }
 

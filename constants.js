@@ -1,8 +1,6 @@
-module.exports = {
-    CURRENT_CONFIG_VERSION: 4,
-    OVERRIDE_DIR: 'overrides',
-    GENERATED_DIR: 'generated',
-    LISTS_DIR: 'features',
-    BROWSERS_SUBDIR: 'browsers/',
-    UNPROTECTED_LIST_NAME: 'unprotected-temporary.json',
-};
+export const CURRENT_CONFIG_VERSION = 4;
+export const OVERRIDE_DIR = 'overrides';
+export const GENERATED_DIR = 'generated';
+export const LISTS_DIR = 'features';
+export const BROWSERS_SUBDIR = 'browsers/';
+export const UNPROTECTED_LIST_NAME = 'unprotected-temporary.json';
