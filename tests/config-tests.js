@@ -168,8 +168,8 @@ describe('Config schema tests', () => {
     it('All subfeatures must be defined in their overrides files if they apply', () => {
         const baseFeatures = getBaseFeatureConfigs();
         for (const platform of platforms) {
-            const __dirname = path.dirname(new URL(import.meta.url).pathname);
-            const overrideConfig = JSON.parse(fs.readFileSync(path.join(__dirname, `/../overrides/${platform}-override.json`), 'utf-8'));
+            const dirname = import.meta.dirname;
+            const overrideConfig = JSON.parse(fs.readFileSync(path.join(dirname, `/../overrides/${platform}-override.json`), 'utf-8'));
             // Skip over extension platforms:
             if (platform.startsWith('browsers/')) {
                 continue;

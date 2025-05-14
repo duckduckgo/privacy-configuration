@@ -3,8 +3,7 @@ import path from 'path';
 import { expect } from 'chai';
 
 function loadJSON(pathFromRoot) {
-    const __dirname = path.dirname(new URL(import.meta.url).pathname);
-    return JSON.parse(fs.readFileSync(path.join(__dirname, '..', pathFromRoot), 'utf-8'));
+    return JSON.parse(fs.readFileSync(path.join(import.meta.dirname, '..', pathFromRoot), 'utf-8'));
 }
 
 function fileNameToFeatureName(name) {
