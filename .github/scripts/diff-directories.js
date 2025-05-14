@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import diff from 'diff';
-import { CURRENT_CONFIG_VERSION } from '../../constants';
+import { CURRENT_CONFIG_VERSION } from '../../constants.js';
 
 function readFilesRecursively(directory) {
     const filenames = fs.readdirSync(directory);
