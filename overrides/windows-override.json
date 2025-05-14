@@ -114,6 +114,15 @@
                 },
                 "partialFormSaves": {
                     "state": "disabled"
+                },
+                "browserMultiStepImport": {
+                    "state": "enabled",
+                    "settings": {
+                        "chrome": "enabled",
+                        "brave": "disabled",
+                        "edge": "disabled",
+                        "vivaldi": "disabled"
+                    }
                 }
             }
         },
@@ -149,6 +158,7 @@
         },
         "duckPlayer": {
             "state": "enabled",
+            "minSupportedVersion": "0.109.7",
             "features": {
                 "pip": {
                     "state": "enabled"
@@ -171,6 +181,85 @@
                 "nativeUI": {
                     "state": "disabled"
                 }
+            },
+            "settings": {
+                "tryDuckPlayerLink": "https://www.youtube.com/watch?v=yKWIA-Pys4c",
+                "duckPlayerDisabledHelpPageLink": "https://duckduckgo.com/duckduckgo-help-pages/duck-player",
+                "youtubePath": "watch",
+                "youtubeEmbedUrl": "youtube-nocookie.com",
+                "youTubeUrl": "youtube.com",
+                "youTubeReferrerHeaders": ["Referer"],
+                "youTubeReferrerQueryParams": ["embeds_referring_euri"],
+                "youTubeVideoIDQueryParam": "v",
+                "overlays": {
+                    "youtube": {
+                        "state": "disabled",
+                        "selectors": {
+                            "thumbLink": "a[href^='/watch']",
+                            "excludedRegions": ["#playlist", "ytd-movie-renderer", "ytd-grid-movie-renderer"],
+                            "videoElement": "#player video",
+                            "videoElementContainer": "#player .html5-video-player",
+                            "hoverExcluded": [],
+                            "clickExcluded": ["ytd-thumbnail-overlay-toggle-button-renderer"],
+                            "allowedEventTargets": [
+                                ".ytp-inline-preview-scrim",
+                                ".ytd-video-preview",
+                                "#thumbnail-container",
+                                "#video-title-link",
+                                "#video-title",
+                                "video.video-stream.html5-main-video"
+                            ],
+                            "drawerContainer": "body"
+                        },
+                        "thumbnailOverlays": {
+                            "state": "enabled"
+                        },
+                        "clickInterception": {
+                            "state": "enabled"
+                        },
+                        "videoOverlays": {
+                            "state": "enabled"
+                        },
+                        "videoDrawer": {
+                            "state": "disabled"
+                        }
+                    },
+                    "serpProxy": {
+                        "state": "disabled"
+                    }
+                },
+                "domains": [
+                    {
+                        "domain": "www.youtube.com",
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/overlays/youtube/state",
+                                "value": "enabled"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "duckduckgo.com",
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/overlays/serpProxy/state",
+                                "value": "enabled"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "m.youtube.com",
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/overlays/youtube/state",
+                                "value": "enabled"
+                            }
+                        ]
+                    }
+                ]
             }
         },
         "elementHiding": {
@@ -520,6 +609,11 @@
                 "hashPrefixUpdateFrequency": 20,
                 "filterSetUpdateFrequency": 720
             },
+            "features": {
+                "scamProtection": {
+                    "state": "enabled"
+                }
+            },
             "exceptions": []
         },
         "windowsWebViewPermissionsSavesInProfile": {
@@ -530,8 +624,14 @@
             "state": "enabled"
         },
         "downloadManager": {
-            "state": "disabled",
-            "minSupportedVersion": "0.111.0"
+            "state": "enabled",
+            "minSupportedVersion": "0.111.0",
+            "features": {
+                "alwaysAskWhereToSaveFiles": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.112.0"
+                }
+            }
         },
         "quickNavTldLookup": {
             "state": "enabled",

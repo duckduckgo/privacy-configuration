@@ -168,6 +168,10 @@
                 "freemium": {
                     "state": "enabled",
                     "minSupportedVersion": "1.114.0"
+                },
+                "remoteBrokerDelivery": {
+                    "state": "internal",
+                    "minSupportedVersion": "1.139.0"
                 }
             },
             "minSupportedVersion": "1.70.0"
@@ -185,7 +189,7 @@
             ],
             "features": {
                 "tdsNextExperimentMay25": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "rollout": {
                         "steps": [
                             {
@@ -200,11 +204,11 @@
                     "cohorts": [
                         {
                             "name": "control",
-                            "weight": 1
+                            "weight": 0
                         },
                         {
                             "name": "treatment",
-                            "weight": 1
+                            "weight": 0
                         }
                     ]
                 }
@@ -1085,6 +1089,9 @@
         "tabCrashRecovery": {
             "state": "enabled",
             "minSupportedVersion": "1.137.0"
+        },
+        "delayedWebviewPresentation": {
+            "state": "internal"
         }
     },
     "unprotectedTemporary": []

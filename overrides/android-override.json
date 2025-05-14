@@ -39,7 +39,7 @@
             "state": "enabled",
             "exceptions": [],
             "settings": {
-                "origins": []
+                "origins": ["funnel_newtab_android_intlannouncement"]
             },
             "minSupportedVersion": 52100000
         },
@@ -51,7 +51,7 @@
             "exceptions": [],
             "features": {
                 "tdsNextExperimentMay25": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": 52250000,
                     "rollout": {
                         "steps": [
@@ -67,11 +67,11 @@
                     "cohorts": [
                         {
                             "name": "control",
-                            "weight": 1
+                            "weight": 0
                         },
                         {
                             "name": "treatment",
-                            "weight": 1
+                            "weight": 0
                         }
                     ]
                 }
@@ -973,7 +973,21 @@
             "state": "enabled",
             "features": {
                 "localVpnControllerDns": {
-                    "state": "enabled"
+                    "state": "enabled",
+                    "settings": {
+                        "domains": {
+                            "controller.netp.duckduckgo.com": [
+                                {
+                                    "address": "20.253.26.112",
+                                    "region": "use"
+                                },
+                                {
+                                    "address": "20.93.77.32",
+                                    "region": "eun"
+                                }
+                            ]
+                        }
+                    }
                 },
                 "allowDnsBlockMalware": {
                     "state": "enabled"
@@ -1827,7 +1841,7 @@
                     "state": "disabled"
                 },
                 "privacyProFreeTrialJan25": {
-                    "state": "disabled",
+                    "state": "enabled",
                     "minSupportedVersion": 52280000,
                     "description": "Privacy Pro free trial experiment",
                     "targets": [
@@ -1838,12 +1852,8 @@
                     ],
                     "cohorts": [
                         {
-                            "name": "control",
-                            "weight": 0
-                        },
-                        {
                             "name": "treatment",
-                            "weight": 0
+                            "weight": 1
                         }
                     ]
                 }
@@ -2023,6 +2033,20 @@
                             }
                         ]
                     }
+                },
+                "scamProtection": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52311000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 30
+                            }
+                        ]
+                    }
                 }
             }
         },
@@ -2084,6 +2108,56 @@
                         },
                         {
                             "name": "variant3",
+                            "weight": 0
+                        }
+                    ]
+                }
+            }
+        },
+        "tabSwitcherAnimation": {
+            "state": "enabled",
+            "minSupportedVersion": 52320000
+        },
+        "senseOfProtection": {
+            "state": "enabled",
+            "minSupportedVersion": 52320000,
+            "exceptions": [],
+            "features": {
+                "senseOfProtectionNewUserExperimentApr25": {
+                    "state": "enabled",
+                    "targets": [
+                        {
+                            "isReturningUser": false
+                        }
+                    ],
+                    "cohorts": [
+                        {
+                            "name": "modifiedControl",
+                            "weight": 1
+                        },
+                        {
+                            "name": "variant1",
+                            "weight": 1
+                        },
+                        {
+                            "name": "variant2",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "senseOfProtectionExistingUserExperimentApr25": {
+                    "state": "disabled",
+                    "cohorts": [
+                        {
+                            "name": "modifiedControl",
+                            "weight": 0
+                        },
+                        {
+                            "name": "variant1",
+                            "weight": 0
+                        },
+                        {
+                            "name": "variant2",
                             "weight": 0
                         }
                     ]
