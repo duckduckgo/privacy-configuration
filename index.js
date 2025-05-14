@@ -1,17 +1,19 @@
-const fs = require('fs');
+import fs from 'fs';
+import fetch from 'node-fetch';
 
-const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
-
-const {
+import {
     addCnameEntriesToAllowlist,
     inlineReasonArrays,
     mergeAllowlistedTrackers,
     addHashToFeatures,
     stripReasons,
     getBaseFeatureConfigs,
-} = require('./util');
+} from './util.js';
 
-const { OVERRIDE_DIR, GENERATED_DIR, LISTS_DIR, BROWSERS_SUBDIR, CURRENT_CONFIG_VERSION, UNPROTECTED_LIST_NAME } = require('./constants');
+import { OVERRIDE_DIR, GENERATED_DIR, LISTS_DIR, BROWSERS_SUBDIR, CURRENT_CONFIG_VERSION, UNPROTECTED_LIST_NAME } from './constants.js';
+
+import platforms from './platforms.js';
+import { compatFunctions, removeEolFeatures } from './compatibility.js';
 
 const defaultConfig = {
     readme: 'https://github.com/duckduckgo/privacy-configuration',
@@ -19,11 +21,9 @@ const defaultConfig = {
     features: getBaseFeatureConfigs(),
     unprotectedTemporary: [],
 };
+
 // Env flag that can be used to override stripping of 'reason' strings from the config.
 const keepReasons = process.argv.includes('--keep-reasons');
-
-const platforms = require('./platforms');
-const compatibility = require('./compatibility');
 
 const tdsPath = 'live';
 
@@ -68,17 +68,17 @@ function writeConfigToDisk(platform, config) {
         if (!prevConfig) {
             prevConfig = config;
         } else {
-            if (!compatibility.compatFunctions[version]) {
+            if (!compatFunctions[version]) {
                 throw new Error(`No compat function for config version ${version}`);
             }
 
-            prevConfig = compatibility.compatFunctions[version](prevConfig, unmodifiedConfig, platform);
+            prevConfig = compatFunctions[version](prevConfig, unmodifiedConfig, platform);
         }
 
         const compatConfig = JSON.parse(JSON.stringify(prevConfig));
         addHashToFeatures(compatConfig);
 
-        compatibility.removeEolFeatures(compatConfig, i);
+        removeEolFeatures(compatConfig, i);
         fs.writeFileSync(`${GENERATED_DIR}/${version}/${configName}-config.json`, JSON.stringify(compatConfig));
     }
 }

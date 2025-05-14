@@ -1,7 +1,7 @@
-const tldts = require('tldts');
-const crypto = require('crypto');
-const fs = require('fs');
-const { LISTS_DIR, UNPROTECTED_LIST_NAME } = require('./constants');
+import tldts from 'tldts';
+import crypto from 'crypto';
+import fs from 'fs';
+import { LISTS_DIR, UNPROTECTED_LIST_NAME } from './constants.js';
 
 function getAllowlistedRule(rules, rulePath) {
     return rules.find(function (x) {
@@ -26,7 +26,7 @@ function addDomainRules(allowlist, domain, rule) {
     });
 }
 
-function addAllowlistRule(allowlist, rule) {
+export function addAllowlistRule(allowlist, rule) {
     const dom = tldts.getDomain(rule.rule);
     addDomainRules(allowlist, dom, { rules: [rule] });
 }
@@ -58,7 +58,7 @@ function addPathRule(rules, rule) {
     }
 }
 
-function getBaseFeatureConfigs() {
+export function getBaseFeatureConfigs() {
     const features = {};
     // Grab all exception lists
     const jsonListNames = fs.readdirSync(LISTS_DIR).filter((listName) => {
@@ -76,7 +76,7 @@ function getBaseFeatureConfigs() {
     return features;
 }
 
-function mergeAllowlistedTrackers(t1, t2) {
+export function mergeAllowlistedTrackers(t1, t2) {
     const res = {};
     for (const dom in t1) {
         addDomainRules(res, dom, t1[dom]);
@@ -100,7 +100,7 @@ function mergeAllowlistedTrackers(t1, t2) {
  * This allows specifying reasons as an array of strings, and converts these to
  * strings in the resulting data.
  */
-function inlineReasonArrays(data) {
+export function inlineReasonArrays(data) {
     if (Array.isArray(data)) {
         return data.map(inlineReasonArrays);
     } else if (typeof data === 'object' && data !== null) {
@@ -148,7 +148,7 @@ function generateCnameRules(tds, cnamedRule) {
 /**
  * Add CNAME entries to the allowlist to support platforms with incorrect CNAME resolution.
  */
-function addCnameEntriesToAllowlist(tds, allowlist) {
+export function addCnameEntriesToAllowlist(tds, allowlist) {
     Object.values(allowlist).forEach((ruleSet) =>
         ruleSet.rules.forEach((rule) => {
             generateCnameRules(tds, rule).forEach((rule) => addAllowlistRule(allowlist, rule));
@@ -161,7 +161,7 @@ function addCnameEntriesToAllowlist(tds, allowlist) {
  *
  * @param {object} config - the config object to update
  */
-function addHashToFeatures(config) {
+export function addHashToFeatures(config) {
     for (const key of Object.keys(config.features)) {
         const featureString = JSON.stringify(config.features[key]);
         config.features[key].hash = crypto.createHash('md5').update(featureString).digest('hex');
@@ -173,7 +173,7 @@ function addHashToFeatures(config) {
  *
  * @param {object} config - the config object to update
  */
-function stripReasons(config) {
+export function stripReasons(config) {
     for (const key of Object.keys(config.features)) {
         for (const exception of config.features[key].exceptions) {
             delete exception.reason;
@@ -201,13 +201,3 @@ function stripReasons(config) {
         }
     }
 }
-
-module.exports = {
-    addAllowlistRule,
-    addCnameEntriesToAllowlist,
-    inlineReasonArrays,
-    mergeAllowlistedTrackers,
-    addHashToFeatures,
-    stripReasons,
-    getBaseFeatureConfigs,
-};

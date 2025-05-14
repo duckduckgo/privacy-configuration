@@ -1,9 +1,9 @@
-const fs = require('fs');
-const path = require('path');
-const expect = require('chai').expect;
+import fs from 'fs';
+import path from 'path';
+import { expect } from 'chai';
 
 function loadJSON(pathFromRoot) {
-    return JSON.parse(fs.readFileSync(path.join(__dirname, '..', pathFromRoot), 'utf-8'));
+    return JSON.parse(fs.readFileSync(path.join(import.meta.dirname, '..', pathFromRoot), 'utf-8'));
 }
 
 function fileNameToFeatureName(name) {

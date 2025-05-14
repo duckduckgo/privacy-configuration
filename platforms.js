@@ -1,5 +1,5 @@
 // Order matters in this list. 'extension' should be first in the list.
-module.exports = [
+const platformName = [
     'extension',
     'browsers/chrome',
     'browsers/firefox',
@@ -15,3 +15,5 @@ module.exports = [
     'macos',
     'windows',
 ];
+
+export default platformName;

@@ -1,12 +1,5 @@
-const expect = require('chai').expect;
-
-const {
-    addAllowlistRule,
-    addCnameEntriesToAllowlist,
-    inlineReasonArrays,
-    mergeAllowlistedTrackers,
-    addHashToFeatures,
-} = require('../util');
+import { expect } from 'chai';
+import { addAllowlistRule, addCnameEntriesToAllowlist, inlineReasonArrays, mergeAllowlistedTrackers, addHashToFeatures } from '../util.js';
 
 const ta1 = {
     'f1.com': {

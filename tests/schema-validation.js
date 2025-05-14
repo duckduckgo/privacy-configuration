@@ -1,6 +1,6 @@
-const Ajv = require('ajv').default;
+import Ajv from 'ajv';
+import schemaGenerator from 'ts-json-schema-generator';
 const ajv = new Ajv({ allowUnionTypes: true });
-const schemaGenerator = require('ts-json-schema-generator');
 
 function createGenerator() {
     try {
@@ -17,7 +17,7 @@ function createGenerator() {
  * Generate the JSONSchema for the named TS type
  * @param {import('../schema/config').ExportedSchemas} schemaName
  */
-function getSchema(schemaName) {
+export function getSchema(schemaName) {
     return createGenerator().createSchema(schemaName);
 }
 
@@ -25,20 +25,14 @@ function getSchema(schemaName) {
  * Generate a validator for checking JSON objects against the named TS type
  * @param {import('../schema/config').ExportedSchemas} schemaName
  */
-function createValidator(schemaName) {
+export function createValidator(schemaName) {
     return ajv.compile(getSchema(schemaName));
 }
 
-function formatErrors(errors) {
+export function formatErrors(errors) {
     if (!Array.isArray(errors)) {
         return '';
     }
 
     return errors.map((item) => `${item.instancePath}: ${item.message}`).join(', ');
 }
-
-module.exports = {
-    getSchema,
-    createValidator,
-    formatErrors,
-};
