@@ -1,8 +1,8 @@
-const fs = require('fs').promises;
-const path = require('path');
-const fetch = require('node-fetch').default;
-const crypto = require('crypto');
-const _ = require('lodash'); // Add this import
+import { promises as fs } from 'fs';
+import path from 'path';
+import fetch from 'node-fetch';
+import crypto from 'crypto';
+import _ from 'lodash';
 
 // Rate limit fetch to 30 requests per second using a promise queue
 // https://thoughtspile.github.io/2018/07/07/rate-limit-promises/
