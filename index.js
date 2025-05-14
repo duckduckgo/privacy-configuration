@@ -258,15 +258,16 @@ async function buildPlatforms() {
             if (isFeatureMissingState(platformConfig.features[key])) {
                 platformConfig.features[key].state = 'disabled';
             }
-            const feature = platformConfig.features[key];
-            feature.reference = defaultConfig.reference;
+            let feature = platformConfig.features[key];
             if ('patchFeature' in feature) {
+                feature.reference = defaultConfig.reference;
                 console.log(`Patching feature ${key} for ${platform}`, feature.patchFeature, JSON.stringify(platformOverride.features[key], null, 2), JSON.stringify(defaultConfig.reference.features[key], null, 2));
-                platformConfig.features[key] = immutableJSONPatch(feature, feature.patchFeature);
-                console.log('Patching feature', platformConfig.features[key]);
+                feature = immutableJSONPatch(feature, feature.patchFeature);
+                delete feature.patchFeature;
+                delete feature.reference;
+                platformConfig.features[key] = feature;
+                //console.log('Patching feature', platformConfig.features[key]);
             }
-            delete feature.patchFeature;
-            delete feature.reference;
         }
 
         // Remove appTP feature from platforms that don't use it since it's a large feature
