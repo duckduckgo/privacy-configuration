@@ -375,6 +375,89 @@
                 "unknownUsernameCategorization": {
                     "state": "enabled"
                 },
+                "siteSpecificFixes": {
+                    "state": "enabled",
+                    "settings": {
+                        "formTypeSettings": [],
+                        "inputTypeSettings": [],
+                        "formBoundarySelector": "",
+                        "domains": [
+                            {
+                                "domain": ["areaclientes.orange.es"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "form",
+                                            "type": "login"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": ["estore.archives.gov", "localhost"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "fieldset[id='ucContentMiddleCenter_fldLogin']",
+                                            "type": "login"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": ["zendesk.com", "localhost"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "#\\:r0\\:\\-\\-input",
+                                            "type": "credentials.username"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": ["att.com"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input[name='Expiration Month']",
+                                            "type": "creditCards.expiration"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": ["gamestop.com"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input[name='dwfrm_profile_customer_email']",
+                                            "type": "identities.emailAddress"
+                                        }
+                                    },
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input[name='dwfrm_profile_login_password']",
+                                            "type": "credentials.password.new"
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                },
                 "onByDefault": {
                     "state": "enabled",
                     "minSupportedVersion": "7.93.0",
@@ -850,7 +933,11 @@
                 },
                 "privacyProFreeTrialJan25": {
                     "state": "enabled",
-                    "targets": [{ "localeCountry": "US" }],
+                    "targets": [
+                        {
+                            "localeCountry": "US"
+                        }
+                    ],
                     "cohorts": [
                         {
                             "name": "control",
@@ -865,7 +952,11 @@
                 },
                 "privacyProOnboardingCTAMarch25": {
                     "state": "enabled",
-                    "targets": [{ "localeCountry": "US" }],
+                    "targets": [
+                        {
+                            "localeCountry": "US"
+                        }
+                    ],
                     "cohorts": [
                         {
                             "name": "control",
