@@ -2177,11 +2177,10 @@
         },
         "tabSwitcherAnimation": {
             "state": "enabled",
-            "minSupportedVersion": 52320000
+            "minSupportedVersion": 52340000
         },
         "senseOfProtection": {
             "state": "enabled",
-            "minSupportedVersion": 52320000,
             "exceptions": [],
             "features": {
                 "senseOfProtectionNewUserExperimentApr25": {
@@ -2208,6 +2207,54 @@
                 },
                 "senseOfProtectionExistingUserExperimentApr25": {
                     "state": "disabled",
+                    "cohorts": [
+                        {
+                            "name": "modifiedControl",
+                            "weight": 0
+                        },
+                        {
+                            "name": "variant1",
+                            "weight": 0
+                        },
+                        {
+                            "name": "variant2",
+                            "weight": 0
+                        }
+                    ]
+                },
+                "senseOfProtectionNewUserExperimentMay25": {
+                    "state": "disabled",
+                    "minSupportedVersion": 52340000,
+                    "targets": [
+                        {
+                            "isReturningUser": false
+                        }
+                    ],
+                    "cohorts": [
+                        {
+                            "name": "modifiedControl",
+                            "weight": 0
+                        },
+                        {
+                            "name": "variant1",
+                            "weight": 0
+                        },
+                        {
+                            "name": "variant2",
+                            "weight": 0
+                        }
+                    ]
+                },
+                "senseOfProtectionExistingUserExperimentMay25": {
+                    "state": "disabled",
+                    "minSupportedVersion": 52340000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            }
+                        ]
+                    },
                     "cohorts": [
                         {
                             "name": "modifiedControl",
