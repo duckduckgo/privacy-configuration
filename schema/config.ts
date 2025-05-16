@@ -4,6 +4,7 @@ import { CookieFeature } from './features/cookie';
 import { TrackerAllowlistFeature } from './features/tracker-allowlist';
 import { WebCompatFeature } from './features/webcompat';
 import { DuckPlayerFeature } from './features/duckplayer';
+import { DuckPlayerNativeFeature } from './features/duckplayer-native';
 import { AutofillFeature } from './features/autofill';
 import { MessageBridgeFeature } from './features/message-bridge';
 import { AndroidBrowserConfig } from './features/android-browser-config';
@@ -14,6 +15,7 @@ import { NetworkProtection } from './features/network-protection';
 
 export { WebCompatSettings } from './features/webcompat';
 export { DuckPlayerSettings } from './features/duckplayer';
+export { DuckPlayerNativeSettings } from './features/duckplayer-native';
 
 export type ExportedSchemas =
     | 'GenericV4Config'
@@ -21,7 +23,8 @@ export type ExportedSchemas =
     | 'LegacyConfig'
     | 'LegacyAndroidConfig'
     | 'WebCompatSettings'
-    | 'DuckPlayerSettings';
+    | 'DuckPlayerSettings'
+    | 'DuckPlayerNativeSettings';
 
 /**
  * Defines the structure of the built V4 config output as downloaded by clients.
@@ -36,6 +39,7 @@ export type ConfigV4<VersionType> = {
         autofill: AutofillFeature<VersionType>;
         cookie: CookieFeature<VersionType>;
         duckPlayer: DuckPlayerFeature<VersionType>;
+        duckPlayerNative: DuckPlayerNativeFeature<VersionType>;
         trackerAllowlist: TrackerAllowlistFeature<VersionType>;
         webCompat: WebCompatFeature<VersionType>;
         messageBridge: MessageBridgeFeature<VersionType>;
