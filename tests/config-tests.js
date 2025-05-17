@@ -31,6 +31,16 @@ const previousConfigs = platformOutput.map((plat) => {
 describe('Config schema tests', () => {
     for (const config of latestConfigs) {
         describe(`${config.name}`, () => {
+            before(() => {
+                const validate = createValidator(platformSpecificSchemas[config.name] || 'GenericV4Config');
+                const validateResult = validate(config.body);
+                if (!validateResult) {
+                    throw new Error(
+                        `JSON Schema validation failed:\n${formatErrors(validate.errors)} Check ${config.name} output against the schema/`,
+                    );
+                }
+            });
+
             // appTrackerProtection should only be on the Android config since it is a large feature
             const shouldContainAppTP = config.name.split('/')[1] === 'android-config.json';
             it('should contain appTrackerProtection or not', () => {
@@ -38,11 +48,6 @@ describe('Config schema tests', () => {
                     shouldContainAppTP,
                     `appTrackerProtection expected: ${shouldContainAppTP}`,
                 );
-            });
-
-            it('should validate against the full configV4 schema', () => {
-                const validate = createValidator(platformSpecificSchemas[config.name] || 'GenericV4Config');
-                expect(validate(config.body)).to.be.equal(true, formatErrors(validate.errors));
             });
 
             it('all features should be named correctly', () => {
@@ -94,7 +99,7 @@ describe('Config schema tests', () => {
                 }
             });
 
-            it('All patchSettings should also be valid', () => {
+            it('All patchSettings should also be valid', function () {
                 const validate = createValidator(platformSpecificSchemas[config.name] || 'GenericV4Config');
                 function applyPatchAndValidate(featureName, feature, conditionalChange, config) {
                     for (const change of conditionalChange) {
@@ -156,7 +161,7 @@ describe('Config schema tests', () => {
                 );
             });
 
-            it('should validate against the legacy schema', () => {
+            it('should validate against the legacy schema', function () {
                 const validate = createValidator(platformSpecificSchemas[config.name] || 'LegacyConfig');
                 expect(validate(config.body)).to.be.equal(true, formatErrors(validate.errors));
             });
