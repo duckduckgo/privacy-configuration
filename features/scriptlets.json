@@ -1,0 +1,230 @@
+{
+    "_meta": {
+        "description": "Run Adguard scriptlets."
+    },
+    "state": "enabled",
+    "exceptions": [],
+    "settings": {
+        "scriptlets": [
+            {
+                "name": "setConstant",
+                "attrs": {
+                    "property": "test",
+                    "value": "no"
+                }
+            },
+            {
+                "name": "abortCurrentInlineScript",
+                "attrs": {
+                    "property": "test",
+                    "search": "test"
+                }
+            },
+            {
+                "name": "abortOnPropertyRead",
+                "attrs": {
+                    "property": "test"
+                }
+            },
+            {
+                "name": "abortOnPropertyWrite",
+                "attrs": {
+                    "property": "test"
+                }
+            }
+        ],
+        "conditionalChanges": [
+            {
+                "condition": {
+                    "domain": "example.com"
+                },
+                "patchSettings": [
+                    {
+                        "op": "add",
+                        "path": "/scriptlets/-",
+                        "value": {
+                            "name": "trustedReplaceNodeText",
+                            "attrs": {
+                                "nodeName": "a",
+                                "textMatch": "More information...",
+                                "pattern": "...",
+                                "replacement": "!",
+                                "extraArgs": ["verbose"]
+                            }
+                        }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/scriptlets/-",
+                        "value": {
+                            "name": "trustedSetAttr",
+                            "attrs": {
+                                "selector": "a",
+                                "attr": "href",
+                                "value": "#"
+                            }
+                        }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/scriptlets/-",
+                        "value": {
+                            "name": "setCookie",
+                            "attrs": {
+                                "domain": "example.com",
+                                "name": "test",
+                                "value": "accepted"
+                            }
+                        }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/scriptlets/-",
+                        "value": {
+                            "name": "removeCookie",
+                            "attrs": {
+                                "domain": "example.com",
+                                "match": "bloop"
+                            }
+                        }
+                    }
+                ]
+            },
+            {
+                "condition": {
+                    "domain": "xnxx.com"
+                },
+                "patchSettings": [
+                    {
+                        "op": "add",
+                        "path": "/scriptlets/-",
+                        "value": {
+                            "name": "preventAddEventListener",
+                            "attrs": {
+                                "typeSearch": "DOMContentLoaded",
+                                "listenerSearch": "/dyn\\.ads|loadAdsDelayed/"
+                            }
+                        }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/scriptlets/-",
+                        "value": {
+                            "name": "setConstant",
+                            "attrs": {
+                                "property": "xv.sda.pp.init",
+                                "value": "noopFunc"
+                            }
+                        }
+                    }
+                ]
+            },
+            {
+                "condition": {
+                    "domain": "pornhub.com"
+                },
+                "patchSettings": [
+                    {
+                        "op": "add",
+                        "path": "/scriptlets/-",
+                        "value": {
+                            "name": "setCookie",
+                            "attrs": {
+                                "name": "views",
+                                "value": "1"
+                            }
+                        }
+                    }
+                ]
+            },
+            {
+                "condition": [
+                    {
+                        "domain": "redtube.com"
+                    },
+                    {
+                        "domain": "redtube.net"
+                    }
+                ],
+                "patchSettings": [
+                    {
+                        "op": "add",
+                        "path": "/scriptlets/-",
+                        "value": {
+                            "name": "preventWindowOpen"
+                        }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/scriptlets/-",
+                        "value": {
+                            "name": "abortCurrentInlineScript",
+                            "attrs": {
+                                "property": "Object.defineProperty",
+                                "search": "trafficjunky"
+                            }
+                        }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/scriptlets/-",
+                        "value": {
+                            "name": "setConstant",
+                            "attrs": {
+                                "property": "page_params.holiday_promo",
+                                "value": true
+                            }
+                        }
+                    }
+                ]
+            },
+            {
+                "condition": {
+                    "domain": "spankbang.com"
+                },
+                "patchSettings": [
+                    {
+                        "op": "add",
+                        "path": "/scriptlets/-",
+                        "value": {
+                            "name": "preventWindowOpen"
+                        }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/scriptlets/-",
+                        "value": {
+                            "name": "setConstant",
+                            "attrs": {
+                                "property": "BJSShowUnder",
+                                "value": {}
+                            }
+                        }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/scriptlets/-",
+                        "value": {
+                            "name": "setConstant",
+                            "attrs": {
+                                "property": "BJSShowUnder.bindTo",
+                                "value": "noopFunc"
+                            }
+                        }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/scriptlets/-",
+                        "value": {
+                            "name": "setConstant",
+                            "attrs": {
+                                "property": "BJSShowUnder.add",
+                                "value": "noopFunc"
+                            }
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+}
