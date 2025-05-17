@@ -3,6 +3,16 @@
         "webViewStateRestoration": {
             "state": "enabled"
         },
+        "adClickAttribution": {
+            "state": "enabled",
+            "patchFeature": [
+                {
+                    "op": "copy",
+                    "from": "/reference/adClickAttribution/settings",
+                    "path": "/settings"
+                }
+            ]
+        },
         "adAttributionReporting": {
             "state": "disabled",
             "minSupportedVersion": "7.146.0",
@@ -327,7 +337,15 @@
             "state": "enabled"
         },
         "elementHiding": {
-            "state": "enabled"
+            "state": "enabled",
+            "patchFeature": [
+                {
+                    "op": "copy",
+                    "from": "/reference/elementHiding/settings/rules",
+                    "path": "/settings"
+                }
+            ],
+            "settings": {}
         },
         "autoconsent": {
             "state": "enabled",
@@ -500,7 +518,10 @@
             }
         },
         "autofillBreakageReporter": {
-            "state": "enabled"
+            "state": "enabled",
+            "settings": {
+                "monitorIntervalDays": 42
+            }
         },
         "autofillSurveys": {
             "state": "enabled",

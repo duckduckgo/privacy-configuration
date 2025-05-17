@@ -3,6 +3,16 @@
         "autofill": {
             "state": "enabled"
         },
+        "adClickAttribution": {
+            "state": "enabled",
+            "patchFeature": [
+                {
+                    "op": "copy",
+                    "from": "/reference/adClickAttribution/settings",
+                    "path": "/settings"
+                }
+            ]
+        },
         "incontextSignup": {
             "state": "enabled",
             "minSupportedVersion": "2023.3.28.1",
@@ -58,7 +68,15 @@
             "state": "enabled"
         },
         "elementHiding": {
-            "state": "enabled"
+            "state": "enabled",
+            "patchFeature": [
+                {
+                    "op": "copy",
+                    "from": "/reference/elementHiding/settings/rules",
+                    "path": "/settings"
+                }
+            ],
+            "settings": {}
         },
         "fingerprintingCanvas": {
             "state": "disabled"

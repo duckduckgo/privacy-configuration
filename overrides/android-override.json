@@ -29,6 +29,13 @@
         },
         "adClickAttribution": {
             "state": "enabled",
+            "patchFeature": [
+                {
+                    "op": "copy",
+                    "from": "/reference/adClickAttribution/settings",
+                    "path": "/settings"
+                }
+            ],
             "features": {
                 "persistExemptions": {
                     "state": "enabled"
@@ -551,7 +558,10 @@
             }
         },
         "autofillBreakageReporter": {
-            "state": "enabled"
+            "state": "enabled",
+            "settings": {
+                "monitorIntervalDays": 42
+            }
         },
         "autofillSurveys": {
             "state": "enabled",
@@ -733,7 +743,15 @@
             }
         },
         "elementHiding": {
-            "state": "enabled"
+            "state": "enabled",
+            "patchFeature": [
+                {
+                    "op": "copy",
+                    "from": "/reference/elementHiding/settings/rules",
+                    "path": "/settings"
+                }
+            ],
+            "settings": {}
         },
         "breakageReporting": {
             "state": "enabled"
