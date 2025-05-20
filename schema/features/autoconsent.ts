@@ -10,6 +10,11 @@ export type AutoconsentFeature<VersionType> = Feature<
                   minSupportedVersion: VersionType;
               }
             | undefined;
+        compactRuleList?: {
+            v: number;
+            s: string[];
+            r: any[];
+        };
     },
     VersionType
 >;
