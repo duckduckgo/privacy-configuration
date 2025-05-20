@@ -259,6 +259,13 @@ async function buildPlatforms() {
             }
         }
 
+        // Skip the config weight of exceptions for features that are disabled
+        for (const [key, feature] of Object.entries(platformConfig.features)) {
+            if (feature.state === 'disabled') {
+                feature.exceptions = [];
+            }
+        }
+
         if (platformOverride.experimentalVariants) {
             platformConfig.experimentalVariants = platformOverride.experimentalVariants;
         }
