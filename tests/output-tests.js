@@ -25,13 +25,15 @@ describe('Build output validation', () => {
         ['content-blocking', 'cookie', 'click-to-load', 'web-compat'].forEach((featureFile) => {
             const feature = fileNameToFeatureName(featureFile);
             const featureConfig = loadJSON(`features/${featureFile}.json`);
-            it(`${feature} should include platform unprotectedTemporary exceptions`, () => {
-                const expected = override.unprotectedTemporary.map(extractDomains);
-                const actual = config.features[feature].exceptions.map(extractDomains);
-                expected.forEach((domain) => {
-                    expect(actual).to.contain(domain);
+            if (config.features[feature].state !== 'disabled') {
+                it(`${feature} should include platform unprotectedTemporary exceptions`, () => {
+                    const expected = override.unprotectedTemporary.map(extractDomains);
+                    const actual = config.features[feature].exceptions.map(extractDomains);
+                    expected.forEach((domain) => {
+                        expect(actual).to.contain(domain);
+                    });
                 });
-            });
+            }
 
             it(`${feature} should include feature exceptions`, () => {
                 const expected = featureConfig.exceptions.map(extractDomains);

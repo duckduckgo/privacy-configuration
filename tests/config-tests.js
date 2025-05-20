@@ -40,6 +40,14 @@ describe('Config schema tests', () => {
                 );
             });
 
+            it('should skip exceptions if feature is disabled', () => {
+                for (const [featureName, feature] of Object.entries(config.body.features)) {
+                    if (feature.state === 'disabled') {
+                        expect(feature.exceptions.length).to.be.equal(0, `Feature ${featureName} should not have exceptions`);
+                    }
+                }
+            });
+
             it('should validate against the full configV4 schema', () => {
                 const validate = createValidator(platformSpecificSchemas[config.name] || 'GenericV4Config');
                 expect(validate(config.body)).to.be.equal(true, formatErrors(validate.errors));
