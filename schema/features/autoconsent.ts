@@ -1,5 +1,4 @@
 import { Feature } from '../feature';
-import { CompactCMPRuleset } from '@duckduckgo/autoconsent/lib/encoding';
 
 export type AutoconsentFeature<VersionType> = Feature<
     {
@@ -11,7 +10,11 @@ export type AutoconsentFeature<VersionType> = Feature<
                   minSupportedVersion: VersionType;
               }
             | undefined;
-        compactRuleList?: CompactCMPRuleset;
+        compactRuleList?: {
+            v: number;
+            s: string[];
+            r: any[];
+        };
     },
     VersionType
 >;
