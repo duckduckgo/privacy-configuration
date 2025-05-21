@@ -108,8 +108,10 @@ addExceptionsToUnprotected(defaultConfig.features.contentBlocking.exceptions);
 
 // Include global unprotected-temporary.json exceptions into selected features domain exceptions
 const featuresToIncludeTempUnprotectedExceptions = [
+    'adBlockExtension',
     'ampLinks',
     'autoconsent',
+    'autofillService',
     'breakageReporting',
     'clickToLoad',
     'clickToPlay',
