@@ -14,7 +14,7 @@
             "state": "enabled",
             "exceptions": [],
             "settings": {
-                "origins": ["funnel_pro_iosrmf_announcement"]
+                "origins": ["funnel_newtab_ios_intlannouncement"]
             },
             "minSupportedVersion": "7.131.0"
         },
@@ -104,6 +104,9 @@
                     "settings": {
                         "signInRequiredSelector": "[href*=\"//support.google.com/youtube/answer/3037019\"]"
                     }
+                },
+                "nativeUI": {
+                    "state": "disabled"
                 }
             },
             "settings": {
@@ -145,7 +148,7 @@
                             "state": "enabled"
                         },
                         "videoDrawer": {
-                            "state": "enabled"
+                            "state": "disabled"
                         }
                     },
                     "serpProxy": {
@@ -186,6 +189,9 @@
                 ]
             }
         },
+        "duckPlayerNative": {
+            "state": "enabled"
+        },
         "marketplaceAdPostback": {
             "state": "enabled"
         },
@@ -193,55 +199,7 @@
             "state": "enabled",
             "exceptions": [],
             "features": {
-                "tdsNextExperimentBaseline": {
-                    "state": "disabled",
-                    "rollout": {
-                        "steps": [
-                            {
-                                "percent": 50
-                            }
-                        ]
-                    },
-                    "settings": {
-                        "controlUrl": "v5/temp/ios-tds.json",
-                        "treatmentUrl": "v5/temp/ios-tds-b.json"
-                    },
-                    "cohorts": [
-                        {
-                            "name": "control",
-                            "weight": 0
-                        },
-                        {
-                            "name": "treatment",
-                            "weight": 0
-                        }
-                    ]
-                },
-                "tdsNextExperimentFeb25": {
-                    "state": "disabled",
-                    "rollout": {
-                        "steps": [
-                            {
-                                "percent": 50
-                            }
-                        ]
-                    },
-                    "settings": {
-                        "controlUrl": "v5/current/ios-tds.json",
-                        "treatmentUrl": "v5/temp/ios-tds-ab-test.json"
-                    },
-                    "cohorts": [
-                        {
-                            "name": "control",
-                            "weight": 0
-                        },
-                        {
-                            "name": "treatment",
-                            "weight": 0
-                        }
-                    ]
-                },
-                "tdsNextExperimentMar25": {
+                "tdsNextExperimentMay25": {
                     "state": "disabled",
                     "rollout": {
                         "steps": [
@@ -251,32 +209,8 @@
                         ]
                     },
                     "settings": {
-                        "controlUrl": "v5/temp/tdsnextexperimentmar25-tds-control.json",
-                        "treatmentUrl": "v5/temp/tdsnextexperimentmar25-tds-treatment.json"
-                    },
-                    "cohorts": [
-                        {
-                            "name": "control",
-                            "weight": 0
-                        },
-                        {
-                            "name": "treatment",
-                            "weight": 0
-                        }
-                    ]
-                },
-                "tdsNextExperimentApr25": {
-                    "state": "disabled",
-                    "rollout": {
-                        "steps": [
-                            {
-                                "percent": 100
-                            }
-                        ]
-                    },
-                    "settings": {
-                        "controlUrl": "v5/temp/tdsnextexperimentapr25-tds-control.json",
-                        "treatmentUrl": "v5/temp/tdsnextexperimentapr25-tds-treatment.json"
+                        "controlUrl": "v5/temp/ios-tdsnextexperimentmay25-tds-control.json",
+                        "treatmentUrl": "v5/temp/ios-tdsnextexperimentmay25-tds-treatment.json"
                     },
                     "cohorts": [
                         {
@@ -348,6 +282,38 @@
         "ampLinks": {
             "state": "enabled"
         },
+        "contentScopeExperiments": {
+            "exceptions": [],
+            "state": "enabled",
+            "features": {
+                "fingerprintingCanvas": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                }
+            }
+        },
         "trackingParameters": {
             "state": "enabled",
             "exceptions": [
@@ -411,6 +377,89 @@
                 },
                 "unknownUsernameCategorization": {
                     "state": "enabled"
+                },
+                "siteSpecificFixes": {
+                    "state": "enabled",
+                    "settings": {
+                        "formTypeSettings": [],
+                        "inputTypeSettings": [],
+                        "formBoundarySelector": "",
+                        "domains": [
+                            {
+                                "domain": ["areaclientes.orange.es"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "form",
+                                            "type": "login"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": ["estore.archives.gov", "localhost"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "fieldset[id='ucContentMiddleCenter_fldLogin']",
+                                            "type": "login"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": ["zendesk.com", "localhost"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "#\\:r0\\:\\-\\-input",
+                                            "type": "credentials.username"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": ["att.com"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input[name='Expiration Month']",
+                                            "type": "creditCards.expiration"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": ["gamestop.com"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input[name='dwfrm_profile_customer_email']",
+                                            "type": "identities.emailAddress"
+                                        }
+                                    },
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input[name='dwfrm_profile_login_password']",
+                                            "type": "credentials.password.new"
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
                 },
                 "onByDefault": {
                     "state": "enabled",
@@ -549,6 +598,9 @@
                     "state": "enabled"
                 },
                 "seamlessAccountSwitching": {
+                    "state": "enabled"
+                },
+                "exchangeKeysToSyncWithAnotherDevice": {
                     "state": "enabled"
                 }
             }
@@ -789,12 +841,6 @@
         "privacyDashboard": {
             "state": "enabled",
             "features": {
-                "highlightedProtectionsToggle": {
-                    "state": "disabled",
-                    "rollout": {
-                        "steps": []
-                    }
-                },
                 "toggleReports": {
                     "state": "enabled"
                 }
@@ -870,9 +916,34 @@
                     },
                     "minSupportedVersion": "7.148.0"
                 },
+                "privacyProAuthV2": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 10
+                            }
+                        ]
+                    },
+                    "minSupportedVersion": "7.167.0"
+                },
+                "privacyProOnboardingPromotion": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.169.0"
+                },
+                "privacyProFreeTrial": {
+                    "state": "enabled"
+                },
                 "privacyProFreeTrialJan25": {
-                    "state": "disabled",
-                    "targets": [{ "localeCountry": "US" }],
+                    "state": "enabled",
+                    "targets": [
+                        {
+                            "localeCountry": "US"
+                        }
+                    ],
                     "cohorts": [
                         {
                             "name": "control",
@@ -880,18 +951,22 @@
                         },
                         {
                             "name": "treatment",
-                            "weight": 0
+                            "weight": 1
                         }
                     ],
                     "minSupportedVersion": "7.157.0"
                 },
                 "privacyProOnboardingCTAMarch25": {
                     "state": "enabled",
-                    "targets": [{ "localeCountry": "US" }],
+                    "targets": [
+                        {
+                            "localeCountry": "US"
+                        }
+                    ],
                     "cohorts": [
                         {
                             "name": "control",
-                            "weight": 1
+                            "weight": 0
                         },
                         {
                             "name": "treatment",
@@ -1001,7 +1076,7 @@
             "state": "enabled",
             "features": {
                 "setAsDefaultBrowserExperiment": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": "7.162.0",
                     "cohorts": [
                         {

@@ -280,6 +280,10 @@
                 "type": "hide-empty"
             },
             {
+                "selector": ".ad-frame",
+                "type": "hide-empty"
+            },
+            {
                 "selector": ".advertisement",
                 "type": "closest-empty"
             },
@@ -678,6 +682,23 @@
                     },
                     {
                         "selector": "[class*='td-block']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "advocate.com",
+                "rules": [
+                    {
+                        "selector": "[class*='ad_leaderboard_wrap']",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": "[class*='ad-tag']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".ad_tag",
                         "type": "hide-empty"
                     }
                 ]
@@ -1106,15 +1127,6 @@
                 ]
             },
             {
-                "domain": "cyclingtips.com",
-                "rules": [
-                    {
-                        "selector": "[data-block-name='ads']",
-                        "type": "closest-empty"
-                    }
-                ]
-            },
-            {
                 "domain": "dailyboulder.com",
                 "rules": [
                     {
@@ -1156,6 +1168,10 @@
                     {
                         "selector": ".mol-ads-label-container",
                         "type": "closest-empty"
+                    },
+                    {
+                        "selector": "#stickyAdsContainer",
+                        "type": "hide-empty"
                     }
                 ]
             },
@@ -1443,24 +1459,8 @@
                         "type": "hide-empty"
                     },
                     {
-                        "selector": ".global-nav-view, .global-nav-view .global-nav-content",
-                        "type": "modify-style",
-                        "values": [
-                            {
-                                "property": "margin-top",
-                                "value": "0px"
-                            }
-                        ]
-                    },
-                    {
-                        "selector": ".search-subnav-slender-view, .search-slender-advanced-panel-view",
-                        "type": "modify-style",
-                        "values": [
-                            {
-                                "property": "top",
-                                "value": "0px"
-                            }
-                        ]
+                        "selector": "[class*='-ad-container']",
+                        "type": "override"
                     }
                 ]
             },
@@ -2394,6 +2394,15 @@
                 ]
             },
             {
+                "domain": "ncaa.com",
+                "rules": [
+                    {
+                        "selector": ".mobile-persistent-bottom",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
                 "domain": "ndtvprofit.com",
                 "rules": [
                     {
@@ -2618,6 +2627,25 @@
                     {
                         "selector": "[id*='pub_pave']",
                         "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "outsideonline.com",
+                "rules": [
+                    {
+                        "selector": ".o-ad",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".l-main",
+                        "type": "modify-style",
+                        "values": [
+                            {
+                                "property": "margin-top",
+                                "value": "0vh"
+                            }
+                        ]
                     }
                 ]
             },
@@ -2943,6 +2971,10 @@
                     {
                         "selector": ".ad-area",
                         "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[data-qa='AdSlot-Container']",
+                        "type": "closest-empty"
                     }
                 ]
             },
@@ -3775,6 +3807,33 @@
                     },
                     {
                         "selector": ".article-sidebar-banner",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "thedrive.com",
+                "rules": [
+                    {
+                        "selector": "#pw-top-right-sidebar-aib",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "worldfootball.net",
+                "rules": [
+                    {
+                        "selector": ".wfb-ad",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "elespanol.com",
+                "rules": [
+                    {
+                        "selector": ".stickycontainer",
                         "type": "hide-empty"
                     }
                 ]

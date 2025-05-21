@@ -1,22 +1,29 @@
-const fs = require('fs');
+import fs from 'fs';
+import fetch from 'node-fetch';
 
-const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
+import {
+    addCnameEntriesToAllowlist,
+    inlineReasonArrays,
+    mergeAllowlistedTrackers,
+    addHashToFeatures,
+    stripReasons,
+    getBaseFeatureConfigs,
+} from './util.js';
 
-const { addCnameEntriesToAllowlist, inlineReasonArrays, mergeAllowlistedTrackers, addHashToFeatures, stripReasons } = require('./util');
+import { OVERRIDE_DIR, GENERATED_DIR, LISTS_DIR, BROWSERS_SUBDIR, CURRENT_CONFIG_VERSION, UNPROTECTED_LIST_NAME } from './constants.js';
 
-const { OVERRIDE_DIR, GENERATED_DIR, LISTS_DIR, BROWSERS_SUBDIR, CURRENT_CONFIG_VERSION } = require('./constants');
+import platforms from './platforms.js';
+import { compatFunctions, removeEolFeatures } from './compatibility.js';
 
 const defaultConfig = {
     readme: 'https://github.com/duckduckgo/privacy-configuration',
     version: Date.now(),
-    features: {},
+    features: getBaseFeatureConfigs(),
     unprotectedTemporary: [],
 };
+
 // Env flag that can be used to override stripping of 'reason' strings from the config.
 const keepReasons = process.argv.includes('--keep-reasons');
-
-const platforms = require('./platforms');
-const compatibility = require('./compatibility');
 
 const tdsPath = 'live';
 
@@ -61,18 +68,18 @@ function writeConfigToDisk(platform, config) {
         if (!prevConfig) {
             prevConfig = config;
         } else {
-            if (!compatibility.compatFunctions[version]) {
+            if (!compatFunctions[version]) {
                 throw new Error(`No compat function for config version ${version}`);
             }
 
-            prevConfig = compatibility.compatFunctions[version](prevConfig, unmodifiedConfig);
+            prevConfig = compatFunctions[version](prevConfig, unmodifiedConfig, platform);
         }
 
         const compatConfig = JSON.parse(JSON.stringify(prevConfig));
         addHashToFeatures(compatConfig);
 
-        compatibility.removeEolFeatures(compatConfig, i);
-        fs.writeFileSync(`${GENERATED_DIR}/${version}/${configName}-config.json`, JSON.stringify(compatConfig, null, 4));
+        removeEolFeatures(compatConfig, i);
+        fs.writeFileSync(`${GENERATED_DIR}/${version}/${configName}-config.json`, JSON.stringify(compatConfig));
     }
 }
 
@@ -87,22 +94,6 @@ function mkdirIfNeeded(dir) {
     }
 }
 
-const unprotectedListName = 'unprotected-temporary.json';
-
-// Grab all exception lists
-const jsonListNames = fs.readdirSync(LISTS_DIR).filter((listName) => {
-    return listName !== unprotectedListName && listName !== '_template.json';
-});
-for (const jsonList of jsonListNames) {
-    const listData = JSON.parse(fs.readFileSync(`${LISTS_DIR}/${jsonList}`));
-    const configKey = jsonList.replace(/[.]json$/, '').replace(/-([a-z0-9])/g, function (g) {
-        return g[1].toUpperCase();
-    });
-
-    delete listData._meta;
-    defaultConfig.features[configKey] = listData;
-}
-
 const unprotectedDomains = new Set();
 function addExceptionsToUnprotected(exceptions) {
     for (const exception of exceptions) {
@@ -111,11 +102,11 @@ function addExceptionsToUnprotected(exceptions) {
     return exceptions.map((obj) => obj.domain);
 }
 
-const listData = JSON.parse(fs.readFileSync(`${LISTS_DIR}/${unprotectedListName}`));
+const listData = JSON.parse(fs.readFileSync(`${LISTS_DIR}/${UNPROTECTED_LIST_NAME}`));
 addExceptionsToUnprotected(listData.exceptions);
 addExceptionsToUnprotected(defaultConfig.features.contentBlocking.exceptions);
 
-// Exclude selected features from the global unprotected-temporary.json domain exceptions
+// Include global unprotected-temporary.json exceptions into selected features domain exceptions
 const featuresToIncludeTempUnprotectedExceptions = [
     'ampLinks',
     'autoconsent',
@@ -149,8 +140,6 @@ const featuresToIncludeTempUnprotectedExceptions = [
     'trackingParameters',
     'unprotectedTemporary',
     'webCompat',
-    'swipingTabs',
-    'showOnAppLaunch',
 ];
 function applyGlobalUnprotectedTempExceptionsToFeatures(key, baseConfig, globalExceptions) {
     if (featuresToIncludeTempUnprotectedExceptions.includes(key)) {

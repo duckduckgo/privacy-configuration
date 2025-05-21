@@ -1,52 +1,17 @@
 {
     "features": {
         "apiManipulation": {
-            "state": "disabled",
+            "state": "enabled",
             "settings": {
                 "apiChanges": {
-                    "Navigator.prototype.joinAdInterestGroup": {
-                        "type": "remove"
+                    "Navigator.prototype.deviceMemory": {
+                        "type": "descriptor",
+                        "getterValue": {
+                            "type": "number",
+                            "value": 8
+                        }
                     },
-                    "Navigator.prototype.leaveAdInterestGroup": {
-                        "type": "remove"
-                    },
-                    "Navigator.prototype.clearOriginJoinedAdInterestGroups": {
-                        "type": "remove"
-                    },
-                    "Navigator.prototype.updateAdInterestGroups": {
-                        "type": "remove"
-                    },
-                    "Navigator.prototype.createAuctionNonce": {
-                        "type": "remove"
-                    },
-                    "Navigator.prototype.runAdAuction": {
-                        "type": "remove"
-                    },
-                    "Navigator.prototype.adAuctionComponents": {
-                        "type": "remove"
-                    },
-                    "Navigator.prototype.deprecatedURNToURL": {
-                        "type": "remove"
-                    },
-                    "Navigator.prototype.deprecatedReplaceInURN": {
-                        "type": "remove"
-                    },
-                    "Navigator.prototype.getInterestGroupAdAuctionData": {
-                        "type": "remove"
-                    },
-                    "Navigator.prototype.createAdRequest": {
-                        "type": "remove"
-                    },
-                    "Navigator.prototype.finalizeAd": {
-                        "type": "remove"
-                    },
-                    "Navigator.prototype.canLoadAdAuctionFencedFrame": {
-                        "type": "remove"
-                    },
-                    "Navigator.prototype.deprecatedRunAdAuctionEnforcesKAnonymity": {
-                        "type": "remove"
-                    },
-                    "Navigator.prototype.protectedAudience": {
+                    "Navigator.prototype.keyboard": {
                         "type": "descriptor",
                         "getterValue": {
                             "type": "undefined"
@@ -66,6 +31,12 @@
                 },
                 "allowBlockMalware": {
                     "state": "enabled"
+                },
+                "userTips": {
+                    "state": "disabled"
+                },
+                "enforceRoutes": {
+                    "state": "disabled"
                 }
             },
             "settings": {
@@ -101,14 +72,10 @@
                     "state": "enabled"
                 },
                 "waitlist": {
-                    "state": "disabled",
-                    "rollout": {
-                        "steps": [
-                            {
-                                "percent": 3
-                            }
-                        ]
-                    }
+                    "state": "disabled"
+                },
+                "freemium": {
+                    "state": "disabled"
                 }
             },
             "settings": {
@@ -120,10 +87,7 @@
             "minSupportedVersion": "0.64.0"
         },
         "brokerProtection": {
-            "state": "enabled",
-            "settings": {
-                "useEnhancedCaptchaSystem": "disabled"
-            }
+            "state": "enabled"
         },
         "windowsPermissionUsage": {
             "state": "enabled"
@@ -150,6 +114,89 @@
                 },
                 "partialFormSaves": {
                     "state": "enabled"
+                },
+                "siteSpecificFixes": {
+                    "state": "enabled",
+                    "settings": {
+                        "formTypeSettings": [],
+                        "inputTypeSettings": [],
+                        "formBoundarySelector": "",
+                        "domains": [
+                            {
+                                "domain": ["areaclientes.orange.es"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "form",
+                                            "type": "login"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": ["estore.archives.gov", "localhost"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "fieldset[id='ucContentMiddleCenter_fldLogin']",
+                                            "type": "login"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": ["zendesk.com", "localhost"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "#\\:r0\\:\\-\\-input",
+                                            "type": "credentials.username"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": ["att.com"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input[name='Expiration Month']",
+                                            "type": "creditCards.expiration"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": ["gamestop.com"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input[name='dwfrm_profile_customer_email']",
+                                            "type": "identities.emailAddress"
+                                        }
+                                    },
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input[name='dwfrm_profile_login_password']",
+                                            "type": "credentials.password.new"
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
                 }
             }
         },
@@ -185,6 +232,7 @@
         },
         "duckPlayer": {
             "state": "enabled",
+            "minSupportedVersion": "0.109.7",
             "features": {
                 "pip": {
                     "state": "enabled"
@@ -203,7 +251,89 @@
                     "settings": {
                         "signInRequiredSelector": "[href*=\"//support.google.com/youtube/answer/3037019\"]"
                     }
+                },
+                "nativeUI": {
+                    "state": "disabled"
                 }
+            },
+            "settings": {
+                "tryDuckPlayerLink": "https://www.youtube.com/watch?v=yKWIA-Pys4c",
+                "duckPlayerDisabledHelpPageLink": "https://duckduckgo.com/duckduckgo-help-pages/duck-player",
+                "youtubePath": "watch",
+                "youtubeEmbedUrl": "youtube-nocookie.com",
+                "youTubeUrl": "youtube.com",
+                "youTubeReferrerHeaders": ["Referer"],
+                "youTubeReferrerQueryParams": ["embeds_referring_euri"],
+                "youTubeVideoIDQueryParam": "v",
+                "overlays": {
+                    "youtube": {
+                        "state": "disabled",
+                        "selectors": {
+                            "thumbLink": "a[href^='/watch']",
+                            "excludedRegions": ["#playlist", "ytd-movie-renderer", "ytd-grid-movie-renderer"],
+                            "videoElement": "#player video",
+                            "videoElementContainer": "#player .html5-video-player",
+                            "hoverExcluded": [],
+                            "clickExcluded": ["ytd-thumbnail-overlay-toggle-button-renderer"],
+                            "allowedEventTargets": [
+                                ".ytp-inline-preview-scrim",
+                                ".ytd-video-preview",
+                                "#thumbnail-container",
+                                "#video-title-link",
+                                "#video-title",
+                                "video.video-stream.html5-main-video"
+                            ],
+                            "drawerContainer": "body"
+                        },
+                        "thumbnailOverlays": {
+                            "state": "enabled"
+                        },
+                        "clickInterception": {
+                            "state": "enabled"
+                        },
+                        "videoOverlays": {
+                            "state": "enabled"
+                        },
+                        "videoDrawer": {
+                            "state": "disabled"
+                        }
+                    },
+                    "serpProxy": {
+                        "state": "disabled"
+                    }
+                },
+                "domains": [
+                    {
+                        "domain": "www.youtube.com",
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/overlays/youtube/state",
+                                "value": "enabled"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "duckduckgo.com",
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/overlays/serpProxy/state",
+                                "value": "enabled"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "m.youtube.com",
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/overlays/youtube/state",
+                                "value": "enabled"
+                            }
+                        ]
+                    }
+                ]
             }
         },
         "elementHiding": {
@@ -214,7 +344,7 @@
             "minSupportedVersion": "0.88.3"
         },
         "fingerprintingHardware": {
-            "state": "enabled",
+            "state": "disabled",
             "minSupportedVersion": "0.88.3",
             "exceptions": [
                 {
@@ -231,6 +361,20 @@
             "state": "enabled",
             "minSupportedVersion": "0.88.3"
         },
+        "import": {
+            "state": "enabled",
+            "features": {
+                "browserMultiStepImport": {
+                    "state": "enabled",
+                    "settings": {
+                        "chrome": "enabled",
+                        "brave": "disabled",
+                        "edge": "disabled",
+                        "vivaldi": "disabled"
+                    }
+                }
+            }
+        },
         "referrer": {
             "state": "enabled",
             "minSupportedVersion": "0.93.0"
@@ -240,6 +384,10 @@
                 {
                     "domain": "legalandgeneral.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2491"
+                },
+                {
+                    "domain": "desjardins.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2946"
                 }
             ],
             "state": "enabled",
@@ -391,7 +539,13 @@
             "state": "disabled"
         },
         "clientBrandHint": {
-            "state": "enabled"
+            "state": "enabled",
+            "exceptions": [
+                {
+                    "domain": "ee.co.uk",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3041"
+                }
+            ]
         },
         "privacyPro": {
             "state": "enabled",
@@ -432,6 +586,9 @@
                 "authApiV2": {
                     "state": "disabled"
                 }
+            },
+            "settings": {
+                "authApiV2NonStableRollout": false
             }
         },
         "webCompat": {
@@ -534,17 +691,49 @@
             }
         },
         "maliciousSiteProtection": {
-            "state": "enabled",
-            "minSupportedVersion": "0.104.3",
+            "state": "disabled",
             "settings": {
                 "hashPrefixUpdateFrequency": 20,
                 "filterSetUpdateFrequency": 720
+            },
+            "features": {
+                "scamProtection": {
+                    "state": "disabled"
+                }
             },
             "exceptions": []
         },
         "windowsWebViewPermissionsSavesInProfile": {
             "state": "disabled",
             "exceptions": []
+        },
+        "brokenSitePrompt": {
+            "state": "enabled"
+        },
+        "downloadManager": {
+            "state": "enabled",
+            "minSupportedVersion": "0.112.0",
+            "features": {
+                "alwaysAskWhereToSaveFiles": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.112.0"
+                }
+            }
+        },
+        "quickNavTldLookup": {
+            "state": "enabled",
+            "minSupportedVersion": "0.111.0"
+        },
+        "adBlockExtension": {
+            "state": "enabled"
+        },
+        "releaseNotes": {
+            "state": "enabled",
+            "features": {
+                "releaseNotesFromCDN": {
+                    "state": "disabled"
+                }
+            }
         }
     },
     "unprotectedTemporary": []

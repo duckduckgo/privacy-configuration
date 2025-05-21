@@ -17,9 +17,28 @@ type ImportFromGooglePasswordManager = {
     signInButton: ButtonConfig;
 };
 
+export type FormTypeSetting = {
+    selector: string;
+    type: 'login' | 'signup';
+};
+
+export type InputTypeSetting = {
+    selector: string;
+    type: string;
+};
+
+export type FormBoundarySelector = string;
+
+export type SiteSpecificFixes = {
+    formBoundarySelector?: FormBoundarySelector;
+    formTypeSettings?: FormTypeSetting[];
+    inputTypeSettings?: InputTypeSetting[];
+};
+
 // Any subfeatures that have typed `settings` should be defined here.
 // Subfeatures without settings (or just string:string mappings for settings) will be automatically validated.
 type SubFeatures<VersionType> = {
+    // Do not copy this schema, it's not standard. Use siteSpecificFixes instead.
     canImportFromGooglePasswordManager?: SubFeature<
         VersionType,
         {
@@ -32,6 +51,7 @@ type SubFeatures<VersionType> = {
             };
         }
     >;
+    siteSpecificFixes?: SubFeature<VersionType, CSSInjectFeatureSettings<SiteSpecificFixes>>;
 };
 
 export type AutofillFeature<VersionType> = Feature<

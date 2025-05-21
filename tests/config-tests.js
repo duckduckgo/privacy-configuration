@@ -1,8 +1,12 @@
-const expect = require('chai').expect;
-const fs = require('fs');
-const { createValidator, formatErrors } = require('./schema-validation');
-const platforms = require('./../platforms').map((item) => item.replace('browsers/', 'extension-'));
-const immutableJSONPatch = require('immutable-json-patch').immutableJSONPatch;
+import { expect } from 'chai';
+import fs from 'fs';
+import path from 'path';
+import { createValidator, formatErrors } from './schema-validation.js';
+import platforms from './../platforms.js';
+import { immutableJSONPatch } from 'immutable-json-patch';
+import { getBaseFeatureConfigs } from '../util.js';
+
+const platformOutput = platforms.map((item) => item.replace('browsers/', 'extension-'));
 
 const platformSpecificSchemas = {
     'v4/android-config.json': 'AndroidV4Config',
@@ -10,14 +14,14 @@ const platformSpecificSchemas = {
 };
 
 // Test the latest 2 versions of each platform
-const latestConfigs = platforms.map((plat) => {
+const latestConfigs = platformOutput.map((plat) => {
     return {
         name: `v4/${plat}-config.json`,
         body: JSON.parse(fs.readFileSync(`./generated/v4/${plat}-config.json`)),
     };
 });
 
-const previousConfigs = platforms.map((plat) => {
+const previousConfigs = platformOutput.map((plat) => {
     return {
         name: `v3/${plat}-config.json`,
         body: JSON.parse(fs.readFileSync(`./generated/v3/${plat}-config.json`)),
@@ -92,21 +96,33 @@ describe('Config schema tests', () => {
 
             it('All patchSettings should also be valid', () => {
                 const validate = createValidator(platformSpecificSchemas[config.name] || 'GenericV4Config');
-                for (const featureName of Object.keys(config.body.features)) {
-                    const feature = config.body.features[featureName];
-                    if (feature?.settings?.domains) {
-                        for (const domain of feature.settings.domains) {
-                            if (!domain.patchSettings) {
-                                continue;
-                            }
-                            let featureSettings = feature.settings;
-                            featureSettings = immutableJSONPatch(featureSettings, domain.patchSettings);
-                            // Clone config and check the schema with the patched featureSettings
-                            const clonedConfig = JSON.parse(JSON.stringify(config.body));
-                            expect(clonedConfig.features[featureName].settings).to.not.be.equal(featureSettings);
-                            clonedConfig.features[featureName].settings = featureSettings;
-                            expect(validate(clonedConfig)).to.be.equal(true, formatErrors(validate.errors));
+                function applyPatchAndValidate(featureName, feature, conditionalChange, config) {
+                    for (const change of conditionalChange) {
+                        if (!change.patchSettings) {
+                            continue;
                         }
+                        let featureSettings = feature.settings;
+                        featureSettings = immutableJSONPatch(featureSettings, change.patchSettings);
+                        // Clone config and check the schema with the patched featureSettings
+                        const clonedConfig = JSON.parse(JSON.stringify(config.body));
+                        expect(clonedConfig.features[featureName].settings).to.not.be.equal(featureSettings);
+                        clonedConfig.features[featureName].settings = featureSettings;
+                        expect(validate(clonedConfig)).to.be.equal(true, formatErrors(validate.errors));
+                    }
+                }
+
+                const legacyFeatures = ['networkProtection'];
+                for (const featureName of Object.keys(config.body.features)) {
+                    // Ignore a non C-S-S feature that uses "domains"
+                    if (legacyFeatures.includes(featureName)) {
+                        continue;
+                    }
+                    const feature = config.body.features[featureName];
+                    if (feature?.settings?.conditionalChanges) {
+                        applyPatchAndValidate(featureName, feature, feature.settings.conditionalChanges, config);
+                    }
+                    if (feature?.settings?.domains) {
+                        applyPatchAndValidate(featureName, feature, feature.settings.domains, config);
                     }
                 }
             });
@@ -146,4 +162,32 @@ describe('Config schema tests', () => {
             });
         });
     }
+});
+
+describe('Config schema tests', () => {
+    it('All subfeatures must be defined in their overrides files if they apply', () => {
+        const baseFeatures = getBaseFeatureConfigs();
+        for (const platform of platforms) {
+            const dirname = import.meta.dirname;
+            const overrideConfig = JSON.parse(fs.readFileSync(path.join(dirname, `/../overrides/${platform}-override.json`), 'utf-8'));
+            // Skip over extension platforms:
+            if (platform.startsWith('browsers/')) {
+                continue;
+            }
+            for (const [featureName, baseFeature] of Object.entries(baseFeatures)) {
+                const overrideFeature = overrideConfig.features[featureName];
+                // Skip over if we have no override for this feature
+                if (!overrideFeature) continue;
+                if (!('features' in overrideFeature)) continue;
+                // Skip over if we have no subfeatures
+                if (!('features' in baseFeature)) continue;
+                for (const [subFeatureName] of Object.entries(baseFeature.features)) {
+                    expect(overrideFeature.features[subFeatureName]).to.be.an(
+                        'object',
+                        `Missing override for ${platform} ${featureName}.${subFeatureName}`,
+                    );
+                }
+            }
+        }
+    });
 });

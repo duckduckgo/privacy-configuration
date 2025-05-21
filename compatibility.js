@@ -11,7 +11,7 @@ function versionToInt(version) {
  * @param {object} config - the config object to remove eol features from
  * @param {int} version - the version of the config object
  */
-function removeEolFeatures(config, version) {
+export function removeEolFeatures(config, version) {
     for (const feature of Object.keys(config.features)) {
         const eol = config.features[feature].eol;
         if (!eol) {
@@ -38,7 +38,7 @@ function removeEolFeatures(config, version) {
  * param {object} config - the config object to convert. This config should be one version higher than the target version.
  * return {object} - The converted config object
  */
-const compatFunctions = {
+export const compatFunctions = {
     v1: (config) => {
         // Breaking changes: minSupportedVersion key in features
 
@@ -70,7 +70,7 @@ const compatFunctions = {
 
         return v2Config;
     },
-    v3: (config, unmodifiedConfig) => {
+    v3: (config, unmodifiedConfig, platform) => {
         // Breaking changes: none, reasons stripped starting in v4
 
         const v3Config = JSON.parse(JSON.stringify(config));
@@ -115,11 +115,25 @@ const compatFunctions = {
             }
         }
 
+        // Change "internal" feature + sub-feature state to "disabled" for the
+        // v3 Windows config. Older versions of the Windows browser cannot parse
+        // configurations that use the "internal" state.
+        if (platform === 'windows') {
+            for (const feature of Object.values(v3Config.features)) {
+                if (feature.state === 'internal') {
+                    feature.state = 'disabled';
+                }
+
+                if (feature.features) {
+                    for (const subFeature of Object.values(feature.features)) {
+                        if (subFeature.state === 'internal') {
+                            subFeature.state = 'disabled';
+                        }
+                    }
+                }
+            }
+        }
+
         return v3Config;
     },
-};
-
-module.exports = {
-    removeEolFeatures,
-    compatFunctions,
 };

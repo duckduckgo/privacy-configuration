@@ -1,4 +1,4 @@
-import { CSSInjectFeatureSettings, Feature, SubFeature } from '../feature';
+import { Feature, SubFeature } from '../feature';
 
 // Type of the feature `settings` object
 type SettingsType = undefined;
@@ -34,6 +34,18 @@ type SubFeatures<VersionType> = {
             domains: string[];
             // Patterns to be matched in the WebView's LevelDB
             matchingRegex: string[];
+        }
+    >;
+    // This sets the omnibar's change bounds duration, tension and icon fade duration.
+    omnibarAnimation?: SubFeature<
+        VersionType,
+        {
+            // Duration of the change bounds animation
+            changeBoundsDuration: number;
+            // Duration of the icon fade animation
+            fadeDuration: number;
+            // Tension of the change bounds animation
+            tension: number;
         }
     >;
 };
