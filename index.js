@@ -108,10 +108,8 @@ addExceptionsToUnprotected(defaultConfig.features.contentBlocking.exceptions);
 
 // Include global unprotected-temporary.json exceptions into selected features domain exceptions
 const featuresToIncludeTempUnprotectedExceptions = [
-    'adBlockExtension',
     'ampLinks',
     'autoconsent',
-    'autofillService',
     'breakageReporting',
     'clickToLoad',
     'clickToPlay',
@@ -162,12 +160,14 @@ function isFeatureMissingState(feature) {
 // We previously rolled out all features to all platforms, so this is a safety whilst we deprecate that behavior.
 // Don't add new items to this list, we should just add fearures to overrides/ files instead with explicit state.
 const legacyDisabledFeatures = [
+    'adBlockExtension',
     'androidBrowserConfig',
     'androidNewStateKillSwitch',
     'ampLinks',
     'appTrackerProtection',
     'auraExperiment',
     'autoconsent',
+    'autofillService',
     'bookmarksSorting',
     'brokenSiteReportExperiment',
     'changeOmnibarPosition',
