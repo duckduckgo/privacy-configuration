@@ -6,6 +6,7 @@ import { WebCompatFeature } from './features/webcompat';
 import { DuckPlayerFeature } from './features/duckplayer';
 import { DuckPlayerNativeFeature } from './features/duckplayer-native';
 import { AutofillFeature } from './features/autofill';
+import { ImportFeature } from './features/import';
 import { MessageBridgeFeature } from './features/message-bridge';
 import { AndroidBrowserConfig } from './features/android-browser-config';
 import { APIModificationFeature } from './features/api-modification';
@@ -37,6 +38,7 @@ export type ConfigV4<VersionType> = {
         apiModification?: APIModificationFeature<VersionType>;
         autoconsent: AutoconsentFeature<VersionType>;
         autofill: AutofillFeature<VersionType>;
+        import: ImportFeature<VersionType>;
         cookie: CookieFeature<VersionType>;
         duckPlayer: DuckPlayerFeature<VersionType>;
         duckPlayerNative: DuckPlayerNativeFeature<VersionType>;
