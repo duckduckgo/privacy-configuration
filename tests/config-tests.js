@@ -29,6 +29,20 @@ const previousConfigs = platformOutput.map((plat) => {
 });
 
 describe('Config schema tests', () => {
+    const featurePlatformUsage = {};
+    for (const otherConfig of latestConfigs) {
+        for (const featureName of Object.keys(otherConfig.body.features)) {
+            // Skip over counting extension specific platforms
+            if (otherConfig.name.match(/extension-[a-z0-9]+-config/)) {
+                continue;
+            }
+            if (!(featureName in otherConfig.body.features)) {
+                continue;
+            }
+            featurePlatformUsage[featureName] = (featurePlatformUsage[featureName] || 0) + 1;
+        }
+    }
+
     for (const config of latestConfigs) {
         describe(`${config.name}`, () => {
             // appTrackerProtection should only be on the Android config since it is a large feature
@@ -81,16 +95,28 @@ describe('Config schema tests', () => {
                 }
             });
 
-            it('All features should have a corresponding feature file', () => {
+            it('All features should have a corresponding feature file if used in more than one platform', () => {
                 // Note: We should not add more to this list, only remove
                 const legacyFeatures = ['webViewBlobDownload', 'experimentTest', 'eme', 'clientContentFeatures'];
+                expect(featurePlatformUsage).to.be.an('object');
+                expect(Object.keys(featurePlatformUsage)).to.have.length.greaterThan(0);
+
                 for (const featureName of Object.keys(config.body.features)) {
+                    // Skip over counting extension specific platforms
+                    if (config.name.match(/extension-[a-z0-9]+-config/)) {
+                        continue;
+                    }
                     if (legacyFeatures.includes(featureName)) {
                         continue;
                     }
                     const dasherizedFeatureName = featureName.replace(/([a-z0-9])([A-Z0-9])/g, '$1-$2').toLowerCase();
                     const featureFile = `./features/${dasherizedFeatureName}.json`;
-                    expect(fs.existsSync(featureFile)).to.be.equal(true, `Feature file not found: ${featureFile}`);
+                    const featureFileExists = fs.existsSync(featureFile);
+                    // Only check for other platforms if the feature file does not exist
+                    expect(!featureFileExists && featurePlatformUsage[featureName] > 1).to.be.equal(
+                        false,
+                        `Feature file not found: ${featureFile} when it's used in ${config.name} and other platforms`,
+                    );
                 }
             });
 
