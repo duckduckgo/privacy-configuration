@@ -97,7 +97,12 @@ describe('Config schema tests', () => {
 
             it('All features should have a corresponding feature file if used in more than one platform', () => {
                 // Note: We should not add more to this list, only remove
-                const legacyFeatures = ['webViewBlobDownload', 'experimentTest', 'eme', 'clientContentFeatures'];
+                const legacyFeatures = [
+                    'webViewBlobDownload',
+                    'experimentTest',
+                    'eme',
+                    'clientContentFeatures',
+                ];
                 expect(featurePlatformUsage).to.be.an('object');
                 expect(Object.keys(featurePlatformUsage)).to.have.length.greaterThan(0);
 
@@ -200,7 +205,10 @@ describe('Config schema tests', () => {
             if (platform.startsWith('browsers/')) {
                 continue;
             }
-            for (const [featureName, baseFeature] of Object.entries(baseFeatures)) {
+            for (const [
+                featureName,
+                baseFeature,
+            ] of Object.entries(baseFeatures)) {
                 const overrideFeature = overrideConfig.features[featureName];
                 // Skip over if we have no override for this feature
                 if (!overrideFeature) continue;
