@@ -3,11 +3,48 @@
         "description": "Protection from canvas API fingerprinting.",
         "sampleExcludeRecords": {
             "domain": "example.com",
-            "reason": "site breakage"
+            "reason": "site breakage",
+            "safeMethods": ["putImageData", "drawImage"],
+            "unsafeMethods": [
+                "strokeRect",
+                "bezierCurveTo",
+                "quadraticCurveTo",
+                "arcTo",
+                "ellipse",
+                "rect",
+                "fill",
+                "stroke",
+                "lineTo",
+                "beginPath",
+                "closePath",
+                "arc",
+                "fillText",
+                "fillRect",
+                "strokeText",
+                "createConicGradient",
+                "createLinearGradient",
+                "createRadialGradient",
+                "createPattern"
+            ],
+            "unsafeGlMethods": [
+                "commit",
+                "compileShader",
+                "shaderSource",
+                "attachShader",
+                "createProgram",
+                "linkProgram",
+                "drawElements",
+                "drawArrays"
+            ],
+            "canvasMethods": [
+                "toDataURL",
+                "toBlob"
+            ]
         }
     },
     "settings": {
-        "webGl": "disabled"
+        "webGl": "disabled",
+        "additionalEnabledCheck": "enabled"
     },
     "exceptions": [
     ]
