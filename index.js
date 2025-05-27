@@ -14,7 +14,8 @@ import { OVERRIDE_DIR, GENERATED_DIR, LISTS_DIR, BROWSERS_SUBDIR, CURRENT_CONFIG
 
 import platforms from './platforms.js';
 import { compatFunctions, removeEolFeatures } from './compatibility.js';
-import { immutableJSONPatch } from 'immutable-json-patch';
+import { immutableJSONPatch, getIn } from 'immutable-json-patch';
+import { deepMerge } from 'ts-json-schema-generator';
 
 const defaultConfig = {
     readme: 'https://github.com/duckduckgo/privacy-configuration',
@@ -82,7 +83,7 @@ function writeConfigToDisk(platform, config) {
         addHashToFeatures(compatConfig);
 
         removeEolFeatures(compatConfig, i);
-        fs.writeFileSync(`${GENERATED_DIR}/${version}/${configName}-config.json`, JSON.stringify(compatConfig, null, 2));
+        fs.writeFileSync(`${GENERATED_DIR}/${version}/${configName}-config.json`, JSON.stringify(compatConfig));//, null, 2));
     }
 }
 
@@ -209,9 +210,56 @@ async function buildPlatforms() {
             }
             */
 
+            function deepMerge(toValue, fromData) {
+                if (Array.isArray(toValue) && Array.isArray(fromData)) {
+                    return [...toValue, ...fromData];
+                } else if (typeof toValue === 'object' && typeof fromData === 'object') {
+                    return { ...toValue, ...fromData };
+                }
+                return fromData; // Fallback to fromData if types don't match
+            }
+
             if ('patchFeature' in feature) {
                 feature.reference = defaultConfig.reference.features;
-                feature = immutableJSONPatch(feature, feature.patchFeature);
+                console.log(`Applying patch for feature ${key}:`, feature.patchFeature);
+                const outputPatches = feature.patchFeature.map((patch) => {
+                    const document = feature;
+                    if (patch.op === 'merge') {
+                        console.log(`Merging patch for feature ${key}:`, patch);
+                        if (patch.from && patch.path) {
+                            const fromData = getIn(document, patch.from)
+                            const toValue = getIn(document, patch.path)
+                            const output = {
+                                op: 'replace',
+                                path: patch.path,
+                                value: deepMerge(toValue, fromData)
+                            }
+                            console.log(`Merged patch for feature ${key}:`, output);
+                            return output;
+                        }
+                    }
+                    return patch;
+                });
+                feature = immutableJSONPatch(feature, outputPatches, {
+                    before: (document, patch) => {
+                        console.log(`Applying patch for feature ${key}:`, patch);
+                        if (patch.op === 'merge') {
+                            if (patch.from && patch.path) {
+                                const fromData = getIn(document, patch.from)
+                                const toValue = getIn(document, patch.path)
+                                // Deep merge the from data into the to value
+                                return {
+                                    operation: {
+                                        op: 'replace',
+                                        path: patch.path,
+                                        value: deepMerge(toValue, fromData)
+                                    },
+                                }
+
+                            }
+                        }
+                    }
+                });
                 // TODO understand why patches aren't applied.
                 delete feature.patchFeature;
                 delete feature.reference;
