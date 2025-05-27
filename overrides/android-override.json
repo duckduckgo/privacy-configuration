@@ -2222,6 +2222,42 @@
                 }
             }
         },
+        "reactivateUsers": {
+            "state": "enabled",
+            "exceptions": [],
+            "features": {
+                "reactivateUsersExperimentMay25": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52360000,
+                    "targets": [
+                        {
+                            "localeLanguage": "en"
+                        }
+                    ],
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "duckplayer_prompt",
+                            "weight": 1
+                        },
+                        {
+                            "name": "browser_prompt",
+                            "weight": 1
+                        }
+                    ]
+                }
+            }
+        },
         "experimentalUITheming": {
             "state": "internal",
             "exceptions": [],
