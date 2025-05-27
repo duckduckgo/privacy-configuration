@@ -26,7 +26,7 @@ type SubFeatures<VersionType> = {
             versions: AppVersionConfig[];
         }
     >;
-    // This subfeature allowlists web local storage when the fire button is pressed
+    // This subfeature allowlists web local storage when the fire button is pressed.
     webLocalStorage?: SubFeature<
         VersionType,
         {
@@ -34,6 +34,14 @@ type SubFeatures<VersionType> = {
             domains: string[];
             // Patterns to be matched in the WebView's LevelDB
             matchingRegex: string[];
+        }
+    >;
+    // This subfeature allowlists IndexedDB entries when the fire button is pressed.
+    indexedDB?: SubFeature<
+        VersionType,
+        {
+            // Domains to be allowlisted
+            domains: string[];
         }
     >;
     // This sets the omnibar's change bounds duration, tension and icon fade duration.
