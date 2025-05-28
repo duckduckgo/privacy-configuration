@@ -20,6 +20,20 @@
                 }
             }
         },
+        "adClickAttribution": {
+            "state": "enabled",
+            "patchFeature": [
+                {
+                    "op": "copy",
+                    "from": "/reference/adClickAttribution/settings",
+                    "path": "/settings"
+                }
+            ]
+        },
+        "contentBlocking": {
+            "state": "enabled",
+            "exceptions": []
+        },
         "networkProtection": {
             "state": "enabled",
             "features": {
@@ -264,7 +278,15 @@
             }
         },
         "elementHiding": {
-            "state": "enabled"
+            "state": "enabled",
+            "patchFeature": [
+                {
+                    "op": "copy",
+                    "from": "/reference/elementHiding/settings",
+                    "path": "/settings"
+                }
+            ],
+            "settings": {}
         },
         "fingerprintingScreenSize": {
             "state": "disabled",

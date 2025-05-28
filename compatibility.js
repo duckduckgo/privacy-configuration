@@ -93,7 +93,7 @@ export const compatFunctions = {
             v3Config.features[key].exceptions = v3Config.features[key].exceptions || [];
             assignReasons(v3Config.features[key].exceptions, unmodifiedConfig?.features[key]?.exceptions);
 
-            if (key === 'trackerAllowlist') {
+            if (key === 'trackerAllowlist' && unmodifiedConfig.features[key].settings.allowlistedTrackers) {
                 for (const domain of Object.keys(unmodifiedConfig.features[key].settings.allowlistedTrackers)) {
                     const rules = v3Config.features[key].settings.allowlistedTrackers[domain].rules;
                     assignReasons(rules, unmodifiedConfig?.features[key]?.settings?.allowlistedTrackers[domain]?.rules);
