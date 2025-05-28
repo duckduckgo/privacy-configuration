@@ -6,6 +6,7 @@ function createGenerator() {
     try {
         return schemaGenerator.createGenerator({
             path: './schema/config.ts',
+            tsconfig: './tsconfig.json',
         });
     } catch (e) {
         console.error(e.diagnostic);
