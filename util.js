@@ -180,7 +180,7 @@ export function stripReasons(config) {
             delete exception.reason;
         }
 
-        if (key === 'trackerAllowlist') {
+        if (key === 'trackerAllowlist' && config.features[key].settings.allowlistedTrackers) {
             for (const domain of Object.keys(config.features[key].settings.allowlistedTrackers)) {
                 for (const rule of config.features[key].settings.allowlistedTrackers[domain].rules) {
                     delete rule.reason;
