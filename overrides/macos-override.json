@@ -277,12 +277,30 @@
         },
         "setAsDefaultAndAddToDock": {
             "state": "enabled",
+            "minSupportedVersion": "1.130.0",
             "settings": {
                 "firstPopoverDelayDays": 14,
                 "bannerAfterPopoverDelayDays": 14,
                 "bannerRepeatIntervalDays": 14
             },
             "features": {
+                "popoverVsBannerExperiment": {
+                    "state": "disabled",
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "popover",
+                            "weight": 1
+                        },
+                        {
+                            "name": "banner",
+                            "weight": 1
+                        }
+                    ]
+                },
                 "scheduledDefaultBrowserAndDockPrompts": {
                     "state": "enabled"
                 }
