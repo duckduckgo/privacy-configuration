@@ -24,4 +24,4 @@ export type AiChatConfig<VersionType> = Feature<
     SettingsType,
     VersionType,
     SubFeatures<VersionType> & Record<string, SubFeature<VersionType>>
->; 
+>;
