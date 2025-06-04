@@ -13,6 +13,7 @@ import { APIModificationFeature } from './features/api-modification';
 import { FingerprintingHardwareFeature } from './features/fingerprinting-hardware';
 import { FingerprintingScreenSizeFeature } from './features/fingerprinting-screen-size';
 import { NetworkProtection } from './features/network-protection';
+import { AiChatConfig } from './features/ai-chat';
 
 export { WebCompatSettings } from './features/webcompat';
 export { DuckPlayerSettings } from './features/duckplayer';
@@ -35,6 +36,7 @@ export type ConfigV4<VersionType> = {
     version: number;
     features: Record<string, Feature<any, VersionType>> & {
         // These features have typed settings
+        aiChat?: AiChatConfig<VersionType>;
         apiModification?: APIModificationFeature<VersionType>;
         autoconsent?: AutoconsentFeature<VersionType>;
         autofill?: AutofillFeature<VersionType>;
