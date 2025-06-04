@@ -2,7 +2,14 @@ import { Feature, SubFeature } from '../feature';
 
 // Type of the feature `settings` object
 type SettingsType = {
-    aiChatURL: string;
+    aiChatURL?: string;
+    onboardingCookieName?: string;
+    onboardingCookieDomain?: string;
+    aiChatURLIdentifiableQuery?: string;
+    aiChatURLIdentifiableQueryValue?: string;
+    aiChatBangs?: string[];
+    aiChatBangRegex?: string;
+    addressBarEntryPoint?: boolean;
 };
 
 // Any subfeatures that have typed `settings` should be defined here.
@@ -14,10 +21,6 @@ type SubFeatures<VersionType> = {
             sessionTimeoutMinutes: number;
         }
     >;
-    // Other subfeatures can be added here as needed
-    browsingToolbarShortcut?: SubFeature<VersionType>;
-    addressBarShortcut?: SubFeature<VersionType>;
-    deepLink?: SubFeature<VersionType>;
 };
 
 export type AiChatConfig<VersionType> = Feature<
