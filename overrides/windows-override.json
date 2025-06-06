@@ -563,7 +563,28 @@
                     "state": "enabled",
                     "changes": []
                 },
+                "disableDeviceEnumerationFrames": "disabled",
+                "disableDeviceEnumeration": "disabled",
                 "domains": [
+                    {
+                        "domain": [
+                            "youtube.com",
+                            "yelp.com",
+                            "linkedin.com"
+                        ],
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/disableDeviceEnumerationFrames",
+                                "value": "enabled"
+                            },
+                            {
+                                "op": "add",
+                                "path": "/disableDeviceEnumeration",
+                                "value": "enabled"
+                            }
+                        ]
+                    },
                     {
                         "domain": "asana.com",
                         "patchSettings": [
