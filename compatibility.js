@@ -90,6 +90,7 @@ export const compatFunctions = {
 
         // Replace reasons
         for (const key of Object.keys(unmodifiedConfig.features)) {
+            v3Config.features[key].exceptions = v3Config.features[key].exceptions || [];
             assignReasons(v3Config.features[key].exceptions, unmodifiedConfig?.features[key]?.exceptions);
 
             if (key === 'trackerAllowlist') {

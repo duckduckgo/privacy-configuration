@@ -1,5 +1,15 @@
 {
     "features": {
+        "experimentalTheming": {
+            "state": "disabled",
+            "exceptions": [],
+            "features": {
+                "visualUpdates": {
+                    "state": "disabled",
+                    "minSupportedVersion": "7.172.0"
+                }
+            }
+        },
         "webViewStateRestoration": {
             "state": "enabled"
         },
@@ -75,6 +85,12 @@
                 "deepLink": {
                     "state": "enabled",
                     "minSupportedVersion": "7.155.0"
+                },
+                "keepSession": {
+                    "state": "internal",
+                    "settings": {
+                        "sessionTimeoutMinutes": 60
+                    }
                 }
             },
             "settings": {
@@ -106,7 +122,15 @@
                     }
                 },
                 "nativeUI": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": "7.171.0",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            }
+                        ]
+                    }
                 }
             },
             "settings": {
@@ -123,7 +147,11 @@
                         "state": "disabled",
                         "selectors": {
                             "thumbLink": "a[href^='/watch']",
-                            "excludedRegions": ["#playlist", "ytd-movie-renderer", "ytd-grid-movie-renderer"],
+                            "excludedRegions": [
+                                "#playlist",
+                                "ytd-movie-renderer",
+                                "ytd-grid-movie-renderer"
+                            ],
                             "videoElement": "#player video",
                             "videoElementContainer": "#player .html5-video-player",
                             "hoverExcluded": [],
@@ -189,6 +217,9 @@
                 ]
             }
         },
+        "duckPlayerNative": {
+            "state": "enabled"
+        },
         "marketplaceAdPostback": {
             "state": "enabled"
         },
@@ -196,18 +227,18 @@
             "state": "enabled",
             "exceptions": [],
             "features": {
-                "tdsNextExperimentMay25": {
+                "tdsNextExperimentJun25": {
                     "state": "disabled",
                     "rollout": {
                         "steps": [
                             {
-                                "percent": 25
+                                "percent": 100
                             }
                         ]
                     },
                     "settings": {
-                        "controlUrl": "v5/temp/ios-tdsnextexperimentmay25-tds-control.json",
-                        "treatmentUrl": "v5/temp/ios-tdsnextexperimentmay25-tds-treatment.json"
+                        "controlUrl": "v5/temp/tdsNextExperimentJune25/tdsNextExperimentJune25-ios-control.json",
+                        "treatmentUrl": "v5/temp/tdsNextExperimentJune25/tdsNextExperimentJune25-ios-treatment.json"
                     },
                     "cohorts": [
                         {
@@ -284,7 +315,7 @@
             "state": "enabled",
             "features": {
                 "fingerprintingCanvas": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "rollout": {
                         "steps": [
                             {
@@ -347,6 +378,13 @@
                         ]
                     }
                 }
+            },
+            "settings": {
+                "disabledCMPs": [
+                    "healthline-media",
+                    "paypal-us"
+                ],
+                "filterlistExceptions": []
             }
         },
         "autofill": {
@@ -375,6 +413,9 @@
                 "unknownUsernameCategorization": {
                     "state": "enabled"
                 },
+                "passwordVariantCategorization": {
+                    "state": "enabled"
+                },
                 "siteSpecificFixes": {
                     "state": "enabled",
                     "settings": {
@@ -396,7 +437,10 @@
                                 ]
                             },
                             {
-                                "domain": ["estore.archives.gov", "localhost"],
+                                "domain": [
+                                    "estore.archives.gov",
+                                    "localhost"
+                                ],
                                 "patchSettings": [
                                     {
                                         "path": "/formTypeSettings/-",
@@ -409,7 +453,10 @@
                                 ]
                             },
                             {
-                                "domain": ["zendesk.com", "localhost"],
+                                "domain": [
+                                    "zendesk.com",
+                                    "localhost"
+                                ],
                                 "patchSettings": [
                                     {
                                         "path": "/inputTypeSettings/-",
@@ -648,7 +695,11 @@
                         "rules": [
                             {
                                 "rule": "securepubads.g.doubleclick.net/tag/js/gpt.js",
-                                "domains": ["solitaired.com", "uwbadgers.com", "asuracomic.net"],
+                                "domains": [
+                                    "solitaired.com",
+                                    "uwbadgers.com",
+                                    "asuracomic.net"
+                                ],
                                 "reason": [
                                     "solitaired.com - https://github.com/duckduckgo/privacy-configuration/pull/2329",
                                     "uwbadgers.com - https://github.com/duckduckgo/privacy-configuration/issues/1593",
@@ -720,7 +771,10 @@
                         "rules": [
                             {
                                 "rule": "npttech.com/advertising.js",
-                                "domains": ["blick.ch", "slate.com"],
+                                "domains": [
+                                    "blick.ch",
+                                    "slate.com"
+                                ],
                                 "reason": [
                                     "blick.ch - https://github.com/duckduckgo/privacy-configuration/issues/1520",
                                     "slate.com - slate.com - https://github.com/duckduckgo/privacy-configuration/pull/2879"
@@ -922,6 +976,9 @@
                             },
                             {
                                 "percent": 10
+                            },
+                            {
+                                "percent": 50
                             }
                         ]
                     },
@@ -929,7 +986,7 @@
                 },
                 "privacyProOnboardingPromotion": {
                     "state": "enabled",
-                    "minSupportedVersion": "7.168.0"
+                    "minSupportedVersion": "7.169.0"
                 },
                 "privacyProFreeTrial": {
                     "state": "enabled"

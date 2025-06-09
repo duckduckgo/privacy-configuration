@@ -22,7 +22,12 @@ describe('Build output validation', () => {
         const override = loadJSON('overrides/extension-override.json');
         const config = loadJSON('generated/v4/extension-config.json');
 
-        ['content-blocking', 'cookie', 'click-to-load', 'web-compat'].forEach((featureFile) => {
+        [
+            'content-blocking',
+            'cookie',
+            'click-to-load',
+            'web-compat',
+        ].forEach((featureFile) => {
             const feature = fileNameToFeatureName(featureFile);
             const featureConfig = loadJSON(`features/${featureFile}.json`);
             it(`${feature} should include platform unprotectedTemporary exceptions`, () => {
@@ -48,7 +53,10 @@ describe('Build output validation', () => {
             });
         });
 
-        ['ad-click-attribution', 'autofill'].forEach((featureFile) => {
+        [
+            'ad-click-attribution',
+            'autofill',
+        ].forEach((featureFile) => {
             const feature = fileNameToFeatureName(featureFile);
             const featureConfig = loadJSON(`features/${featureFile}.json`);
 

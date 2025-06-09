@@ -113,7 +113,10 @@ class ConfigProcessor {
 
             const exceptions = config.features.maliciousSiteProtection.exceptions || [];
             // Check for stale exceptions
-            const [updatedExceptions, removedExceptions] = await this.getUpdatedExceptions(exceptions, platform.name);
+            const [
+                updatedExceptions,
+                removedExceptions,
+            ] = await this.getUpdatedExceptions(exceptions, platform.name);
 
             // Add removed domains to the PR body
             removedExceptions.forEach((exception) => {
@@ -158,7 +161,10 @@ class ConfigProcessor {
                 removedExceptions.push(exception);
             }
         }
-        return [updatedExceptions, removedExceptions];
+        return [
+            updatedExceptions,
+            removedExceptions,
+        ];
     }
 
     /*

@@ -39,7 +39,7 @@
             "state": "enabled",
             "exceptions": [],
             "settings": {
-                "origins": ["funnel_newtab_android_intlannouncement"]
+                "origins": []
             },
             "minSupportedVersion": 52100000
         },
@@ -50,19 +50,19 @@
             "state": "enabled",
             "exceptions": [],
             "features": {
-                "tdsNextExperimentMay25": {
+                "tdsNextExperimentJun25": {
                     "state": "disabled",
                     "minSupportedVersion": 52250000,
                     "rollout": {
                         "steps": [
                             {
-                                "percent": 25
+                                "percent": 100
                             }
                         ]
                     },
                     "settings": {
-                        "controlUrl": "v5/temp/android-tdsnextexperimentmay25-tds-control.json",
-                        "treatmentUrl": "v5/temp/android-tdsnextexperimentmay25-tds-treatment.json"
+                        "controlUrl": "v5/temp/tdsNextExperimentJune25/tdsNextExperimentJune25-android-control.json",
+                        "treatmentUrl": "v5/temp/tdsNextExperimentJune25/tdsNextExperimentJune25-android-treatment.json"
                     },
                     "cohorts": [
                         {
@@ -216,7 +216,12 @@
         "aiChat": {
             "state": "enabled",
             "settings": {
-                "aiChatBangs": ["!ai", "!aichat", "!chat", "!duckai"],
+                "aiChatBangs": [
+                    "!ai",
+                    "!aichat",
+                    "!chat",
+                    "!duckai"
+                ],
                 "aiChatBangRegex": "^(?!({bangs})$)(?=.*({bangs})(?=$|\\s)).+$",
                 "addressBarEntryPoint": true
             },
@@ -285,63 +290,6 @@
                         ]
                     }
                 }
-            },
-            "settings": {
-                "disabledCMPs": [
-                    "healthline-media",
-                    "paypal-us",
-                    "abc",
-                    "activobank.pt",
-                    "adultfriendfinder",
-                    "amazon.com",
-                    "athlinks-com",
-                    "bbc.com",
-                    "hetzner.com",
-                    "leafly",
-                    "geeks-for-geeks",
-                    "xhamster-eu",
-                    "samsung.com",
-                    "strato.de",
-                    "womenshealthmag-us",
-                    "caranddriver.com",
-                    "plos",
-                    "xhamster-us",
-                    "dndbeyond",
-                    "xe.com",
-                    "Yahoo",
-                    "skyscanner",
-                    "europa-eu",
-                    "pornhub.com",
-                    "ourworldindata",
-                    "tesla",
-                    "ebay",
-                    "unicourt",
-                    "transip-nl",
-                    "whitepages.com",
-                    "nos.nl",
-                    "kleinanzeigen-de",
-                    "cookiecuttr",
-                    "livejasmin",
-                    "vodafone.de",
-                    "csu-landtag-de",
-                    "setapp.com",
-                    "roblox",
-                    "rog-forum.asus.com",
-                    "postnl",
-                    "tesco",
-                    "imdb",
-                    "groundnews",
-                    "dji",
-                    "zinio",
-                    "clustrmaps.com",
-                    "wikiwand",
-                    "povr",
-                    "jdsports",
-                    "netbeat.de",
-                    "summitracing",
-                    "uswitch.com"
-                ],
-                "filterlistExceptions": []
             }
         },
         "autofill": {
@@ -377,6 +325,9 @@
                     "state": "enabled"
                 },
                 "canCategorizeUnknownUsername": {
+                    "state": "enabled"
+                },
+                "passwordVariantCategorization": {
                     "state": "enabled"
                 },
                 "canIntegrateWebMessageBasedAutofillInWebView": {
@@ -441,7 +392,10 @@
                                 ]
                             },
                             {
-                                "domain": ["estore.archives.gov", "localhost"],
+                                "domain": [
+                                    "estore.archives.gov",
+                                    "localhost"
+                                ],
                                 "patchSettings": [
                                     {
                                         "path": "/formTypeSettings/-",
@@ -454,7 +408,10 @@
                                 ]
                             },
                             {
-                                "domain": ["zendesk.com", "localhost"],
+                                "domain": [
+                                    "zendesk.com",
+                                    "localhost"
+                                ],
                                 "patchSettings": [
                                     {
                                         "path": "/inputTypeSettings/-",
@@ -510,7 +467,10 @@
                         "javascriptConfig": {
                             "domains": [
                                 {
-                                    "domain": ["google.com", "localhost"],
+                                    "domain": [
+                                        "google.com",
+                                        "localhost"
+                                    ],
                                     "patchSettings": [
                                         {
                                             "path": "",
@@ -546,7 +506,8 @@
                     }
                 },
                 "createAsyncPreferences": {
-                    "state": "disabled"
+                    "state": "enabled",
+                    "minSupportedVersion": 52320000
                 }
             }
         },
@@ -715,6 +676,12 @@
                 "fireproofedWebLocalStorage": {
                     "state": "enabled"
                 },
+                "indexedDB": {
+                    "state": "enabled",
+                    "settings": {
+                        "domains": ["duckduckgo.com"]
+                    }
+                },
                 "enableMaliciousSiteProtection": {
                     "state": "enabled",
                     "minSupportedVersion": 52301000
@@ -853,7 +820,11 @@
                         "state": "disabled",
                         "selectors": {
                             "thumbLink": "a[href^='/watch']",
-                            "excludedRegions": ["#playlist", "ytd-movie-renderer", "ytd-grid-movie-renderer"],
+                            "excludedRegions": [
+                                "#playlist",
+                                "ytd-movie-renderer",
+                                "ytd-grid-movie-renderer"
+                            ],
                             "videoElement": "#player video",
                             "videoElementContainer": "#player .html5-video-player",
                             "hoverExcluded": [],
@@ -1898,6 +1869,9 @@
                 "serpPromoCookie": {
                     "state": "disabled"
                 },
+                "privacyProFreeTrial": {
+                    "state": "enabled"
+                },
                 "privacyProFreeTrialJan25": {
                     "state": "enabled",
                     "minSupportedVersion": 52280000,
@@ -2033,20 +2007,10 @@
             }
         },
         "swipingTabs": {
-            "state": "internal",
-            "minSupportedVersion": 52320000,
+            "state": "enabled",
+            "minSupportedVersion": 52380000,
             "features": {
                 "enabledForUsers": {
-                    "state": "enabled",
-                    "rollout": {
-                        "steps": [
-                            {
-                                "percent": 20
-                            }
-                        ]
-                    }
-                },
-                "saveStateToDataStore": {
                     "state": "enabled"
                 }
             }
@@ -2105,6 +2069,9 @@
                             },
                             {
                                 "percent": 75
+                            },
+                            {
+                                "percent": 100
                             }
                         ]
                     }
@@ -2143,11 +2110,11 @@
             }
         },
         "defaultBrowserPrompts": {
-            "state": "enabled",
+            "state": "disabled",
             "exceptions": [],
             "features": {
                 "defaultBrowserAdditionalPrompts202501": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": 52282000,
                     "settings": {
                         "activeDaysUntilStage1": "1",
@@ -2177,11 +2144,10 @@
         },
         "tabSwitcherAnimation": {
             "state": "enabled",
-            "minSupportedVersion": 52320000
+            "minSupportedVersion": 52342000
         },
         "senseOfProtection": {
             "state": "enabled",
-            "minSupportedVersion": 52320000,
             "exceptions": [],
             "features": {
                 "senseOfProtectionNewUserExperimentApr25": {
@@ -2222,6 +2188,179 @@
                             "weight": 0
                         }
                     ]
+                },
+                "senseOfProtectionNewUserExperimentMay25": {
+                    "state": "disabled",
+                    "minSupportedVersion": 52342000,
+                    "targets": [
+                        {
+                            "isReturningUser": false
+                        }
+                    ],
+                    "cohorts": [
+                        {
+                            "name": "modifiedControl",
+                            "weight": 0
+                        },
+                        {
+                            "name": "variant1",
+                            "weight": 0
+                        },
+                        {
+                            "name": "variant2",
+                            "weight": 0
+                        }
+                    ]
+                },
+                "senseOfProtectionExistingUserExperimentMay25": {
+                    "state": "disabled",
+                    "minSupportedVersion": 52342000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 1
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "modifiedControl",
+                            "weight": 0
+                        },
+                        {
+                            "name": "variant1",
+                            "weight": 0
+                        },
+                        {
+                            "name": "variant2",
+                            "weight": 0
+                        }
+                    ]
+                },
+                "senseOfProtectionNewUserExperiment27May25": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52361000,
+                    "targets": [
+                        {
+                            "isReturningUser": false
+                        }
+                    ],
+                    "cohorts": [
+                        {
+                            "name": "modifiedControl",
+                            "weight": 1
+                        },
+                        {
+                            "name": "variant1",
+                            "weight": 1
+                        },
+                        {
+                            "name": "variant2",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "senseOfProtectionExistingUserExperiment27May25": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52361000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 1
+                            },
+                            {
+                                "percent": 3
+                            },
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 8
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "modifiedControl",
+                            "weight": 0
+                        },
+                        {
+                            "name": "variant1",
+                            "weight": 0
+                        },
+                        {
+                            "name": "variant2",
+                            "weight": 0
+                        }
+                    ]
+                }
+            }
+        },
+        "reactivateUsers": {
+            "state": "enabled",
+            "exceptions": [],
+            "features": {
+                "reactivateUsersExperimentMay25": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52361000,
+                    "targets": [
+                        {
+                            "localeLanguage": "en"
+                        }
+                    ],
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 15
+                            },
+                            {
+                                "percent": 30
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 80
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 0
+                        },
+                        {
+                            "name": "duckplayerPrompt",
+                            "weight": 0
+                        },
+                        {
+                            "name": "browserPrompt",
+                            "weight": 0
+                        }
+                    ]
+                }
+            }
+        },
+        "experimentalUITheming": {
+            "state": "disabled",
+            "exceptions": [],
+            "features": {
+                "visualUpdatesFeature": {
+                    "state": "disabled",
+                    "minSupportedVersion": 52361000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            }
+                        ]
+                    }
                 }
             }
         }

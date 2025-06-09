@@ -29,7 +29,7 @@
             "state": "enabled",
             "features": {
                 "fingerprintingCanvas": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "rollout": {
                         "steps": [
                             {
@@ -102,6 +102,10 @@
                 },
                 "appStoreSystemExtension": {
                     "state": "enabled"
+                },
+                "appStoreSystemExtensionMessage": {
+                    "state": "enabled",
+                    "minSupportedVersion": "1.137.0"
                 }
             },
             "minSupportedVersion": "1.57.1"
@@ -133,6 +137,9 @@
                 },
                 "applicationMenuShortcut": {
                     "state": "enabled"
+                },
+                "sidebar": {
+                    "state": "disabled"
                 }
             },
             "settings": {
@@ -170,8 +177,8 @@
                     "minSupportedVersion": "1.114.0"
                 },
                 "remoteBrokerDelivery": {
-                    "state": "internal",
-                    "minSupportedVersion": "1.139.0"
+                    "state": "enabled",
+                    "minSupportedVersion": "1.140.0"
                 }
             },
             "minSupportedVersion": "1.70.0"
@@ -188,18 +195,18 @@
                 }
             ],
             "features": {
-                "tdsNextExperimentMay25": {
+                "tdsNextExperimentJun25": {
                     "state": "disabled",
                     "rollout": {
                         "steps": [
                             {
-                                "percent": 25
+                                "percent": 100
                             }
                         ]
                     },
                     "settings": {
-                        "controlUrl": "v6/temp/macos-tdsnextexperimentmay25-tds-control.json",
-                        "treatmentUrl": "v6/temp/macos-tdsnextexperimentmay25-tds-treatment.json"
+                        "controlUrl": "v6/temp/tdsNextExperimentJune25/tdsNextExperimentJune25-macos-control.json",
+                        "treatmentUrl": "v6/temp/tdsNextExperimentJune25/tdsNextExperimentJune25-macos-treatment.json"
                     },
                     "cohorts": [
                         {
@@ -274,9 +281,14 @@
         "setAsDefaultAndAddToDock": {
             "state": "enabled",
             "minSupportedVersion": "1.130.0",
+            "settings": {
+                "firstPopoverDelayDays": 14,
+                "bannerAfterPopoverDelayDays": 14,
+                "bannerRepeatIntervalDays": 14
+            },
             "features": {
                 "popoverVsBannerExperiment": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "cohorts": [
                         {
                             "name": "control",
@@ -291,6 +303,10 @@
                             "weight": 1
                         }
                     ]
+                },
+                "scheduledDefaultBrowserAndDockPrompts": {
+                    "state": "enabled",
+                    "minSupportedVersion": "1.143.0"
                 }
             }
         },
@@ -321,7 +337,11 @@
                 "messageHandlers": {
                     "state": "disabled",
                     "handlerStrategies": {
-                        "reflect": ["trackerDetectedMessage", "printHandler", "specialPages"],
+                        "reflect": [
+                            "trackerDetectedMessage",
+                            "printHandler",
+                            "specialPages"
+                        ],
                         "polyfill": ["*"],
                         "undefined": []
                     }
@@ -405,6 +425,9 @@
                 "unknownUsernameCategorization": {
                     "state": "enabled"
                 },
+                "passwordVariantCategorization": {
+                    "state": "enabled"
+                },
                 "credentialsImportPromotion": {
                     "state": "enabled"
                 },
@@ -435,7 +458,10 @@
                                 ]
                             },
                             {
-                                "domain": ["estore.archives.gov", "localhost"],
+                                "domain": [
+                                    "estore.archives.gov",
+                                    "localhost"
+                                ],
                                 "patchSettings": [
                                     {
                                         "path": "/formTypeSettings/-",
@@ -448,7 +474,10 @@
                                 ]
                             },
                             {
-                                "domain": ["zendesk.com", "localhost"],
+                                "domain": [
+                                    "zendesk.com",
+                                    "localhost"
+                                ],
                                 "patchSettings": [
                                     {
                                         "path": "/inputTypeSettings/-",
@@ -835,7 +864,11 @@
                         "rules": [
                             {
                                 "rule": "securepubads.g.doubleclick.net/tag/js/gpt.js",
-                                "domains": ["solitaired.com", "uwbadgers.com", "asuracomic.net"],
+                                "domains": [
+                                    "solitaired.com",
+                                    "uwbadgers.com",
+                                    "asuracomic.net"
+                                ],
                                 "reason": [
                                     "solitaired.com - https://github.com/duckduckgo/privacy-configuration/pull/2329",
                                     "uwbadgers.com - https://github.com/duckduckgo/privacy-configuration/issues/1593",
@@ -867,7 +900,11 @@
                             },
                             {
                                 "rule": "connect.facebook.net/en_US/sdk.js",
-                                "domains": ["mytrackman.com", "nextdoor.com", "solitaired.com"],
+                                "domains": [
+                                    "mytrackman.com",
+                                    "nextdoor.com",
+                                    "solitaired.com"
+                                ],
                                 "reason": [
                                     "mytrackman.com - https://github.com/duckduckgo/privacy-configuration/issues/1426",
                                     "nextdoor.com - https://github.com/duckduckgo/privacy-configuration/issues/1190",
@@ -912,7 +949,10 @@
                         "rules": [
                             {
                                 "rule": "www.googletagservices.com/tag/js/gpt.js",
-                                "domains": ["wp.pl", "idahonews.com"],
+                                "domains": [
+                                    "wp.pl",
+                                    "idahonews.com"
+                                ],
                                 "reason": [
                                     "Adwall appears which reappears when dismissed. The adwall prevents interaction with the page.",
                                     "idahonews.com - https://github.com/duckduckgo/privacy-configuration/issues/1834"
@@ -942,7 +982,10 @@
                         "rules": [
                             {
                                 "rule": "npttech.com/advertising.js",
-                                "domains": ["blick.ch", "slate.com"],
+                                "domains": [
+                                    "blick.ch",
+                                    "slate.com"
+                                ],
                                 "reason": [
                                     "blick.ch - https://github.com/duckduckgo/privacy-configuration/issues/1520",
                                     "slate.com - slate.com - https://github.com/duckduckgo/privacy-configuration/pull/2879"
@@ -1065,8 +1108,18 @@
                     "minSupportedVersion": "1.116.0"
                 },
                 "privacyProAuthV2": {
-                    "state": "internal",
-                    "minSupportedVersion": "1.133.0"
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            }
+                        ]
+                    },
+                    "minSupportedVersion": "1.139.0"
+                },
+                "privacyProFreeTrial": {
+                    "state": "internal"
                 }
             }
         },

@@ -54,6 +54,9 @@
                 },
                 "applicationMenuShortcut": {
                     "state": "enabled"
+                },
+                "sidebar": {
+                    "state": "disabled"
                 }
             },
             "minSupportedVersion": "0.100.0",
@@ -98,10 +101,16 @@
         "autofill": {
             "state": "enabled",
             "features": {
+                "autofillPopupReuse": {
+                    "state": "disabled"
+                },
                 "deduplicateLoginsOnImport": {
                     "state": "enabled"
                 },
                 "unknownUsernameCategorization": {
+                    "state": "enabled"
+                },
+                "passwordVariantCategorization": {
                     "state": "enabled"
                 },
                 "credentialsImportPromotion": {
@@ -113,7 +122,7 @@
                     "minSupportedVersion": "0.98.0"
                 },
                 "partialFormSaves": {
-                    "state": "disabled"
+                    "state": "enabled"
                 },
                 "siteSpecificFixes": {
                     "state": "enabled",
@@ -136,7 +145,10 @@
                                 ]
                             },
                             {
-                                "domain": ["estore.archives.gov", "localhost"],
+                                "domain": [
+                                    "estore.archives.gov",
+                                    "localhost"
+                                ],
                                 "patchSettings": [
                                     {
                                         "path": "/formTypeSettings/-",
@@ -149,7 +161,10 @@
                                 ]
                             },
                             {
-                                "domain": ["zendesk.com", "localhost"],
+                                "domain": [
+                                    "zendesk.com",
+                                    "localhost"
+                                ],
                                 "patchSettings": [
                                     {
                                         "path": "/inputTypeSettings/-",
@@ -197,15 +212,6 @@
                             }
                         ]
                     }
-                },
-                "browserMultiStepImport": {
-                    "state": "enabled",
-                    "settings": {
-                        "chrome": "enabled",
-                        "brave": "disabled",
-                        "edge": "disabled",
-                        "vivaldi": "disabled"
-                    }
                 }
             }
         },
@@ -241,7 +247,6 @@
         },
         "duckPlayer": {
             "state": "enabled",
-            "minSupportedVersion": "0.109.7",
             "features": {
                 "pip": {
                     "state": "enabled"
@@ -264,85 +269,6 @@
                 "nativeUI": {
                     "state": "disabled"
                 }
-            },
-            "settings": {
-                "tryDuckPlayerLink": "https://www.youtube.com/watch?v=yKWIA-Pys4c",
-                "duckPlayerDisabledHelpPageLink": "https://duckduckgo.com/duckduckgo-help-pages/duck-player",
-                "youtubePath": "watch",
-                "youtubeEmbedUrl": "youtube-nocookie.com",
-                "youTubeUrl": "youtube.com",
-                "youTubeReferrerHeaders": ["Referer"],
-                "youTubeReferrerQueryParams": ["embeds_referring_euri"],
-                "youTubeVideoIDQueryParam": "v",
-                "overlays": {
-                    "youtube": {
-                        "state": "disabled",
-                        "selectors": {
-                            "thumbLink": "a[href^='/watch']",
-                            "excludedRegions": ["#playlist", "ytd-movie-renderer", "ytd-grid-movie-renderer"],
-                            "videoElement": "#player video",
-                            "videoElementContainer": "#player .html5-video-player",
-                            "hoverExcluded": [],
-                            "clickExcluded": ["ytd-thumbnail-overlay-toggle-button-renderer"],
-                            "allowedEventTargets": [
-                                ".ytp-inline-preview-scrim",
-                                ".ytd-video-preview",
-                                "#thumbnail-container",
-                                "#video-title-link",
-                                "#video-title",
-                                "video.video-stream.html5-main-video"
-                            ],
-                            "drawerContainer": "body"
-                        },
-                        "thumbnailOverlays": {
-                            "state": "enabled"
-                        },
-                        "clickInterception": {
-                            "state": "enabled"
-                        },
-                        "videoOverlays": {
-                            "state": "enabled"
-                        },
-                        "videoDrawer": {
-                            "state": "disabled"
-                        }
-                    },
-                    "serpProxy": {
-                        "state": "disabled"
-                    }
-                },
-                "domains": [
-                    {
-                        "domain": "www.youtube.com",
-                        "patchSettings": [
-                            {
-                                "op": "replace",
-                                "path": "/overlays/youtube/state",
-                                "value": "enabled"
-                            }
-                        ]
-                    },
-                    {
-                        "domain": "duckduckgo.com",
-                        "patchSettings": [
-                            {
-                                "op": "replace",
-                                "path": "/overlays/serpProxy/state",
-                                "value": "enabled"
-                            }
-                        ]
-                    },
-                    {
-                        "domain": "m.youtube.com",
-                        "patchSettings": [
-                            {
-                                "op": "replace",
-                                "path": "/overlays/youtube/state",
-                                "value": "enabled"
-                            }
-                        ]
-                    }
-                ]
             }
         },
         "elementHiding": {
@@ -369,6 +295,50 @@
         "fingerprintingBattery": {
             "state": "enabled",
             "minSupportedVersion": "0.88.3"
+        },
+        "import": {
+            "state": "enabled",
+            "features": {
+                "browserMultiStepImport": {
+                    "state": "enabled",
+                    "settings": {
+                        "chrome": "enabled",
+                        "brave": "enabled",
+                        "edge": "disabled",
+                        "vivaldi": "disabled"
+                    }
+                },
+                "appBoundDecryption": {
+                    "state": "disabled",
+                    "settings": {
+                        "chrome": "disabled",
+                        "brave": "disabled",
+                        "edge": "disabled",
+                        "vivaldi": "disabled",
+                        "chromium": "disabled"
+                    }
+                }
+            }
+        },
+        "messageBridge": {
+            "exceptions": [],
+            "settings": {
+                "aiChat": "disabled",
+                "domains": [
+                    {
+                        "domain": "duckduckgo.com",
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/aiChat",
+                                "value": "enabled"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "state": "enabled",
+            "minSupportedVersion": "0.115.0"
         },
         "referrer": {
             "state": "enabled",
@@ -583,7 +553,7 @@
                 }
             },
             "settings": {
-                "authApiV2NonStableRollout": false
+                "authApiV2NonStableRollout": true
             }
         },
         "webCompat": {
@@ -593,7 +563,28 @@
                     "state": "enabled",
                     "changes": []
                 },
+                "disableDeviceEnumerationFrames": "disabled",
+                "disableDeviceEnumeration": "disabled",
                 "domains": [
+                    {
+                        "domain": [
+                            "youtube.com",
+                            "yelp.com",
+                            "linkedin.com"
+                        ],
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/disableDeviceEnumerationFrames",
+                                "value": "enabled"
+                            },
+                            {
+                                "op": "add",
+                                "path": "/disableDeviceEnumeration",
+                                "value": "enabled"
+                            }
+                        ]
+                    },
                     {
                         "domain": "asana.com",
                         "patchSettings": [
@@ -638,7 +629,8 @@
                     "state": "enabled"
                 },
                 "crashAutoRecovery": {
-                    "state": "disabled"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.114.0"
                 }
             }
         },
@@ -707,7 +699,7 @@
         },
         "downloadManager": {
             "state": "enabled",
-            "minSupportedVersion": "0.111.0",
+            "minSupportedVersion": "0.112.0",
             "features": {
                 "alwaysAskWhereToSaveFiles": {
                     "state": "enabled",
@@ -719,11 +711,24 @@
             "state": "enabled",
             "minSupportedVersion": "0.111.0"
         },
+        "adBlockExtension": {
+            "state": "enabled"
+        },
         "releaseNotes": {
             "state": "enabled",
             "features": {
                 "releaseNotesFromCDN": {
                     "state": "disabled"
+                }
+            }
+        },
+        "experimentalTheming": {
+            "state": "enabled",
+            "minSupportedVersion": "0.116.0",
+            "features": {
+                "modernTheme": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.116.0"
                 }
             }
         }

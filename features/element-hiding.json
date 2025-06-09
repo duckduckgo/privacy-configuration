@@ -10,6 +10,10 @@
         {
             "domain": "duckduckgo.com",
             "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1236"
+        },
+        {
+            "domain": "duck.co",
+            "reason": "Element hiding is targeting the ad badge on dev instances as they are not under the duckduckgo.com domain anymore"
         }
     ],
     "settings": {
@@ -510,8 +514,23 @@
                 "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2821"
             }
         ],
-        "hideTimeouts": [0, 100, 300, 500, 1000, 1500, 2000, 3000, 5000],
-        "unhideTimeouts": [1250, 2250, 3250, 5250],
+        "hideTimeouts": [
+            0,
+            100,
+            300,
+            500,
+            1000,
+            1500,
+            2000,
+            3000,
+            5000
+        ],
+        "unhideTimeouts": [
+            1250,
+            2250,
+            3250,
+            5250
+        ],
         "mediaAndFormSelectors": "video,canvas,embed,object,audio,map,form,input,textarea,select,option",
         "adLabelStrings": [
             "ad",
@@ -1116,22 +1135,24 @@
                 "domain": "cricbuzz.com",
                 "rules": [
                     {
-                        "selector": "#loaderCon",
+                        "selector": "#main-header.top-12",
                         "type": "modify-style",
                         "values": [
                             {
-                                "opacity": "1"
+                                "property": "top",
+                                "value": "0rem"
                             }
                         ]
-                    }
-                ]
-            },
-            {
-                "domain": "cyclingtips.com",
-                "rules": [
+                    },
                     {
-                        "selector": "[data-block-name='ads']",
-                        "type": "closest-empty"
+                        "selector": "#main-nav.top-24",
+                        "type": "modify-style",
+                        "values": [
+                            {
+                                "property": "top",
+                                "value": "3rem"
+                            }
+                        ]
                     }
                 ]
             },
@@ -1299,7 +1320,14 @@
                 ]
             },
             {
-                "domain": ["ebay.com", "ebay.ca", "ebay.co.uk", "ebay.de", "ebay.fr", "ebay.com.au"],
+                "domain": [
+                    "ebay.com",
+                    "ebay.ca",
+                    "ebay.co.uk",
+                    "ebay.de",
+                    "ebay.fr",
+                    "ebay.com.au"
+                ],
                 "rules": [
                     {
                         "selector": "#g-yolo-overlay-holder",
@@ -1627,6 +1655,15 @@
                     {
                         "selector": ".ONhome1-recs",
                         "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "gardenersworld.com",
+                "rules": [
+                    {
+                        "selector": ".stitcher-ad--dai-placeholder",
+                        "type": "hide-empty"
                     }
                 ]
             },
@@ -2636,6 +2673,25 @@
                     {
                         "selector": "[id*='pub_pave']",
                         "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "outsideonline.com",
+                "rules": [
+                    {
+                        "selector": ".o-ad",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".l-main",
+                        "type": "modify-style",
+                        "values": [
+                            {
+                                "property": "margin-top",
+                                "value": "0vh"
+                            }
+                        ]
                     }
                 ]
             },
@@ -3815,6 +3871,52 @@
                 "rules": [
                     {
                         "selector": ".wfb-ad",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "elespanol.com",
+                "rules": [
+                    {
+                        "selector": ".stickycontainer",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "autoexpress.co.uk",
+                "rules": [
+                    {
+                        "selector": ".polaris__below-header-ad-wrapper,.polaris__ad",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "airlive.net",
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    },
+                    {
+                        "selector": "ins.adsbygoogle",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "sfchronicle.com",
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    },
+                    {
+                        "selector": "[data-block-type='ad']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[class*='belowMastheadWrapper']",
                         "type": "hide-empty"
                     }
                 ]

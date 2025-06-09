@@ -105,7 +105,10 @@ export function inlineReasonArrays(data) {
         return data.map(inlineReasonArrays);
     } else if (typeof data === 'object' && data !== null) {
         const res = {};
-        for (const [k, v] of Object.entries(data)) {
+        for (const [
+            k,
+            v,
+        ] of Object.entries(data)) {
             if (k === 'reason') {
                 // we collapse list 'reason' field values into a single string
                 res[k] = Array.isArray(v) ? v.join(' ') : v;
@@ -124,7 +127,12 @@ export function inlineReasonArrays(data) {
  */
 function getCnameSources(tds, cnameTarget) {
     return Object.entries(tds.cnames)
-        .filter(([k, v]) => v.endsWith(cnameTarget))
+        .filter(
+            ([
+                k,
+                v,
+            ]) => v.endsWith(cnameTarget),
+        )
         .map((kv) => kv[0]);
 }
 
@@ -175,6 +183,9 @@ export function addHashToFeatures(config) {
  */
 export function stripReasons(config) {
     for (const key of Object.keys(config.features)) {
+        if (!config.features[key].exceptions) {
+            continue;
+        }
         for (const exception of config.features[key].exceptions) {
             delete exception.reason;
         }
