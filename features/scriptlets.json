@@ -57,24 +57,6 @@
             },
             {
                 "condition": {
-                    "domain": "aznude.com"
-                },
-                "patchSettings": [
-                    {
-                        "op": "add",
-                        "path": "/scriptlets/-",
-                        "value": {
-                            "name": "preventFetch",
-                            "attrs": {
-                                "propsToMatch": "/magsrv\\.com|\\/ad-provider\\.js/"
-                            },
-                            "source": "adguard"
-                        }
-                    }
-                ]
-            },
-            {
-                "condition": {
                     "domain": "babepedia.com"
                 },
                 "patchSettings": [
@@ -125,6 +107,17 @@
                                 "property": "backgroundBlack"
                             },
                             "source": "adguard"
+                        }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/scriptlets/-",
+                        "value": {
+                            "name": "abortOnPropertyRead",
+                            "attrs": {
+                                "property": "popunder"
+                            },
+                            "source": "ubo"
                         }
                     },
                     {
@@ -554,6 +547,18 @@
                             },
                             "source": "adguard"
                         }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/scriptlets/-",
+                        "value": {
+                            "name": "setCookie",
+                            "attrs": {
+                                "name": "__PPU_ppucnt",
+                                "value": "1"
+                            },
+                            "source": "ddg"
+                        }
                     }
                 ]
             },
@@ -584,6 +589,17 @@
                                 "value": "noopFunc"
                             },
                             "source": "adguard"
+                        }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/scriptlets/-",
+                        "value": {
+                            "name": "abortOnPropertyRead",
+                            "attrs": {
+                                "property": "popns"
+                            },
+                            "source": "ubo"
                         }
                     }
                 ]
@@ -654,6 +670,18 @@
                                 "listenerSearch": "popMagic"
                             },
                             "source": "adguard"
+                        }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/scriptlets/-",
+                        "value": {
+                            "name": "setCookie",
+                            "attrs": {
+                                "name": "__PPU_ppucnt",
+                                "value": "1"
+                            },
+                            "source": "ddg"
                         }
                     }
                 ]
@@ -804,24 +832,6 @@
             },
             {
                 "condition": {
-                    "domain": "pasarbokep.com"
-                },
-                "patchSettings": [
-                    {
-                        "op": "add",
-                        "path": "/scriptlets/-",
-                        "value": {
-                            "name": "abortOnPropertyRead",
-                            "attrs": {
-                                "property": "adsBlocked"
-                            },
-                            "source": "adguard"
-                        }
-                    }
-                ]
-            },
-            {
-                "condition": {
                     "domain": "pornhat.com"
                 },
                 "patchSettings": [
@@ -934,7 +944,10 @@
             },
             {
                 "condition": {
-                    "domain": "pornhub.com"
+                    "domain": [
+                        "pornhub.com",
+                        "pornhub.org"
+                    ]
                 },
                 "patchSettings": [
                     {
@@ -959,35 +972,17 @@
                             },
                             "source": "adguard"
                         }
-                    }
-                ]
-            },
-            {
-                "condition": {
-                    "domain": "pornhub.org"
-                },
-                "patchSettings": [
-                    {
-                        "op": "add",
-                        "path": "/scriptlets/-",
-                        "value": {
-                            "name": "setConstant",
-                            "attrs": {
-                                "property": "page_params.holiday_promo_prem",
-                                "value": "true"
-                            },
-                            "source": "adguard"
-                        }
                     },
                     {
                         "op": "add",
                         "path": "/scriptlets/-",
                         "value": {
-                            "name": "preventSetTimeout",
+                            "name": "trustedSetCookie",
                             "attrs": {
-                                "matchCallback": "\\x41\\x64\\x62\\x6c\\x6f\\x63\\x6b\\x20\\x66\\x6f\\x72\\x20\\x70\\x6f\\x72\\x6e\\x68\\x75\\x62"
+                                "name": "popShown",
+                                "value": "$now$"
                             },
-                            "source": "adguard"
+                            "source": "ddg"
                         }
                     }
                 ]
@@ -1048,6 +1043,18 @@
                             },
                             "source": "adguard"
                         }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/scriptlets/-",
+                        "value": {
+                            "name": "setCookie",
+                            "attrs": {
+                                "name": "aawsmackeroo0",
+                                "value": "1"
+                            },
+                            "source": "ddg"
+                        }
                     }
                 ]
             },
@@ -1102,6 +1109,18 @@
                             },
                             "source": "adguard"
                         }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/scriptlets/-",
+                        "value": {
+                            "name": "setCookie",
+                            "attrs": {
+                                "name": "__PPU_ppucnt",
+                                "value": "1"
+                            },
+                            "source": "ddg"
+                        }
                     }
                 ]
             },
@@ -1121,21 +1140,17 @@
                             },
                             "source": "adguard"
                         }
-                    }
-                ]
-            },
-            {
-                "condition": {
-                    "domain": "sotwe.com"
-                },
-                "patchSettings": [
+                    },
                     {
                         "op": "add",
                         "path": "/scriptlets/-",
                         "value": {
-                            "name": "preventWindowOpen",
-                            "attrs": {},
-                            "source": "adguard"
+                            "name": "trustedSetCookie",
+                            "attrs": {
+                                "name": "popShown",
+                                "value": "$now$"
+                            },
+                            "source": "ddg"
                         }
                     }
                 ]
@@ -1271,7 +1286,10 @@
             },
             {
                 "condition": {
-                    "domain": "sxyprn.com"
+                    "domain": [
+                        "sxyprn.com",
+                        "sxyprn.net"
+                    ]
                 },
                 "patchSettings": [
                     {
@@ -1309,46 +1327,17 @@
                             },
                             "source": "adguard"
                         }
-                    }
-                ]
-            },
-            {
-                "condition": {
-                    "domain": "sxyprn.net"
-                },
-                "patchSettings": [
-                    {
-                        "op": "add",
-                        "path": "/scriptlets/-",
-                        "value": {
-                            "name": "abortOnPropertyRead",
-                            "attrs": {
-                                "property": "popns"
-                            },
-                            "source": "adguard"
-                        }
                     },
                     {
                         "op": "add",
                         "path": "/scriptlets/-",
                         "value": {
-                            "name": "abortOnPropertyWrite",
+                            "name": "setCookie",
                             "attrs": {
-                                "property": "__aaZoneid"
+                                "name": "__PPU_ppucnt",
+                                "value": "1"
                             },
-                            "source": "adguard"
-                        }
-                    },
-                    {
-                        "op": "add",
-                        "path": "/scriptlets/-",
-                        "value": {
-                            "name": "setConstant",
-                            "attrs": {
-                                "property": "D4zz",
-                                "value": "noopFunc"
-                            },
-                            "source": "adguard"
+                            "source": "ddg"
                         }
                     }
                 ]
@@ -1543,397 +1532,14 @@
             },
             {
                 "condition": {
-                    "domain": "xhamster.com"
-                },
-                "patchSettings": [
-                    {
-                        "op": "add",
-                        "path": "/scriptlets/-",
-                        "value": {
-                            "name": "removeCookie",
-                            "attrs": {
-                                "match": "video_view_count"
-                            },
-                            "source": "adguard"
-                        }
-                    },
-                    {
-                        "op": "add",
-                        "path": "/scriptlets/-",
-                        "value": {
-                            "name": "setLocalStorageItem",
-                            "attrs": {
-                                "key": "popseen",
-                                "value": "true"
-                            },
-                            "source": "adguard"
-                        }
-                    },
-                    {
-                        "op": "add",
-                        "path": "/scriptlets/-",
-                        "value": {
-                            "name": "abortCurrentInlineScript",
-                            "attrs": {
-                                "property": "document.createElement",
-                                "search": "initTabUnder"
-                            },
-                            "source": "adguard"
-                        }
-                    },
-                    {
-                        "op": "add",
-                        "path": "/scriptlets/-",
-                        "value": {
-                            "name": "setCookieReload",
-                            "attrs": {
-                                "name": "pShow",
-                                "value": "true"
-                            },
-                            "source": "adguard"
-                        }
-                    },
-                    {
-                        "op": "add",
-                        "path": "/scriptlets/-",
-                        "value": {
-                            "name": "setCookieReload",
-                            "attrs": {
-                                "name": "ts_popunder",
-                                "value": "1"
-                            },
-                            "source": "adguard"
-                        }
-                    },
-                    {
-                        "op": "add",
-                        "path": "/scriptlets/-",
-                        "value": {
-                            "name": "setConstant",
-                            "attrs": {
-                                "property": "history.replaceState",
-                                "value": "noopFunc"
-                            },
-                            "source": "adguard"
-                        }
-                    }
-                ]
-            },
-            {
-                "condition": {
-                    "domain": "xhamster.desi"
-                },
-                "patchSettings": [
-                    {
-                        "op": "add",
-                        "path": "/scriptlets/-",
-                        "value": {
-                            "name": "removeCookie",
-                            "attrs": {
-                                "match": "video_view_count"
-                            },
-                            "source": "adguard"
-                        }
-                    },
-                    {
-                        "op": "add",
-                        "path": "/scriptlets/-",
-                        "value": {
-                            "name": "setLocalStorageItem",
-                            "attrs": {
-                                "key": "popseen",
-                                "value": "true"
-                            },
-                            "source": "adguard"
-                        }
-                    },
-                    {
-                        "op": "add",
-                        "path": "/scriptlets/-",
-                        "value": {
-                            "name": "abortCurrentInlineScript",
-                            "attrs": {
-                                "property": "document.createElement",
-                                "search": "initTabUnder"
-                            },
-                            "source": "adguard"
-                        }
-                    },
-                    {
-                        "op": "add",
-                        "path": "/scriptlets/-",
-                        "value": {
-                            "name": "setCookieReload",
-                            "attrs": {
-                                "name": "pShow",
-                                "value": "true"
-                            },
-                            "source": "adguard"
-                        }
-                    },
-                    {
-                        "op": "add",
-                        "path": "/scriptlets/-",
-                        "value": {
-                            "name": "setCookieReload",
-                            "attrs": {
-                                "name": "ts_popunder",
-                                "value": "1"
-                            },
-                            "source": "adguard"
-                        }
-                    },
-                    {
-                        "op": "add",
-                        "path": "/scriptlets/-",
-                        "value": {
-                            "name": "setConstant",
-                            "attrs": {
-                                "property": "history.replaceState",
-                                "value": "noopFunc"
-                            },
-                            "source": "adguard"
-                        }
-                    }
-                ]
-            },
-            {
-                "condition": {
-                    "domain": "xhamster1.desi"
-                },
-                "patchSettings": [
-                    {
-                        "op": "add",
-                        "path": "/scriptlets/-",
-                        "value": {
-                            "name": "removeCookie",
-                            "attrs": {
-                                "match": "video_view_count"
-                            },
-                            "source": "adguard"
-                        }
-                    },
-                    {
-                        "op": "add",
-                        "path": "/scriptlets/-",
-                        "value": {
-                            "name": "setLocalStorageItem",
-                            "attrs": {
-                                "key": "popseen",
-                                "value": "true"
-                            },
-                            "source": "adguard"
-                        }
-                    },
-                    {
-                        "op": "add",
-                        "path": "/scriptlets/-",
-                        "value": {
-                            "name": "abortCurrentInlineScript",
-                            "attrs": {
-                                "property": "document.createElement",
-                                "search": "initTabUnder"
-                            },
-                            "source": "adguard"
-                        }
-                    },
-                    {
-                        "op": "add",
-                        "path": "/scriptlets/-",
-                        "value": {
-                            "name": "setCookieReload",
-                            "attrs": {
-                                "name": "pShow",
-                                "value": "true"
-                            },
-                            "source": "adguard"
-                        }
-                    },
-                    {
-                        "op": "add",
-                        "path": "/scriptlets/-",
-                        "value": {
-                            "name": "setCookieReload",
-                            "attrs": {
-                                "name": "ts_popunder",
-                                "value": "1"
-                            },
-                            "source": "adguard"
-                        }
-                    },
-                    {
-                        "op": "add",
-                        "path": "/scriptlets/-",
-                        "value": {
-                            "name": "setConstant",
-                            "attrs": {
-                                "property": "history.replaceState",
-                                "value": "noopFunc"
-                            },
-                            "source": "adguard"
-                        }
-                    }
-                ]
-            },
-            {
-                "condition": {
-                    "domain": "xhamster19.com"
-                },
-                "patchSettings": [
-                    {
-                        "op": "add",
-                        "path": "/scriptlets/-",
-                        "value": {
-                            "name": "removeCookie",
-                            "attrs": {
-                                "match": "video_view_count"
-                            },
-                            "source": "adguard"
-                        }
-                    },
-                    {
-                        "op": "add",
-                        "path": "/scriptlets/-",
-                        "value": {
-                            "name": "setLocalStorageItem",
-                            "attrs": {
-                                "key": "popseen",
-                                "value": "true"
-                            },
-                            "source": "adguard"
-                        }
-                    },
-                    {
-                        "op": "add",
-                        "path": "/scriptlets/-",
-                        "value": {
-                            "name": "abortCurrentInlineScript",
-                            "attrs": {
-                                "property": "document.createElement",
-                                "search": "initTabUnder"
-                            },
-                            "source": "adguard"
-                        }
-                    },
-                    {
-                        "op": "add",
-                        "path": "/scriptlets/-",
-                        "value": {
-                            "name": "setCookieReload",
-                            "attrs": {
-                                "name": "pShow",
-                                "value": "true"
-                            },
-                            "source": "adguard"
-                        }
-                    },
-                    {
-                        "op": "add",
-                        "path": "/scriptlets/-",
-                        "value": {
-                            "name": "setCookieReload",
-                            "attrs": {
-                                "name": "ts_popunder",
-                                "value": "1"
-                            },
-                            "source": "adguard"
-                        }
-                    },
-                    {
-                        "op": "add",
-                        "path": "/scriptlets/-",
-                        "value": {
-                            "name": "setConstant",
-                            "attrs": {
-                                "property": "history.replaceState",
-                                "value": "noopFunc"
-                            },
-                            "source": "adguard"
-                        }
-                    }
-                ]
-            },
-            {
-                "condition": {
-                    "domain": "xhamster2.com"
-                },
-                "patchSettings": [
-                    {
-                        "op": "add",
-                        "path": "/scriptlets/-",
-                        "value": {
-                            "name": "removeCookie",
-                            "attrs": {
-                                "match": "video_view_count"
-                            },
-                            "source": "adguard"
-                        }
-                    },
-                    {
-                        "op": "add",
-                        "path": "/scriptlets/-",
-                        "value": {
-                            "name": "setLocalStorageItem",
-                            "attrs": {
-                                "key": "popseen",
-                                "value": "true"
-                            },
-                            "source": "adguard"
-                        }
-                    },
-                    {
-                        "op": "add",
-                        "path": "/scriptlets/-",
-                        "value": {
-                            "name": "abortCurrentInlineScript",
-                            "attrs": {
-                                "property": "document.createElement",
-                                "search": "initTabUnder"
-                            },
-                            "source": "adguard"
-                        }
-                    },
-                    {
-                        "op": "add",
-                        "path": "/scriptlets/-",
-                        "value": {
-                            "name": "setCookieReload",
-                            "attrs": {
-                                "name": "pShow",
-                                "value": "true"
-                            },
-                            "source": "adguard"
-                        }
-                    },
-                    {
-                        "op": "add",
-                        "path": "/scriptlets/-",
-                        "value": {
-                            "name": "setCookieReload",
-                            "attrs": {
-                                "name": "ts_popunder",
-                                "value": "1"
-                            },
-                            "source": "adguard"
-                        }
-                    },
-                    {
-                        "op": "add",
-                        "path": "/scriptlets/-",
-                        "value": {
-                            "name": "setConstant",
-                            "attrs": {
-                                "property": "history.replaceState",
-                                "value": "noopFunc"
-                            },
-                            "source": "adguard"
-                        }
-                    }
-                ]
-            },
-            {
-                "condition": {
-                    "domain": "xhamster3.com"
+                    "domain": [
+                        "xhamster.com",
+                        "xhamster2.com",
+                        "xhamster3.com",
+                        "xhamster19.com",
+                        "xhamster.desi",
+                        "xhamster1.desi"
+                    ]
                 },
                 "patchSettings": [
                     {
@@ -2129,6 +1735,18 @@
                                 "textMatch": "/window\\.[\\s\\S]*?_zone_[\\s\\S]*?{\"zone_id\":/"
                             },
                             "source": "adguard"
+                        }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/scriptlets/-",
+                        "value": {
+                            "name": "trustedSetCookie",
+                            "attrs": {
+                                "name": "popShown",
+                                "value": "$now$"
+                            },
+                            "source": "ddg"
                         }
                     }
                 ]
