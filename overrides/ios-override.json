@@ -11,6 +11,9 @@
                         "steps": [
                             {
                                 "percent": 5
+                            },
+                            {
+                                "percent": 10
                             }
                         ]
                     }
@@ -62,6 +65,7 @@
             "exceptions": [],
             "settings": {
                 "aiChat": "disabled",
+                "subscriptions": "disabled",
                 "domains": [
                     {
                         "domain": "duckduckgo.com",
@@ -69,6 +73,11 @@
                             {
                                 "op": "replace",
                                 "path": "/aiChat",
+                                "value": "enabled"
+                            },
+                            {
+                                "op": "replace",
+                                "path": "/subscriptions",
                                 "value": "enabled"
                             }
                         ]
@@ -94,7 +103,7 @@
                     "minSupportedVersion": "7.155.0"
                 },
                 "keepSession": {
-                    "state": "internal",
+                    "state": "enabled",
                     "settings": {
                         "sessionTimeoutMinutes": 60
                     }
@@ -141,6 +150,9 @@
                             },
                             {
                                 "percent": 30
+                            },
+                            {
+                                "percent": 100
                             }
                         ]
                     }
@@ -26890,6 +26902,9 @@
                     "state": "enabled"
                 },
                 "exchangeKeysToSyncWithAnotherDevice": {
+                    "state": "enabled"
+                },
+                "syncSetupBarcodeIsUrlBased": {
                     "state": "enabled"
                 }
             }

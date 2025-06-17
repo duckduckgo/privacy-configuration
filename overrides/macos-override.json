@@ -1,5 +1,23 @@
 {
     "features": {
+        "experimentalTheming": {
+            "state": "enabled",
+            "exceptions": [],
+            "minSupportedVersion": "1.143.0",
+            "features": {
+                "visualUpdates": {
+                    "state": "enabled",
+                    "minSupportedVersion": "1.143.0",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            }
+                        ]
+                    }
+                }
+            }
+        },
         "incrementalRolloutTest": {
             "state": "enabled",
             "features": {
@@ -114,6 +132,7 @@
             "exceptions": [],
             "settings": {
                 "aiChat": "disabled",
+                "subscriptions": "disabled",
                 "domains": [
                     {
                         "domain": "duckduckgo.com",
@@ -121,6 +140,11 @@
                             {
                                 "op": "replace",
                                 "path": "/aiChat",
+                                "value": "enabled"
+                            },
+                            {
+                                "op": "replace",
+                                "path": "/subscriptions",
                                 "value": "enabled"
                             }
                         ]
@@ -27031,6 +27055,9 @@
                 },
                 "exchangeKeysToSyncWithAnotherDevice": {
                     "state": "enabled"
+                },
+                "syncSetupBarcodeIsUrlBased": {
+                    "state": "enabled"
                 }
             }
         },
@@ -27361,7 +27388,7 @@
                     "minSupportedVersion": "1.139.0"
                 },
                 "privacyProFreeTrial": {
-                    "state": "internal"
+                    "state": "enabled"
                 }
             }
         },
