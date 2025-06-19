@@ -330,13 +330,23 @@
             "exceptions": [],
             "settings": {
                 "aiChat": "disabled",
+                "subscriptions": "disabled",
+                "subscriptionPages": "disabled",
                 "domains": [
                     {
-                        "domain": "duckduckgo.com",
+                        "domain": [
+                            "duckduckgo.com",
+                            "duck.co"
+                        ],
                         "patchSettings": [
                             {
                                 "op": "replace",
                                 "path": "/aiChat",
+                                "value": "enabled"
+                            },
+                            {
+                                "op": "replace",
+                                "path": "/subscriptions",
                                 "value": "enabled"
                             }
                         ]
@@ -688,6 +698,9 @@
             "features": {
                 "useExtensionBasedBurn": {
                     "state": "enabled"
+                },
+                "fireAnimationSettingVisibility": {
+                    "state": "disabled"
                 }
             }
         },

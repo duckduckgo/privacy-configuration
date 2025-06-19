@@ -65,13 +65,22 @@
             "exceptions": [],
             "settings": {
                 "aiChat": "disabled",
+                "subscriptions": "disabled",
                 "domains": [
                     {
-                        "domain": "duckduckgo.com",
+                        "domain": [
+                            "duckduckgo.com",
+                            "duck.co"
+                        ],
                         "patchSettings": [
                             {
                                 "op": "replace",
                                 "path": "/aiChat",
+                                "value": "enabled"
+                            },
+                            {
+                                "op": "replace",
+                                "path": "/subscriptions",
                                 "value": "enabled"
                             }
                         ]
@@ -144,6 +153,9 @@
                             },
                             {
                                 "percent": 30
+                            },
+                            {
+                                "percent": 100
                             }
                         ]
                     }
@@ -243,27 +255,27 @@
             "state": "enabled",
             "exceptions": [],
             "features": {
-                "tdsNextExperimentJun25": {
-                    "state": "disabled",
+                "tdsNextExperimentJul25": {
+                    "state": "enabled",
                     "rollout": {
                         "steps": [
                             {
-                                "percent": 100
+                                "percent": 25
                             }
                         ]
                     },
                     "settings": {
-                        "controlUrl": "v5/temp/tdsNextExperimentJune25/tdsNextExperimentJune25-ios-control.json",
-                        "treatmentUrl": "v5/temp/tdsNextExperimentJune25/tdsNextExperimentJune25-ios-treatment.json"
+                        "controlUrl": "v5/experiments/20250617-ios-tds-control.json",
+                        "treatmentUrl": "v5/experiments/20250617-ios-tds-treatment.json"
                     },
                     "cohorts": [
                         {
                             "name": "control",
-                            "weight": 0
+                            "weight": 1
                         },
                         {
                             "name": "treatment",
-                            "weight": 0
+                            "weight": 1
                         }
                     ]
                 }
@@ -26893,6 +26905,9 @@
                     "state": "enabled"
                 },
                 "exchangeKeysToSyncWithAnotherDevice": {
+                    "state": "enabled"
+                },
+                "syncSetupBarcodeIsUrlBased": {
                     "state": "enabled"
                 }
             }
