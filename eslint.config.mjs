@@ -14,6 +14,7 @@ export default [
                 ...globals.commonjs,
                 ...globals.browser,
                 ...globals.jasmine,
+                ...globals.mocha,
                 ...globals.node,
             },
         },
