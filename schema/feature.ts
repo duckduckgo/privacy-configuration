@@ -10,7 +10,7 @@ export type Cohort = {
     weight: number;
 };
 
-export type FeatureState = 'enabled' | 'disabled' | 'internal';
+export type FeatureState = 'enabled' | 'disabled' | 'internal' | 'preview';
 
 type FeatureMeta = {
     description: string;

@@ -20,7 +20,7 @@ describe('Build output validation', () => {
     describe('unprotected temporary merge', () => {
         const extractDomains = (exception) => exception.domain;
         const override = loadJSON('overrides/extension-override.json');
-        const config = loadJSON('generated/v4/extension-config.json');
+        const config = loadJSON('generated/v5/extension-config.json');
 
         [
             'content-blocking',
