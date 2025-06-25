@@ -116,18 +116,18 @@ export const compatFunctions = {
             }
         }
 
-        // Change "internal" feature + sub-feature state to "disabled" for the
+        // Change "internal" and "preview" feature + sub-feature states to "disabled" for the
         // v3 Windows config. Older versions of the Windows browser cannot parse
-        // configurations that use the "internal" state.
+        // configurations that use the "internal"/"preview" states.
         if (platform === 'windows') {
             for (const feature of Object.values(v3Config.features)) {
-                if (feature.state === 'internal') {
+                if (feature.state === 'internal' || feature.state === 'preview') {
                     feature.state = 'disabled';
                 }
 
                 if (feature.features) {
                     for (const subFeature of Object.values(feature.features)) {
-                        if (subFeature.state === 'internal') {
+                        if (subFeature.state === 'internal' || subFeature.state === 'preview') {
                             subFeature.state = 'disabled';
                         }
                     }
@@ -137,4 +137,26 @@ export const compatFunctions = {
 
         return v3Config;
     },
+
+    v4: (config, unmodifiedConfig, platform) => {
+        // Breaking changes: added preview state for features and sub-features.
+
+        const v3Config = JSON.parse(JSON.stringify(config));
+        if (platform === 'windows') {
+            // Unknown states for features and sub-features will be automatically set to "disabled" from Windows Release v0.118.0
+            for (const feature of Object.values(v3Config.features)) {
+                if (feature.state === 'preview') {
+                    feature.state = 'disabled';
+                }
+
+                if (feature.features) {
+                    for (const subFeature of Object.values(feature.features)) {
+                        if (subFeature.state === 'preview') {
+                            subFeature.state = 'disabled';
+                        }
+                    }
+                }
+            }
+        }
+    }
 };
