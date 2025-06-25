@@ -82,7 +82,10 @@ function writeConfigToDisk(platform, config) {
         addHashToFeatures(compatConfig);
 
         removeEolFeatures(compatConfig, i);
-        fs.writeFileSync(`${GENERATED_DIR}/${version}/${configName}-config.json`, debugOutput ? JSON.stringify(compatConfig, null, 2) : JSON.stringify(compatConfig));
+        fs.writeFileSync(
+            `${GENERATED_DIR}/${version}/${configName}-config.json`,
+            debugOutput ? JSON.stringify(compatConfig, null, 2) : JSON.stringify(compatConfig),
+        );
     }
 }
 
