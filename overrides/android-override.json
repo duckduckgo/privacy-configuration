@@ -2384,20 +2384,26 @@
                 }
             }
         },
-        "experimentalUITheming": {
-            "state": "disabled",
-            "exceptions": [],
+        "experimentalTheming": {
+            "state": "enabled",
+            "minSupportedVersion": 52400000,
             "features": {
-                "visualUpdatesFeature": {
-                    "state": "disabled",
-                    "minSupportedVersion": 52361000,
+                "splitOmnibarFeature": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52400000,
                     "rollout": {
                         "steps": [
                             {
                                 "percent": 5
                             }
                         ]
-                    }
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        }
+                    ]
                 }
             }
         }
