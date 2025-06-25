@@ -9,22 +9,22 @@ import { getBaseFeatureConfigs } from '../util.js';
 const platformOutput = platforms.map((item) => item.replace('browsers/', 'extension-'));
 
 const platformSpecificSchemas = {
-    'v4/android-config.json': 'AndroidV4Config',
-    'v3/android-config.json': 'LegacyAndroidConfig',
+    'v5/android-config.json': 'AndroidV5Config',
+    'v4/android-config.json': 'LegacyAndroidConfig',
 };
 
 // Test the latest 2 versions of each platform
 const latestConfigs = platformOutput.map((plat) => {
     return {
-        name: `v4/${plat}-config.json`,
-        body: JSON.parse(fs.readFileSync(`./generated/v4/${plat}-config.json`)),
+        name: `v5/${plat}-config.json`,
+        body: JSON.parse(fs.readFileSync(`./generated/v5/${plat}-config.json`)),
     };
 });
 
 const previousConfigs = platformOutput.map((plat) => {
     return {
-        name: `v3/${plat}-config.json`,
-        body: JSON.parse(fs.readFileSync(`./generated/v3/${plat}-config.json`)),
+        name: `v4/${plat}-config.json`,
+        body: JSON.parse(fs.readFileSync(`./generated/v4/${plat}-config.json`)),
     };
 });
 
@@ -54,8 +54,8 @@ describe('Config schema tests', () => {
                 );
             });
 
-            it('should validate against the full configV4 schema', () => {
-                const validate = createValidator(platformSpecificSchemas[config.name] || 'GenericV4Config');
+            it('should validate against the full configV5 schema', () => {
+                const validate = createValidator(platformSpecificSchemas[config.name] || 'GenericV5Config');
                 expect(validate(config.body)).to.be.equal(true, formatErrors(validate.errors));
             });
 
@@ -128,7 +128,7 @@ describe('Config schema tests', () => {
             });
 
             it('All patchSettings should also be valid', () => {
-                const validate = createValidator(platformSpecificSchemas[config.name] || 'GenericV4Config');
+                const validate = createValidator(platformSpecificSchemas[config.name] || 'GenericV5Config');
                 function applyPatchAndValidate(featureName, feature, conditionalChange, config) {
                     for (const change of conditionalChange) {
                         if (!change.patchSettings) {
