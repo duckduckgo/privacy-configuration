@@ -137,7 +137,6 @@ export const compatFunctions = {
 
         return v3Config;
     },
-
     v4: (config, unmodifiedConfig, platform) => {
         // Breaking changes: added preview state for features and sub-features.
 
@@ -158,5 +157,5 @@ export const compatFunctions = {
                 }
             }
         }
-    }
+    },
 };
