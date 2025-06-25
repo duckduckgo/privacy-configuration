@@ -9,7 +9,7 @@ import { getBaseFeatureConfigs } from '../util.js';
 const platformOutput = platforms.map((item) => item.replace('browsers/', 'extension-'));
 
 const platformSpecificSchemas = {
-    'v5/android-config.json': 'AndroidV5Config',
+    'v5/android-config.json': 'AndroidCurrentConfig',
     'v4/android-config.json': 'LegacyAndroidConfig',
 };
 
@@ -55,7 +55,7 @@ describe('Config schema tests', () => {
             });
 
             it('should validate against the full configV5 schema', () => {
-                const validate = createValidator(platformSpecificSchemas[config.name] || 'GenericV5Config');
+                const validate = createValidator(platformSpecificSchemas[config.name] || 'CurrentGenericConfig');
                 expect(validate(config.body)).to.be.equal(true, formatErrors(validate.errors));
             });
 
@@ -128,7 +128,7 @@ describe('Config schema tests', () => {
             });
 
             it('All patchSettings should also be valid', () => {
-                const validate = createValidator(platformSpecificSchemas[config.name] || 'GenericV5Config');
+                const validate = createValidator(platformSpecificSchemas[config.name] || 'CurrentGenericConfig');
                 function applyPatchAndValidate(featureName, feature, conditionalChange, config) {
                     for (const change of conditionalChange) {
                         if (!change.patchSettings) {

@@ -20,8 +20,8 @@ export { DuckPlayerSettings } from './features/duckplayer';
 export { DuckPlayerNativeSettings } from './features/duckplayer-native';
 
 export type ExportedSchemas =
-    | 'GenericV5Config'
-    | 'AndroidV5Config'
+    | 'CurrentGenericConfig'
+    | 'AndroidCurrentConfig'
     | 'LegacyConfig'
     | 'LegacyAndroidConfig'
     | 'WebCompatSettings'
@@ -60,7 +60,7 @@ export type ConfigV5<VersionType> = {
  *  - Uses integer version numbers for minSupportedVersion
  *  - Adds 'experimentalVariants' top level property
  */
-export type AndroidV5Config = ConfigV5<number> & {
+export type AndroidCurrentConfig = ConfigV5<number> & {
     experimentalVariants: {
         variants: {
             desc: string;
@@ -77,7 +77,7 @@ export type AndroidV5Config = ConfigV5<number> & {
  * Generic spec: covers mac, iOS, windows and extension configs
  *  - Use string version numbers for minSupportedVersion
  */
-export type GenericV5Config = ConfigV5<string>;
+export type CurrentGenericConfig = ConfigV5<string>;
 
-export type LegacyConfig = GenericV5Config;
-export type LegacyAndroidConfig = AndroidV5Config;
+export type LegacyConfig = CurrentGenericConfig;
+export type LegacyAndroidConfig = AndroidCurrentConfig;
