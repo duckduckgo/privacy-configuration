@@ -141,18 +141,16 @@ export const compatFunctions = {
         // Breaking changes: added preview state for features and sub-features.
 
         const v4Config = JSON.parse(JSON.stringify(config));
-        if (platform === 'windows') {
-            // Unknown states for features and sub-features will be automatically set to "disabled" from Windows Release v0.118.0
-            for (const feature of Object.values(v4Config.features)) {
-                if (feature.state === 'preview') {
-                    feature.state = 'disabled';
-                }
+        // [Windows] Invalid states for features and sub-features will be automatically set to "disabled" from Windows Release v0.118.0
+        for (const feature of Object.values(v4Config.features)) {
+            if (feature.state === 'preview') {
+                feature.state = 'disabled';
+            }
 
-                if (feature.features) {
-                    for (const subFeature of Object.values(feature.features)) {
-                        if (subFeature.state === 'preview') {
-                            subFeature.state = 'disabled';
-                        }
+            if (feature.features) {
+                for (const subFeature of Object.values(feature.features)) {
+                    if (subFeature.state === 'preview') {
+                        subFeature.state = 'disabled';
                     }
                 }
             }
