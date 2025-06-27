@@ -10,6 +10,10 @@
         {
             "domain": "duckduckgo.com",
             "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1236"
+        },
+        {
+            "domain": "duck.co",
+            "reason": "Element hiding is targeting the ad badge on dev instances as they are not under the duckduckgo.com domain anymore"
         }
     ],
     "settings": {
@@ -277,6 +281,10 @@
             },
             {
                 "selector": ".ad-current",
+                "type": "hide-empty"
+            },
+            {
+                "selector": ".ad-frame",
                 "type": "hide-empty"
             },
             {
@@ -698,6 +706,23 @@
                 ]
             },
             {
+                "domain": "advocate.com",
+                "rules": [
+                    {
+                        "selector": "[class*='ad_leaderboard_wrap']",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": "[class*='ad-tag']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".ad_tag",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
                 "domain": "allgemeine-zeitung.de",
                 "rules": [
                     {
@@ -1094,6 +1119,15 @@
                 ]
             },
             {
+                "domain": "cookingclassy.com",
+                "rules": [
+                    {
+                        "selector": ".adthrive",
+                        "type": "override"
+                    }
+                ]
+            },
+            {
                 "domain": "corriere.it",
                 "rules": [
                     {
@@ -1110,22 +1144,24 @@
                 "domain": "cricbuzz.com",
                 "rules": [
                     {
-                        "selector": "#loaderCon",
+                        "selector": "#main-header.top-12",
                         "type": "modify-style",
                         "values": [
                             {
-                                "opacity": "1"
+                                "property": "top",
+                                "value": "0rem"
                             }
                         ]
-                    }
-                ]
-            },
-            {
-                "domain": "cyclingtips.com",
-                "rules": [
+                    },
                     {
-                        "selector": "[data-block-name='ads']",
-                        "type": "closest-empty"
+                        "selector": "#main-nav.top-24",
+                        "type": "modify-style",
+                        "values": [
+                            {
+                                "property": "top",
+                                "value": "3rem"
+                            }
+                        ]
                     }
                 ]
             },
@@ -1171,6 +1207,10 @@
                     {
                         "selector": ".mol-ads-label-container",
                         "type": "closest-empty"
+                    },
+                    {
+                        "selector": "#stickyAdsContainer",
+                        "type": "hide-empty"
                     }
                 ]
             },
@@ -1465,24 +1505,8 @@
                         "type": "hide-empty"
                     },
                     {
-                        "selector": ".global-nav-view, .global-nav-view .global-nav-content",
-                        "type": "modify-style",
-                        "values": [
-                            {
-                                "property": "margin-top",
-                                "value": "0px"
-                            }
-                        ]
-                    },
-                    {
-                        "selector": ".search-subnav-slender-view, .search-slender-advanced-panel-view",
-                        "type": "modify-style",
-                        "values": [
-                            {
-                                "property": "top",
-                                "value": "0px"
-                            }
-                        ]
+                        "selector": "[class*='-ad-container']",
+                        "type": "override"
                     }
                 ]
             },
@@ -1640,6 +1664,15 @@
                     {
                         "selector": ".ONhome1-recs",
                         "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "gardenersworld.com",
+                "rules": [
+                    {
+                        "selector": ".stitcher-ad--dai-placeholder",
+                        "type": "hide-empty"
                     }
                 ]
             },
@@ -1991,6 +2024,15 @@
                     {
                         "selector": "[class*='adv']",
                         "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "iltalehti.fi",
+                "rules": [
+                    {
+                        "type": "override",
+                        "selector": ".ad"
                     }
                 ]
             },
@@ -2403,6 +2445,15 @@
                 ]
             },
             {
+                "domain": "nature.com",
+                "rules": [
+                    {
+                        "selector": ".c-ad",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
                 "domain": "nbcsports.com",
                 "rules": [
                     {
@@ -2412,6 +2463,15 @@
                     {
                         "selector": "#nbcsports-leaderboard",
                         "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "ncaa.com",
+                "rules": [
+                    {
+                        "selector": ".mobile-persistent-bottom",
+                        "type": "hide"
                     }
                 ]
             },
@@ -2640,6 +2700,25 @@
                     {
                         "selector": "[id*='pub_pave']",
                         "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "outsideonline.com",
+                "rules": [
+                    {
+                        "selector": ".o-ad",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".l-main",
+                        "type": "modify-style",
+                        "values": [
+                            {
+                                "property": "margin-top",
+                                "value": "0vh"
+                            }
+                        ]
                     }
                 ]
             },
@@ -2903,7 +2982,7 @@
                 "domain": "reuters.com",
                 "rules": [
                     {
-                        "selector": "[testid='ResponsiveAdSlot']",
+                        "selector": "[data-testid='ResponsiveAdSlot']",
                         "type": "hide-empty"
                     }
                 ]
@@ -2932,6 +3011,15 @@
                     {
                         "selector": ".fc-ab-root",
                         "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "sciencenews.org",
+                "rules": [
+                    {
+                        "selector": "[class*='ad-block']",
+                        "type": "hide-empty"
                     }
                 ]
             },
@@ -2965,6 +3053,10 @@
                     {
                         "selector": ".ad-area",
                         "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[data-qa='AdSlot-Container']",
+                        "type": "closest-empty"
                     }
                 ]
             },
@@ -3133,6 +3225,23 @@
                     {
                         "selector": "[id^='btf-']",
                         "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "techrepublic.com",
+                "rules": [
+                    {
+                        "selector": "#nav-ad",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "#leader-plus-top",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "#sticky-bottom",
+                        "type": "hide-empty"
                     }
                 ]
             },
@@ -3797,6 +3906,70 @@
                     },
                     {
                         "selector": ".article-sidebar-banner",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "thedrive.com",
+                "rules": [
+                    {
+                        "selector": "#pw-top-right-sidebar-aib",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "worldfootball.net",
+                "rules": [
+                    {
+                        "selector": ".wfb-ad",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "elespanol.com",
+                "rules": [
+                    {
+                        "selector": ".stickycontainer",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "autoexpress.co.uk",
+                "rules": [
+                    {
+                        "selector": ".polaris__below-header-ad-wrapper,.polaris__ad",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "airlive.net",
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    },
+                    {
+                        "selector": "ins.adsbygoogle",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "sfchronicle.com",
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    },
+                    {
+                        "selector": "[data-block-type='ad']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[class*='belowMastheadWrapper']",
                         "type": "hide-empty"
                     }
                 ]

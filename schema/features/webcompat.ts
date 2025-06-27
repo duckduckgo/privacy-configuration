@@ -1,5 +1,4 @@
 import { Feature, CSSInjectFeatureSettings } from '../feature';
-import { Operation } from '../json-patch';
 
 type StateToggle = 'enabled' | 'disabled';
 type FullWebCompatOptions = CSSInjectFeatureSettings<{
@@ -53,6 +52,8 @@ type FullWebCompatOptions = CSSInjectFeatureSettings<{
             domain?: string;
         }[];
     };
+    disableDeviceEnumeration: StateToggle;
+    disableDeviceEnumerationFrames: StateToggle;
 }>;
 export type WebCompatSettings = Partial<FullWebCompatOptions>;
 

@@ -50,28 +50,28 @@
             "state": "enabled",
             "exceptions": [],
             "features": {
-                "tdsNextExperimentMar25": {
-                    "state": "disabled",
-                    "minSupportedVersion": 52250000,
+                "tdsNextExperiment001": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52361000,
                     "rollout": {
                         "steps": [
                             {
-                                "percent": 25
+                                "percent": 100
                             }
                         ]
                     },
                     "settings": {
-                        "controlUrl": "v5/temp/march25-tds-a.json",
-                        "treatmentUrl": "v5/temp/march25-tds-b.json"
+                        "controlUrl": "v5/experiments/20250617-android-tds-control.json",
+                        "treatmentUrl": "v5/experiments/20250617-android-tds-treatment.json"
                     },
                     "cohorts": [
                         {
                             "name": "control",
-                            "weight": 0
+                            "weight": 1
                         },
                         {
                             "name": "treatment",
-                            "weight": 0
+                            "weight": 1
                         }
                     ]
                 }
@@ -215,8 +215,37 @@
         },
         "aiChat": {
             "state": "enabled",
+            "settings": {
+                "aiChatBangs": [
+                    "!ai",
+                    "!aichat",
+                    "!chat",
+                    "!duckai"
+                ],
+                "aiChatBangRegex": "^(?!({bangs})$)(?=.*({bangs})(?=$|\\s)).+$",
+                "addressBarEntryPoint": true
+            },
             "minSupportedVersion": 52250000,
-            "exceptions": []
+            "exceptions": [],
+            "features": {
+                "duckAiButtonInBrowser": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52390000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 25
+                            }
+                        ]
+                    }
+                }
+            }
         },
         "ampLinks": {
             "state": "enabled",
@@ -317,6 +346,9 @@
                 "canCategorizeUnknownUsername": {
                     "state": "enabled"
                 },
+                "passwordVariantCategorization": {
+                    "state": "enabled"
+                },
                 "canIntegrateWebMessageBasedAutofillInWebView": {
                     "state": "disabled"
                 },
@@ -354,6 +386,95 @@
                             },
                             {
                                 "percent": 100
+                            }
+                        ]
+                    }
+                },
+                "siteSpecificFixes": {
+                    "state": "enabled",
+                    "settings": {
+                        "formTypeSettings": [],
+                        "inputTypeSettings": [],
+                        "formBoundarySelector": "",
+                        "domains": [
+                            {
+                                "domain": ["areaclientes.orange.es"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "form",
+                                            "type": "login"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": [
+                                    "estore.archives.gov",
+                                    "localhost"
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "fieldset[id='ucContentMiddleCenter_fldLogin']",
+                                            "type": "login"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": [
+                                    "zendesk.com",
+                                    "localhost"
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "#\\:r0\\:\\-\\-input",
+                                            "type": "credentials.username"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": ["att.com"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input[name='Expiration Month']",
+                                            "type": "creditCards.expiration"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": ["gamestop.com"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input[name='dwfrm_profile_customer_email']",
+                                            "type": "identities.emailAddress"
+                                        }
+                                    },
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input[name='dwfrm_profile_login_password']",
+                                            "type": "credentials.password.new"
+                                        }
+                                    }
+                                ]
                             }
                         ]
                     }
@@ -412,6 +533,10 @@
                             ]
                         }
                     }
+                },
+                "createAsyncPreferences": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52320000
                 }
             }
         },
@@ -422,6 +547,24 @@
             "state": "enabled",
             "settings": {
                 "surveys": []
+            }
+        },
+        "autofillService": {
+            "state": "disabled",
+            "minSupportedVersion": 52290000,
+            "features": {
+                "canUpdateAppToDomainDataset": {
+                    "state": "disabled",
+                    "minSupportedVersion": 52290000
+                },
+                "canMapAppToDomain": {
+                    "state": "disabled",
+                    "minSupportedVersion": 52290000
+                },
+                "canAutofillInsideDDG": {
+                    "state": "disabled",
+                    "minSupportedVersion": 52290000
+                }
             }
         },
         "androidBrowserConfig": {
@@ -532,6 +675,17 @@
                                     "appTP": false,
                                     "netP": false
                                 }
+                            },
+                            {
+                                "appVersion": 52290000,
+                                "daysUntilLoggingStarts": 8,
+                                "daysLogging": 10,
+                                "featuresLogged": {
+                                    "gpc": false,
+                                    "cpm": false,
+                                    "appTP": false,
+                                    "netP": false
+                                }
                             }
                         ]
                     }
@@ -553,8 +707,26 @@
                 "fireproofedWebLocalStorage": {
                     "state": "enabled"
                 },
+                "indexedDB": {
+                    "state": "enabled",
+                    "settings": {
+                        "domains": ["duckduckgo.com"]
+                    }
+                },
                 "enableMaliciousSiteProtection": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": 52301000
+                },
+                "httpError5xxPixel": {
+                    "state": "enabled"
+                },
+                "omnibarAnimation": {
+                    "state": "enabled",
+                    "settings": {
+                        "changeBoundsDuration": 400,
+                        "fadeDuration": 200,
+                        "tension": 1
+                    }
                 }
             }
         },
@@ -565,10 +737,7 @@
             "state": "enabled"
         },
         "brokerProtection": {
-            "state": "enabled",
-            "settings": {
-                "useEnhancedCaptchaSystem": "disabled"
-            }
+            "state": "enabled"
         },
         "customUserAgent": {
             "state": "enabled",
@@ -590,6 +759,10 @@
                     },
                     {
                         "domain": "duck.it",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1959"
+                    },
+                    {
+                        "domain": "duck.co",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1959"
                     }
                 ],
@@ -663,6 +836,9 @@
                     "settings": {
                         "signInRequiredSelector": "[href*=\"//support.google.com/youtube/answer/3037019\"]"
                     }
+                },
+                "nativeUI": {
+                    "state": "disabled"
                 }
             },
             "settings": {
@@ -714,7 +890,7 @@
                             "state": "enabled"
                         },
                         "videoDrawer": {
-                            "state": "enabled"
+                            "state": "disabled"
                         }
                     },
                     "serpProxy": {
@@ -733,7 +909,10 @@
                         ]
                     },
                     {
-                        "domain": "duckduckgo.com",
+                        "domain": [
+                            "duckduckgo.com",
+                            "duck.co"
+                        ],
                         "patchSettings": [
                             {
                                 "op": "replace",
@@ -845,13 +1024,22 @@
             "minSupportedVersion": 52250000,
             "settings": {
                 "aiChat": "disabled",
+                "subscriptions": "disabled",
                 "domains": [
                     {
-                        "domain": "duckduckgo.com",
+                        "domain": [
+                            "duckduckgo.com",
+                            "duck.co"
+                        ],
                         "patchSettings": [
                             {
                                 "op": "replace",
                                 "path": "/aiChat",
+                                "value": "enabled"
+                            },
+                            {
+                                "op": "replace",
+                                "path": "/subscriptions",
                                 "value": "enabled"
                             }
                         ]
@@ -866,6 +1054,23 @@
         "networkProtection": {
             "state": "enabled",
             "features": {
+                "localVpnControllerDns": {
+                    "state": "enabled",
+                    "settings": {
+                        "domains": {
+                            "controller.netp.duckduckgo.com": [
+                                {
+                                    "address": "20.253.26.112",
+                                    "region": "use"
+                                },
+                                {
+                                    "address": "20.93.77.32",
+                                    "region": "eun"
+                                }
+                            ]
+                        }
+                    }
+                },
                 "allowDnsBlockMalware": {
                     "state": "enabled"
                 },
@@ -902,6 +1107,12 @@
                             }
                         ]
                     }
+                },
+                "userTips": {
+                    "state": "disabled"
+                },
+                "enforceRoutes": {
+                    "state": "disabled"
                 }
             },
             "settings": {
@@ -965,19 +1176,7 @@
             "minSupportedVersion": 51670000
         },
         "privacyDashboard": {
-            "state": "enabled",
-            "features": {
-                "highlightedProtectionsToggle": {
-                    "state": "enabled",
-                    "rollout": {
-                        "steps": [
-                            {
-                                "percent": 50
-                            }
-                        ]
-                    }
-                }
-            }
+            "state": "enabled"
         },
         "requestFilterer": {
             "state": "enabled",
@@ -1065,10 +1264,6 @@
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2182"
                 },
                 {
-                    "domain": "ctvnews.ca",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2766"
-                },
-                {
                     "domain": "skechers.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2827"
                 },
@@ -1123,7 +1318,7 @@
                         ]
                     },
                     {
-                        "domain": "www.realestate.com.au",
+                        "domain": "realestate.com.au",
                         "patchSettings": [
                             {
                                 "op": "replace",
@@ -1231,7 +1426,7 @@
                     }
                 },
                 "mediaSession": "enabled",
-                "presentation": "enabled",
+                "presentation": "disabled",
                 "viewportWidth": "enabled",
                 "webShare": "enabled",
                 "screenLock": "enabled",
@@ -1640,8 +1835,8 @@
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2527"
                 },
                 {
-                    "domain": "login.coinbase.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2660"
+                    "domain": "coinbase.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3356"
                 },
                 {
                     "domain": "identity.docusign.net",
@@ -1654,6 +1849,10 @@
                 {
                     "domain": "aointerview.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2914"
+                },
+                {
+                    "domain": "id.onfido.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3295"
                 }
             ]
         },
@@ -1733,6 +1932,9 @@
                 "serpPromoCookie": {
                     "state": "disabled"
                 },
+                "privacyProFreeTrial": {
+                    "state": "enabled"
+                },
                 "privacyProFreeTrialJan25": {
                     "state": "enabled",
                     "minSupportedVersion": 52280000,
@@ -1744,10 +1946,6 @@
                         }
                     ],
                     "cohorts": [
-                        {
-                            "name": "control",
-                            "weight": 1
-                        },
                         {
                             "name": "treatment",
                             "weight": 1
@@ -1872,8 +2070,14 @@
             }
         },
         "swipingTabs": {
-            "state": "internal",
-            "minSupportedVersion": 52271000
+            "state": "enabled",
+            "minSupportedVersion": 52390000,
+            "features": {
+                "enabledForUsers": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52390000
+                }
+            }
         },
         "showOnAppLaunch": {
             "state": "enabled"
@@ -1887,12 +2091,56 @@
             }
         },
         "maliciousSiteProtection": {
-            "state": "internal",
+            "state": "enabled",
             "settings": {
                 "hashPrefixUpdateFrequency": 20,
                 "filterSetUpdateFrequency": 720
             },
-            "exceptions": []
+            "features": {
+                "visibleAndOnByDefault": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52301000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 75
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
+                },
+                "scamProtection": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52311000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 30
+                            },
+                            {
+                                "percent": 75
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
+                }
+            }
         },
         "bookmarksSorting": {
             "state": "enabled",
@@ -1926,11 +2174,11 @@
             }
         },
         "defaultBrowserPrompts": {
-            "state": "enabled",
+            "state": "disabled",
             "exceptions": [],
             "features": {
                 "defaultBrowserAdditionalPrompts202501": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": 52282000,
                     "settings": {
                         "activeDaysUntilStage1": "1",
@@ -1955,6 +2203,228 @@
                             "weight": 0
                         }
                     ]
+                }
+            }
+        },
+        "tabSwitcherAnimation": {
+            "state": "enabled",
+            "minSupportedVersion": 52342000
+        },
+        "senseOfProtection": {
+            "state": "enabled",
+            "exceptions": [],
+            "features": {
+                "senseOfProtectionNewUserExperimentApr25": {
+                    "state": "disabled",
+                    "targets": [
+                        {
+                            "isReturningUser": false
+                        }
+                    ],
+                    "cohorts": [
+                        {
+                            "name": "modifiedControl",
+                            "weight": 0
+                        },
+                        {
+                            "name": "variant1",
+                            "weight": 0
+                        },
+                        {
+                            "name": "variant2",
+                            "weight": 0
+                        }
+                    ]
+                },
+                "senseOfProtectionExistingUserExperimentApr25": {
+                    "state": "disabled",
+                    "cohorts": [
+                        {
+                            "name": "modifiedControl",
+                            "weight": 0
+                        },
+                        {
+                            "name": "variant1",
+                            "weight": 0
+                        },
+                        {
+                            "name": "variant2",
+                            "weight": 0
+                        }
+                    ]
+                },
+                "senseOfProtectionNewUserExperimentMay25": {
+                    "state": "disabled",
+                    "minSupportedVersion": 52342000,
+                    "targets": [
+                        {
+                            "isReturningUser": false
+                        }
+                    ],
+                    "cohorts": [
+                        {
+                            "name": "modifiedControl",
+                            "weight": 0
+                        },
+                        {
+                            "name": "variant1",
+                            "weight": 0
+                        },
+                        {
+                            "name": "variant2",
+                            "weight": 0
+                        }
+                    ]
+                },
+                "senseOfProtectionExistingUserExperimentMay25": {
+                    "state": "disabled",
+                    "minSupportedVersion": 52342000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 1
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "modifiedControl",
+                            "weight": 0
+                        },
+                        {
+                            "name": "variant1",
+                            "weight": 0
+                        },
+                        {
+                            "name": "variant2",
+                            "weight": 0
+                        }
+                    ]
+                },
+                "senseOfProtectionNewUserExperiment27May25": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52361000,
+                    "targets": [
+                        {
+                            "isReturningUser": false
+                        }
+                    ],
+                    "cohorts": [
+                        {
+                            "name": "modifiedControl",
+                            "weight": 1
+                        },
+                        {
+                            "name": "variant1",
+                            "weight": 1
+                        },
+                        {
+                            "name": "variant2",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "senseOfProtectionExistingUserExperiment27May25": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52361000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 1
+                            },
+                            {
+                                "percent": 3
+                            },
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 8
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "modifiedControl",
+                            "weight": 0
+                        },
+                        {
+                            "name": "variant1",
+                            "weight": 0
+                        },
+                        {
+                            "name": "variant2",
+                            "weight": 0
+                        }
+                    ]
+                }
+            }
+        },
+        "reactivateUsers": {
+            "state": "enabled",
+            "exceptions": [],
+            "features": {
+                "reactivateUsersExperimentMay25": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52361000,
+                    "targets": [
+                        {
+                            "localeLanguage": "en"
+                        }
+                    ],
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 15
+                            },
+                            {
+                                "percent": 30
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 80
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 0
+                        },
+                        {
+                            "name": "duckplayerPrompt",
+                            "weight": 0
+                        },
+                        {
+                            "name": "browserPrompt",
+                            "weight": 0
+                        }
+                    ]
+                }
+            }
+        },
+        "experimentalUITheming": {
+            "state": "disabled",
+            "exceptions": [],
+            "features": {
+                "visualUpdatesFeature": {
+                    "state": "disabled",
+                    "minSupportedVersion": 52361000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            }
+                        ]
+                    }
                 }
             }
         }

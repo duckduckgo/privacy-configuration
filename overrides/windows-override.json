@@ -31,6 +31,12 @@
                 },
                 "allowBlockMalware": {
                     "state": "enabled"
+                },
+                "userTips": {
+                    "state": "disabled"
+                },
+                "enforceRoutes": {
+                    "state": "disabled"
                 }
             },
             "settings": {
@@ -48,6 +54,9 @@
                 },
                 "applicationMenuShortcut": {
                     "state": "enabled"
+                },
+                "sidebar": {
+                    "state": "disabled"
                 }
             },
             "minSupportedVersion": "0.100.0",
@@ -66,14 +75,10 @@
                     "state": "enabled"
                 },
                 "waitlist": {
-                    "state": "disabled",
-                    "rollout": {
-                        "steps": [
-                            {
-                                "percent": 3
-                            }
-                        ]
-                    }
+                    "state": "disabled"
+                },
+                "freemium": {
+                    "state": "disabled"
                 }
             },
             "settings": {
@@ -85,10 +90,7 @@
             "minSupportedVersion": "0.64.0"
         },
         "brokerProtection": {
-            "state": "enabled",
-            "settings": {
-                "useEnhancedCaptchaSystem": "disabled"
-            }
+            "state": "enabled"
         },
         "windowsPermissionUsage": {
             "state": "enabled"
@@ -99,10 +101,16 @@
         "autofill": {
             "state": "enabled",
             "features": {
+                "autofillPopupReuse": {
+                    "state": "disabled"
+                },
                 "deduplicateLoginsOnImport": {
                     "state": "enabled"
                 },
                 "unknownUsernameCategorization": {
+                    "state": "enabled"
+                },
+                "passwordVariantCategorization": {
                     "state": "enabled"
                 },
                 "credentialsImportPromotion": {
@@ -115,6 +123,101 @@
                 },
                 "partialFormSaves": {
                     "state": "enabled"
+                },
+                "autofillCreditCards": {
+                    "state": "enabled"
+                },
+                "autofillCreditCardsOnByDefault": {
+                    "state": "enabled"
+                },
+                "siteSpecificFixes": {
+                    "state": "enabled",
+                    "settings": {
+                        "formTypeSettings": [],
+                        "inputTypeSettings": [],
+                        "formBoundarySelector": "",
+                        "domains": [
+                            {
+                                "domain": ["areaclientes.orange.es"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "form",
+                                            "type": "login"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": [
+                                    "estore.archives.gov",
+                                    "localhost"
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "fieldset[id='ucContentMiddleCenter_fldLogin']",
+                                            "type": "login"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": [
+                                    "zendesk.com",
+                                    "localhost"
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "#\\:r0\\:\\-\\-input",
+                                            "type": "credentials.username"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": ["att.com"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input[name='Expiration Month']",
+                                            "type": "creditCards.expiration"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": ["gamestop.com"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input[name='dwfrm_profile_customer_email']",
+                                            "type": "identities.emailAddress"
+                                        }
+                                    },
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input[name='dwfrm_profile_login_password']",
+                                            "type": "credentials.password.new"
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
                 }
             }
         },
@@ -168,6 +271,9 @@
                     "settings": {
                         "signInRequiredSelector": "[href*=\"//support.google.com/youtube/answer/3037019\"]"
                     }
+                },
+                "nativeUI": {
+                    "state": "disabled"
                 }
             }
         },
@@ -196,6 +302,63 @@
             "state": "enabled",
             "minSupportedVersion": "0.88.3"
         },
+        "import": {
+            "state": "enabled",
+            "features": {
+                "browserMultiStepImport": {
+                    "state": "enabled",
+                    "settings": {
+                        "chrome": "enabled",
+                        "brave": "enabled",
+                        "edge": "disabled",
+                        "vivaldi": "disabled"
+                    }
+                },
+                "appBoundDecryption": {
+                    "state": "enabled",
+                    "settings": {
+                        "chrome": "enabled",
+                        "brave": "enabled",
+                        "edge": "disabled",
+                        "vivaldi": "disabled",
+                        "chromium": "enabled"
+                    }
+                },
+                "bulkBookmarksImport": {
+                    "state": "enabled"
+                }
+            }
+        },
+        "messageBridge": {
+            "exceptions": [],
+            "settings": {
+                "aiChat": "disabled",
+                "subscriptions": "disabled",
+                "subscriptionPages": "disabled",
+                "domains": [
+                    {
+                        "domain": [
+                            "duckduckgo.com",
+                            "duck.co"
+                        ],
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/aiChat",
+                                "value": "enabled"
+                            },
+                            {
+                                "op": "replace",
+                                "path": "/subscriptions",
+                                "value": "enabled"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "state": "enabled",
+            "minSupportedVersion": "0.115.0"
+        },
         "referrer": {
             "state": "enabled",
             "minSupportedVersion": "0.93.0"
@@ -205,6 +368,10 @@
                 {
                     "domain": "legalandgeneral.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2491"
+                },
+                {
+                    "domain": "desjardins.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2946"
                 }
             ],
             "state": "enabled",
@@ -362,7 +529,13 @@
             "state": "disabled"
         },
         "clientBrandHint": {
-            "state": "enabled"
+            "state": "enabled",
+            "exceptions": [
+                {
+                    "domain": "ee.co.uk",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3041"
+                }
+            ]
         },
         "privacyPro": {
             "state": "enabled",
@@ -403,6 +576,9 @@
                 "authApiV2": {
                     "state": "disabled"
                 }
+            },
+            "settings": {
+                "authApiV2NonStableRollout": true
             }
         },
         "webCompat": {
@@ -412,7 +588,36 @@
                     "state": "enabled",
                     "changes": []
                 },
+                "disableDeviceEnumerationFrames": "disabled",
+                "disableDeviceEnumeration": "disabled",
                 "domains": [
+                    {
+                        "domain": [
+                            "microsoft.com",
+                            "nytimes.com",
+                            "gmail.com",
+                            "reuters.com",
+                            "etsy.com",
+                            "aliexpress.com",
+                            "walmart.com",
+                            "bestbuy.com",
+                            "www.youtube.com",
+                            "yelp.com",
+                            "linkedin.com"
+                        ],
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/disableDeviceEnumerationFrames",
+                                "value": "enabled"
+                            },
+                            {
+                                "op": "add",
+                                "path": "/disableDeviceEnumeration",
+                                "value": "enabled"
+                            }
+                        ]
+                    },
                     {
                         "domain": "asana.com",
                         "patchSettings": [
@@ -457,7 +662,8 @@
                     "state": "enabled"
                 },
                 "crashAutoRecovery": {
-                    "state": "disabled"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.114.0"
                 }
             }
         },
@@ -500,22 +706,81 @@
             "state": "enabled",
             "features": {
                 "useExtensionBasedBurn": {
+                    "state": "disabled"
+                },
+                "burnAnimationSettingVisibility": {
+                    "state": "disabled"
+                },
+                "burnOnStartup": {
+                    "state": "enabled"
+                },
+                "abortingBurn": {
                     "state": "enabled"
                 }
             }
         },
         "maliciousSiteProtection": {
             "state": "enabled",
-            "minSupportedVersion": "0.104.3",
+            "minSupportedVersion": "0.115.0",
             "settings": {
                 "hashPrefixUpdateFrequency": 20,
                 "filterSetUpdateFrequency": 720
+            },
+            "features": {
+                "scamProtection": {
+                    "state": "enabled"
+                }
             },
             "exceptions": []
         },
         "windowsWebViewPermissionsSavesInProfile": {
             "state": "disabled",
             "exceptions": []
+        },
+        "brokenSitePrompt": {
+            "state": "enabled"
+        },
+        "downloadManager": {
+            "state": "enabled",
+            "minSupportedVersion": "0.112.0",
+            "features": {
+                "alwaysAskWhereToSaveFiles": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.112.0"
+                }
+            }
+        },
+        "quickNavTldLookup": {
+            "state": "enabled",
+            "minSupportedVersion": "0.111.0"
+        },
+        "adBlockExtension": {
+            "state": "enabled"
+        },
+        "releaseNotes": {
+            "state": "enabled",
+            "features": {
+                "releaseNotesFromCDN": {
+                    "state": "disabled"
+                }
+            }
+        },
+        "experimentalTheming": {
+            "state": "enabled",
+            "minSupportedVersion": "0.116.5",
+            "features": {
+                "modernTheme": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.116.5",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            }
+                        ]
+                    }
+                }
+            }
         }
     },
     "unprotectedTemporary": []

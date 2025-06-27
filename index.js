@@ -1,23 +1,29 @@
-const fs = require('fs');
+import fs from 'fs';
+import fetch from 'node-fetch';
 
-const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
+import {
+    addCnameEntriesToAllowlist,
+    inlineReasonArrays,
+    mergeAllowlistedTrackers,
+    addHashToFeatures,
+    stripReasons,
+    getBaseFeatureConfigs,
+} from './util.js';
 
-const { addCnameEntriesToAllowlist, inlineReasonArrays, mergeAllowlistedTrackers, addHashToFeatures, versionToInt } = require('./util');
+import { OVERRIDE_DIR, GENERATED_DIR, LISTS_DIR, BROWSERS_SUBDIR, CURRENT_CONFIG_VERSION, UNPROTECTED_LIST_NAME } from './constants.js';
 
-const { OVERRIDE_DIR, GENERATED_DIR, LISTS_DIR, BROWSERS_SUBDIR, CURRENT_CONFIG_VERSION } = require('./constants.json');
+import platforms from './platforms.js';
+import { compatFunctions, removeEolFeatures } from './compatibility.js';
 
 const defaultConfig = {
     readme: 'https://github.com/duckduckgo/privacy-configuration',
     version: Date.now(),
-    features: {},
+    features: getBaseFeatureConfigs(),
     unprotectedTemporary: [],
 };
-// Drop support here.
-// Env flag that can be used to override stripping of 'reason' strings from the config.
-// const keepReasons = process.argv.includes('--keep-reasons');
 
-const platforms = require('./platforms');
-const compatibility = require('./compatibility');
+// Env flag that can be used to override stripping of 'reason' strings from the config.
+const keepReasons = process.argv.includes('--keep-reasons');
 
 const tdsPath = 'live';
 
@@ -55,27 +61,25 @@ function writeConfigToDisk(platform, config) {
         const version = `v${i}`;
         mkdirIfNeeded(`${GENERATED_DIR}/${version}`);
 
+        if (i === CURRENT_CONFIG_VERSION && !keepReasons) {
+            stripReasons(config);
+        }
+
         if (!prevConfig) {
             prevConfig = config;
         } else {
-            if (!compatibility.compatFunctions[version]) {
+            if (!compatFunctions[version]) {
                 throw new Error(`No compat function for config version ${version}`);
             }
 
-            prevConfig = compatibility.compatFunctions[version](prevConfig, unmodifiedConfig);
+            prevConfig = compatFunctions[version](prevConfig, unmodifiedConfig, platform);
         }
 
-        let compatConfig = JSON.parse(JSON.stringify(prevConfig));
-        // These methods allow us to add new deletions to config that don't impact older ones
-        for (const method in compatibility.outputFilterFunctions) {
-            if (versionToInt(method) <= i) {
-                compatConfig = compatibility.outputFilterFunctions[method](compatConfig);
-            }
-        }
+        const compatConfig = JSON.parse(JSON.stringify(prevConfig));
         addHashToFeatures(compatConfig);
 
-        compatibility.removeEolFeatures(compatConfig, i);
-        fs.writeFileSync(`${GENERATED_DIR}/${version}/${configName}-config.json`, JSON.stringify(compatConfig, null, 4));
+        removeEolFeatures(compatConfig, i);
+        fs.writeFileSync(`${GENERATED_DIR}/${version}/${configName}-config.json`, JSON.stringify(compatConfig));
     }
 }
 
@@ -90,22 +94,6 @@ function mkdirIfNeeded(dir) {
     }
 }
 
-const unprotectedListName = 'unprotected-temporary.json';
-
-// Grab all exception lists
-const jsonListNames = fs.readdirSync(LISTS_DIR).filter((listName) => {
-    return listName !== unprotectedListName && listName !== '_template.json';
-});
-for (const jsonList of jsonListNames) {
-    const listData = JSON.parse(fs.readFileSync(`${LISTS_DIR}/${jsonList}`));
-    const configKey = jsonList.replace(/[.]json$/, '').replace(/-([a-z0-9])/g, function (g) {
-        return g[1].toUpperCase();
-    });
-
-    delete listData._meta;
-    defaultConfig.features[configKey] = listData;
-}
-
 const unprotectedDomains = new Set();
 function addExceptionsToUnprotected(exceptions) {
     for (const exception of exceptions) {
@@ -114,11 +102,11 @@ function addExceptionsToUnprotected(exceptions) {
     return exceptions.map((obj) => obj.domain);
 }
 
-const listData = JSON.parse(fs.readFileSync(`${LISTS_DIR}/${unprotectedListName}`));
+const listData = JSON.parse(fs.readFileSync(`${LISTS_DIR}/${UNPROTECTED_LIST_NAME}`));
 addExceptionsToUnprotected(listData.exceptions);
 addExceptionsToUnprotected(defaultConfig.features.contentBlocking.exceptions);
 
-// Exclude selected features from the global unprotected-temporary.json domain exceptions
+// Include global unprotected-temporary.json exceptions into selected features domain exceptions
 const featuresToIncludeTempUnprotectedExceptions = [
     'ampLinks',
     'autoconsent',
@@ -152,8 +140,6 @@ const featuresToIncludeTempUnprotectedExceptions = [
     'trackingParameters',
     'unprotectedTemporary',
     'webCompat',
-    'swipingTabs',
-    'showOnAppLaunch',
 ];
 function applyGlobalUnprotectedTempExceptionsToFeatures(key, baseConfig, globalExceptions) {
     if (featuresToIncludeTempUnprotectedExceptions.includes(key)) {
@@ -170,6 +156,63 @@ mkdirIfNeeded(GENERATED_DIR);
 function isFeatureMissingState(feature) {
     return !('state' in feature);
 }
+
+// We previously rolled out all features to all platforms, so this is a safety whilst we deprecate that behavior.
+// Don't add new items to this list, we should just add fearures to overrides/ files instead with explicit state.
+const legacyDisabledFeatures = [
+    'adBlockExtension',
+    'androidBrowserConfig',
+    'androidNewStateKillSwitch',
+    'ampLinks',
+    'appTrackerProtection',
+    'auraExperiment',
+    'autoconsent',
+    'autofillService',
+    'bookmarksSorting',
+    'brokenSiteReportExperiment',
+    'changeOmnibarPosition',
+    'clickToLoad',
+    'clickToPlay',
+    'clientBrandHint',
+    'contextualOnboarding',
+    'cookie',
+    'customUserAgent',
+    'duckPlayer',
+    'exceptionHandler',
+    'extendedOnboarding',
+    'fingerprintingBattery',
+    'fingerprintingCanvas',
+    'fingerprintingTemporaryStorage',
+    'googleRejected',
+    'harmfulApis',
+    'incontextSignup',
+    'mediaPlaybackRequiresUserGesture',
+    'messageBridge',
+    'newTabContinueSetUp',
+    'nonTracking3pCookies',
+    'privacyDashboard',
+    'referrer',
+    'serviceworkerInitiatedRequests',
+    'settingsPage',
+    'showOnAppLaunch',
+    'swipingTabs',
+    'tabManager',
+    'textZoom',
+    'trackingCookies1p',
+    'trackingCookies3p',
+    'voiceSearch',
+    'webViewBlobDownload',
+    'windowsDownloadLink',
+    'windowsExternalPreviewReleases',
+    'windowsFireWindow',
+    'windowsPermissionUsage',
+    'windowsPrecisionScroll',
+    'windowsSpellChecker',
+    'windowsStartupBoost',
+    'windowsWaitlist',
+    'windowsWebViewPermissionsSavesInProfile',
+    'windowsWebviewFailures',
+];
 
 // Handle platform specific overrides and write configs to disk
 async function buildPlatforms() {
@@ -255,8 +298,13 @@ async function buildPlatforms() {
                 }
             }
 
-            if (isFeatureMissingState(platformConfig.features[key])) {
-                platformConfig.features[key].state = 'disabled';
+            if (isFeatureMissingState(platformConfig.features[key], key)) {
+                if (legacyDisabledFeatures.includes(key)) {
+                    platformConfig.features[key].state = 'disabled';
+                } else {
+                    // Remove the feature if we're not explicitly enabling it in overrides/
+                    delete platformConfig.features[key];
+                }
             }
         }
 
@@ -267,9 +315,6 @@ async function buildPlatforms() {
             }
 
             platformConfig.features[key] = { ...platformOverride.features[key] };
-            if (isFeatureMissingState(platformConfig.features[key])) {
-                platformConfig.features[key].state = 'disabled';
-            }
         }
 
         // Remove appTP feature from platforms that don't use it since it's a large feature
@@ -301,8 +346,6 @@ async function buildPlatforms() {
 
 buildPlatforms().then((platformConfigs) => {
     // Generate legacy Safari format
-    const legacyTextDomains = [
-        ...unprotectedDomains,
-    ].join('\n');
+    const legacyTextDomains = [...unprotectedDomains].join('\n');
     fs.writeFileSync(`${GENERATED_DIR}/trackers-unprotected-temporary.txt`, legacyTextDomains);
 });

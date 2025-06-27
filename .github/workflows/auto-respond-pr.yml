@@ -21,21 +21,21 @@ jobs:
               with:
                   issue-number: ${{ github.event.pull_request.number }}
                   body: |
-                      Don't forget to add an individual *reviewer* (in addition to those already added, this should create a task for them in Asana).
-                          - The best reviewer is most likely a feature or platform owner.
-                          - If they've got permission to approve, you're good to merge. [See CODEOWNERS](https://github.com/duckduckgo/privacy-configuration/blob/main/CODEOWNERS)
-                          - As a fallback the Global owners are:
-                              - [Breakage AOR](https://github.com/orgs/duckduckgo/teams/breakage-aor)
-                              - [Breakage triagers](https://github.com/orgs/duckduckgo/teams/breakage)
-                              - [Config AOR](https://github.com/orgs/duckduckgo/teams/config-aor)
-                      Please mark this as draft unless there's intention to merge this.
-                      Click the "Merge When Ready" if you're happy for this to automatically get merged once reviewed.
-                          - If the option isn't available to you; ensure you've signed into DuckDuckGo oauth.
-                      Also don't forget to add schema changes to validate if you're adding/changing a feature.
+                      👋 Don't forget to **add an individual reviewer** (in addition to those auto-added), as this will create a task for them in Asana.
+                      - The best reviewer is most likely a feature or platform owner.
+                       - If they've got permission to approve, you're good to merge. See [CODEOWNERS](https://github.com/duckduckgo/privacy-configuration/blob/main/CODEOWNERS)
+                       - As a fallback the Global owners are:
+                         - [Breakage AOR](https://github.com/orgs/duckduckgo/teams/breakage-aor)
+                         - [Breakage triagers](https://github.com/orgs/duckduckgo/teams/breakage)
+                         - [Config AOR](https://github.com/orgs/duckduckgo/teams/config-aor)
 
-                      -   [Config Reviewer Documentation](https://app.asana.com/0/1200890834746050/1204443212791216/f)
-                      -   [Config Maintainer Documentation](https://app.asana.com/0/1200890834746050/1200573250322769/f)
-                      -   [Feature Implementer Documentation](https://app.asana.com/0/1200890834746050/1201498956177210/f)
+                      👉 Please mark this as DRAFT unless there's an intention to merge this immediately.
+                      👉 Click "Merge when ready" if you're happy for this to be automatically merged once reviewed. (If not available, ensure you've signed in to DuckDuckGo oauth.)
+                      👉 Don't forget to add schema changes to validate if you're adding/changing a feature.
+
+                       - [Config Reviewer Documentation](https://app.asana.com/0/1200890834746050/1204443212791216/f)
+                       - [Config Maintainer Documentation](https://app.asana.com/0/1200890834746050/1200573250322769/f)
+                       - [Feature Implementer Documentation](https://app.asana.com/0/1200890834746050/1201498956177210/f)
 
             - name: Checkout base branch
               uses: actions/checkout@v4

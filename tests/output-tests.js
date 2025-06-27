@@ -1,10 +1,9 @@
-const fs = require('fs');
-const path = require('path');
-const expect = require('chai').expect;
-const { CURRENT_CONFIG_VERSION } = require('../constants.json');
+import fs from 'fs';
+import path from 'path';
+import { expect } from 'chai';
 
 function loadJSON(pathFromRoot) {
-    return JSON.parse(fs.readFileSync(path.join(__dirname, '..', pathFromRoot), 'utf-8'));
+    return JSON.parse(fs.readFileSync(path.join(import.meta.dirname, '..', pathFromRoot), 'utf-8'));
 }
 
 function fileNameToFeatureName(name) {
@@ -21,7 +20,7 @@ describe('Build output validation', () => {
     describe('unprotected temporary merge', () => {
         const extractDomains = (exception) => exception.domain;
         const override = loadJSON('overrides/extension-override.json');
-        const config = loadJSON(`generated/v${CURRENT_CONFIG_VERSION}/extension-config.json`);
+        const config = loadJSON('generated/v5/extension-config.json');
 
         [
             'content-blocking',
@@ -78,29 +77,5 @@ describe('Build output validation', () => {
                 });
             });
         });
-    });
-
-    describe('Validate the latest config has removed the reasons', () => {
-        const config = loadJSON(`generated/v${CURRENT_CONFIG_VERSION}/extension-config.json`);
-        for (const feature of Object.keys(config.features)) {
-            const exceptions = config.features[feature].exceptions;
-            if (exceptions) {
-                exceptions.forEach((exception) => {
-                    expect(exception).to.not.have.property('reason');
-                });
-            }
-        }
-    });
-
-    describe('Ensure versions older than 4 have reasons', () => {
-        const config = loadJSON(`generated/v3/extension-config.json`);
-        for (const feature of Object.keys(config.features)) {
-            const exceptions = config.features[feature].exceptions;
-            if (exceptions) {
-                exceptions.forEach((exception) => {
-                    expect(exception).to.have.property('reason');
-                });
-            }
-        }
     });
 });

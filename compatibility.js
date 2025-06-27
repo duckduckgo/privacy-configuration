@@ -1,4 +1,8 @@
-const { versionToInt, stripReasons } = require('./util.js');
+function versionToInt(version) {
+    // convert v2 to 2
+    return parseInt(version.replace('v', ''));
+}
+
 /**
  * Remove features from `config` that have reached their end of life.
  * This function will also remove the `eol` key from features when it
@@ -7,7 +11,7 @@ const { versionToInt, stripReasons } = require('./util.js');
  * @param {object} config - the config object to remove eol features from
  * @param {int} version - the version of the config object
  */
-function removeEolFeatures(config, version) {
+export function removeEolFeatures(config, version) {
     for (const feature of Object.keys(config.features)) {
         const eol = config.features[feature].eol;
         if (!eol) {
@@ -34,7 +38,7 @@ function removeEolFeatures(config, version) {
  * param {object} config - the config object to convert. This config should be one version higher than the target version.
  * return {object} - The converted config object
  */
-const compatFunctions = {
+export const compatFunctions = {
     v1: (config) => {
         // Breaking changes: minSupportedVersion key in features
 
@@ -66,7 +70,7 @@ const compatFunctions = {
 
         return v2Config;
     },
-    v3: (config, unmodifiedConfig) => {
+    v3: (config, unmodifiedConfig, platform) => {
         // Breaking changes: none, reasons stripped starting in v4
 
         const v3Config = JSON.parse(JSON.stringify(config));
@@ -86,6 +90,7 @@ const compatFunctions = {
 
         // Replace reasons
         for (const key of Object.keys(unmodifiedConfig.features)) {
+            v3Config.features[key].exceptions = v3Config.features[key].exceptions || [];
             assignReasons(v3Config.features[key].exceptions, unmodifiedConfig?.features[key]?.exceptions);
 
             if (key === 'trackerAllowlist') {
@@ -111,15 +116,54 @@ const compatFunctions = {
             }
         }
 
+        // Change "internal" feature + sub-feature state to "disabled" for the
+        // v3 Windows config. Older versions of the Windows browser cannot parse
+        // configurations that use the "internal" state.
+        if (platform === 'windows') {
+            for (const feature of Object.values(v3Config.features)) {
+                if (feature.state === 'internal') {
+                    feature.state = 'disabled';
+                }
+
+                if (feature.features) {
+                    for (const subFeature of Object.values(feature.features)) {
+                        if (subFeature.state === 'internal') {
+                            subFeature.state = 'disabled';
+                        }
+                    }
+                }
+            }
+        }
+
         return v3Config;
     },
-    v4: (config) => {
-        // Breaking changes: none
+    v4: (config, unmodifiedConfig, platform) => {
+        // Breaking changes: added preview state for features and sub-features.
+
         const v4Config = JSON.parse(JSON.stringify(config));
+        // [Windows] Invalid states for features and sub-features will be automatically set to "disabled" from Windows Release v0.118.0
+        for (const feature of Object.values(v4Config.features)) {
+            if (feature.state === 'preview') {
+                feature.state = 'disabled';
+            }
+
+            if (feature.features) {
+                for (const subFeature of Object.values(feature.features)) {
+                    if (subFeature.state === 'preview') {
+                        subFeature.state = 'disabled';
+                    }
+                }
+            }
+        }
+        return v4Config;
+    },
+    v5: (config) => {
+        // Breaking changes: none
+        const v6Config = JSON.parse(JSON.stringify(config));
 
         // Remove exceptions from sub-features
-        for (const feature of Object.keys(v4Config.features)) {
-            const subFeatures = v4Config.features[feature].features;
+        for (const feature of Object.keys(v6Config.features)) {
+            const subFeatures = v6Config.features[feature].features;
             if (subFeatures) {
                 for (const subFeature of Object.keys(subFeatures)) {
                     if (subFeatures[subFeature].exceptions) {
@@ -129,37 +173,24 @@ const compatFunctions = {
             }
         }
         // Remove description, rollout and targets from parent features
-        for (const feature of Object.keys(v4Config.features)) {
-            if (v4Config.features[feature].description) {
-                delete v4Config.features[feature].description;
+        for (const feature of Object.keys(v6Config.features)) {
+            if (v6Config.features[feature].description) {
+                delete v6Config.features[feature].description;
             }
-            if (v4Config.features[feature].rollout) {
-                delete v4Config.features[feature].rollout;
+            if (v6Config.features[feature].rollout) {
+                delete v6Config.features[feature].rollout;
             }
-            if (v4Config.features[feature].targets) {
-                delete v4Config.features[feature].targets;
+            if (v6Config.features[feature].targets) {
+                delete v6Config.features[feature].targets;
             }
         }
         // Ensure exceptions key is present for parent features
-        for (const feature of Object.keys(v4Config.features)) {
-            if (!v4Config.features[feature].exceptions) {
-                v4Config.features[feature].exceptions = [];
+        for (const feature of Object.keys(v6Config.features)) {
+            if (!v6Config.features[feature].exceptions) {
+                v6Config.features[feature].exceptions = [];
             }
         }
 
-        return v4Config;
+        return v6Config;
     },
-};
-
-const outputFilterFunctions = {
-    v4: (config) => {
-        stripReasons(config);
-        return config;
-    },
-};
-
-module.exports = {
-    removeEolFeatures,
-    outputFilterFunctions,
-    compatFunctions,
 };
