@@ -5,7 +5,9 @@ import json from 'eslint-plugin-json';
 export default [
     ...ddgConfig,
     {
-        files: ['**/*.json'],
+        files: [
+            '**/*.json',
+        ],
         ...json.configs.recommended,
     },
     {
