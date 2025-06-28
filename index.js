@@ -25,6 +25,9 @@ const defaultConfig = {
 // Env flag that can be used to override stripping of 'reason' strings from the config.
 const keepReasons = process.argv.includes('--keep-reasons');
 
+// Add this near the top, after other flag definitions
+const debugOutput = process.argv.includes('--debug');
+
 const tdsPath = 'live';
 
 async function getTds() {
@@ -79,7 +82,10 @@ function writeConfigToDisk(platform, config) {
         addHashToFeatures(compatConfig);
 
         removeEolFeatures(compatConfig, i);
-        fs.writeFileSync(`${GENERATED_DIR}/${version}/${configName}-config.json`, JSON.stringify(compatConfig));
+        fs.writeFileSync(
+            `${GENERATED_DIR}/${version}/${configName}-config.json`,
+            debugOutput ? JSON.stringify(compatConfig, null, 2) : JSON.stringify(compatConfig),
+        );
     }
 }
 

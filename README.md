@@ -48,6 +48,16 @@ To build locally the `generated` files, run:
 npm run build
 ```
 
+This will generate the configuration files in a compact JSON format.
+
+To generate the configuration files with pretty-printed (indented) JSON for easier inspection, use:
+
+```
+npm run build:debug
+```
+
+This is useful for debugging or reviewing the generated output.
+
 ### Linting
 
 If you're seeing linting errors in automation run the following:
