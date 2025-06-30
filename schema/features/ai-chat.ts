@@ -10,6 +10,7 @@ type SettingsType = {
     aiChatBangs?: string[];
     aiChatBangRegex?: string;
     addressBarEntryPoint?: boolean;
+    sessionTimeoutMinutes?: number;
 };
 
 // Any subfeatures that have typed `settings` should be defined here.
