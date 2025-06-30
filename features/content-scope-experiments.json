@@ -4,5 +4,30 @@
         "sampleExcludeRecords": {}
     },
     "state": "disabled",
-    "exceptions": []
+    "exceptions": [],
+    "features": {
+        "contentScopeExperiment1": {
+            "state": "enabled",
+            "rollout": {
+                "steps": [
+                    {
+                        "percent": 20
+                    },
+                    {
+                        "percent": 100
+                    }
+                ]
+            },
+            "cohorts": [
+                {
+                    "name": "control",
+                    "weight": 1
+                },
+                {
+                    "name": "treatment",
+                    "weight": 1
+                }
+            ]
+        }
+    }
 }
