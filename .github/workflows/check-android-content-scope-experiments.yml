@@ -24,7 +24,7 @@ jobs:
                   node-version: 20.x
                   cache: 'npm'
             - name: Install dependencies
-              run: npm ci
+              run: npm ci; apt-get -y update; apt-get -y install curl; apt-get -y install jq
             - uses: ./
             - name: Build
               run: npm run build
@@ -37,7 +37,7 @@ jobs:
                   ALL_REMOTE_EXPERIMENTS=$(curl -sL "$URL" | grep -o 'contentScopeExperiment[0-9]*' | sort -u)
 
                   if [ -z "$ALL_REMOTE_EXPERIMENTS" ]; then
-                    echo "::error::Could not fetch remote experiments from $URL. Failing workflow."
+                    echo "Could not fetch remote experiments from $URL. Failing workflow." >> /dev/stderr
                     exit 1
                   fi
 
@@ -63,44 +63,29 @@ jobs:
                   fi
                   if [ -n "$ENABLED_RECENT_EXPERIMENTS" ]; then
                     recently_added_enabled_found='true'
+                    echo "About to run out of allocated experiments"
                     { echo 'enabled_recent_experiments<<EOF'; echo "$ENABLED_RECENT_EXPERIMENTS"; echo 'EOF'; } >> "$GITHUB_OUTPUT"
-                  fi
-
-                  # --- Phase 3: Set Summary Outputs ---
-                  if [ "$invalid_local_experiments_found" == 'true' ]; then
-                    echo "errors_found=true" >> $GITHUB_OUTPUT
-                  else
-                    echo "errors_found=false" >> $GITHUB_OUTPUT
-                  fi
-
-                  if [ "$recently_added_enabled_found" == 'true' ]; then
-                    echo "warnings_found=true" >> $GITHUB_OUTPUT
-                  else
-                    echo "warnings_found=false" >> $GITHUB_OUTPUT
                   fi
 
                   # Also pass through detailed findings for the Asana task
                   echo "invalid_local_experiments_found=$invalid_local_experiments_found" >> $GITHUB_OUTPUT
                   echo "recently_added_enabled_found=$recently_added_enabled_found" >> $GITHUB_OUTPUT
 
+            - name: Log invalid experiments error
+              if: steps.analyze.outputs.invalid_local_experiments_found == 'true'
+              run: |
+                  echo "Invalid experiments found - The following enabled experiments are not defined in the Android codebase. Either disable them for Android, or ping an Android engineer to support to them" >> /dev/stderr
+                  echo "Failing experiments: ${{ steps.analyze.outputs.invalid_experiments }}" >> /dev/stderr
+                  exit 1
+
             - name: Prepare Asana Task
-              if: steps.analyze.outputs.errors_found == 'true' || steps.analyze.outputs.warnings_found == 'true'
+              if: steps.analyze.outputs.recently_added_enabled_found == 'true'
               id: asana_content
               run: |
-                  if [ "${{ steps.analyze.outputs.errors_found }}" == 'true' ]; then
-                    echo "task_name=GH Workflow Failure - Content Scope Experiment Check Failed" >> $GITHUB_OUTPUT
-                  else
-                    echo "task_name=GH Workflow Warning - Content Scope Experiment Check" >> $GITHUB_OUTPUT
-                  fi
+                  echo "task_name=GH Workflow Warning - Content Scope Experiment Check" >> $GITHUB_OUTPUT
 
-                  DESCRIPTION=""
-                  if [ "${{ steps.analyze.outputs.invalid_local_experiments_found }}" == 'true' ]; then
-                    DESCRIPTION="${DESCRIPTION}**ERROR: \nAn enabled experiment is not defined in the Android codebase. Please add it to ContentScopeExperimentsFeature.kt.\n"
-                    DESCRIPTION="${DESCRIPTION}Failing experiments: ${{ steps.analyze.outputs.invalid_experiments }}\n\n"
-                  fi
-                  if [ "${{ steps.analyze.outputs.recently_added_enabled_found }}" == 'true' ]; then
-                    DESCRIPTION="${DESCRIPTION}**WARNING: About to run out of allocated experiments, please pre-allocate more experiments in ContentScopeExperimentsFeature.kt.\n\n"
-                  fi
+                  DESCRIPTION="WARNING: About to run out of allocated experiments, please pre-allocate more experiments in ContentScopeExperimentsFeature.kt.\n"
+                  DESCRIPTION="${DESCRIPTION} Recently enabled experiments: ${{ steps.analyze.outputs.enabled_recent_experiments }}\n\n"
 
                   {
                     echo 'task_description<<EOF'
@@ -120,7 +105,3 @@ jobs:
                       ${{ steps.asana_content.outputs.task_description }}
                       Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
                   action: 'create-asana-task'
-
-            - name: Fail workflow if errors were found
-              if: steps.analyze.outputs.errors_found == 'true'
-              run: exit 1
