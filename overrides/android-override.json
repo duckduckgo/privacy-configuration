@@ -223,7 +223,8 @@
                     "!duckai"
                 ],
                 "aiChatBangRegex": "^(?!({bangs})$)(?=.*({bangs})(?=$|\\s)).+$",
-                "addressBarEntryPoint": true
+                "addressBarEntryPoint": true,
+                "sessionTimeoutMinutes": 60
             },
             "minSupportedVersion": 52250000,
             "exceptions": [],
@@ -244,6 +245,17 @@
                             },
                             {
                                 "percent": 100
+                            }
+                        ]
+                    }
+                },
+                "keepSession": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52400000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25
                             }
                         ]
                     }
