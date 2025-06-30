@@ -323,6 +323,9 @@
                         "vivaldi": "disabled",
                         "chromium": "enabled"
                     }
+                },
+                "bulkBookmarksImport": {
+                    "state": "enabled"
                 }
             }
         },
@@ -653,8 +656,7 @@
                     "state": "enabled"
                 },
                 "crashAutoRecovery": {
-                    "state": "enabled",
-                    "minSupportedVersion": "0.114.0"
+                    "state": "disabled"
                 }
             }
         },
@@ -697,22 +699,29 @@
             "state": "enabled",
             "features": {
                 "useExtensionBasedBurn": {
+                    "state": "disabled"
+                },
+                "burnAnimationSettingVisibility": {
+                    "state": "disabled"
+                },
+                "burnOnStartup": {
                     "state": "enabled"
                 },
-                "fireAnimationSettingVisibility": {
-                    "state": "disabled"
+                "abortingBurn": {
+                    "state": "enabled"
                 }
             }
         },
         "maliciousSiteProtection": {
-            "state": "disabled",
+            "state": "enabled",
+            "minSupportedVersion": "0.115.0",
             "settings": {
                 "hashPrefixUpdateFrequency": 20,
                 "filterSetUpdateFrequency": 720
             },
             "features": {
                 "scamProtection": {
-                    "state": "disabled"
+                    "state": "enabled"
                 }
             },
             "exceptions": []
@@ -751,11 +760,18 @@
         },
         "experimentalTheming": {
             "state": "enabled",
-            "minSupportedVersion": "0.116.0",
+            "minSupportedVersion": "0.116.5",
             "features": {
                 "modernTheme": {
                     "state": "enabled",
-                    "minSupportedVersion": "0.116.0"
+                    "minSupportedVersion": "0.116.5",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            }
+                        ]
+                    }
                 }
             }
         }
