@@ -48,7 +48,7 @@ jobs:
                   invalid_local_experiments_found='false'
                   recently_added_enabled_found='false'
 
-                  LATEST_10_EXPERIMENT_NUMS=$(echo "$ALL_REMOTE_EXPERIMENTS" | sed 's/contentScopeExperiment//' | sort -n | tail -n 10)
+                  LATEST_5_EXPERIMENT_NUMS=$(echo "$ALL_REMOTE_EXPERIMENTS" | sed 's/contentScopeExperiment//' | sort -n | tail -n 5)
 
                   INVALID_EXPERIMENTS=$(comm -13 <(echo "$ALL_REMOTE_EXPERIMENTS" | sort) <(echo "$ENABLED_LOCAL_EXPERIMENTS" | sort))
                   if [ -n "$INVALID_EXPERIMENTS" ]; then
@@ -57,9 +57,9 @@ jobs:
                   fi
 
                   ENABLED_RECENT_EXPERIMENTS=""
-                  if [ -n "$LATEST_10_EXPERIMENT_NUMS" ]; then
-                    LATEST_10_EXPERIMENTS=$(for n in $LATEST_10_EXPERIMENT_NUMS; do echo "contentScopeExperiment$n"; done)
-                    ENABLED_RECENT_EXPERIMENTS=$(comm -12 <(echo "$LATEST_10_EXPERIMENTS" | sort) <(echo "$ENABLED_LOCAL_EXPERIMENTS" | sort))
+                  if [ -n "$LATEST_5_EXPERIMENT_NUMS" ]; then
+                    LATEST_5_EXPERIMENTS=$(for n in $LATEST_5_EXPERIMENT_NUMS; do echo "contentScopeExperiment$n"; done)
+                    ENABLED_RECENT_EXPERIMENTS=$(comm -12 <(echo "$LATEST_5_EXPERIMENTS" | sort) <(echo "$ENABLED_LOCAL_EXPERIMENTS" | sort))
                   fi
                   if [ -n "$ENABLED_RECENT_EXPERIMENTS" ]; then
                     recently_added_enabled_found='true'
