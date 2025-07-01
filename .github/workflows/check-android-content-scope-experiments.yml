@@ -33,7 +33,7 @@ jobs:
               id: analyze
               run: |
                   # --- Phase 1: Data Gathering ---
-                  URL="https://raw.githubusercontent.com/duckduckgo/Android/feature/cris/css-experiments/pre-allocate-experiments/content-scope-scripts/content-scope-scripts-impl/src/main/java/com/duckduckgo/contentscopescripts/impl/features/contentscopeexperiments/ContentScopeExperimentsFeature.kt"
+                  URL="https://raw.githubusercontent.com/duckduckgo/Android/develop/content-scope-scripts/content-scope-scripts-impl/src/main/java/com/duckduckgo/contentscopescripts/impl/features/contentscopeexperiments/ContentScopeExperimentsFeature.kt"
                   ALL_REMOTE_EXPERIMENTS=$(curl -sL "$URL" | grep -o 'contentScopeExperiment[0-9]*' | sort -u)
 
                   if [ -z "$ALL_REMOTE_EXPERIMENTS" ]; then
