@@ -6413,35 +6413,34 @@
                     ],
                     [
                         {
+                            "wait": 300
+                        },
+                        {
                             "if": {
-                                "exists": [
+                                "visible": [
                                     ".govuk-cookie-banner__message",
-                                    "xpath///button[contains(., 'Reject')] | //a[contains(., 'Reject')] | //input[contains(@value, 'Reject')]"
+                                    "xpath///button[contains(., 'Reject')] | //a[contains(., 'Reject')] | //input[contains(@value, 'Reject')] | //button[contains(., 'do not use analytics cookies')]"
                                 ]
                             },
                             "then": [
                                 {
                                     "click": [
                                         ".govuk-cookie-banner__message",
-                                        "xpath///button[contains(., 'Reject')] | //a[contains(., 'Reject')] | //input[contains(@value, 'Reject')]"
+                                        "xpath///button[contains(., 'Reject')] | //a[contains(., 'Reject')] | //input[contains(@value, 'Reject')] | //button[contains(., 'do not use analytics cookies')]"
                                     ]
                                 }
                             ]
                         },
                         {
-                            "if": {
-                                "exists": [
-                                    ".govuk-cookie-banner__message",
-                                    "xpath///button[contains(., 'Hide')] | //a[contains(., 'Hide')] | //input[contains(@value, 'Hide')]"
-                                ]
-                            },
-                            "then": [
-                                {
-                                    "click": [
-                                        ".govuk-cookie-banner__message",
-                                        "xpath///button[contains(., 'Hide')] | //a[contains(., 'Hide')] | //input[contains(@value, 'Hide')]"
-                                    ]
-                                }
+                            "waitForVisible": [
+                                ".govuk-cookie-banner__message",
+                                "xpath///button[contains(., 'Hide')] | //a[contains(., 'Hide')] | //input[contains(@value, 'Hide')]"
+                            ]
+                        },
+                        {
+                            "click": [
+                                ".govuk-cookie-banner__message",
+                                "xpath///button[contains(., 'Hide')] | //a[contains(., 'Hide')] | //input[contains(@value, 'Hide')]"
                             ]
                         }
                     ],
