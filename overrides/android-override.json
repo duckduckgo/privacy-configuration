@@ -2475,20 +2475,26 @@
                 }
             }
         },
-        "experimentalUITheming": {
-            "state": "disabled",
-            "exceptions": [],
+        "experimentalTheming": {
+            "state": "internal",
+            "minSupportedVersion": 52410000,
             "features": {
-                "visualUpdatesFeature": {
-                    "state": "disabled",
-                    "minSupportedVersion": 52361000,
+                "singleOmnibarFeature": {
+                    "state": "internal",
+                    "minSupportedVersion": 52410000,
                     "rollout": {
                         "steps": [
                             {
                                 "percent": 5
                             }
                         ]
-                    }
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        }
+                    ]
                 }
             }
         }
