@@ -17,6 +17,9 @@
                             },
                             {
                                 "percent": 25
+                            },
+                            {
+                                "percent": 100
                             }
                         ]
                     }
@@ -183,8 +186,8 @@
                                 "ytd-movie-renderer",
                                 "ytd-grid-movie-renderer"
                             ],
-                            "videoElement": "#player video",
-                            "videoElementContainer": "#player .html5-video-player",
+                            "videoElement": "[full-bleed-player] #player-full-bleed-container video, #player video",
+                            "videoElementContainer": "[full-bleed-player] #player-full-bleed-container .html5-video-player, #player .html5-video-player",
                             "hoverExcluded": [],
                             "clickExcluded": ["ytd-thumbnail-overlay-toggle-button-renderer"],
                             "allowedEventTargets": [
@@ -259,7 +262,7 @@
             "exceptions": [],
             "features": {
                 "tdsNextExperimentJul25": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "rollout": {
                         "steps": [
                             {
@@ -414,6 +417,12 @@
         "autofill": {
             "state": "enabled",
             "features": {
+                "autocompleteAttributeSupport": {
+                    "state": "enabled"
+                },
+                "inputFocusApi": {
+                    "state": "enabled"
+                },
                 "credentialsSaving": {
                     "state": "enabled",
                     "minSupportedVersion": "7.74.0"
@@ -814,6 +823,15 @@
                                     "blick.ch - https://github.com/duckduckgo/privacy-configuration/issues/1520",
                                     "slate.com - slate.com - https://github.com/duckduckgo/privacy-configuration/pull/2879"
                                 ]
+                            }
+                        ]
+                    },
+                    "datadoghq-browser-agent.com": {
+                        "rules": [
+                            {
+                                "rule": "datadoghq-browser-agent.com",
+                                "domains": ["resy.com"],
+                                "reason": "resy.com - https://github.com/duckduckgo/privacy-configuration/pull/3370"
                             }
                         ]
                     },

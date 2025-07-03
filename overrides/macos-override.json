@@ -15,6 +15,9 @@
                             },
                             {
                                 "percent": 25
+                            },
+                            {
+                                "percent": 50
                             }
                         ]
                     }
@@ -170,6 +173,9 @@
                 },
                 "sidebar": {
                     "state": "disabled"
+                },
+                "textSummarization": {
+                    "state": "disabled"
                 }
             },
             "settings": {
@@ -230,32 +236,8 @@
                 }
             ],
             "features": {
-                "tdsNextExperimentJul25": {
-                    "state": "disabled",
-                    "rollout": {
-                        "steps": [
-                            {
-                                "percent": 25
-                            }
-                        ]
-                    },
-                    "settings": {
-                        "controlUrl": "v5/experiments/20250617-macos-tds-control.json",
-                        "treatmentUrl": "v5/experiments/20250617-macos-tds-treatment.json"
-                    },
-                    "cohorts": [
-                        {
-                            "name": "control",
-                            "weight": 1
-                        },
-                        {
-                            "name": "treatment",
-                            "weight": 1
-                        }
-                    ]
-                },
                 "tdsNextExperimentAug25": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "rollout": {
                         "steps": [
                             {
@@ -611,6 +593,11 @@
         "shortHistoryMenu": {
             "state": "enabled"
         },
+        "updatesWontAutomaticallyRestartApp": {
+            "state": "enabled",
+            "exceptions": [],
+            "minSupportedVersion": "1.145.0"
+        },
         "incontextSignup": {
             "state": "enabled"
         },
@@ -697,6 +684,10 @@
                 {
                     "domain": "zoom.us",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1635"
+                },
+                {
+                    "domain": "wetter.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3366"
                 }
             ]
         },
@@ -1173,6 +1164,9 @@
                         "steps": [
                             {
                                 "percent": 5
+                            },
+                            {
+                                "percent": 15
                             }
                         ]
                     },
@@ -1266,7 +1260,12 @@
             "state": "internal"
         },
         "macOSBrowserConfig": {
-            "state": "enabled"
+            "state": "enabled",
+            "features": {
+                "willSoonDropBigSurSupport": {
+                    "state": "enabled"
+                }
+            }
         }
     },
     "unprotectedTemporary": []

@@ -51,7 +51,7 @@
             "exceptions": [],
             "features": {
                 "tdsNextExperiment001": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": 52361000,
                     "rollout": {
                         "steps": [
@@ -223,7 +223,8 @@
                     "!duckai"
                 ],
                 "aiChatBangRegex": "^(?!({bangs})$)(?=.*({bangs})(?=$|\\s)).+$",
-                "addressBarEntryPoint": true
+                "addressBarEntryPoint": true,
+                "sessionTimeoutMinutes": 60
             },
             "minSupportedVersion": 52250000,
             "exceptions": [],
@@ -238,6 +239,29 @@
                             },
                             {
                                 "percent": 10
+                            },
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
+                },
+                "keepSession": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52400000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
                             }
                         ]
                     }
@@ -845,8 +869,8 @@
                                 "ytd-movie-renderer",
                                 "ytd-grid-movie-renderer"
                             ],
-                            "videoElement": "#player video",
-                            "videoElementContainer": "#player .html5-video-player",
+                            "videoElement": "[full-bleed-player] #player-full-bleed-container video, #player video",
+                            "videoElementContainer": "[full-bleed-player] #player-full-bleed-container .html5-video-player, #player .html5-video-player",
                             "hoverExcluded": [],
                             "clickExcluded": ["ytd-thumbnail-overlay-toggle-button-renderer"],
                             "allowedEventTargets": [
@@ -1197,6 +1221,15 @@
                                 "rule": "cdx.cedexis.net",
                                 "domains": ["linkedin.com"],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/675"
+                            }
+                        ]
+                    },
+                    "datadoghq-browser-agent.com": {
+                        "rules": [
+                            {
+                                "rule": "datadoghq-browser-agent.com",
+                                "domains": ["resy.com"],
+                                "reason": "resy.com - https://github.com/duckduckgo/privacy-configuration/pull/3370"
                             }
                         ]
                     },
@@ -2143,6 +2176,64 @@
                             }
                         ]
                     }
+                },
+                "widgetAsProtection": {
+                    "minSupportedVersion": 52400000,
+                    "state": "enabled"
+                }
+            }
+        },
+        "postCtaExperience": {
+            "state": "enabled",
+            "exceptions": [],
+            "features": {
+                "postCtaExperienceExperimentJun25": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52400000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "simpleSearchWidgetPrompt",
+                            "weight": 1
+                        }
+                    ]
+                }
+            }
+        },
+        "onboardingHomeScreenWidget": {
+            "state": "enabled",
+            "exceptions": [],
+            "features": {
+                "onboardingHomeScreenWidgetExperimentJun25": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52400000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "experimentalOnboardingHomeScreenWidgetPrompt",
+                            "weight": 1
+                        }
+                    ]
                 }
             }
         },
