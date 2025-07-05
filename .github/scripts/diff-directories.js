@@ -144,7 +144,7 @@ ${fileDiff}
                     const lastFileName = rollup.files[rollup.files.length - 1];
                     const modifiedDiff = rollup.string.replace(
                         `--- ${lastFileName}`,
-                        `--- ${lastFileName} (and ${rollup.files.length - 1} other files)`
+                        `--- ${lastFileName} (and ${rollup.files.length - 1} other files)`,
                     );
                     outString += '\n\n' + modifiedDiff;
                 } else {
