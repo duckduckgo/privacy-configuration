@@ -1,3 +1,16 @@
+# Auto Respond to PR Workflow
+#
+# This workflow automatically generates and posts diff comments showing changes to generated configuration files.
+#
+# ## Generated Diff Output Guide:
+# - **X files changed**: Multiple files with identical changes (collapsed for readability)
+# - **X files identical**: Files that are exactly the same between base and PR branches
+# - **File headers**: Show `--- filename (and X other files)` when multiple files share the same diff
+# - **File lists**: Individual files are listed under each collapsed section
+# - **Sections**: `latest` (current config version, expanded) and `legacy` (older versions, collapsed)
+#
+# The diff script groups files by their actual changes to reduce noise and improve review efficiency.
+
 name: Auto Respond to PR
 
 on:
@@ -95,7 +108,7 @@ jobs:
                       const prNumber = context.issue.number;
                       const diffOutput = fs.readFileSync('diff_output.txt', 'utf8');
                       let commentBody = `
-                      ### Generated file outputs:
+                      ### [Generated file outputs](https://github.com/duckduckgo/privacy-configuration/blob/main/.github/workflows/auto-respond-pr.yml#L5-L12):
                       *Time updated:* ${new Date().toUTCString()}
                       ${diffOutput}
                       `
