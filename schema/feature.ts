@@ -54,9 +54,25 @@ export type Feature<
     minSupportedVersion?: VersionType;
 };
 
+type DocumentContextCondition = {
+    /**
+     * Only one of 'top' or 'frame' may be present. If both are present, config is invalid.
+     * - { top: true } matches top-level documents
+     * - { frame: true } matches subframes
+     * - {} or absent matches all
+     * - { top: false } or { frame: false } never matches
+     */
+    top?: boolean;
+    frame?: boolean;
+};
+
 type ConditionBlock = {
     domain?: string;
     urlPattern?: string;
+    /**
+     * New: documentContext condition for frame/top-level matching
+     */
+    documentContext?: DocumentContextCondition;
 };
 
 type CSSInjectFeatureSettingsPatches = {
