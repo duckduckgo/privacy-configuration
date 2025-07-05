@@ -114,16 +114,46 @@ ${fileDiff}
         .map((key) => {
             const rollup = rollupGrouping[key];
             let outString = '';
-            let title = rollup.files[0];
+            let title;
+
+            // Create descriptive title based on file count and type
+            if (rollup.files.length === 1) {
+                title = rollup.files[0];
+            } else {
+                const fileCount = rollup.files.length;
+                if (key === 'identical') {
+                    title = `${fileCount} files identical`;
+                } else if (key === 'old 1') {
+                    title = `${fileCount} files only in old changeset`;
+                } else if (key === 'new 2') {
+                    title = `${fileCount} files only in new changeset`;
+                } else {
+                    title = `${fileCount} files changed`;
+                }
+            }
+
             // If there's more than one file in the rollup, list them
             if (rollup.files.length > 1) {
-                title += ` (${rollup.files.length - 1} more)`;
                 outString += '\n';
                 for (const file of rollup.files) {
                     outString += `- ${file}\n`;
                 }
+
+                // Simple replacement of the last filename with additional info
+                if (rollup.string.includes('```diff')) {
+                    const lastFileName = rollup.files[rollup.files.length - 1];
+                    const modifiedDiff = rollup.string.replace(
+                        `--- ${lastFileName}`,
+                        `--- ${lastFileName} (and ${rollup.files.length - 1} other files)`
+                    );
+                    outString += '\n\n' + modifiedDiff;
+                } else {
+                    outString += '\n\n' + rollup.string;
+                }
+            } else {
+                outString += '\n\n' + rollup.string;
             }
-            outString += '\n\n' + rollup.string;
+
             return renderDetails(title, outString, isOpen);
         })
         .join('\n');
@@ -178,6 +208,6 @@ for (const [
     files,
 ] of Object.entries(sections)) {
     const isOpen = section === 'latest';
-    const fileOut = displayDiffs(files.dir1, files.dir2, isOpen);
+    const fileOut = displayDiffs(files.dir1 || {}, files.dir2 || {}, isOpen);
     console.log(renderDetails(section, fileOut, isOpen));
 }
