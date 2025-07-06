@@ -20,7 +20,7 @@ Reference tests: [privacy-reference-tests](https://github.com/duckduckgo/privacy
 - Products download a configuration file defining which privacy features are enabled and which sites are excluded (globally or per-feature).
 - If the downloaded config fails to parse, platforms should embed a local copy with the installation.
 - Example config: [extension-config.json](https://staticcdn.duckduckgo.com/trackerblocking/config/v1/extension-config.json)
-- Features included in the config files: [Feature Key Mappings](https://app.asana.com/0/0/1201287926785314/f/)
+- Features included in the config files: [Feature Key Mappings](./privacy-feature-key-mappings.md)
 - Structure specified in [`schema/config.ts`](https://github.com/duckduckgo/privacy-configuration/blob/main/schema/config.ts).
 - Load the file for your platform: `<platform>-config.json`
 
@@ -28,19 +28,38 @@ Reference tests: [privacy-reference-tests](https://github.com/duckduckgo/privacy
 - `version`: Timestamp (ms since Unix epoch) when the config was published. Always increases, even on rollback.
 - `features`: Mapping of all privacy features and their properties.
   - `featurename`: Canonical name for the feature.
-    - `state`: If the feature is enabled/disabled/internal/preview. Unknown states should be treated as disabled.
+    - `state`: If the feature is enabled/disabled/internal/preview.
+        - ⚠️ Clients should be able to parse any string here, treating unknown states as disabled.
     - `exceptions`: Websites that have this feature disabled. (domain, reason)
+      - `domain` - top level URL
+      - `reason` - [removed from [v4](https://app.asana.com/1/137249556945/project/1200890834746050/task/1205680646032200?focus=true) onwards and should not be relied upon] the reason for the exception
     - `minSupportedVersion`: Minimum platform version for which this feature should be enabled. (Android uses numbers, others use strings)
     - `features`: Some features have sub-features.
-      - `state`, `minSupportedVersion`, `description`, `rollout`, `targets`, `cohorts` (see Asana for details)
+      - `state` - same as parent features.
+          - ⚠️ unclear if a disabled feature should make a sub-feature disabled (Android/Extensions does not but iOS/macOS and Windows does).
+      - `minSupportedVersion` - same as parent features.
+      - `description` - optional and non function to describe the sub feature.
+      - `rollout` - They can also support progressive rollout which are described here: ✓ NetP: Feature Flag Incremental Rollouts
+          - [Windows] rollout applies separately to enabled/preview states. More info here: [Add a feature flag via Remote Config](https://app.asana.com/1/137249556945/project/1208736637614995/task/1207579150090376?focus=true)
+      - `targets` - Permits enabling of the features based on certain conditions.
+      - `cohorts` - Enables [Native Apps Experiment Framework (A/B testing framework)](https://app.asana.com/1/137249556945/project/1208889145294658/list/1208889101183474)
     - `settings`: Optional mapping for extra info needed for the feature. (e.g., scripts, aboutBlankEnabled, aboutBlankSites)
-      - Some features use other keys; see feature-specific docs.
+      - In our browser extension it may be common to see the following keys within "settings"
+      - `scripts` - a list of URL regexes that are exempted from protection (follows the same format as "exceptions")
+        - Note: this is a runtime protection and we trace the stack to see if the script URL is within the trace. This can't capture all scripts, but for common cases it should work.
+      - `aboutBlankEnabled` - if set to "disabled" this disables the specific feature for about:blank frames embedded within websites.
+      - `aboutBlankSites` - a list of sites disabling about:blank frame protection (follows the same format as "exceptions")
+      - Some features (such as [Temporary tracker allowlist](https://app.asana.com/1/137249556945/project/1163321984198618/task/1200434943367884?focus=true)) use other keys not mentioned here. If this is the case it will be documented in the feature's own documentation and implementation guidelines.
 - `unprotectedTemporary`: Websites that have ALL features disabled (same format as `exceptions`).
-- `experimentalVariants`: Mapping of all live experiment variants and their properties (Android only).
+- `experimentalVariants`: Mapping of all live experiment variants and their properties (Android only [Add 'experimentalVariants' and 'targets' to remote config](https://app.asana.com/1/137249556945/project/1200890834746050/task/1205908353497982)).
+  - `desc` - variant's description for documentation purposes.
+  - `variantKey` - letters associated to the experimental variant.
+  - `weight` - weight of the variant [0.0-1.0] to be used for the distribution.
+  - `filters` - a mapping of filters to be used to allocate a user to the variant or not. For now, we only support locale, but could expand in the future.
 
 ### Notes
 - All `domain` fields are wildcarded by default (e.g., `https://bank.com` matches `https://bank.com` and all subdomains), except user manual disables, which are not wildcarded.
-- All exceptions should only match the top frame URL and apply to all subframes.
+- All exceptions should only match the top frame URL and apply to all subframes.  e.g. Let's say that the feature X has "safelisted.com" on the "exceptions" list. This means that if "safelisted.com" is loaded as an iframe on "example.com" the exception does NOT apply. It also means that if "safelsited.com" (where exception does apply) has an iframe with "example.com" the exception DOES apply to that frame also.
 - If a single feature in the config fails to parse, it should be considered disabled.
 
 ### Implementation Verification
