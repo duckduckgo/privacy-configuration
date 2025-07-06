@@ -16,7 +16,7 @@
 
 1. Copy `features/_template.json` to a new file in `features/`.
 2. The filename (e.g., `myFeature.json`) becomes the feature key (camelCased) in the output.
-3. JSON files are copied into the generated output (see 🛠 Implementation Guidelines: Remote Privacy Configuration/Allowlists).
+3. JSON files are copied into the generated output (see [🛠 Implementation Guidelines: Remote Privacy Configuration/Allowlists](./implementation-guidelines-remote-privacy-configuration-allowlists.md)).
 4. The `_meta` key is removed (for documentation only).
 5. Add an `"exceptions"` key (list of TLDs) to disable the feature for specific sites.
 6. Other keys can be added, typically under a `"settings"` object.
@@ -47,7 +47,7 @@
    - Mark as draft if not ready.
    - Mark as 'merge when ready' if ready for review/merge.
    - Tag a reviewer familiar with the problem.
-5. ⚠️ If waiting for review, ping the ~Breakage channel on Mattermost for help.
+5. ⚠️ If waiting for review, ping the [~Breakage](https://chat.duckduckgo.com/ddg/channels/breakage) channel on Mattermost for help.
 
 ---
 

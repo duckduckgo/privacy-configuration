@@ -9,7 +9,7 @@ As a config reviewer, your role is critical in preventing misconfiguration of ou
 - If you're unfamiliar with the keys being edited, ask the feature author to clarify.
 - Clarify with the author if a change shouldn't target a certain platform.
 - If the PR has set 'merge when ready', then let it merge once you've approved it. (If this status is not present, ping the author on MM/Asana to let them know, but allow them to merge the PR in case they're waiting on further review.)
-- Please ask questions in ~breakage if you're unsure!
+- Please ask questions in [~breakage](https://chat.duckduckgo.com/ddg/channels/breakage) if you're unsure!
 - Once a PR is merged it will be automatically released to all platforms; generally it will be adopted within 30 minutes.
 
 ## PR Diff Automation
