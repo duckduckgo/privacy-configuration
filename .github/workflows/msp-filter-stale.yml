@@ -36,7 +36,7 @@ jobs:
                   echo "EOF" >> $GITHUB_ENV
                   npm run lint-fix
             - name: Create PR with updated configs
-              uses: peter-evans/create-pull-request@88ed63ce144f5372efe9f999d8bb224f582d98d9
+              uses: peter-evans/create-pull-request@56cdd05eb2cd4cbc18954377c5774f8438239ae8
               id: create-pr
               with:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
