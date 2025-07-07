@@ -13,6 +13,17 @@ https://staticcdn.duckduckgo.com/trackerblocking/config/v4/...
 Please see the [Related Resources](#Related-Resources) section for a list of
 files used by each platform.
 
+## Documentation
+
+- [Config Maintainer Documentation](docs/config-maintainer-documentation.md)
+- [Config Reviewer Documentation](docs/config-reviewer-documentation.md)
+- [Privacy Feature Key Mappings](docs/privacy-feature-key-mappings.md)
+- [Feature Implementer Documentation](docs/feature-implementer-documentation.md)
+- [Incremental Rollout Implementation Guide](docs/incremental-rollout-implementation-guide.md)
+- [Writing a Schema for Your Config Feature](docs/writing-schema-for-config-feature.md)
+- [Implementation Guidelines: Remote Privacy Configuration/Allowlists](docs/implementation-guidelines-remote-privacy-configuration-allowlists.md)
+- [Remote Configuration Change Log](docs/remote-configuration-change-log.md)
+
 **Deprecated Files**
 
 Please note the files `trackers-unprotected-temporary.txt` in the `generated` directory, as well as `v1` config
