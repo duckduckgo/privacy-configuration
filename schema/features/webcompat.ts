@@ -54,6 +54,7 @@ type FullWebCompatOptions = CSSInjectFeatureSettings<{
     };
     disableDeviceEnumeration: StateToggle;
     disableDeviceEnumerationFrames: StateToggle;
+    enumerateDevices: StateToggle;
 }>;
 export type WebCompatSettings = Partial<FullWebCompatOptions>;
 
