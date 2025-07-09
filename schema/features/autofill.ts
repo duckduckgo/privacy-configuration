@@ -27,12 +27,19 @@ export type InputTypeSetting = {
     type: string;
 };
 
+export type FailsafeSettings = {
+    maxInputsPerPage?: number;
+    maxInputsPerForm?: number;
+    maxFormsPerPage?: number;
+};
+
 export type FormBoundarySelector = string;
 
 export type SiteSpecificFixes = {
     formBoundarySelector?: FormBoundarySelector;
     formTypeSettings?: FormTypeSetting[];
     inputTypeSettings?: InputTypeSetting[];
+    failsafeSettings?: FailsafeSettings;
 };
 
 // Any subfeatures that have typed `settings` should be defined here.
