@@ -9,6 +9,7 @@ type DescriptorAPIChange = {
     enumerable?: boolean;
     configurable?: boolean;
     getterValue: CSSConfigSetting;
+    define?: boolean; // If this is true, it permits defining new properties on the object. Otherwise, it only permits modifying existing properties.
 };
 
 type FullAPIModificationOptions = CSSInjectFeatureSettings<{
