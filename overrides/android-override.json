@@ -2513,23 +2513,46 @@
         "apiManipulation": {
             "readme": "Example config for apiManipulation to set navigator.plugins to return PDF viewer plugins",
             "state": "enabled",
-            "minSupportedVersion": 52410000,
             "exceptions": [],
             "settings": {
-                "apiChanges": {
-                    "Navigator.prototype.plugins": {
-                        "type": "descriptor",
-                        "getterValue": {
-                            "type": "array",
-                            "value": [
-                                { "name": "PDF Viewer", "filename": "internal-pdf-viewer", "description": "Portable Document Format" },
-                                { "name": "Chrome PDF Viewer", "filename": "internal-pdf-viewer", "description": "Portable Document Format" },
-                                { "name": "Chromium PDF Viewer", "filename": "internal-pdf-viewer", "description": "Portable Document Format" },
-                                { "name": "Microsoft Edge PDF Viewer", "filename": "internal-pdf-viewer", "description": "Portable Document Format" },
-                                { "name": "WebKit built-in PDF", "filename": "internal-pdf-viewer", "description": "Portable Document Format" }
-                            ]
-                        }
+                "conditionalChanges": [
+                    {
+                        "condition": { "experiment": { "experimentName": "contentScopeExperiment0", "cohort": "treatment" } },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/apiChanges",
+                                "value": {
+                                    "Navigator.prototype.plugins": {
+                                        "type": "descriptor",
+                                        "getterValue": {
+                                            "type": "array",
+                                            "value": [
+                                                { "name": "PDF Viewer", "filename": "internal-pdf-viewer", "description": "Portable Document Format" },
+                                                { "name": "Chrome PDF Viewer", "filename": "internal-pdf-viewer", "description": "Portable Document Format" },
+                                                { "name": "Chromium PDF Viewer", "filename": "internal-pdf-viewer", "description": "Portable Document Format" },
+                                                { "name": "Microsoft Edge PDF Viewer", "filename": "internal-pdf-viewer", "description": "Portable Document Format" },
+                                                { "name": "WebKit built-in PDF", "filename": "internal-pdf-viewer", "description": "Portable Document Format" }
+                                            ]
+                                        }
+                                    }
+                                }
+                            }
+                        ]
                     }
+                ]
+            }
+        },
+        "contentScopeExperiments": {
+            "state": "enabled",
+            "features": {
+                "contentScopeExperiment0": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52410000,
+                    "cohorts": [
+                        { "name": "control", "weight": 1 },
+                        { "name": "treatment", "weight": 1 }
+                    ]
                 }
             }
         }
