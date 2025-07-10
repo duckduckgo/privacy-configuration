@@ -161,6 +161,7 @@
         "apiManipulation": {
             "state": "enabled",
             "settings": {
+                "apiChanges": {},
                 "conditionalChanges": [
                     {
                         "condition": { "experiment": { "experimentName": "contentScopeExperiment1", "cohort": "treatment" } },
@@ -168,7 +169,13 @@
                             {
                                 "op": "add",
                                 "path": "/apiChanges/window.exampleExperimentVisible",
-                                "value": true
+                                "value": {
+                                    "type": "descriptor",
+                                    "getterValue": {
+                                        "type": "boolean",
+                                        "value": true
+                                    }
+                                }
                             }
                         ]
                     }
