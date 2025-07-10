@@ -12,9 +12,9 @@ type DescriptorAPIChange = {
     define?: boolean; // If this is true, it permits defining new properties on the object. Otherwise, it only permits modifying existing properties.
 };
 
-type FullAPIModificationOptions = CSSInjectFeatureSettings<{
+type FullAPIManipulationOptions = CSSInjectFeatureSettings<{
     apiChanges: Record<string, RemoveAPIChange | DescriptorAPIChange>;
 }>;
-export type APIModificationSettings = Partial<FullAPIModificationOptions>;
+export type APIManipulationSettings = Partial<FullAPIManipulationOptions>;
 
-export type APIModificationFeature<VersionType> = Feature<APIModificationSettings, VersionType>;
+export type APIManipulationFeature<VersionType> = Feature<APIManipulationSettings, VersionType>;

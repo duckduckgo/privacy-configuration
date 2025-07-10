@@ -9,7 +9,7 @@ import { AutofillFeature } from './features/autofill';
 import { ImportFeature } from './features/import';
 import { MessageBridgeFeature } from './features/message-bridge';
 import { AndroidBrowserConfig } from './features/android-browser-config';
-import { APIModificationFeature } from './features/api-modification';
+import { APIManipulationFeature } from './features/api-manipulation';
 import { FingerprintingHardwareFeature } from './features/fingerprinting-hardware';
 import { FingerprintingScreenSizeFeature } from './features/fingerprinting-screen-size';
 import { NetworkProtection } from './features/network-protection';
@@ -37,7 +37,7 @@ export type ConfigV5<VersionType> = {
     features: Record<string, Feature<any, VersionType>> & {
         // These features have typed settings
         aiChat?: AiChatConfig<VersionType>;
-        apiModification?: APIModificationFeature<VersionType>;
+        apiManipulation?: APIManipulationFeature<VersionType>;
         autoconsent?: AutoconsentFeature<VersionType>;
         autofill?: AutofillFeature<VersionType>;
         import?: ImportFeature<VersionType>;
