@@ -377,9 +377,22 @@
                 "scriptletExperiment": {
                     "state": "enabled",
                     "minSupportedVersion": "7.175.0",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            }
+                        ]
+                    },
                     "cohorts": [
-                        { "name": "control", "weight": 1 },
-                        { "name": "treatment", "weight": 1 }
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
                     ]
                 }
             }
