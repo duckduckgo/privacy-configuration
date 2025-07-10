@@ -157,6 +157,35 @@
         },
         "webCompat": {
             "state": "disabled"
+        },
+        "apiManipulation": {
+            "state": "enabled",
+            "settings": {
+                "conditionalChanges": [
+                    {
+                        "condition": { "experiment": { "experimentName": "contentScopeExperiment1", "cohort": "treatment" } },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/apiChanges/window.exampleExperimentVisible",
+                                "value": true
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        "contentScopeExperiments": {
+            "state": "enabled",
+            "features": {
+                "contentScopeExperiment1": {
+                    "state": "enabled",
+                    "cohorts": [
+                        { "name": "control", "weight": 1 },
+                        { "name": "treatment", "weight": 1 }
+                    ]
+                }
+            }
         }
     },
     "unprotectedTemporary": [
