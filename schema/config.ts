@@ -14,6 +14,7 @@ import { FingerprintingHardwareFeature } from './features/fingerprinting-hardwar
 import { FingerprintingScreenSizeFeature } from './features/fingerprinting-screen-size';
 import { NetworkProtection } from './features/network-protection';
 import { AiChatConfig } from './features/ai-chat';
+import { ScriptletsFeature } from './features/scriptlets';
 
 export { WebCompatSettings } from './features/webcompat';
 export { DuckPlayerSettings } from './features/duckplayer';
@@ -51,6 +52,7 @@ export type ConfigV5<VersionType> = {
         fingerprintingHardware?: FingerprintingHardwareFeature<VersionType>;
         fingerpringtingScreenSize?: FingerprintingScreenSizeFeature<VersionType>;
         networkProtection?: NetworkProtection<VersionType>;
+        scriptlets?: ScriptletsFeature<VersionType>;
     };
     unprotectedTemporary: SiteException[];
 };

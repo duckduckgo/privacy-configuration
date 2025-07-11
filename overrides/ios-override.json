@@ -373,6 +373,27 @@
                             "weight": 1
                         }
                     ]
+                },
+                "scriptletExperiment": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.175.0",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
                 }
             }
         },
@@ -1242,7 +1263,1829 @@
         },
         "iOSBrowserConfig": {
             "state": "enabled"
+        },
+        "scriptlets": {
+            "state": "enabled",
+            "exceptions": [],
+            "settings": {
+                "scriptlets": [],
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "experiment": { "experimentName": "scriptletExperiment", "cohort": "treatment" },
+                            "domain": "4tube.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "abortOnPropertyRead",
+                                    "attrs": {
+                                        "property": "ExoLoader"
+                                    },
+                                    "source": "adguard"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": { "experimentName": "scriptletExperiment", "cohort": "treatment" },
+                            "domain": "ashemaletube.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "abortOnPropertyRead",
+                                    "attrs": {
+                                        "property": "popns"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "removeNodeText",
+                                    "attrs": {
+                                        "nodeName": "script",
+                                        "textMatch": "popunder"
+                                    },
+                                    "source": "adguard"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": { "experimentName": "scriptletExperiment", "cohort": "treatment" },
+                            "domain": "babepedia.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "setConstant",
+                                    "attrs": {
+                                        "property": "loadTool",
+                                        "value": "undefined"
+                                    },
+                                    "source": "adguard"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": { "experimentName": "scriptletExperiment", "cohort": "treatment" },
+                            "domain": "bitchesgirls.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "preventAddEventListener",
+                                    "attrs": {
+                                        "typeSearch": "load",
+                                        "listenerSearch": "adSession"
+                                    },
+                                    "source": "adguard"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": { "experimentName": "scriptletExperiment", "cohort": "treatment" },
+                            "domain": "boyfriendtv.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "abortOnPropertyRead",
+                                    "attrs": {
+                                        "property": "backgroundBlack"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "abortOnPropertyRead",
+                                    "attrs": {
+                                        "property": "popunder"
+                                    },
+                                    "source": "ubo"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "preventAddEventListener",
+                                    "attrs": {
+                                        "typeSearch": "click",
+                                        "listenerSearch": "interstitial"
+                                    },
+                                    "source": "adguard"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": { "experimentName": "scriptletExperiment", "cohort": "treatment" },
+                            "domain": "breitbart.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "setConstant",
+                                    "attrs": {
+                                        "property": "BB_G.doing_popup",
+                                        "value": "undefined"
+                                    },
+                                    "source": "adguard"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": { "experimentName": "scriptletExperiment", "cohort": "treatment" },
+                            "domain": "camwhores.tv"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "abortCurrentInlineScript",
+                                    "attrs": {
+                                        "property": "String.fromCharCode",
+                                        "search": "zfgloaded"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "abortOnPropertyRead",
+                                    "attrs": {
+                                        "property": "onload"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "abortOnPropertyRead",
+                                    "attrs": {
+                                        "property": "crakPopInParams"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "setConstant",
+                                    "attrs": {
+                                        "property": "loadTool",
+                                        "value": "undefined"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "setConstant",
+                                    "attrs": {
+                                        "property": "flashvars.protect_block",
+                                        "value": ""
+                                    },
+                                    "source": "adguard"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": { "experimentName": "scriptletExperiment", "cohort": "treatment" },
+                            "domain": "eporner.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "abortOnPropertyRead",
+                                    "attrs": {
+                                        "property": "ExoLoader"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "preventAddEventListener",
+                                    "attrs": {
+                                        "typeSearch": "getexoloader"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "abortOnPropertyRead",
+                                    "attrs": {
+                                        "property": "BetterJsPop"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "setCookie",
+                                    "attrs": {
+                                        "name": "ADBp",
+                                        "value": "yes"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "abortOnPropertyWrite",
+                                    "attrs": {
+                                        "property": "initEPNB"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "preventSetTimeout",
+                                    "attrs": {
+                                        "matchCallback": "/click[\\s\\S]*?window.location.replace/"
+                                    },
+                                    "source": "adguard"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": { "experimentName": "scriptletExperiment", "cohort": "treatment" },
+                            "domain": "erome.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "abortOnPropertyRead",
+                                    "attrs": {
+                                        "property": "ExoLoader"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "setConstant",
+                                    "attrs": {
+                                        "property": "tiPopAction",
+                                        "value": "noopFunc"
+                                    },
+                                    "source": "adguard"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": { "experimentName": "scriptletExperiment", "cohort": "treatment" },
+                            "domain": "fapfappy.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "abortCurrentInlineScript",
+                                    "attrs": {
+                                        "property": "WebAssembly",
+                                        "search": "atob"
+                                    },
+                                    "source": "adguard"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": { "experimentName": "scriptletExperiment", "cohort": "treatment" },
+                            "domain": "hanime.tv"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "setCookie",
+                                    "attrs": {
+                                        "name": "in_d0",
+                                        "value": "1"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "setCookie",
+                                    "attrs": {
+                                        "name": "in_d4",
+                                        "value": "1"
+                                    },
+                                    "source": "adguard"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": { "experimentName": "scriptletExperiment", "cohort": "treatment" },
+                            "domain": "hentaicity.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "abortCurrentInlineScript",
+                                    "attrs": {
+                                        "property": "document.querySelectorAll",
+                                        "search": "popMagic"
+                                    },
+                                    "source": "adguard"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": { "experimentName": "scriptletExperiment", "cohort": "treatment" },
+                            "domain": "hentaihaven.xxx"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "preventFetch",
+                                    "attrs": {
+                                        "propsToMatch": "/ads-twitter\\.com|pagead|googleads|doubleclick/",
+                                        "responseBody": "",
+                                        "responseType": "opaque"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "setConstant",
+                                    "attrs": {
+                                        "property": "clickPopUpcf",
+                                        "value": "1"
+                                    },
+                                    "source": "adguard"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": { "experimentName": "scriptletExperiment", "cohort": "treatment" },
+                            "domain": "hqporner.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "preventAddEventListener",
+                                    "attrs": {
+                                        "typeSearch": "click",
+                                        "listenerSearch": "popMagic"
+                                    },
+                                    "source": "adguard"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": { "experimentName": "scriptletExperiment", "cohort": "treatment" },
+                            "domain": "imagefap.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "setConstant",
+                                    "attrs": {
+                                        "property": "adblockOn",
+                                        "value": "false"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "abortOnPropertyRead",
+                                    "attrs": {
+                                        "property": "popCookie"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "setConstant",
+                                    "attrs": {
+                                        "property": "Buu",
+                                        "value": "undefined"
+                                    },
+                                    "source": "adguard"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": { "experimentName": "scriptletExperiment", "cohort": "treatment" },
+                            "domain": "javtiful.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "abortCurrentInlineScript",
+                                    "attrs": {
+                                        "property": "document.getElementById",
+                                        "search": "!document.body.contains(document.getElementById("
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "preventAddEventListener",
+                                    "attrs": {
+                                        "typeSearch": "DOMContentLoaded",
+                                        "listenerSearch": "adsBlocked"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "abortOnPropertyRead",
+                                    "attrs": {
+                                        "property": "_pop"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "preventAddEventListener",
+                                    "attrs": {
+                                        "typeSearch": "click",
+                                        "listenerSearch": "popMagic"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "abortCurrentInlineScript",
+                                    "attrs": {
+                                        "property": "EventTarget.prototype.addEventListener",
+                                        "search": "0x"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "setCookie",
+                                    "attrs": {
+                                        "name": "__PPU_ppucnt",
+                                        "value": "1"
+                                    },
+                                    "source": "ddg"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": { "experimentName": "scriptletExperiment", "cohort": "treatment" },
+                            "domain": "luxuretv.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "abortCurrentInlineScript",
+                                    "attrs": {
+                                        "property": "$",
+                                        "search": "Modal"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "setConstant",
+                                    "attrs": {
+                                        "property": "videojsPlayer.vastClient",
+                                        "value": "noopFunc"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "abortOnPropertyRead",
+                                    "attrs": {
+                                        "property": "popns"
+                                    },
+                                    "source": "ubo"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": { "experimentName": "scriptletExperiment", "cohort": "treatment" },
+                            "domain": "missav.plus"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "abortCurrentInlineScript",
+                                    "attrs": {
+                                        "property": "document.createElement",
+                                        "search": "htmlAds"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "preventWindowOpen",
+                                    "attrs": {},
+                                    "source": "adguard"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": { "experimentName": "scriptletExperiment", "cohort": "treatment" },
+                            "domain": "missavtv.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "preventFetch",
+                                    "attrs": {
+                                        "propsToMatch": "www3.doubleclick.net"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "abortCurrentInlineScript",
+                                    "attrs": {
+                                        "property": "WebAssembly",
+                                        "search": "atob"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "preventAddEventListener",
+                                    "attrs": {
+                                        "typeSearch": "click",
+                                        "listenerSearch": "popMagic"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "setCookie",
+                                    "attrs": {
+                                        "name": "__PPU_ppucnt",
+                                        "value": "1"
+                                    },
+                                    "source": "ddg"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": { "experimentName": "scriptletExperiment", "cohort": "treatment" },
+                            "domain": "motherless.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "abortOnPropertyRead",
+                                    "attrs": {
+                                        "property": "ExoLoader"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "setCookie",
+                                    "attrs": {
+                                        "name": "_pre_js",
+                                        "value": "1"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "setConstant",
+                                    "attrs": {
+                                        "property": "_ml_ads_ns",
+                                        "value": "null"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "abortCurrentInlineScript",
+                                    "attrs": {
+                                        "property": "jQuery",
+                                        "search": "secondPop"
+                                    },
+                                    "source": "adguard"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": { "experimentName": "scriptletExperiment", "cohort": "treatment" },
+                            "domain": "nhentai.net"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "setConstant",
+                                    "attrs": {
+                                        "property": "N_BetterJsPop.object",
+                                        "value": "emptyObj"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "setConstant",
+                                    "attrs": {
+                                        "property": "_n_app.popunder",
+                                        "value": "null"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "preventWindowOpen",
+                                    "attrs": {},
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "abortCurrentInlineScript",
+                                    "attrs": {
+                                        "property": "document.querySelectorAll",
+                                        "search": "popMagic"
+                                    },
+                                    "source": "adguard"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": { "experimentName": "scriptletExperiment", "cohort": "treatment" },
+                            "domain": "nudevista.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "abortCurrentInlineScript",
+                                    "attrs": {
+                                        "property": "document.querySelectorAll",
+                                        "search": "popMagic"
+                                    },
+                                    "source": "adguard"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": { "experimentName": "scriptletExperiment", "cohort": "treatment" },
+                            "domain": "ok.xxx"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "preventAddEventListener",
+                                    "attrs": {
+                                        "typeSearch": "click",
+                                        "listenerSearch": "popMagic"
+                                    },
+                                    "source": "adguard"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": { "experimentName": "scriptletExperiment", "cohort": "treatment" },
+                            "domain": "pornhat.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "abortCurrentInlineScript",
+                                    "attrs": {
+                                        "property": "document.dispatchEvent",
+                                        "search": "/getexoloader/"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "preventAddEventListener",
+                                    "attrs": {
+                                        "typeSearch": "click",
+                                        "listenerSearch": "popMagic"
+                                    },
+                                    "source": "adguard"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": { "experimentName": "scriptletExperiment", "cohort": "treatment" },
+                            "domain": "pornhd.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "abortOnPropertyRead",
+                                    "attrs": {
+                                        "property": "ExoLoader"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "preventAddEventListener",
+                                    "attrs": {
+                                        "typeSearch": "getexoloader"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "abortOnPropertyRead",
+                                    "attrs": {
+                                        "property": "popns"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "preventAddEventListener",
+                                    "attrs": {
+                                        "typeSearch": "click",
+                                        "listenerSearch": "popMagic"
+                                    },
+                                    "source": "adguard"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": { "experimentName": "scriptletExperiment", "cohort": "treatment" },
+                            "domain": "pornhits.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "abortOnPropertyRead",
+                                    "attrs": {
+                                        "property": "AdManager"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "abortCurrentInlineScript",
+                                    "attrs": {
+                                        "property": "ACtMan"
+                                    },
+                                    "source": "adguard"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "condition": [
+                            {
+                                "experiment": { "experimentName": "scriptletExperiment", "cohort": "treatment" },
+                                "domain": "pornhub.com"
+                            },
+                            {
+                                "experiment": { "experimentName": "scriptletExperiment", "cohort": "treatment" },
+                                "domain": "pornhub.org"
+                            }
+                        ],
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "setConstant",
+                                    "attrs": {
+                                        "property": "page_params.holiday_promo_prem",
+                                        "value": "true"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "preventSetTimeout",
+                                    "attrs": {
+                                        "matchCallback": "\\x41\\x64\\x62\\x6c\\x6f\\x63\\x6b\\x20\\x66\\x6f\\x72\\x20\\x70\\x6f\\x72\\x6e\\x68\\x75\\x62"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "trustedSetCookie",
+                                    "attrs": {
+                                        "name": "popShown",
+                                        "value": "$now$"
+                                    },
+                                    "source": "ddg"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": { "experimentName": "scriptletExperiment", "cohort": "treatment" },
+                            "domain": "pornkai.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "abortOnPropertyRead",
+                                    "attrs": {
+                                        "property": "ljcode"
+                                    },
+                                    "source": "adguard"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": { "experimentName": "scriptletExperiment", "cohort": "treatment" },
+                            "domain": "porntrex.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "abortOnPropertyRead",
+                                    "attrs": {
+                                        "property": "popns"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "abortCurrentInlineScript",
+                                    "attrs": {
+                                        "property": "String.fromCharCode",
+                                        "search": "zfgloaded"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "abortOnPropertyWrite",
+                                    "attrs": {
+                                        "property": "__showPush"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "setCookie",
+                                    "attrs": {
+                                        "name": "aawsmackeroo0",
+                                        "value": "1"
+                                    },
+                                    "source": "ddg"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": { "experimentName": "scriptletExperiment", "cohort": "treatment" },
+                            "domain": "pornxp.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "abortOnPropertyRead",
+                                    "attrs": {
+                                        "property": "AaDetector"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "abortCurrentInlineScript",
+                                    "attrs": {
+                                        "property": "document.querySelectorAll",
+                                        "search": "popMagic"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "abortCurrentInlineScript",
+                                    "attrs": {
+                                        "property": "EventTarget.prototype.addEventListener",
+                                        "search": "0x"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "abortCurrentInlineScript",
+                                    "attrs": {
+                                        "property": "document.createElement",
+                                        "search": "/l\\.parentNode\\.insertBefore\\(s/"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "setCookie",
+                                    "attrs": {
+                                        "name": "__PPU_ppucnt",
+                                        "value": "1"
+                                    },
+                                    "source": "ddg"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": { "experimentName": "scriptletExperiment", "cohort": "treatment" },
+                            "domain": "redtube.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "setConstant",
+                                    "attrs": {
+                                        "property": "page_params.holiday_promo",
+                                        "value": "true"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "trustedSetCookie",
+                                    "attrs": {
+                                        "name": "popShown",
+                                        "value": "$now$"
+                                    },
+                                    "source": "ddg"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": { "experimentName": "scriptletExperiment", "cohort": "treatment" },
+                            "domain": "spankbang.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "setCookie",
+                                    "attrs": {
+                                        "name": "pg_interstitial_v5",
+                                        "value": "1"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "setConstant",
+                                    "attrs": {
+                                        "property": "chrome",
+                                        "value": "undefined"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "preventWindowOpen",
+                                    "attrs": {},
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "preventSetTimeout",
+                                    "attrs": {
+                                        "matchCallback": "window.location=page_url"
+                                    },
+                                    "source": "adguard"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": { "experimentName": "scriptletExperiment", "cohort": "treatment" },
+                            "domain": "stripchat.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "removeCookie",
+                                    "attrs": {
+                                        "match": "video_view_count"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "setLocalStorageItem",
+                                    "attrs": {
+                                        "key": "popseen",
+                                        "value": "true"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "abortCurrentInlineScript",
+                                    "attrs": {
+                                        "property": "document.createElement",
+                                        "search": "initTabUnder"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "setCookieReload",
+                                    "attrs": {
+                                        "name": "pShow",
+                                        "value": "true"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "setCookieReload",
+                                    "attrs": {
+                                        "name": "ts_popunder",
+                                        "value": "1"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "setConstant",
+                                    "attrs": {
+                                        "property": "history.replaceState",
+                                        "value": "noopFunc"
+                                    },
+                                    "source": "adguard"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "condition": [
+                            {
+                                "experiment": { "experimentName": "scriptletExperiment", "cohort": "treatment" },
+                                "domain": "sxyprn.com"
+                            },
+                            {
+                                "experiment": { "experimentName": "scriptletExperiment", "cohort": "treatment" },
+                                "domain": "sxyprn.net"
+                            }
+                        ],
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "abortCurrentInlineScript",
+                                    "attrs": {
+                                        "property": "WebAssembly",
+                                        "search": "atob"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "abortCurrentInlineScript",
+                                    "attrs": {
+                                        "property": "document.createElement",
+                                        "search": "/l\\.parentNode\\.insertBefore\\(s/"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "setConstant",
+                                    "attrs": {
+                                        "property": "D4zz",
+                                        "value": "noopFunc"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "setCookie",
+                                    "attrs": {
+                                        "name": "__PPU_ppucnt",
+                                        "value": "1"
+                                    },
+                                    "source": "ddg"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": { "experimentName": "scriptletExperiment", "cohort": "treatment" },
+                            "domain": "thisvid.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "abortOnPropertyRead",
+                                    "attrs": {
+                                        "property": "ExoLoader"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "abortCurrentInlineScript",
+                                    "attrs": {
+                                        "property": "document.dispatchEvent",
+                                        "search": "/getexoloader/"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "preventAddEventListener",
+                                    "attrs": {
+                                        "typeSearch": "click",
+                                        "listenerSearch": "popMagic"
+                                    },
+                                    "source": "adguard"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": { "experimentName": "scriptletExperiment", "cohort": "treatment" },
+                            "domain": "thothub.to"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "abortOnPropertyWrite",
+                                    "attrs": {
+                                        "property": "window.onload"
+                                    },
+                                    "source": "adguard"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": { "experimentName": "scriptletExperiment", "cohort": "treatment" },
+                            "domain": "tnaflix.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "abortOnPropertyRead",
+                                    "attrs": {
+                                        "property": "popns"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "setConstant",
+                                    "attrs": {
+                                        "property": "ads",
+                                        "value": "emptyObj"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "setCookie",
+                                    "attrs": {
+                                        "name": "popunder_stop",
+                                        "value": "1"
+                                    },
+                                    "source": "adguard"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": { "experimentName": "scriptletExperiment", "cohort": "treatment" },
+                            "domain": "tubesafari.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "abortOnPropertyRead",
+                                    "attrs": {
+                                        "property": "ljcode"
+                                    },
+                                    "source": "adguard"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": { "experimentName": "scriptletExperiment", "cohort": "treatment" },
+                            "domain": "txxx.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "abortOnPropertyRead",
+                                    "attrs": {
+                                        "property": "ExoLoader"
+                                    },
+                                    "source": "adguard"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": { "experimentName": "scriptletExperiment", "cohort": "treatment" },
+                            "domain": "viralxxxporn.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "setConstant",
+                                    "attrs": {
+                                        "property": "flashvars.adv_pre_url",
+                                        "value": ""
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "setConstant",
+                                    "attrs": {
+                                        "property": "flashvars.adv_pre_src",
+                                        "value": ""
+                                    },
+                                    "source": "adguard"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": { "experimentName": "scriptletExperiment", "cohort": "treatment" },
+                            "domain": "vjav.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "setConstant",
+                                    "attrs": {
+                                        "property": "adver",
+                                        "value": "noopFunc"
+                                    },
+                                    "source": "adguard"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "condition": [
+                            {
+                                "experiment": { "experimentName": "scriptletExperiment", "cohort": "treatment" },
+                                "domain": "xhamster.com"
+                            },
+                            {
+                                "experiment": { "experimentName": "scriptletExperiment", "cohort": "treatment" },
+                                "domain": "xhamster2.com"
+                            },
+                            {
+                                "experiment": { "experimentName": "scriptletExperiment", "cohort": "treatment" },
+                                "domain": "xhamster3.com"
+                            },
+                            {
+                                "experiment": { "experimentName": "scriptletExperiment", "cohort": "treatment" },
+                                "domain": "xhamster19.com"
+                            },
+                            {
+                                "experiment": { "experimentName": "scriptletExperiment", "cohort": "treatment" },
+                                "domain": "xhamster.desi"
+                            },
+                            {
+                                "experiment": { "experimentName": "scriptletExperiment", "cohort": "treatment" },
+                                "domain": "xhamster1.desi"
+                            }
+                        ],
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "removeCookie",
+                                    "attrs": {
+                                        "match": "video_view_count"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "setLocalStorageItem",
+                                    "attrs": {
+                                        "key": "popseen",
+                                        "value": "true"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "abortCurrentInlineScript",
+                                    "attrs": {
+                                        "property": "document.createElement",
+                                        "search": "initTabUnder"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "setCookieReload",
+                                    "attrs": {
+                                        "name": "pShow",
+                                        "value": "true"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "setCookieReload",
+                                    "attrs": {
+                                        "name": "ts_popunder",
+                                        "value": "1"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "setConstant",
+                                    "attrs": {
+                                        "property": "history.replaceState",
+                                        "value": "noopFunc"
+                                    },
+                                    "source": "adguard"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": { "experimentName": "scriptletExperiment", "cohort": "treatment" },
+                            "domain": "xnxx.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "abortOnPropertyRead",
+                                    "attrs": {
+                                        "property": "exoJsPop101"
+                                    },
+                                    "source": "adguard"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": { "experimentName": "scriptletExperiment", "cohort": "treatment" },
+                            "domain": "xvideos.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "abortOnPropertyRead",
+                                    "attrs": {
+                                        "property": "popns"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "abortOnPropertyRead",
+                                    "attrs": {
+                                        "property": "exoJsPop101"
+                                    },
+                                    "source": "adguard"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": { "experimentName": "scriptletExperiment", "cohort": "treatment" },
+                            "domain": "xxxshake.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "preventWindowOpen",
+                                    "attrs": {},
+                                    "source": "adguard"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": { "experimentName": "scriptletExperiment", "cohort": "treatment" },
+                            "domain": "youjizz.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "abortOnPropertyRead",
+                                    "attrs": {
+                                        "property": "ExoLoader"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "setConstant",
+                                    "attrs": {
+                                        "property": "config.ads.desktopPreroll",
+                                        "value": ""
+                                    },
+                                    "source": "adguard"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": { "experimentName": "scriptletExperiment", "cohort": "treatment" },
+                            "domain": "youporn.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "setConstant",
+                                    "attrs": {
+                                        "property": "page_params.holiday_promo",
+                                        "value": "true"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "removeNodeText",
+                                    "attrs": {
+                                        "nodeName": "script",
+                                        "textMatch": "/window\\.[\\s\\S]*?_zone_[\\s\\S]*?{\"zone_id\":/"
+                                    },
+                                    "source": "adguard"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/scriptlets/-",
+                                "value": {
+                                    "name": "trustedSetCookie",
+                                    "attrs": {
+                                        "name": "popShown",
+                                        "value": "$now$"
+                                    },
+                                    "source": "ddg"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
         }
     },
+
     "unprotectedTemporary": []
 }
