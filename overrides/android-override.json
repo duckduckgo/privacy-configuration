@@ -2526,58 +2526,14 @@
             "state": "enabled",
             "exceptions": [],
             "settings": {
-                "apiChanges": {},
-                "conditionalChanges": [
-                    {
-                        "condition": { "experiment": { "experimentName": "contentScopeExperiment0", "cohort": "treatment" } },
-                        "patchSettings": [
-                            {
-                                "op": "add",
-                                "path": "/apiChanges/Navigator.prototype.plugins",
-                                "value": {
-                                    "type": "descriptor",
-                                    "getterValue": {
-                                        "type": "array",
-                                        "value": [
-                                            {
-                                                "name": "PDF Viewer",
-                                                "filename": "internal-pdf-viewer",
-                                                "description": "Portable Document Format"
-                                            },
-                                            {
-                                                "name": "Chrome PDF Viewer",
-                                                "filename": "internal-pdf-viewer",
-                                                "description": "Portable Document Format"
-                                            },
-                                            {
-                                                "name": "Chromium PDF Viewer",
-                                                "filename": "internal-pdf-viewer",
-                                                "description": "Portable Document Format"
-                                            },
-                                            {
-                                                "name": "Microsoft Edge PDF Viewer",
-                                                "filename": "internal-pdf-viewer",
-                                                "description": "Portable Document Format"
-                                            },
-                                            {
-                                                "name": "WebKit built-in PDF",
-                                                "filename": "internal-pdf-viewer",
-                                                "description": "Portable Document Format"
-                                            }
-                                        ]
-                                    }
-                                }
-                            }
-                        ]
-                    }
-                ]
+                "apiChanges": {}
             }
         },
         "contentScopeExperiments": {
             "state": "enabled",
             "features": {
                 "contentScopeExperiment0": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": 52410000,
                     "cohorts": [
                         { "name": "control", "weight": 1 },
