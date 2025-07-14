@@ -9,19 +9,20 @@ import { AutofillFeature } from './features/autofill';
 import { ImportFeature } from './features/import';
 import { MessageBridgeFeature } from './features/message-bridge';
 import { AndroidBrowserConfig } from './features/android-browser-config';
-import { APIModificationFeature } from './features/api-modification';
+import { APIManipulationFeature } from './features/api-manipulation';
 import { FingerprintingHardwareFeature } from './features/fingerprinting-hardware';
 import { FingerprintingScreenSizeFeature } from './features/fingerprinting-screen-size';
 import { NetworkProtection } from './features/network-protection';
 import { AiChatConfig } from './features/ai-chat';
+import { ScriptletsFeature } from './features/scriptlets';
 
 export { WebCompatSettings } from './features/webcompat';
 export { DuckPlayerSettings } from './features/duckplayer';
 export { DuckPlayerNativeSettings } from './features/duckplayer-native';
 
 export type ExportedSchemas =
-    | 'GenericV4Config'
-    | 'AndroidV4Config'
+    | 'CurrentGenericConfig'
+    | 'AndroidCurrentConfig'
     | 'LegacyConfig'
     | 'LegacyAndroidConfig'
     | 'WebCompatSettings'
@@ -29,15 +30,15 @@ export type ExportedSchemas =
     | 'DuckPlayerNativeSettings';
 
 /**
- * Defines the structure of the built V4 config output as downloaded by clients.
+ * Defines the structure of the built V5 config output as downloaded by clients.
  */
-export type ConfigV4<VersionType> = {
+export type ConfigV5<VersionType> = {
     readme: string;
     version: number;
     features: Record<string, Feature<any, VersionType>> & {
         // These features have typed settings
         aiChat?: AiChatConfig<VersionType>;
-        apiModification?: APIModificationFeature<VersionType>;
+        apiManipulation?: APIManipulationFeature<VersionType>;
         autoconsent?: AutoconsentFeature<VersionType>;
         autofill?: AutofillFeature<VersionType>;
         import?: ImportFeature<VersionType>;
@@ -51,6 +52,7 @@ export type ConfigV4<VersionType> = {
         fingerprintingHardware?: FingerprintingHardwareFeature<VersionType>;
         fingerpringtingScreenSize?: FingerprintingScreenSizeFeature<VersionType>;
         networkProtection?: NetworkProtection<VersionType>;
+        scriptlets?: ScriptletsFeature<VersionType>;
     };
     unprotectedTemporary: SiteException[];
 };
@@ -60,7 +62,7 @@ export type ConfigV4<VersionType> = {
  *  - Uses integer version numbers for minSupportedVersion
  *  - Adds 'experimentalVariants' top level property
  */
-export type AndroidV4Config = ConfigV4<number> & {
+export type AndroidCurrentConfig = ConfigV5<number> & {
     experimentalVariants: {
         variants: {
             desc: string;
@@ -77,7 +79,7 @@ export type AndroidV4Config = ConfigV4<number> & {
  * Generic spec: covers mac, iOS, windows and extension configs
  *  - Use string version numbers for minSupportedVersion
  */
-export type GenericV4Config = ConfigV4<string>;
+export type CurrentGenericConfig = ConfigV5<string>;
 
-export type LegacyConfig = GenericV4Config;
-export type LegacyAndroidConfig = AndroidV4Config;
+export type LegacyConfig = CurrentGenericConfig;
+export type LegacyAndroidConfig = AndroidCurrentConfig;

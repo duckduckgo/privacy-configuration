@@ -10,7 +10,7 @@ export type Cohort = {
     weight: number;
 };
 
-export type FeatureState = 'enabled' | 'disabled' | 'internal';
+export type FeatureState = 'enabled' | 'disabled' | 'internal' | 'preview';
 
 type FeatureMeta = {
     description: string;
@@ -57,6 +57,10 @@ export type Feature<
 type ConditionBlock = {
     domain?: string;
     urlPattern?: string;
+    experiment?: {
+        experimentName: string;
+        cohort: string;
+    };
 };
 
 type CSSInjectFeatureSettingsPatches = {
@@ -78,7 +82,7 @@ export type CSSConfigSetting = CSSConfigSettingSingle | CSSConfigSettingSingle[]
 type CSSConfigSettingSingle = {
     type: 'undefined' | 'number' | 'string' | 'function' | 'boolean' | 'null' | 'array' | 'object';
     functionName?: string;
-    value?: boolean | string | number;
+    value?: boolean | string | number | object | Array<boolean | string | number | object>;
     criteria?: {
         arch: string;
     };

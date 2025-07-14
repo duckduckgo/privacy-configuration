@@ -35,7 +35,7 @@ const slowFetch = rateLimit(fetch, 1000, 30);
 class ConfigProcessor {
     constructor(options = {}) {
         this.apiBaseUrl = options.apiBaseUrl || 'https://duckduckgo.com/api/protection/v2';
-        this.outputPath = options.outputPath || 'generated/v4/';
+        this.outputPath = options.outputPath || 'generated/v5/';
         this.inputPath = options.inputPath || 'overrides/';
         this.defaultConfig = options.defaultConfig || 'features/malicious-site-protection.json';
         this.platforms = [

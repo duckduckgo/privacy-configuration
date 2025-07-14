@@ -841,7 +841,7 @@
                     {
                         "rule": "datadoghq-browser-agent.com",
                         "domains": ["indeed.com"],
-                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/2163"
+                        "reason": "indeed.com - https://github.com/duckduckgo/privacy-configuration/issues/2163"
                     }
                 ]
             },
@@ -2368,8 +2368,14 @@
                     },
                     {
                         "rule": "cdn.medallia.com/react-surveys-next/",
-                        "domains": ["dunkinrunsonyou.com"],
-                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2823"
+                        "domains": [
+                            "dunkinrunsonyou.com",
+                            "survey.walmart.com"
+                        ],
+                        "reason": [
+                            "https://github.com/duckduckgo/privacy-configuration/pull/2823",
+                            "https://github.com/duckduckgo/privacy-configuration/pull/3340"
+                        ]
                     },
                     {
                         "rule": "digital-cloud-west.medallia.com/",
@@ -2619,12 +2625,30 @@
                     }
                 ]
             },
+            "opentable.com": {
+                "rules": [
+                    {
+                        "rule": "opentable.com/widget/reservation/loader",
+                        "domains": ["<all>"],
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3391"
+                    }
+                ]
+            },
             "openx.net": {
                 "rules": [
                     {
                         "rule": "venatusmedia-d.openx.net/w/1.0/arj",
                         "domains": ["aternos.org"],
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/328"
+                    }
+                ]
+            },
+            "open-system.fr": {
+                "rules": [
+                    {
+                        "rule": "open-system.fr/widgets-libs/rel/noyau-1.0.min.js",
+                        "domains": ["<all>"],
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3408"
                     }
                 ]
             },
@@ -2938,6 +2962,15 @@
                         "rule": "a.pub.network/thenation-com/pubfig.min.js",
                         "domains": ["thenation.com"],
                         "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2829"
+                    }
+                ]
+            },
+            "pure.cloud": {
+                "rules": [
+                    {
+                        "rule": "pure.cloud/genesys-bootstrap/genesys.min.js",
+                        "domains": ["<all>"],
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3396"
                     }
                 ]
             },

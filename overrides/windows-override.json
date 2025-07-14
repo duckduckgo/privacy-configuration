@@ -20,6 +20,13 @@
                 }
             }
         },
+        "telemetry": {
+            "state": "enabled",
+            "exceptions": [],
+            "settings": {
+                "videoPlayback": "enabled"
+            }
+        },
         "networkProtection": {
             "state": "enabled",
             "features": {
@@ -56,7 +63,8 @@
                     "state": "enabled"
                 },
                 "sidebar": {
-                    "state": "disabled"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.120.0"
                 }
             },
             "minSupportedVersion": "0.100.0",
@@ -136,7 +144,18 @@
                         "formTypeSettings": [],
                         "inputTypeSettings": [],
                         "formBoundarySelector": "",
+                        "failsafeSettings": {},
                         "domains": [
+                            {
+                                "domain": ["coolors.co"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/failsafeSettings/maxInputsPerPage",
+                                        "op": "add",
+                                        "value": 110
+                                    }
+                                ]
+                            },
                             {
                                 "domain": ["areaclientes.orange.es"],
                                 "patchSettings": [
@@ -592,6 +611,7 @@
                 },
                 "disableDeviceEnumerationFrames": "disabled",
                 "disableDeviceEnumeration": "disabled",
+                "enumerateDevices": "enabled",
                 "domains": [
                     {
                         "domain": [
@@ -664,8 +684,10 @@
                     "state": "enabled"
                 },
                 "crashAutoRecovery": {
-                    "state": "enabled",
-                    "minSupportedVersion": "0.114.0"
+                    "state": "disabled"
+                },
+                "ignoreInvalidCastExceptionOnDisposal": {
+                    "state": "enabled"
                 }
             }
         },
@@ -696,6 +718,9 @@
             "state": "enabled",
             "minSupportedVersion": "0.105.0"
         },
+        "shortHistoryMenu": {
+            "state": "enabled"
+        },
         "addressBarTldNavOrSearch": {
             "state": "enabled",
             "minSupportedVersion": "0.100.0"
@@ -708,10 +733,17 @@
             "state": "enabled",
             "features": {
                 "useExtensionBasedBurn": {
-                    "state": "enabled"
+                    "state": "disabled"
                 },
                 "burnAnimationSettingVisibility": {
-                    "state": "disabled"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.120.0"
+                },
+                "burnOnStartup": {
+                    "state": "enabled"
+                },
+                "abortingBurn": {
+                    "state": "enabled"
                 }
             }
         },
@@ -757,7 +789,8 @@
             "state": "enabled",
             "features": {
                 "releaseNotesFromCDN": {
-                    "state": "disabled"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.120.0"
                 }
             }
         },
@@ -772,9 +805,39 @@
                         "steps": [
                             {
                                 "percent": 5
+                            },
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
                             }
                         ]
                     }
+                }
+            }
+        },
+        "setAsDefaultAndAddToDock": {
+            "state": "enabled",
+            "minSupportedVersion": "0.118.0",
+            "settings": {
+                "firstPopoverDelayDays": 14,
+                "bannerAfterPopoverDelayDays": 14,
+                "bannerRepeatIntervalDays": 14
+            },
+            "features": {
+                "scheduledDefaultBrowserAndTaskbarPrompts": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.118.0"
+                },
+                "scheduledPinToTaskbarPrompts": {
+                    "state": "enabled"
+                },
+                "popoverVsBannerExperiment": {
+                    "state": "disabled"
                 }
             }
         }

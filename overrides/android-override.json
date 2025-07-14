@@ -51,7 +51,7 @@
             "exceptions": [],
             "features": {
                 "tdsNextExperiment001": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": 52361000,
                     "rollout": {
                         "steps": [
@@ -223,7 +223,8 @@
                     "!duckai"
                 ],
                 "aiChatBangRegex": "^(?!({bangs})$)(?=.*({bangs})(?=$|\\s)).+$",
-                "addressBarEntryPoint": true
+                "addressBarEntryPoint": true,
+                "sessionTimeoutMinutes": 60
             },
             "minSupportedVersion": 52250000,
             "exceptions": [],
@@ -235,6 +236,32 @@
                         "steps": [
                             {
                                 "percent": 5
+                            },
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
+                },
+                "keepSession": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52400000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
                             }
                         ]
                     }
@@ -390,7 +417,18 @@
                         "formTypeSettings": [],
                         "inputTypeSettings": [],
                         "formBoundarySelector": "",
+                        "failsafeSettings": {},
                         "domains": [
+                            {
+                                "domain": ["coolors.co"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/failsafeSettings/maxInputsPerPage",
+                                        "op": "add",
+                                        "value": 110
+                                    }
+                                ]
+                            },
                             {
                                 "domain": ["areaclientes.orange.es"],
                                 "patchSettings": [
@@ -842,8 +880,8 @@
                                 "ytd-movie-renderer",
                                 "ytd-grid-movie-renderer"
                             ],
-                            "videoElement": "#player video",
-                            "videoElementContainer": "#player .html5-video-player",
+                            "videoElement": "[full-bleed-player] #player-full-bleed-container video, #player video",
+                            "videoElementContainer": "[full-bleed-player] #player-full-bleed-container .html5-video-player, #player .html5-video-player",
                             "hoverExcluded": [],
                             "clickExcluded": ["ytd-thumbnail-overlay-toggle-button-renderer"],
                             "allowedEventTargets": [
@@ -1194,6 +1232,15 @@
                                 "rule": "cdx.cedexis.net",
                                 "domains": ["linkedin.com"],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/675"
+                            }
+                        ]
+                    },
+                    "datadoghq-browser-agent.com": {
+                        "rules": [
+                            {
+                                "rule": "datadoghq-browser-agent.com",
+                                "domains": ["resy.com"],
+                                "reason": "resy.com - https://github.com/duckduckgo/privacy-configuration/pull/3370"
                             }
                         ]
                     },
@@ -1805,8 +1852,8 @@
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2527"
                 },
                 {
-                    "domain": "www.coinbase.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3295"
+                    "domain": "coinbase.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3356"
                 },
                 {
                     "domain": "identity.docusign.net",
@@ -2140,6 +2187,73 @@
                             }
                         ]
                     }
+                },
+                "widgetAsProtection": {
+                    "minSupportedVersion": 52400000,
+                    "state": "enabled"
+                }
+            }
+        },
+        "postCtaExperience": {
+            "state": "enabled",
+            "exceptions": [],
+            "features": {
+                "postCtaExperienceExperimentJun25": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52400000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "simpleSearchWidgetPrompt",
+                            "weight": 1
+                        }
+                    ]
+                }
+            }
+        },
+        "onboardingHomeScreenWidget": {
+            "state": "enabled",
+            "exceptions": [],
+            "features": {
+                "onboardingHomeScreenWidgetExperimentJun25": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52400000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "experimentalOnboardingHomeScreenWidgetPrompt",
+                            "weight": 1
+                        }
+                    ]
                 }
             }
         },
@@ -2181,7 +2295,7 @@
             "minSupportedVersion": 52342000
         },
         "senseOfProtection": {
-            "state": "enabled",
+            "state": "disabled",
             "exceptions": [],
             "features": {
                 "senseOfProtectionNewUserExperimentApr25": {
@@ -2272,7 +2386,7 @@
                     ]
                 },
                 "senseOfProtectionNewUserExperiment27May25": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": 52361000,
                     "targets": [
                         {
@@ -2282,20 +2396,20 @@
                     "cohorts": [
                         {
                             "name": "modifiedControl",
-                            "weight": 1
+                            "weight": 0
                         },
                         {
                             "name": "variant1",
-                            "weight": 1
+                            "weight": 0
                         },
                         {
                             "name": "variant2",
-                            "weight": 1
+                            "weight": 0
                         }
                     ]
                 },
                 "senseOfProtectionExistingUserExperiment27May25": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": 52361000,
                     "rollout": {
                         "steps": [
@@ -2381,20 +2495,50 @@
                 }
             }
         },
-        "experimentalUITheming": {
-            "state": "disabled",
-            "exceptions": [],
+        "experimentalTheming": {
+            "state": "enabled",
+            "minSupportedVersion": 52410000,
             "features": {
-                "visualUpdatesFeature": {
-                    "state": "disabled",
-                    "minSupportedVersion": 52361000,
+                "singleOmnibarFeature": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52410000,
                     "rollout": {
                         "steps": [
                             {
                                 "percent": 5
+                            },
+                            {
+                                "percent": 10
                             }
                         ]
-                    }
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        }
+                    ]
+                }
+            }
+        },
+        "apiManipulation": {
+            "readme": "Example config for apiManipulation to set navigator.plugins to return PDF viewer plugins",
+            "state": "enabled",
+            "exceptions": [],
+            "settings": {
+                "apiChanges": {}
+            }
+        },
+        "contentScopeExperiments": {
+            "state": "enabled",
+            "features": {
+                "contentScopeExperiment0": {
+                    "state": "disabled",
+                    "minSupportedVersion": 52410000,
+                    "cohorts": [
+                        { "name": "control", "weight": 1 },
+                        { "name": "treatment", "weight": 1 }
+                    ]
                 }
             }
         }

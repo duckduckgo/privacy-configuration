@@ -1,0 +1,107 @@
+name: Check Latest Content Scope Experiment State (Android)
+
+on:
+    push:
+        branches:
+            - main
+        paths:
+            - 'features/content-scope-experiments.json'
+            - 'overrides/android-override.json'
+    pull_request:
+        paths:
+            - 'features/content-scope-experiments.json'
+            - 'overrides/android-override.json'
+
+jobs:
+    check-experiment-state:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+            - name: Use Node.js 20
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 20.x
+                  cache: 'npm'
+            - name: Install dependencies
+              run: npm ci; sudo apt-get -y update; sudo apt-get -y install curl; sudo apt-get -y install jq
+            - uses: ./
+            - name: Build
+              run: npm run build
+
+            - name: Analyze Experiments
+              id: analyze
+              run: |
+                  # --- Phase 1: Data Gathering ---
+                  URL="https://raw.githubusercontent.com/duckduckgo/Android/develop/content-scope-scripts/content-scope-scripts-impl/src/main/java/com/duckduckgo/contentscopescripts/impl/features/contentscopeexperiments/ContentScopeExperimentsFeature.kt"
+                  ALL_REMOTE_EXPERIMENTS=$(curl -sL "$URL" | grep -o 'contentScopeExperiment[0-9]*' | sort -u)
+
+                  if [ -z "$ALL_REMOTE_EXPERIMENTS" ]; then
+                    echo "Could not fetch remote experiments from $URL. Failing workflow." >> /dev/stderr
+                    exit 1
+                  fi
+
+                  CONFIG_FILE="generated/v5/android-config.json"
+                  ENABLED_LOCAL_EXPERIMENTS=$(jq -r 'if .features.contentScopeExperiments.features then .features.contentScopeExperiments.features | to_entries[] | select(.value.state == "enabled") | .key else empty end' "$CONFIG_FILE")
+
+                  # --- Phase 2: Analysis & Individual Outputs ---
+                  invalid_local_experiments_found='false'
+                  recently_added_enabled_found='false'
+
+                  LATEST_5_EXPERIMENT_NUMS=$(echo "$ALL_REMOTE_EXPERIMENTS" | sed 's/contentScopeExperiment//' | sort -n | tail -n 5)
+
+                  INVALID_EXPERIMENTS=$(comm -13 <(echo "$ALL_REMOTE_EXPERIMENTS" | sort) <(echo "$ENABLED_LOCAL_EXPERIMENTS" | sort))
+                  if [ -n "$INVALID_EXPERIMENTS" ]; then
+                    invalid_local_experiments_found='true'
+                    { echo 'invalid_experiments<<EOF'; echo "$INVALID_EXPERIMENTS"; echo 'EOF'; } >> "$GITHUB_OUTPUT"
+                  fi
+
+                  ENABLED_RECENT_EXPERIMENTS=""
+                  if [ -n "$LATEST_5_EXPERIMENT_NUMS" ]; then
+                    LATEST_5_EXPERIMENTS=$(for n in $LATEST_5_EXPERIMENT_NUMS; do echo "contentScopeExperiment$n"; done)
+                    ENABLED_RECENT_EXPERIMENTS=$(comm -12 <(echo "$LATEST_5_EXPERIMENTS" | sort) <(echo "$ENABLED_LOCAL_EXPERIMENTS" | sort))
+                  fi
+                  if [ -n "$ENABLED_RECENT_EXPERIMENTS" ]; then
+                    recently_added_enabled_found='true'
+                    echo "About to run out of allocated experiments"
+                    { echo 'enabled_recent_experiments<<EOF'; echo "$ENABLED_RECENT_EXPERIMENTS"; echo 'EOF'; } >> "$GITHUB_OUTPUT"
+                  fi
+
+                  # Also pass through detailed findings for the Asana task
+                  echo "invalid_local_experiments_found=$invalid_local_experiments_found" >> $GITHUB_OUTPUT
+                  echo "recently_added_enabled_found=$recently_added_enabled_found" >> $GITHUB_OUTPUT
+
+            - name: Log invalid experiments error
+              if: steps.analyze.outputs.invalid_local_experiments_found == 'true'
+              run: |
+                  echo "Invalid experiments found - The following enabled experiments are not defined in the Android codebase. Either disable them for Android, or ping an Android engineer to support to them" >> /dev/stderr
+                  echo "Failing experiments: ${{ steps.analyze.outputs.invalid_experiments }}" >> /dev/stderr
+                  exit 1
+
+            - name: Prepare Asana Task
+              if: steps.analyze.outputs.recently_added_enabled_found == 'true'
+              id: asana_content
+              run: |
+                  echo "task_name=GH Workflow Warning - Content Scope Experiment Check" >> $GITHUB_OUTPUT
+
+                  DESCRIPTION="WARNING: About to run out of allocated experiments, please pre-allocate more experiments in ContentScopeExperimentsFeature.kt.\n"
+                  DESCRIPTION="${DESCRIPTION} Recently enabled experiments: ${{ steps.analyze.outputs.enabled_recent_experiments }}\n\n"
+
+                  {
+                    echo 'task_description<<EOF'
+                    echo -e "$DESCRIPTION"
+                    echo 'EOF'
+                  } >> "$GITHUB_OUTPUT"
+
+            - name: Create Asana Task
+              if: steps.asana_content.outcome == 'success'
+              uses: duckduckgo/native-github-asana-sync@v1.1
+              with:
+                  asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+                  asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
+                  asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
+                  asana-task-name: ${{ steps.asana_content.outputs.task_name }}
+                  asana-task-description: |
+                      ${{ steps.asana_content.outputs.task_description }}
+                      Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+                  action: 'create-asana-task'
