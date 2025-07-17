@@ -585,6 +585,24 @@
                                         }
                                     }
                                 ]
+                            },
+                            {
+                                "domain": ["netflix.com"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "div[data-uia='web-login-form']",
+                                            "type": "login"
+                                        }
+                                    },
+                                    {
+                                        "path": "/formBoundarySelector",
+                                        "op": "replace",
+                                        "value": "div[data-uia='web-login-form']"
+                                    }
+                                ]
                             }
                         ]
                     }
