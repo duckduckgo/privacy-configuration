@@ -12,6 +12,7 @@ type SubFeatures<VersionType> = {
             vivaldi: 'enabled' | 'disabled';
         }
     >;
+    improvedErrorPixels?: SubFeature<VersionType, SettingsType>;
 };
 
 export type ImportFeature<VersionType> = Feature<
