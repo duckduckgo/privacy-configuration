@@ -157,4 +157,40 @@ export const compatFunctions = {
         }
         return v4Config;
     },
+    v5: (config) => {
+        // Breaking changes: none
+        const v6Config = JSON.parse(JSON.stringify(config));
+
+        // Remove exceptions from sub-features
+        for (const feature of Object.keys(v6Config.features)) {
+            const subFeatures = v6Config.features[feature].features;
+            if (subFeatures) {
+                for (const subFeature of Object.keys(subFeatures)) {
+                    if (subFeatures[subFeature].exceptions) {
+                        delete subFeatures[subFeature].exceptions;
+                    }
+                }
+            }
+        }
+        // Remove description, rollout and targets from parent features
+        for (const feature of Object.keys(v6Config.features)) {
+            if (v6Config.features[feature].description) {
+                delete v6Config.features[feature].description;
+            }
+            if (v6Config.features[feature].rollout) {
+                delete v6Config.features[feature].rollout;
+            }
+            if (v6Config.features[feature].targets) {
+                delete v6Config.features[feature].targets;
+            }
+        }
+        // Ensure exceptions key is present for parent features
+        for (const feature of Object.keys(v6Config.features)) {
+            if (!v6Config.features[feature].exceptions) {
+                v6Config.features[feature].exceptions = [];
+            }
+        }
+
+        return v6Config;
+    },
 };
