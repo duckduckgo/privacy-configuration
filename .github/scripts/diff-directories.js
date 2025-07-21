@@ -2,52 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import * as diff from 'diff';
 import { CURRENT_CONFIG_VERSION } from '../../constants.js';
-
-function readFilesRecursively(directory) {
-    const filenames = fs.readdirSync(directory);
-    const files = {};
-
-    filenames.forEach((filename) => {
-        const filePath = path.join(directory, filename);
-        const fileStats = fs.statSync(filePath);
-
-        if (fileStats.isDirectory()) {
-            const nestedFiles = readFilesRecursively(filePath);
-            for (const [
-                nestedFilePath,
-                nestedFileContent,
-            ] of Object.entries(nestedFiles)) {
-                files[path.join(filename, nestedFilePath)] = nestedFileContent;
-            }
-        } else {
-            files[filename] = fs.readFileSync(filePath, 'utf-8');
-        }
-    });
-
-    return files;
-}
-
-/**
- * Removes superfluous info from the file contents to improve diff readability
- * @param {string} fileContent
- * @param {string} filePath
- * @returns {string}
- */
-function mungeFileContents(fileContent, filePath) {
-    if (filePath.endsWith('.json')) {
-        const fileJSON = JSON.parse(fileContent);
-        delete fileJSON.version;
-        if ('features' in fileJSON) {
-            for (const key of Object.keys(fileJSON.features)) {
-                if ('hash' in fileJSON.features[key]) {
-                    delete fileJSON.features[key].hash;
-                }
-            }
-        }
-        return JSON.stringify(fileJSON, null, 4);
-    }
-    return fileContent;
-}
+import { readFilesRecursively, mungeFileContents } from '../../util.js';
 
 function displayDiffs(dir1Files, dir2Files, isOpen) {
     const rollupGrouping = {};

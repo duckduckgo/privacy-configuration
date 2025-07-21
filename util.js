@@ -1,6 +1,7 @@
 import tldts from 'tldts';
 import crypto from 'crypto';
 import fs from 'fs';
+import path from 'path';
 import { LISTS_DIR, UNPROTECTED_LIST_NAME } from './constants.js';
 
 function getAllowlistedRule(rules, rulePath) {
@@ -211,4 +212,55 @@ export function stripReasons(config) {
             }
         }
     }
+}
+
+/**
+ * Reads all files in a directory recursively and returns them as an object
+ * @param {string} directory - The directory path to read
+ * @returns {Object} Object with file paths as keys and file contents as values
+ */
+export function readFilesRecursively(directory) {
+    const filenames = fs.readdirSync(directory);
+    const files = {};
+
+    filenames.forEach((filename) => {
+        const filePath = path.join(directory, filename);
+        const fileStats = fs.statSync(filePath);
+
+        if (fileStats.isDirectory()) {
+            const nestedFiles = readFilesRecursively(filePath);
+            for (const [
+                nestedFilePath,
+                nestedFileContent,
+            ] of Object.entries(nestedFiles)) {
+                files[path.join(filename, nestedFilePath)] = nestedFileContent;
+            }
+        } else {
+            files[filename] = fs.readFileSync(filePath, 'utf-8');
+        }
+    });
+
+    return files;
+}
+
+/**
+ * Removes superfluous info from the file contents to improve diff readability
+ * @param {string} fileContent - The raw file content
+ * @param {string} filePath - The file path (used to determine file type)
+ * @returns {string} The cleaned file content
+ */
+export function mungeFileContents(fileContent, filePath) {
+    if (filePath.endsWith('.json')) {
+        const fileJSON = JSON.parse(fileContent);
+        delete fileJSON.version;
+        if ('features' in fileJSON) {
+            for (const key of Object.keys(fileJSON.features)) {
+                if ('hash' in fileJSON.features[key]) {
+                    delete fileJSON.features[key].hash;
+                }
+            }
+        }
+        return JSON.stringify(fileJSON, null, 4);
+    }
+    return fileContent;
 }
