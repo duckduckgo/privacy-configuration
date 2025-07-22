@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import * as diff from 'diff';
 import { CURRENT_CONFIG_VERSION } from '../../constants.js';
-import { readFilesRecursively, mungeFileContents } from '../../util.js';
+import { readFilesRecursively, mungeFileContents } from '../../automation-utils.js';
 
 function displayDiffs(dir1Files, dir2Files, isOpen) {
     const rollupGrouping = {};
