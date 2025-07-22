@@ -1,7 +1,5 @@
 import fs from 'fs';
 import path from 'path';
-import pkg from 'fast-json-patch';
-const { compare } = pkg;
 
 /**
  * Reads all files in a directory recursively and returns them as an object
@@ -62,20 +60,18 @@ export function mungeFileContents(fileContent, filePath) {
 export function isElementHidingOnlyChanges(patches) {
     const allowedPaths = [
         '/settings/domains',
-        '/exceptions'
+        '/exceptions',
     ];
-    
+
     // Check if all patches are for element hiding feature and allowed paths
-    return patches.every(patch => {
+    return patches.every((patch) => {
         // Must be for element hiding feature
         if (!patch.path.startsWith('/features/elementHiding')) {
             return false;
         }
-        
+
         // Check if the path is in the allowed list
-        return allowedPaths.some(allowedPath => 
-            patch.path.includes(allowedPath)
-        );
+        return allowedPaths.some((allowedPath) => patch.path.includes(allowedPath));
     });
 }
 
@@ -88,39 +84,40 @@ export function analyzePatchesForApproval(patches) {
     if (patches.length === 0) {
         return {
             shouldApprove: false,
-            reason: 'No changes detected'
+            reason: 'No changes detected',
         };
     }
-    
+
     // Check if changes are only to element hiding allowed paths
     if (isElementHidingOnlyChanges(patches)) {
         return {
             shouldApprove: true,
-            reason: 'Auto-approved: Changes only to element hiding domains/exceptions'
+            reason: 'Auto-approved: Changes only to element hiding domains/exceptions',
         };
     }
-    
+
     // Check if any changes are outside allowed paths
-    const disallowedPaths = patches.filter(patch => {
+    const disallowedPaths = patches.filter((patch) => {
         if (patch.path.startsWith('/features/elementHiding')) {
-            const allowedPaths = ['/settings/domains', '/exceptions'];
-            return !allowedPaths.some(allowedPath => 
-                patch.path.includes(allowedPath)
-            );
+            const allowedPaths = [
+                '/settings/domains',
+                '/exceptions',
+            ];
+            return !allowedPaths.some((allowedPath) => patch.path.includes(allowedPath));
         }
         return true; // Any non-element-hiding changes are disallowed
     });
-    
+
     if (disallowedPaths.length > 0) {
         return {
             shouldApprove: false,
-            reason: `Manual review required: Changes to disallowed paths: ${disallowedPaths.map(p => p.path).join(', ')}`
+            reason: `Manual review required: Changes to disallowed paths: ${disallowedPaths.map((p) => p.path).join(', ')}`,
         };
     }
-    
+
     return {
         shouldApprove: false,
-        reason: 'Manual review required: Changes outside element hiding feature'
+        reason: 'Manual review required: Changes outside element hiding feature',
     };
 }
 
@@ -135,17 +132,17 @@ export function generateChangeSummary(patches) {
         byOperation: {},
         byPath: {},
         elementHidingChanges: 0,
-        otherChanges: 0
+        otherChanges: 0,
     };
-    
-    patches.forEach(patch => {
+
+    patches.forEach((patch) => {
         // Count by operation
         summary.byOperation[patch.op] = (summary.byOperation[patch.op] || 0) + 1;
-        
+
         // Count by path
         const pathKey = patch.path.split('/').slice(0, 3).join('/'); // Top 3 levels
         summary.byPath[pathKey] = (summary.byPath[pathKey] || 0) + 1;
-        
+
         // Count element hiding vs other changes
         if (patch.path.startsWith('/features/elementHiding')) {
             summary.elementHidingChanges++;
@@ -153,6 +150,6 @@ export function generateChangeSummary(patches) {
             summary.otherChanges++;
         }
     });
-    
+
     return summary;
-} 
+}

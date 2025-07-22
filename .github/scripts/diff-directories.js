@@ -1,5 +1,4 @@
 import fs from 'fs';
-import path from 'path';
 import * as diff from 'diff';
 import { CURRENT_CONFIG_VERSION } from '../../constants.js';
 import { readFilesRecursively, mungeFileContents } from '../../automation-utils.js';

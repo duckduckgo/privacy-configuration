@@ -9,12 +9,24 @@ export default [
         ...json.configs.recommended,
     },
     {
+        files: ['tests/**/*.js'],
+        languageOptions: {
+            globals: {
+                ...globals.mocha,
+            },
+        },
+        rules: {
+            'no-unused-expressions': 'off',
+        },
+    },
+    {
         languageOptions: {
             globals: {
                 ...globals.commonjs,
                 ...globals.browser,
                 ...globals.jasmine,
                 ...globals.node,
+                ...globals.mocha,
             },
         },
     },
