@@ -177,3 +177,111 @@ describe('Auto-approvable features structure tests', () => {
         expect(summary.byOperation.remove).to.equal(1);
     });
 });
+
+describe('generateChangeSummary specific tests', () => {
+    it('should correctly count auto-approvable changes within allowed paths', () => {
+        const patches = [
+            { op: 'add', path: '/features/elementHiding/settings/domains/0', value: { domain: 'test.com' } },
+            { op: 'add', path: '/features/elementHiding/exceptions/0', value: { domain: 'test.com', reason: 'testing' } },
+            { op: 'add', path: '/features/fingerprintingAudio/exceptions/0', value: { domain: 'test.com', reason: 'testing' } },
+        ];
+
+        const summary = generateChangeSummary(patches);
+
+        expect(summary.total).to.equal(3);
+        expect(summary.autoApprovableChanges).to.equal(3);
+        expect(summary.otherChanges).to.equal(0);
+    });
+
+    it('should NOT count disallowed paths as auto-approvable even within auto-approvable features', () => {
+        const patches = [
+            { op: 'add', path: '/features/elementHiding/settings/domains/0', value: { domain: 'test.com' } },
+            { op: 'add', path: '/features/elementHiding/settings/rules/0', value: { selector: '.ad', type: 'hide' } },
+            { op: 'add', path: '/features/elementHiding/settings/enabled', value: false },
+            { op: 'add', path: '/features/fingerprintingAudio/settings/enabled', value: true },
+        ];
+
+        const summary = generateChangeSummary(patches);
+
+        expect(summary.total).to.equal(4);
+        expect(summary.autoApprovableChanges).to.equal(1); // Only the domains change
+        expect(summary.otherChanges).to.equal(3); // rules, enabled settings
+    });
+
+    it('should correctly count nested properties within allowed paths', () => {
+        const patches = [
+            { op: 'add', path: '/features/elementHiding/settings/domains/0/domain', value: 'test.com' },
+            { op: 'add', path: '/features/elementHiding/settings/domains/0/rules/0', value: { selector: '.ad' } },
+            { op: 'add', path: '/features/elementHiding/exceptions/0/reason', value: 'testing' },
+        ];
+
+        const summary = generateChangeSummary(patches);
+
+        expect(summary.total).to.equal(3);
+        expect(summary.autoApprovableChanges).to.equal(3); // All are within allowed paths
+        expect(summary.otherChanges).to.equal(0);
+    });
+
+    it('should correctly count mixed auto-approvable and non-auto-approvable features', () => {
+        const patches = [
+            { op: 'add', path: '/features/elementHiding/settings/domains/0', value: { domain: 'test.com' } },
+            { op: 'add', path: '/features/trackingProtection/settings/domains/0', value: { domain: 'test.com' } },
+            { op: 'add', path: '/features/fingerprintingCanvas/exceptions/0', value: { domain: 'test.com', reason: 'testing' } },
+            { op: 'add', path: '/features/cookie/settings/enabled', value: false },
+        ];
+
+        const summary = generateChangeSummary(patches);
+
+        expect(summary.total).to.equal(4);
+        expect(summary.autoApprovableChanges).to.equal(2); // elementHiding domains + fingerprintingCanvas exceptions
+        expect(summary.otherChanges).to.equal(2); // trackingProtection + cookie
+    });
+
+    it('should correctly count by operation type', () => {
+        const patches = [
+            { op: 'add', path: '/features/elementHiding/settings/domains/0', value: { domain: 'test.com' } },
+            { op: 'replace', path: '/features/elementHiding/exceptions/0/domain', value: 'updated.com' },
+            { op: 'remove', path: '/features/fingerprintingAudio/exceptions/1' },
+            { op: 'add', path: '/features/trackingProtection/enabled', value: true },
+        ];
+
+        const summary = generateChangeSummary(patches);
+
+        expect(summary.total).to.equal(4);
+        expect(summary.autoApprovableChanges).to.equal(3);
+        expect(summary.otherChanges).to.equal(1);
+        expect(summary.byOperation.add).to.equal(2);
+        expect(summary.byOperation.replace).to.equal(1);
+        expect(summary.byOperation.remove).to.equal(1);
+    });
+
+    it('should correctly count by path grouping', () => {
+        const patches = [
+            { op: 'add', path: '/features/elementHiding/settings/domains/0', value: { domain: 'test.com' } },
+            { op: 'add', path: '/features/elementHiding/exceptions/0', value: { domain: 'test.com' } },
+            { op: 'add', path: '/features/fingerprintingAudio/exceptions/0', value: { domain: 'test.com' } },
+            { op: 'add', path: '/features/trackingProtection/settings/domains/0', value: { domain: 'test.com' } },
+        ];
+
+        const summary = generateChangeSummary(patches);
+
+        expect(summary.total).to.equal(4);
+        expect(summary.autoApprovableChanges).to.equal(3);
+        expect(summary.otherChanges).to.equal(1);
+        expect(summary.byPath['/features/elementHiding']).to.equal(2);
+        expect(summary.byPath['/features/fingerprintingAudio']).to.equal(1);
+        expect(summary.byPath['/features/trackingProtection']).to.equal(1);
+    });
+
+    it('should handle empty patches array', () => {
+        const patches = [];
+
+        const summary = generateChangeSummary(patches);
+
+        expect(summary.total).to.equal(0);
+        expect(summary.autoApprovableChanges).to.equal(0);
+        expect(summary.otherChanges).to.equal(0);
+        expect(Object.keys(summary.byOperation)).to.have.length(0);
+        expect(Object.keys(summary.byPath)).to.have.length(0);
+    });
+});

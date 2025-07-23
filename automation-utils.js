@@ -206,7 +206,8 @@ export function generateChangeSummary(patches) {
         summary.byPath[pathKey] = (summary.byPath[pathKey] || 0) + 1;
 
         // Count auto-approvable vs other changes
-        if (AUTO_APPROVABLE_FEATURE_PATHS.some((feature) => patch.path.startsWith(feature))) {
+        const featurePath = AUTO_APPROVABLE_FEATURE_PATHS.find((feature) => patch.path.startsWith(feature));
+        if (featurePath && isPathAllowedForFeature(patch.path, featurePath)) {
             summary.autoApprovableChanges++;
         } else {
             summary.otherChanges++;
