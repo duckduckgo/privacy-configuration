@@ -5,7 +5,7 @@ import path from 'path';
  * Auto-approvable features configuration
  * Defines which features can be auto-approved and their allowed paths
  */
-const AUTO_APPROVABLE_FEATURES = {
+export const AUTO_APPROVABLE_FEATURES = {
     '/features/elementHiding': [
         '/settings/domains',
         '/exceptions',
@@ -21,7 +21,7 @@ const AUTO_APPROVABLE_FEATURES = {
 /**
  * List of auto-approvable feature paths for summary generation
  */
-const AUTO_APPROVABLE_FEATURE_PATHS = Object.keys(AUTO_APPROVABLE_FEATURES);
+export const AUTO_APPROVABLE_FEATURE_PATHS = Object.keys(AUTO_APPROVABLE_FEATURES);
 
 /**
  * Checks if a patch path is allowed for auto-approval
@@ -29,7 +29,7 @@ const AUTO_APPROVABLE_FEATURE_PATHS = Object.keys(AUTO_APPROVABLE_FEATURES);
  * @param {string} featurePath - The feature path this patch belongs to
  * @returns {boolean} True if the path is allowed for auto-approval
  */
-function isPathAllowedForFeature(patchPath, featurePath) {
+export function isPathAllowedForFeature(patchPath, featurePath) {
     const allowedPaths = AUTO_APPROVABLE_FEATURES[featurePath];
     if (!allowedPaths) {
         return false;
@@ -176,6 +176,7 @@ export function analyzePatchesForApproval(patches) {
         };
     }
 
+    // This case covers changes to non-auto-approvable features
     return {
         shouldApprove: false,
         reason: 'Manual review required: Changes outside auto-approvable features',
