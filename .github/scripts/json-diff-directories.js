@@ -1,7 +1,14 @@
 import fs from 'fs';
 import pkg from 'fast-json-patch';
 import { CURRENT_CONFIG_VERSION } from '../../constants.js';
-import { readFilesRecursively, mungeFileContents, analyzePatchesForApproval, generateChangeSummary, AUTO_APPROVABLE_FEATURES, isPathAllowedForFeature } from '../../automation-utils.js';
+import {
+    readFilesRecursively,
+    mungeFileContents,
+    analyzePatchesForApproval,
+    generateChangeSummary,
+    AUTO_APPROVABLE_FEATURES,
+    isPathAllowedForFeature,
+} from '../../automation-utils.js';
 
 const { compare } = pkg;
 

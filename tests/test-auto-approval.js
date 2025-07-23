@@ -117,7 +117,7 @@ describe('Auto-approvable features structure tests', () => {
         const result = analyzePatchesForApproval(realElementHidingPatches);
         const summary = generateChangeSummary(realElementHidingPatches);
 
-        expect(result.shouldApprove).to.be.true;
+        expect(result.shouldApprove).to.equal(true);
         expect(result.reason).to.include('Auto-approved');
         expect(summary.autoApprovableChanges).to.equal(2);
         expect(summary.otherChanges).to.equal(0);
@@ -131,7 +131,7 @@ describe('Auto-approvable features structure tests', () => {
         const result = analyzePatchesForApproval(fingerprintingPatches);
         const summary = generateChangeSummary(fingerprintingPatches);
 
-        expect(result.shouldApprove).to.be.true;
+        expect(result.shouldApprove).to.equal(true);
         expect(result.reason).to.include('Auto-approved');
         expect(summary.autoApprovableChanges).to.equal(1);
         expect(summary.otherChanges).to.equal(0);
@@ -144,7 +144,7 @@ describe('Auto-approvable features structure tests', () => {
 
         const result = analyzePatchesForApproval(rulesPatches);
 
-        expect(result.shouldApprove).to.be.false;
+        expect(result.shouldApprove).to.equal(false);
         expect(result.reason).to.include('Manual review required');
         expect(result.reason).to.include('disallowed paths');
     });
@@ -156,7 +156,7 @@ describe('Auto-approvable features structure tests', () => {
 
         const result = analyzePatchesForApproval(otherFeaturePatches);
 
-        expect(result.shouldApprove).to.be.false;
+        expect(result.shouldApprove).to.equal(false);
         expect(result.reason).to.include('Manual review required');
     });
 
