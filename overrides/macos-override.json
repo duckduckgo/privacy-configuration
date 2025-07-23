@@ -624,6 +624,32 @@
                                 ]
                             },
                             {
+                                "domain": ["portal.vectorsecurity.com"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "form[method='post'][action='/index']",
+                                            "type": "login"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": ["reddit.com"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "rpl-modal-card.settings-row-modal-card[id*='settings-mfa-enable-password']",
+                                            "type": "login"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
                                 "domain": ["netflix.com"],
                                 "patchSettings": [
                                     {
