@@ -1014,7 +1014,7 @@
                 "#ez-save-settings",
                 "ez-consent-tcf",
                 "div[data-testid=\"cookie-policy-manage-dialog\"]",
-                "button[data-cookiebanner=\"accept_only_essential_button\"]",
+                "#CcpaWrapper",
                 "#fast-cmp-root",
                 "iframe#fast-cmp-iframe",
                 "fastCMP-",
@@ -2235,7 +2235,9 @@
                 "body:not([id]) > div#cookie-notice-consent > div:not([id]) > div:nth-child(2):not([id]) > a:nth-child(2)#cookie-notice-consent__reject-button",
                 "body:not([id]) > div:not([id]) > div#cookie-settings > small:nth-child(1):not([id]) > form#manage-cookie-settings > div:nth-child(2):not([id]) > button:nth-child(1)#declinecookies",
                 "body:not([id]) > div:not([id]) > div:not([id]) > div#ch2-dialog > div:nth-child(2):not([id]) > button:nth-child(1):not([id])",
-                "body:not([id]) > div:not([id]) > div:nth-child(2):not([id]) > button:nth-child(1)#privacy-reject"
+                "body:not([id]) > div:not([id]) > div:nth-child(2):not([id]) > button:nth-child(1)#privacy-reject",
+                "body:not([id]) > div:not([id]) > div:not([id]) > div:not([id]) > div:not([id]) > div:not([id]) > div:not([id]) > div:nth-child(3):not([id]) > div:nth-child(2):not([id]) > div:not([id]) > div:nth-child(1):not([id]) > div:nth-child(2):not([id])",
+                "body#js-body > div:not([id]) > div:not([id]) > a:nth-child(1):not([id])"
             ],
             "r": [
                 [
@@ -2745,6 +2747,35 @@
                     [
                         {
                             "cc": 52
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
+                    "app.discuss.io",
+                    2,
+                    "^https?://app\\.discuss\\.io/",
+                    10,
+                    [],
+                    [
+                        {
+                            "e": 699
+                        }
+                    ],
+                    [
+                        {
+                            "v": 699
+                        }
+                    ],
+                    [
+                        {
+                            "c": 699
+                        }
+                    ],
+                    [
+                        {
+                            "cc": 99
                         }
                     ],
                     {}
@@ -4857,11 +4888,20 @@
                     ],
                     [
                         {
-                            "comment": "some templates don't hide the banner automatically",
-                            "h": 263
+                            "eval": "EVAL_COOKIEINFORMATION_0"
                         },
                         {
-                            "eval": "EVAL_COOKIEINFORMATION_0"
+                            "wait": 1000
+                        },
+                        {
+                            "if": {
+                                "v": 385
+                            },
+                            "then": [
+                                {
+                                    "h": 263
+                                }
+                            ]
                         }
                     ],
                     [
@@ -6016,7 +6056,7 @@
                     ],
                     [
                         {
-                            "c": 385
+                            "c": 1607
                         },
                         {
                             "check": "none",
@@ -13739,6 +13779,41 @@
                             "timeout": 1000,
                             "check": "none",
                             "wv": 1152
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
+                    "auto_AU_lemonde.fr_jgt",
+                    0,
+                    "^https?://(www\\.)?lemonde\\.fr/",
+                    10,
+                    [],
+                    [
+                        {
+                            "e": 1608
+                        }
+                    ],
+                    [
+                        {
+                            "v": 1608
+                        }
+                    ],
+                    [
+                        {
+                            "wait": 500
+                        },
+                        {
+                            "comment": "Reject all cookies",
+                            "c": 1608
+                        }
+                    ],
+                    [
+                        {
+                            "timeout": 1000,
+                            "check": "none",
+                            "wv": 1608
                         }
                     ],
                     {}
