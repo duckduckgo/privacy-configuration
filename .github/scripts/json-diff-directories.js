@@ -6,6 +6,66 @@ import { readFilesRecursively, mungeFileContents, analyzePatchesForApproval, gen
 const { compare } = pkg;
 
 /**
+ * Auto-approvable features configuration
+ * Defines which features can be auto-approved and their allowed paths
+ */
+const AUTO_APPROVABLE_FEATURES = {
+    '/features/elementHiding': [
+        '/settings/domains',
+        '/exceptions',
+    ],
+    '/features/fingerprintingTemporaryStorage': ['/exceptions'],
+    '/features/fingerprintingAudio': ['/exceptions'],
+    '/features/fingerprintingBattery': ['/exceptions'],
+    '/features/fingerprintingCanvas': ['/exceptions'],
+    '/features/fingerprintingHardware': ['/exceptions'],
+    '/features/fingerprintingScreenSize': ['/exceptions'],
+};
+
+/**
+ * Checks if a patch path is allowed for auto-approval
+ * @param {string} patchPath - The patch path to check
+ * @param {string} featurePath - The feature path this patch belongs to
+ * @returns {boolean} True if the path is allowed for auto-approval
+ */
+function isPathAllowedForFeature(patchPath, featurePath) {
+    const allowedPaths = AUTO_APPROVABLE_FEATURES[featurePath];
+    if (!allowedPaths) {
+        return false;
+    }
+
+    // Use exact path matching or path starts with allowed path
+    return allowedPaths.some((allowedPath) => {
+        // Exact match
+        if (patchPath === featurePath + allowedPath) {
+            return true;
+        }
+
+        // Path starts with feature + allowed path (for nested properties)
+        // Allow array indices and nested properties within the allowed paths
+        const fullAllowedPath = featurePath + allowedPath;
+        if (patchPath.startsWith(fullAllowedPath + '/')) {
+            // Check if the next part is an array index (number)
+            const remainingPath = patchPath.substring(fullAllowedPath.length + 1);
+            const pathParts = remainingPath.split('/');
+
+            // Allow array indices and nested properties within array elements
+            // This allows:
+            // - /features/elementHiding/settings/domains/0 (array index)
+            // - /features/elementHiding/settings/domains/0/domain (nested property within array element)
+            // - /features/elementHiding/settings/domains/0/rules/0 (nested array within array element)
+            // But not: /features/elementHiding/settings/rules/0 (different allowed path)
+
+            // First part must be an array index
+            if (pathParts.length >= 1 && /^\d+$/.test(pathParts[0])) {
+                return true;
+            }
+        }
+        return false;
+    });
+}
+
+/**
  * Compares two directories and outputs approval status for changed files
  * @param {string} dir1 - First directory path
  * @param {string} dir2 - Second directory path
@@ -48,26 +108,11 @@ function displayApprovalStatus(dir1Files, dir2Files, isOpen) {
 
                 // Extract disallowed paths for manual review
                 const disallowedPaths = patches.filter((patch) => {
-                    // Define auto-approvable features and their allowed paths
-                    const autoApprovableFeatures = {
-                        '/features/elementHiding': [
-                            '/settings/domains',
-                            '/exceptions',
-                        ],
-                        '/features/fingerprintingTemporaryStorage': ['/exceptions'],
-                        '/features/fingerprintingAudio': ['/exceptions'],
-                        '/features/fingerprintingBattery': ['/exceptions'],
-                        '/features/fingerprintingCanvas': ['/exceptions'],
-                        '/features/fingerprintingHardware': ['/exceptions'],
-                        '/features/fingerprintingScreenSize': ['/exceptions'],
-                    };
-
-                    // Find which auto-approvable feature this patch belongs to
-                    const featurePath = Object.keys(autoApprovableFeatures).find((feature) => patch.path.startsWith(feature));
+                    // Use the same logic as analyzePatchesForApproval for consistency
+                    const featurePath = Object.keys(AUTO_APPROVABLE_FEATURES).find((feature) => patch.path.startsWith(feature));
 
                     if (featurePath) {
-                        const allowedPaths = autoApprovableFeatures[featurePath];
-                        return !allowedPaths.some((allowedPath) => patch.path.includes(allowedPath));
+                        return !isPathAllowedForFeature(patch.path, featurePath);
                     }
                     return true; // Any non-auto-approvable feature changes are disallowed
                 });

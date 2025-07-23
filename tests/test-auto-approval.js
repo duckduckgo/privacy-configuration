@@ -66,6 +66,26 @@ describe('Auto-approval logic tests', () => {
             patches: [],
             expected: false,
         },
+        {
+            name: 'Path matching edge cases - should approve',
+            patches: [
+                // These should be approved - they are nested properties within allowed paths
+                { op: 'add', path: '/features/elementHiding/settings/domains/0/domain', value: 'test.com' },
+                { op: 'add', path: '/features/elementHiding/exceptions/0/reason', value: 'testing' },
+                { op: 'add', path: '/features/fingerprintingAudio/exceptions/0/domain', value: 'test.com' },
+            ],
+            expected: true,
+        },
+        {
+            name: 'Improved path matching - should NOT approve',
+            patches: [
+                // These should NOT be approved - they are outside allowed paths
+                { op: 'add', path: '/features/elementHiding/settings/rules/0', value: { selector: '.ad' } },
+                { op: 'add', path: '/features/elementHiding/settings/enabled', value: false },
+                { op: 'add', path: '/features/fingerprintingAudio/settings/enabled', value: true },
+            ],
+            expected: false,
+        },
     ];
 
     testCases.forEach((testCase) => {
