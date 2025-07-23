@@ -67,7 +67,7 @@ jobs:
 
             - name: Install dependencies
               run: |
-                  npm install diff
+                  npm install diff fast-json-patch
 
             - name: Run build script on base branch
               run: |
@@ -89,23 +89,34 @@ jobs:
             - name: Create diff of file outputs
               run: node pr/.github/scripts/diff-directories.js base/generated pr/generated > diff_output.txt
 
-            - name: Find Previous Comment
+            - name: Create JSON approval analysis
+              run: node pr/.github/scripts/json-diff-directories.js base/generated pr/generated > approval_output.txt
+
+            - name: Find Previous Diff Comment
               uses: peter-evans/find-comment@v3
-              id: find_comment
+              id: find_diff_comment
               with:
                   issue-number: ${{ github.event.pull_request.number }}
                   comment-author: 'github-actions[bot]'
                   body-includes: 'Generated file outputs'
                   direction: last
 
-            - name: Create Comment Body
+            - name: Find Previous Approval Comment
+              uses: peter-evans/find-comment@v3
+              id: find_approval_comment
+              with:
+                  issue-number: ${{ github.event.pull_request.number }}
+                  comment-author: 'github-actions[bot]'
+                  body-includes: 'JSON approval analysis'
+                  direction: last
+
+            - name: Create Diff Comment Body
               uses: actions/github-script@v7
-              id: create_body
+              id: create_diff_body
               with:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
                   script: |
                       const fs = require('fs');
-                      const prNumber = context.issue.number;
                       const diffOutput = fs.readFileSync('diff_output.txt', 'utf8');
                       let commentBody = `
                       ### [Generated file outputs](https://github.com/duckduckgo/privacy-configuration/blob/main/.github/workflows/auto-respond-pr.yml#L5-L12):
@@ -117,10 +128,36 @@ jobs:
                       }
                       core.setOutput('comment_body', commentBody);
 
-            - name: Create, or Update the Comment
+            - name: Create Approval Comment Body
+              uses: actions/github-script@v7
+              id: create_approval_body
+              with:
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  script: |
+                      const fs = require('fs');
+                      const approvalOutput = fs.readFileSync('approval_output.txt', 'utf8');
+                      let commentBody = `
+                      ### [🔴 **BETA** JSON approval analysis](https://github.com/duckduckgo/privacy-configuration/blob/main/.github/workflows/auto-respond-pr.yml#L5-L12):
+                      *Time updated:* ${new Date().toUTCString()}
+                      ${approvalOutput}
+                      `
+                      if (commentBody.length > 65536) {
+                          commentBody = '❌ Approval analysis output is too large to post as a comment, run locally to see the analysis and validate'
+                      }
+                      core.setOutput('comment_body', commentBody);
+
+            - name: Create, or Update the Diff Comment
               uses: peter-evans/create-or-update-comment@v4
               with:
                   issue-number: ${{ github.event.pull_request.number }}
-                  comment-id: ${{ steps.find_comment.outputs.comment-id }}
-                  body: ${{ steps.create_body.outputs.comment_body }}
+                  comment-id: ${{ steps.find_diff_comment.outputs.comment-id }}
+                  body: ${{ steps.create_diff_body.outputs.comment_body }}
+                  edit-mode: replace
+
+            - name: Create, or Update the Approval Comment
+              uses: peter-evans/create-or-update-comment@v4
+              with:
+                  issue-number: ${{ github.event.pull_request.number }}
+                  comment-id: ${{ steps.find_approval_comment.outputs.comment-id }}
+                  body: ${{ steps.create_approval_body.outputs.comment_body }}
                   edit-mode: replace
