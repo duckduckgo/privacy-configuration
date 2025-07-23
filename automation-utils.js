@@ -53,24 +53,36 @@ export function mungeFileContents(fileContent, filePath) {
 }
 
 /**
- * Checks if changes are only to allowed paths in element hiding feature
+ * Checks if changes are only to allowed paths in auto-approvable features
  * @param {Array} patches - Array of JSON patches from fast-json-patch
  * @returns {boolean} True if changes are only to allowed paths
  */
-export function isElementHidingOnlyChanges(patches) {
-    const allowedPaths = [
-        '/settings/domains',
-        '/exceptions',
-    ];
+export function isAllowedChangesOnly(patches) {
+    // Define auto-approvable features and their allowed paths
+    const autoApprovableFeatures = {
+        '/features/elementHiding': ['/settings/domains', '/exceptions'],
+        // Add fingerprinting features - allow exceptions for all
+        '/features/fingerprintingTemporaryStorage': ['/exceptions'],
+        '/features/fingerprintingAudio': ['/exceptions'],
+        '/features/fingerprintingBattery': ['/exceptions'],
+        '/features/fingerprintingCanvas': ['/exceptions'],
+        '/features/fingerprintingHardware': ['/exceptions'],
+        '/features/fingerprintingScreenSize': ['/exceptions'],
+    };
 
-    // Check if all patches are for element hiding feature and allowed paths
+    // Check if all patches are for auto-approvable features and allowed paths
     return patches.every((patch) => {
-        // Must be for element hiding feature
-        if (!patch.path.startsWith('/features/elementHiding')) {
-            return false;
+        // Find which auto-approvable feature this patch belongs to
+        const featurePath = Object.keys(autoApprovableFeatures).find((feature) =>
+            patch.path.startsWith(feature)
+        );
+
+        if (!featurePath) {
+            return false; // Not an auto-approvable feature
         }
 
-        // Check if the path is in the allowed list
+        // Check if the path is in the allowed list for this feature
+        const allowedPaths = autoApprovableFeatures[featurePath];
         return allowedPaths.some((allowedPath) => patch.path.includes(allowedPath));
     });
 }
@@ -88,24 +100,37 @@ export function analyzePatchesForApproval(patches) {
         };
     }
 
-    // Check if changes are only to element hiding allowed paths
-    if (isElementHidingOnlyChanges(patches)) {
+    // Check if changes are only to auto-approvable allowed paths
+    if (isAllowedChangesOnly(patches)) {
         return {
             shouldApprove: true,
-            reason: 'Auto-approved: Changes only to element hiding domains/exceptions',
+            reason: 'Auto-approved: Changes only to auto-approvable feature domains/exceptions',
         };
     }
 
     // Check if any changes are outside allowed paths
     const disallowedPaths = patches.filter((patch) => {
-        if (patch.path.startsWith('/features/elementHiding')) {
-            const allowedPaths = [
-                '/settings/domains',
-                '/exceptions',
-            ];
+        // Define auto-approvable features and their allowed paths
+        const autoApprovableFeatures = {
+            '/features/elementHiding': ['/settings/domains', '/exceptions'],
+            '/features/fingerprintingTemporaryStorage': ['/exceptions'],
+            '/features/fingerprintingAudio': ['/exceptions'],
+            '/features/fingerprintingBattery': ['/exceptions'],
+            '/features/fingerprintingCanvas': ['/exceptions'],
+            '/features/fingerprintingHardware': ['/exceptions'],
+            '/features/fingerprintingScreenSize': ['/exceptions'],
+        };
+
+        // Find which auto-approvable feature this patch belongs to
+        const featurePath = Object.keys(autoApprovableFeatures).find((feature) =>
+            patch.path.startsWith(feature)
+        );
+
+        if (featurePath) {
+            const allowedPaths = autoApprovableFeatures[featurePath];
             return !allowedPaths.some((allowedPath) => patch.path.includes(allowedPath));
         }
-        return true; // Any non-element-hiding changes are disallowed
+        return true; // Any non-auto-approvable feature changes are disallowed
     });
 
     if (disallowedPaths.length > 0) {
@@ -131,9 +156,20 @@ export function generateChangeSummary(patches) {
         total: patches.length,
         byOperation: {},
         byPath: {},
-        elementHidingChanges: 0,
+        autoApprovableChanges: 0,
         otherChanges: 0,
     };
+
+    // Define auto-approvable features
+    const autoApprovableFeatures = [
+        '/features/elementHiding',
+        '/features/fingerprintingTemporaryStorage',
+        '/features/fingerprintingAudio',
+        '/features/fingerprintingBattery',
+        '/features/fingerprintingCanvas',
+        '/features/fingerprintingHardware',
+        '/features/fingerprintingScreenSize',
+    ];
 
     patches.forEach((patch) => {
         // Count by operation
@@ -143,9 +179,9 @@ export function generateChangeSummary(patches) {
         const pathKey = patch.path.split('/').slice(0, 3).join('/'); // Top 3 levels
         summary.byPath[pathKey] = (summary.byPath[pathKey] || 0) + 1;
 
-        // Count element hiding vs other changes
-        if (patch.path.startsWith('/features/elementHiding')) {
-            summary.elementHidingChanges++;
+        // Count auto-approvable vs other changes
+        if (autoApprovableFeatures.some((feature) => patch.path.startsWith(feature))) {
+            summary.autoApprovableChanges++;
         } else {
             summary.otherChanges++;
         }

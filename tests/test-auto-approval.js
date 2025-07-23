@@ -35,6 +35,22 @@ describe('Auto-approval logic tests', () => {
             expected: false,
         },
         {
+            name: 'Fingerprinting exceptions only - should approve',
+            patches: [
+                { op: 'add', path: '/features/fingerprintingTemporaryStorage/exceptions/0', value: { domain: 'test.com', reason: 'testing' } },
+                { op: 'remove', path: '/features/fingerprintingAudio/exceptions/1' },
+            ],
+            expected: true,
+        },
+        {
+            name: 'Mixed fingerprinting and element hiding - should approve',
+            patches: [
+                { op: 'add', path: '/features/elementHiding/settings/domains/0', value: { domain: 'test.com' } },
+                { op: 'add', path: '/features/fingerprintingCanvas/exceptions/0', value: { domain: 'test.com', reason: 'testing' } },
+            ],
+            expected: true,
+        },
+        {
             name: 'Other feature changes - should NOT approve',
             patches: [
                 { op: 'add', path: '/features/trackingProtection/settings/domains/0', value: { domain: 'test.com' } },
@@ -57,13 +73,13 @@ describe('Auto-approval logic tests', () => {
             expect(summary.total).to.equal(testCase.patches.length);
 
             if (testCase.patches.length > 0) {
-                expect(summary.elementHidingChanges + summary.otherChanges).to.equal(testCase.patches.length);
+                expect(summary.autoApprovableChanges + summary.otherChanges).to.equal(testCase.patches.length);
             }
         });
     });
 });
 
-describe('Element hiding structure tests', () => {
+describe('Auto-approvable features structure tests', () => {
     it('should approve real element hiding domain and exception changes', () => {
         const realElementHidingPatches = [
             { op: 'add', path: '/features/elementHiding/settings/domains/0', value: { domain: 'newsite.com', rules: [] } },
@@ -79,7 +95,21 @@ describe('Element hiding structure tests', () => {
 
         expect(result.shouldApprove).to.be.true;
         expect(result.reason).to.include('Auto-approved');
-        expect(summary.elementHidingChanges).to.equal(2);
+        expect(summary.autoApprovableChanges).to.equal(2);
+        expect(summary.otherChanges).to.equal(0);
+    });
+
+    it('should approve fingerprinting exception changes', () => {
+        const fingerprintingPatches = [
+            { op: 'add', path: '/features/fingerprintingHardware/exceptions/0', value: { domain: 'test.com', reason: 'testing' } },
+        ];
+
+        const result = analyzePatchesForApproval(fingerprintingPatches);
+        const summary = generateChangeSummary(fingerprintingPatches);
+
+        expect(result.shouldApprove).to.be.true;
+        expect(result.reason).to.include('Auto-approved');
+        expect(summary.autoApprovableChanges).to.equal(1);
         expect(summary.otherChanges).to.equal(0);
     });
 
@@ -116,7 +146,7 @@ describe('Element hiding structure tests', () => {
         const summary = generateChangeSummary(mixedPatches);
 
         expect(summary.total).to.equal(3);
-        expect(summary.elementHidingChanges).to.equal(2);
+        expect(summary.autoApprovableChanges).to.equal(2);
         expect(summary.otherChanges).to.equal(1);
         expect(summary.byOperation.add).to.equal(1);
         expect(summary.byOperation.replace).to.equal(1);

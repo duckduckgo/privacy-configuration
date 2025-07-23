@@ -24,54 +24,65 @@ function displayApprovalStatus(dir1Files, dir2Files, isOpen) {
             const fileOut = mungeFileContents(fileContent, filePath);
             const file2Out = mungeFileContents(dir2Files[filePath], filePath);
 
+            // Skip identical files entirely
             if (fileOut === file2Out) {
-                fileAnalysis[filePath] = {
-                    status: 'identical',
-                    message: '⚠️ File is identical',
-                };
-            } else {
-                try {
-                    const json1 = JSON.parse(fileOut);
-                    const json2 = JSON.parse(file2Out);
-                    const patches = compare(json1, json2);
+                delete dir2Files[filePath];
+                continue;
+            }
 
-                    allPatches.push(...patches);
+            try {
+                const json1 = JSON.parse(fileOut);
+                const json2 = JSON.parse(file2Out);
+                const patches = compare(json1, json2);
 
-                    if (patches.length === 0) {
-                        fileAnalysis[filePath] = {
-                            status: 'identical',
-                            message: '⚠️ File is identical (after munging)',
-                        };
-                    } else {
-                        const analysis = analyzePatchesForApproval(patches);
-                        const summary = generateChangeSummary(patches);
+                allPatches.push(...patches);
 
-                        // Extract disallowed paths for manual review
-                        const disallowedPaths = patches.filter((patch) => {
-                            if (patch.path.startsWith('/features/elementHiding')) {
-                                const allowedPaths = [
-                                    '/settings/domains',
-                                    '/exceptions',
-                                ];
-                                return !allowedPaths.some((allowedPath) => patch.path.includes(allowedPath));
-                            }
-                            return true; // Any non-element-hiding changes are disallowed
-                        });
-
-                        fileAnalysis[filePath] = {
-                            status: analysis.shouldApprove ? 'approved' : 'manual_review',
-                            message: analysis.shouldApprove ? '✅ Auto-approved' : '❌ Manual review required',
-                            patches,
-                            disallowedPaths,
-                            summary,
-                        };
-                    }
-                } catch (error) {
-                    fileAnalysis[filePath] = {
-                        status: 'error',
-                        message: `❌ JSON parsing error: ${error.message}`,
-                    };
+                if (patches.length === 0) {
+                    // Skip files that are identical after munging
+                    delete dir2Files[filePath];
+                    continue;
                 }
+
+                const analysis = analyzePatchesForApproval(patches);
+                const summary = generateChangeSummary(patches);
+
+                // Extract disallowed paths for manual review
+                const disallowedPaths = patches.filter((patch) => {
+                    // Define auto-approvable features and their allowed paths
+                    const autoApprovableFeatures = {
+                        '/features/elementHiding': ['/settings/domains', '/exceptions'],
+                        '/features/fingerprintingTemporaryStorage': ['/exceptions'],
+                        '/features/fingerprintingAudio': ['/exceptions'],
+                        '/features/fingerprintingBattery': ['/exceptions'],
+                        '/features/fingerprintingCanvas': ['/exceptions'],
+                        '/features/fingerprintingHardware': ['/exceptions'],
+                        '/features/fingerprintingScreenSize': ['/exceptions'],
+                    };
+
+                    // Find which auto-approvable feature this patch belongs to
+                    const featurePath = Object.keys(autoApprovableFeatures).find((feature) =>
+                        patch.path.startsWith(feature)
+                    );
+
+                    if (featurePath) {
+                        const allowedPaths = autoApprovableFeatures[featurePath];
+                        return !allowedPaths.some((allowedPath) => patch.path.includes(allowedPath));
+                    }
+                    return true; // Any non-auto-approvable feature changes are disallowed
+                });
+
+                fileAnalysis[filePath] = {
+                    status: analysis.shouldApprove ? 'approved' : 'manual_review',
+                    message: analysis.shouldApprove ? '✅ Auto-approved' : '❌ Manual review required',
+                    patches,
+                    disallowedPaths,
+                    summary,
+                };
+            } catch (error) {
+                fileAnalysis[filePath] = {
+                    status: 'error',
+                    message: `❌ JSON parsing error: ${error.message}`,
+                };
             }
 
             delete dir2Files[filePath];
@@ -94,7 +105,6 @@ function displayApprovalStatus(dir1Files, dir2Files, isOpen) {
     const groupedFiles = {
         approved: [],
         manual_review: [],
-        identical: [],
         added: [],
         removed: [],
         error: [],
@@ -160,10 +170,6 @@ function displayApprovalStatus(dir1Files, dir2Files, isOpen) {
         groupedFiles.error.forEach(({ filePath, message }) => {
             outString += `- **${filePath}**: ${message}\n`;
         });
-    }
-
-    if (groupedFiles.identical.length > 0) {
-        outString += `\n## ℹ️ Unchanged Files (${groupedFiles.identical.length})\n`;
     }
 
     // Analyze overall approval
