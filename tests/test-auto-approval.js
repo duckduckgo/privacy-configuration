@@ -37,7 +37,11 @@ describe('Auto-approval logic tests', () => {
         {
             name: 'Fingerprinting exceptions only - should approve',
             patches: [
-                { op: 'add', path: '/features/fingerprintingTemporaryStorage/exceptions/0', value: { domain: 'test.com', reason: 'testing' } },
+                {
+                    op: 'add',
+                    path: '/features/fingerprintingTemporaryStorage/exceptions/0',
+                    value: { domain: 'test.com', reason: 'testing' },
+                },
                 { op: 'remove', path: '/features/fingerprintingAudio/exceptions/1' },
             ],
             expected: true,

@@ -60,7 +60,10 @@ export function mungeFileContents(fileContent, filePath) {
 export function isAllowedChangesOnly(patches) {
     // Define auto-approvable features and their allowed paths
     const autoApprovableFeatures = {
-        '/features/elementHiding': ['/settings/domains', '/exceptions'],
+        '/features/elementHiding': [
+            '/settings/domains',
+            '/exceptions',
+        ],
         // Add fingerprinting features - allow exceptions for all
         '/features/fingerprintingTemporaryStorage': ['/exceptions'],
         '/features/fingerprintingAudio': ['/exceptions'],
@@ -73,9 +76,7 @@ export function isAllowedChangesOnly(patches) {
     // Check if all patches are for auto-approvable features and allowed paths
     return patches.every((patch) => {
         // Find which auto-approvable feature this patch belongs to
-        const featurePath = Object.keys(autoApprovableFeatures).find((feature) =>
-            patch.path.startsWith(feature)
-        );
+        const featurePath = Object.keys(autoApprovableFeatures).find((feature) => patch.path.startsWith(feature));
 
         if (!featurePath) {
             return false; // Not an auto-approvable feature
@@ -112,7 +113,10 @@ export function analyzePatchesForApproval(patches) {
     const disallowedPaths = patches.filter((patch) => {
         // Define auto-approvable features and their allowed paths
         const autoApprovableFeatures = {
-            '/features/elementHiding': ['/settings/domains', '/exceptions'],
+            '/features/elementHiding': [
+                '/settings/domains',
+                '/exceptions',
+            ],
             '/features/fingerprintingTemporaryStorage': ['/exceptions'],
             '/features/fingerprintingAudio': ['/exceptions'],
             '/features/fingerprintingBattery': ['/exceptions'],
@@ -122,9 +126,7 @@ export function analyzePatchesForApproval(patches) {
         };
 
         // Find which auto-approvable feature this patch belongs to
-        const featurePath = Object.keys(autoApprovableFeatures).find((feature) =>
-            patch.path.startsWith(feature)
-        );
+        const featurePath = Object.keys(autoApprovableFeatures).find((feature) => patch.path.startsWith(feature));
 
         if (featurePath) {
             const allowedPaths = autoApprovableFeatures[featurePath];

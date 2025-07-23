@@ -50,7 +50,10 @@ function displayApprovalStatus(dir1Files, dir2Files, isOpen) {
                 const disallowedPaths = patches.filter((patch) => {
                     // Define auto-approvable features and their allowed paths
                     const autoApprovableFeatures = {
-                        '/features/elementHiding': ['/settings/domains', '/exceptions'],
+                        '/features/elementHiding': [
+                            '/settings/domains',
+                            '/exceptions',
+                        ],
                         '/features/fingerprintingTemporaryStorage': ['/exceptions'],
                         '/features/fingerprintingAudio': ['/exceptions'],
                         '/features/fingerprintingBattery': ['/exceptions'],
@@ -60,9 +63,7 @@ function displayApprovalStatus(dir1Files, dir2Files, isOpen) {
                     };
 
                     // Find which auto-approvable feature this patch belongs to
-                    const featurePath = Object.keys(autoApprovableFeatures).find((feature) =>
-                        patch.path.startsWith(feature)
-                    );
+                    const featurePath = Object.keys(autoApprovableFeatures).find((feature) => patch.path.startsWith(feature));
 
                     if (featurePath) {
                         const allowedPaths = autoApprovableFeatures[featurePath];
