@@ -53,22 +53,11 @@ function displayApprovalStatus(dir1Files, dir2Files, isOpen) {
                 const analysis = analyzePatchesForApproval(patches);
                 const summary = generateChangeSummary(patches);
 
-                // Extract disallowed paths for manual review
-                const disallowedPaths = patches.filter((patch) => {
-                    // Use the same logic as analyzePatchesForApproval for consistency
-                    const featurePath = Object.keys(AUTO_APPROVABLE_FEATURES).find((feature) => patch.path.startsWith(feature));
-
-                    if (featurePath) {
-                        return !isPathAllowedForFeature(patch.path, featurePath);
-                    }
-                    return true; // Any non-auto-approvable feature changes are disallowed
-                });
-
                 fileAnalysis[filePath] = {
                     status: analysis.shouldApprove ? 'approved' : 'manual_review',
                     message: analysis.shouldApprove ? '✅ Auto-approved' : '❌ Manual review required',
                     patches,
-                    disallowedPaths,
+                    disallowedPatches: analysis.disallowedPatches || [],
                     summary,
                 };
             } catch (error) {
@@ -124,19 +113,18 @@ function displayApprovalStatus(dir1Files, dir2Files, isOpen) {
     // Manual review files
     if (groupedFiles.manual_review.length > 0) {
         outString += '\n## ❌ Manual Review Required\n';
-        groupedFiles.manual_review.forEach(({ filePath, disallowedPaths, summary }) => {
+        groupedFiles.manual_review.forEach(({ filePath, disallowedPatches, summary }) => {
             outString += `- **${filePath}** (${summary.total} total changes)\n`;
 
-            if (disallowedPaths.length > 0) {
+            if (disallowedPatches.length > 0) {
                 outString += '  **Disallowed paths that require review:**\n';
-                disallowedPaths.forEach((patch) => {
-                    const pathDisplay = patch.path.replace(/\//g, '.').replace(/^\./, '');
-                    outString += `  - \`${pathDisplay}\` (${patch.op})\n`;
+                disallowedPatches.forEach((patch) => {
+                    outString += `  - \`${patch.path}\` (${patch.op})\n`;
                 });
             }
 
             // Show allowed changes count
-            const allowedChanges = summary.total - disallowedPaths.length;
+            const allowedChanges = summary.total - disallowedPatches.length;
             if (allowedChanges > 0) {
                 outString += `  *${allowedChanges} auto-approvable changes*\n`;
             }
@@ -249,12 +237,3 @@ for (const [
 // Output overall approval status
 console.log('\n## 🎯 OVERALL APPROVAL STATUS');
 console.log(`**${overallApprovalAnalysis.shouldApprove ? '✅ AUTO-APPROVED' : '❌ MANUAL REVIEW REQUIRED'}**`);
-
-/* Skip for now duplicated
-if (overallApprovalAnalysis.reasons.length > 0) {
-    console.log('\n**Reasons for manual review:**');
-    overallApprovalAnalysis.reasons.forEach((reason) => {
-        console.log(`- ${reason}`);
-    });
-}
-*/

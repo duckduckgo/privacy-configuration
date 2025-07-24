@@ -159,20 +159,20 @@ export function analyzePatchesForApproval(patches) {
     }
 
     // Check if any changes are outside allowed paths
-    const disallowedPaths = new Set();
+    const disallowedPatches = [];
     for (const patch of patches) {
         const featurePath = AUTO_APPROVABLE_FEATURE_PATHS.find((feature) => patch.path.startsWith(feature));
         const isDisallowed = featurePath ? !isPathAllowedForFeature(patch.path, featurePath) : true;
         if (isDisallowed) {
-            disallowedPaths.add(patch.path);
+            disallowedPatches.push(patch);
         }
     }
 
-    if (disallowedPaths.size > 0) {
+    if (disallowedPatches.length > 0) {
         return {
             shouldApprove: false,
             reason: 'Manual review required: Changes to disallowed paths',
-            disallowedPaths,
+            disallowedPatches,
         };
     }
 
