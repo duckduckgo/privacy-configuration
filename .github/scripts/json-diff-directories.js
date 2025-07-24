@@ -168,21 +168,17 @@ function displayApprovalStatus(dir1Files, dir2Files, isOpen) {
     }
 
     // Aggregate overall approval analysis from individual file analyses
-    const overallApprovalAnalysis = {
-        shouldApprove: true,
-        reasons: [],
-    };
+    let approvalAnalysis = true;
 
     for (const analysis of Object.values(fileAnalysis)) {
         if (analysis.status !== 'approved') {
-            overallApprovalAnalysis.shouldApprove = false;
-            overallApprovalAnalysis.reasons.push(analysis.message);
+            approvalAnalysis = false;
         }
     }
 
     return {
         html: outString,
-        approvalAnalysis: overallApprovalAnalysis,
+        approvalAnalysis,
         fileAnalysis,
     };
 }
@@ -231,11 +227,7 @@ if (!fs.existsSync(`${dir1}/v${CURRENT_CONFIG_VERSION}`)) {
 sortFiles(readFilesRecursively(dir1), 'dir1');
 sortFiles(readFilesRecursively(dir2), 'dir2');
 
-// eslint-disable-next-line prefer-const
-let overallApprovalAnalysis = {
-    shouldApprove: true,
-    reasons: [],
-};
+let overallApprovalAnalysis = true;
 
 for (const [
     section,
@@ -245,9 +237,8 @@ for (const [
     const result = displayApprovalStatus(files.dir1 || {}, files.dir2 || {}, isOpen);
 
     // Update overall approval analysis
-    if (!result.approvalAnalysis.shouldApprove) {
-        overallApprovalAnalysis.shouldApprove = false;
-        overallApprovalAnalysis.reasons.push(result.approvalAnalysis.reason);
+    if (!result.approvalAnalysis) {
+        overallApprovalAnalysis = false;
     }
 
     // Only show non-'latest' sections if 'latest' is empty
@@ -258,4 +249,4 @@ for (const [
 
 // Output overall approval status
 console.log('\n## 🎯 OVERALL APPROVAL STATUS');
-console.log(`**${overallApprovalAnalysis.shouldApprove ? '✅ AUTO-APPROVED' : '❌ MANUAL REVIEW REQUIRED'}**`);
+console.log(`**${overallApprovalAnalysis ? '✅ AUTO-APPROVED' : '❌ MANUAL REVIEW REQUIRED'}**`);
