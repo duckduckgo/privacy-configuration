@@ -223,7 +223,7 @@ export function hasConditionalChanges(feature) {
 /**
  * Applies conditionalChanges patches to feature settings
  * @param {Object} feature - The feature object containing settings and conditionalChanges
- * @returns {Object} The feature settings after applying all conditionalChanges patches
+ * @returns {Object|false} The feature settings after applying all conditionalChanges patches, or false on error
  */
 export function applyConditionalChanges(feature) {
     if (!hasConditionalChanges(feature)) {
@@ -249,7 +249,7 @@ export function applyConditionalChanges(feature) {
 /**
  * Applies conditionalChanges patches to all features in a config object
  * @param {Object} config - The config object containing features
- * @returns {Object} The config object with all conditionalChanges patches applied
+ * @returns {Object|false} The config object with all conditionalChanges patches applied, or false on error
  */
 export function applyConditionalChangesToConfig(config) {
     if (!config?.features) {
@@ -264,7 +264,7 @@ export function applyConditionalChangesToConfig(config) {
     ] of Object.entries(patchedConfig.features)) {
         if (hasConditionalChanges(feature)) {
             const patchedSettings = applyConditionalChanges(feature);
-            if (!patchedSettings) {
+            if (patchedSettings === false) {
                 return false;
             }
             patchedConfig.features[featureName] = {
