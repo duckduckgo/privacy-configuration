@@ -241,8 +241,8 @@ for (const [
         overallApprovalAnalysis = false;
     }
 
-    // Only show non-'latest' sections if 'latest' is empty
-    if (isOpen || Object.keys(sections.latest).length === 0) {
+    // Only show non-'latest' sections if failing
+    if (isOpen || !result.approvalAnalysis) {
         console.log(renderDetails(section, result.html, isOpen));
     }
 }
