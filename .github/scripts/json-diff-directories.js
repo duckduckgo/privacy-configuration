@@ -19,7 +19,6 @@ const { compare } = pkg;
  * @returns {Object} Object with HTML-formatted output and approval analysis
  */
 function displayApprovalStatus(dir1Files, dir2Files, isOpen) {
-    const allPatches = [];
     const fileAnalysis = {};
 
     for (const [
@@ -58,8 +57,6 @@ function displayApprovalStatus(dir1Files, dir2Files, isOpen) {
                 // Compare the patched configs
                 const patches = compare(patchedJson1, patchedJson2);
 
-                allPatches.push(...patches);
-
                 if (patches.length === 0) {
                     // Skip files that are identical after munging and patching
                     delete dir2Files[filePath];
@@ -75,6 +72,7 @@ function displayApprovalStatus(dir1Files, dir2Files, isOpen) {
                     patches,
                     disallowedPatches: analysis.disallowedPatches || [],
                     summary,
+                    approvalAnalysis: analysis,
                 };
             } catch (error) {
                 fileAnalysis[filePath] = {
@@ -169,14 +167,22 @@ function displayApprovalStatus(dir1Files, dir2Files, isOpen) {
         });
     }
 
-    // Analyze overall approval
-    const analysis = analyzePatchesForApproval(allPatches);
-    const changeSummary = generateChangeSummary(allPatches);
+    // Aggregate overall approval analysis from individual file analyses
+    const overallApprovalAnalysis = {
+        shouldApprove: true,
+        reasons: [],
+    };
+
+    for (const analysis of Object.values(fileAnalysis)) {
+        if (analysis.status !== 'approved') {
+            overallApprovalAnalysis.shouldApprove = false;
+            overallApprovalAnalysis.reasons.push(analysis.message);
+        }
+    }
 
     return {
         html: outString,
-        approvalAnalysis: analysis,
-        changeSummary,
+        approvalAnalysis: overallApprovalAnalysis,
         fileAnalysis,
     };
 }

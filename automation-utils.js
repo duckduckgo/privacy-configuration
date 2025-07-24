@@ -169,18 +169,11 @@ export function analyzePatchesForApproval(patches) {
         }
     }
 
-    if (disallowedPatches.length > 0) {
-        return {
-            shouldApprove: false,
-            reason: 'Manual review required: Changes to disallowed paths',
-            disallowedPatches,
-        };
-    }
-
     // This case covers changes to non-auto-approvable features
     return {
         shouldApprove: false,
-        reason: 'Manual review required: Changes outside auto-approvable features',
+        reason: 'Manual review required: Changes to disallowed paths',
+        disallowedPatches,
     };
 }
 
