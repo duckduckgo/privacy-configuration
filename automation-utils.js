@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { immutableJSONPatch } from 'immutable-json-patch';
 
 /**
  * Auto-approvable features configuration
@@ -215,4 +216,70 @@ export function generateChangeSummary(patches) {
     });
 
     return summary;
+}
+
+/**
+ * Checks if a feature has conditionalChanges
+ * @param {Object} feature - The feature object to check
+ * @returns {boolean} True if the feature has conditionalChanges
+ */
+export function hasConditionalChanges(feature) {
+    return !!feature?.settings?.conditionalChanges;
+}
+
+/**
+ * Applies conditionalChanges patches to feature settings
+ * @param {Object} feature - The feature object containing settings and conditionalChanges
+ * @returns {Object} The feature settings after applying all conditionalChanges patches
+ */
+export function applyConditionalChanges(feature) {
+    if (!hasConditionalChanges(feature)) {
+        return feature.settings;
+    }
+
+    let patchedSettings = feature.settings;
+
+    for (const change of feature.settings.conditionalChanges) {
+        if (change.patchSettings) {
+            try {
+                patchedSettings = immutableJSONPatch(patchedSettings, change.patchSettings);
+            } catch (error) {
+                console.warn(`Failed to apply conditionalChanges patch: ${error.message}`);
+                return false;
+            }
+        }
+    }
+
+    return patchedSettings;
+}
+
+/**
+ * Applies conditionalChanges patches to all features in a config object
+ * @param {Object} config - The config object containing features
+ * @returns {Object} The config object with all conditionalChanges patches applied
+ */
+export function applyConditionalChangesToConfig(config) {
+    if (!config?.features) {
+        return config;
+    }
+
+    const patchedConfig = JSON.parse(JSON.stringify(config));
+
+    for (const [
+        featureName,
+        feature,
+    ] of Object.entries(patchedConfig.features)) {
+        if (hasConditionalChanges(feature)) {
+            const patchedSettings = applyConditionalChanges(feature);
+            if (!patchedSettings) {
+                return false;
+            }
+            patchedConfig.features[featureName] = {
+                ...feature,
+                settings: patchedSettings,
+            };
+        }
+    }
+
+    return patchedConfig;
 }

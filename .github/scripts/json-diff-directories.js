@@ -1,7 +1,13 @@
 import fs from 'fs';
 import pkg from 'fast-json-patch';
 import { CURRENT_CONFIG_VERSION } from '../../constants.js';
-import { readFilesRecursively, mungeFileContents, analyzePatchesForApproval, generateChangeSummary } from '../../automation-utils.js';
+import {
+    readFilesRecursively,
+    mungeFileContents,
+    analyzePatchesForApproval,
+    generateChangeSummary,
+    applyConditionalChangesToConfig,
+} from '../../automation-utils.js';
 
 const { compare } = pkg;
 
@@ -33,12 +39,29 @@ function displayApprovalStatus(dir1Files, dir2Files, isOpen) {
             try {
                 const json1 = JSON.parse(fileOut);
                 const json2 = JSON.parse(file2Out);
-                const patches = compare(json1, json2);
+
+                // Apply all conditionalChanges patches to both configs if they have features
+                const patchedJson1 = applyConditionalChangesToConfig(json1);
+                const patchedJson2 = applyConditionalChangesToConfig(json2);
+
+                if (!patchedJson1 || !patchedJson2) {
+                    // This might happen if the conditionalChanges collide with each other
+                    // We may need to handle this case better if it happens.
+                    // For now the safe thing is to just fail.
+                    fileAnalysis[filePath] = {
+                        status: 'error',
+                        message: '❌ Conditional changes patch failed',
+                    };
+                    continue;
+                }
+
+                // Compare the patched configs
+                const patches = compare(patchedJson1, patchedJson2);
 
                 allPatches.push(...patches);
 
                 if (patches.length === 0) {
-                    // Skip files that are identical after munging
+                    // Skip files that are identical after munging and patching
                     delete dir2Files[filePath];
                     continue;
                 }
