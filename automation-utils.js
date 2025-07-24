@@ -141,7 +141,7 @@ export function isAllowedChangesOnly(patches) {
  * Analyzes patches to determine if they should be auto-approved
  * @param {Array} patches - Array of JSON patches from fast-json-patch
  * @returns {Object} Analysis result with approval status and reasoning
-  */
+ */
 export function analyzePatchesForApproval(patches) {
     if (patches.length === 0) {
         return {
