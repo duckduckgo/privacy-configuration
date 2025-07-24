@@ -6,8 +6,7 @@ import {
     mungeFileContents,
     analyzePatchesForApproval,
     generateChangeSummary,
-    AUTO_APPROVABLE_FEATURES,
-    isPathAllowedForFeature,
+    applyConditionalChangesToConfig,
 } from '../../automation-utils.js';
 
 const { compare } = pkg;
@@ -20,7 +19,6 @@ const { compare } = pkg;
  * @returns {Object} Object with HTML-formatted output and approval analysis
  */
 function displayApprovalStatus(dir1Files, dir2Files, isOpen) {
-    const allPatches = [];
     const fileAnalysis = {};
 
     for (const [
@@ -40,12 +38,27 @@ function displayApprovalStatus(dir1Files, dir2Files, isOpen) {
             try {
                 const json1 = JSON.parse(fileOut);
                 const json2 = JSON.parse(file2Out);
-                const patches = compare(json1, json2);
 
-                allPatches.push(...patches);
+                // Apply all conditionalChanges patches to both configs if they have features
+                const patchedJson1 = applyConditionalChangesToConfig(json1);
+                const patchedJson2 = applyConditionalChangesToConfig(json2);
+
+                if (!patchedJson1 || !patchedJson2) {
+                    // This might happen if the conditionalChanges collide with each other
+                    // We may need to handle this case better if it happens.
+                    // For now the safe thing is to just fail.
+                    fileAnalysis[filePath] = {
+                        status: 'error',
+                        message: '❌ Conditional changes patch failed',
+                    };
+                    continue;
+                }
+
+                // Compare the patched configs
+                const patches = compare(patchedJson1, patchedJson2);
 
                 if (patches.length === 0) {
-                    // Skip files that are identical after munging
+                    // Skip files that are identical after munging and patching
                     delete dir2Files[filePath];
                     continue;
                 }
@@ -53,23 +66,13 @@ function displayApprovalStatus(dir1Files, dir2Files, isOpen) {
                 const analysis = analyzePatchesForApproval(patches);
                 const summary = generateChangeSummary(patches);
 
-                // Extract disallowed paths for manual review
-                const disallowedPaths = patches.filter((patch) => {
-                    // Use the same logic as analyzePatchesForApproval for consistency
-                    const featurePath = Object.keys(AUTO_APPROVABLE_FEATURES).find((feature) => patch.path.startsWith(feature));
-
-                    if (featurePath) {
-                        return !isPathAllowedForFeature(patch.path, featurePath);
-                    }
-                    return true; // Any non-auto-approvable feature changes are disallowed
-                });
-
                 fileAnalysis[filePath] = {
                     status: analysis.shouldApprove ? 'approved' : 'manual_review',
                     message: analysis.shouldApprove ? '✅ Auto-approved' : '❌ Manual review required',
                     patches,
-                    disallowedPaths,
+                    disallowedPatches: analysis.disallowedPatches || [],
                     summary,
+                    approvalAnalysis: analysis,
                 };
             } catch (error) {
                 fileAnalysis[filePath] = {
@@ -124,19 +127,18 @@ function displayApprovalStatus(dir1Files, dir2Files, isOpen) {
     // Manual review files
     if (groupedFiles.manual_review.length > 0) {
         outString += '\n## ❌ Manual Review Required\n';
-        groupedFiles.manual_review.forEach(({ filePath, disallowedPaths, summary }) => {
+        groupedFiles.manual_review.forEach(({ filePath, disallowedPatches, summary }) => {
             outString += `- **${filePath}** (${summary.total} total changes)\n`;
 
-            if (disallowedPaths.length > 0) {
+            if (disallowedPatches.length > 0) {
                 outString += '  **Disallowed paths that require review:**\n';
-                disallowedPaths.forEach((patch) => {
-                    const pathDisplay = patch.path.replace(/\//g, '.').replace(/^\./, '');
-                    outString += `  - \`${pathDisplay}\` (${patch.op})\n`;
+                disallowedPatches.forEach((patch) => {
+                    outString += `  - \`${patch.path}\` (${patch.op})\n`;
                 });
             }
 
             // Show allowed changes count
-            const allowedChanges = summary.total - disallowedPaths.length;
+            const allowedChanges = summary.total - disallowedPatches.length;
             if (allowedChanges > 0) {
                 outString += `  *${allowedChanges} auto-approvable changes*\n`;
             }
@@ -165,14 +167,18 @@ function displayApprovalStatus(dir1Files, dir2Files, isOpen) {
         });
     }
 
-    // Analyze overall approval
-    const analysis = analyzePatchesForApproval(allPatches);
-    const changeSummary = generateChangeSummary(allPatches);
+    // Aggregate overall approval analysis from individual file analyses
+    let approvalAnalysis = true;
+
+    for (const analysis of Object.values(fileAnalysis)) {
+        if (analysis.status !== 'approved') {
+            approvalAnalysis = false;
+        }
+    }
 
     return {
         html: outString,
-        approvalAnalysis: analysis,
-        changeSummary,
+        approvalAnalysis,
         fileAnalysis,
     };
 }
@@ -221,11 +227,7 @@ if (!fs.existsSync(`${dir1}/v${CURRENT_CONFIG_VERSION}`)) {
 sortFiles(readFilesRecursively(dir1), 'dir1');
 sortFiles(readFilesRecursively(dir2), 'dir2');
 
-// eslint-disable-next-line prefer-const
-let overallApprovalAnalysis = {
-    shouldApprove: true,
-    reasons: [],
-};
+let overallApprovalAnalysis = true;
 
 for (const [
     section,
@@ -235,21 +237,16 @@ for (const [
     const result = displayApprovalStatus(files.dir1 || {}, files.dir2 || {}, isOpen);
 
     // Update overall approval analysis
-    if (!result.approvalAnalysis.shouldApprove) {
-        overallApprovalAnalysis.shouldApprove = false;
-        overallApprovalAnalysis.reasons.push(result.approvalAnalysis.reason);
+    if (!result.approvalAnalysis) {
+        overallApprovalAnalysis = false;
     }
 
-    console.log(renderDetails(section, result.html, isOpen));
+    // Only show non-'latest' sections if failing
+    if (isOpen || !result.approvalAnalysis) {
+        console.log(renderDetails(section, result.html, isOpen));
+    }
 }
 
 // Output overall approval status
 console.log('\n## 🎯 OVERALL APPROVAL STATUS');
-console.log(`**${overallApprovalAnalysis.shouldApprove ? '✅ AUTO-APPROVED' : '❌ MANUAL REVIEW REQUIRED'}**`);
-
-if (overallApprovalAnalysis.reasons.length > 0) {
-    console.log('\n**Reasons for manual review:**');
-    overallApprovalAnalysis.reasons.forEach((reason) => {
-        console.log(`- ${reason}`);
-    });
-}
+console.log(`**${overallApprovalAnalysis ? '✅ AUTO-APPROVED' : '❌ MANUAL REVIEW REQUIRED'}**`);

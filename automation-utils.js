@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { immutableJSONPatch } from 'immutable-json-patch';
 
 /**
  * Auto-approvable features configuration
@@ -159,27 +160,20 @@ export function analyzePatchesForApproval(patches) {
     }
 
     // Check if any changes are outside allowed paths
-    const disallowedPaths = patches.filter((patch) => {
-        // Find which auto-approvable feature this patch belongs to
+    const disallowedPatches = [];
+    for (const patch of patches) {
         const featurePath = AUTO_APPROVABLE_FEATURE_PATHS.find((feature) => patch.path.startsWith(feature));
-
-        if (featurePath) {
-            return !isPathAllowedForFeature(patch.path, featurePath);
+        const isDisallowed = featurePath ? !isPathAllowedForFeature(patch.path, featurePath) : true;
+        if (isDisallowed) {
+            disallowedPatches.push(patch);
         }
-        return true; // Any non-auto-approvable feature changes are disallowed
-    });
-
-    if (disallowedPaths.length > 0) {
-        return {
-            shouldApprove: false,
-            reason: `Manual review required: Changes to disallowed paths: ${disallowedPaths.map((p) => p.path).join(', ')}`,
-        };
     }
 
     // This case covers changes to non-auto-approvable features
     return {
         shouldApprove: false,
-        reason: 'Manual review required: Changes outside auto-approvable features',
+        reason: 'Manual review required: Changes to disallowed paths',
+        disallowedPatches,
     };
 }
 
@@ -215,4 +209,70 @@ export function generateChangeSummary(patches) {
     });
 
     return summary;
+}
+
+/**
+ * Checks if a feature has conditionalChanges
+ * @param {Object} feature - The feature object to check
+ * @returns {boolean} True if the feature has conditionalChanges
+ */
+export function hasConditionalChanges(feature) {
+    return !!feature?.settings?.conditionalChanges;
+}
+
+/**
+ * Applies conditionalChanges patches to feature settings
+ * @param {Object} feature - The feature object containing settings and conditionalChanges
+ * @returns {Object|false} The feature settings after applying all conditionalChanges patches, or false on error
+ */
+export function applyConditionalChanges(feature) {
+    if (!hasConditionalChanges(feature)) {
+        return feature.settings;
+    }
+
+    let patchedSettings = feature.settings;
+
+    for (const change of feature.settings.conditionalChanges) {
+        if (change.patchSettings) {
+            try {
+                patchedSettings = immutableJSONPatch(patchedSettings, change.patchSettings);
+            } catch (error) {
+                console.warn(`Failed to apply conditionalChanges patch: ${error.message}`);
+                return false;
+            }
+        }
+    }
+
+    return patchedSettings;
+}
+
+/**
+ * Applies conditionalChanges patches to all features in a config object
+ * @param {Object} config - The config object containing features
+ * @returns {Object|false} The config object with all conditionalChanges patches applied, or false on error
+ */
+export function applyConditionalChangesToConfig(config) {
+    if (!config?.features) {
+        return config;
+    }
+
+    const patchedConfig = JSON.parse(JSON.stringify(config));
+
+    for (const [
+        featureName,
+        feature,
+    ] of Object.entries(patchedConfig.features)) {
+        if (hasConditionalChanges(feature)) {
+            const patchedSettings = applyConditionalChanges(feature);
+            if (patchedSettings === false) {
+                return false;
+            }
+            patchedConfig.features[featureName] = {
+                ...feature,
+                settings: patchedSettings,
+            };
+        }
+    }
+
+    return patchedConfig;
 }
