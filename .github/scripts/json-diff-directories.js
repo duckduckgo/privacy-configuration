@@ -240,16 +240,21 @@ for (const [
         overallApprovalAnalysis.reasons.push(result.approvalAnalysis.reason);
     }
 
-    console.log(renderDetails(section, result.html, isOpen));
+    // Only show non-'latest' sections if 'latest' is empty
+    if (isOpen || Object.keys(sections.latest).length === 0) {
+        console.log(renderDetails(section, result.html, isOpen));
+    }
 }
 
 // Output overall approval status
 console.log('\n## 🎯 OVERALL APPROVAL STATUS');
 console.log(`**${overallApprovalAnalysis.shouldApprove ? '✅ AUTO-APPROVED' : '❌ MANUAL REVIEW REQUIRED'}**`);
 
+/* Skip for now duplicated
 if (overallApprovalAnalysis.reasons.length > 0) {
     console.log('\n**Reasons for manual review:**');
     overallApprovalAnalysis.reasons.forEach((reason) => {
         console.log(`- ${reason}`);
     });
 }
+*/

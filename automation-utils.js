@@ -141,7 +141,7 @@ export function isAllowedChangesOnly(patches) {
  * Analyzes patches to determine if they should be auto-approved
  * @param {Array} patches - Array of JSON patches from fast-json-patch
  * @returns {Object} Analysis result with approval status and reasoning
- */
+  */
 export function analyzePatchesForApproval(patches) {
     if (patches.length === 0) {
         return {
@@ -159,20 +159,20 @@ export function analyzePatchesForApproval(patches) {
     }
 
     // Check if any changes are outside allowed paths
-    const disallowedPaths = patches.filter((patch) => {
-        // Find which auto-approvable feature this patch belongs to
+    const disallowedPaths = new Set();
+    for (const patch of patches) {
         const featurePath = AUTO_APPROVABLE_FEATURE_PATHS.find((feature) => patch.path.startsWith(feature));
-
-        if (featurePath) {
-            return !isPathAllowedForFeature(patch.path, featurePath);
+        const isDisallowed = featurePath ? !isPathAllowedForFeature(patch.path, featurePath) : true;
+        if (isDisallowed) {
+            disallowedPaths.add(patch.path);
         }
-        return true; // Any non-auto-approvable feature changes are disallowed
-    });
+    }
 
-    if (disallowedPaths.length > 0) {
+    if (disallowedPaths.size > 0) {
         return {
             shouldApprove: false,
-            reason: `Manual review required: Changes to disallowed paths: ${disallowedPaths.map((p) => p.path).join(', ')}`,
+            reason: 'Manual review required: Changes to disallowed paths',
+            disallowedPaths,
         };
     }
 
