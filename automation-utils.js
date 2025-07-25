@@ -18,6 +18,18 @@ export const AUTO_APPROVABLE_FEATURES = {
     '/features/fingerprintingHardware': ['/exceptions'],
     '/features/fingerprintingScreenSize': ['/exceptions'],
     '/features/trackerAllowlist': ['/settings/allowlistedTrackers'],
+    '/features/gpc': ['/exceptions'],
+    '/features/webCompat': ['/exceptions'],
+    '/features/clickToLoad': ['/exceptions'],
+    '/features/eme': ['/exceptions'],
+    '/features/autoconsent': ['/exceptions'],
+    '/features/customUserAgent': [
+        '/exceptions',
+        '/settings/ddgFixedSites',
+        '/settings/omitApplicationSites',
+        '/settings/defaultSites',
+    ],
+    '/features/mediaPlaybackRequiresUserGesture': ['/exceptions'],
 };
 
 /**
