@@ -45,32 +45,87 @@ function stableJsonStringify(obj) {
 function alignObjectStructure(base, update) {
     const alignedBase = {};
     const alignedUpdate = {};
+
     const baseKeys = Object.keys(base);
     const updateKeys = Object.keys(update);
-    const seen = new Set();
+    const updateKeySet = new Set(updateKeys);
 
-    // Keep keys from base first, in order
+    const unchanged = [];
+    const replaced = [];
+    const added = [];
+    const removed = [];
+
     for (const key of baseKeys) {
-        if (key in update) {
+        if (updateKeySet.has(key)) {
             const [
-                b,
-                u,
+                bVal,
+                uVal,
             ] = alignJsonStructure(base[key], update[key]);
-            alignedBase[key] = b;
-            alignedUpdate[key] = u;
-            seen.add(key);
+            const isSame = JSON.stringify(bVal) === JSON.stringify(uVal);
+            if (isSame) {
+                unchanged.push([
+                    key,
+                    bVal,
+                    uVal,
+                ]);
+            } else {
+                replaced.push([
+                    key,
+                    bVal,
+                    uVal,
+                ]);
+            }
+        } else {
+            removed.push([
+                key,
+                base[key],
+            ]);
         }
     }
 
-    // Add remaining keys from update, sorted
-    const extraKeys = updateKeys.filter((k) => !seen.has(k)).sort();
-    for (const key of extraKeys) {
-        const [
-            // eslint-disable-next-line no-unused-vars
-            _,
-            u,
-        ] = alignJsonStructure(undefined, update[key]);
+    for (const key of updateKeys) {
+        if (!(key in base)) {
+            added.push([
+                key,
+                update[key],
+            ]);
+        }
+    }
+
+    // 1. Unchanged (preserve base order)
+    for (const [
+        key,
+        b,
+        u,
+    ] of unchanged) {
+        alignedBase[key] = b;
         alignedUpdate[key] = u;
+    }
+
+    // 2. Replaced (sorted)
+    for (const [
+        key,
+        b,
+        u,
+    ] of replaced.sort((a, b) => a[0].localeCompare(b[0]))) {
+        alignedBase[key] = b;
+        alignedUpdate[key] = u;
+    }
+
+    // 3. Added (sorted)
+    for (const [
+        key,
+        u,
+    ] of added.sort((a, b) => a[0].localeCompare(b[0]))) {
+        alignedUpdate[key] = u;
+    }
+
+    // 4. Removed (sorted at end of base)
+    for (const [
+        key,
+        b,
+    ] of removed.sort((a, b) => a[0].localeCompare(b[0]))) {
+        alignedBase[key] = b;
     }
 
     return [
