@@ -11,6 +11,242 @@ import {
 
 const { compare } = pkg;
 
+// Sorting utilities from compare-branches-sorted.js
+function isObject(x) {
+    return x && typeof x === 'object' && !Array.isArray(x);
+}
+
+/**
+ * Stringifies a JSON object in a stable order, preserving array order and object key order.
+ *
+ * @param {*} obj - The JSON object to stringify.
+ * @returns {string} - The stringified JSON object.
+ */
+function stableJsonStringify(obj) {
+    if (Array.isArray(obj)) {
+        return `[${obj.map(stableJsonStringify).join(',')}]`;
+    } else if (isObject(obj)) {
+        const keys = Object.keys(obj).sort();
+        return `{${keys.map((k) => `"${k}":${stableJsonStringify(obj[k])}`).join(',')}}`;
+    }
+    return JSON.stringify(obj);
+}
+
+/**
+ * Aligns the structure of two objects for diffing.
+ *
+ * Preserves the key order from the base object, aligning values from both base and update.
+ * Any extra keys present only in the update object are appended in sorted order.
+ *
+ * @param {Object} base - The base object to align from.
+ * @param {Object} update - The updated object to align to.
+ * @returns {[Object, Object]} - Tuple of aligned base and update objects.
+ */
+function alignObjectStructure(base, update) {
+    const alignedBase = {};
+    const alignedUpdate = {};
+
+    const baseKeys = Object.keys(base);
+    const updateKeys = Object.keys(update);
+    const updateKeySet = new Set(updateKeys);
+
+    const unchanged = [];
+    const replaced = [];
+    const added = [];
+    const removed = [];
+
+    for (const key of baseKeys) {
+        if (updateKeySet.has(key)) {
+            const [
+                bVal,
+                uVal,
+            ] = alignJsonStructure(base[key], update[key]);
+            const isSame = JSON.stringify(bVal) === JSON.stringify(uVal);
+            if (isSame) {
+                unchanged.push([
+                    key,
+                    bVal,
+                    uVal,
+                ]);
+            } else {
+                replaced.push([
+                    key,
+                    bVal,
+                    uVal,
+                ]);
+            }
+        } else {
+            removed.push([
+                key,
+                base[key],
+            ]);
+        }
+    }
+
+    for (const key of updateKeys) {
+        if (!(key in base)) {
+            added.push([
+                key,
+                update[key],
+            ]);
+        }
+    }
+
+    // 1. Unchanged (preserve base order)
+    for (const [
+        key,
+        b,
+        u,
+    ] of unchanged) {
+        alignedBase[key] = b;
+        alignedUpdate[key] = u;
+    }
+
+    // 2. Replaced (sorted)
+    for (const [
+        key,
+        b,
+        u,
+    ] of replaced.sort((a, b) => a[0].localeCompare(b[0]))) {
+        alignedBase[key] = b;
+        alignedUpdate[key] = u;
+    }
+
+    // 3. Added (sorted)
+    for (const [
+        key,
+        u,
+    ] of added.sort((a, b) => a[0].localeCompare(b[0]))) {
+        alignedUpdate[key] = u;
+    }
+
+    // 4. Removed (sorted at end of base)
+    for (const [
+        key,
+        b,
+    ] of removed.sort((a, b) => a[0].localeCompare(b[0]))) {
+        alignedBase[key] = b;
+    }
+
+    return [
+        alignedBase,
+        alignedUpdate,
+    ];
+}
+
+/**
+ * Aligns two arrays by matching items using a stable JSON hash, preserving base context.
+ * Uses a simplified form of LCS (Longest Common Subsequence)
+ * LCS finds the longest sequence of items that appear in the same order in both arrays, not necessarily contiguously.
+ * Here, we use hashes to identify matching objects and align them, which helps make diffs more readable by grouping similar objects together.
+ *
+ * @param {Array} baseArr - The base array to align from.
+ * @param {Array} updateArr - The updated array to align to.
+ * @returns {[Array, Array]} - Tuple of aligned base and update arrays.
+ */
+function alignArrayByLCSWithBaseContext(baseArr, updateArr) {
+    const baseHashes = baseArr.map(stableJsonStringify);
+    const updateHashes = updateArr.map(stableJsonStringify);
+
+    const common = baseHashes.filter((h) => updateHashes.includes(h));
+    const dedupedCommon = [...new Set(common)];
+
+    const seenUpdateHashes = new Set();
+
+    const alignedBase = [];
+    const alignedUpdate = [];
+
+    // First pass: handle all base items, matching with update items where possible
+    for (let i = 0; i < baseArr.length; i++) {
+        const baseItem = baseArr[i];
+        const baseHash = baseHashes[i];
+
+        if (dedupedCommon.includes(baseHash)) {
+            // Try to find a matching update item that hasn't been used yet
+            const updateIndex = updateHashes.findIndex((h, idx) => h === baseHash && !seenUpdateHashes.has(idx));
+            if (updateIndex !== -1) {
+                // Matched: add both base and update items
+                alignedBase.push(baseItem);
+                alignedUpdate.push(updateArr[updateIndex]);
+                seenUpdateHashes.add(updateIndex);
+            } else {
+                // No matching update item available (duplicate in base): add base with undefined update
+                alignedBase.push(baseItem);
+                alignedUpdate.push(undefined);
+            }
+        } else {
+            // Base item not in update: add base with undefined update (removed item)
+            alignedBase.push(baseItem);
+            alignedUpdate.push(undefined);
+        }
+    }
+
+    // Second pass: append remaining update items that weren't matched (added items)
+    for (let i = 0; i < updateArr.length; i++) {
+        if (!seenUpdateHashes.has(i)) {
+            alignedBase.push(undefined);
+            alignedUpdate.push(updateArr[i]);
+        }
+    }
+
+    return [
+        alignedBase,
+        alignedUpdate,
+    ];
+}
+
+/**
+ * Recursively aligns the structure of two JSON values (objects, arrays, or primitives)
+ * to facilitate meaningful diffing. Arrays are aligned using LCS-based matching,
+ * objects are aligned by keys, and primitives are returned as-is.
+ *
+ * @param {*} base - The base JSON value to align from.
+ * @param {*} update - The updated JSON value to align to.
+ * @returns {[*, *]} - Tuple of aligned base and update values.
+ */
+function alignJsonStructure(base, update) {
+    if (Array.isArray(update)) {
+        if (Array.isArray(base)) {
+            const [
+                alignedBaseArr,
+                alignedUpdateArr,
+            ] = alignArrayByLCSWithBaseContext(base, update);
+            const alignedBase = [];
+            const alignedUpdate = [];
+
+            for (let i = 0; i < alignedUpdateArr.length; i++) {
+                const [
+                    b,
+                    u,
+                ] = alignJsonStructure(alignedBaseArr[i], alignedUpdateArr[i]);
+                alignedBase.push(b);
+                alignedUpdate.push(u);
+            }
+
+            return [
+                alignedBase,
+                alignedUpdate,
+            ];
+        } else {
+            // No matching base array: return update as-is
+            return [
+                [],
+                update,
+            ];
+        }
+    }
+
+    if (isObject(update)) {
+        return alignObjectStructure(base || {}, update);
+    }
+
+    // primitive
+    return [
+        base,
+        update,
+    ];
+}
+
 /**
  * Compares two directories and outputs approval status for changed files
  * @param {string} dir1 - First directory path
@@ -54,8 +290,14 @@ function displayApprovalStatus(dir1Files, dir2Files, isOpen) {
                     continue;
                 }
 
-                // Compare the patched configs
-                const patches = compare(patchedJson1, patchedJson2);
+                // Align structure of both objects for stable comparison
+                const [
+                    sortedJson1,
+                    sortedJson2,
+                ] = alignJsonStructure(patchedJson1, patchedJson2);
+
+                // Compare the aligned configs
+                const patches = compare(sortedJson1, sortedJson2);
 
                 if (patches.length === 0) {
                     // Skip files that are identical after munging and patching
