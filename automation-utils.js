@@ -39,11 +39,6 @@ export function isPathAllowedForFeature(patchPath, featurePath) {
 
     // Use exact path matching or path starts with allowed path
     return allowedPaths.some((allowedPath) => {
-        // Exact match
-        if (patchPath === featurePath + allowedPath) {
-            return true;
-        }
-
         const fullAllowedPath = featurePath + allowedPath;
         if (patchPath === fullAllowedPath || patchPath.startsWith(fullAllowedPath + '/')) {
             return true;
