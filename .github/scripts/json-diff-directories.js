@@ -11,6 +11,140 @@ import {
 
 const { compare } = pkg;
 
+// Sorting utilities from compare-branches-sorted.js
+function isObject(x) {
+    return x && typeof x === 'object' && !Array.isArray(x);
+}
+
+function stableJsonStringify(obj) {
+    if (Array.isArray(obj)) {
+        return `[${obj.map(stableJsonStringify).join(',')}]`;
+    } else if (isObject(obj)) {
+        const keys = Object.keys(obj).sort();
+        return `{${keys.map((k) => `"${k}":${stableJsonStringify(obj[k])}`).join(',')}`;
+    }
+    return JSON.stringify(obj);
+}
+
+function alignObjectStructure(base, update) {
+    const alignedBase = {};
+    const alignedUpdate = {};
+    const baseKeys = Object.keys(base);
+    const updateKeys = Object.keys(update);
+    const seen = new Set();
+
+    // Keep keys from base first, in order
+    for (const key of baseKeys) {
+        if (key in update) {
+            const [
+                b,
+                u,
+            ] = alignJsonStructure(base[key], update[key]);
+            alignedBase[key] = b;
+            alignedUpdate[key] = u;
+            seen.add(key);
+        }
+    }
+
+    // Add remaining keys from update, sorted
+    const extraKeys = updateKeys.filter((k) => !seen.has(k)).sort();
+    for (const key of extraKeys) {
+        // eslint-disable-next-line no-unused-vars
+        const [
+            _,
+            u,
+        ] = alignJsonStructure(undefined, update[key]);
+        alignedUpdate[key] = u;
+    }
+
+    return [
+        alignedBase,
+        alignedUpdate,
+    ];
+}
+
+function alignArrayByLCSWithBaseContext(baseArr, updateArr) {
+    const baseHashes = baseArr.map(stableJsonStringify);
+    const updateHashes = updateArr.map(stableJsonStringify);
+
+    const common = baseHashes.filter((h) => updateHashes.includes(h));
+    const dedupedCommon = [...new Set(common)];
+
+    const seenUpdateHashes = new Set();
+
+    const alignedBase = [];
+    const alignedUpdate = [];
+
+    for (let i = 0; i < baseArr.length; i++) {
+        const baseItem = baseArr[i];
+        const baseHash = baseHashes[i];
+        if (dedupedCommon.includes(baseHash)) {
+            const updateIndex = updateHashes.findIndex((h, idx) => h === baseHash && !seenUpdateHashes.has(idx));
+            if (updateIndex !== -1) {
+                alignedBase.push(baseItem);
+                alignedUpdate.push(updateArr[updateIndex]);
+                seenUpdateHashes.add(updateIndex);
+            }
+        }
+    }
+
+    // Append remaining items from update that were not matched
+    for (let i = 0; i < updateArr.length; i++) {
+        if (!seenUpdateHashes.has(i)) {
+            alignedBase.push(undefined);
+            alignedUpdate.push(updateArr[i]);
+        }
+    }
+
+    return [
+        alignedBase,
+        alignedUpdate,
+    ];
+}
+
+function alignJsonStructure(base, update) {
+    if (Array.isArray(update)) {
+        if (Array.isArray(base)) {
+            const [
+                alignedBaseArr,
+                alignedUpdateArr,
+            ] = alignArrayByLCSWithBaseContext(base, update);
+            const alignedBase = [];
+            const alignedUpdate = [];
+
+            for (let i = 0; i < alignedUpdateArr.length; i++) {
+                const [
+                    b,
+                    u,
+                ] = alignJsonStructure(alignedBaseArr[i], alignedUpdateArr[i]);
+                alignedBase.push(b);
+                alignedUpdate.push(u);
+            }
+
+            return [
+                alignedBase,
+                alignedUpdate,
+            ];
+        } else {
+            // No matching base array: return update as-is
+            return [
+                [],
+                update,
+            ];
+        }
+    }
+
+    if (isObject(update)) {
+        return alignObjectStructure(base || {}, update);
+    }
+
+    // primitive
+    return [
+        base,
+        update,
+    ];
+}
+
 /**
  * Compares two directories and outputs approval status for changed files
  * @param {string} dir1 - First directory path
@@ -54,8 +188,14 @@ function displayApprovalStatus(dir1Files, dir2Files, isOpen) {
                     continue;
                 }
 
-                // Compare the patched configs
-                const patches = compare(patchedJson1, patchedJson2);
+                // Align structure of both objects for stable comparison
+                const [
+                    sortedJson1,
+                    sortedJson2,
+                ] = alignJsonStructure(patchedJson1, patchedJson2);
+
+                // Compare the aligned configs
+                const patches = compare(sortedJson1, sortedJson2);
 
                 if (patches.length === 0) {
                     // Skip files that are identical after munging and patching

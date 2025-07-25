@@ -17,6 +17,7 @@ export const AUTO_APPROVABLE_FEATURES = {
     '/features/fingerprintingCanvas': ['/exceptions'],
     '/features/fingerprintingHardware': ['/exceptions'],
     '/features/fingerprintingScreenSize': ['/exceptions'],
+    '/features/trackerAllowlist': ['/settings/allowlistedTrackers'],
 };
 
 /**
@@ -43,25 +44,9 @@ export function isPathAllowedForFeature(patchPath, featurePath) {
             return true;
         }
 
-        // Path starts with feature + allowed path (for nested properties)
-        // Allow array indices and nested properties within the allowed paths
         const fullAllowedPath = featurePath + allowedPath;
-        if (patchPath.startsWith(fullAllowedPath + '/')) {
-            // Check if the next part is an array index (number)
-            const remainingPath = patchPath.substring(fullAllowedPath.length + 1);
-            const pathParts = remainingPath.split('/');
-
-            // Allow array indices and nested properties within array elements
-            // This allows:
-            // - /features/elementHiding/settings/domains/0 (array index)
-            // - /features/elementHiding/settings/domains/0/domain (nested property within array element)
-            // - /features/elementHiding/settings/domains/0/rules/0 (nested array within array element)
-            // But not: /features/elementHiding/settings/rules/0 (different allowed path)
-
-            // First part must be an array index
-            if (pathParts.length >= 1 && /^\d+$/.test(pathParts[0])) {
-                return true;
-            }
+        if (patchPath === fullAllowedPath || patchPath.startsWith(fullAllowedPath + '/')) {
+            return true;
         }
         return false;
     });
