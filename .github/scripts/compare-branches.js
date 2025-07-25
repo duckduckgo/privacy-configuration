@@ -45,7 +45,7 @@ function compareBranches(branch1, branch2, cleanup = true) {
         // Build branch1
         console.log(`\n📦 Building ${branch1}...`);
         execSync('npm run build', { stdio: 'inherit', cwd: branch1Dir });
-        
+
         // Copy generated files from branch1 if they exist
         const branch1GeneratedPath = path.join(branch1Dir, 'generated');
         if (fs.existsSync(branch1GeneratedPath)) {
@@ -62,7 +62,7 @@ function compareBranches(branch1, branch2, cleanup = true) {
         // Build branch2
         console.log(`\n📦 Building ${branch2}...`);
         execSync('npm run build', { stdio: 'inherit', cwd: branch2Dir });
-        
+
         // Copy generated files from branch2 if they exist
         const branch2GeneratedPath = path.join(branch2Dir, 'generated');
         if (fs.existsSync(branch2GeneratedPath)) {
