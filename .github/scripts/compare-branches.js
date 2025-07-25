@@ -18,7 +18,6 @@ function compareBranches(branch1, branch2, cleanup = true) {
     const branch2GeneratedDir = path.join(tempDir, `${branch2.replace(/\//g, '-')}-generated`);
 
     console.log(`Comparing branches: ${branch1} vs ${branch2}`);
-    console.log('=' * 50);
 
     try {
         // Create temp directories
