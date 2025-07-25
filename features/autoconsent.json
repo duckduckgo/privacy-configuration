@@ -1049,8 +1049,8 @@
                 ".show-cookies-modal .cookies-modal #cookies-accept",
                 ".show-cookies-modal .cookies-modal #cookies-reject",
                 "a[href^=\"https://policies.google.com/technologies/cookies\"",
-                "form[action^=\"https://consent.google.\"][action$=\"/save\"]",
-                "form[action^=\"https://consent.google.\"][action$=\"/save\"]:has(input[name=set_eom][value=true]) button",
+                "form[action^=\"https://consent.google.\"][action$=\"/save\"],form[action^=\"https://consent.youtube.\"][action$=\"/save\"]",
+                "form[action^=\"https://consent.google.\"][action$=\"/save\"]:has(input[name=set_eom][value=true]) button,form[action^=\"https://consent.youtube.\"][action$=\"/save\"]:has(input[name=set_eom][value=true]) button",
                 ".glue-cookie-notification-bar",
                 ".glue-cookie-notification-bar__reject",
                 ".HTjtHe#xe7COe",
@@ -1216,7 +1216,7 @@
                 "[data-testid=cookie-dialog-root]",
                 "input[type=radio][id$=-declineLabel]",
                 "[data-testid=confirm-choice-button]",
-                "#ccm_notification_host",
+                "ccm-notification",
                 ".button--notice",
                 ".notice--cookie",
                 ".nrk-masthead__info-banner--cookie",
@@ -2237,7 +2237,10 @@
                 "body:not([id]) > div:not([id]) > div:not([id]) > div#ch2-dialog > div:nth-child(2):not([id]) > button:nth-child(1):not([id])",
                 "body:not([id]) > div:not([id]) > div:nth-child(2):not([id]) > button:nth-child(1)#privacy-reject",
                 "body:not([id]) > div:not([id]) > div:not([id]) > div:not([id]) > div:not([id]) > div:not([id]) > div:not([id]) > div:nth-child(3):not([id]) > div:nth-child(2):not([id]) > div:not([id]) > div:nth-child(1):not([id]) > div:nth-child(2):not([id])",
-                "body#js-body > div:not([id]) > div:not([id]) > a:nth-child(1):not([id])"
+                "body#js-body > div:not([id]) > div:not([id]) > a:nth-child(1):not([id])",
+                "body > div[class*=_shein_privacy]",
+                "body > div[class*=_shein_privacy] > div:nth-of-type(2) > div:nth-of-type(4) > div:nth-of-type(3)",
+                "body > div:not([id]) > div:nth-child(3)#cookie-consent-banner > button:nth-child(3)#cookie-decline-button"
             ],
             "r": [
                 [
@@ -6913,7 +6916,7 @@
                     1,
                     "imdb",
                     0,
-                    "^https://(www.)?imdb.com/",
+                    "^https://(www\\.)?(m\\.)?imdb.com/",
                     22,
                     [
                         437
@@ -8229,8 +8232,7 @@
                     [
                         {
                             "visible": [
-                                "#ccm_notification_host",
-                                "#ccm_notification"
+                                "ccm-notification"
                             ]
                         }
                     ],
@@ -9978,6 +9980,39 @@
                         }
                     ],
                     [],
+                    {}
+                ],
+                [
+                    1,
+                    "shein.com",
+                    2,
+                    "^https?://([a-z]+\\.)?shein\\.com/",
+                    22,
+                    [
+                        1609
+                    ],
+                    [
+                        {
+                            "e": 1610
+                        }
+                    ],
+                    [
+                        {
+                            "v": 1610
+                        }
+                    ],
+                    [
+                        {
+                            "c": 1610
+                        }
+                    ],
+                    [
+                        {
+                            "timeout": 1000,
+                            "check": "none",
+                            "wv": 1610
+                        }
+                    ],
                     {}
                 ],
                 [
@@ -12768,6 +12803,41 @@
                             "timeout": 1000,
                             "check": "none",
                             "wv": 1079
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
+                    "auto_AU_arthurbanana.com_b24",
+                    0,
+                    "^https?://(www\\.)?arthurbanana\\.com/",
+                    10,
+                    [],
+                    [
+                        {
+                            "e": 1611
+                        }
+                    ],
+                    [
+                        {
+                            "v": 1611
+                        }
+                    ],
+                    [
+                        {
+                            "wait": 500
+                        },
+                        {
+                            "comment": "Decline",
+                            "c": 1611
+                        }
+                    ],
+                    [
+                        {
+                            "timeout": 1000,
+                            "check": "none",
+                            "wv": 1611
                         }
                     ],
                     {}
