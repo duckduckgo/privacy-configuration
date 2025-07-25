@@ -16,6 +16,12 @@ function isObject(x) {
     return x && typeof x === 'object' && !Array.isArray(x);
 }
 
+/**
+ * Stringifies a JSON object in a stable order, preserving array order and object key order.
+ *
+ * @param {*} obj - The JSON object to stringify.
+ * @returns {string} - The stringified JSON object.
+ */
 function stableJsonStringify(obj) {
     if (Array.isArray(obj)) {
         return `[${obj.map(stableJsonStringify).join(',')}]`;
@@ -26,6 +32,16 @@ function stableJsonStringify(obj) {
     return JSON.stringify(obj);
 }
 
+/**
+ * Aligns the structure of two objects for diffing.
+ *
+ * Preserves the key order from the base object, aligning values from both base and update.
+ * Any extra keys present only in the update object are appended in sorted order.
+ *
+ * @param {Object} base - The base object to align from.
+ * @param {Object} update - The updated object to align to.
+ * @returns {[Object, Object]} - Tuple of aligned base and update objects.
+ */
 function alignObjectStructure(base, update) {
     const alignedBase = {};
     const alignedUpdate = {};
@@ -49,8 +65,8 @@ function alignObjectStructure(base, update) {
     // Add remaining keys from update, sorted
     const extraKeys = updateKeys.filter((k) => !seen.has(k)).sort();
     for (const key of extraKeys) {
-        // eslint-disable-next-line no-unused-vars
         const [
+            // eslint-disable-next-line no-unused-vars
             _,
             u,
         ] = alignJsonStructure(undefined, update[key]);
@@ -63,6 +79,16 @@ function alignObjectStructure(base, update) {
     ];
 }
 
+/**
+ * Aligns two arrays by matching items using a stable JSON hash, preserving base context.
+ * Uses a simplified form of LCS (Longest Common Subsequence)
+ * LCS finds the longest sequence of items that appear in the same order in both arrays, not necessarily contiguously.
+ * Here, we use hashes to identify matching objects and align them, which helps make diffs more readable by grouping similar objects together.
+ *
+ * @param {Array} baseArr - The base array to align from.
+ * @param {Array} updateArr - The updated array to align to.
+ * @returns {[Array, Array]} - Tuple of aligned base and update arrays.
+ */
 function alignArrayByLCSWithBaseContext(baseArr, updateArr) {
     const baseHashes = baseArr.map(stableJsonStringify);
     const updateHashes = updateArr.map(stableJsonStringify);
@@ -102,6 +128,15 @@ function alignArrayByLCSWithBaseContext(baseArr, updateArr) {
     ];
 }
 
+/**
+ * Recursively aligns the structure of two JSON values (objects, arrays, or primitives)
+ * to facilitate meaningful diffing. Arrays are aligned using LCS-based matching,
+ * objects are aligned by keys, and primitives are returned as-is.
+ *
+ * @param {*} base - The base JSON value to align from.
+ * @param {*} update - The updated JSON value to align to.
+ * @returns {[*, *]} - Tuple of aligned base and update values.
+ */
 function alignJsonStructure(base, update) {
     if (Array.isArray(update)) {
         if (Array.isArray(base)) {
