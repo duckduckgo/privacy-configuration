@@ -156,20 +156,32 @@ function alignArrayByLCSWithBaseContext(baseArr, updateArr) {
     const alignedBase = [];
     const alignedUpdate = [];
 
+    // First pass: handle all base items, matching with update items where possible
     for (let i = 0; i < baseArr.length; i++) {
         const baseItem = baseArr[i];
         const baseHash = baseHashes[i];
+
         if (dedupedCommon.includes(baseHash)) {
+            // Try to find a matching update item that hasn't been used yet
             const updateIndex = updateHashes.findIndex((h, idx) => h === baseHash && !seenUpdateHashes.has(idx));
             if (updateIndex !== -1) {
+                // Matched: add both base and update items
                 alignedBase.push(baseItem);
                 alignedUpdate.push(updateArr[updateIndex]);
                 seenUpdateHashes.add(updateIndex);
+            } else {
+                // No matching update item available (duplicate in base): add base with undefined update
+                alignedBase.push(baseItem);
+                alignedUpdate.push(undefined);
             }
+        } else {
+            // Base item not in update: add base with undefined update (removed item)
+            alignedBase.push(baseItem);
+            alignedUpdate.push(undefined);
         }
     }
 
-    // Append remaining items from update that were not matched
+    // Second pass: append remaining update items that weren't matched (added items)
     for (let i = 0; i < updateArr.length; i++) {
         if (!seenUpdateHashes.has(i)) {
             alignedBase.push(undefined);
