@@ -27,7 +27,7 @@ function stableJsonStringify(obj) {
         return `[${obj.map(stableJsonStringify).join(',')}]`;
     } else if (isObject(obj)) {
         const keys = Object.keys(obj).sort();
-        return `{${keys.map((k) => `"${k}":${stableJsonStringify(obj[k])}`).join(',')}`;
+        return `{${keys.map((k) => `"${k}":${stableJsonStringify(obj[k])}`).join(',')}}`;
     }
     return JSON.stringify(obj);
 }
