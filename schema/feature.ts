@@ -23,6 +23,7 @@ type FeatureMeta = {
 */
 export type SubFeature<VersionType, SettingsType = Record<string, string>> = {
     state: FeatureState;
+    exceptions?: SiteException[];
     settings?: SettingsType;
     rollout?: {
         steps: { percent: number }[];
@@ -47,8 +48,19 @@ export type Feature<
     readme?: string;
     _meta?: FeatureMeta;
     state: FeatureState;
-    exceptions: SiteException[];
+    exceptions?: SiteException[];
     settings?: SettingsType;
+    rollout?: {
+        steps: { percent: number }[];
+    };
+    description?: string;
+    targets?: {
+        variantKey?: string;
+        localeCountry?: string;
+        localeLanguage?: string;
+        isReturningUser?: boolean;
+        isPrivacyProEligible?: boolean;
+    }[];
     features?: SubFeatures;
     hash: string;
     minSupportedVersion?: VersionType;
