@@ -72,13 +72,12 @@
             "settings": {
                 "aiChat": "disabled",
                 "subscriptions": "disabled",
-                "serpSettings": "enabled",
+                "serpSettings": "disabled",
                 "domains": [
                     {
                         "domain": [
                             "duckduckgo.com",
-                            "duck.co",
-                            "bhall.duck.co"
+                            "duck.co"
                         ],
                         "patchSettings": [
                             {
@@ -89,6 +88,11 @@
                             {
                                 "op": "replace",
                                 "path": "/subscriptions",
+                                "value": "enabled"
+                            },
+                            {
+                                "op": "add",
+                                "path": "/serpSettings",
                                 "value": "enabled"
                             }
                         ]
@@ -3129,9 +3133,6 @@
                     }
                 ]
             }
-        },
-        "serpSettings": {
-            "state": "enabled"
         }
     },
 
