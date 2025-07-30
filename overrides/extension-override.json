@@ -68,7 +68,24 @@
             "state": "enabled"
         },
         "fingerprintingCanvas": {
-            "state": "disabled"
+            "state": "enabled",
+            "settings": {
+                "webGl": "enabled",
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "experiment": { "experimentName": "fingerprintingCanvasAdditionalEnabledCheck", "cohort": "treatment" }
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/additionalEnabledCheck",
+                                "value": true
+                            }
+                        ]
+                    }
+                ]
+            }
         },
         "fingerprintingAudio": {
             "state": "disabled"
@@ -157,6 +174,25 @@
         },
         "webCompat": {
             "state": "disabled"
+        },
+        "contentScopeExperiments": {
+            "state": "enabled",
+            "features": {
+                "fingerprintingCanvasAdditionalEnabledCheck": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        { "name": "control", "weight": 1 },
+                        { "name": "treatment", "weight": 1 }
+                    ]
+                }
+            }
         }
     },
     "unprotectedTemporary": [
