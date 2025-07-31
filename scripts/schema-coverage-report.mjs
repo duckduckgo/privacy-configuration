@@ -204,10 +204,11 @@ function analyzeSchemaCoverage() {
     const featuresWithConfig = new Set();
     const platformSpecificFeatures = new Set();
     const platformSpecificWithSettings = new Set();
+    const featuresWithoutSchemaWithSettings = new Set();
     
     for (const file of featureFiles) {
         const featureName = extractFeatureNameFromJson(path.join(featuresDir, file));
-        if (featureName) {
+        if (featureName && featureName !== '_template') {
             featuresWithConfig.add(featureName);
             
             // Track platform-specific features
@@ -263,13 +264,20 @@ function analyzeSchemaCoverage() {
     for (const feature of nonPlatformFeatures) {
         if (!featuresWithSchema.has(feature)) {
             featuresWithoutSchema.add(feature);
+            
+            // Check if this feature has settings
+            const featureFile = `${feature}.json`;
+            if (featureFiles.includes(featureFile) && hasSettings(path.join(featuresDir, featureFile))) {
+                featuresWithoutSchemaWithSettings.add(feature);
+            }
         }
     }
     
     if (featuresWithoutSchema.size > 0) {
         console.log('❌ Features without any schema:');
         Array.from(featuresWithoutSchema).sort().forEach(feature => {
-            console.log(`   - ${feature}`);
+            const hasSettingsFlag = featuresWithoutSchemaWithSettings.has(feature) ? ' (has settings)' : '';
+            console.log(`   - ${feature}${hasSettingsFlag}`);
         });
         console.log('');
     }
@@ -299,14 +307,15 @@ function analyzeSchemaCoverage() {
     console.log('=' .repeat(50));
     console.log(`Schema coverage: ${schemaCoverage.toFixed(1)}%`);
     console.log(`Features needing schema: ${featuresWithoutSchema.size}`);
+    console.log(`Features needing schema with settings: ${featuresWithoutSchemaWithSettings.size}`);
     console.log(`Platform-specific features: ${platformSpecificFeatures.size}`);
     console.log(`Platform-specific features with settings: ${platformSpecificWithSettings.size}`);
     
     return {
         totalFeatures,
-        featuresWithSchema: featuresWithSchema.size,
         schemaCoverage,
         featuresWithoutSchema: Array.from(featuresWithoutSchema).sort(),
+        featuresWithoutSchemaWithSettings: Array.from(featuresWithoutSchemaWithSettings).sort(),
         featuresWithSchema: Array.from(featuresWithSchema).sort(),
         platformSpecificFeatures: Array.from(platformSpecificFeatures).sort(),
         platformSpecificWithSettings: Array.from(platformSpecificWithSettings).sort()
