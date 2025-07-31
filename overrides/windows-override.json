@@ -67,7 +67,8 @@
                     "minSupportedVersion": "0.120.0"
                 },
                 "textSummarization": {
-                    "state": "internal"
+                    "state": "internal",
+                    "minSupportedVersion": "0.123.0"
                 }
             },
             "minSupportedVersion": "0.100.0",
@@ -113,8 +114,7 @@
             "state": "enabled",
             "features": {
                 "autofillPopupReuse": {
-                    "state": "enabled",
-                    "minSupportedVersion": "0.122.0"
+                    "state": "disabled"
                 },
                 "deduplicateLoginsOnImport": {
                     "state": "enabled"
@@ -150,6 +150,19 @@
                         "formBoundarySelector": "",
                         "failsafeSettings": {},
                         "domains": [
+                            {
+                                "domain": ["ring.com"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "body > main > section > form:nth-child(2)",
+                                            "type": "signup"
+                                        }
+                                    }
+                                ]
+                            },
                             {
                                 "domain": ["coolors.co"],
                                 "patchSettings": [
@@ -248,6 +261,32 @@
                                         "value": {
                                             "selector": "input.TextInputBase.TokenizerInput-input[data-testid='tokenizer-input'][placeholder='Name or email']",
                                             "type": "unknown"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": ["portal.vectorsecurity.com"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "form[method='post'][action='/index']",
+                                            "type": "login"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": ["reddit.com"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "rpl-modal-card.settings-row-modal-card[id*='settings-mfa-enable-password']",
+                                            "type": "login"
                                         }
                                     }
                                 ]
@@ -536,6 +575,27 @@
                 },
                 "passwords": {
                     "state": "enabled"
+                },
+                "bookmarkNew": {
+                    "state": "internal"
+                },
+                "passwordNew": {
+                    "state": "internal"
+                },
+                "bookmarkManagerEmpty": {
+                    "state": "internal"
+                },
+                "passwordManagerEmptyAllItems": {
+                    "state": "internal"
+                },
+                "passwordManagerEmptyPasswords": {
+                    "state": "internal"
+                },
+                "importStart": {
+                    "state": "internal"
+                },
+                "importEnd": {
+                    "state": "internal"
                 }
             }
         },
@@ -633,6 +693,12 @@
                             },
                             {
                                 "percent": 10
+                            },
+                            {
+                                "percent": 20
+                            },
+                            {
+                                "percent": 50
                             }
                         ]
                     },
@@ -655,29 +721,12 @@
                 "enumerateDevices": "enabled",
                 "domains": [
                     {
-                        "domain": [
-                            "microsoft.com",
-                            "nytimes.com",
-                            "gmail.com",
-                            "reuters.com",
-                            "etsy.com",
-                            "aliexpress.com",
-                            "walmart.com",
-                            "bestbuy.com",
-                            "www.youtube.com",
-                            "yelp.com",
-                            "linkedin.com"
-                        ],
+                        "domain": "meet.google.com",
                         "patchSettings": [
                             {
-                                "op": "add",
-                                "path": "/disableDeviceEnumerationFrames",
-                                "value": "enabled"
-                            },
-                            {
-                                "op": "add",
-                                "path": "/disableDeviceEnumeration",
-                                "value": "enabled"
+                                "op": "replace",
+                                "path": "/enumerateDevices",
+                                "value": "disabled"
                             }
                         ]
                     },
@@ -868,7 +917,7 @@
             }
         },
         "setAsDefaultAndAddToDock": {
-            "state": "enabled",
+            "state": "disabled",
             "minSupportedVersion": "0.123.0",
             "settings": {
                 "firstPopoverDelayDays": 14,

@@ -86,7 +86,12 @@
             "minSupportedVersion": 51852000,
             "exceptions": [],
             "settings": {
-                "domains": []
+                "domains": [
+                    {
+                        "domain": "chatgpt.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3509"
+                    }
+                ]
             }
         },
         "contentBlocking": {
@@ -420,6 +425,19 @@
                         "failsafeSettings": {},
                         "domains": [
                             {
+                                "domain": ["ring.com"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "body > main > section > form:nth-child(2)",
+                                            "type": "signup"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
                                 "domain": ["coolors.co"],
                                 "patchSettings": [
                                     {
@@ -517,6 +535,32 @@
                                         "value": {
                                             "selector": "input.TextInputBase.TokenizerInput-input[data-testid='tokenizer-input'][placeholder='Name or email']",
                                             "type": "unknown"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": ["portal.vectorsecurity.com"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "form[method='post'][action='/index']",
+                                            "type": "login"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": ["reddit.com"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "rpl-modal-card.settings-row-modal-card[id*='settings-mfa-enable-password']",
+                                            "type": "login"
                                         }
                                     }
                                 ]
@@ -981,7 +1025,13 @@
             "minSupportedVersion": 52160000
         },
         "fingerprintingBattery": {
-            "state": "enabled"
+            "state": "enabled",
+            "exceptions": [
+                {
+                    "domain": "chatgpt.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3509"
+                }
+            ]
         },
         "fingerprintingCanvas": {
             "state": "disabled"
@@ -1013,6 +1063,10 @@
                 {
                     "domain": "realtor.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2855"
+                },
+                {
+                    "domain": "chatgpt.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3509"
                 }
             ]
         },
@@ -1022,6 +1076,10 @@
                 {
                     "domain": "youtube.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/557"
+                },
+                {
+                    "domain": "chatgpt.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3509"
                 }
             ]
         },
@@ -1031,6 +1089,10 @@
                 {
                     "domain": "ticketmaster.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/575"
+                },
+                {
+                    "domain": "chatgpt.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3509"
                 }
             ]
         },
@@ -1094,7 +1156,13 @@
         },
         "navigatorInterface": {
             "state": "enabled",
-            "minSupportedVersion": 52250000
+            "minSupportedVersion": 52250000,
+            "exceptions": [
+                {
+                    "domain": "chatgpt.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3509"
+                }
+            ]
         },
         "networkProtection": {
             "state": "enabled",
@@ -1322,6 +1390,10 @@
                 {
                     "domain": "n4g.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2892"
+                },
+                {
+                    "domain": "chatgpt.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3509"
                 }
             ],
             "state": "enabled",
@@ -1901,6 +1973,10 @@
                 {
                     "domain": "id.onfido.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3295"
+                },
+                {
+                    "domain": "chatgpt.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3509"
                 }
             ]
         },
@@ -1982,6 +2058,10 @@
                 },
                 "privacyProFreeTrial": {
                     "state": "enabled"
+                },
+                "enableSubscriptionFlowsV2": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52420000
                 },
                 "privacyProFreeTrialJan25": {
                     "state": "enabled",

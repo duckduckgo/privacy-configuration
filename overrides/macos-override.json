@@ -522,6 +522,19 @@
                         "failsafeSettings": {},
                         "domains": [
                             {
+                                "domain": ["ring.com"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "body > main > section > form:nth-child(2)",
+                                            "type": "signup"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
                                 "domain": ["coolors.co"],
                                 "patchSettings": [
                                     {
@@ -619,6 +632,32 @@
                                         "value": {
                                             "selector": "input.TextInputBase.TokenizerInput-input[data-testid='tokenizer-input'][placeholder='Name or email']",
                                             "type": "unknown"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": ["portal.vectorsecurity.com"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "form[method='post'][action='/index']",
+                                            "type": "login"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": ["reddit.com"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "rpl-modal-card.settings-row-modal-card[id*='settings-mfa-enable-password']",
+                                            "type": "login"
                                         }
                                     }
                                 ]
@@ -767,6 +806,10 @@
                 {
                     "domain": "zoom.us",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1635"
+                },
+                {
+                    "domain": "vox.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3510"
                 },
                 {
                     "domain": "wetter.com",
@@ -1256,6 +1299,9 @@
                             },
                             {
                                 "percent": 60
+                            },
+                            {
+                                "percent": 100
                             }
                         ]
                     },

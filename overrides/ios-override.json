@@ -488,6 +488,19 @@
                         "failsafeSettings": {},
                         "domains": [
                             {
+                                "domain": ["ring.com"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "body > main > section > form:nth-child(2)",
+                                            "type": "signup"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
                                 "domain": ["coolors.co"],
                                 "patchSettings": [
                                     {
@@ -590,6 +603,32 @@
                                 ]
                             },
                             {
+                                "domain": ["portal.vectorsecurity.com"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "form[method='post'][action='/index']",
+                                            "type": "login"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": ["reddit.com"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "rpl-modal-card.settings-row-modal-card[id*='settings-mfa-enable-password']",
+                                            "type": "login"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
                                 "domain": ["netflix.com"],
                                 "patchSettings": [
                                     {
@@ -653,6 +692,12 @@
                 "autofillCreditCardsOnByDefault": {
                     "state": "enabled",
                     "minSupportedVersion": "7.175.0"
+                },
+                "canPromoteImportPasswordsInPasswordManagement": {
+                    "state": "enabled"
+                },
+                "canPromoteImportPasswordsInBrowser": {
+                    "state": "enabled"
                 }
             }
         },
@@ -1107,6 +1152,9 @@
                             },
                             {
                                 "percent": 75
+                            },
+                            {
+                                "percent": 100
                             }
                         ]
                     },
