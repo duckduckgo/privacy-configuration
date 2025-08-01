@@ -1953,7 +1953,7 @@
                 "body:not([id]) > div#__next > div:nth-child(1):not([id]) > div:not([id]) > div:nth-child(3):not([id]) > button:nth-child(2):not([id])",
                 "body:not([id]) > div#page > section:nth-child(1):not([id]) > div:nth-child(2):not([id]) > button:nth-child(2):not([id])",
                 "body:not([id]) > div#__tealiumGDPRecModal > div:not([id]) > div:not([id]) > div:nth-child(2):not([id]) > button:nth-child(2)#consent_prompt_submitNo",
-                "body:not([id]) > div#on1-cookie-banner > div:not([id]) > div:not([id]) > div:nth-child(1):not([id]) > p:not([id]) > a:nth-child(3):not([id])",
+                "#cookie-notice-decline",
                 "body:not([id]) > div#app > div:nth-child(1)#container > div:nth-child(1):not([id]) > div:nth-child(2):not([id]) > div:not([id]) > div:not([id]) > div:nth-child(3):not([id]) > button:nth-child(2):not([id])",
                 "body:not([id]) > div#cookie-banner > div:nth-child(2):not([id]) > button:nth-child(2)#reject-all",
                 "body:not([id]) > div:not([id]) > div:not([id]) > div:nth-child(1)#ch2-dialog > div:nth-child(2):not([id]) > button:nth-child(2):not([id])",
@@ -2248,7 +2248,9 @@
                 "body#js-body > div:not([id]) > div:not([id]) > a:nth-child(1):not([id])",
                 "body > div[class*=_shein_privacy]",
                 "body > div[class*=_shein_privacy] > div:nth-of-type(2) > div:nth-of-type(4) > div:nth-of-type(3)",
-                "body > div:not([id]) > div:nth-child(3)#cookie-consent-banner > button:nth-child(3)#cookie-decline-button"
+                "body > div:not([id]) > div:nth-child(3)#cookie-consent-banner > button:nth-child(3)#cookie-decline-button",
+                "#on1-cookie-banner",
+                "#on1-cookie-banner a[onclick=\"declineCookieBanner();\"]"
             ],
             "r": [
                 [
@@ -13378,6 +13380,41 @@
                             "timeout": 1000,
                             "check": "none",
                             "wv": 1013
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
+                    "auto_AU_epoch.ai_2pl",
+                    0,
+                    "^https?://(www\\.)?epoch\\.ai/",
+                    10,
+                    [],
+                    [
+                        {
+                            "e": 226
+                        }
+                    ],
+                    [
+                        {
+                            "v": 1316
+                        }
+                    ],
+                    [
+                        {
+                            "wait": 500
+                        },
+                        {
+                            "comment": "Reject all",
+                            "c": 1316
+                        }
+                    ],
+                    [
+                        {
+                            "timeout": 1000,
+                            "check": "none",
+                            "wv": 1316
                         }
                     ],
                     {}
@@ -26193,6 +26230,32 @@
                         {
                             "comment": "REFUSE",
                             "c": 1315
+                        }
+                    ],
+                    [],
+                    {}
+                ],
+                [
+                    1,
+                    "auto_GB_on1.com_0",
+                    0,
+                    "^https?://(www\\.)?on1\\.com/",
+                    10,
+                    [],
+                    [
+                        {
+                            "e": 1612
+                        }
+                    ],
+                    [
+                        {
+                            "v": 1612
+                        }
+                    ],
+                    [
+                        {
+                            "comment": "Decline",
+                            "c": 1613
                         }
                     ],
                     [],
