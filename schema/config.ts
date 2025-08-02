@@ -11,6 +11,7 @@ import { MessageBridgeFeature } from './features/message-bridge';
 import { AndroidBrowserConfig } from './features/android-browser-config';
 import { APIManipulationFeature } from './features/api-manipulation';
 import { FingerprintingHardwareFeature } from './features/fingerprinting-hardware';
+import { FingerprintingCanvasFeature } from './features/fingerprinting-canvas';
 import { FingerprintingScreenSizeFeature } from './features/fingerprinting-screen-size';
 import { NetworkProtection } from './features/network-protection';
 import { AiChatConfig } from './features/ai-chat';
@@ -50,6 +51,7 @@ export type ConfigV5<VersionType> = {
         messageBridge?: MessageBridgeFeature<VersionType>;
         androidBrowserConfig?: AndroidBrowserConfig<VersionType>;
         fingerprintingHardware?: FingerprintingHardwareFeature<VersionType>;
+        fingerprintingCanvas?: FingerprintingCanvasFeature<VersionType>;
         fingerpringtingScreenSize?: FingerprintingScreenSizeFeature<VersionType>;
         networkProtection?: NetworkProtection<VersionType>;
         scriptlets?: ScriptletsFeature<VersionType>;
