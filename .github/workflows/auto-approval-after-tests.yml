@@ -1,0 +1,87 @@
+name: Auto-approval After Tests
+
+on:
+    workflow_run:
+        workflows: ["Tests"]
+        types: [completed]
+
+jobs:
+    re-evaluate-auto-approval:
+        runs-on: ubuntu-latest
+        if: ${{ github.event.workflow_run.conclusion == 'success' }}
+        permissions:
+            pull-requests: write
+            contents: read
+
+        steps:
+            - name: Checkout PR
+              uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.event.workflow_run.head_branch }}
+
+            - name: Get PR number
+              id: get-pr
+              uses: actions/github-script@v7
+              with:
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  script: |
+                      const { data: pulls } = await github.rest.pulls.list({
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          head: context.repo.owner + ':' + '${{ github.event.workflow_run.head_branch }}',
+                          state: 'open'
+                      });
+                      
+                      if (pulls.length > 0) {
+                          core.setOutput('pr-number', pulls[0].number);
+                          console.log(`Found PR #${pulls[0].number} for branch ${{ github.event.workflow_run.head_branch }}`);
+                      } else {
+                          console.log('No open PR found for this branch');
+                          core.setOutput('pr-number', '');
+                      }
+
+            - name: Checkout base branch
+              if: steps.get-pr.outputs.pr-number != ''
+              uses: actions/checkout@v4
+              with:
+                  ref: main
+                  path: base
+
+            - name: Build base branch
+              if: steps.get-pr.outputs.pr-number != ''
+              run: |
+                  cd base
+                  npm install
+                  node index.js
+                  cd ..
+
+            - name: Build PR branch
+              if: steps.get-pr.outputs.pr-number != ''
+              run: |
+                  npm install
+                  node index.js
+
+            - name: Re-run approval analysis
+              if: steps.get-pr.outputs.pr-number != ''
+              run: |
+                  node .github/scripts/json-diff-directories.js base/generated generated > approval_output.txt
+
+            - name: Re-evaluate auto-approval after tests
+              if: steps.get-pr.outputs.pr-number != ''
+              uses: actions/github-script@v7
+              with:
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  script: |
+                      const { reEvaluateAfterTests } = await import('./.github/scripts/auto-approval-handler.js');
+                      
+                      // Create a mock context for the PR
+                      const mockContext = {
+                          repo: context.repo,
+                          payload: {
+                              pull_request: {
+                                  number: parseInt('${{ steps.get-pr.outputs.pr-number }}')
+                              }
+                          }
+                      };
+                      
+                      await reEvaluateAfterTests(github, mockContext, 'approval_output.txt'); 

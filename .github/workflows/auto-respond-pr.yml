@@ -26,6 +26,9 @@ on:
 jobs:
     auto_respond:
         runs-on: ubuntu-latest
+        permissions:
+            pull-requests: write
+            contents: read
 
         steps:
             - name: Create comment
@@ -161,3 +164,12 @@ jobs:
                   comment-id: ${{ steps.find_approval_comment.outputs.comment-id }}
                   body: ${{ steps.create_approval_body.outputs.comment_body }}
                   edit-mode: replace
+
+            - name: Handle auto-approval
+              if: github.event.action == 'opened' || github.event.action == 'synchronize'
+              uses: actions/github-script@v7
+              with:
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  script: |
+                      const { handleAutoApproval } = await import('./.github/scripts/auto-approval-handler.js');
+                      await handleAutoApproval(github, context, 'approval_output.txt', '${{ github.event.action }}');
