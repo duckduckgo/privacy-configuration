@@ -2,7 +2,7 @@ name: Auto-approval After Tests
 
 on:
     workflow_run:
-        workflows: ["Tests"]
+        workflows: ['Tests']
         types: [completed]
 
 jobs:
@@ -31,7 +31,7 @@ jobs:
                           head: context.repo.owner + ':' + '${{ github.event.workflow_run.head_branch }}',
                           state: 'open'
                       });
-                      
+
                       if (pulls.length > 0) {
                           core.setOutput('pr-number', pulls[0].number);
                           console.log(`Found PR #${pulls[0].number} for branch ${{ github.event.workflow_run.head_branch }}`);
@@ -73,7 +73,7 @@ jobs:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
                   script: |
                       const { reEvaluateAfterTests } = await import('./.github/scripts/auto-approval-handler.js');
-                      
+
                       // Create a mock context for the PR
                       const mockContext = {
                           repo: context.repo,
@@ -83,5 +83,5 @@ jobs:
                               }
                           }
                       };
-                      
-                      await reEvaluateAfterTests(github, mockContext, 'approval_output.txt'); 
+
+                      await reEvaluateAfterTests(github, mockContext, 'approval_output.txt');
