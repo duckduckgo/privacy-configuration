@@ -8,7 +8,6 @@ import fs from 'fs';
  * This script handles:
  * - Auto-approving PRs that only contain auto-approvable changes
  * - Revoking auto-approvals when PR is synced (new commits added)
- * - Re-approving after tests pass if still auto-approvable
  * - Ensuring cursor bug bot has finished its analysis before approval
  *   (The cursor bot provides bug analysis - any comment from it blocks approval, timeout allows approval)
  */
@@ -202,6 +201,29 @@ async function dismissAutoApprovalReview(github, context, review, reason) {
 }
 
 /**
+ * Immediately dismiss any existing auto-approval reviews when PR is synchronized
+ * This should be called as soon as auto-respond-pr.yml runs, not after cursor bot wait
+ * @param {Object} github - GitHub API client
+ * @param {Object} context - GitHub context
+ * @returns {Promise<boolean>} True if successful
+ */
+export async function dismissExistingReviews(github, context) {
+    try {
+        const existingReview = await getExistingAutoApprovalReview(github, context);
+        if (existingReview) {
+            console.log('🔄 PR synchronized, immediately dismissing existing auto-approval...');
+            await dismissAutoApprovalReview(github, context, existingReview, 'PR synchronized - re-evaluating after changes');
+            return true;
+        }
+        console.log('ℹ️ No existing auto-approval review to dismiss');
+        return true;
+    } catch (error) {
+        console.error('❌ Failed to dismiss existing reviews:', error.message);
+        return false;
+    }
+}
+
+/**
  * Handle auto-approval logic based on the current state
  * @param {Object} github - GitHub API client
  * @param {Object} context - GitHub context
@@ -236,15 +258,9 @@ export async function handleAutoApproval(github, context, approvalOutputPath, ac
     console.log(`Existing auto-approval review: ${existingReview ? 'Yes' : 'No'}`);
 
     if (action === 'synchronize') {
-        // On sync, always dismiss existing auto-approval and re-evaluate
-        if (existingReview) {
-            console.log('🔄 PR synchronized, dismissing existing auto-approval...');
-            await dismissAutoApprovalReview(github, context, existingReview, 'PR synchronized - re-evaluating after changes');
-        }
-
-        // Don't auto-approve immediately on sync - wait for tests to pass
-        console.log('⏳ Waiting for tests to complete before re-evaluating auto-approval');
-        return;
+        // On sync, we've already dismissed existing reviews via dismissExistingReviews()
+        // Now proceed with normal auto-approval logic
+        console.log('🔄 PR synchronized, proceeding with auto-approval evaluation...');
     }
 
     if (isCurrentlyAutoApprovable) {
@@ -270,42 +286,7 @@ export async function handleAutoApproval(github, context, approvalOutputPath, ac
  * @param {Object} context - GitHub context
  * @param {string} approvalOutputPath - Path to approval analysis output file
  */
-export async function reEvaluateAfterTests(github, context, approvalOutputPath) {
-    console.log('🧪 Tests completed, re-evaluating auto-approval...');
 
-    if (!fs.existsSync(approvalOutputPath)) {
-        console.log('❌ Approval analysis file not found for re-evaluation');
-        return;
-    }
-
-    // Wait for cursor bug bot to finish running before proceeding
-    console.log('⏳ Waiting for cursor bug bot to finish running before re-evaluation...');
-    const cursorBotResult = await waitForCursorBugBot(github, context);
-
-    if (!cursorBotResult.success) {
-        if (cursorBotResult.hasIssues) {
-            console.log('❌ Cursor bug bot found issues - blocking re-evaluation');
-        } else {
-            console.log('❌ Cursor bug bot did not finish within timeout, skipping re-evaluation');
-        }
-        return;
-    }
-
-    const approvalOutput = fs.readFileSync(approvalOutputPath, 'utf8');
-    const isCurrentlyAutoApprovable = isAutoApprovable(approvalOutput);
-    const existingReview = await getExistingAutoApprovalReview(github, context);
-
-    if (isCurrentlyAutoApprovable) {
-        if (!existingReview) {
-            console.log('🤖 Tests passed and changes are auto-approvable, submitting review...');
-            await submitAutoApprovalReview(github, context);
-        } else {
-            console.log('✅ Auto-approval review already exists after tests');
-        }
-    } else {
-        console.log('❌ Changes still require manual review after tests');
-    }
-}
 
 // CLI interface for direct script execution
 if (import.meta.url === `file://${process.argv[1]}`) {
@@ -314,7 +295,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
 
     if (!action || !approvalOutputPath) {
         console.error('Usage: node auto-approval-handler.js <action> <approval-output-path>');
-        console.error('Actions: opened, synchronize, re-evaluate');
+        console.error('Actions: opened, synchronize');
         process.exit(1);
     }
 
