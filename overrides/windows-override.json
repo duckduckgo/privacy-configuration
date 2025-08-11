@@ -148,6 +148,9 @@
                 "autofillIdentitiesOnByDefault": {
                     "state": "internal"
                 },
+                "autofillSkipAuthenticationIfVaultEmpty": {
+                    "state": "internal"
+                },
                 "siteSpecificFixes": {
                     "state": "enabled",
                     "settings": {
@@ -605,6 +608,12 @@
                 },
                 "importEnd": {
                     "state": "internal"
+                },
+                "bookmarksBarEmpty": {
+                    "state": "internal"
+                },
+                "bookmarksBarNonEmpty": {
+                    "state": "internal"
                 }
             }
         },
@@ -783,7 +792,13 @@
                     "state": "enabled"
                 },
                 "crashAutoRecovery": {
-                    "state": "disabled"
+                    "state": "preview",
+                    "minSupportedVersion": "0.125.0",
+                    "settings": {
+                        "autoRecoveryBrowserEngine": true,
+                        "autoRecoveryTab": true,
+                        "autoRecoveryTabOutOfMemory": false
+                    }
                 },
                 "ignoreInvalidCastExceptionOnDisposal": {
                     "state": "enabled"
@@ -811,7 +826,7 @@
                     "state": "enabled"
                 },
                 "omnibar": {
-                    "state": "disabled"
+                    "state": "internal"
                 }
             },
             "minSupportedVersion": "0.100.0"
@@ -958,6 +973,14 @@
                 "uiHangDetection": {
                     "state": "enabled"
                 }
+            }
+        },
+        "diskSpaceMonitoring": {
+            "state": "enabled",
+            "exceptions": [],
+            "settings": {
+                "lowSpaceThresholdMegabytes": 100,
+                "checkIntervalSeconds": 60
             }
         }
     },
