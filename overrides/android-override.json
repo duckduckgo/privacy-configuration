@@ -35742,7 +35742,23 @@
             "state": "enabled"
         },
         "breakageReporting": {
-            "state": "enabled"
+            "state": "enabled",
+            "settings": {
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "injectName": "android"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/additionalEnabledCheck",
+                                "value": "disabled"
+                            }
+                        ]
+                    }
+                ]
+            }
         },
         "brokerProtection": {
             "state": "enabled"
@@ -35950,7 +35966,23 @@
                     "domain": "chatgpt.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3509"
                 }
-            ]
+            ],
+            "settings": {
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "injectName": "android"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/additionalEnabledCheck",
+                                "value": "disabled"
+                            }
+                        ]
+                    }
+                ]
+            }
         },
         "fingerprintingCanvas": {
             "state": "disabled"
@@ -35968,7 +36000,21 @@
                 "deviceMemory": {
                     "type": "number",
                     "value": 4
-                }
+                },
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "injectName": "android"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/additionalEnabledCheck",
+                                "value": "disabled"
+                            }
+                        ]
+                    }
+                ]
             },
             "exceptions": [
                 {
@@ -36000,7 +36046,23 @@
                     "domain": "chatgpt.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3509"
                 }
-            ]
+            ],
+            "settings": {
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "injectName": "android"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/additionalEnabledCheck",
+                                "value": "disabled"
+                            }
+                        ]
+                    }
+                ]
+            }
         },
         "fingerprintingTemporaryStorage": {
             "state": "enabled",
@@ -36013,10 +36075,42 @@
                     "domain": "chatgpt.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3509"
                 }
-            ]
+            ],
+            "settings": {
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "injectName": "android"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/additionalEnabledCheck",
+                                "value": "disabled"
+                            }
+                        ]
+                    }
+                ]
+            }
         },
         "gpc": {
-            "state": "enabled"
+            "state": "enabled",
+            "settings": {
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "injectName": "android"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/additionalEnabledCheck",
+                                "value": "disabled"
+                            }
+                        ]
+                    }
+                ]
+            }
         },
         "history": {
             "state": "enabled",
@@ -36294,6 +36388,7 @@
             }
         },
         "webCompat": {
+            "state": "enabled",
             "exceptions": [
                 {
                     "domain": "chewy.com",
@@ -36324,7 +36419,6 @@
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3509"
                 }
             ],
-            "state": "enabled",
             "settings": {
                 "domains": [
                     {
