@@ -1,7 +1,10 @@
 import { Feature, CSSInjectFeatureSettings, CSSConfigSetting, FeatureState } from '../feature';
 
 type FullFingerprintingCanvasOptions = CSSInjectFeatureSettings<{
+    // Codebase change
     additionalEnabledCheck?: FeatureState;
+    // Generic change used elsewhere.
+    additionalCheck?: FeatureState;
     webGl?: FeatureState;
     safeMethods?: string[];
     unsafeMethods?: string[];

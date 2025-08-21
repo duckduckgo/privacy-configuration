@@ -61,6 +61,14 @@ type ConditionBlock = {
         experimentName: string;
         cohort: string;
     };
+    injectName?: string;
+    minSupportedVersion?: number;
+    maxSupportedVersion?: number;
+    internal?: boolean;
+    context?: {
+        top?: boolean;
+        frame?: boolean;
+    };
 };
 
 type CSSInjectFeatureSettingsPatches = {
