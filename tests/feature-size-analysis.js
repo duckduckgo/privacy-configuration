@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { expect } from 'chai';
+import { CURRENT_CONFIG_VERSION } from '../constants.js';
 
 /**
  * Feature size analysis tests. These tests analyze the size contribution of individual
@@ -14,22 +15,13 @@ describe('Feature size analysis', () => {
             throw new Error('Generated directory does not exist. Run `npm run build` first.');
         }
 
-        const versions = fs
-            .readdirSync(GENERATED_DIR)
-            .filter((dir) => dir.startsWith('v') && fs.statSync(path.join(GENERATED_DIR, dir)).isDirectory());
-
-        // Use latest version (highest version number)
-        const latestVersion = versions.sort((a, b) => {
-            const aNum = parseInt(a.replace('v', ''));
-            const bNum = parseInt(b.replace('v', ''));
-            return bNum - aNum;
-        })[0];
-
-        if (!latestVersion) {
-            throw new Error('No version directories found in generated/');
-        }
-
+        // Use current version from constants
+        const latestVersion = `v${CURRENT_CONFIG_VERSION}`;
         const versionDir = path.join(GENERATED_DIR, latestVersion);
+
+        if (!fs.existsSync(versionDir)) {
+            throw new Error(`Version directory ${latestVersion} does not exist in generated/`);
+        }
         const configFiles = fs.readdirSync(versionDir).filter((file) => file.endsWith('-config.json'));
 
         return configFiles.map((file) => ({
