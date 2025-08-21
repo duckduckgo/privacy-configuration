@@ -53,7 +53,7 @@ export type ConfigV5<VersionType> = {
         androidBrowserConfig?: AndroidBrowserConfig<VersionType>;
         fingerprintingHardware?: FingerprintingHardwareFeature<VersionType>;
         fingerprintingCanvas?: FingerprintingCanvasFeature<VersionType>;
-        fingerpringtingScreenSize?: FingerprintingScreenSizeFeature<VersionType>;
+        fingerprintingScreenSize?: FingerprintingScreenSizeFeature<VersionType>;
         networkProtection?: NetworkProtection<VersionType>;
         scriptlets?: ScriptletsFeature<VersionType>;
         windowsWebviewFailures?: WindowsWebViewFailures<VersionType>;
