@@ -51,14 +51,14 @@ jobs:
                        - [Feature Implementer Documentation](https://app.asana.com/0/1200890834746050/1201498956177210/f)
 
             - name: Checkout base branch
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
               with:
                   ref: ${{ github.event.pull_request.base.ref }}
                   repository: ${{ github.event.pull_request.head.repo.full_name }}
                   path: base
 
             - name: Checkout PR branch
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
               with:
                   ref: ${{ github.event.pull_request.head.ref }}
                   repository: ${{ github.event.pull_request.head.repo.full_name }}
