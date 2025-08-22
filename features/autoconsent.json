@@ -3206,7 +3206,8 @@
                 "body > div#root > div:nth-child(2):not([id]) > div:not([id]) > main:nth-child(3):not([id]) > div:nth-child(2):not([id]) > div:nth-child(2):not([id]) > button:nth-child(1)#rcc-decline-button",
                 "body > div:not([id]) > div:nth-child(1)#consent-banner > div:not([id]) > div:nth-child(4):not([id]) > form:nth-child(1)#email-form > a:nth-child(3)#decline-btn",
                 "body > div:not([id]) > footer:nth-child(3):not([id]) > div:nth-child(3):not([id]) > div:not([id]) > div:not([id]) > div:nth-child(2):not([id]) > button:nth-child(2):not([id])",
-                "body > div:not([id]) > div:not([id]) > div:not([id]) > div:nth-child(2):not([id]) > div:nth-child(2):not([id])"
+                "body > div:not([id]) > div:not([id]) > div:not([id]) > div:nth-child(2):not([id]) > div:nth-child(2):not([id])",
+                "#disagree-btn"
             ],
             "r": [
                 [
@@ -10411,56 +10412,68 @@
                     ],
                     [
                         {
-                            "timeout": 2000,
-                            "w": 710
-                        },
-                        {
                             "if": {
-                                "e": 711
+                                "e": 2595
                             },
                             "then": [
                                 {
-                                    "k": 711
+                                    "k": 2595
                                 }
                             ],
                             "else": [
                                 {
-                                    "k": 712
-                                },
-                                {
-                                    "wv": 713
-                                },
-                                {
-                                    "all": true,
-                                    "optional": true,
-                                    "k": 714
-                                },
-                                {
-                                    "click": [
-                                        ".qc-cmp2-main",
-                                        "xpath///button[contains(., 'REJECT ALL') or contains(., 'ALLE VERWERPEN') or contains(., 'ΑΠΟΡΡΙΠΤΩ ΤΑ ΠΑΝΤΑ') or contains(., 'RESPINGERE TOTALĂ') or contains(., 'ALLE ABLEHNEN') or contains(., 'ODRZUCENIE') or contains(., 'BLOQUEAR TODO') or contains(., 'REJEITAR TODOS') or contains(., 'RIFIUTA TUTTO') or contains(., 'TOUT REFUSER') or contains(., 'ОТКЛОНИТЬ ВСЕХ')]"
-                                    ],
-                                    "optional": true
-                                },
-                                {
-                                    "wait": 500
+                                    "timeout": 2000,
+                                    "w": 710
                                 },
                                 {
                                     "if": {
-                                        "e": 715
+                                        "e": 711
                                     },
                                     "then": [
                                         {
-                                            "k": 715
+                                            "k": 711
                                         }
                                     ],
                                     "else": [
                                         {
-                                            "waitForThenClick": [
+                                            "k": 712
+                                        },
+                                        {
+                                            "wv": 713
+                                        },
+                                        {
+                                            "all": true,
+                                            "optional": true,
+                                            "k": 714
+                                        },
+                                        {
+                                            "click": [
                                                 ".qc-cmp2-main",
-                                                "xpath///button[contains(.,'SAVE & EXIT') or contains(.,'SALVA ED ESCI') or contains(.,'GUARDAR Y SALIR') or contains(.,'SPEICHERN & VERLASSEN')"
+                                                "xpath///button[contains(., 'REJECT ALL') or contains(., 'ALLE VERWERPEN') or contains(., 'ΑΠΟΡΡΙΠΤΩ ΤΑ ΠΑΝΤΑ') or contains(., 'RESPINGERE TOTALĂ') or contains(., 'ALLE ABLEHNEN') or contains(., 'ODRZUCENIE') or contains(., 'BLOQUEAR TODO') or contains(., 'REJEITAR TODOS') or contains(., 'RIFIUTA TUTTO') or contains(., 'TOUT REFUSER') or contains(., 'ОТКЛОНИТЬ ВСЕХ')]"
                                             ],
-                                            "timeout": 5000
+                                            "optional": true
+                                        },
+                                        {
+                                            "wait": 500
+                                        },
+                                        {
+                                            "if": {
+                                                "e": 715
+                                            },
+                                            "then": [
+                                                {
+                                                    "k": 715
+                                                }
+                                            ],
+                                            "else": [
+                                                {
+                                                    "waitForThenClick": [
+                                                        ".qc-cmp2-main",
+                                                        "xpath///button[contains(.,'SAVE & EXIT') or contains(.,'SALVA ED ESCI') or contains(.,'GUARDAR Y SALIR') or contains(.,'SPEICHERN & VERLASSEN')"
+                                                    ],
+                                                    "timeout": 5000
+                                                }
+                                            ]
                                         }
                                     ]
                                 }
