@@ -11,7 +11,6 @@ import {
 
 const { compare } = pkg;
 
-// Sorting utilities from compare-branches-sorted.js
 function isObject(x) {
     return x && typeof x === 'object' && !Array.isArray(x);
 }
