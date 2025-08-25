@@ -5,7 +5,7 @@ type FullFingerprintingScreenSizeOptions = CSSInjectFeatureSettings<{
     availLeft?: CSSConfigSetting;
     colorDepth?: CSSConfigSetting;
     pixelDepth?: CSSConfigSetting;
-    additionalEnabledCheck?: FeatureState;
+    additionalCheck?: FeatureState;
 }>;
 
 export type FingerprintingScreenSizeFeature<VersionType> = Feature<Partial<FullFingerprintingScreenSizeOptions>, VersionType>;

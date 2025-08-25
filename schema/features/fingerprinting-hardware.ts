@@ -4,7 +4,7 @@ type FullFingerprintingHardwareOptions = CSSInjectFeatureSettings<{
     deviceMemory?: CSSConfigSetting;
     hardwareConcurrency?: CSSConfigSetting;
     keyboard?: CSSConfigSetting;
-    additionalEnabledCheck?: FeatureState;
+    additionalCheck?: FeatureState;
 }>;
 
 export type FingerprintingHardwareFeature<VersionType> = Feature<Partial<FullFingerprintingHardwareOptions>, VersionType>;
