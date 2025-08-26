@@ -1127,10 +1127,10 @@
                 "#lanyard_root button[class*=confirmButton],#lanyard_root div[class*=actions_] > button:nth-child(1), #lanyard_root button[class*=actionButton]",
                 "_ketch_consent_v1_",
                 "#gdpr-banner-container",
-                "#gdpr-banner-container #gdpr-banner [data-testid=gdpr-banner-cmp-button]",
-                "#ConsentManagementPage",
-                "#gdpr-banner-container #gdpr-banner",
-                "#ConsentManagementPage .Button-secondary",
+                ".iubenda-cs-reject-btn",
+                ".iub-btn-reject",
+                "#gdpr-banner-container #gdpr-banner [data-testid=gdpr-banner-decline-button]",
+                "div[class*=cookieBanner].pencraft",
                 "div:has(> div > a[href*='/privacy-policy'])",
                 ".lia-cookie-banner-alert",
                 ".lia-cookie-banner-alert .AjaxFeedback",
@@ -1266,7 +1266,7 @@
                 ".cookieAction.saveCookie,.confirmCookie #submitCookiesBtn",
                 "#gdprCookieBanner",
                 "#gdprCookieContent_wrapper",
-                ".gdprCookieBanner_decline-button",
+                "hideCookieBanner=",
                 "cookie_prefs",
                 "#aviso_cookies",
                 ".lang_en #aviso_cookies",
@@ -1410,7 +1410,7 @@
                 "div[class^=\"cookies-banner-module_cookie-banner_\"]",
                 "div[class^=\"cookies-banner-module_small-cookie-banner_\"]",
                 "#tarteaucitronRoot",
-                "#tarteaucitronRoot #tarteaucitronAlertBig",
+                "#tarteaucitronAllDenied2",
                 "#taunton-user-consent__overlay",
                 "#taunton-user-consent__overlay:not([aria-hidden=true])",
                 "#taunton-user-consent__toolbar input[type=checkbox]:checked",
@@ -1657,7 +1657,7 @@
                 "body > div:not([id]) > div:not([id]) > div:nth-child(1):not([id]) > button:nth-child(2):not([id])",
                 "body > div#root > div:not([id]) > section:nth-child(1):not([id]) > div:not([id]) > div:not([id]) > div:nth-child(3):not([id]) > div:nth-child(1):not([id]) > button:nth-child(2):not([id])",
                 "body:not([id]) > div:not([id]) > div:nth-child(3):not([id]) > div:nth-child(1):not([id]) > button:nth-child(2):not([id])",
-                "body:not([id]) > div#cookie-policy-info > div:not([id]) > div:not([id]) > div:nth-child(2):not([id]) > button:nth-child(2):not([id])",
+                "#tarteaucitronCloseAlert",
                 "body > div#elGuestTerms > div:not([id]) > div:nth-child(2):not([id]) > form:not([id]) > button:nth-child(3):not([id])",
                 "body > div:not([id]) > ul:not([id]) > li:not([id]) > div:not([id]) > div:nth-child(2):not([id]) > div:not([id]) > div:nth-child(2):not([id]) > a:nth-child(2):not([id]) > span:not([id])",
                 "body:not([id]) > div:not([id]) > div:not([id]) > div:not([id]) > div:nth-child(2):not([id]) > div:not([id]) > a:nth-child(1):not([id])",
@@ -1776,7 +1776,7 @@
                 "body > div:not([id]) > div:not([id]) > button:nth-child(5):not([id])",
                 "body > div#consent-widget-container > div:not([id])[data-testid=\"consent-widget-view\"] > div:nth-child(2):not([id]) > button:nth-child(2)#widget-button-reject[data-testid=\"consent-widget-reject-all\"]",
                 "body:not([id]) > div#__nuxt > div#__layout > div#app > div:nth-child(7):not([id]) > div:nth-child(2):not([id]) > div:not([id]) > button:nth-child(1):not([id])",
-                "body:not([id]) > div#root > div:not([id]) > div:nth-child(2):not([id]) > div:not([id]) > div:nth-child(2):not([id]) > button:nth-child(3):not([id])",
+                ".dsgvoaio-checkbox",
                 "body > div#shopify-section-sections--18523644756187__ae721dda-d94a-4267-887e-55888f578a11 > sys-cookies:nth-child(2):not([id]) > hdt-drawer#drawerCookies > div:not([id]) > div:nth-child(2):not([id]) > button:nth-child(2):not([id])",
                 "body:not([id]) > div#cck_here > div#cookie-consent-banner > div:nth-child(1):not([id]) > div:not([id]) > div:nth-child(2):not([id]) > a:nth-child(2):not([id])",
                 "body > div > div > div > div:nth-child(2) > button:nth-child(2)",
@@ -3203,7 +3203,12 @@
                 "body > div:not([id]) > div:nth-child(1)#consent-banner > div:not([id]) > div:nth-child(4):not([id]) > form:nth-child(1)#email-form > a:nth-child(3)#decline-btn",
                 "body > div:not([id]) > footer:nth-child(3):not([id]) > div:nth-child(3):not([id]) > div:not([id]) > div:not([id]) > div:nth-child(2):not([id]) > button:nth-child(2):not([id])",
                 "body > div:not([id]) > div:not([id]) > div:not([id]) > div:nth-child(2):not([id]) > div:nth-child(2):not([id])",
-                "#disagree-btn"
+                "#disagree-btn",
+                ".dsgvoaio-checkbox > input:checked",
+                "#tarteaucitronPersonalize",
+                "#tarteaucitronAllDenied",
+                "#tarteaucitronClosePanel",
+                "body > div#cookie-consent-container > div#cookie-consent-banner > div:nth-child(2):not([id]) > div:nth-child(2):not([id]) > button:nth-child(3)#btn-reject-all"
             ],
             "r": [
                 [
@@ -8093,13 +8098,25 @@
                     ],
                     [
                         {
-                            "c": 483
-                        },
-                        {
-                            "eval": "EVAL_IUBENDA_0"
-                        },
-                        {
-                            "c": 484
+                            "if": {
+                                "e": 519
+                            },
+                            "then": [
+                                {
+                                    "k": 519
+                                }
+                            ],
+                            "else": [
+                                {
+                                    "c": 483
+                                },
+                                {
+                                    "c": 520
+                                },
+                                {
+                                    "c": 484
+                                }
+                            ]
                         }
                     ],
                     [
@@ -8424,43 +8441,17 @@
                     ],
                     [
                         {
-                            "any": [
-                                {
-                                    "e": 519
-                                },
-                                {
-                                    "e": 520
-                                }
-                            ]
+                            "e": 521
                         }
                     ],
                     [
                         {
-                            "any": [
-                                {
-                                    "v": 519
-                                },
-                                {
-                                    "v": 520
-                                }
-                            ]
+                            "v": 521
                         }
                     ],
                     [
                         {
-                            "if": {
-                                "e": 521
-                            },
-                            "then": [
-                                {
-                                    "k": 519
-                                }
-                            ],
-                            "else": [
-                                {
-                                    "k": 522
-                                }
-                            ]
+                            "k": 521
                         }
                     ],
                     [],
@@ -9863,10 +9854,7 @@
                     ],
                     [
                         {
-                            "wait": 200
-                        },
-                        {
-                            "k": 658
+                            "c": 651
                         }
                     ],
                     [
@@ -11277,6 +11265,38 @@
                 ],
                 [
                     1,
+                    "substack",
+                    0,
+                    "",
+                    12,
+                    [],
+                    [
+                        {
+                            "e": 522
+                        }
+                    ],
+                    [
+                        {
+                            "v": 522
+                        }
+                    ],
+                    [
+                        {
+                            "waitForThenClick": [
+                                ".pencraft",
+                                "xpath///button[contains(., 'Only Necessary')]"
+                            ]
+                        }
+                    ],
+                    [
+                        {
+                            "cc": 658
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
                     "summitracing",
                     1,
                     "",
@@ -11418,6 +11438,37 @@
                 ],
                 [
                     1,
+                    "tarteaucitron deny",
+                    2,
+                    "",
+                    22,
+                    [
+                        801
+                    ],
+                    [
+                        {
+                            "e": 801
+                        }
+                    ],
+                    [
+                        {
+                            "v": 802
+                        }
+                    ],
+                    [
+                        {
+                            "k": 802
+                        }
+                    ],
+                    [
+                        {
+                            "eval": "EVAL_TARTEAUCITRON_2"
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
                     "tarteaucitron.js",
                     2,
                     "",
@@ -11432,13 +11483,39 @@
                     ],
                     [
                         {
-                            "check": "any",
-                            "v": 802
+                            "v": 1049
+                        },
+                        {
+                            "negated": true,
+                            "e": 802
                         }
                     ],
                     [
                         {
-                            "eval": "EVAL_TARTEAUCITRON_0"
+                            "if": {
+                                "e": 1168
+                            },
+                            "then": [
+                                {
+                                    "all": true,
+                                    "optional": true,
+                                    "k": 2596
+                                },
+                                {
+                                    "k": 1049
+                                }
+                            ],
+                            "else": [
+                                {
+                                    "k": 2597
+                                },
+                                {
+                                    "c": 2598
+                                },
+                                {
+                                    "k": 2599
+                                }
+                            ]
                         }
                     ],
                     [
@@ -12880,7 +12957,7 @@
                     ],
                     [
                         {
-                            "e": 939
+                            "v": 939
                         }
                     ],
                     [
@@ -13906,9 +13983,6 @@
                         }
                     ],
                     [
-                        {
-                            "wait": 500
-                        },
                         {
                             "c": 577
                         }
@@ -15836,6 +15910,40 @@
                             "timeout": 1000,
                             "check": "none",
                             "wv": 1081
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
+                    "auto_AU_hyprnote.com_5ti",
+                    0,
+                    "^https?://(www\\.)?hyprnote\\.com/",
+                    10,
+                    [],
+                    [
+                        {
+                            "e": 1034
+                        }
+                    ],
+                    [
+                        {
+                            "v": 1034
+                        }
+                    ],
+                    [
+                        {
+                            "wait": 500
+                        },
+                        {
+                            "c": 1034
+                        }
+                    ],
+                    [
+                        {
+                            "timeout": 1000,
+                            "check": "none",
+                            "wv": 1034
                         }
                     ],
                     {}
@@ -18385,31 +18493,6 @@
                 ],
                 [
                     1,
-                    "auto_CA_asus.com_dm1",
-                    0,
-                    "^https?://(www\\.)?asus\\.com/",
-                    10,
-                    [],
-                    [
-                        {
-                            "e": 1049
-                        }
-                    ],
-                    [
-                        {
-                            "v": 1049
-                        }
-                    ],
-                    [
-                        {
-                            "c": 1049
-                        }
-                    ],
-                    [],
-                    {}
-                ],
-                [
-                    1,
                     "auto_CA_banfflakelouise.com_4eg",
                     0,
                     "^https?://(www\\.)?banfflakelouise\\.com/",
@@ -19787,6 +19870,40 @@
                             "timeout": 1000,
                             "check": "none",
                             "wv": 1069
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
+                    "auto_CA_needco.com_3y2",
+                    0,
+                    "^https?://(www\\.)?needco\\.com/",
+                    10,
+                    [],
+                    [
+                        {
+                            "e": 2600
+                        }
+                    ],
+                    [
+                        {
+                            "v": 2600
+                        }
+                    ],
+                    [
+                        {
+                            "wait": 500
+                        },
+                        {
+                            "c": 2600
+                        }
+                    ],
+                    [
+                        {
+                            "timeout": 1000,
+                            "check": "none",
+                            "wv": 2600
                         }
                     ],
                     {}
@@ -21392,6 +21509,40 @@
                             "timeout": 1000,
                             "check": "none",
                             "wv": 1331
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
+                    "auto_CA_worldelectricsupply.com_f0d",
+                    0,
+                    "^https?://(www\\.)?worldelectricsupply\\.com/",
+                    10,
+                    [],
+                    [
+                        {
+                            "e": 2600
+                        }
+                    ],
+                    [
+                        {
+                            "v": 2600
+                        }
+                    ],
+                    [
+                        {
+                            "wait": 500
+                        },
+                        {
+                            "c": 2600
+                        }
+                    ],
+                    [
+                        {
+                            "timeout": 1000,
+                            "check": "none",
+                            "wv": 2600
                         }
                     ],
                     {}
@@ -23454,9 +23605,6 @@
                         }
                     ],
                     [
-                        {
-                            "wait": 500
-                        },
                         {
                             "c": 1454
                         }
@@ -65910,31 +66058,6 @@
                             "wv": 2202
                         }
                     ],
-                    {}
-                ],
-                [
-                    1,
-                    "auto_GB_coinbase.com_0",
-                    0,
-                    "^https?://(www\\.)?coinbase\\.com/",
-                    10,
-                    [],
-                    [
-                        {
-                            "e": 1168
-                        }
-                    ],
-                    [
-                        {
-                            "v": 1168
-                        }
-                    ],
-                    [
-                        {
-                            "c": 1168
-                        }
-                    ],
-                    [],
                     {}
                 ],
                 [
