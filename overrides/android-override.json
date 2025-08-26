@@ -35754,7 +35754,7 @@
                         "patchSettings": [
                             {
                                 "op": "replace",
-                                "path": "/additionalEnabledCheck",
+                                "path": "/additionalCheck",
                                 "value": "disabled"
                             }
                         ]
@@ -36008,7 +36008,7 @@
                         "patchSettings": [
                             {
                                 "op": "replace",
-                                "path": "/additionalEnabledCheck",
+                                "path": "/additionalCheck",
                                 "value": "disabled"
                             }
                         ]
@@ -36071,7 +36071,7 @@
                         "patchSettings": [
                             {
                                 "op": "replace",
-                                "path": "/additionalEnabledCheck",
+                                "path": "/additionalCheck",
                                 "value": "disabled"
                             }
                         ]
@@ -36123,8 +36123,7 @@
                     "domain": "chatgpt.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3509"
                 }
-            ],
-            "internal": true
+            ]
         },
         "fingerprintingScreenSize": {
             "state": "enabled",
@@ -36149,7 +36148,7 @@
                         "patchSettings": [
                             {
                                 "op": "replace",
-                                "path": "/additionalEnabledCheck",
+                                "path": "/additionalCheck",
                                 "value": "disabled"
                             }
                         ]
@@ -36208,7 +36207,7 @@
                         "patchSettings": [
                             {
                                 "op": "replace",
-                                "path": "/additionalEnabledCheck",
+                                "path": "/additionalCheck",
                                 "value": "disabled"
                             }
                         ]
@@ -36257,7 +36256,7 @@
                         "patchSettings": [
                             {
                                 "op": "replace",
-                                "path": "/additionalEnabledCheck",
+                                "path": "/additionalCheck",
                                 "value": "disabled"
                             }
                         ]
@@ -36601,9 +36600,53 @@
                 }
             ],
             "settings": {
-                "domains": [
+                "conditionalChanges": [
                     {
-                        "domain": "m.facebook.com",
+                        "condition": {
+                            "injectName": "android-adsjs",
+                            "maxSupportedVersion": 52459999,
+                            "internal": true
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/additionalCheck",
+                                "value": "disabled"
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "injectName": "android",
+                            "minSupportedVersion": 52460000,
+                            "internal": true
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/additionalCheck",
+                                "value": "disabled"
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "injectName": "android-adsjs",
+                            "minSupportedVersion": 52460000,
+                            "internal": true
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/additionalCheck",
+                                "value": "enabled"
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "domain": "m.facebook.com"
+                        },
                         "patchSettings": [
                             {
                                 "op": "add",
@@ -36615,7 +36658,9 @@
                         ]
                     },
                     {
-                        "domain": "msn.com",
+                        "condition": {
+                            "domain": "msn.com"
+                        },
                         "patchSettings": [
                             {
                                 "op": "add",
@@ -36628,7 +36673,9 @@
                         ]
                     },
                     {
-                        "domain": "privacy-test-pages.site",
+                        "condition": {
+                            "domain": "privacy-test-pages.site"
+                        },
                         "patchSettings": [
                             {
                                 "op": "add",
@@ -36641,7 +36688,9 @@
                         ]
                     },
                     {
-                        "domain": "realestate.com.au",
+                        "condition": {
+                            "domain": "realestate.com.au"
+                        },
                         "patchSettings": [
                             {
                                 "op": "replace",
@@ -36651,7 +36700,9 @@
                         ]
                     },
                     {
-                        "domain": "hyatt.com",
+                        "condition": {
+                            "domain": "hyatt.com"
+                        },
                         "patchSettings": [
                             {
                                 "op": "replace",
