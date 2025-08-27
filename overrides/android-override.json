@@ -37589,11 +37589,32 @@
             }
         },
         "apiManipulation": {
-            "readme": "Example config for apiManipulation to set navigator.plugins to return PDF viewer plugins",
+            "readme": "Used for manipulating APIs",
             "state": "enabled",
             "exceptions": [],
             "settings": {
-                "apiChanges": {}
+                "apiChanges": {
+                    "speechSynthesis": {
+                        "type": "descriptor",
+                        "define": true,
+                        "getterValue": {
+                            "type": "object",
+                            "value": {}
+                        }
+                    },
+                    "speechSynthesis.getVoices": {
+                        "type": "descriptor",
+                        "define": true,
+                        "getterValue": {
+                            "type": "function",
+                            "functionValue": {
+                                "type": "array",
+                                "value": [],
+                                "async": true
+                            }
+                        }
+                    }
+                }
             }
         },
         "contentScopeExperiments": {
