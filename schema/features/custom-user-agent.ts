@@ -1,4 +1,4 @@
-import { Feature, CSSInjectFeatureSettings } from '../feature';
+import { Feature } from '../feature';
 
 type UserAgentOverride = {
     domain: string;
@@ -23,7 +23,7 @@ type VersionsOnly = {
     versions: string[];
 };
 
-type FullCustomUserAgentOptions = CSSInjectFeatureSettings<{
+type CustomUserAgentSettings = {
     // Windows properties
     userAgentOverrides?: UserAgentOverride[];
     omitClientHintMutations?: string[];
@@ -42,8 +42,6 @@ type FullCustomUserAgentOptions = CSSInjectFeatureSettings<{
     // iOS/Android specific user agent configs
     closestUserAgent?: UserAgentConfig | VersionsOnly;
     ddgFixedUserAgent?: UserAgentConfig;
-}>;
-
-export type CustomUserAgentSettings = Partial<FullCustomUserAgentOptions>;
+};
 
 export type CustomUserAgentFeature<VersionType> = Feature<CustomUserAgentSettings, VersionType>;
