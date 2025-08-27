@@ -437,6 +437,26 @@
                             "weight": 1
                         }
                     ]
+                },
+                "notificationExperiment": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
                 }
             }
         },
@@ -1057,9 +1077,23 @@
                     "state": "enabled",
                     "changes": []
                 },
-                "domains": [
+                "conditionalChanges": [
                     {
-                        "domain": "www.cbsnews.com",
+                        "condition": {
+                            "experiment": { "experimentName": "notificationExperiment", "cohort": "treatment" }
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/notification",
+                                "value": "enabled"
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "domain": "www.cbsnews.com"
+                        },
                         "patchSettings": [
                             {
                                 "op": "replace",
@@ -1069,7 +1103,9 @@
                         ]
                     },
                     {
-                        "domain": "myhome.experian.co.uk",
+                        "condition": {
+                            "domain": "myhome.experian.co.uk"
+                        },
                         "patchSettings": [
                             {
                                 "op": "replace",
@@ -1079,7 +1115,9 @@
                         ]
                     },
                     {
-                        "domain": "msn.com",
+                        "condition": {
+                            "domain": "msn.com"
+                        },
                         "patchSettings": [
                             {
                                 "op": "add",
@@ -1092,7 +1130,9 @@
                         ]
                     },
                     {
-                        "domain": "privacy-test-pages.site",
+                        "condition": {
+                            "domain": "privacy-test-pages.site"
+                        },
                         "patchSettings": [
                             {
                                 "op": "add",
