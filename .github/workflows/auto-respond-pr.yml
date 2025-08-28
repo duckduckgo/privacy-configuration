@@ -92,6 +92,41 @@ jobs:
             - name: Create JSON approval analysis
               run: node pr/.github/scripts/json-diff-directories.js base/generated pr/generated > approval_output.txt
 
+            - name: Check changed files
+              id: check_files
+              run: |
+                  cd pr
+                  # Get list of changed files
+                  changed_files=$(git diff --name-only origin/${{ github.event.pull_request.base.ref }}...HEAD)
+                  echo "Changed files:"
+                  echo "$changed_files"
+
+                  # Check if all changed files are JSON files in overrides/ or features/
+                  valid_changes=true
+                  while IFS= read -r file; do
+                      if [[ ! "$file" =~ ^(overrides|features)/.+\.json$ ]]; then
+                          echo "❌ Invalid file change detected: $file"
+                          echo "Only JSON files in overrides/ and features/ directories are allowed for auto-approval"
+                          valid_changes=false
+                      fi
+                  done <<< "$changed_files"
+
+                  if [ "$valid_changes" = true ]; then
+                      echo "✅ All changed files are valid JSON files in allowed directories"
+                      echo "files_valid=true" >> $GITHUB_OUTPUT
+                  else
+                      echo "files_valid=false" >> $GITHUB_OUTPUT
+                  fi
+
+            - name: Parse approval output
+              id: approval
+              run: |
+                  if grep -q "AUTO-APPROVED" approval_output.txt; then
+                    echo "approved=true" >> $GITHUB_OUTPUT
+                  else
+                    echo "approved=false" >> $GITHUB_OUTPUT
+                  fi
+
             - name: Find Previous Diff Comment
               uses: peter-evans/find-comment@v3
               id: find_diff_comment
@@ -127,6 +162,23 @@ jobs:
                           commentBody = '❌ Generated diff output is too large to post as a comment, run locally to see the diff and validate'
                       }
                       core.setOutput('comment_body', commentBody);
+
+            - name: Wait for Cursor Bugbot
+              uses: fountainhead/action-wait-for-check@v1.2.0
+              id: wait-for-build
+              with:
+                  token: ${{ secrets.GITHUB_TOKEN }}
+                  checkName: Cursor Bugbot
+                  ref: ${{ github.event.pull_request.head.sha }}
+                  timeoutSeconds: 600
+
+            - name: Auto approve
+              if: steps.wait-for-build.outputs.conclusion == 'success' && steps.approval.outputs.approved == 'true' && steps.check_files.outputs.files_valid == 'true'
+              run: |
+                  gh pr review --approve "$PR_URL"
+              env:
+                  PR_URL: ${{ github.event.pull_request.html_url }}
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
             - name: Create Approval Comment Body
               uses: actions/github-script@v7
