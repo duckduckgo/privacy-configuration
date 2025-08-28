@@ -287,7 +287,6 @@ export async function handleAutoApproval(github, context, approvalOutputPath, ac
  * @param {string} approvalOutputPath - Path to approval analysis output file
  */
 
-
 // CLI interface for direct script execution
 if (import.meta.url === `file://${process.argv[1]}`) {
     const action = process.argv[2];
