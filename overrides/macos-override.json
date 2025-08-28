@@ -77,6 +77,36 @@
                             "weight": 1
                         }
                     ]
+                },
+                "scriptletExperiment": {
+                    "state": "disabled",
+                    "minSupportedVersion": "1.145.0",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
                 }
             }
         },
