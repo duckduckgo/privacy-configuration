@@ -367,6 +367,24 @@
                                         "value": "adc-card.adc-card"
                                     }
                                 ]
+                            },
+                            {
+                                "domain": ["order.yodobashi.com"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "div.loginEntry.ecOrderContainerFrame.pa10",
+                                            "type": "login"
+                                        }
+                                    },
+                                    {
+                                        "path": "/formBoundarySelector",
+                                        "op": "replace",
+                                        "value": "div.loginEntry.ecOrderContainerFrame.pa10"
+                                    }
+                                ]
                             }
                         ]
                     }
