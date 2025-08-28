@@ -176,7 +176,6 @@ jobs:
               if: steps.wait-for-build.outputs.conclusion == 'success' && steps.approval.outputs.approved == 'true' && steps.check_files.outputs.files_valid == 'true'
               run: |
                   gh pr review --approve "$PR_URL"
-                  gh pr merge --auto --squash "$PR_URL"
               env:
                   PR_URL: ${{ github.event.pull_request.html_url }}
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
