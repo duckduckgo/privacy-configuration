@@ -49,7 +49,7 @@ jobs:
                               core.setFailed(`User does not have sufficient repository permissions to use this workflow`);
                           }
                       } catch (error) {
-                          core.setFailed(`Unable to verify user permissions: ${error.message}`);
+                          core.setFailed(`Unable to verify user permissions`);
                       }
             - name: Create comment
               if: github.event.action == 'opened'
