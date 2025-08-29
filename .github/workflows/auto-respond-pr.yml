@@ -28,6 +28,31 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
+            - name: Check team membership
+              uses: actions/github-script@v7
+              with:
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  script: |
+                      try {
+                          const response = await github.rest.teams.getMembershipForUserInOrg({
+                              org: 'duckduckgo',
+                              team_slug: 'core',
+                              username: context.payload.pull_request.user.login
+                          });
+                          
+                          if (response.data.state !== 'active') {
+                              core.setFailed(`User ${context.payload.pull_request.user.login} is not an active member of @duckduckgo/core team`);
+                              return;
+                          }
+                          
+                          console.log(`✅ User ${context.payload.pull_request.user.login} is a member of @duckduckgo/core team`);
+                      } catch (error) {
+                          if (error.status === 404) {
+                              core.setFailed(`User ${context.payload.pull_request.user.login} is not a member of @duckduckgo/core team`);
+                          } else {
+                              core.setFailed(`Error checking team membership: ${error.message}`);
+                          }
+                      }
             - name: Create comment
               if: github.event.action == 'opened'
               uses: peter-evans/create-or-update-comment@v4
