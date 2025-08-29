@@ -50,19 +50,44 @@
             "state": "enabled",
             "exceptions": [],
             "features": {
-                "tdsNextExperiment001": {
+                "tdsNextExperiment002": {
                     "state": "disabled",
                     "minSupportedVersion": 52361000,
                     "rollout": {
                         "steps": [
                             {
-                                "percent": 100
+                                "percent": 25
                             }
                         ]
                     },
                     "settings": {
-                        "controlUrl": "v5/experiments/20250617-android-tds-control.json",
-                        "treatmentUrl": "v5/experiments/20250617-android-tds-treatment.json"
+                        "controlUrl": "v5/experiments/202508v1-android-tds-control.json",
+                        "treatmentUrl": "v5/experiments/202508v1-android-tds-treatment.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "tdsNextExperiment003": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52361000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "v5/experiments/202508v2-android-tds-control.json",
+                        "treatmentUrl": "v5/experiments/202508v2-android-tds-treatment.json"
                     },
                     "cohorts": [
                         {
@@ -36112,10 +36137,6 @@
                 {
                     "domain": "realtor.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2855"
-                },
-                {
-                    "domain": "chatgpt.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3509"
                 }
             ]
         },
@@ -36125,10 +36146,6 @@
                 {
                     "domain": "youtube.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/557"
-                },
-                {
-                    "domain": "chatgpt.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3509"
                 }
             ],
             "settings": {
@@ -36182,10 +36199,6 @@
                 {
                     "domain": "ticketmaster.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/575"
-                },
-                {
-                    "domain": "chatgpt.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3509"
                 }
             ],
             "settings": {
@@ -36338,12 +36351,7 @@
         "navigatorInterface": {
             "state": "enabled",
             "minSupportedVersion": 52250000,
-            "exceptions": [
-                {
-                    "domain": "chatgpt.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3509"
-                }
-            ]
+            "exceptions": []
         },
         "networkProtection": {
             "state": "enabled",
@@ -36581,10 +36589,6 @@
                 {
                     "domain": "n4g.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2892"
-                },
-                {
-                    "domain": "chatgpt.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3509"
                 }
             ],
             "settings": {
@@ -37213,10 +37217,6 @@
                 {
                     "domain": "id.onfido.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3295"
-                },
-                {
-                    "domain": "chatgpt.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3509"
                 }
             ]
         },
@@ -37628,35 +37628,35 @@
             }
         },
         "defaultBrowserPrompts": {
-            "state": "disabled",
+            "state": "enabled",
             "exceptions": [],
             "features": {
-                "defaultBrowserAdditionalPrompts202501": {
-                    "state": "disabled",
-                    "minSupportedVersion": 52282000,
-                    "settings": {
-                        "activeDaysUntilStage1": "1",
-                        "activeDaysUntilStage2": "4",
-                        "activeDaysUntilStop": "11"
+                "defaultBrowserPrompts25": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52451000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 20
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
                     },
-                    "cohorts": [
-                        {
-                            "name": "control",
-                            "weight": 0
-                        },
-                        {
-                            "name": "variant1",
-                            "weight": 0
-                        },
-                        {
-                            "name": "variant2",
-                            "weight": 0
-                        },
-                        {
-                            "name": "variant3",
-                            "weight": 0
-                        }
-                    ]
+                    "settings": {
+                        "newUserActiveDaysUntilStage1": "1",
+                        "newUserActiveDaysUntilStage2": "5",
+                        "newUserActiveDaysUntilStage3": "19",
+                        "existingUserActiveDaysUntilStage1": "0",
+                        "existingUserActiveDaysUntilStage3": "14"
+                    }
                 }
             }
         },

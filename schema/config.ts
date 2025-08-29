@@ -17,6 +17,7 @@ import { NetworkProtection } from './features/network-protection';
 import { AiChatConfig } from './features/ai-chat';
 import { ScriptletsFeature } from './features/scriptlets';
 import { WindowsWebViewFailures } from './features/windows-webview-failures';
+import { CustomUserAgentFeature } from './features/custom-user-agent';
 
 export { WebCompatSettings } from './features/webcompat';
 export { DuckPlayerSettings } from './features/duckplayer';
@@ -57,6 +58,7 @@ export type ConfigV5<VersionType> = {
         networkProtection?: NetworkProtection<VersionType>;
         scriptlets?: ScriptletsFeature<VersionType>;
         windowsWebviewFailures?: WindowsWebViewFailures<VersionType>;
+        customUserAgent?: CustomUserAgentFeature<VersionType>;
     };
     unprotectedTemporary: SiteException[];
 };
