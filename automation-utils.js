@@ -22,7 +22,10 @@ export const AUTO_APPROVABLE_FEATURES = {
     '/features/webCompat': ['/exceptions'],
     '/features/clickToLoad': ['/exceptions'],
     '/features/eme': ['/exceptions'],
-    '/features/autoconsent': ['/exceptions'],
+    '/features/autoconsent': [
+        '/exceptions',
+        '/settings/disabledCMPs',
+    ],
     '/features/customUserAgent': [
         '/exceptions',
         '/settings/ddgFixedSites',

@@ -1,5 +1,34 @@
 {
     "features": {
+        "experimentTest": {
+            "state": "enabled",
+            "exceptions": [],
+            "features": {
+                "experimentTestAA": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 20
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                }
+            }
+        },
         "apiManipulation": {
             "state": "enabled",
             "settings": {
@@ -24,7 +53,8 @@
             "state": "enabled",
             "exceptions": [],
             "settings": {
-                "videoPlayback": "enabled"
+                "videoPlayback": "enabled",
+                "urlChanged": "enabled"
             }
         },
         "networkProtection": {
@@ -69,6 +99,16 @@
                 "textSummarization": {
                     "state": "enabled",
                     "minSupportedVersion": "0.123.0"
+                },
+                "textTranslation": {
+                    "state": "internal"
+                },
+                "duckAiChatJumpListItem": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.125.0"
+                },
+                "globalToggle": {
+                    "state": "internal"
                 }
             },
             "minSupportedVersion": "0.100.0",
@@ -143,12 +183,15 @@
                     "state": "enabled"
                 },
                 "autofillIdentities": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "autofillIdentitiesOnByDefault": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "autofillSkipAuthenticationIfVaultEmpty": {
+                    "state": "internal"
+                },
+                "totp": {
                     "state": "internal"
                 },
                 "siteSpecificFixes": {
@@ -438,6 +481,9 @@
                 },
                 "bulkBookmarksImport": {
                     "state": "enabled"
+                },
+                "multiImportWindow": {
+                    "state": "internal"
                 }
             }
         },
@@ -570,7 +616,16 @@
             "settings": {
                 "omitApplicationSites": [],
                 "omitVersionSites": [],
-                "userAgentOverrides": [],
+                "userAgentOverrides": [
+                    {
+                        "domain": "www.msn.com",
+                        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
+                    },
+                    {
+                        "domain": "www.moneygram.com",
+                        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
+                    }
+                ],
                 "omitClientHintMutations": []
             },
             "exceptions": [],
@@ -589,41 +644,50 @@
         "syncPromotion": {
             "state": "enabled",
             "features": {
+                "bookmarkNew": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.126.0"
+                },
+                "bookmarksBarEmpty": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.126.0"
+                },
+                "bookmarksBarNonEmpty": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.126.0"
+                },
                 "bookmarks": {
                     "state": "enabled"
+                },
+                "bookmarkManagerEmpty": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.126.0"
+                },
+                "passwordNew": {
+                    "state": "disabled"
                 },
                 "passwords": {
                     "state": "enabled"
                 },
-                "bookmarksAndPasswordsBannersOpenSyncSetupDialog": {
-                    "state": "internal"
-                },
-                "bookmarkNew": {
-                    "state": "internal"
-                },
-                "passwordNew": {
-                    "state": "internal"
-                },
-                "bookmarkManagerEmpty": {
-                    "state": "internal"
-                },
                 "passwordManagerEmptyAllItems": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.126.0"
                 },
                 "passwordManagerEmptyPasswords": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.126.0"
+                },
+                "bookmarksAndPasswordsBannersOpenSyncSetupDialog": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.126.0"
                 },
                 "importStart": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.126.0"
                 },
                 "importEnd": {
-                    "state": "internal"
-                },
-                "bookmarksBarEmpty": {
-                    "state": "internal"
-                },
-                "bookmarksBarNonEmpty": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.126.0"
                 }
             }
         },
@@ -721,6 +785,9 @@
                             },
                             {
                                 "percent": 50
+                            },
+                            {
+                                "percent": 100
                             }
                         ]
                     },
@@ -796,7 +863,7 @@
                     "state": "enabled"
                 },
                 "crashAutoRecovery": {
-                    "state": "preview",
+                    "state": "enabled",
                     "minSupportedVersion": "0.125.0",
                     "settings": {
                         "autoRecoveryBrowserEngine": true,
@@ -809,12 +876,30 @@
                 }
             }
         },
+        "webview": {
+            "state": "enabled",
+            "features": {
+                "webViewProviderPreviewOptIn": {
+                    "state": "disabled"
+                },
+                "webViewProviderPreviewOptInFallbackToDefault": {
+                    "state": "disabled"
+                }
+            },
+            "exceptions": []
+        },
         "remoteMessaging": {
             "state": "enabled"
         },
         "windowsFireWindow": {
             "state": "enabled",
-            "minSupportedVersion": "0.98.0"
+            "minSupportedVersion": "0.98.0",
+            "features": {
+                "fireWindowJumpListItem": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.125.0"
+                }
+            }
         },
         "windowsNewTabPageExperiment": {
             "state": "enabled",
@@ -831,6 +916,9 @@
                 },
                 "omnibar": {
                     "state": "internal"
+                },
+                "newTabPagePerTab": {
+                    "state": "disabled"
                 }
             },
             "minSupportedVersion": "0.100.0"
@@ -854,8 +942,15 @@
             "state": "enabled",
             "features": {
                 "useExtensionBasedBurn": {
-                    "state": "preview",
-                    "minSupportedVersion": "0.124.0"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.124.0",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 20.0
+                            }
+                        ]
+                    }
                 },
                 "burnAnimationSettingVisibility": {
                     "state": "enabled",
@@ -949,17 +1044,20 @@
                 "bannerAfterPopoverDelayDays": 14,
                 "bannerRepeatIntervalDays": 14
             },
-            "minSupportedVersion": "0.123.0",
+            "minSupportedVersion": "0.127.0",
             "features": {
                 "scheduledDefaultBrowserAndTaskbarPrompts": {
                     "state": "enabled",
-                    "minSupportedVersion": "0.123.0"
+                    "minSupportedVersion": "0.127.0"
                 },
                 "scheduledPinToTaskbarPrompts": {
                     "state": "enabled",
-                    "minSupportedVersion": "0.123.0"
+                    "minSupportedVersion": "0.127.0"
                 },
                 "popoverVsBannerExperiment": {
+                    "state": "disabled"
+                },
+                "toastNotifications": {
                     "state": "disabled"
                 }
             }
@@ -986,6 +1084,10 @@
                 "lowSpaceThresholdMegabytes": 100,
                 "checkIntervalSeconds": 60
             }
+        },
+        "uncleanExitDetectionPopup": {
+            "state": "enabled",
+            "exceptions": []
         }
     },
     "unprotectedTemporary": []
