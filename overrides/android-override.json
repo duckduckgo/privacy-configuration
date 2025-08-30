@@ -35767,7 +35767,51 @@
             "state": "enabled"
         },
         "breakageReporting": {
-            "state": "enabled"
+            "state": "enabled",
+            "settings": {
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "injectName": "android-adsjs"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/additionalCheck",
+                                "value": "disabled"
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "injectName": "android",
+                            "minSupportedVersion": 53000000,
+                            "internal": true
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/additionalCheck",
+                                "value": "disabled"
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "injectName": "android-adsjs",
+                            "minSupportedVersion": 53000000,
+                            "internal": true
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/additionalCheck",
+                                "value": "enabled"
+                            }
+                        ]
+                    }
+                ]
+            }
         },
         "brokerProtection": {
             "state": "enabled"
@@ -35970,7 +36014,56 @@
         },
         "fingerprintingBattery": {
             "state": "enabled",
-            "exceptions": []
+            "exceptions": [
+                {
+                    "domain": "chatgpt.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3509"
+                }
+            ],
+            "settings": {
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "injectName": "android-adsjs"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/additionalCheck",
+                                "value": "disabled"
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "injectName": "android",
+                            "minSupportedVersion": 53000000,
+                            "internal": true
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/additionalCheck",
+                                "value": "disabled"
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "injectName": "android-adsjs",
+                            "minSupportedVersion": 53000000,
+                            "internal": true
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/additionalCheck",
+                                "value": "enabled"
+                            }
+                        ]
+                    }
+                ]
+            }
         },
         "fingerprintingCanvas": {
             "state": "disabled"
@@ -35988,7 +36081,49 @@
                 "deviceMemory": {
                     "type": "number",
                     "value": 4
-                }
+                },
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "injectName": "android-adsjs"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/additionalCheck",
+                                "value": "disabled"
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "injectName": "android",
+                            "minSupportedVersion": 53000000,
+                            "internal": true
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/additionalCheck",
+                                "value": "disabled"
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "injectName": "android-adsjs",
+                            "minSupportedVersion": 53000000,
+                            "internal": true
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/additionalCheck",
+                                "value": "enabled"
+                            }
+                        ]
+                    }
+                ]
             },
             "exceptions": [
                 {
@@ -36012,7 +36147,51 @@
                     "domain": "youtube.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/557"
                 }
-            ]
+            ],
+            "settings": {
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "injectName": "android-adsjs"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/additionalCheck",
+                                "value": "disabled"
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "injectName": "android",
+                            "minSupportedVersion": 53000000,
+                            "internal": true
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/additionalCheck",
+                                "value": "disabled"
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "injectName": "android-adsjs",
+                            "minSupportedVersion": 53000000,
+                            "internal": true
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/additionalCheck",
+                                "value": "enabled"
+                            }
+                        ]
+                    }
+                ]
+            }
         },
         "fingerprintingTemporaryStorage": {
             "state": "enabled",
@@ -36021,10 +36200,98 @@
                     "domain": "ticketmaster.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/575"
                 }
-            ]
+            ],
+            "settings": {
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "injectName": "android-adsjs"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/additionalCheck",
+                                "value": "disabled"
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "injectName": "android",
+                            "minSupportedVersion": 53000000,
+                            "internal": true
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/additionalCheck",
+                                "value": "disabled"
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "injectName": "android-adsjs",
+                            "minSupportedVersion": 53000000,
+                            "internal": true
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/additionalCheck",
+                                "value": "enabled"
+                            }
+                        ]
+                    }
+                ]
+            }
         },
         "gpc": {
-            "state": "enabled"
+            "state": "enabled",
+            "settings": {
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "injectName": "android-adsjs"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/additionalCheck",
+                                "value": "disabled"
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "injectName": "android",
+                            "minSupportedVersion": 53000000,
+                            "internal": true
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/additionalCheck",
+                                "value": "disabled"
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "injectName": "android-adsjs",
+                            "minSupportedVersion": 53000000,
+                            "internal": true
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/additionalCheck",
+                                "value": "enabled"
+                            }
+                        ]
+                    }
+                ]
+            }
         },
         "history": {
             "state": "enabled",
@@ -36297,6 +36564,7 @@
             }
         },
         "webCompat": {
+            "state": "enabled",
             "exceptions": [
                 {
                     "domain": "chewy.com",
@@ -36323,11 +36591,52 @@
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2892"
                 }
             ],
-            "state": "enabled",
             "settings": {
-                "domains": [
+                "conditionalChanges": [
                     {
-                        "domain": "m.facebook.com",
+                        "condition": {
+                            "injectName": "android-adsjs"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/additionalCheck",
+                                "value": "disabled"
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "injectName": "android",
+                            "minSupportedVersion": 53000000,
+                            "internal": true
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/additionalCheck",
+                                "value": "disabled"
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "injectName": "android-adsjs",
+                            "minSupportedVersion": 53000000,
+                            "internal": true
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/additionalCheck",
+                                "value": "enabled"
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "domain": "m.facebook.com"
+                        },
                         "patchSettings": [
                             {
                                 "op": "add",
@@ -36339,7 +36648,9 @@
                         ]
                     },
                     {
-                        "domain": "msn.com",
+                        "condition": {
+                            "domain": "msn.com"
+                        },
                         "patchSettings": [
                             {
                                 "op": "add",
@@ -36352,7 +36663,9 @@
                         ]
                     },
                     {
-                        "domain": "privacy-test-pages.site",
+                        "condition": {
+                            "domain": "privacy-test-pages.site"
+                        },
                         "patchSettings": [
                             {
                                 "op": "add",
@@ -36365,7 +36678,9 @@
                         ]
                     },
                     {
-                        "domain": "realestate.com.au",
+                        "condition": {
+                            "domain": "realestate.com.au"
+                        },
                         "patchSettings": [
                             {
                                 "op": "replace",
@@ -36375,7 +36690,9 @@
                         ]
                     },
                     {
-                        "domain": "hyatt.com",
+                        "condition": {
+                            "domain": "hyatt.com"
+                        },
                         "patchSettings": [
                             {
                                 "op": "replace",
@@ -37588,7 +37905,49 @@
             "state": "enabled",
             "exceptions": [],
             "settings": {
-                "apiChanges": {}
+                "apiChanges": {},
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "injectName": "android-adsjs"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/additionalCheck",
+                                "value": "disabled"
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "injectName": "android",
+                            "minSupportedVersion": 53000000,
+                            "internal": true
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/additionalCheck",
+                                "value": "disabled"
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "injectName": "android-adsjs",
+                            "minSupportedVersion": 53000000,
+                            "internal": true
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/additionalCheck",
+                                "value": "enabled"
+                            }
+                        ]
+                    }
+                ]
             }
         },
         "contentScopeExperiments": {
