@@ -14,14 +14,15 @@
 name: Auto Respond to PR
 
 on:
-    pull_request:
+    pull_request_review:
+    pull_request_target:
         types:
             - opened
+            - edited
+            - closed
+            - reopened
             - synchronize
-        paths:
-            - '**.json'
-            - '**.js'
-            - '**.yml'
+            - review_requested
 
 jobs:
     auto_respond:
@@ -51,27 +52,6 @@ jobs:
                       } catch (error) {
                           core.setFailed(`Unable to verify user permissions`);
                       }
-            - name: Create comment
-              if: github.event.action == 'opened'
-              uses: peter-evans/create-or-update-comment@v4
-              with:
-                  issue-number: ${{ github.event.pull_request.number }}
-                  body: |
-                      👋 Don't forget to **add an individual reviewer** (in addition to those auto-added), as this will create a task for them in Asana.
-                      - The best reviewer is most likely a feature or platform owner.
-                       - If they've got permission to approve, you're good to merge. See [CODEOWNERS](https://github.com/duckduckgo/privacy-configuration/blob/main/CODEOWNERS)
-                       - As a fallback the Global owners are:
-                         - [Breakage AOR](https://github.com/orgs/duckduckgo/teams/breakage-aor)
-                         - [Breakage triagers](https://github.com/orgs/duckduckgo/teams/breakage)
-                         - [Config AOR](https://github.com/orgs/duckduckgo/teams/config-aor)
-
-                      👉 Please mark this as DRAFT unless there's an intention to merge this immediately.
-                      👉 Click "Merge when ready" if you're happy for this to be automatically merged once reviewed. (If not available, ensure you've signed in to DuckDuckGo oauth.)
-                      👉 Don't forget to add schema changes to validate if you're adding/changing a feature.
-
-                       - [Config Reviewer Documentation](https://app.asana.com/0/1200890834746050/1204443212791216/f)
-                       - [Config Maintainer Documentation](https://app.asana.com/0/1200890834746050/1200573250322769/f)
-                       - [Feature Implementer Documentation](https://app.asana.com/0/1200890834746050/1201498956177210/f)
 
             - name: Checkout base branch
               uses: actions/checkout@v5
@@ -202,6 +182,38 @@ jobs:
               env:
                   PR_URL: ${{ github.event.pull_request.html_url }}
                   GITHUB_TOKEN: ${{ secrets.PRIVACY_CONFIG_PAT }}
+
+            - uses: duckduckgo/action-asana-sync@v11
+              if: (steps.wait-for-build.outputs.conclusion == 'success' && steps.approval.outputs.approved == 'true' && steps.check_files.outputs.files_valid == 'true') != true
+              with:
+                  ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+                  ASANA_WORKSPACE_ID: ${{ secrets.ASANA_WORKSPACE_ID }}
+                  ASANA_PROJECT_ID: '1206780406371845'
+                  GITHUB_PAT: ${{ secrets.GH_RO_PAT }}
+                  USER_MAP: ${{ vars.USER_MAP }}
+                  ASSIGN_PR_AUTHOR: 'true'
+
+            - name: Create comment
+              if: github.event.action == 'opened' && (steps.wait-for-build.outputs.conclusion == 'success' && steps.approval.outputs.approved == 'true' && steps.check_files.outputs.files_valid == 'true') != true
+              uses: peter-evans/create-or-update-comment@v4
+              with:
+                  issue-number: ${{ github.event.pull_request.number }}
+                  body: |
+                      👋 Don't forget to **add an individual reviewer** (in addition to those auto-added), as this will create a task for them in Asana.
+                      - The best reviewer is most likely a feature or platform owner.
+                       - If they've got permission to approve, you're good to merge. See [CODEOWNERS](https://github.com/duckduckgo/privacy-configuration/blob/main/CODEOWNERS)
+                       - As a fallback the Global owners are:
+                         - [Breakage AOR](https://github.com/orgs/duckduckgo/teams/breakage-aor)
+                         - [Breakage triagers](https://github.com/orgs/duckduckgo/teams/breakage)
+                         - [Config AOR](https://github.com/orgs/duckduckgo/teams/config-aor)
+
+                      👉 Please mark this as DRAFT unless there's an intention to merge this immediately.
+                      👉 Click "Merge when ready" if you're happy for this to be automatically merged once reviewed. (If not available, ensure you've signed in to DuckDuckGo oauth.)
+                      👉 Don't forget to add schema changes to validate if you're adding/changing a feature.
+
+                       - [Config Reviewer Documentation](https://app.asana.com/0/1200890834746050/1204443212791216/f)
+                       - [Config Maintainer Documentation](https://app.asana.com/0/1200890834746050/1200573250322769/f)
+                       - [Feature Implementer Documentation](https://app.asana.com/0/1200890834746050/1201498956177210/f)
 
             - name: Create Approval Comment Body
               uses: actions/github-script@v7
