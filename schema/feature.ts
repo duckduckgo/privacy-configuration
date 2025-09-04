@@ -65,6 +65,10 @@ type ConditionBlock = {
     minSupportedVersion?: number;
     maxSupportedVersion?: number;
     internal?: boolean;
+    context?: {
+        top?: boolean;
+        frame?: boolean;
+    };
 };
 
 type CSSInjectFeatureSettingsPatches = {
