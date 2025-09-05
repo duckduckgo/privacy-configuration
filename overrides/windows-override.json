@@ -109,6 +109,9 @@
                 },
                 "globalToggle": {
                     "state": "internal"
+                },
+                "pageContext": {
+                    "state": "internal"
                 }
             },
             "minSupportedVersion": "0.100.0",
@@ -271,6 +274,19 @@
                                 ]
                             },
                             {
+                                "domain": ["cvs.com"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "profile-lookup[app-name='account-login'] input[type='text']",
+                                            "type": "credentials.username"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
                                 "domain": ["att.com"],
                                 "patchSettings": [
                                     {
@@ -368,6 +384,24 @@
                                         "path": "/formBoundarySelector",
                                         "op": "replace",
                                         "value": "adc-card.adc-card"
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": ["order.yodobashi.com"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": ".loginSelectUnit.slctInputUnit",
+                                            "type": "login"
+                                        }
+                                    },
+                                    {
+                                        "path": "/formBoundarySelector",
+                                        "op": "replace",
+                                        "value": ".loginSelectUnit.slctInputUnit"
                                     }
                                 ]
                             }
@@ -509,6 +543,11 @@
                                 "op": "replace",
                                 "path": "/subscriptions",
                                 "value": "enabled"
+                            },
+                            {
+                                "op": "replace",
+                                "path": "/subscriptionPages",
+                                "value": "enabled"
                             }
                         ]
                     }
@@ -646,48 +685,94 @@
             "features": {
                 "bookmarkNew": {
                     "state": "enabled",
-                    "minSupportedVersion": "0.126.0"
+                    "minSupportedVersion": "0.128.3",
+                    "rollout": {
+                        "steps": [
+                            { "percent": 10 }]
+                    }
                 },
                 "bookmarksBarEmpty": {
                     "state": "enabled",
-                    "minSupportedVersion": "0.126.0"
+                    "minSupportedVersion": "0.128.3",
+                    "rollout": {
+                        "steps": [
+                            { "percent": 10 }]
+                    }
                 },
                 "bookmarksBarNonEmpty": {
                     "state": "enabled",
-                    "minSupportedVersion": "0.126.0"
+                    "minSupportedVersion": "0.128.3",
+                    "rollout": {
+                        "steps": [
+                            { "percent": 10 }]
+                    }
                 },
                 "bookmarks": {
-                    "state": "enabled"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.128.3",
+                    "rollout": {
+                        "steps": [
+                            { "percent": 10 }]
+                    }
                 },
                 "bookmarkManagerEmpty": {
                     "state": "enabled",
-                    "minSupportedVersion": "0.126.0"
+                    "minSupportedVersion": "0.128.3",
+                    "rollout": {
+                        "steps": [
+                            { "percent": 10 }]
+                    }
                 },
                 "passwordNew": {
                     "state": "disabled"
                 },
                 "passwords": {
-                    "state": "enabled"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.128.3",
+                    "rollout": {
+                        "steps": [
+                            { "percent": 10 }]
+                    }
                 },
                 "passwordManagerEmptyAllItems": {
                     "state": "enabled",
-                    "minSupportedVersion": "0.126.0"
+                    "minSupportedVersion": "0.128.3",
+                    "rollout": {
+                        "steps": [
+                            { "percent": 10 }]
+                    }
                 },
                 "passwordManagerEmptyPasswords": {
                     "state": "enabled",
-                    "minSupportedVersion": "0.126.0"
+                    "minSupportedVersion": "0.128.3",
+                    "rollout": {
+                        "steps": [
+                            { "percent": 10 }]
+                    }
                 },
                 "bookmarksAndPasswordsBannersOpenSyncSetupDialog": {
                     "state": "enabled",
-                    "minSupportedVersion": "0.126.0"
+                    "minSupportedVersion": "0.128.3",
+                    "rollout": {
+                        "steps": [
+                            { "percent": 10 }]
+                    }
                 },
                 "importStart": {
                     "state": "enabled",
-                    "minSupportedVersion": "0.126.0"
+                    "minSupportedVersion": "0.128.3",
+                    "rollout": {
+                        "steps": [
+                            { "percent": 10 }]
+                    }
                 },
                 "importEnd": {
                     "state": "enabled",
-                    "minSupportedVersion": "0.126.0"
+                    "minSupportedVersion": "0.128.3",
+                    "rollout": {
+                        "steps": [
+                            { "percent": 10 }]
+                    }
                 }
             }
         },
@@ -792,6 +877,14 @@
                         ]
                     },
                     "minSupportedVersion": "0.118.4"
+                },
+                "subscriptionRebranding": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.126.0"
+                },
+                "paidAiChat": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.126.0"
                 }
             },
             "settings": {

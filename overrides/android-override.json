@@ -50,38 +50,13 @@
             "state": "enabled",
             "exceptions": [],
             "features": {
-                "tdsNextExperiment002": {
-                    "state": "disabled",
-                    "minSupportedVersion": 52361000,
-                    "rollout": {
-                        "steps": [
-                            {
-                                "percent": 25
-                            }
-                        ]
-                    },
-                    "settings": {
-                        "controlUrl": "v5/experiments/202508v1-android-tds-control.json",
-                        "treatmentUrl": "v5/experiments/202508v1-android-tds-treatment.json"
-                    },
-                    "cohorts": [
-                        {
-                            "name": "control",
-                            "weight": 1
-                        },
-                        {
-                            "name": "treatment",
-                            "weight": 1
-                        }
-                    ]
-                },
                 "tdsNextExperiment003": {
                     "state": "enabled",
                     "minSupportedVersion": 52361000,
                     "rollout": {
                         "steps": [
                             {
-                                "percent": 25
+                                "percent": 100
                             }
                         ]
                     },
@@ -35393,6 +35368,19 @@
                                 ]
                             },
                             {
+                                "domain": ["cvs.com"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "profile-lookup[app-name='account-login'] input[type='text']",
+                                            "type": "credentials.username"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
                                 "domain": [
                                     "att.com"
                                 ],
@@ -35504,6 +35492,24 @@
                                         "path": "/formBoundarySelector",
                                         "op": "replace",
                                         "value": "adc-card.adc-card"
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": ["order.yodobashi.com"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": ".loginSelectUnit.slctInputUnit",
+                                            "type": "login"
+                                        }
+                                    },
+                                    {
+                                        "path": "/formBoundarySelector",
+                                        "op": "replace",
+                                        "value": ".loginSelectUnit.slctInputUnit"
                                     }
                                 ]
                             }
@@ -37357,6 +37363,10 @@
                     "state": "enabled",
                     "minSupportedVersion": 52420000
                 },
+                "duckAiPlus": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52451000
+                },
                 "privacyProFreeTrialJan25": {
                     "state": "enabled",
                     "minSupportedVersion": 52280000,
@@ -37373,6 +37383,12 @@
                             "weight": 1
                         }
                     ]
+                },
+                "subscriptionRebranding": {
+                    "state": "enabled"
+                },
+                "subscriptionAIFeaturesRebranding": {
+                    "state": "enabled"
                 }
             }
         },
@@ -37710,160 +37726,6 @@
                 }
             }
         },
-        "tabSwitcherAnimation": {
-            "state": "enabled",
-            "minSupportedVersion": 52342000
-        },
-        "senseOfProtection": {
-            "state": "disabled",
-            "exceptions": [],
-            "features": {
-                "senseOfProtectionNewUserExperimentApr25": {
-                    "state": "disabled",
-                    "targets": [
-                        {
-                            "isReturningUser": false
-                        }
-                    ],
-                    "cohorts": [
-                        {
-                            "name": "modifiedControl",
-                            "weight": 0
-                        },
-                        {
-                            "name": "variant1",
-                            "weight": 0
-                        },
-                        {
-                            "name": "variant2",
-                            "weight": 0
-                        }
-                    ]
-                },
-                "senseOfProtectionExistingUserExperimentApr25": {
-                    "state": "disabled",
-                    "cohorts": [
-                        {
-                            "name": "modifiedControl",
-                            "weight": 0
-                        },
-                        {
-                            "name": "variant1",
-                            "weight": 0
-                        },
-                        {
-                            "name": "variant2",
-                            "weight": 0
-                        }
-                    ]
-                },
-                "senseOfProtectionNewUserExperimentMay25": {
-                    "state": "disabled",
-                    "minSupportedVersion": 52342000,
-                    "targets": [
-                        {
-                            "isReturningUser": false
-                        }
-                    ],
-                    "cohorts": [
-                        {
-                            "name": "modifiedControl",
-                            "weight": 0
-                        },
-                        {
-                            "name": "variant1",
-                            "weight": 0
-                        },
-                        {
-                            "name": "variant2",
-                            "weight": 0
-                        }
-                    ]
-                },
-                "senseOfProtectionExistingUserExperimentMay25": {
-                    "state": "disabled",
-                    "minSupportedVersion": 52342000,
-                    "rollout": {
-                        "steps": [
-                            {
-                                "percent": 1
-                            }
-                        ]
-                    },
-                    "cohorts": [
-                        {
-                            "name": "modifiedControl",
-                            "weight": 0
-                        },
-                        {
-                            "name": "variant1",
-                            "weight": 0
-                        },
-                        {
-                            "name": "variant2",
-                            "weight": 0
-                        }
-                    ]
-                },
-                "senseOfProtectionNewUserExperiment27May25": {
-                    "state": "disabled",
-                    "minSupportedVersion": 52361000,
-                    "targets": [
-                        {
-                            "isReturningUser": false
-                        }
-                    ],
-                    "cohorts": [
-                        {
-                            "name": "modifiedControl",
-                            "weight": 0
-                        },
-                        {
-                            "name": "variant1",
-                            "weight": 0
-                        },
-                        {
-                            "name": "variant2",
-                            "weight": 0
-                        }
-                    ]
-                },
-                "senseOfProtectionExistingUserExperiment27May25": {
-                    "state": "disabled",
-                    "minSupportedVersion": 52361000,
-                    "rollout": {
-                        "steps": [
-                            {
-                                "percent": 1
-                            },
-                            {
-                                "percent": 3
-                            },
-                            {
-                                "percent": 5
-                            },
-                            {
-                                "percent": 8
-                            }
-                        ]
-                    },
-                    "cohorts": [
-                        {
-                            "name": "modifiedControl",
-                            "weight": 0
-                        },
-                        {
-                            "name": "variant1",
-                            "weight": 0
-                        },
-                        {
-                            "name": "variant2",
-                            "weight": 0
-                        }
-                    ]
-                }
-            }
-        },
         "reactivateUsers": {
             "state": "enabled",
             "exceptions": [],
@@ -38044,6 +37906,23 @@
                 "waitForLocalPrivacyConfig": {
                     "state": "enabled",
                     "minSupportedVersion": 52450000
+                }
+            }
+        },
+        "serpEasterEggLogos": {
+            "state": "enabled",
+            "exceptions": [],
+            "features": {
+                "feature": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52470000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            }
+                        ]
+                    }
                 }
             }
         }
