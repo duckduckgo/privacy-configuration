@@ -1,10 +1,11 @@
-import { Feature, CSSInjectFeatureSettings, CSSConfigSetting } from '../feature';
+import { Feature, CSSInjectFeatureSettings, CSSConfigSetting, FeatureState } from '../feature';
 
 type FullFingerprintingScreenSizeOptions = CSSInjectFeatureSettings<{
     availTop?: CSSConfigSetting;
     availLeft?: CSSConfigSetting;
     colorDepth?: CSSConfigSetting;
     pixelDepth?: CSSConfigSetting;
+    additionalCheck?: FeatureState;
 }>;
 
 export type FingerprintingScreenSizeFeature<VersionType> = Feature<Partial<FullFingerprintingScreenSizeOptions>, VersionType>;

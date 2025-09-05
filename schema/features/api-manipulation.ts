@@ -1,4 +1,4 @@
-import { Feature, CSSInjectFeatureSettings, CSSConfigSetting } from '../feature';
+import { Feature, CSSInjectFeatureSettings, CSSConfigSetting, FeatureState } from '../feature';
 
 type RemoveAPIChange = {
     type: 'remove';
@@ -14,6 +14,7 @@ type DescriptorAPIChange = {
 
 type FullAPIManipulationOptions = CSSInjectFeatureSettings<{
     apiChanges: Record<string, RemoveAPIChange | DescriptorAPIChange>;
+    additionalCheck?: FeatureState;
 }>;
 export type APIManipulationSettings = Partial<FullAPIManipulationOptions>;
 
