@@ -49,5 +49,10 @@ export function formatErrors(errors) {
         return '';
     }
 
-    return errors.map((item) => `${item.instancePath}: ${formatParams(item.params)} - ${item.message}`).join(', ');
+    return errors
+        .map((item) => {
+            const params = formatParams(item.params);
+            return params ? `${item.instancePath}: ${params} - ${item.message}` : `${item.instancePath}: ${item.message}`;
+        })
+        .join(', ');
 }
