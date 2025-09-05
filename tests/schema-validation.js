@@ -30,10 +30,29 @@ export function createValidator(schemaName) {
     return ajv.compile(getSchema(schemaName));
 }
 
+function formatParams(params) {
+    if (params) {
+        return Object.entries(params)
+            .map(
+                ([
+                    key,
+                    value,
+                ]) => `${key}: ${value}`,
+            )
+            .join(',\n');
+    }
+    return '';
+}
+
 export function formatErrors(errors) {
     if (!Array.isArray(errors)) {
         return '';
     }
 
-    return errors.map((item) => `${item.instancePath}: ${item.message}`).join(', ');
+    return errors
+        .map((item) => {
+            const params = formatParams(item.params);
+            return params ? `${item.instancePath}: ${params} - ${item.message}` : `${item.instancePath}: ${item.message}`;
+        })
+        .join(', ');
 }

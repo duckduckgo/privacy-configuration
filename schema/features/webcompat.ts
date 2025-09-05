@@ -1,4 +1,4 @@
-import { Feature, CSSInjectFeatureSettings } from '../feature';
+import { Feature, CSSInjectFeatureSettings, FeatureState } from '../feature';
 
 type StateToggle = 'enabled' | 'disabled';
 type FullWebCompatOptions = CSSInjectFeatureSettings<{
@@ -55,6 +55,7 @@ type FullWebCompatOptions = CSSInjectFeatureSettings<{
     disableDeviceEnumeration: StateToggle;
     disableDeviceEnumerationFrames: StateToggle;
     enumerateDevices: StateToggle;
+    additionalCheck?: FeatureState;
 }>;
 export type WebCompatSettings = Partial<FullWebCompatOptions>;
 
