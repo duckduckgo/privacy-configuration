@@ -1431,12 +1431,20 @@
                     "state": "disabled"
                 },
                 "inactivityNotification": {
-                    "state": "internal",
+                    "state": "disabled",
+                    "minSupportedVersion": "7.186.0",
                     "description": "Local inactivity provisional notifications delivered to Notification Center.",
                     "targets": [
                         { "localeLanguage": "en", "localeCountry": "US" }],
                     "settings": {
                         "daysInactive": "7"
+                    },
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            }
+                        ]
                     }
                 },
                 "appShortcut": {
