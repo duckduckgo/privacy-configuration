@@ -84,7 +84,23 @@
             }
         },
         "duckAiListener": {
-            "state": "enabled"
+            "state": "enabled",
+            "settings": {
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "internal": false
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/additionalCheck",
+                                "value": "disabled"
+                            }
+                        ]
+                    }
+                ]
+            }
         },
         "aiChat": {
             "state": "enabled",
@@ -1212,7 +1228,23 @@
         },
         "pageContext": {
             "state": "enabled",
-            "exceptions": []
+            "exceptions": [],
+            "settings": {
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "internal": false
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/additionalCheck",
+                                "value": "disabled"
+                            }
+                        ]
+                    }
+                ]
+            }
         }
     },
     "unprotectedTemporary": []
