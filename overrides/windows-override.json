@@ -101,7 +101,8 @@
                     "minSupportedVersion": "0.123.0"
                 },
                 "textTranslation": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.129.0"
                 },
                 "duckAiChatJumpListItem": {
                     "state": "enabled",
@@ -402,6 +403,18 @@
                                         "path": "/formBoundarySelector",
                                         "op": "replace",
                                         "value": ".loginSelectUnit.slctInputUnit"
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": [
+                                    "accounts.google.com"
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formBoundarySelector",
+                                        "op": "replace",
+                                        "value": "c-wiz > main"
                                     }
                                 ]
                             }
@@ -977,6 +990,9 @@
                 },
                 "webViewProviderPreviewOptInFallbackToDefault": {
                     "state": "disabled"
+                },
+                "certificateTransparency": {
+                    "state": "enabled"
                 }
             },
             "exceptions": []
@@ -1043,6 +1059,9 @@
                                 "percent": 20.0
                             }
                         ]
+                    },
+                    "settings": {
+                        "timeoutIntervalSeconds": 12
                     }
                 },
                 "burnAnimationSettingVisibility": {
@@ -1082,6 +1101,10 @@
                 "alwaysAskWhereToSaveFiles": {
                     "state": "enabled",
                     "minSupportedVersion": "0.112.0"
+                },
+                "showDownloadPopup": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.129.0"
                 }
             }
         },
@@ -1151,12 +1174,14 @@
                     "state": "disabled"
                 },
                 "toastNotifications": {
-                    "state": "disabled"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.129.0"
                 }
             }
         },
         "pinnedTabs": {
-            "state": "internal",
+            "state": "preview",
+            "minSupportedVersion": "0.129.0",
             "features": {}
         },
         "appHealth": {

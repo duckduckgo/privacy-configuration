@@ -18,6 +18,7 @@ import { AiChatConfig } from './features/ai-chat';
 import { ScriptletsFeature } from './features/scriptlets';
 import { WindowsWebViewFailures } from './features/windows-webview-failures';
 import { CustomUserAgentFeature } from './features/custom-user-agent';
+import { BurnFeature } from './features/burn';
 
 export { WebCompatSettings } from './features/webcompat';
 export { DuckPlayerSettings } from './features/duckplayer';
@@ -44,6 +45,7 @@ export type ConfigV5<VersionType> = {
         apiManipulation?: APIManipulationFeature<VersionType>;
         autoconsent?: AutoconsentFeature<VersionType>;
         autofill?: AutofillFeature<VersionType>;
+        burn?: BurnFeature<VersionType>;
         import?: ImportFeature<VersionType>;
         cookie?: CookieFeature<VersionType>;
         duckPlayer?: DuckPlayerFeature<VersionType>;

@@ -35310,6 +35310,18 @@
                             },
                             {
                                 "domain": [
+                                    "accounts.google.com"
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formBoundarySelector",
+                                        "op": "replace",
+                                        "value": "c-wiz > main"
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": [
                                     "coolors.co"
                                 ],
                                 "patchSettings": [
@@ -35551,6 +35563,13 @@
                                                     ],
                                                     "labelTexts": [
                                                         "Export"
+                                                    ]
+                                                },
+                                                "exportConfirmButton": {
+                                                    "shouldAutotap": true,
+                                                    "path": "/options",
+                                                    "selectors": [
+                                                        "button[data-mdc-dialog-action='ok']"
                                                     ]
                                                 },
                                                 "signInButton": {
@@ -36616,10 +36635,6 @@
                 {
                     "domain": "realtor.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2855"
-                },
-                {
-                    "domain": "n4g.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2892"
                 }
             ],
             "settings": {
@@ -37891,15 +37906,15 @@
                     "cohorts": [
                         {
                             "name": "modifiedControl",
-                            "weight": 1
+                            "weight": 0
                         },
                         {
                             "name": "bb",
-                            "weight": 1
+                            "weight": 0
                         },
                         {
                             "name": "buck",
-                            "weight": 1
+                            "weight": 0
                         }
                     ]
                 },
@@ -37920,6 +37935,15 @@
                         "steps": [
                             {
                                 "percent": 5
+                            },
+                            {
+                                "percent": 20
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
                             }
                         ]
                     }

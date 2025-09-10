@@ -1958,6 +1958,10 @@
                         "type": "hide"
                     },
                     {
+                        "selector": "div:has(> iframe[src*='prid=19050206'])",
+                        "type": "hide"
+                    },
+                    {
                         "selector": "[aria-labelledby='promo-header']",
                         "type": "hide"
                     },
@@ -2028,11 +2032,14 @@
                 "domain": "hindustantimes.com",
                 "rules": [
                     {
+                        "type": "disable-default"
+                    },
+                    {
                         "selector": ".desktopAd",
                         "type": "hide-empty"
                     },
                     {
-                        "selector": "[class^='adHeight']",
+                        "selector": "[id^='adslotLazy']",
                         "type": "hide-empty"
                     },
                     {
@@ -2511,6 +2518,10 @@
                     {
                         "selector": ".f-item-ad-inhouse",
                         "type": "closest-empty"
+                    },
+                    {
+                        "selector": "[class^='sp-backdrop-info']",
+                        "type": "hide"
                     }
                 ]
             },

@@ -8,13 +8,14 @@ type ButtonConfig = {
     shouldAutotap: boolean;
     path: string;
     selectors: string[];
-    labelTexts: string[];
+    labelTexts?: string[];
 };
 
 type ImportFromGooglePasswordManager = {
     settingsButton: ButtonConfig;
     exportButton: ButtonConfig;
     signInButton: ButtonConfig;
+    exportConfirmButton: ButtonConfig;
 };
 
 export type FormTypeSetting = {
