@@ -408,6 +408,18 @@
                                         "value": ".loginSelectUnit.slctInputUnit"
                                     }
                                 ]
+                            },
+                            {
+                                "domain": [
+                                    "accounts.google.com"
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formBoundarySelector",
+                                        "op": "replace",
+                                        "value": "c-wiz > main"
+                                    }
+                                ]
                             }
                         ]
                     }
@@ -981,6 +993,9 @@
                 },
                 "webViewProviderPreviewOptInFallbackToDefault": {
                     "state": "disabled"
+                },
+                "certificateTransparency": {
+                    "state": "enabled"
                 }
             },
             "exceptions": []
@@ -1047,6 +1062,9 @@
                                 "percent": 20.0
                             }
                         ]
+                    },
+                    "settings": {
+                        "timeoutIntervalSeconds": 12
                     }
                 },
                 "burnAnimationSettingVisibility": {
@@ -1165,7 +1183,8 @@
             }
         },
         "pinnedTabs": {
-            "state": "internal",
+            "state": "preview",
+            "minSupportedVersion": "0.129.0",
             "features": {}
         },
         "appHealth": {
