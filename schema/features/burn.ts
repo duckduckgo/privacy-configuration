@@ -4,9 +4,9 @@ type SubFeatures<VersionType> = {
     useExtensionBasedBurn?: SubFeature<
         VersionType,
         {
-            useSubController: boolean;
-            pollingIntervalMs: number;
-            timeoutIntervalSeconds: number;
+            useSubController?: boolean;
+            pollingIntervalMs?: number;
+            timeoutIntervalSeconds?: number;
         }
     >;
 };
