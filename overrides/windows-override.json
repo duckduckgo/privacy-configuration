@@ -83,6 +83,25 @@
                 "betaEndingDescription": "The free, beta period is ending soon."
             }
         },
+        "duckAiListener": {
+            "state": "enabled",
+            "settings": {
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "internal": false
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/additionalCheck",
+                                "value": "disabled"
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
         "aiChat": {
             "state": "enabled",
             "features": {
@@ -1206,6 +1225,26 @@
         "uncleanExitDetectionPopup": {
             "state": "enabled",
             "exceptions": []
+        },
+        "pageContext": {
+            "state": "enabled",
+            "exceptions": [],
+            "settings": {
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "internal": false
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/additionalCheck",
+                                "value": "disabled"
+                            }
+                        ]
+                    }
+                ]
+            }
         }
     },
     "unprotectedTemporary": []

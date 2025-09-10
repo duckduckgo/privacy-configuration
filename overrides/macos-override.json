@@ -195,11 +195,33 @@
             },
             "state": "enabled"
         },
+        "duckAiListener": {
+            "state": "enabled",
+            "settings": {
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "internal": false
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/additionalCheck",
+                                "value": "disabled"
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
         "aiChat": {
             "state": "enabled",
             "features": {
                 "toolbarShortcut": {
                     "state": "enabled"
+                },
+                "pageContext": {
+                    "state": "internal"
                 },
                 "applicationMenuShortcut": {
                     "state": "enabled"
@@ -1501,6 +1523,26 @@
                 "willSoonDropBigSurSupport": {
                     "state": "enabled"
                 }
+            }
+        },
+        "pageContext": {
+            "state": "enabled",
+            "exceptions": [],
+            "settings": {
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "internal": false
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/additionalCheck",
+                                "value": "disabled"
+                            }
+                        ]
+                    }
+                ]
             }
         }
     },
