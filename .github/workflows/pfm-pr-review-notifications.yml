@@ -1,15 +1,36 @@
-name: Update Asana on pull request reviewed
+name: PFM PR reviewed
 
 on:
     pull_request_review:
-        types: [submitted]
+        types: [submitted, dismissed]
 
 jobs:
     pr-reviewed:
-        name: Add PR reviewed comment to Asana task
-        uses: duckduckgo/native-github-asana-sync/.github/workflows/pr-review-notifications.yml@v2.0
         if: contains(join(github.event.pull_request.labels.*.name, ','), 'SBT-PFM')
-        with:
-            trigger-phrase: '\*\*Asana Task/Github Issue:\*\*'
-        secrets:
-            asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+        runs-on: ubuntu-latest
+        steps:
+            - name: Get task IDs in PR
+              uses: ./actions
+              id: find-asana-task-ids
+              with:
+                  action: 'find-asana-task-ids'
+
+            - name: Notify changes requested in Asana
+              if: github.event.review.state == 'changes_requested'
+              uses: ./actions
+              with:
+                  asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+                  asana-task-id: '${{ steps.find-asana-task-ids.outputs.asanaTaskIds }}'
+                  asana-task-comment: 'Changes requested on PR: ${{ github.event.pull_request.html_url }}'
+                  asana-task-comment-pinned: false
+                  action: 'post-comment-asana-task'
+
+            - name: Add PR comment to Asana
+              if: github.event.review.state == 'commented'
+              uses: ./actions
+              with:
+                  asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+                  asana-task-id: '${{ steps.find-asana-task-ids.outputs.asanaTaskIds }}'
+                  asana-task-comment: 'PR: ${{ github.event.pull_request.html_url }} has a new comment -> ${{ github.event.review.body }}'
+                  asana-task-comment-pinned: false
+                  action: 'post-comment-asana-task'

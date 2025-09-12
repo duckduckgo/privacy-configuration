@@ -1,19 +1,25 @@
-name: Mark Asana task complete on merge
+name: Close Asana task after PR merged
 
 on:
     pull_request:
         types: [closed]
 
 jobs:
-    add-pr-merged-comment:
-        if: contains(join(github.event.pull_request.labels.*.name, ','), 'SBT-PFM') && (github.event.pull_request.merged == true)
-        name: Process Pull Request, closing linked Asana task
+    add-merged-comment:
+        if: contains(join(github.event.pull_request.labels.*.name, ','), 'SBT-PFM')
         runs-on: ubuntu-latest
         steps:
-            - name: Add comment in Asana task
+            - name: Get task IDs in PR
+              uses: ./actions
+              id: find-asana-task-ids
+              with:
+                  action: 'find-asana-task-ids'
+
+            - name: Close Asana task on merge
               uses: duckduckgo/native-github-asana-sync@v2.0
+              if: github.event.pull_request.merged == true
               with:
                   asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-                  trigger-phrase: '\*\*Asana Task/Github Issue:\*\*'
-                  action: 'notify-pr-merged'
+                  asana-task-id: '${{ steps.find-asana-task-ids.outputs.asanaTaskIds }}'
                   is-complete: true
+                  action: 'notify-pr-merged'
