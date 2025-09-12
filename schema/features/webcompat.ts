@@ -52,8 +52,6 @@ type FullWebCompatOptions = CSSInjectFeatureSettings<{
             domain?: string;
         }[];
     };
-    disableDeviceEnumeration: StateToggle;
-    disableDeviceEnumerationFrames: StateToggle;
     enumerateDevices: StateToggle;
     additionalCheck?: FeatureState;
 }>;
