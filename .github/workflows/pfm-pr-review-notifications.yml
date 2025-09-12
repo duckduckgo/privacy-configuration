@@ -2,7 +2,7 @@ name: PFM PR reviewed
 
 on:
     pull_request_review:
-        types: [submitted, dismissed]
+        types: [submitted]
 
 jobs:
     pr-reviewed:
@@ -14,6 +14,17 @@ jobs:
               id: find-asana-task-ids
               with:
                   action: 'find-asana-task-ids'
+
+            - name: Notify PR approved in Asana
+              if: github.event.review.state == 'approved'
+              uses: ./actions
+              id: post-comment-pr-approved
+              with:
+                  asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+                  asana-task-id: '${{ steps.find-asana-task-ids.outputs.asanaTaskIds }}'
+                  asana-task-comment: 'PR: ${{ github.event.pull_request.html_url }} has been approved.'
+                  asana-task-comment-pinned: true
+                  action: 'post-comment-asana-task'
 
             - name: Notify changes requested in Asana
               if: github.event.review.state == 'changes_requested'
