@@ -10,14 +10,14 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Get task IDs in PR
-              uses: ./actions
+              uses: duckduckgo/native-github-asana-sync@v2.0
               id: find-asana-task-ids
               with:
                   action: 'find-asana-task-ids'
 
             - name: Notify PR approved in Asana
               if: github.event.review.state == 'approved'
-              uses: ./actions
+              uses: duckduckgo/native-github-asana-sync@v2.0
               id: post-comment-pr-approved
               with:
                   asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
@@ -28,7 +28,7 @@ jobs:
 
             - name: Notify changes requested in Asana
               if: github.event.review.state == 'changes_requested'
-              uses: ./actions
+              uses: duckduckgo/native-github-asana-sync@v2.0
               with:
                   asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
                   asana-task-id: '${{ steps.find-asana-task-ids.outputs.asanaTaskIds }}'
@@ -38,7 +38,7 @@ jobs:
 
             - name: Add PR comment to Asana
               if: github.event.review.state == 'commented'
-              uses: ./actions
+              uses: duckduckgo/native-github-asana-sync@v2.0
               with:
                   asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
                   asana-task-id: '${{ steps.find-asana-task-ids.outputs.asanaTaskIds }}'
