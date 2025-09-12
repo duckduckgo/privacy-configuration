@@ -34,33 +34,6 @@ describe('isPathAllowedForFeature tests', () => {
         });
     });
 
-    describe('Fingerprinting features - exceptions only', () => {
-        const fingerprintingFeatures = [
-            '/features/fingerprintingTemporaryStorage',
-            '/features/fingerprintingAudio',
-            '/features/fingerprintingBattery',
-            '/features/fingerprintingCanvas',
-            '/features/fingerprintingHardware',
-            '/features/fingerprintingScreenSize',
-        ];
-
-        fingerprintingFeatures.forEach((feature) => {
-            it(`should allow exact exceptions path for ${feature}`, () => {
-                const result = isPathAllowedForFeature(`${feature}/exceptions`, feature);
-                expect(result).to.equal(true);
-            });
-
-            it(`should allow nested exceptions paths for ${feature}`, () => {
-                const result = isPathAllowedForFeature(`${feature}/exceptions/0/domain`, feature);
-                expect(result).to.equal(true);
-            });
-
-            it(`should NOT allow settings paths for ${feature}`, () => {
-                const result = isPathAllowedForFeature(`${feature}/settings/enabled`, feature);
-                expect(result).to.equal(false);
-            });
-        });
-    });
 
     describe('Complex feature paths', () => {
         it('should allow all allowed paths for trackerAllowlist', () => {
@@ -183,26 +156,38 @@ describe('isPathAllowedForFeature tests', () => {
         });
     });
 
+    describe('Wildcard pattern support', () => {
+        it('should allow exceptions for any new feature using wildcard pattern', () => {
+            const result1 = isPathAllowedForFeature('/features/newFeature/exceptions', '/features/*');
+            const result2 = isPathAllowedForFeature('/features/anotherFeature/exceptions/0', '/features/*');
+            expect(result1).to.equal(true);
+            expect(result2).to.equal(true);
+        });
+
+        it('should NOT allow non-exceptions paths for wildcard pattern', () => {
+            const result1 = isPathAllowedForFeature('/features/newFeature/settings/enabled', '/features/*');
+            const result2 = isPathAllowedForFeature('/features/anotherFeature/state', '/features/*');
+            expect(result1).to.equal(false);
+            expect(result2).to.equal(false);
+        });
+
+        it('should prefer exact feature matches over wildcard', () => {
+            // elementHiding has specific allowed paths, should not fall back to wildcard
+            const result = isPathAllowedForFeature('/features/elementHiding/settings/enabled', '/features/elementHiding');
+            expect(result).to.equal(false);
+        });
+    });
+
     describe('Comprehensive AUTO_APPROVABLE_FEATURES coverage', () => {
         it('should test all configured auto-approvable features exist', () => {
             // Ensure our test coverage matches the actual configuration
             const configuredFeatures = Object.keys(AUTO_APPROVABLE_FEATURES);
             expect(configuredFeatures).to.include.members([
                 '/features/elementHiding',
-                '/features/fingerprintingTemporaryStorage',
-                '/features/fingerprintingAudio',
-                '/features/fingerprintingBattery',
-                '/features/fingerprintingCanvas',
-                '/features/fingerprintingHardware',
-                '/features/fingerprintingScreenSize',
                 '/features/trackerAllowlist',
-                '/features/gpc',
-                '/features/webCompat',
-                '/features/clickToLoad',
-                '/features/eme',
                 '/features/autoconsent',
                 '/features/customUserAgent',
-                '/features/mediaPlaybackRequiresUserGesture',
+                '/features/*',
             ]);
         });
 

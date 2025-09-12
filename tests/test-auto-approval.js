@@ -86,6 +86,34 @@ describe('Auto-approval logic tests', () => {
             ],
             expected: false,
         },
+        {
+            name: 'Wildcard pattern for new features - should approve',
+            patches: [
+                // These should be approved using the wildcard pattern
+                { op: 'add', path: '/features/newFeature/exceptions/0', value: { domain: 'test.com', reason: 'testing' } },
+                { op: 'add', path: '/features/anotherFeature/exceptions/0', value: { domain: 'example.com', reason: 'testing' } },
+            ],
+            expected: true,
+        },
+        {
+            name: 'Wildcard pattern mixed with disallowed paths - should NOT approve',
+            patches: [
+                // Mix of allowed wildcard and disallowed paths
+                { op: 'add', path: '/features/newFeature/exceptions/0', value: { domain: 'test.com', reason: 'testing' } },
+                { op: 'add', path: '/features/newFeature/settings/enabled', value: false },
+            ],
+            expected: false,
+        },
+        {
+            name: 'Fingerprinting features via wildcard - should approve',
+            patches: [
+                // These were previously explicit but now handled by wildcard
+                { op: 'add', path: '/features/fingerprintingAudio/exceptions/0', value: { domain: 'test.com', reason: 'testing' } },
+                { op: 'add', path: '/features/gpc/exceptions/0', value: { domain: 'example.com', reason: 'testing' } },
+                { op: 'add', path: '/features/webCompat/exceptions/0', value: { domain: 'site.com', reason: 'testing' } },
+            ],
+            expected: true,
+        },
     ];
 
     testCases.forEach((testCase) => {
