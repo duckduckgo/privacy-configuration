@@ -35533,6 +35533,8 @@
                     "settings": {
                         "launchUrl": "https://takeout.google.com/",
                         "javascriptConfig": {
+                            "actions": [],
+                            "selectors": {},
                             "domains": [
                                 {
                                     "domain": [
@@ -35540,178 +35542,175 @@
                                     ],
                                     "patchSettings": [
                                         {
-                                            "path": "/",
+                                            "path": "/selectors",
                                             "op": "add",
                                             "value": {
-                                                "selectors": {
-                                                    "tabPanel": "div[role=\"tabpanel\"]",
-                                                    "chromeDataButton": "div[role=\"tabpanel\"] div:nth-child(10) > div:nth-child(2) > div:nth-child(2) button",
-                                                    "downloadLink": "a[href=\"./manage/archive/\"]",
-                                                    "userIdLink": "a[href*=\"&user=\"]"
-                                                },
-                                                "actions": [
-                                                    {
-                                                        "id": "deselect-all-button-click",
-                                                        "actionType": "click",
-                                                        "elements": [
-                                                            {
-                                                                "type": "element",
-                                                                "selector": "div[role=\"tabpanel\"] div:nth-child(2) div:nth-child(2) button"
-                                                            }
-                                                        ]
-                                                    },
-                                                    {
-                                                        "id": "deselect-all-button-expectation",
-                                                        "actionType": "expectation",
-                                                        "expectations": [
-                                                            {
-                                                                "type": "element",
-                                                                "selector": "div[role=\"tabpanel\"] div:nth-child(10) input[type=\"checkbox\"][checked]:not(:checked)"
-                                                            }
-                                                        ]
-                                                    },
-                                                    {
-                                                        "id": "chrome-section-scroll",
-                                                        "actionType": "scroll",
-                                                        "selector": "c-wiz [data-id=\"chrome\"]"
-                                                    },
-                                                    {
-                                                        "id": "chrome-section-select",
-                                                        "actionType": "click",
-                                                        "elements": [
-                                                            {
-                                                                "type": "element",
-                                                                "selector": "div[role=\"tabpanel\"] div:nth-child(10) input[type=\"checkbox\"][checked]:not(:checked)"
-                                                            }
-                                                        ]
-                                                    },
-                                                    {
-                                                        "id": "chrome-data-button-click",
-                                                        "actionType": "click",
-                                                        "elements": [
-                                                            {
-                                                                "type": "element",
-                                                                "selector": "div[role=\"tabpanel\"] div:nth-child(10) > div:nth-child(2) > div:nth-child(2) button"
-                                                            }
-                                                        ]
-                                                    },
-                                                    {
-                                                        "id": "bookmark-modal-expectation",
-                                                        "actionType": "expectation",
-                                                        "expectations": [
-                                                            {
-                                                                "type": "element",
-                                                                "selector": "fieldset.rcetic"
-                                                            }
-                                                        ]
-                                                    },
-                                                    {
-                                                        "id": "bookmark-deselect-all-button-click",
-                                                        "actionType": "click",
-                                                        "elements": [
-                                                            {
-                                                                "type": "element",
-                                                                "selector": "fieldset.rcetic div:nth-child(2) button:nth-of-type(2)"
-                                                            }
-                                                        ]
-                                                    },
-                                                    {
-                                                        "id": "bookmark-checkbox-expectation",
-                                                        "actionType": "expectation",
-                                                        "expectations": [
-                                                            {
-                                                                "type": "element",
-                                                                "selector": "fieldset.rcetic div:nth-child(3) > div:nth-of-type(2) input[checked]:not(:checked)"
-                                                            }
-                                                        ]
-                                                    },
-                                                    {
-                                                        "id": "bookmark-checkbox-click",
-                                                        "actionType": "click",
-                                                        "elements": [
-                                                            {
-                                                                "type": "element",
-                                                                "selector": "fieldset.rcetic div:nth-child(3) > div:nth-of-type(2) input[checked]:not(:checked)"
-                                                            }
-                                                        ]
-                                                    },
-                                                    {
-                                                        "id": "ok-button-expectation",
-                                                        "actionType": "expectation",
-                                                        "elements": [
-                                                            {
-                                                                "type": "element",
-                                                                "selector": "div[isfullscreen] div:nth-child(3) div:last-child[aria-disabled=\"false\"]"
-                                                            }
-                                                        ],
-                                                        "expectations": [
-                                                            {
-                                                                "type": "element",
-                                                                "selector": "div[isfullscreen] div:nth-child(3) div:last-child[aria-disabled=\"false\"]"
-                                                            },
-                                                            {
-                                                                "type": "element",
-                                                                "selector": "fieldset.rcetic div:nth-child(3) > div:nth-of-type(2) input[checked]:checked"
-                                                            }
-                                                        ]
-                                                    },
-                                                    {
-                                                        "id": "ok-button-click",
-                                                        "actionType": "click",
-                                                        "elements": [
-                                                            {
-                                                                "type": "element",
-                                                                "selector": "div[isfullscreen] div:nth-child(3) div:last-child[aria-disabled=\"false\"]"
-                                                            }
-                                                        ]
-                                                    },
-                                                    {
-                                                        "id": "next-step-button-scroll",
-                                                        "actionType": "scroll",
-                                                        "elements": [
-                                                            {
-                                                                "type": "element",
-                                                                "selector": "div[role=\"tabpanel\"] > div:nth-child(1) > div:nth-child(2) button"
-                                                            }
-                                                        ]
-                                                    },
-                                                    {
-                                                        "id": "next-step-button-click",
-                                                        "actionType": "click",
-                                                        "elements": [
-                                                            {
-                                                                "type": "element",
-                                                                "selector": "div[role=\"tabpanel\"] > div:nth-child(1) > div:nth-child(2) button"
-                                                            }
-                                                        ]
-                                                    },
-                                                    {
-                                                        "id": "create-export-button-scroll",
-                                                        "actionType": "scroll",
-                                                        "selector": "div[data-configure-step=\"1\"] button"
-                                                    },
-                                                    {
-                                                        "id": "create-export-button-click",
-                                                        "actionType": "click",
-                                                        "elements": [
-                                                            {
-                                                                "type": "element",
-                                                                "selector": "div[data-configure-step=\"1\"] button"
-                                                            }
-                                                        ]
-                                                    },
-                                                    {
-                                                        "id": "manage-button-click",
-                                                        "actionType": "click",
-                                                        "elements": [
-                                                            {
-                                                                "type": "element",
-                                                                "selector": "a[href=\"manage\"]"
-                                                            }
-                                                        ]
-                                                    }
-                                                ]
+                                                "tabPanel": "div[role=\"tabpanel\"]",
+                                                "chromeDataButton": "div[role=\"tabpanel\"] div:nth-child(10) > div:nth-child(2) > div:nth-child(2) button",
+                                                "downloadLink": "a[href=\"./manage/archive/\"]",
+                                                "userIdLink": "a[href*=\"&user=\"]"
                                             }
+                                        },
+                                        {
+                                            "path": "/actions/-",
+                                            "op": "add",
+                                            "value": [
+                                                {
+                                                    "id": "deselect-all-button-click",
+                                                    "actionType": "click",
+                                                    "elements": [
+                                                        {
+                                                            "type": "element",
+                                                            "selector": "div[role=\"tabpanel\"] div:nth-child(2) div:nth-child(2) button"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "id": "deselect-all-button-expectation",
+                                                    "actionType": "expectation",
+                                                    "expectations": [
+                                                        {
+                                                            "type": "element",
+                                                            "selector": "div[role=\"tabpanel\"] div:nth-child(10) input[type=\"checkbox\"][checked]:not(:checked)"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "id": "chrome-section-scroll",
+                                                    "actionType": "scroll",
+                                                    "selector": "c-wiz [data-id=\"chrome\"]"
+                                                },
+                                                {
+                                                    "id": "chrome-section-select",
+                                                    "actionType": "click",
+                                                    "elements": [
+                                                        {
+                                                            "type": "element",
+                                                            "selector": "div[role=\"tabpanel\"] div:nth-child(10) input[type=\"checkbox\"][checked]:not(:checked)"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "id": "chrome-data-button-click",
+                                                    "actionType": "click",
+                                                    "elements": [
+                                                        {
+                                                            "type": "element",
+                                                            "selector": "div[role=\"tabpanel\"] div:nth-child(10) > div:nth-child(2) > div:nth-child(2) button"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "id": "bookmark-modal-expectation",
+                                                    "actionType": "expectation",
+                                                    "expectations": [
+                                                        {
+                                                            "type": "element",
+                                                            "selector": "fieldset.rcetic"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "id": "bookmark-deselect-all-button-click",
+                                                    "actionType": "click",
+                                                    "elements": [
+                                                        {
+                                                            "type": "element",
+                                                            "selector": "fieldset.rcetic div:nth-child(2) button:nth-of-type(2)"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "id": "bookmark-checkbox-expectation",
+                                                    "actionType": "expectation",
+                                                    "expectations": [
+                                                        {
+                                                            "type": "element",
+                                                            "selector": "fieldset.rcetic div:nth-child(3) > div:nth-of-type(2) input[checked]:not(:checked)"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "id": "bookmark-checkbox-click",
+                                                    "actionType": "click",
+                                                    "elements": [
+                                                        {
+                                                            "type": "element",
+                                                            "selector": "fieldset.rcetic div:nth-child(3) > div:nth-of-type(2) input[checked]:not(:checked)"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "id": "ok-button-expectation",
+                                                    "actionType": "expectation",
+                                                    "elements": [
+                                                        {
+                                                            "type": "element",
+                                                            "selector": "div[isfullscreen] div:nth-child(3) div:last-child[aria-disabled=\"false\"]"
+                                                        }
+                                                    ],
+                                                    "expectations": [
+                                                        {
+                                                            "type": "element",
+                                                            "selector": "div[isfullscreen] div:nth-child(3) > div[role=\"button\"]:not([aria-disabled]):nth-of-type(2)"
+                                                        },
+                                                        {
+                                                            "type": "element",
+                                                            "selector": "fieldset.rcetic div:nth-child(3) > div:nth-of-type(2) input[checked]:checked"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "id": "ok-button-click",
+                                                    "actionType": "click",
+                                                    "elements": [
+                                                        {
+                                                            "type": "element",
+                                                            "selector": "div[isfullscreen] div:nth-child(3) > div[role=\"button\"]:not([aria-disabled]):nth-of-type(2)"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "id": "next-step-button-scroll",
+                                                    "actionType": "scroll",
+                                                    "selector": "div[role=\"tabpanel\"] > div:nth-child(1) > div:nth-child(2) button"
+                                                },
+                                                {
+                                                    "id": "next-step-button-click",
+                                                    "actionType": "click",
+                                                    "elements": [
+                                                        {
+                                                            "type": "element",
+                                                            "selector": "div[role=\"tabpanel\"] > div:nth-child(1) > div:nth-child(2) button"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "id": "create-export-button-scroll",
+                                                    "actionType": "scroll",
+                                                    "selector": "div[data-configure-step=\"1\"] button"
+                                                },
+                                                {
+                                                    "id": "create-export-button-click",
+                                                    "actionType": "click",
+                                                    "elements": [
+                                                        {
+                                                            "type": "element",
+                                                            "selector": "div[data-configure-step=\"1\"] button"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "id": "manage-button-click",
+                                                    "actionType": "click",
+                                                    "elements": [
+                                                        {
+                                                            "type": "element",
+                                                            "selector": "a[href=\"manage\"]"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
                                         }
                                     ]
                                 }
