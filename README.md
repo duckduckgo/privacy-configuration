@@ -101,7 +101,7 @@ npm run test
     -   [Safari extension](https://github.com/duckduckgo/privacy-essentials-safari)
         -   The Safari extension has only partial remote configuration support, and uses
             [trackers-unprotected-temporary.txt](https://staticcdn.duckduckgo.com/trackerblocking/config/trackers-unprotected-temporary.txt)
-    -   Mac app (https://github.com/duckduckgo/apple-browsers)
+    -   [Mac app](https://github.com/duckduckgo/apple-browsers)
         -   [macos-config.json](https://staticcdn.duckduckgo.com/trackerblocking/config/v2/macos-config.json)
     -   Windows app (in beta, code not yet open source)
         -   [windows-config.json](https://staticcdn.duckduckgo.com/trackerblocking/config/v2/windows-config.json)
