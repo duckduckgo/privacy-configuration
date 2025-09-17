@@ -91,6 +91,6 @@ jobs:
               with:
                   asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
                   asana-task-id: '${{ steps.find-asana-task-ids.outputs.asanaTaskIds }}'
-                  asana-task-comment: 'PR: ${{ github.event.pull_request.html_url }} has a new comment -> ${{ github.event.review.body }}'
+                  asana-task-comment: 'PR: ${{ github.event.pull_request.html_url }} has a new comment.'
                   asana-task-comment-pinned: false
                   action: 'post-comment-asana-task'
