@@ -32,6 +32,8 @@ type SubFeatures<VersionType> = {
         {
             // Domains to be allowlisted
             domains: string[];
+            // Keys to be deleted when using the Fire Button
+            keysToDelete: string[];
             // Patterns to be matched in the WebView's LevelDB
             matchingRegex: string[];
         }
