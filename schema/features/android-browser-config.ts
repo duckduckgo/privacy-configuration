@@ -36,7 +36,6 @@ type SubFeatures<VersionType> = {
             keysToDelete: string[];
             // Patterns to be matched in the WebView's LevelDB
             matchingRegex: string[];
-
         }
     >;
     // This subfeature allowlists IndexedDB entries when the fire button is pressed.
