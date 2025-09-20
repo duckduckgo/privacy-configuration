@@ -18,6 +18,13 @@ type ImportFromGooglePasswordManager = {
     exportConfirmButton: ButtonConfig;
 };
 
+type ImportBookmarksFromGoogleTakeout = {
+    selectors: Record<string, string>;
+    actions: Record<string, any>[];
+    launchUrl: string;
+    javascriptConfig: any;
+};
+
 export type FormTypeSetting = {
     selector: string;
     type: 'login' | 'signup';
@@ -59,6 +66,9 @@ type SubFeatures<VersionType> = {
             };
         }
     >;
+    canImportBookmarksFromGoogleTakeout?: SubFeature<VersionType, CSSInjectFeatureSettings<ImportBookmarksFromGoogleTakeout>>;
+
+    // Standard schema structure
     siteSpecificFixes?: SubFeature<VersionType, CSSInjectFeatureSettings<SiteSpecificFixes>>;
 };
 
