@@ -11,17 +11,7 @@ export const AUTO_APPROVABLE_FEATURES = {
         '/settings/domains',
         '/exceptions',
     ],
-    '/features/fingerprintingTemporaryStorage': ['/exceptions'],
-    '/features/fingerprintingAudio': ['/exceptions'],
-    '/features/fingerprintingBattery': ['/exceptions'],
-    '/features/fingerprintingCanvas': ['/exceptions'],
-    '/features/fingerprintingHardware': ['/exceptions'],
-    '/features/fingerprintingScreenSize': ['/exceptions'],
     '/features/trackerAllowlist': ['/settings/allowlistedTrackers'],
-    '/features/gpc': ['/exceptions'],
-    '/features/webCompat': ['/exceptions'],
-    '/features/clickToLoad': ['/exceptions'],
-    '/features/eme': ['/exceptions'],
     '/features/autoconsent': [
         '/exceptions',
         '/settings/disabledCMPs',
@@ -32,7 +22,7 @@ export const AUTO_APPROVABLE_FEATURES = {
         '/settings/omitApplicationSites',
         '/settings/defaultSites',
     ],
-    '/features/mediaPlaybackRequiresUserGesture': ['/exceptions'],
+    '/features/*': ['/exceptions'],
 };
 
 /**
@@ -52,7 +42,26 @@ export function isPathAllowedForFeature(patchPath, featurePath) {
         return false;
     }
 
-    // Use exact path matching or path starts with allowed path
+    // Handle wildcard patterns
+    if (featurePath === '/features/*') {
+        // Extract actual feature path from patch path
+        const pathParts = patchPath.split('/');
+        if (pathParts.length >= 3) {
+            const actualFeaturePath = `/${pathParts[1]}/${pathParts[2]}`;
+
+            // Check if remaining path matches allowed patterns
+            return allowedPaths.some((allowedPath) => {
+                const fullAllowedPath = actualFeaturePath + allowedPath;
+                if (patchPath === fullAllowedPath || patchPath.startsWith(fullAllowedPath + '/')) {
+                    return true;
+                }
+                return false;
+            });
+        }
+        return false;
+    }
+
+    // Use exact path matching or path starts with allowed path (existing behavior)
     return allowedPaths.some((allowedPath) => {
         const fullAllowedPath = featurePath + allowedPath;
         if (patchPath === fullAllowedPath || patchPath.startsWith(fullAllowedPath + '/')) {
@@ -114,6 +123,35 @@ export function mungeFileContents(fileContent, filePath) {
 }
 
 /**
+ * Finds the matching feature path for a patch, including wildcard patterns
+ * @param {string} patchPath - The patch path to match
+ * @returns {string|null} The matching feature path or null if not found
+ */
+function findMatchingFeaturePath(patchPath) {
+    // First try exact matches (existing behavior)
+    const exactMatch = AUTO_APPROVABLE_FEATURE_PATHS.find((feature) => feature !== '/features/*' && patchPath.startsWith(feature));
+
+    if (exactMatch) {
+        return exactMatch;
+    }
+
+    // Then try wildcard patterns
+    if (patchPath.startsWith('/features/')) {
+        // Extract feature name from path like /features/someFeature/... -> someFeature
+        const pathParts = patchPath.split('/');
+        if (pathParts.length >= 3) {
+            const featureName = pathParts[2];
+            // Only match if this is a direct feature path, not a nested path
+            if (featureName && !featureName.includes('/')) {
+                return '/features/*';
+            }
+        }
+    }
+
+    return null;
+}
+
+/**
  * Checks if changes are only to allowed paths in auto-approvable features
  * @param {Array} patches - Array of JSON patches from fast-json-patch
  * @returns {boolean} True if changes are only to allowed paths
@@ -122,7 +160,7 @@ export function isAllowedChangesOnly(patches) {
     // Check if all patches are for auto-approvable features and allowed paths
     return patches.every((patch) => {
         // Find which auto-approvable feature this patch belongs to
-        const featurePath = AUTO_APPROVABLE_FEATURE_PATHS.find((feature) => patch.path.startsWith(feature));
+        const featurePath = findMatchingFeaturePath(patch.path);
 
         if (!featurePath) {
             return false; // Not an auto-approvable feature
@@ -157,7 +195,7 @@ export function analyzePatchesForApproval(patches) {
     // Check if any changes are outside allowed paths
     const disallowedPatches = [];
     for (const patch of patches) {
-        const featurePath = AUTO_APPROVABLE_FEATURE_PATHS.find((feature) => patch.path.startsWith(feature));
+        const featurePath = findMatchingFeaturePath(patch.path);
         const isDisallowed = featurePath ? !isPathAllowedForFeature(patch.path, featurePath) : true;
         if (isDisallowed) {
             disallowedPatches.push(patch);
@@ -195,7 +233,7 @@ export function generateChangeSummary(patches) {
         summary.byPath[pathKey] = (summary.byPath[pathKey] || 0) + 1;
 
         // Count auto-approvable vs other changes
-        const featurePath = AUTO_APPROVABLE_FEATURE_PATHS.find((feature) => patch.path.startsWith(feature));
+        const featurePath = findMatchingFeaturePath(patch.path);
         if (featurePath && isPathAllowedForFeature(patch.path, featurePath)) {
             summary.autoApprovableChanges++;
         } else {
