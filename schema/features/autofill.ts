@@ -18,9 +18,9 @@ type ImportFromGooglePasswordManager = {
     exportConfirmButton: ButtonConfig;
 };
 
-type ImportBookmarksFromGoogleTakeout = {
-    launchUrl: string;
-    javascriptConfig: any;
+type ImportBookmarksFromGoogleTakeoutSettings = {
+    actions: Record<string, any>[];
+    selectors: Record<string, string>;
 };
 
 export type FormTypeSetting = {
@@ -48,23 +48,25 @@ export type SiteSpecificFixes = {
     failsafeSettings?: FailsafeSettings;
 };
 
+type DeprecatedAutofillImportSettings<T> = {
+    launchUrl: string;
+    javascriptConfig: {
+        domains: {
+            domain: string | string[];
+            patchSettings: Operation<T>[];
+        }[];
+    };
+};
+
 // Any subfeatures that have typed `settings` should be defined here.
 // Subfeatures without settings (or just string:string mappings for settings) will be automatically validated.
 type SubFeatures<VersionType> = {
     // Do not copy this schema, it's not standard. Use siteSpecificFixes instead.
-    canImportFromGooglePasswordManager?: SubFeature<
+    canImportFromGooglePasswordManager?: SubFeature<VersionType, DeprecatedAutofillImportSettings<ImportFromGooglePasswordManager>>;
+    canImportBookmarksFromGoogleTakeout?: SubFeature<
         VersionType,
-        {
-            launchUrl: string;
-            javascriptConfig: {
-                domains: {
-                    domain: string | string[];
-                    patchSettings: Operation<ImportFromGooglePasswordManager>[];
-                }[];
-            };
-        }
+        DeprecatedAutofillImportSettings<ImportBookmarksFromGoogleTakeoutSettings>
     >;
-    canImportBookmarksFromGoogleTakeout?: SubFeature<VersionType, CSSInjectFeatureSettings<ImportBookmarksFromGoogleTakeout>>;
 
     // Standard schema structure
     siteSpecificFixes?: SubFeature<VersionType, CSSInjectFeatureSettings<SiteSpecificFixes>>;
