@@ -39,6 +39,9 @@ type CustomUserAgentSettings = {
     ddgDefaultSites?: DomainWithReason[];
     webViewDefault?: DomainWithReason[];
 
+    // iOS specific properties
+    useUpdatedSafariVersions?: boolean;
+
     // iOS/Android specific user agent configs
     closestUserAgent?: UserAgentConfig | VersionsOnly;
     ddgFixedUserAgent?: UserAgentConfig;
