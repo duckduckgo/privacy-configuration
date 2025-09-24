@@ -71,14 +71,16 @@ type ConditionBlock = {
     };
 };
 
+type JSONValidValueType = boolean | string | number | object | Array<boolean | string | number | object>;
+
 type CSSInjectFeatureSettingsPatches = {
     domains?: {
         domain: string | string[];
-        patchSettings: Operation<string | object | number>[];
+        patchSettings: Operation<JSONValidValueType>[];
     }[];
     conditionalChanges?: {
         condition: ConditionBlock | ConditionBlock[];
-        patchSettings: Operation<string | object | number>[];
+        patchSettings: Operation<JSONValidValueType>[];
     }[];
 };
 
@@ -90,7 +92,7 @@ export type CSSConfigSetting = CSSConfigSettingSingle | CSSConfigSettingSingle[]
 type CSSConfigSettingSingle = {
     type: 'undefined' | 'number' | 'string' | 'function' | 'boolean' | 'null' | 'array' | 'object';
     functionName?: string;
-    value?: boolean | string | number | object | Array<boolean | string | number | object>;
+    value?: JSONValidValueType;
     criteria?: {
         arch: string;
     };

@@ -19,8 +19,8 @@ type ImportFromGooglePasswordManager = {
 };
 
 type ImportBookmarksFromGoogleTakeoutSettings = {
-    actions: Record<string, any>[];
-    selectors: Record<string, string>;
+    actions?: Record<string, any>[];
+    selectors?: Record<string, string>;
 };
 
 export type FormTypeSetting = {
@@ -65,7 +65,10 @@ type SubFeatures<VersionType> = {
     canImportFromGooglePasswordManager?: SubFeature<VersionType, DeprecatedAutofillImportSettings<ImportFromGooglePasswordManager>>;
     canImportBookmarksFromGoogleTakeout?: SubFeature<
         VersionType,
-        DeprecatedAutofillImportSettings<ImportBookmarksFromGoogleTakeoutSettings>
+        {
+            launchUrl: string;
+            javascriptConfig: CSSInjectFeatureSettings<ImportBookmarksFromGoogleTakeoutSettings>;
+        }
     >;
 
     // Standard schema structure
