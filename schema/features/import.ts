@@ -12,15 +12,6 @@ type SubFeatures<VersionType> = {
             vivaldi: 'enabled' | 'disabled';
         }
     >;
-    importShortcuts?: SubFeature<
-        VersionType,
-        {
-            chrome: 'enabled' | 'disabled';
-            brave: 'enabled' | 'disabled';
-            edge: 'enabled' | 'disabled';
-            firefox: 'enabled' | 'disabled';
-        }
-    >;
 };
 
 export type ImportFeature<VersionType> = Feature<
