@@ -35342,6 +35342,27 @@
                                 ]
                             },
                             {
+                                "domain": ["alibris.com"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "form[action*=\"Guest\"]",
+                                            "type": "signup"
+                                        }
+                                    },
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "form[action*=\"CreateAccount\"]",
+                                            "type": "signup"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
                                 "domain": [
                                     "accounts.google.com"
                                 ],
