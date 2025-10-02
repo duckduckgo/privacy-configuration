@@ -84,8 +84,8 @@ describe('Config schema tests', () => {
                         // Allow _DDGWV feature overrides for Windows temporarily
                         const ddgwvFeatureRegex = /^[a-zA-Z0-9]+_DDGWV$/;
                         expect(featureName).to.match(
-                            ddgwvFeatureRegex, 
-                            `_DDGWV feature override '${featureName}' should match pattern: baseName_DDGWV`
+                            ddgwvFeatureRegex,
+                            `_DDGWV feature override '${featureName}' should match pattern: baseName_DDGWV`,
                         );
                     } else {
                         expect(featureName).to.match(featureNameRegex);
@@ -188,75 +188,99 @@ describe('Config schema tests', () => {
             if (config.name.includes('windows-config.json')) {
                 // Only run this test for Windows config to validate _DDGWV features
                 it('Windows config _DDGWV features should be valid overrides of their base features', () => {
-                    
                     // Find all _DDGWV features and their corresponding base features
                     const baseFeatures = {};
                     for (const featureName of Object.keys(config.body.features)) {
                         if (featureName.endsWith('_DDGWV')) {
                             const baseFeatureName = featureName.replace('_DDGWV', '');
-                            
-                            expect(config.body.features[baseFeatureName]).to.be.an('object',
-                                `_DDGWV feature override '${featureName}' should have a corresponding base feature '${baseFeatureName}'`);
-                            
+
+                            expect(config.body.features[baseFeatureName]).to.be.an(
+                                'object',
+                                `_DDGWV feature override '${featureName}' should have a corresponding base feature '${baseFeatureName}'`,
+                            );
+
                             baseFeatures[featureName] = {
                                 ddgwvFeature: config.body.features[featureName],
                                 baseFeature: config.body.features[baseFeatureName],
-                                baseFeatureName: baseFeatureName
+                                baseFeatureName,
                             };
                         }
                     }
 
                     // Validate each _DDGWV feature is a proper override
-                    for (const [ddgwvFeatureName, { ddgwvFeature, baseFeature, baseFeatureName }] of Object.entries(baseFeatures)) {
+                    for (const [
+                        ddgwvFeatureName,
+                        { ddgwvFeature, baseFeature, baseFeatureName },
+                    ] of Object.entries(baseFeatures)) {
                         // Check that settings structure matches (if present)
                         if (baseFeature.settings && ddgwvFeature.settings) {
                             const baseSettingsKeys = Object.keys(baseFeature.settings).sort();
                             const ddgwvSettingsKeys = Object.keys(ddgwvFeature.settings).sort();
-                            
-                            expect(ddgwvSettingsKeys).to.deep.equal(baseSettingsKeys,
-                                `_DDGWV feature override '${ddgwvFeatureName}' settings keys should match base feature '${baseFeatureName}' settings keys`);
+
+                            expect(ddgwvSettingsKeys).to.deep.equal(
+                                baseSettingsKeys,
+                                `_DDGWV feature override '${ddgwvFeatureName}' settings keys should match base feature '${baseFeatureName}' settings keys`,
+                            );
                         } else if (baseFeature.settings || ddgwvFeature.settings) {
-                            expect.fail(`_DDGWV feature override '${ddgwvFeatureName}' and base feature '${baseFeatureName}' should both have or not have settings`);
+                            expect.fail(
+                                `_DDGWV feature override '${ddgwvFeatureName}' and base feature '${baseFeatureName}' should both have or not have settings`,
+                            );
                         }
 
-                        expect(ddgwvFeature.minSupportedVersion).to.deep.equal(baseFeature.minSupportedVersion,
-                            `_DDGWV feature override '${ddgwvFeatureName}' minSupportedVersion should match base feature '${baseFeatureName}' minSupportedVersion`);
-                        
+                        expect(ddgwvFeature.minSupportedVersion).to.deep.equal(
+                            baseFeature.minSupportedVersion,
+                            `_DDGWV feature override '${ddgwvFeatureName}' minSupportedVersion should match base feature '${baseFeatureName}' minSupportedVersion`,
+                        );
+
                         // Check that if both features have subfeatures, they have the same subfeature names
                         if (baseFeature.features && ddgwvFeature.features) {
                             const baseSubfeatureNames = Object.keys(baseFeature.features).sort();
                             const ddgwvSubfeatureNames = Object.keys(ddgwvFeature.features).sort();
-                            
-                            expect(ddgwvSubfeatureNames).to.deep.equal(baseSubfeatureNames,
-                                `_DDGWV feature override '${ddgwvFeatureName}' subfeatures should match base feature '${baseFeatureName}' subfeatures`);
-                            
+
+                            expect(ddgwvSubfeatureNames).to.deep.equal(
+                                baseSubfeatureNames,
+                                `_DDGWV feature override '${ddgwvFeatureName}' subfeatures should match base feature '${baseFeatureName}' subfeatures`,
+                            );
+
                             // For each subfeature, check fields that should match
                             for (const subfeatureName of baseSubfeatureNames) {
                                 const baseSubfeature = baseFeature.features[subfeatureName];
                                 const ddgwvSubfeature = ddgwvFeature.features[subfeatureName];
-                                
+
                                 // Check minSupportedVersion
-                                expect(ddgwvSubfeature.minSupportedVersion).to.deep.equal(baseSubfeature.minSupportedVersion,
-                                    `_DDGWV feature override '${ddgwvFeatureName}.${subfeatureName}' minSupportedVersion should match base feature '${baseFeatureName}.${subfeatureName}' minSupportedVersion`);
+                                expect(ddgwvSubfeature.minSupportedVersion).to.deep.equal(
+                                    baseSubfeature.minSupportedVersion,
+                                    `_DDGWV feature override '${ddgwvFeatureName}.${subfeatureName}' minSupportedVersion should match base feature '${baseFeatureName}.${subfeatureName}' minSupportedVersion`,
+                                );
 
                                 // Check rollout (if present)
                                 if (baseSubfeature.rollout && ddgwvSubfeature.rollout) {
-                                    expect(ddgwvSubfeature.rollout).to.deep.equal(baseSubfeature.rollout,
-                                        `_DDGWV feature override '${ddgwvFeatureName}.${subfeatureName}' rollout should match base feature '${baseFeatureName}.${subfeatureName}' rollout`);
+                                    expect(ddgwvSubfeature.rollout).to.deep.equal(
+                                        baseSubfeature.rollout,
+                                        `_DDGWV feature override '${ddgwvFeatureName}.${subfeatureName}' rollout should match base feature '${baseFeatureName}.${subfeatureName}' rollout`,
+                                    );
                                 } else if (baseSubfeature.rollout || ddgwvSubfeature.rollout) {
-                                    expect.fail(`_DDGWV feature override '${ddgwvFeatureName}.${subfeatureName}' and base feature '${baseFeatureName}.${subfeatureName}' should both have or not have rollout`);
+                                    expect.fail(
+                                        `_DDGWV feature override '${ddgwvFeatureName}.${subfeatureName}' and base feature '${baseFeatureName}.${subfeatureName}' should both have or not have rollout`,
+                                    );
                                 }
-                                
+
                                 // Check cohorts (if present)
                                 if (baseSubfeature.cohorts && ddgwvSubfeature.cohorts) {
-                                    expect(ddgwvSubfeature.cohorts).to.deep.equal(baseSubfeature.cohorts,
-                                        `_DDGWV feature override '${ddgwvFeatureName}.${subfeatureName}' cohorts should match base feature '${baseFeatureName}.${subfeatureName}' cohorts`);
+                                    expect(ddgwvSubfeature.cohorts).to.deep.equal(
+                                        baseSubfeature.cohorts,
+                                        `_DDGWV feature override '${ddgwvFeatureName}.${subfeatureName}' cohorts should match base feature '${baseFeatureName}.${subfeatureName}' cohorts`,
+                                    );
                                 } else if (baseSubfeature.cohorts || ddgwvSubfeature.cohorts) {
-                                    expect.fail(`_DDGWV feature override '${ddgwvFeatureName}.${subfeatureName}' and base feature '${baseFeatureName}.${subfeatureName}' should both have or not have cohorts`);
+                                    expect.fail(
+                                        `_DDGWV feature override '${ddgwvFeatureName}.${subfeatureName}' and base feature '${baseFeatureName}.${subfeatureName}' should both have or not have cohorts`,
+                                    );
                                 }
                             }
                         } else if (baseFeature.features || ddgwvFeature.features) {
-                            expect.fail(`_DDGWV feature override '${ddgwvFeatureName}' and base feature '${baseFeatureName}' should both have or not have subfeatures`);
+                            expect.fail(
+                                `_DDGWV feature override '${ddgwvFeatureName}' and base feature '${baseFeatureName}' should both have or not have subfeatures`,
+                            );
                         }
                     }
                 });
