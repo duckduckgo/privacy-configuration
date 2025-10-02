@@ -4,12 +4,12 @@ type SubFeatures<VersionType> = {
     uiHangDetection?: SubFeature<
         VersionType,
         {
-            includeCallStack: boolean;
-            callStackLimit: number;
-            pingDispatcher: boolean;
-            includeWindowState: boolean;
-            collectCpuUsage: boolean;
-            concurrentlyCheckDispatcher: boolean;
+            includeCallStack?: boolean;
+            callStackLimit?: number;
+            pingDispatcher?: boolean;
+            includeWindowState?: boolean;
+            collectCpuUsage?: boolean;
+            concurrentlyCheckDispatcher?: boolean;
         }
     >;
 };
