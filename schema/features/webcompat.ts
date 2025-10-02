@@ -34,6 +34,7 @@ type FullWebCompatOptions = CSSInjectFeatureSettings<{
               forcedDesktopValue: string;
               forcedMobileValue: string;
           };
+    viewportWidthLegacy: StateToggle;
     screenLock: StateToggle;
     plainTextViewPort: StateToggle;
     modifyLocalStorage: {
