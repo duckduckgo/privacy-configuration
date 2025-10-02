@@ -87,7 +87,6 @@ describe('Config schema tests', () => {
                             ddgwvFeatureRegex, 
                             `_DDGWV feature override '${featureName}' should match pattern: baseName_DDGWV`
                         );
-                        continue;
                     } else {
                         expect(featureName).to.match(featureNameRegex);
                         // Features should not have platform specific names so we can use the same config for all platforms.
