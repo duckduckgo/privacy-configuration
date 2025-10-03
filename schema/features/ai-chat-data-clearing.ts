@@ -6,7 +6,4 @@ type SettingsType = {
     chatImagesIndexDbNameObjectStoreNamePairs: string[][];
 };
 
-export type AiChatDataClearingConfig<VersionType> = Feature<
-    SettingsType,
-    VersionType
->;
+export type AiChatDataClearingConfig<VersionType> = Feature<SettingsType, VersionType>;
