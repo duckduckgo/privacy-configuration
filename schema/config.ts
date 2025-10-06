@@ -22,6 +22,7 @@ import { BurnFeature } from './features/burn';
 import { Taskbar } from './features/taskbar';
 import { AppHealth } from './features/appHealth';
 import { ElementHidingFeature } from './features/element-hiding';
+import { RequestBlocklistFeature } from './features/request-blocklist';
 
 export { WebCompatSettings } from './features/webcompat';
 export { DuckPlayerSettings } from './features/duckplayer';
@@ -68,6 +69,7 @@ export type ConfigV5<VersionType> = {
         windowsWebviewFailures_DDGWV?: WindowsWebViewFailures<VersionType>;
         customUserAgent?: CustomUserAgentFeature<VersionType>;
         elementHiding?: ElementHidingFeature<VersionType>;
+        requestBlocklist?: RequestBlocklistFeature<VersionType>;
     };
     unprotectedTemporary: SiteException[];
 };
