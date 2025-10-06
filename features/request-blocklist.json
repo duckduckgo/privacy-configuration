@@ -1,0 +1,37 @@
+{
+    "_meta": {
+        "description": "Request blocking rules necessary to fix website breakage. Note: Tracker request blocking is handled elsewhere.",
+        "sampleExcludeRecords": {
+            "domain": "example.com",
+            "reason": "site breakage"
+        }
+    },
+    "state": "disabled",
+    "settings": {
+        "blockedRequests": {
+            "privacy-test-pages.site": {
+                "rules": [
+                    {
+                        "rule": "privacy-test-pages.site/privacy-protections/request-blocklist/*?block=true",
+                        "domains": [
+                            "privacy-test-pages.site"
+                        ],
+                        "reason": "Testing rule for the privacy test page, see https://privacy-test-pages.site/privacy-protections/request-blocklist/"
+                    }
+                ]
+            },
+            "third-party.site": {
+                "rules": [
+                    {
+                        "rule": "third-party.site/privacy-protections/request-blocklist/*?block=true",
+                        "domains": [
+                            "privacy-test-pages.site"
+                        ],
+                        "reason": "Testing rule for the privacy test page, see https://privacy-test-pages.site/privacy-protections/request-blocklist/"
+                    }
+                ]
+            }
+        }
+    },
+    "exceptions": []
+}
