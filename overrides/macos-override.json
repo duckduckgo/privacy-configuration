@@ -304,8 +304,27 @@
                     "minSupportedVersion": "1.140.0"
                 },
                 "emailConfirmationDecoupling": {
-                    "state": "internal",
-                    "minSupportedVersion": "1.158.0"
+                    "state": "enabled",
+                    "minSupportedVersion": "1.158.0",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
                 }
             },
             "minSupportedVersion": "1.70.0"
