@@ -492,6 +492,29 @@
                                         }
                                     }
                                 ]
+                            },
+                            {
+                                "domain": [
+                                    "login.coinbase.com"
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input[data-testid='unified-login-email-prompt-input']",
+                                            "type": "credentials.username"
+                                        }
+                                    },
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "span[data-testid='input-interactable-area'] input[type='email']",
+                                            "type": "identities.emailAddress"
+                                        }
+                                    }
+                                ]
                             }
                         ]
                     }
