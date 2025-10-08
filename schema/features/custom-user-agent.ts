@@ -41,6 +41,7 @@ type CustomUserAgentSettings = {
 
     // iOS specific properties
     useUpdatedSafariVersions?: boolean;
+    safariVersionMappings?: Record<string, string>;
 
     // iOS/Android specific user agent configs
     closestUserAgent?: UserAgentConfig | VersionsOnly;
