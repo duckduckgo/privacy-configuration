@@ -51,7 +51,7 @@
             "exceptions": [],
             "features": {
                 "tdsNextExperiment003": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": 52361000,
                     "rollout": {
                         "steps": [
@@ -35596,6 +35596,29 @@
                                         }
                                     }
                                 ]
+                            },
+                            {
+                                "domain": [
+                                    "login.coinbase.com"
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input[data-testid='unified-login-email-prompt-input']",
+                                            "type": "credentials.username"
+                                        }
+                                    },
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "span[data-testid='input-interactable-area'] input[type='email']",
+                                            "type": "identities.emailAddress"
+                                        }
+                                    }
+                                ]
                             }
                         ]
                     }
@@ -36046,6 +36069,9 @@
                         "fadeDuration": 200,
                         "tension": 1
                     }
+                },
+                "updateScriptOnPageFinished": {
+                    "state": "disabled"
                 },
                 "vpnMenuItem": {
                     "state": "enabled",
@@ -37730,6 +37756,9 @@
                 "widgetAsProtection": {
                     "minSupportedVersion": 52400000,
                     "state": "enabled"
+                },
+                "embeddedSettingsWebView": {
+                    "state": "enabled"
                 }
             }
         },
@@ -37838,6 +37867,9 @@
                         "steps": [
                             {
                                 "percent": 5
+                            },
+                            {
+                                "percent": 20
                             }
                         ]
                     }

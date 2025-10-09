@@ -304,8 +304,15 @@
                     "minSupportedVersion": "1.140.0"
                 },
                 "emailConfirmationDecoupling": {
-                    "state": "internal",
-                    "minSupportedVersion": "1.158.0"
+                    "state": "enabled",
+                    "minSupportedVersion": "1.158.0",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            }
+                        ]
+                    }
                 }
             },
             "minSupportedVersion": "1.70.0"
@@ -323,7 +330,7 @@
             ],
             "features": {
                 "tdsNextExperiment003": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "rollout": {
                         "steps": [
                             {
@@ -832,6 +839,29 @@
                                         }
                                     }
                                 ]
+                            },
+                            {
+                                "domain": [
+                                    "login.coinbase.com"
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input[data-testid='unified-login-email-prompt-input']",
+                                            "type": "credentials.username"
+                                        }
+                                    },
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "span[data-testid='input-interactable-area'] input[type='email']",
+                                            "type": "identities.emailAddress"
+                                        }
+                                    }
+                                ]
                             }
                         ]
                     }
@@ -853,8 +883,7 @@
                     "minSupportedVersion": "1.157.0"
                 },
                 "newTabPagePerTab": {
-                    "state": "enabled",
-                    "minSupportedVersion": "1.157.0"
+                    "state": "disabled"
                 }
             }
         },
@@ -901,6 +930,9 @@
             "minSupportedVersion": "0.22.3"
         },
         "performanceMetrics": {
+            "state": "enabled"
+        },
+        "breakageReporting": {
             "state": "enabled"
         },
         "fingerprintingHardware": {
@@ -1522,6 +1554,9 @@
                     "state": "disabled",
                     "description": "Enables wide pixel measurement for Privacy Pro subscription restore events",
                     "minSupportedVersion": "1.161.0"
+                },
+                "winBackOffer": {
+                    "state": "disabled"
                 }
             }
         },
@@ -1618,6 +1653,9 @@
                 },
                 "unifiedURLPredictor": {
                     "state": "internal"
+                },
+                "appStoreUpdateFlow": {
+                    "state": "enabled"
                 }
             }
         },

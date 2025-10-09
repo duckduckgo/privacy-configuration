@@ -1,4 +1,4 @@
-import { Feature, CSSInjectFeatureSettings, CSSConfigSetting, FeatureState } from '../feature';
+import { Feature, CSSInjectFeatureSettings, FeatureState } from '../feature';
 
 type FullFingerprintingCanvasOptions = CSSInjectFeatureSettings<{
     // Codebase change
