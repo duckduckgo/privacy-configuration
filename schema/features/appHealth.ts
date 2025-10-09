@@ -10,6 +10,7 @@ type SubFeatures<VersionType> = {
             includeWindowState?: boolean;
             collectCpuUsage?: boolean;
             concurrentlyCheckDispatcher?: boolean;
+            concurrentlyCheckIsHungAppWindow?: boolean;
         }
     >;
 };
