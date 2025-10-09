@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import fs from 'fs';
 import path from 'path';
-import { createValidator, formatErrors } from './schema-validation.js';
+import { createValidator, createHybridValidator, formatErrors } from './schema-validation.js';
 import platforms from './../platforms.js';
 import { immutableJSONPatch } from 'immutable-json-patch';
 import { getBaseFeatureConfigs } from '../util.js';
@@ -55,7 +55,7 @@ describe('Config schema tests', () => {
             });
 
             it('should validate against the full configV5 schema', () => {
-                const validate = createValidator(platformSpecificSchemas[config.name] || 'CurrentGenericConfig');
+                const validate = createHybridValidator(platformSpecificSchemas[config.name] || 'CurrentGenericConfig');
                 expect(validate(config.body)).to.be.equal(true, formatErrors(validate.errors));
             });
 
@@ -128,7 +128,7 @@ describe('Config schema tests', () => {
             });
 
             it('All patchSettings should also be valid', () => {
-                const validate = createValidator(platformSpecificSchemas[config.name] || 'CurrentGenericConfig');
+                const validate = createHybridValidator(platformSpecificSchemas[config.name] || 'CurrentGenericConfig');
                 function applyPatchAndValidate(featureName, feature, conditionalChange, config) {
                     for (const change of conditionalChange) {
                         if (!change.patchSettings) {

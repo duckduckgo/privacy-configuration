@@ -56,3 +56,147 @@ export function formatErrors(errors) {
         })
         .join(', ');
 }
+
+function validateElementHidingRules(rules) {
+    if (!Array.isArray(rules)) {
+        return { valid: true };
+    }
+
+    for (let i = 0; i < rules.length; i++) {
+        const rule = rules[i];
+        
+        if (!rule.type) {
+            return { 
+                valid: false, 
+                error: `Rule ${i}: Missing required 'type' property` 
+            };
+        }
+
+        if (rule.type === 'modify-style') {
+            if (!rule.values || !Array.isArray(rule.values)) {
+                return { 
+                    valid: false, 
+                    error: `Rule ${i}: modify-style rules must have 'values' array property` 
+                };
+            }
+            for (let j = 0; j < rule.values.length; j++) {
+                const value = rule.values[j];
+                if (!value.property || !value.value) {
+                    return { 
+                        valid: false, 
+                        error: `Rule ${i}, value ${j}: Style values must have 'property' and 'value' properties` 
+                    };
+                }
+            }
+        }
+
+        if (rule.type === 'modify-attr') {
+            if (!rule.values || !Array.isArray(rule.values)) {
+                return { 
+                    valid: false, 
+                    error: `Rule ${i}: modify-attr rules must have 'values' array property` 
+                };
+            }
+            for (let j = 0; j < rule.values.length; j++) {
+                const value = rule.values[j];
+                if (!value.attribute || !value.value) {
+                    return { 
+                        valid: false, 
+                        error: `Rule ${i}, value ${j}: Attribute values must have 'attribute' and 'value' properties` 
+                    };
+                }
+            }
+        }
+
+        if (['hide-empty', 'hide', 'closest-empty', 'override'].includes(rule.type)) {
+            if (!rule.selector) {
+                return { 
+                    valid: false, 
+                    error: `Rule ${i}: ${rule.type} rules must have 'selector' property` 
+                };
+            }
+        }
+
+        if (rule.type === 'disable-default') {
+        }
+    }
+
+    return { valid: true };
+}
+
+function validateElementHidingDomains(domains) {
+    if (!Array.isArray(domains)) {
+        return { valid: true };
+    }
+
+    for (let i = 0; i < domains.length; i++) {
+        const domain = domains[i];
+        
+        if (!domain.domain) {
+            return { 
+                valid: false, 
+                error: `Domain ${i}: Missing required 'domain' property` 
+            };
+        }
+
+        if (typeof domain.domain !== 'string' && !Array.isArray(domain.domain)) {
+            return { 
+                valid: false, 
+                error: `Domain ${i}: 'domain' must be string or array of strings` 
+            };
+        }
+
+        if (domain.rules) {
+            const rulesValidation = validateElementHidingRules(domain.rules);
+            if (!rulesValidation.valid) {
+                return { 
+                    valid: false, 
+                    error: `Domain ${i}: ${rulesValidation.error}` 
+                };
+            }
+        }
+    }
+
+    return { valid: true };
+}
+
+export function createHybridValidator(schemaName) {
+    const basicValidator = createValidator(schemaName);
+    
+    return function validate(config) {
+        const basicResult = basicValidator(config);
+        if (!basicResult) {
+            return false;
+        }
+
+        if (config.features?.elementHiding?.settings) {
+            const settings = config.features.elementHiding.settings;
+            
+            if (settings.rules) {
+                const rulesValidation = validateElementHidingRules(settings.rules);
+                if (!rulesValidation.valid) {
+                    validate.errors = [{
+                        instancePath: '/features/elementHiding/settings/rules',
+                        message: rulesValidation.error,
+                        params: {}
+                    }];
+                    return false;
+                }
+            }
+
+            if (settings.domains) {
+                const domainsValidation = validateElementHidingDomains(settings.domains);
+                if (!domainsValidation.valid) {
+                    validate.errors = [{
+                        instancePath: '/features/elementHiding/settings/domains',
+                        message: domainsValidation.error,
+                        params: {}
+                    }];
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    };
+}
