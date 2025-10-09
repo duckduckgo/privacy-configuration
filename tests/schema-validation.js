@@ -64,18 +64,23 @@ function validateElementHidingRulesOptimized(rules) {
 
     const simpleRules = [];
     const complexRules = [];
-    
+
     for (let i = 0; i < rules.length; i++) {
         const rule = rules[i];
-        
+
         if (!rule.type) {
-            return { 
-                valid: false, 
-                error: `Rule ${i}: Missing required 'type' property` 
+            return {
+                valid: false,
+                error: `Rule ${i}: Missing required 'type' property`,
             };
         }
 
-        if (['modify-style', 'modify-attr'].includes(rule.type)) {
+        if (
+            [
+                'modify-style',
+                'modify-attr',
+            ].includes(rule.type)
+        ) {
             complexRules.push({ rule, index: i });
         } else {
             simpleRules.push({ rule, index: i });
@@ -84,20 +89,27 @@ function validateElementHidingRulesOptimized(rules) {
 
     const simpleValidation = validateSimpleRules(simpleRules);
     if (!simpleValidation.valid) return simpleValidation;
-    
+
     const complexValidation = validateComplexRules(complexRules);
     if (!complexValidation.valid) return complexValidation;
-    
+
     return { valid: true };
 }
 
 function validateSimpleRules(simpleRules) {
     for (const { rule, index } of simpleRules) {
-        if (['hide-empty', 'hide', 'closest-empty', 'override'].includes(rule.type)) {
+        if (
+            [
+                'hide-empty',
+                'hide',
+                'closest-empty',
+                'override',
+            ].includes(rule.type)
+        ) {
             if (!rule.selector) {
-                return { 
-                    valid: false, 
-                    error: `Rule ${index}: ${rule.type} rules must have 'selector' property` 
+                return {
+                    valid: false,
+                    error: `Rule ${index}: ${rule.type} rules must have 'selector' property`,
                 };
             }
         }
@@ -109,17 +121,17 @@ function validateComplexRules(complexRules) {
     for (const { rule, index } of complexRules) {
         if (rule.type === 'modify-style') {
             if (!rule.values || !Array.isArray(rule.values)) {
-                return { 
-                    valid: false, 
-                    error: `Rule ${index}: modify-style rules must have 'values' array property` 
+                return {
+                    valid: false,
+                    error: `Rule ${index}: modify-style rules must have 'values' array property`,
                 };
             }
             for (let j = 0; j < rule.values.length; j++) {
                 const value = rule.values[j];
                 if (!value.property || !value.value) {
-                    return { 
-                        valid: false, 
-                        error: `Rule ${index}, value ${j}: Style values must have 'property' and 'value' properties` 
+                    return {
+                        valid: false,
+                        error: `Rule ${index}, value ${j}: Style values must have 'property' and 'value' properties`,
                     };
                 }
             }
@@ -127,17 +139,17 @@ function validateComplexRules(complexRules) {
 
         if (rule.type === 'modify-attr') {
             if (!rule.values || !Array.isArray(rule.values)) {
-                return { 
-                    valid: false, 
-                    error: `Rule ${index}: modify-attr rules must have 'values' array property` 
+                return {
+                    valid: false,
+                    error: `Rule ${index}: modify-attr rules must have 'values' array property`,
                 };
             }
             for (let j = 0; j < rule.values.length; j++) {
                 const value = rule.values[j];
                 if (!value.attribute || !value.value) {
-                    return { 
-                        valid: false, 
-                        error: `Rule ${index}, value ${j}: Attribute values must have 'attribute' and 'value' properties` 
+                    return {
+                        valid: false,
+                        error: `Rule ${index}, value ${j}: Attribute values must have 'attribute' and 'value' properties`,
                     };
                 }
             }
@@ -153,27 +165,27 @@ function validateElementHidingDomains(domains) {
 
     for (let i = 0; i < domains.length; i++) {
         const domain = domains[i];
-        
+
         if (!domain.domain) {
-            return { 
-                valid: false, 
-                error: `Domain ${i}: Missing required 'domain' property` 
+            return {
+                valid: false,
+                error: `Domain ${i}: Missing required 'domain' property`,
             };
         }
 
         if (typeof domain.domain !== 'string' && !Array.isArray(domain.domain)) {
-            return { 
-                valid: false, 
-                error: `Domain ${i}: 'domain' must be string or array of strings` 
+            return {
+                valid: false,
+                error: `Domain ${i}: 'domain' must be string or array of strings`,
             };
         }
 
         if (domain.rules) {
             const rulesValidation = validateElementHidingRulesOptimized(domain.rules);
             if (!rulesValidation.valid) {
-                return { 
-                    valid: false, 
-                    error: `Domain ${i}: ${rulesValidation.error}` 
+                return {
+                    valid: false,
+                    error: `Domain ${i}: ${rulesValidation.error}`,
                 };
             }
         }
@@ -184,7 +196,7 @@ function validateElementHidingDomains(domains) {
 
 export function createHybridValidator(schemaName) {
     const basicValidator = createValidator(schemaName);
-    
+
     return function validate(config) {
         const basicResult = basicValidator(config);
         if (!basicResult) {
@@ -193,15 +205,17 @@ export function createHybridValidator(schemaName) {
 
         if (config.features?.elementHiding?.settings) {
             const settings = config.features.elementHiding.settings;
-            
+
             if (settings.rules) {
                 const rulesValidation = validateElementHidingRulesOptimized(settings.rules);
                 if (!rulesValidation.valid) {
-                    validate.errors = [{
-                        instancePath: '/features/elementHiding/settings/rules',
-                        message: rulesValidation.error,
-                        params: {}
-                    }];
+                    validate.errors = [
+                        {
+                            instancePath: '/features/elementHiding/settings/rules',
+                            message: rulesValidation.error,
+                            params: {},
+                        },
+                    ];
                     return false;
                 }
             }
@@ -209,11 +223,13 @@ export function createHybridValidator(schemaName) {
             if (settings.domains) {
                 const domainsValidation = validateElementHidingDomains(settings.domains);
                 if (!domainsValidation.valid) {
-                    validate.errors = [{
-                        instancePath: '/features/elementHiding/settings/domains',
-                        message: domainsValidation.error,
-                        params: {}
-                    }];
+                    validate.errors = [
+                        {
+                            instancePath: '/features/elementHiding/settings/domains',
+                            message: domainsValidation.error,
+                            params: {},
+                        },
+                    ];
                     return false;
                 }
             }

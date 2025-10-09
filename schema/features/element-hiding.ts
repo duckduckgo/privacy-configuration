@@ -1,13 +1,6 @@
 import { Feature } from '../feature';
 
-type ElementHidingRuleType =
-    | 'hide-empty'
-    | 'hide'
-    | 'closest-empty'
-    | 'override'
-    | 'modify-style'
-    | 'modify-attr'
-    | 'disable-default';
+type ElementHidingRuleType = 'hide-empty' | 'hide' | 'closest-empty' | 'override' | 'modify-style' | 'modify-attr' | 'disable-default';
 
 type StyleValue = {
     property: string;
