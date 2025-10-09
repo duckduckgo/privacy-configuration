@@ -1458,10 +1458,21 @@
                 ]
             },
             {
-                "domain": "ebay-kleinanzeigen.de",
+                "domain": [
+                    "ebay-kleinanzeigen.de",
+                    "kleinanzeigen.de"
+                ],
                 "rules": [
                     {
                         "selector": "[data-liberty-position-name]",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".bannerplacement-fullwidth",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".bannerplacement-sticky",
                         "type": "hide-empty"
                     }
                 ]
