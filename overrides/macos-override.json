@@ -270,13 +270,28 @@
         },
         "duckAiDataClearing": {
             "exceptions": [],
-            "state": "internal",
+            "state": "enabled",
             "settings": {
+                "additionalCheck": "disabled",
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "internal": true
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/additionalCheck",
+                                "value": "enabled"
+                            }
+                        ]
+                    }
+                ],
                 "chatsLocalStorageKeys": ["savedAIChats"],
                 "chatImagesIndexDbNameObjectStoreNamePairs": [[
-                        "savedAIChatData",
-                        "chat-images"
-                    ]]
+                    "savedAIChatData",
+                    "chat-images"
+                ]]
             }
         },
         "autocompleteTabs": {
