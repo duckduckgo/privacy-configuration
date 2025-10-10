@@ -269,6 +269,32 @@
                 "aiChatURLIdentifiableQueryValue": "chat"
             }
         },
+        "duckAiDataClearing": {
+            "exceptions": [],
+            "state": "enabled",
+            "settings": {
+                "additionalCheck": "disabled",
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "internal": true
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/additionalCheck",
+                                "value": "enabled"
+                            }
+                        ]
+                    }
+                ],
+                "chatsLocalStorageKeys": ["savedAIChats"],
+                "chatImagesIndexDbNameObjectStoreNamePairs": [[
+                        "savedAIChatData",
+                        "chat-images"
+                    ]]
+            }
+        },
         "autocompleteTabs": {
             "minSupportedVersion": "1.134.0"
         },
