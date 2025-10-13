@@ -1171,10 +1171,17 @@
                     "state": "enabled"
                 },
                 "allowRetriesForServiceWorkerTimeouts": {
-                    "state": "disabled"
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 50.0
+                            }
+                        ]
+                    }
                 },
                 "skipFetchForServiceWorkers": {
-                    "state": "preview"
+                    "state": "disabled"
                 },
                 "webViewSkipServiceWorkerAttachments": {
                     "state": "disabled",
