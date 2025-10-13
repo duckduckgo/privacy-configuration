@@ -978,6 +978,31 @@
                 ]
             },
             {
+                "domain": "boardgamegeek.com",
+                "rules": [
+                    {
+                        "selector": "gg-home-leaderboard-ad",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "gg-leaderboard-lg-ad",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "gg-support-leaderboard-ad",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "gg-post-inline-ad",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[hide-ad-block]",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
                 "domain": "bostonglobe.com",
                 "rules": [
                     {
@@ -1265,6 +1290,15 @@
                 ]
             },
             {
+                "domain": "dailymotion.com",
+                "rules": [
+                    {
+                        "selector": "[class^='DisplayAd']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
                 "domain": "dallasnews.com",
                 "rules": [
                     {
@@ -1424,10 +1458,21 @@
                 ]
             },
             {
-                "domain": "ebay-kleinanzeigen.de",
+                "domain": [
+                    "ebay-kleinanzeigen.de",
+                    "kleinanzeigen.de"
+                ],
                 "rules": [
                     {
                         "selector": "[data-liberty-position-name]",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".bannerplacement-fullwidth",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".bannerplacement-sticky",
                         "type": "hide-empty"
                     }
                 ]
@@ -1845,6 +1890,15 @@
                 ]
             },
             {
+                "domain": "globo.com",
+                "rules": [
+                    {
+                        "selector": "banner-ad",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
                 "domain": [
                     "google.com",
                     "google.ca",
@@ -2173,6 +2227,10 @@
                     {
                         "selector": "#stickyFooterRoot",
                         "type": "hide"
+                    },
+                    {
+                        "selector": ".sc-toncsa-0",
+                        "type": "hide-empty"
                     }
                 ]
             },
@@ -2296,6 +2354,15 @@
                     },
                     {
                         "selector": "[class*='placeholder']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "koreatimes.co.kr",
+                "rules": [
+                    {
+                        "selector": "[data-ad-position]",
                         "type": "hide-empty"
                     }
                 ]
@@ -2620,6 +2687,9 @@
                 "domain": "newatlas.com",
                 "rules": [
                     {
+                        "type": "disable-default"
+                    },
+                    {
                         "selector": ".OcelotAdModule",
                         "type": "hide-empty"
                     },
@@ -2699,12 +2769,12 @@
                 "domain": "nottinghampost.com",
                 "rules": [
                     {
-                        "selector": "#auth-ui_one-tap-container",
+                        "selector": "div[data-tmdatatrack=\"non-content-unit\"]",
                         "type": "hide"
                     },
                     {
-                        "selector": "#comments-standalone-mpu",
-                        "type": "hide-empty"
+                        "selector": "div.vf-promo-gtag",
+                        "type": "closest-empty"
                     }
                 ]
             },
@@ -3468,6 +3538,15 @@
                 ]
             },
             {
+                "domain": "theregister.com",
+                "rules": [
+                    {
+                        "selector": ".adun",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
                 "domain": "thetimes.co.uk",
                 "rules": [
                     {
@@ -3836,6 +3915,14 @@
                     },
                     {
                         "selector": "[id*='rrvkqH1']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".ad-container",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "ul.flex > li.relative",
                         "type": "hide-empty"
                     }
                 ]

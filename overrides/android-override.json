@@ -51,7 +51,7 @@
             "exceptions": [],
             "features": {
                 "tdsNextExperiment003": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": 52361000,
                     "rollout": {
                         "steps": [
@@ -269,6 +269,29 @@
                 "duckAiInputScreen": {
                     "state": "enabled",
                     "minSupportedVersion": 52440000
+                },
+                "showAIChatAddressBarChoiceScreen": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52490000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
                 }
             }
         },
@@ -315,6 +338,10 @@
                 {
                     "domain": "kvb.koeln",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2808"
+                },
+                {
+                    "domain": "ashleyfurniture.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3908"
                 }
             ],
             "features": {
@@ -35309,6 +35336,40 @@
                                 ]
                             },
                             {
+                                "domain": ["www.joinblvd.com"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "blvd-wizard-step form",
+                                            "type": "signup"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": ["alibris.com"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "form[action*=\"Guest\"]",
+                                            "type": "signup"
+                                        }
+                                    },
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "form[action*=\"CreateAccount\"]",
+                                            "type": "signup"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
                                 "domain": [
                                     "accounts.google.com"
                                 ],
@@ -35524,8 +35585,232 @@
                                         "value": ".loginSelectUnit.slctInputUnit"
                                     }
                                 ]
+                            },
+                            {
+                                "domain": [
+                                    "challenge.spotify.com"
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input[inputmode=\"numeric\"]",
+                                            "type": "unknown"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": [
+                                    "login.coinbase.com"
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input[data-testid='unified-login-email-prompt-input']",
+                                            "type": "credentials.username"
+                                        }
+                                    },
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "span[data-testid='input-interactable-area'] input[type='email']",
+                                            "type": "identities.emailAddress"
+                                        }
+                                    }
+                                ]
                             }
                         ]
+                    }
+                },
+                "canImportBookmarksFromGoogleTakeout": {
+                    "state": "enabled",
+                    "settings": {
+                        "launchUrl": "https://takeout.google.com/",
+                        "javascriptConfig": {
+                            "domains": [
+                                {
+                                    "domain": [
+                                        "takeout.google.com"
+                                    ],
+                                    "patchSettings": [
+                                        {
+                                            "path": "/selectors",
+                                            "op": "add",
+                                            "value": {
+                                                "tabPanel": "div[role=\"tabpanel\"]",
+                                                "userIdLink": "a[href*=\"&user=\"]"
+                                            }
+                                        },
+                                        {
+                                            "path": "/actions",
+                                            "op": "add",
+                                            "value": [
+                                                {
+                                                    "id": "deselect-all-button-click",
+                                                    "actionType": "click",
+                                                    "elements": [
+                                                        {
+                                                            "type": "element",
+                                                            "selector": "div[role=\"tabpanel\"] div:nth-child(2) div:nth-child(2) button"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "id": "deselect-all-button-expectation",
+                                                    "actionType": "expectation",
+                                                    "expectations": [
+                                                        {
+                                                            "type": "element",
+                                                            "selector": "div[role=\"tabpanel\"] div:nth-child(10) input[type=\"checkbox\"][checked]:not(:checked)"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "id": "chrome-section-scroll",
+                                                    "actionType": "scroll",
+                                                    "selector": "c-wiz [data-id=\"chrome\"]"
+                                                },
+                                                {
+                                                    "id": "chrome-section-select",
+                                                    "actionType": "click",
+                                                    "elements": [
+                                                        {
+                                                            "type": "element",
+                                                            "selector": "div[role=\"tabpanel\"] div:nth-child(10) input[type=\"checkbox\"][checked]:not(:checked)"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "id": "chrome-data-button-click",
+                                                    "actionType": "click",
+                                                    "elements": [
+                                                        {
+                                                            "type": "element",
+                                                            "selector": "div[role=\"tabpanel\"] div:nth-child(10) > div:nth-child(2) > div:nth-child(2) button"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "id": "bookmark-modal-expectation",
+                                                    "actionType": "expectation",
+                                                    "expectations": [
+                                                        {
+                                                            "type": "element",
+                                                            "selector": "fieldset.rcetic"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "id": "bookmark-deselect-all-button-click",
+                                                    "actionType": "click",
+                                                    "elements": [
+                                                        {
+                                                            "type": "element",
+                                                            "selector": "fieldset.rcetic div:nth-child(2) button:nth-of-type(2)"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "id": "bookmark-checkbox-expectation",
+                                                    "actionType": "expectation",
+                                                    "expectations": [
+                                                        {
+                                                            "type": "element",
+                                                            "selector": "fieldset.rcetic div:nth-child(3) > div:nth-of-type(2) input[checked]:not(:checked)"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "id": "bookmark-checkbox-click",
+                                                    "actionType": "click",
+                                                    "elements": [
+                                                        {
+                                                            "type": "element",
+                                                            "selector": "fieldset.rcetic div:nth-child(3) > div:nth-of-type(2) input[checked]:not(:checked)"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "id": "ok-button-expectation",
+                                                    "actionType": "expectation",
+                                                    "elements": [
+                                                        {
+                                                            "type": "element",
+                                                            "selector": "div[isfullscreen] div:nth-child(3) div:last-child[aria-disabled=\"false\"]"
+                                                        }
+                                                    ],
+                                                    "expectations": [
+                                                        {
+                                                            "type": "element",
+                                                            "selector": "div[isfullscreen] div:nth-child(3) > div[role=\"button\"]:not([aria-disabled]):nth-of-type(2)"
+                                                        },
+                                                        {
+                                                            "type": "element",
+                                                            "selector": "fieldset.rcetic div:nth-child(3) > div:nth-of-type(2) input[checked]:checked"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "id": "ok-button-click",
+                                                    "actionType": "click",
+                                                    "elements": [
+                                                        {
+                                                            "type": "element",
+                                                            "selector": "div[isfullscreen] div:nth-child(3) > div[role=\"button\"]:not([aria-disabled]):nth-of-type(2)"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "id": "next-step-button-scroll",
+                                                    "actionType": "scroll",
+                                                    "selector": "div[role=\"tabpanel\"] > div:nth-child(1) > div:nth-child(2) button"
+                                                },
+                                                {
+                                                    "id": "next-step-button-click",
+                                                    "actionType": "click",
+                                                    "elements": [
+                                                        {
+                                                            "type": "element",
+                                                            "selector": "div[role=\"tabpanel\"] > div:nth-child(1) > div:nth-child(2) button"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "id": "create-export-button-scroll",
+                                                    "actionType": "scroll",
+                                                    "selector": "div[data-configure-step=\"1\"] button"
+                                                },
+                                                {
+                                                    "id": "create-export-button-click",
+                                                    "actionType": "click",
+                                                    "elements": [
+                                                        {
+                                                            "type": "element",
+                                                            "selector": "div[data-configure-step=\"1\"] button"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "id": "manage-button-click",
+                                                    "actionType": "click",
+                                                    "elements": [
+                                                        {
+                                                            "type": "element",
+                                                            "selector": "a[href=\"manage\"]"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
                     }
                 },
                 "canImportFromGooglePasswordManager": {
@@ -35536,7 +35821,7 @@
                             "domains": [
                                 {
                                     "domain": [
-                                        "google.com",
+                                        "passwords.google.com",
                                         "localhost"
                                     ],
                                     "patchSettings": [
@@ -35753,6 +36038,9 @@
                         "domains": [
                             "duckduckgo.com"
                         ],
+                        "keysToDelete": [
+                            "savedAIChats"
+                        ],
                         "matchingRegex": [
                             "^_https://([a-zA-Z0-9.-]+\\.)?{domain}\u0000\u0001.+$",
                             "^META:https://([a-zA-Z0-9.-]+\\.)?{domain}$",
@@ -35785,6 +36073,18 @@
                         "fadeDuration": 200,
                         "tension": 1
                     }
+                },
+                "updateScriptOnPageFinished": {
+                    "state": "disabled"
+                },
+                "vpnMenuItem": {
+                    "state": "enabled",
+                    "targets": [
+                        {
+                            "localeCountry": "gb",
+                            "isPrivacyProEligible": true
+                        }
+                    ]
                 }
             }
         },
@@ -35804,34 +36104,6 @@
                                 "op": "add",
                                 "path": "/additionalCheck",
                                 "value": "disabled"
-                            }
-                        ]
-                    },
-                    {
-                        "condition": {
-                            "injectName": "android",
-                            "minSupportedVersion": 52470004,
-                            "internal": true
-                        },
-                        "patchSettings": [
-                            {
-                                "op": "add",
-                                "path": "/additionalCheck",
-                                "value": "disabled"
-                            }
-                        ]
-                    },
-                    {
-                        "condition": {
-                            "injectName": "android-adsjs",
-                            "minSupportedVersion": 52470004,
-                            "internal": true
-                        },
-                        "patchSettings": [
-                            {
-                                "op": "add",
-                                "path": "/additionalCheck",
-                                "value": "enabled"
                             }
                         ]
                     }
@@ -35940,6 +36212,9 @@
                     }
                 },
                 "nativeUI": {
+                    "state": "disabled"
+                },
+                "addCustomEmbedReferer": {
                     "state": "disabled"
                 }
             },
@@ -36053,12 +36328,17 @@
                                 "value": "disabled"
                             }
                         ]
-                    },
+                    }
+                ]
+            }
+        },
+        "fingerprintingCanvas": {
+            "state": "disabled",
+            "settings": {
+                "conditionalChanges": [
                     {
                         "condition": {
-                            "injectName": "android",
-                            "minSupportedVersion": 52470004,
-                            "internal": true
+                            "injectName": "android-adsjs"
                         },
                         "patchSettings": [
                             {
@@ -36067,26 +36347,9 @@
                                 "value": "disabled"
                             }
                         ]
-                    },
-                    {
-                        "condition": {
-                            "injectName": "android-adsjs",
-                            "minSupportedVersion": 52470004,
-                            "internal": true
-                        },
-                        "patchSettings": [
-                            {
-                                "op": "add",
-                                "path": "/additionalCheck",
-                                "value": "enabled"
-                            }
-                        ]
                     }
                 ]
             }
-        },
-        "fingerprintingCanvas": {
-            "state": "disabled"
         },
         "fingerprintingHardware": {
             "state": "enabled",
@@ -36112,34 +36375,6 @@
                                 "op": "add",
                                 "path": "/additionalCheck",
                                 "value": "disabled"
-                            }
-                        ]
-                    },
-                    {
-                        "condition": {
-                            "injectName": "android",
-                            "minSupportedVersion": 52470004,
-                            "internal": true
-                        },
-                        "patchSettings": [
-                            {
-                                "op": "add",
-                                "path": "/additionalCheck",
-                                "value": "disabled"
-                            }
-                        ]
-                    },
-                    {
-                        "condition": {
-                            "injectName": "android-adsjs",
-                            "minSupportedVersion": 52470004,
-                            "internal": true
-                        },
-                        "patchSettings": [
-                            {
-                                "op": "add",
-                                "path": "/additionalCheck",
-                                "value": "enabled"
                             }
                         ]
                     }
@@ -36197,34 +36432,6 @@
                                 "value": "disabled"
                             }
                         ]
-                    },
-                    {
-                        "condition": {
-                            "injectName": "android",
-                            "minSupportedVersion": 52470004,
-                            "internal": true
-                        },
-                        "patchSettings": [
-                            {
-                                "op": "add",
-                                "path": "/additionalCheck",
-                                "value": "disabled"
-                            }
-                        ]
-                    },
-                    {
-                        "condition": {
-                            "injectName": "android-adsjs",
-                            "minSupportedVersion": 52470004,
-                            "internal": true
-                        },
-                        "patchSettings": [
-                            {
-                                "op": "add",
-                                "path": "/additionalCheck",
-                                "value": "enabled"
-                            }
-                        ]
                     }
                 ]
             }
@@ -36248,34 +36455,6 @@
                                 "op": "add",
                                 "path": "/additionalCheck",
                                 "value": "disabled"
-                            }
-                        ]
-                    },
-                    {
-                        "condition": {
-                            "injectName": "android",
-                            "minSupportedVersion": 52470004,
-                            "internal": true
-                        },
-                        "patchSettings": [
-                            {
-                                "op": "add",
-                                "path": "/additionalCheck",
-                                "value": "disabled"
-                            }
-                        ]
-                    },
-                    {
-                        "condition": {
-                            "injectName": "android-adsjs",
-                            "minSupportedVersion": 52470004,
-                            "internal": true
-                        },
-                        "patchSettings": [
-                            {
-                                "op": "add",
-                                "path": "/additionalCheck",
-                                "value": "enabled"
                             }
                         ]
                     }
@@ -36304,34 +36483,6 @@
                                 "op": "add",
                                 "path": "/additionalCheck",
                                 "value": "disabled"
-                            }
-                        ]
-                    },
-                    {
-                        "condition": {
-                            "injectName": "android",
-                            "minSupportedVersion": 52470004,
-                            "internal": true
-                        },
-                        "patchSettings": [
-                            {
-                                "op": "add",
-                                "path": "/additionalCheck",
-                                "value": "disabled"
-                            }
-                        ]
-                    },
-                    {
-                        "condition": {
-                            "injectName": "android-adsjs",
-                            "minSupportedVersion": 52470004,
-                            "internal": true
-                        },
-                        "patchSettings": [
-                            {
-                                "op": "add",
-                                "path": "/additionalCheck",
-                                "value": "enabled"
                             }
                         ]
                     }
@@ -36371,6 +36522,7 @@
             "settings": {
                 "aiChat": "disabled",
                 "subscriptions": "disabled",
+                "serpSettings": "disabled",
                 "domains": [
                     {
                         "domain": [
@@ -36386,6 +36538,11 @@
                             {
                                 "op": "replace",
                                 "path": "/subscriptions",
+                                "value": "enabled"
+                            },
+                            {
+                                "op": "replace",
+                                "path": "/serpSettings",
                                 "value": "enabled"
                             }
                         ]
@@ -36648,34 +36805,6 @@
                     },
                     {
                         "condition": {
-                            "injectName": "android",
-                            "minSupportedVersion": 52470004,
-                            "internal": true
-                        },
-                        "patchSettings": [
-                            {
-                                "op": "add",
-                                "path": "/additionalCheck",
-                                "value": "disabled"
-                            }
-                        ]
-                    },
-                    {
-                        "condition": {
-                            "injectName": "android-adsjs",
-                            "minSupportedVersion": 52470004,
-                            "internal": true
-                        },
-                        "patchSettings": [
-                            {
-                                "op": "add",
-                                "path": "/additionalCheck",
-                                "value": "enabled"
-                            }
-                        ]
-                    },
-                    {
-                        "condition": {
                             "context": {
                                 "frame": true
                             }
@@ -36762,6 +36891,9 @@
                         ]
                     }
                 ],
+                "cleanIframeValue": {
+                    "state": "disabled"
+                },
                 "notification": {
                     "state": "enabled"
                 },
@@ -36852,6 +36984,7 @@
                 "mediaSession": "enabled",
                 "presentation": "disabled",
                 "viewportWidth": "enabled",
+                "viewportWidthLegacy": "enabled",
                 "webShare": "enabled",
                 "screenLock": "enabled",
                 "plainTextViewPort": "enabled",
@@ -36871,8 +37004,7 @@
             "state": "enabled",
             "features": {
                 "useNewWebCompatApis": {
-                    "state": "internal",
-                    "minSupportedVersion": 52470004
+                    "state": "disabled"
                 }
             },
             "exceptions": []
@@ -37377,23 +37509,6 @@
                     "state": "enabled",
                     "minSupportedVersion": 52451000
                 },
-                "privacyProFreeTrialJan25": {
-                    "state": "enabled",
-                    "minSupportedVersion": 52280000,
-                    "description": "Privacy Pro free trial experiment",
-                    "targets": [
-                        {
-                            "localeCountry": "us",
-                            "isPrivacyProEligible": true
-                        }
-                    ],
-                    "cohorts": [
-                        {
-                            "name": "treatment",
-                            "weight": 1
-                        }
-                    ]
-                },
                 "subscriptionRebranding": {
                     "state": "enabled"
                 },
@@ -37645,6 +37760,9 @@
                 "widgetAsProtection": {
                     "minSupportedVersion": 52400000,
                     "state": "enabled"
+                },
+                "embeddedSettingsWebView": {
+                    "state": "enabled"
                 }
             }
         },
@@ -37746,85 +37864,22 @@
             "state": "enabled",
             "exceptions": [],
             "features": {
-                "reactivateUsersExperimentMay25": {
+                "browserComparisonPrompt": {
                     "state": "enabled",
-                    "minSupportedVersion": 52361000,
-                    "targets": [
-                        {
-                            "localeLanguage": "en"
-                        }
-                    ],
+                    "minSupportedVersion": 52510000,
                     "rollout": {
                         "steps": [
                             {
                                 "percent": 5
                             },
                             {
-                                "percent": 15
-                            },
-                            {
-                                "percent": 30
+                                "percent": 20
                             },
                             {
                                 "percent": 50
-                            },
-                            {
-                                "percent": 80
-                            },
-                            {
-                                "percent": 100
                             }
                         ]
-                    },
-                    "cohorts": [
-                        {
-                            "name": "control",
-                            "weight": 0
-                        },
-                        {
-                            "name": "duckplayerPrompt",
-                            "weight": 0
-                        },
-                        {
-                            "name": "browserPrompt",
-                            "weight": 0
-                        }
-                    ]
-                }
-            }
-        },
-        "experimentalTheming": {
-            "state": "enabled",
-            "minSupportedVersion": 52410000,
-            "features": {
-                "singleOmnibarFeature": {
-                    "state": "enabled",
-                    "minSupportedVersion": 52410000,
-                    "rollout": {
-                        "steps": [
-                            {
-                                "percent": 5
-                            },
-                            {
-                                "percent": 10
-                            },
-                            {
-                                "percent": 25
-                            },
-                            {
-                                "percent": 50
-                            },
-                            {
-                                "percent": 100
-                            }
-                        ]
-                    },
-                    "cohorts": [
-                        {
-                            "name": "control",
-                            "weight": 1
-                        }
-                    ]
+                    }
                 }
             }
         },
@@ -37844,34 +37899,6 @@
                                 "op": "add",
                                 "path": "/additionalCheck",
                                 "value": "disabled"
-                            }
-                        ]
-                    },
-                    {
-                        "condition": {
-                            "injectName": "android",
-                            "minSupportedVersion": 52470004,
-                            "internal": true
-                        },
-                        "patchSettings": [
-                            {
-                                "op": "add",
-                                "path": "/additionalCheck",
-                                "value": "disabled"
-                            }
-                        ]
-                    },
-                    {
-                        "condition": {
-                            "injectName": "android-adsjs",
-                            "minSupportedVersion": 52470004,
-                            "internal": true
-                        },
-                        "patchSettings": [
-                            {
-                                "op": "add",
-                                "path": "/additionalCheck",
-                                "value": "enabled"
                             }
                         ]
                     }
@@ -37894,34 +37921,6 @@
                             "weight": 1
                         }
                     ]
-                }
-            }
-        },
-        "onboardingDesignExperiment": {
-            "state": "enabled",
-            "exceptions": [],
-            "features": {
-                "onboardingDesignExperimentAug25": {
-                    "state": "enabled",
-                    "minSupportedVersion": 52450000,
-                    "cohorts": [
-                        {
-                            "name": "modifiedControl",
-                            "weight": 0
-                        },
-                        {
-                            "name": "bb",
-                            "weight": 0
-                        },
-                        {
-                            "name": "buck",
-                            "weight": 0
-                        }
-                    ]
-                },
-                "waitForLocalPrivacyConfig": {
-                    "state": "enabled",
-                    "minSupportedVersion": 52450000
                 }
             }
         },
@@ -37948,6 +37947,34 @@
                             }
                         ]
                     }
+                }
+            }
+        },
+        "onboardingDesignExperiment": {
+            "state": "enabled",
+            "exceptions": [],
+            "features": {
+                "onboardingDesignExperimentOct25": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52510000,
+                    "cohorts": [
+                        {
+                            "name": "modifiedControl",
+                            "weight": 1
+                        },
+                        {
+                            "name": "bb",
+                            "weight": 1
+                        },
+                        {
+                            "name": "buck",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "waitForLocalPrivacyConfig": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52510000
                 }
             }
         }

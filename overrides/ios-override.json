@@ -122,14 +122,38 @@
                     "minSupportedVersion": "7.181.0"
                 },
                 "showAIChatAddressBarChoiceScreen": {
-                    "state": "internal",
-                    "minSupportedVersion": "7.186.0"
+                    "state": "enabled",
+                    "minSupportedVersion": "7.187.2",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
                 },
                 "keepSession": {
                     "state": "enabled",
                     "settings": {
                         "sessionTimeoutMinutes": 60
                     }
+                },
+                "serpSettingsFollowUpQuestions": {
+                    "state": "internal",
+                    "description": "Sync Duck.ai checkbox between SERP and Native app",
+                    "minSupportedVersion": "7.189.0"
                 }
             },
             "settings": {
@@ -276,7 +300,7 @@
             "exceptions": [],
             "features": {
                 "tdsNextExperiment003": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "rollout": {
                         "steps": [
                             {
@@ -538,6 +562,40 @@
                                 ]
                             },
                             {
+                                "domain": ["www.joinblvd.com"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "blvd-wizard-step form",
+                                            "type": "signup"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": ["alibris.com"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "form[action*=\"Guest\"]",
+                                            "type": "signup"
+                                        }
+                                    },
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "form[action*=\"CreateAccount\"]",
+                                            "type": "signup"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
                                 "domain": [
                                     "estore.archives.gov",
                                     "localhost"
@@ -712,6 +770,44 @@
                                         "value": "c-wiz > main"
                                     }
                                 ]
+                            },
+                            {
+                                "domain": [
+                                    "challenge.spotify.com"
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input[inputmode=\"numeric\"]",
+                                            "type": "unknown"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": [
+                                    "login.coinbase.com"
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input[data-testid='unified-login-email-prompt-input']",
+                                            "type": "credentials.username"
+                                        }
+                                    },
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "span[data-testid='input-interactable-area'] input[type='email']",
+                                            "type": "identities.emailAddress"
+                                        }
+                                    }
+                                ]
                             }
                         ]
                     }
@@ -794,6 +890,12 @@
             "state": "enabled",
             "settings": {
                 "defaultPolicy": "brand",
+                "useUpdatedSafariVersions": true,
+                "safariVersionMappings": {
+                    "26": "18_6",
+                    "26.0": "18_6",
+                    "26.0.1": "18_7"
+                },
                 "ddgFixedSites": [
                     {
                         "domain": "chase.com",
@@ -818,6 +920,10 @@
                     {
                         "domain": "arcteryx.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3701"
+                    },
+                    {
+                        "domain": "messaginganalytics.athena.io",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3900"
                     }
                 ],
                 "ddgDefaultSites": [
@@ -853,6 +959,10 @@
                     {
                         "domain": "arcteryx.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3701"
+                    },
+                    {
+                        "domain": "messaginganalytics.athena.io",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3900"
                     }
                 ],
                 "omitVersionSites": []
@@ -881,6 +991,9 @@
                     "state": "enabled"
                 },
                 "syncSetupBarcodeIsUrlBased": {
+                    "state": "enabled"
+                },
+                "syncCreditCards": {
                     "state": "enabled"
                 }
             }
@@ -1287,6 +1400,9 @@
                 "paidAIChat": {
                     "state": "enabled",
                     "minSupportedVersion": "7.181.0"
+                },
+                "winBackOffer": {
+                    "state": "disabled"
                 }
             }
         },
@@ -1448,18 +1564,13 @@
                 },
                 "inactivityNotification": {
                     "state": "disabled",
+                    "minSupportedVersion": "7.187.0",
                     "description": "Local inactivity provisional notifications delivered to Notification Center.",
                     "targets": [
                         { "localeLanguage": "en", "localeCountry": "US" }],
                     "settings": {
                         "daysInactive": "7"
                     }
-                },
-                "appShortcut": {
-                    "state": "disabled",
-                    "description": "iOS App Shortcuts for quick actions",
-                    "targets": [
-                        { "localeLanguage": "en", "localeCountry": "US" }]
                 }
             }
         },
@@ -1484,6 +1595,16 @@
                 }
             },
             "minSupportedVersion": "7.180.0"
+        },
+        "behaviorMetrics": {
+            "state": "disabled",
+            "exceptions": [],
+            "features": {
+                "behaviorMetricsEnabled": {
+                    "state": "disabled"
+                }
+            },
+            "minSupportedVersion": "7.186.0"
         }
     },
 

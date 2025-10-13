@@ -5,7 +5,7 @@
             "exceptions": [],
             "features": {
                 "experimentTestAA": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "rollout": {
                         "steps": [
                             {
@@ -129,10 +129,24 @@
                     "minSupportedVersion": "0.125.0"
                 },
                 "globalToggle": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.130.0"
+                },
+                "omnibarAiChat": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.130.0"
                 },
                 "pageContext": {
                     "state": "internal"
+                },
+                "improvements": {
+                    "state": "internal"
+                },
+                "keepSession": {
+                    "state": "internal",
+                    "settings": {
+                        "sessionTimeoutMinutes": 60
+                    }
                 }
             },
             "minSupportedVersion": "0.100.0",
@@ -144,6 +158,10 @@
                 "aiChatURLIdentifiableQueryValue": "chat"
             }
         },
+        "duckAiDataClearing": {
+            "exceptions": [],
+            "state": "disabled"
+        },
         "dbp": {
             "state": "enabled",
             "features": {
@@ -154,7 +172,7 @@
                     "state": "disabled"
                 },
                 "freemium": {
-                    "state": "disabled"
+                    "state": "preview"
                 }
             },
             "settings": {
@@ -178,7 +196,8 @@
             "state": "enabled",
             "features": {
                 "autofillPopupReuse": {
-                    "state": "disabled"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.131.0"
                 },
                 "deduplicateLoginsOnImport": {
                     "state": "enabled"
@@ -234,6 +253,40 @@
                                         "op": "add",
                                         "value": {
                                             "selector": "body > main > section > form:nth-child(2)",
+                                            "type": "signup"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": ["www.joinblvd.com"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "blvd-wizard-step form",
+                                            "type": "signup"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": ["alibris.com"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "form[action*=\"Guest\"]",
+                                            "type": "signup"
+                                        }
+                                    },
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "form[action*=\"CreateAccount\"]",
                                             "type": "signup"
                                         }
                                     }
@@ -437,6 +490,44 @@
                                         "value": "c-wiz > main"
                                     }
                                 ]
+                            },
+                            {
+                                "domain": [
+                                    "challenge.spotify.com"
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input[inputmode=\"numeric\"]",
+                                            "type": "unknown"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": [
+                                    "login.coinbase.com"
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input[data-testid='unified-login-email-prompt-input']",
+                                            "type": "credentials.username"
+                                        }
+                                    },
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "span[data-testid='input-interactable-area'] input[type='email']",
+                                            "type": "identities.emailAddress"
+                                        }
+                                    }
+                                ]
                             }
                         ]
                     }
@@ -461,7 +552,13 @@
                 "filterlist": {
                     "state": "disabled"
                 }
-            }
+            },
+            "exceptions": [
+                {
+                    "domain": "ashleyfurniture.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3908"
+                }
+            ]
         },
         "googleRejected": {
             "state": "disabled",
@@ -471,7 +568,12 @@
             "state": "enabled"
         },
         "breakageReporting": {
-            "state": "enabled"
+            "state": "enabled",
+            "features": {
+                "includeOriginTrials": {
+                    "state": "enabled"
+                }
+            }
         },
         "duckPlayer": {
             "state": "enabled",
@@ -551,6 +653,15 @@
                 },
                 "multiImportWindow": {
                     "state": "internal"
+                },
+                "importShortcuts": {
+                    "state": "disabled",
+                    "settings": {
+                        "chrome": "enabled",
+                        "brave": "enabled",
+                        "edge": "enabled",
+                        "firefox": "enabled"
+                    }
                 }
             }
         },
@@ -560,6 +671,7 @@
                 "aiChat": "disabled",
                 "subscriptions": "disabled",
                 "subscriptionPages": "disabled",
+                "serpSettings": "disabled",
                 "domains": [
                     {
                         "domain": [
@@ -580,6 +692,11 @@
                             {
                                 "op": "replace",
                                 "path": "/subscriptionPages",
+                                "value": "enabled"
+                            },
+                            {
+                                "op": "replace",
+                                "path": "/serpSettings",
                                 "value": "enabled"
                             }
                         ]
@@ -711,7 +828,33 @@
             "exceptions": []
         },
         "sync": {
-            "state": "enabled"
+            "state": "enabled",
+            "features": {
+                "level0ShowSync": {
+                    "state": "enabled"
+                },
+                "level1AllowDataSyncing": {
+                    "state": "enabled"
+                },
+                "level2AllowSetupFlows": {
+                    "state": "enabled"
+                },
+                "level3AllowCreateAccount": {
+                    "state": "enabled"
+                },
+                "exchangeKeysToSyncWithAnotherDevice": {
+                    "state": "enabled"
+                },
+                "syncSetupBarcodeIsUrlBased": {
+                    "state": "enabled"
+                },
+                "syncCreditCards": {
+                    "state": "internal"
+                },
+                "syncIdentities": {
+                    "state": "internal"
+                }
+            }
         },
         "syncPromotion": {
             "state": "enabled",
@@ -942,12 +1085,14 @@
                     "state": "enabled",
                     "changes": []
                 },
-                "disableDeviceEnumerationFrames": "disabled",
-                "disableDeviceEnumeration": "disabled",
                 "enumerateDevices": "enabled",
                 "domains": [
                     {
-                        "domain": "meet.google.com",
+                        "domain": [
+                            "meet.google.com",
+                            "autotrader.com",
+                            "canadiantire.ca"
+                        ],
                         "patchSettings": [
                             {
                                 "op": "replace",
@@ -1024,6 +1169,22 @@
                 },
                 "certificateTransparency": {
                     "state": "enabled"
+                },
+                "allowRetriesForServiceWorkerTimeouts": {
+                    "state": "disabled"
+                },
+                "skipFetchForServiceWorkers": {
+                    "state": "preview"
+                },
+                "webViewSkipServiceWorkerAttachments": {
+                    "state": "disabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 50
+                            }
+                        ]
+                    }
                 }
             },
             "exceptions": []
@@ -1055,7 +1216,8 @@
                     "state": "enabled"
                 },
                 "omnibar": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.130.0"
                 },
                 "newTabPagePerTab": {
                     "state": "disabled"
@@ -1088,11 +1250,14 @@
                         "steps": [
                             {
                                 "percent": 20.0
+                            },
+                            {
+                                "percent": 100.0
                             }
                         ]
                     },
                     "settings": {
-                        "timeoutIntervalSeconds": 12
+                        "timeoutIntervalSeconds": 10
                     }
                 },
                 "burnAnimationSettingVisibility": {
@@ -1138,10 +1303,12 @@
                     "minSupportedVersion": "0.129.0"
                 },
                 "downloadDeletion": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.131.0"
                 },
                 "downloadContextMenu": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.131.0"
                 }
             }
         },
@@ -1220,7 +1387,7 @@
             }
         },
         "pinnedTabs": {
-            "state": "preview",
+            "state": "enabled",
             "minSupportedVersion": "0.129.0",
             "features": {}
         },
@@ -1231,7 +1398,10 @@
                     "state": "enabled"
                 },
                 "uiHangDetection": {
-                    "state": "enabled"
+                    "state": "enabled",
+                    "settings": {
+                        "callStackLimit": 15
+                    }
                 }
             }
         },
@@ -1252,6 +1422,7 @@
             "exceptions": [],
             "settings": {
                 "additionalCheck": "disabled",
+                "maxContentLength": 9500,
                 "conditionalChanges": [
                     {
                         "condition": {
@@ -1269,7 +1440,46 @@
             }
         },
         "openFireWindowByDefault": {
-            "state": "internal"
+            "state": "enabled",
+            "minSupportedVersion": "0.130.0"
+        },
+        "extendedCrashReporting": {
+            "state": "enabled",
+            "exceptions": [],
+            "features": {
+                "reportExtendedResourceUsageMetrics": {
+                    "state": "enabled"
+                }
+            }
+        },
+        "hwAccelerationExperiment": {
+            "state": "enabled",
+            "features": {
+                "disableHwAccelerationOnRenderCrash": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10.0
+                            }
+                        ]
+                    }
+                }
+            },
+            "exceptions": []
+        },
+        "taskbar": {
+            "state": "enabled",
+            "exceptions": [],
+            "features": {
+                "win10Pinning": {
+                    "state": "enabled",
+                    "settings": {
+                        "minWin10Build": 19045,
+                        "minWin10Patch": 6159
+                    }
+                }
+            }
         }
     },
     "unprotectedTemporary": []

@@ -34,6 +34,7 @@ type FullWebCompatOptions = CSSInjectFeatureSettings<{
               forcedDesktopValue: string;
               forcedMobileValue: string;
           };
+    viewportWidthLegacy: StateToggle;
     screenLock: StateToggle;
     plainTextViewPort: StateToggle;
     modifyLocalStorage: {
@@ -52,8 +53,6 @@ type FullWebCompatOptions = CSSInjectFeatureSettings<{
             domain?: string;
         }[];
     };
-    disableDeviceEnumeration: StateToggle;
-    disableDeviceEnumerationFrames: StateToggle;
     enumerateDevices: StateToggle;
     additionalCheck?: FeatureState;
 }>;

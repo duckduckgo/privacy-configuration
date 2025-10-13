@@ -172,6 +172,7 @@
             "settings": {
                 "aiChat": "disabled",
                 "subscriptions": "disabled",
+                "serpSettings": "disabled",
                 "domains": [
                     {
                         "domain": [
@@ -188,6 +189,11 @@
                                 "op": "replace",
                                 "path": "/subscriptions",
                                 "value": "enabled"
+                            },
+                            {
+                                "op": "replace",
+                                "path": "/serpSettings",
+                                "value": "enabled"
                             }
                         ]
                     }
@@ -202,7 +208,8 @@
                 "conditionalChanges": [
                     {
                         "condition": {
-                            "internal": true
+                            "internal": true,
+                            "maxSupportedVersion": "1.160.0"
                         },
                         "patchSettings": [
                             {
@@ -237,10 +244,21 @@
                     "minSupportedVersion": "1.150.0"
                 },
                 "textTranslation": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": "1.157.0"
                 },
                 "globalToggle": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": "1.157.0"
+                },
+                "improvements": {
+                    "state": "disabled"
+                },
+                "keepSession": {
+                    "state": "disabled",
+                    "settings": {
+                        "sessionTimeoutMinutes": 60
+                    }
                 }
             },
             "settings": {
@@ -249,6 +267,32 @@
                 "onboardingCookieDomain": "duckduckgo.com",
                 "aiChatURLIdentifiableQuery": "ia",
                 "aiChatURLIdentifiableQueryValue": "chat"
+            }
+        },
+        "duckAiDataClearing": {
+            "exceptions": [],
+            "state": "enabled",
+            "settings": {
+                "additionalCheck": "disabled",
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "internal": true
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/additionalCheck",
+                                "value": "enabled"
+                            }
+                        ]
+                    }
+                ],
+                "chatsLocalStorageKeys": ["savedAIChats"],
+                "chatImagesIndexDbNameObjectStoreNamePairs": [[
+                        "savedAIChatData",
+                        "chat-images"
+                    ]]
             }
         },
         "autocompleteTabs": {
@@ -287,7 +331,15 @@
                     "minSupportedVersion": "1.140.0"
                 },
                 "emailConfirmationDecoupling": {
-                    "state": "disabled"
+                    "state": "enabled",
+                    "minSupportedVersion": "1.158.0",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            }
+                        ]
+                    }
                 }
             },
             "minSupportedVersion": "1.70.0"
@@ -305,7 +357,7 @@
             ],
             "features": {
                 "tdsNextExperiment003": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "rollout": {
                         "steps": [
                             {
@@ -578,6 +630,40 @@
                                 ]
                             },
                             {
+                                "domain": ["www.joinblvd.com"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "blvd-wizard-step form",
+                                            "type": "signup"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": ["alibris.com"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "form[action*=\"Guest\"]",
+                                            "type": "signup"
+                                        }
+                                    },
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "form[action*=\"CreateAccount\"]",
+                                            "type": "signup"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
                                 "domain": ["areaclientes.orange.es"],
                                 "patchSettings": [
                                     {
@@ -765,6 +851,44 @@
                                         "value": "c-wiz > main"
                                     }
                                 ]
+                            },
+                            {
+                                "domain": [
+                                    "challenge.spotify.com"
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input[inputmode=\"numeric\"]",
+                                            "type": "unknown"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": [
+                                    "login.coinbase.com"
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input[data-testid='unified-login-email-prompt-input']",
+                                            "type": "credentials.username"
+                                        }
+                                    },
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "span[data-testid='input-interactable-area'] input[type='email']",
+                                            "type": "identities.emailAddress"
+                                        }
+                                    }
+                                ]
                             }
                         ]
                     }
@@ -782,10 +906,11 @@
                     "state": "disabled"
                 },
                 "omnibar": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": "1.157.0"
                 },
                 "newTabPagePerTab": {
-                    "state": "internal"
+                    "state": "disabled"
                 }
             }
         },
@@ -832,6 +957,9 @@
             "minSupportedVersion": "0.22.3"
         },
         "performanceMetrics": {
+            "state": "enabled"
+        },
+        "breakageReporting": {
             "state": "enabled"
         },
         "fingerprintingHardware": {
@@ -1094,9 +1222,21 @@
                         "steps": [
                             {
                                 "percent": 25.0
+                            },
+                            {
+                                "percent": 50.0
+                            },
+                            {
+                                "percent": 100.0
                             }
                         ]
                     }
+                },
+                "syncCreditCards": {
+                    "state": "enabled"
+                },
+                "syncIdentities": {
+                    "state": "enabled"
                 }
             }
         },
@@ -1442,6 +1582,9 @@
                 "paidAIChat": {
                     "state": "enabled",
                     "minSupportedVersion": "1.153.0"
+                },
+                "winBackOffer": {
+                    "state": "disabled"
                 }
             }
         },
@@ -1532,6 +1675,15 @@
             "features": {
                 "willSoonDropBigSurSupport": {
                     "state": "enabled"
+                },
+                "hangReporting": {
+                    "state": "internal"
+                },
+                "unifiedURLPredictor": {
+                    "state": "internal"
+                },
+                "appStoreUpdateFlow": {
+                    "state": "enabled"
                 }
             }
         },
@@ -1540,6 +1692,7 @@
             "exceptions": [],
             "settings": {
                 "additionalCheck": "disabled",
+                "maxContentLength": 9500,
                 "conditionalChanges": [
                     {
                         "condition": {
@@ -1555,6 +1708,16 @@
                     }
                 ]
             }
+        },
+        "behaviorMetrics": {
+            "state": "disabled",
+            "exceptions": [],
+            "features": {
+                "behaviorMetricsEnabled": {
+                    "state": "disabled"
+                }
+            },
+            "minSupportedVersion": "1.156.0"
         }
     },
     "unprotectedTemporary": []
