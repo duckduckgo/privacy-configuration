@@ -1693,6 +1693,7 @@
             "settings": {
                 "additionalCheck": "disabled",
                 "maxContentLength": 9500,
+                "mainContentSelector": "main, article, .content, .main, #content, #main",
                 "conditionalChanges": [
                     {
                         "condition": {
@@ -1703,6 +1704,18 @@
                                 "op": "replace",
                                 "path": "/additionalCheck",
                                 "value": "enabled"
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "domain": "nba.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/mainContentSelector",
+                                "value": "main"
                             }
                         ]
                     }
