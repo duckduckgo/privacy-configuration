@@ -22,6 +22,7 @@ export type ElementHidingFeature<VersionType> = Feature<
                 }>;
             }>;
         }>;
+        hideTimeouts?: number[];
         unhideTimeouts?: number[];
         mediaAndFormSelectors?: string;
         adLabelStrings?: string[];
