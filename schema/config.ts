@@ -65,6 +65,7 @@ export type ConfigV5<VersionType> = {
         networkProtection?: NetworkProtection<VersionType>;
         scriptlets?: ScriptletsFeature<VersionType>;
         windowsWebviewFailures?: WindowsWebViewFailures<VersionType>;
+        windowsWebviewFailures_DDGWV?: WindowsWebViewFailures<VersionType>;
         customUserAgent?: CustomUserAgentFeature<VersionType>;
         elementHiding?: ElementHidingFeature<VersionType>;
     };
