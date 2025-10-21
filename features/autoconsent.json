@@ -912,8 +912,8 @@
                 ".modal-body",
                 ".modal-body input:checked, .switch[data-switch=\"on\"]",
                 "[role=\"dialog\"] .modal-footer button",
-                "#cookie-notice",
-                "#cookie-notice .cookie-notice-container",
+                "div[consent-skip-blocker=\"1\"][id][data-bg]",
+                "div[consent-skip-blocker=\"1\"][id][data-bg] > dialog > div > div > div > div > div > a[role=button][id]",
                 "#cookiescript_injected",
                 "#cookiescript_reject",
                 "#cookiescript_manage",
@@ -1274,8 +1274,8 @@
                 "input[type=radio][id$=-declineLabel]",
                 "[data-testid=confirm-choice-button]",
                 "ccm-notification",
-                ".button--notice",
-                ".notice--cookie",
+                "body > div#doc > div:nth-child(1):not([id]) > div:not([id]) > div:not([id]) > div:nth-child(2):not([id]) > div:nth-child(2):not([id]) > div:nth-child(2):not([id]) > div:not([id]) > div:nth-child(2):not([id]) > button:nth-child(2):not([id])",
+                "body > div:not([id]) > aside:nth-child(2):not([id]) > div:nth-child(2):not([id]) > div#modal-content-117 > div#pr-cookie-notice > div:nth-child(1):not([id]) > div:nth-child(2):not([id]) > button:nth-child(2)#btn-cookie-decline",
                 "body > div:not([id]) > footer:nth-child(3):not([id]) > div:nth-child(3):not([id]) > div:not([id]) > div:not([id]) > div:nth-child(2):not([id]) > button:nth-child(2):not([id])",
                 "gdpr-banner",
                 ".disc-cp--active",
@@ -3573,9 +3573,7 @@
                 "body > div:not([id]) > div:nth-child(17):not([id]) > div:not([id]) > a:nth-child(3):not([id])",
                 "body > div#consent > div:nth-child(1):not([id]) > div:nth-child(2)#consent-buttons > button:nth-child(1)#consent-button-nope",
                 "body > div#site-wrapper > div:nth-child(1)#site-canvas > div#wrapper1 > main:nth-child(2)#mainSection1 > div:nth-child(3):not([id]) > div:not([id]) > div:not([id]) > div:nth-child(3):not([id]) > button:nth-child(1):not([id])",
-                "body > div:not([id]) > div:nth-child(2)#\\30 b94133b-8573-43fe-8d37-771c47a4d616 > div:nth-child(2):not([id]) > button:nth-child(2):not([id])",
-                "body > div#doc > div:nth-child(1):not([id]) > div:not([id]) > div:not([id]) > div:nth-child(2):not([id]) > div:nth-child(2):not([id]) > div:nth-child(2):not([id]) > div:not([id]) > div:nth-child(2):not([id]) > button:nth-child(2):not([id])",
-                "body > div:not([id]) > aside:nth-child(2):not([id]) > div:nth-child(2):not([id]) > div#modal-content-117 > div#pr-cookie-notice > div:nth-child(1):not([id]) > div:nth-child(2):not([id]) > button:nth-child(2)#btn-cookie-decline"
+                "body > div:not([id]) > div:nth-child(2)#\\30 b94133b-8573-43fe-8d37-771c47a4d616 > div:nth-child(2):not([id]) > button:nth-child(2):not([id])"
             ],
             "r": [
                 [
@@ -5256,33 +5254,6 @@
                     {
                         "intermediate": false
                     }
-                ],
-                [
-                    1,
-                    "cookie-notice",
-                    1,
-                    "",
-                    22,
-                    [
-                        226
-                    ],
-                    [
-                        {
-                            "v": 227
-                        }
-                    ],
-                    [
-                        {
-                            "v": 226
-                        }
-                    ],
-                    [
-                        {
-                            "h": 226
-                        }
-                    ],
-                    [],
-                    {}
                 ],
                 [
                     1,
@@ -7908,33 +7879,6 @@
                 ],
                 [
                     1,
-                    "notice-cookie",
-                    1,
-                    "",
-                    22,
-                    [
-                        588
-                    ],
-                    [
-                        {
-                            "e": 589
-                        }
-                    ],
-                    [
-                        {
-                            "v": 589
-                        }
-                    ],
-                    [
-                        {
-                            "h": 589
-                        }
-                    ],
-                    [],
-                    {}
-                ],
-                [
-                    1,
                     "obi.de",
                     2,
                     "",
@@ -8588,6 +8532,42 @@
                         }
                     ],
                     [],
+                    {}
+                ],
+                [
+                    1,
+                    "real-cookie-banner",
+                    0,
+                    "",
+                    10,
+                    [
+                        226
+                    ],
+                    [
+                        {
+                            "e": 227
+                        }
+                    ],
+                    [
+                        {
+                            "v": 227
+                        }
+                    ],
+                    [
+                        {
+                            "waitForThenClick": [
+                                "div[consent-skip-blocker=\"1\"][id][data-bg] > dialog > div > div > div > div > div > a[role=button]:not([id])",
+                                "xpath///span[contains(., ' ohne ') or contains(., 'without')]"
+                            ]
+                        }
+                    ],
+                    [
+                        {
+                            "timeout": 1000,
+                            "check": "none",
+                            "wv": 227
+                        }
+                    ],
                     {}
                 ],
                 [
@@ -87982,12 +87962,12 @@
                     [],
                     [
                         {
-                            "e": 2888
+                            "e": 588
                         }
                     ],
                     [
                         {
-                            "v": 2888
+                            "v": 588
                         }
                     ],
                     [
@@ -87995,14 +87975,14 @@
                             "wait": 500
                         },
                         {
-                            "c": 2888
+                            "c": 588
                         }
                     ],
                     [
                         {
                             "timeout": 1000,
                             "check": "none",
-                            "wv": 2888
+                            "wv": 588
                         }
                     ],
                     {}
@@ -88119,12 +88099,12 @@
                     [],
                     [
                         {
-                            "e": 2889
+                            "e": 589
                         }
                     ],
                     [
                         {
-                            "v": 2889
+                            "v": 589
                         }
                     ],
                     [
@@ -88132,14 +88112,14 @@
                             "wait": 500
                         },
                         {
-                            "c": 2889
+                            "c": 589
                         }
                     ],
                     [
                         {
                             "timeout": 1000,
                             "check": "none",
-                            "wv": 2889
+                            "wv": 589
                         }
                     ],
                     {}
