@@ -14,6 +14,20 @@
             ".header",
             ".banner",
             ".popup"
+        ],
+        "conditionalChanges": [
+          {
+            "condition": {
+              "domain": "reddit.com"
+            },
+            "patchSettings": [
+              {
+                "op": "add",
+                "path": "/excludeSelectors",
+                "value": "shreddit-comments-page-ad"
+              }
+            ]
+          }
         ]
     },
     "exceptions": []
