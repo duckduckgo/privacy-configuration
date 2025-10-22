@@ -1493,6 +1493,15 @@
             "settings": {
                 "additionalCheck": "disabled",
                 "maxContentLength": 9500,
+                "excludeSelectors": [
+                    ".ad",
+                    ".sidebar",
+                    ".footer",
+                    ".nav",
+                    ".header",
+                    ".banner",
+                    ".popup"
+                ],
                 "conditionalChanges": [
                     {
                         "condition": {
@@ -1503,6 +1512,18 @@
                                 "op": "replace",
                                 "path": "/additionalCheck",
                                 "value": "enabled"
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "domain": "reddit.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/excludeSelectors/-",
+                                "value": "shreddit-comments-page-ad"
                             }
                         ]
                     }
