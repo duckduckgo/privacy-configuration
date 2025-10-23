@@ -19,7 +19,10 @@
 ### Element Hiding Specific Checks
 - **Rule Types**: Must be one of `hide-empty`, `hide`, `closest-empty`, `override`, `modify-style`, `modify-attr`, or `disable-default`
 - **Required Fields**: `selector` for most rules, `type` for all rules
-- **Optional Fields**: `values` array only for `modify-style` and `modify-attr` rules
+- **Values Field Rules**: 
+  - **Required** for `modify-style` and `modify-attr` rules
+  - **Forbidden** for `hide-empty`, `hide`, `closest-empty`, `override` rules
+  - **Forbidden** for `disable-default` rules
 - **Domain Placement**: Domain-specific rules go in `domains[]` array
 - **Global Rules**: Go in top-level `rules[]` array
 
@@ -88,6 +91,13 @@ When validation fails, provide clear, actionable error messages:
 ❌ **Missing Values Array**
 **Error**: Rule type 'modify-style' requires 'values' array
 **Fix**: Add `"values": [{"property": "display", "value": "none"}]` to the rule
+```
+
+#### Forbidden Values Field
+```
+❌ **Forbidden Values Field**
+**Error**: Rule type 'hide-empty' cannot have 'values' field
+**Fix**: Remove the 'values' field from the rule
 ```
 
 #### Wrong Rule Placement
