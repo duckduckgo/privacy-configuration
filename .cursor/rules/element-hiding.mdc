@@ -1,0 +1,84 @@
+---
+description: Element hiding mitigation decision guide and rule type reference for privacy-configuration. Use this when working with element-hiding rules and mitigations.
+
+alwaysApply: true
+---
+# Element Hiding Mitigation Rules
+
+## Schema & Implementation References
+
+- **Schema**: `schema/features/element-hiding.ts` - TypeScript type definitions
+- **Implementation**: `content-scope-scripts/injected/src/features/element-hiding.js` - JavaScript runtime logic
+- **Configuration**: `features/element-hiding.json` - Rule definitions and domain-specific overrides
+
+## Type Definitions
+
+```typescript
+// Hide rules (no values field allowed)
+type ElementHidingRuleHide = {
+  selector: string;
+  type: 'hide-empty' | 'hide' | 'closest-empty' | 'override';
+  // No values field allowed for hide rules
+}
+
+// Modify rules (values field required)
+type ElementHidingRuleModify = {
+  selector: string;
+  type: 'modify-style' | 'modify-attr';
+  values: ElementHidingValue[];  // Required for modify rules
+}
+
+// Disable rules (no selector field allowed)
+type ElementHidingRuleDisable = {
+  type: 'disable-default';
+}
+
+type ElementHidingRule = ElementHidingRuleHide | ElementHidingRuleModify | ElementHidingRuleDisable;
+
+type ElementHidingValue = {
+  property: string;
+  value: string;
+}
+
+type ElementHidingDomain = {
+  domain: string | string[];
+  rules: ElementHidingRule[];
+}
+```
+
+## Element Hiding Mitigation Decision Tree (Strategy-Prioritized):
+
+```
+Blank spaces? → hide-empty (try first)
+↓
+Target has content but parent empty? → closest-empty
+↓
+Content must be hidden? → hide (only if necessary — may trigger detection)
+↓
+Global rule conflict? → override the selector
+↓
+Adblock detection? → disable-default + add working rules
+↓
+Layout/visual issues? → modify-style
+↓
+Attribute issues? → modify-attr
+```
+
+## Rule Type Reference
+
+| Rule Type | Use Case | Values Field | Notes |
+|-----------|----------|--------------|-------|
+| `hide-empty` | Empty ad containers or blank placeholders | ❌ **Forbidden** | ✅ Default rule. Hides only if empty. |
+| `closest-empty` | Empty parent container remains | ❌ **Forbidden** | Crawls up DOM tree to hide the empty parent. |
+| `hide` | Always hide, even if visible content | ❌ **Forbidden** | ⚠️ Use sparingly — can cause detection. |
+| `override` | Cancel specific global rules | ❌ **Forbidden** | Domain-specific only. Fixes global breakage. |
+| `disable-default` | Defuse adblock detection | ❌ **Forbidden** | Domain-specific only. Never alone; rebuild safe rules. |
+| `modify-style` | Layout or visibility tweaks | ✅ **Required** | Replace CSS values (e.g., height → 0px). |
+| `modify-attr` | Attribute corrections | ✅ **Required** | Replace element attributes (e.g., src/class). |
+
+## Schema Validation Rules
+
+- **Hide rules** (`hide-empty`, `hide`, `closest-empty`, `override`): Cannot have `values` field
+- **Modify rules** (`modify-style`, `modify-attr`): Must have `values` field with property/value pairs
+- **Disable rules** (`disable-default`): Cannot have `selector` or `values` fields
+- **TypeScript enforces** these rules at compile time

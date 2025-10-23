@@ -5,17 +5,23 @@ type ElementHidingValue = {
     value: string;
 };
 
-type ElementHidingRuleWithSelector = {
+type ElementHidingRuleHide = {
     selector: string;
-    type: 'hide-empty' | 'hide' | 'closest-empty' | 'override' | 'modify-style' | 'modify-attr';
-    values?: ElementHidingValue[];
+    type: 'hide-empty' | 'hide' | 'closest-empty' | 'override';
+    // No values field allowed for hide rules
+};
+
+type ElementHidingRuleModify = {
+    selector: string;
+    type: 'modify-style' | 'modify-attr';
+    values: ElementHidingValue[]; // Required for modify rules
 };
 
 type ElementHidingRuleWithoutSelector = {
     type: 'disable-default';
 };
 
-type ElementHidingRule = ElementHidingRuleWithSelector | ElementHidingRuleWithoutSelector;
+type ElementHidingRule = ElementHidingRuleHide | ElementHidingRuleModify | ElementHidingRuleWithoutSelector;
 
 type ElementHidingDomain = {
     domain: string | string[];
