@@ -8,12 +8,6 @@
 - **Validate JSON structure** and syntax
 - **Ensure TypeScript type compliance**
 
-### Auto-Approval Integration
-- **Respect path-based rules** defined in `automation-utils.js`
-- **Only approve changes** in `AUTO_APPROVABLE_FEATURES` paths
-- **Flag disallowed paths** for manual review
-- **Follow existing automation logic** from `json-diff-directories.js`
-
 ## Element Hiding Feature Validation
 
 ### Schema & Implementation References
@@ -21,10 +15,6 @@
 - **Schema**: `schema/features/element-hiding.ts` - TypeScript type definitions
 - **Implementation**: `content-scope-scripts/injected/src/features/element-hiding.js` - JavaScript runtime logic
 - **Configuration**: `features/element-hiding.json` - Rule definitions and domain-specific overrides
-
-### Auto-Approval Paths
-- **Allowed**: `domains`, `exceptions` (see `automation-utils.js`)
-- **Requires Manual Review**: Global `rules`, `settings`, `useStrictHideStyleTag`, etc.
 
 ### Element Hiding Specific Checks
 - **Rule Types**: Must be one of `hide-empty`, `hide`, `closest-empty`, `override`, `modify-style`, `modify-attr`, or `disable-default`
@@ -48,55 +38,64 @@
 - **Ad labels**: `adLabelStrings` for identifying ad containers
 - **Exceptions**: `styleTagExceptions` for domains with special handling
 
-## Common Issues to Flag
+## Element Hiding Validation Errors
+
+### Rule Placement Mistakes
+- ❌ **Global rules in domain sections**: Rules without `domain` field in `domains[]` array
+- ❌ **Domain rules in global sections**: Rules with `domain` field in global `rules[]` array
+- ❌ **Missing required fields**: `selector` missing for rule types that require it
+- ❌ **Invalid rule types**: Rule types not in allowed list
+- ❌ **Missing values array**: `modify-style`/`modify-attr` rules without `values`
 
 ### Schema Violations
-- Missing required fields for element-hiding rules
-- Invalid rule types or values
-- Malformed JSON structure
-- TypeScript type mismatches
+- **Missing required fields** for element-hiding rules
+- **Invalid rule types** or values
+- **Malformed JSON structure**
+- **TypeScript type mismatches**
 
-### Path Violations
-- Changes outside `AUTO_APPROVABLE_FEATURES` paths
-- Domain-specific rules in wrong location
-- Global rules in domain-specific sections
+## GitHub Error Reporting
 
-### Quality Issues
-- Inconsistent rule naming or formatting
-- Missing rule comments or documentation
-- Overly broad selectors (security risk)
-- Missing test coverage
+### Error Message Format
+When validation fails, provide clear, actionable error messages:
 
-## Auto-Approval Criteria
+```
+❌ **Element Hiding Validation Error**
+**File**: `features/element-hiding.json`
+**Location**: `domains[0].rules[0]`
+**Error**: Missing required field 'selector' for rule type 'hide-empty'
+**Fix**: Add `"selector": ".your-selector"` to the rule
+```
 
-### Repository-Wide Requirements
-- Schema-compliant rule structure
-- Valid JSON syntax
-- Changes only in allowed paths (per `automation-utils.js`)
-- Clear rule purpose and documentation
+### Common Error Scenarios
 
-### Element Hiding Specific Requirements
-- Appropriate rule type selection
-- Proper domain placement
-- Valid selector syntax
-- Clear mitigation purpose
+#### Missing Required Fields
+```
+❌ **Missing Selector Field**
+**Error**: Rule type 'hide-empty' requires 'selector' field
+**Fix**: Add `"selector": ".ad-container"` to the rule
+```
 
-## Integration with Existing Automation
+#### Invalid Rule Types
+```
+❌ **Invalid Rule Type**
+**Error**: 'hide-forever' is not a valid rule type
+**Valid types**: hide-empty, hide, closest-empty, override, modify-style, modify-attr, disable-default
+**Fix**: Use one of the valid rule types
+```
 
-### Path-Based Validation
-- Use `automation-utils.js` as source of truth for allowed paths
-- Follow `AUTO_APPROVABLE_FEATURES` configuration
-- Respect conditional changes patching logic
+#### Missing Values Array
+```
+❌ **Missing Values Array**
+**Error**: Rule type 'modify-style' requires 'values' array
+**Fix**: Add `"values": [{"property": "display", "value": "none"}]` to the rule
+```
 
-### Testing Integration
-- Reference `tests/test-auto-approval.js` for valid patterns
-- Follow `json-diff-directories.js` analysis logic
-- Ensure compatibility with existing test suite
-
-### Workflow Integration
-- Work with `auto-respond-pr.yml` automation
-- Integrate with Asana sync for manual review cases
-- Support reviewer assignment automation
+#### Wrong Rule Placement
+```
+❌ **Wrong Rule Placement**
+**Error**: Global rule placed in domain-specific section
+**Fix**: Move rule to global 'rules[]' array or add 'domain' field to make it domain-specific
+```
 
 ## Adding New Features to Bugbot
 
@@ -116,8 +115,8 @@ When adding new features to this repository, follow this pattern:
 3. **Update this `BUGBOT.md`** to include:
    - Feature-specific validation section
    - Schema references
-   - Auto-approval paths
-   - Common issues to flag
+   - Validation error scenarios
+   - GitHub error reporting format
 
 4. **Add feature-specific validation criteria** following the element-hiding pattern
 
