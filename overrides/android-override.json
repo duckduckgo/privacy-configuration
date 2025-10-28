@@ -44,7 +44,34 @@
             "minSupportedVersion": 52100000
         },
         "appTrackerProtection": {
-            "state": "enabled"
+            "state": "enabled",
+            "features": {
+                "atpTdsExperiment001": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52361000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "experiment/tds-202510AA-control-android.json",
+                        "treatmentUrl": "experiment/tds-202510AA-treatment-android.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                }
+            }
         },
         "blockList": {
             "state": "enabled",
