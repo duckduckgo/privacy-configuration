@@ -53,8 +53,4 @@ export type AttributedMetricsSubFeatures = {
     canEmitSyncDevices: SubFeature<string>;
 };
 
-export type AttributedMetricsFeature = Feature<
-    AttributedMetricsSettings,
-    string,
-    AttributedMetricsSubFeatures
->;
+export type AttributedMetricsFeature = Feature<AttributedMetricsSettings, string, AttributedMetricsSubFeatures>;
