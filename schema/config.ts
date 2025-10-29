@@ -1,4 +1,5 @@
 import { Feature, SiteException } from './feature';
+import { AttributedMetricsFeature } from './features/attributed-metrics';
 import { AutoconsentFeature } from './features/autoconsent';
 import { CookieFeature } from './features/cookie';
 import { TrackerAllowlistFeature } from './features/tracker-allowlist';
@@ -25,7 +26,6 @@ import { ElementHidingFeature } from './features/element-hiding';
 
 export { WebCompatSettings } from './features/webcompat';
 export { DuckPlayerSettings } from './features/duckplayer';
-export { DuckPlayerNativeSettings } from './features/duckplayer-native';
 
 export type ExportedSchemas =
     | 'CurrentGenericConfig'
@@ -34,7 +34,8 @@ export type ExportedSchemas =
     | 'LegacyAndroidConfig'
     | 'WebCompatSettings'
     | 'DuckPlayerSettings'
-    | 'DuckPlayerNativeSettings';
+    | 'DuckPlayerNativeSettings'
+    | 'AttributedMetricsFeature';
 
 /**
  * Defines the structure of the built V5 config output as downloaded by clients.
@@ -47,6 +48,7 @@ export type ConfigV5<VersionType> = {
         aiChat?: AiChatConfig<VersionType>;
         apiManipulation?: APIManipulationFeature<VersionType>;
         appHealth?: AppHealth<VersionType>;
+        attributedMetrics?: AttributedMetricsFeature;
         autoconsent?: AutoconsentFeature<VersionType>;
         autofill?: AutofillFeature<VersionType>;
         burn?: BurnFeature<VersionType>;
