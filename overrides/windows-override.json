@@ -138,7 +138,8 @@
                     "minSupportedVersion": "0.130.0"
                 },
                 "pageContext": {
-                    "state": "internal"
+                    "minSupportedVersion": "0.136.2",
+                    "state": "preview"
                 },
                 "improvements": {
                     "state": "enabled",
@@ -1512,6 +1513,18 @@
                     {
                         "condition": {
                             "internal": true
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/additionalCheck",
+                                "value": "enabled"
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "preview": true
                         },
                         "patchSettings": [
                             {
