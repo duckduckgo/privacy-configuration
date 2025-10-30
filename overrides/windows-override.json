@@ -1563,7 +1563,7 @@
             }
         },
         "hwAccelerationExperiment": {
-            "state": "disabled",
+            "state": "enabled",
             "features": {
                 "disableHwAccelerationOnRenderCrash": {
                     "state": "disabled",
@@ -1577,6 +1577,45 @@
                             }
                         ]
                     }
+                },
+                "disableHwAccelerationExperimentGroup": {
+                    "state": "enabled",
+                    "cohorts": [
+                        {
+                            "name": "groupCom",
+                            "weight": 1
+                        },
+                        {
+                            "name": "groupOom",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "disableHwAccelerationOnRenderCrashCom": {
+                    "state": "enabled",
+                    "cohorts": [
+                        {
+                            "name": "controlCom",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatmentCom",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "disableHwAccelerationOnRenderCrashOom": {
+                    "state": "enabled",
+                    "cohorts": [
+                        {
+                            "name": "controlOom",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatmentOom",
+                            "weight": 1
+                        }
+                    ]
                 }
             },
             "exceptions": []
