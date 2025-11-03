@@ -2976,6 +2976,37 @@
                 }
             }
         },
+        "notificationPromptExperiment": {
+            "state": "enabled",
+            "exceptions": [],
+            "features": {
+                "notificationPromptExperimentOct25": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52550000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "experimentalNoNotificationPrompt",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "waitForLocalPrivacyConfig": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52550000
+                }
+            }
+        },
         "apiManipulation": {
             "readme": "Example config for apiManipulation to set navigator.plugins to return PDF viewer plugins",
             "state": "enabled",
