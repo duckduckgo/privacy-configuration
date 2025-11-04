@@ -3081,6 +3081,29 @@
                 ]
             },
             {
+                "domain": "quizlet.com",
+                "rules": [
+                    {
+                        "selector": "#targetDiv-setpage_billboard",
+                        "type": "modify-style",
+                        "values": [
+                            {
+                                "property": "height",
+                                "value": "0px"
+                            },
+                            {
+                                "property": "min-height",
+                                "value": "0px"
+                            }
+                        ]
+                    },
+                    {
+                        "selector": ".SetPageTerms-embeddedDesktopAdWrapper",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
                 "domain": "quora.com",
                 "rules": [
                     {
@@ -3366,7 +3389,10 @@
                 "domain": "snopes.com",
                 "rules": [
                     {
-                        "selector": ".proper-dynamic-insertion",
+                        "type": "disable-default"
+                    },
+                    {
+                        "selector": ".adblock_notice",
                         "type": "closest-empty"
                     }
                 ]
@@ -3733,6 +3759,18 @@
                 "rules": [
                     {
                         "type": "disable-default"
+                    }
+                ]
+            },
+            {
+                "domain": "tvtropes.org",
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    },
+                    {
+                        "selector": ".adblock_notice",
+                        "type": "closest-empty"
                     }
                 ]
             },

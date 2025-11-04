@@ -47,7 +47,7 @@
             "state": "enabled",
             "features": {
                 "atpTdsExperiment001": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": 52361000,
                     "rollout": {
                         "steps": [
@@ -319,6 +319,9 @@
                             }
                         ]
                     }
+                },
+                "standaloneMigration": {
+                    "state": "disabled"
                 }
             }
         },
@@ -1995,6 +1998,30 @@
                                 }
                             }
                         ]
+                    },
+                    {
+                        "condition": {
+                            "domain": "realtor.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/notification/state",
+                                "value": "disabled"
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "domain": "chewy.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/notification/state",
+                                "value": "disabled"
+                            }
+                        ]
                     }
                 ],
                 "cleanIframeValue": {
@@ -2949,6 +2976,37 @@
                 }
             }
         },
+        "notificationPromptExperiment": {
+            "state": "enabled",
+            "exceptions": [],
+            "features": {
+                "notificationPromptExperimentOct25": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52550000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "experimentalNoNotificationPrompt",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "waitForLocalPrivacyConfig": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52550000
+                }
+            }
+        },
         "apiManipulation": {
             "readme": "Example config for apiManipulation to set navigator.plugins to return PDF viewer plugins",
             "state": "enabled",
@@ -3049,7 +3107,7 @@
             "exceptions": [],
             "features": {
                 "feature": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": 52530000,
                     "rollout": {
                         "steps": [
@@ -3061,6 +3119,9 @@
                             },
                             {
                                 "percent": 50
+                            },
+                            {
+                                "percent": 100
                             }
                         ]
                     }

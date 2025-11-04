@@ -9,6 +9,17 @@
     "state": "enabled",
     "settings": {
         "allowlistedTrackers": {
+            "third-party.site": {
+                "rules": [
+                    {
+                        "rule": "allowlisted.third-party.site",
+                        "domains": [
+                            "privacy-test-pages.site"
+                        ],
+                        "reason": "Testing rule for the privacy test pages"
+                    }
+                ]
+            },
             "2mdn.net": {
                 "rules": [
                     {
@@ -498,6 +509,20 @@
                             "Example URL2: https://www.beretta.com/en-us/mens-clothing/caps-and-hats/lp-trucker-hat/;",
                             "Various product and product-related images do not render - e.g., main product images on product pages, product images in product listings, etc."
                         ]
+                    }
+                ]
+            },
+            "bigcrunch.com": {
+                "rules": [
+                    {
+                        "rule": "ship.bigcrunch.com/prebid",
+                        "domains": ["tvtropes.org"],
+                        "reason": ["https://github.com/duckduckgo/privacy-configuration/pull/4006"]
+                    },
+                    {
+                        "rule": "lh.bigcrunch.com/main.js",
+                        "domains": ["snopes.com"],
+                        "reason": ["https://github.com/duckduckgo/privacy-configuration/pull/4007"]
                     }
                 ]
             },
@@ -1704,6 +1729,17 @@
                         "rule": "google.com/adsense/search/",
                         "domains": ["ihowlist.com"],
                         "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2140"
+                    },
+                    {
+                        "rule": "fundingchoicesmessages.google.com",
+                        "domains": [
+                            "tvtropes.org",
+                            "snopes.com"
+                        ],
+                        "reason": [
+                            "https://github.com/duckduckgo/privacy-configuration/pull/4006",
+                            "https://github.com/duckduckgo/privacy-configuration/pull/4007"
+                        ]
                     }
                 ]
             },
@@ -1857,7 +1893,9 @@
                             "wps.com",
                             "comparethemarket.com",
                             "birminghamairport.co.uk",
-                            "flyfrontier.com"
+                            "flyfrontier.com",
+                            "tvtropes.org",
+                            "snopes.com"
                         ],
                         "reason": [
                             "https://github.com/duckduckgo/privacy-configuration/issues/929",
@@ -1875,7 +1913,9 @@
                             "vizio.com - https://github.com/duckduckgo/privacy-configuration/pull/2761",
                             "wps.com - https://github.com/duckduckgo/privacy-configuration/pull/2826",
                             "birminghamairport.co.uk - https://github.com/duckduckgo/privacy-configuration/pull/3558",
-                            "flyfrontier.com - https://github.com/duckduckgo/privacy-configuration/pull/3982"
+                            "flyfrontier.com - https://github.com/duckduckgo/privacy-configuration/pull/3982",
+                            "tvtropes.org - https://github.com/duckduckgo/privacy-configuration/pull/4006",
+                            "snopes.com - https://github.com/duckduckgo/privacy-configuration/pull/4007"
                         ]
                     }
                 ]

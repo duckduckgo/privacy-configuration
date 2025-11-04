@@ -138,7 +138,8 @@
                     "minSupportedVersion": "0.130.0"
                 },
                 "pageContext": {
-                    "state": "internal"
+                    "minSupportedVersion": "0.136.4",
+                    "state": "preview"
                 },
                 "improvements": {
                     "state": "enabled",
@@ -150,6 +151,12 @@
                     "settings": {
                         "sessionTimeoutMinutes": 60
                     }
+                },
+                "standaloneMigration": {
+                    "state": "disabled"
+                },
+                "omnibarToggle": {
+                    "state": "internal"
                 }
             },
             "minSupportedVersion": "0.100.0",
@@ -874,10 +881,15 @@
                     "state": "enabled"
                 },
                 "syncCreditCards": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.136.0"
                 },
                 "syncIdentities": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.136.0"
+                },
+                "seamlessAccountSwitching": {
+                    "state": "enabled"
                 }
             }
         },
@@ -1216,10 +1228,18 @@
             "state": "enabled",
             "features": {
                 "webViewProviderPreviewOptIn": {
-                    "state": "disabled"
-                },
-                "webViewProviderPreviewOptInFallbackToDefault": {
-                    "state": "disabled"
+                    "state": "preview",
+                    "minSupportedVersion": "0.136.2",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5.0
+                            },
+                            {
+                                "percent": 20.0
+                            }
+                        ]
+                    }
                 },
                 "certificateTransparency": {
                     "state": "enabled"
@@ -1492,6 +1512,7 @@
             "exceptions": [],
             "settings": {
                 "additionalCheck": "disabled",
+                "includeIframes": "disabled",
                 "maxContentLength": 9500,
                 "excludeSelectors": [
                     ".ad",
@@ -1506,6 +1527,18 @@
                     {
                         "condition": {
                             "internal": true
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/additionalCheck",
+                                "value": "enabled"
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "preview": true
                         },
                         "patchSettings": [
                             {
@@ -1547,7 +1580,7 @@
             "state": "enabled",
             "features": {
                 "disableHwAccelerationOnRenderCrash": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "rollout": {
                         "steps": [
                             {
@@ -1558,6 +1591,45 @@
                             }
                         ]
                     }
+                },
+                "disableHwAccelerationExperimentGroup": {
+                    "state": "enabled",
+                    "cohorts": [
+                        {
+                            "name": "groupCom",
+                            "weight": 1
+                        },
+                        {
+                            "name": "groupOom",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "disableHwAccelerationOnRenderCrashCom": {
+                    "state": "enabled",
+                    "cohorts": [
+                        {
+                            "name": "controlCom",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatmentCom",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "disableHwAccelerationOnRenderCrashOom": {
+                    "state": "enabled",
+                    "cohorts": [
+                        {
+                            "name": "controlOom",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatmentOom",
+                            "weight": 1
+                        }
+                    ]
                 }
             },
             "exceptions": []

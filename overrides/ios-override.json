@@ -155,10 +155,25 @@
                     "state": "internal",
                     "description": "Sync Duck.ai checkbox between SERP and Native app",
                     "minSupportedVersion": "7.189.0"
+                },
+                "standaloneMigration": {
+                    "state": "disabled"
                 }
             },
             "settings": {
                 "aiChatURL": "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=4"
+            }
+        },
+        "duckAiDataClearing": {
+            "minSupportedVersion": "7.194.0",
+            "exceptions": [],
+            "state": "enabled",
+            "settings": {
+                "chatsLocalStorageKeys": ["savedAIChats"],
+                "chatImagesIndexDbNameObjectStoreNamePairs": [[
+                        "savedAIChatData",
+                        "chat-images"
+                    ]]
             }
         },
         "duckPlayer": {
@@ -1003,7 +1018,8 @@
                     "state": "enabled"
                 },
                 "syncCreditCards": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": "7.193.0"
                 }
             }
         },
