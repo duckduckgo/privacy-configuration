@@ -17,6 +17,10 @@ export type AttributedMetricsSettings = {
         buckets: number[];
         version: number;
     };
+    attributed_metric_average_searches_past_week: {
+        buckets: number[];
+        version: number;
+    };
     attributed_metric_average_ad_clicks_past_week: {
         buckets: number[];
         version: number;
