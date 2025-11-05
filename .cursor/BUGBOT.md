@@ -107,6 +107,14 @@ When validation fails, provide clear, actionable error messages:
 **Fix**: Move rule to global 'rules[]' array or add 'domain' field to make it domain-specific
 ```
 
+## Request Blocklist Feature Validation
+
+### References
+
+- **Rule File**: `.cursor/rules/request-blocklist.mdc` - Developer guidance
+- **Schema**: `schema/features/request-blocklist.ts` - TypeScript type definitions
+- **Configuration**: `features/request-blocklist.json` - Request blocking rule definitions
+
 ## Adding New Features to Bugbot
 
 ### Template for New Feature Validation
