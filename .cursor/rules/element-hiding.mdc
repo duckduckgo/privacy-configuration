@@ -1,14 +1,13 @@
 ---
+globs: features/element-hiding.json,overrides/**/*.json
+alwaysApply: false
 description: Element hiding mitigation decision guide and rule type reference for privacy-configuration. Use this when working with element-hiding rules and mitigations.
-
-alwaysApply: true
 ---
 # Element Hiding Mitigation Rules
 
-## Schema & Implementation References
+## Schema & Configuration References
 
 - **Schema**: `schema/features/element-hiding.ts` - TypeScript type definitions
-- **Implementation**: `content-scope-scripts/injected/src/features/element-hiding.js` - JavaScript runtime logic
 - **Configuration**: `features/element-hiding.json` - Rule definitions and domain-specific overrides
 
 ## Type Definitions
@@ -76,9 +75,56 @@ Attribute issues? → modify-attr
 | `modify-style` | Layout or visibility tweaks | ✅ **Required** | Replace CSS values (e.g., height → 0px). |
 | `modify-attr` | Attribute corrections | ✅ **Required** | Replace element attributes (e.g., src/class). |
 
-## Schema Validation Rules
+### Configuration Structure
+- **Rule Placement**: 
+- **Domain-specific rules**: Go in `domains[]` array
+- **Global rules**: Go in top-level `rules[]` array
+- **Global settings**: `useStrictHideStyleTag`, `hideTimeouts`, `unhideTimeouts`
+- **Media selectors**: `mediaAndFormSelectors` for form/media element targeting
+- **Ad labels**: `adLabelStrings` for identifying ad containers
+- **Exceptions**: `styleTagExceptions` for domains with special handling
 
-- **Hide rules** (`hide-empty`, `hide`, `closest-empty`, `override`): Cannot have `values` field
-- **Modify rules** (`modify-style`, `modify-attr`): Must have `values` field with property/value pairs
-- **Disable rules** (`disable-default`): Cannot have `selector` or `values` fields
-- **TypeScript enforces** these rules at compile time
+## Error Reporting Format
+
+When validation fails, provide clear, actionable error messages:
+
+```
+❌ **Element Hiding Validation Error**
+**File**: `features/element-hiding.json`
+**Location**: `domains[0].rules[0]`
+**Error**: Missing required field 'selector' for rule type 'hide-empty'
+**Fix**: Add `"selector": ".your-selector"` to the rule
+```
+
+### Common Error Scenarios
+
+```
+❌ **Missing Selector Field**
+**Error**: Rule type 'hide-empty' requires 'selector' field
+**Fix**: Add `"selector": ".ad-container"` to the rule
+```
+
+```
+❌ **Invalid Rule Type**
+**Error**: 'hide-forever' is not a valid rule type
+**Valid types**: hide-empty, hide, closest-empty, override, modify-style, modify-attr, disable-default
+**Fix**: Use one of the valid rule types
+```
+
+```
+❌ **Missing Values Array**
+**Error**: Rule type 'modify-style' requires 'values' array
+**Fix**: Add `"values": [{"property": "display", "value": "none"}]` to the rule
+```
+
+```
+❌ **Forbidden Values Field**
+**Error**: Rule type 'hide-empty' cannot have 'values' field
+**Fix**: Remove the 'values' field from the rule
+```
+
+```
+❌ **Wrong Rule Placement**
+**Error**: Global rule placed in domain-specific section
+**Fix**: Move rule to global 'rules[]' array or add 'domain' field to make it domain-specific
+```
