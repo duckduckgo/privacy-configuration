@@ -350,18 +350,18 @@
                 }
             ],
             "features": {
-                "tdsNextExperiment003": {
-                    "state": "disabled",
+                "tdsNextExperiment004": {
+                    "state": "enabled",
                     "rollout": {
                         "steps": [
                             {
-                                "percent": 100
+                                "percent": 25
                             }
                         ]
                     },
                     "settings": {
-                        "controlUrl": "v6/experiments/202508v2-macos-tds-control.json",
-                        "treatmentUrl": "v6/experiments/202508v2-macos-tds-treatment.json"
+                        "controlUrl": "v6/experiments/202511v1-macos-tds-control.json",
+                        "treatmentUrl": "v6/experiments/202511v1-macos-tds-treatment.json"
                     },
                     "cohorts": [
                         {
@@ -1611,6 +1611,17 @@
                 },
                 "winBackOffer": {
                     "state": "disabled"
+                },
+                "blackFridayCampaign": {
+                    "state": "disabled",
+                    "targets": [
+                        {
+                            "localeCountry": "US"
+                        }
+                    ],
+                    "settings": {
+                        "discountPercent": "40"
+                    }
                 }
             }
         },
