@@ -46,7 +46,31 @@
                             "type": "undefined"
                         }
                     }
-                }
+                },
+                "conditionalChanges": [
+                    {
+                        "condition": [
+                            {
+                                "domain": "news.ycombinator.com"
+                            },
+                            {
+                                "domain": "hackaday.com"
+                            }],
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/apiChanges/Navigator.prototype.userAgent",
+                                "value": {
+                                    "type": "descriptor",
+                                    "getterValue": {
+                                        "type": "string",
+                                        "value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/536.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/536.36"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                ]
             }
         },
         "webTelemetry": {
