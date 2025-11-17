@@ -316,7 +316,7 @@
             "exceptions": [],
             "features": {
                 "tdsNextExperiment004": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "rollout": {
                         "steps": [
                             {
@@ -327,6 +327,30 @@
                     "settings": {
                         "controlUrl": "v5/experiments/202511v1-ios-tds-control.json",
                         "treatmentUrl": "v5/experiments/202511v1-ios-tds-treatment.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "tdsNextExperiment005": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "v5/experiments/202511v2-ios-tds-control.json",
+                        "treatmentUrl": "v5/experiments/202511v2-ios-tds-treatment.json"
                     },
                     "cohorts": [
                         {
