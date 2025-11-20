@@ -39,22 +39,19 @@ export type AttributedMetricsSettings = {
     };
 };
 
-export type AttributedMetricsSubFeatures = {
-    emitAllMetrics: SubFeature<string>;
-    retention: SubFeature<string>;
-    canEmitRetention: SubFeature<string>;
-    searchDaysAvg: SubFeature<string>;
-    canEmitSearchDaysAvg: SubFeature<string>;
-    searchCountAvg: SubFeature<string>;
-    canEmitSearchCountAvg: SubFeature<string>;
-    adClickCountAvg: SubFeature<string>;
-    canEmitAdClickCountAvg: SubFeature<string>;
-    aiUsageAvg: SubFeature<string>;
-    canEmitAIUsageAvg: SubFeature<string>;
-    subscriptionRetention: SubFeature<string>;
-    canEmitSubscriptionRetention: SubFeature<string>;
-    syncDevices: SubFeature<string>;
-    canEmitSyncDevices: SubFeature<string>;
+// Any subfeatures that have typed `settings` should be defined here.
+// Subfeatures without settings (or just string:string mappings for settings) will be automatically validated.
+type SubFeatures<VersionType> = {
+    sendOriginParam?: SubFeature<
+        VersionType,
+        {
+            originCampaignSubstrings: string[];
+        }
+    >;
 };
 
-export type AttributedMetricsFeature = Feature<AttributedMetricsSettings, string, AttributedMetricsSubFeatures>;
+export type AttributedMetricsFeature = Feature<
+    AttributedMetricsSettings,
+    string,
+    SubFeatures<string> & Record<string, SubFeature<string>>
+>;
