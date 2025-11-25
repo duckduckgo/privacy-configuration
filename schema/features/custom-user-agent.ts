@@ -1,4 +1,4 @@
-import { Feature } from '../feature';
+import { Feature, SubFeature } from '../feature';
 
 type UserAgentOverride = {
     domain: string;
@@ -48,4 +48,24 @@ type CustomUserAgentSettings = {
     ddgFixedUserAgent?: UserAgentConfig;
 };
 
-export type CustomUserAgentFeature<VersionType> = Feature<CustomUserAgentSettings, VersionType>;
+// Windows-specific sub-feature: userAgentStrategies
+type UserAgentStrategy = {
+    strategy: string;
+    domain: string;
+    pathRegex?: string;
+};
+
+type SubFeatures<VersionType> = {
+    userAgentStrategies?: SubFeature<
+        VersionType,
+        {
+            strategies: UserAgentStrategy[];
+        }
+    >;
+};
+
+export type CustomUserAgentFeature<VersionType> = Feature<
+    CustomUserAgentSettings,
+    VersionType,
+    SubFeatures<VersionType> & Record<string, SubFeature<VersionType>>
+>;

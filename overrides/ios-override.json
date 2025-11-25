@@ -158,6 +158,11 @@
                 },
                 "standaloneMigration": {
                     "state": "disabled"
+                },
+                "onboardingSearchExperience": {
+                    "state": "enabled",
+                    "description": "Toggle Choice Screen during onboarding",
+                    "minSupportedVersion": "7.197.0"
                 }
             },
             "settings": {
@@ -316,7 +321,7 @@
             "exceptions": [],
             "features": {
                 "tdsNextExperiment004": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "rollout": {
                         "steps": [
                             {
@@ -327,6 +332,30 @@
                     "settings": {
                         "controlUrl": "v5/experiments/202511v1-ios-tds-control.json",
                         "treatmentUrl": "v5/experiments/202511v1-ios-tds-treatment.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "tdsNextExperiment005": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "v5/experiments/202511v2-ios-tds-control.json",
+                        "treatmentUrl": "v5/experiments/202511v2-ios-tds-treatment.json"
                     },
                     "cohorts": [
                         {
@@ -1283,7 +1312,13 @@
             }
         },
         "gpc": {
-            "state": "enabled"
+            "state": "enabled",
+            "exceptions": [
+                {
+                    "domain": "musiciansfriend.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4073"
+                }
+            ]
         },
         "performanceMetrics": {
             "state": "enabled"
@@ -1449,7 +1484,13 @@
                     "minSupportedVersion": "7.181.0"
                 },
                 "winBackOffer": {
-                    "state": "disabled"
+                    "state": "enabled",
+                    "minSupportedVersion": "7.195.0",
+                    "targets": [
+                        {
+                            "localeCountry": "US"
+                        }
+                    ]
                 },
                 "blackFridayCampaign": {
                     "state": "disabled",
@@ -1635,7 +1676,7 @@
                     "state": "disabled"
                 },
                 "inactivityNotification": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": "7.187.0",
                     "description": "Local inactivity provisional notifications delivered to Notification Center.",
                     "targets": [
@@ -1643,12 +1684,6 @@
                     "settings": {
                         "daysInactive": "7"
                     }
-                },
-                "appShortcut": {
-                    "state": "disabled",
-                    "description": "iOS App Shortcuts for quick actions",
-                    "targets": [
-                        { "localeLanguage": "en", "localeCountry": "US" }]
                 }
             }
         },

@@ -351,7 +351,7 @@
             ],
             "features": {
                 "tdsNextExperiment004": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "rollout": {
                         "steps": [
                             {
@@ -362,6 +362,30 @@
                     "settings": {
                         "controlUrl": "v6/experiments/202511v1-macos-tds-control.json",
                         "treatmentUrl": "v6/experiments/202511v1-macos-tds-treatment.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "tdsNextExperiment005": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "v6/experiments/202511v2-macos-tds-control.json",
+                        "treatmentUrl": "v6/experiments/202511v2-macos-tds-treatment.json"
                     },
                     "cohorts": [
                         {
@@ -1610,7 +1634,13 @@
                     "minSupportedVersion": "1.153.0"
                 },
                 "winBackOffer": {
-                    "state": "disabled"
+                    "state": "enabled",
+                    "minSupportedVersion": "1.165.0",
+                    "targets": [
+                        {
+                            "localeCountry": "US"
+                        }
+                    ]
                 },
                 "blackFridayCampaign": {
                     "state": "disabled",
@@ -1725,6 +1755,10 @@
                 },
                 "webKitPerformanceReporting": {
                     "state": "enabled"
+                },
+                "pinnedTabsViewRewrite": {
+                    "state": "enabled",
+                    "minSupportedVersion": "1.166.0"
                 }
             }
         },
@@ -1782,6 +1816,13 @@
                         ]
                     }
                 ]
+            }
+        },
+        "popupBlocking": {
+            "state": "internal",
+            "exceptions": [],
+            "settings": {
+                "userInitiatedPopupThreshold": 6.0
             }
         }
     },

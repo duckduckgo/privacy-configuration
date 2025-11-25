@@ -46,9 +46,9 @@
         "appTrackerProtection": {
             "state": "enabled",
             "features": {
-                "atpTdsExperiment001": {
-                    "state": "disabled",
-                    "minSupportedVersion": 52361000,
+                "atpTdsExperiment002": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52550000,
                     "rollout": {
                         "steps": [
                             {
@@ -57,8 +57,8 @@
                         ]
                     },
                     "settings": {
-                        "controlUrl": "experiment/tds-202510AA-control-android.json",
-                        "treatmentUrl": "experiment/tds-202510AA-treatment-android.json"
+                        "controlUrl": "experiment/tds-202511AA-control-android.json",
+                        "treatmentUrl": "experiment/tds-202511AA-treatment-android.json"
                     },
                     "cohorts": [
                         {
@@ -121,6 +121,14 @@
                 },
                 "canEmitSyncDevices": {
                     "state": "internal"
+                },
+                "sendOriginParam": {
+                    "state": "internal",
+                    "settings": {
+                        "originCampaignSubstrings": [
+                            "paid"
+                        ]
+                    }
                 }
             },
             "settings": {
@@ -194,7 +202,7 @@
             "exceptions": [],
             "features": {
                 "tdsNextExperiment004": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": 52361000,
                     "rollout": {
                         "steps": [
@@ -206,6 +214,31 @@
                     "settings": {
                         "controlUrl": "v5/experiments/202511v1-android-tds-control.json",
                         "treatmentUrl": "v5/experiments/202511v1-android-tds-treatment.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "tdsNextExperiment005": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52361000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "v5/experiments/202511v2-android-tds-control.json",
+                        "treatmentUrl": "v5/experiments/202511v2-android-tds-treatment.json"
                     },
                     "cohorts": [
                         {
@@ -488,10 +521,6 @@
                 {
                     "domain": "ashleyfurniture.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3908"
-                },
-                {
-                    "domain": "tractorhouse.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4057"
                 }
             ],
             "features": {
@@ -1327,7 +1356,8 @@
                     "minSupportedVersion": 52250000,
                     "settings": {
                         "domains": [
-                            "duckduckgo.com"
+                            "duckduckgo.com",
+                            "duck.ai"
                         ],
                         "keysToDelete": [
                             "savedAIChats"
@@ -1346,7 +1376,8 @@
                     "state": "enabled",
                     "settings": {
                         "domains": [
-                            "duckduckgo.com"
+                            "duckduckgo.com",
+                            "duck.ai"
                         ]
                     }
                 },
@@ -1382,12 +1413,34 @@
                     ]
                 },
                 "reportWebViewCapabilities": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": 52560000,
                     "rollout": {
                         "steps": [
                             {
                                 "percent": 10
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
+                },
+                "splitOmnibar": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 20
+                            },
+                            {
+                                "percent": 50
                             },
                             {
                                 "percent": 100
@@ -1763,6 +1816,12 @@
         },
         "gpc": {
             "state": "enabled",
+            "exceptions": [
+                {
+                    "domain": "musiciansfriend.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4073"
+                }
+            ],
             "settings": {
                 "gpcHeaderEnabledSites": [
                     "global-privacy-control.glitch.me",
@@ -2052,6 +2111,24 @@
                             }
                         ]
                     },
+                    "doubleclick.net": {
+                        "rules": [
+                            {
+                                "rule": "securepubads.g.doubleclick.net/tag/js/gpt.js",
+                                "domains": [
+                                    "tractorhouse.com"
+                                ],
+                                "reason": "tractorhouse.com - https://github.com/duckduckgo/privacy-configuration/pull/4065"
+                            },
+                            {
+                                "rule": "securepubads.g.doubleclick.net/pagead/managed/js/gpt",
+                                "domains": [
+                                    "tractorhouse.com"
+                                ],
+                                "reason": "tractorhouse.com - https://github.com/duckduckgo/privacy-configuration/pull/4065"
+                            }
+                        ]
+                    },
                     "tealiumiq.com": {
                         "rules": [
                             {
@@ -2067,6 +2144,17 @@
                                     "tracfone.com"
                                 ],
                                 "reason": "tracfone.com - https://github.com/duckduckgo/privacy-configuration/pull/4032"
+                            }
+                        ]
+                    },
+                    "tiqcdn.com": {
+                        "rules": [
+                            {
+                                "rule": "tags.tiqcdn.com",
+                                "domains": [
+                                    "tracfone.com"
+                                ],
+                                "reason": "tracfone.com - https://github.com/duckduckgo/privacy-configuration/pull/4077"
                             }
                         ]
                     },
@@ -2698,10 +2786,6 @@
                     "reason": "experimental mitigation for unreproduced issue as description corresponds to similar breakage"
                 },
                 {
-                    "domain": "id.onfido.com",
-                    "reason": "Camera capture doesn't work for id verification"
-                },
-                {
                     "domain": "thrifty.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2527"
                 },
@@ -3153,11 +3237,11 @@
             }
         },
         "notificationPromptExperiment": {
-            "state": "enabled",
+            "state": "disabled",
             "exceptions": [],
             "features": {
                 "notificationPromptExperimentOct25": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": 52550000,
                     "rollout": {
                         "steps": [
@@ -3178,16 +3262,16 @@
                     "cohorts": [
                         {
                             "name": "control",
-                            "weight": 1
+                            "weight": 0
                         },
                         {
                             "name": "experimentalNoNotificationPrompt",
-                            "weight": 1
+                            "weight": 0
                         }
                     ]
                 },
                 "waitForLocalPrivacyConfig": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": 52550000
                 }
             }
@@ -3310,6 +3394,37 @@
                             }
                         ]
                     }
+                }
+            }
+        },
+        "webViewCompat": {
+            "state": "disabled",
+            "exceptions": [],
+            "settings": {
+                "jsInitialPingDelay": 0,
+                "initialPingDelay": 0
+            },
+            "features": {
+                "jsSendsInitialPing": {
+                    "state": "disabled"
+                },
+                "jsRepliesToNativeMessages": {
+                    "state": "disabled"
+                },
+                "replyToInitialPing": {
+                    "state": "disabled"
+                },
+                "useBlobDownloadsMessageListener": {
+                    "state": "disabled"
+                },
+                "sendMessageOnContexMenuOpened": {
+                    "state": "disabled"
+                },
+                "sendMessageOnPageStarted": {
+                    "state": "disabled"
+                },
+                "sendMessagesUsingReplyProxy": {
+                    "state": "disabled"
                 }
             }
         }

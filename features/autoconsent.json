@@ -80,10 +80,6 @@
             "reason": "After the cookie popup is managed and disappears, a semi-transparent overlay remains on the page which prevents further interaction with the site."
         },
         {
-            "domain": "mathebibel.de",
-            "reason": "Page renders but one cannot scroll (and no CMP is shown) for a few seconds."
-        },
-        {
             "domain": "focus.de",
             "reason": "Page renders but one cannot scroll (and no CMP is shown) for a few seconds."
         },
@@ -690,6 +686,34 @@
         {
             "domain": "elektramat.nl",
             "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4013"
+        },
+        {
+            "domain": "bank.marksandspencer.com",
+            "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4067"
+        },
+        {
+            "domain": "the-race.com",
+            "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4068"
+        },
+        {
+            "domain": "membersuite.com",
+            "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4074"
+        },
+        {
+            "domain": "brocardi.it",
+            "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4088"
+        },
+        {
+            "domain": "rugbyrama.fr",
+            "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4101"
+        },
+        {
+            "domain": "mypremiercreditcard.com",
+            "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4122"
+        },
+        {
+            "domain": "ciwf.nl",
+            "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4133"
         }
     ],
     "settings": {
@@ -1401,6 +1425,7 @@
                 "#zdf-cmp-main.zdf-cmp-show",
                 "#zdf-cmp-main #zdf-cmp-deny-btn",
                 "#cookie-consent-banner #accept-button",
+                "#sp-cc-wrapper *,[data-action=sp-cc],span[data-action=\"sp-cc\"][data-sp-cc*=\"rejectAllAction\"]",
                 "body > div#banner-0 > div:nth-child(1)#grouped-pageload-Banner > div:not([id]) > div:not([id]) > div:not([id]) > div:nth-child(3):not([id]) > button:nth-child(3):not([id])",
                 "body > div#root > div#ccpa-iframe-theme-provider[data-testid=\"ccpa-iframe-theme-provider\"] > div#ccpa-iframe[data-testid=\"ccpa-iframe\"] > div#ccpa_consent_banner[data-testid=\"ccpa_consent_banner\"] > div:not([id]) > div:nth-child(3):not([id]) > span:not([id]) > span:not([id]) > div:nth-child(2):not([id]) > span:nth-child(1):not([id]) > button#decline_cookies_button[data-testid=\"decline_cookies_button\"]",
                 "body:not([id]) > div#banner-0 > div:nth-child(1)#grouped-pageload-Banner > div:not([id]) > div:not([id]) > div:not([id]) > div:nth-child(3):not([id]) > button:nth-child(2):not([id])",
@@ -1440,7 +1465,6 @@
                 "span[role=checkbox][aria-checked=true]",
                 "#save-all-pur",
                 "#reminder",
-                ".cookie-banner-wrapper .cookie-banner",
                 ".cookie-banner-wrapper button.btn-secondary-lg",
                 "RBXcb",
                 "#cookie-policy-info",
@@ -3591,7 +3615,8 @@
                 "body > div#site-wrapper > div:nth-child(1)#site-canvas > div#wrapper1 > main:nth-child(2)#mainSection1 > div:nth-child(3):not([id]) > div:not([id]) > div:not([id]) > div:nth-child(3):not([id]) > button:nth-child(1):not([id])",
                 "body > div:not([id]) > div:nth-child(2)#\\30 b94133b-8573-43fe-8d37-771c47a4d616 > div:nth-child(2):not([id]) > button:nth-child(2):not([id])",
                 "button#decline-button",
-                "body > div#located-in-eu-ca-quebec > section:nth-child(2):not([id]) > div:nth-child(2):not([id]) > div:nth-child(2):not([id]) > button:nth-child(1)#gdpr-dismiss"
+                "body > div#located-in-eu-ca-quebec > section:nth-child(2):not([id]) > div:nth-child(2):not([id]) > div:nth-child(2):not([id]) > button:nth-child(1)#gdpr-dismiss",
+                ".cookie-banner-wrapper .cookie-banner"
             ],
             "r": [
                 [
@@ -3787,7 +3812,8 @@
                     ],
                     [
                         {
-                            "v": 46
+                            "check": "any",
+                            "v": 699
                         }
                     ],
                     [
@@ -10442,40 +10468,6 @@
                     [],
                     [
                         {
-                            "e": 699
-                        }
-                    ],
-                    [
-                        {
-                            "v": 699
-                        }
-                    ],
-                    [
-                        {
-                            "wait": 500
-                        },
-                        {
-                            "c": 699
-                        }
-                    ],
-                    [
-                        {
-                            "timeout": 1000,
-                            "check": "none",
-                            "wv": 699
-                        }
-                    ],
-                    {}
-                ],
-                [
-                    1,
-                    "auto_AU_help.dropbox.com_4ad_+1",
-                    0,
-                    "^https?://(www\\.)?dropbox\\.com/|^https?://(www\\.)?dropbox\\.com/",
-                    1,
-                    [],
-                    [
-                        {
                             "e": 700
                         }
                     ],
@@ -10503,9 +10495,9 @@
                 ],
                 [
                     1,
-                    "auto_CA_coasthotels.com_f8m",
+                    "auto_AU_help.dropbox.com_4ad_+1",
                     0,
-                    "^https?://(www\\.)?coasthotels\\.com/",
+                    "^https?://(www\\.)?dropbox\\.com/|^https?://(www\\.)?dropbox\\.com/",
                     1,
                     [],
                     [
@@ -10520,17 +10512,26 @@
                     ],
                     [
                         {
+                            "wait": 500
+                        },
+                        {
                             "c": 701
                         }
                     ],
-                    [],
+                    [
+                        {
+                            "timeout": 1000,
+                            "check": "none",
+                            "wv": 701
+                        }
+                    ],
                     {}
                 ],
                 [
                     1,
-                    "auto_CA_epihunter.eu_hd4",
+                    "auto_CA_coasthotels.com_f8m",
                     0,
-                    "^https?://(www\\.)?combell\\.com/",
+                    "^https?://(www\\.)?coasthotels\\.com/",
                     1,
                     [],
                     [
@@ -10545,26 +10546,17 @@
                     ],
                     [
                         {
-                            "wait": 500
-                        },
-                        {
                             "c": 702
                         }
                     ],
-                    [
-                        {
-                            "timeout": 1000,
-                            "check": "none",
-                            "wv": 702
-                        }
-                    ],
+                    [],
                     {}
                 ],
                 [
                     1,
-                    "auto_CA_natureconservancy.ca_3pp",
+                    "auto_CA_epihunter.eu_hd4",
                     0,
-                    "^https?://(www\\.)?natureconservancy\\.ca/",
+                    "^https?://(www\\.)?combell\\.com/",
                     1,
                     [],
                     [
@@ -10596,9 +10588,9 @@
                 ],
                 [
                     1,
-                    "auto_CA_ontariospca.ca_k32",
+                    "auto_CA_natureconservancy.ca_3pp",
                     0,
-                    "^https?://(www\\.)?widget-next\\.clym-sdk\\.net/",
+                    "^https?://(www\\.)?natureconservancy\\.ca/",
                     1,
                     [],
                     [
@@ -10630,7 +10622,7 @@
                 ],
                 [
                     1,
-                    "auto_CA_phoenixnap.com_hrb",
+                    "auto_CA_ontariospca.ca_k32",
                     0,
                     "^https?://(www\\.)?widget-next\\.clym-sdk\\.net/",
                     1,
@@ -10664,7 +10656,7 @@
                 ],
                 [
                     1,
-                    "auto_CH_phoenixnap.com_lx5",
+                    "auto_CA_phoenixnap.com_hrb",
                     0,
                     "^https?://(www\\.)?widget-next\\.clym-sdk\\.net/",
                     1,
@@ -10698,9 +10690,9 @@
                 ],
                 [
                     1,
-                    "auto_CH_swisscare.com_arx",
+                    "auto_CH_phoenixnap.com_lx5",
                     0,
-                    "^https?://(www\\.)?swisscare\\.com/",
+                    "^https?://(www\\.)?widget-next\\.clym-sdk\\.net/",
                     1,
                     [],
                     [
@@ -10732,9 +10724,9 @@
                 ],
                 [
                     1,
-                    "auto_DE_alfaromeo.de_gvg_+2",
+                    "auto_CH_swisscare.com_arx",
                     0,
-                    "^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/|^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/|^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/",
+                    "^https?://(www\\.)?swisscare\\.com/",
                     1,
                     [],
                     [
@@ -10766,9 +10758,9 @@
                 ],
                 [
                     1,
-                    "auto_DE_huss-licht-ton.de_jj0",
+                    "auto_DE_alfaromeo.de_gvg_+2",
                     0,
-                    "^https?://(www\\.)?huss-licht-ton\\.de/",
+                    "^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/|^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/|^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/",
                     1,
                     [],
                     [
@@ -10800,9 +10792,9 @@
                 ],
                 [
                     1,
-                    "auto_DE_modellbau-berlinski.de_8vm",
+                    "auto_DE_huss-licht-ton.de_jj0",
                     0,
-                    "^https?://(www\\.)?modellbau-berlinski\\.de/",
+                    "^https?://(www\\.)?huss-licht-ton\\.de/",
                     1,
                     [],
                     [
@@ -10834,9 +10826,9 @@
                 ],
                 [
                     1,
-                    "auto_DE_phase-6.de_jkj",
+                    "auto_DE_modellbau-berlinski.de_8vm",
                     0,
-                    "^https?://(www\\.)?phase-6\\.de/",
+                    "^https?://(www\\.)?modellbau-berlinski\\.de/",
                     1,
                     [],
                     [
@@ -10868,9 +10860,9 @@
                 ],
                 [
                     1,
-                    "auto_DE_phoenixnap.com_xq7",
+                    "auto_DE_phase-6.de_jkj",
                     0,
-                    "^https?://(www\\.)?widget-next\\.clym-sdk\\.net/",
+                    "^https?://(www\\.)?phase-6\\.de/",
                     1,
                     [],
                     [
@@ -10902,9 +10894,9 @@
                 ],
                 [
                     1,
-                    "auto_FR_bnpparibasfortis.be_02b",
+                    "auto_DE_phoenixnap.com_xq7",
                     0,
-                    "^https?://(www\\.)?bnpparibasfortis\\.be/",
+                    "^https?://(www\\.)?widget-next\\.clym-sdk\\.net/",
                     1,
                     [],
                     [
@@ -10936,77 +10928,43 @@
                 ],
                 [
                     1,
+                    "auto_FR_bnpparibasfortis.be_02b",
+                    0,
+                    "^https?://(www\\.)?bnpparibasfortis\\.be/",
+                    1,
+                    [],
+                    [
+                        {
+                            "e": 714
+                        }
+                    ],
+                    [
+                        {
+                            "v": 714
+                        }
+                    ],
+                    [
+                        {
+                            "wait": 500
+                        },
+                        {
+                            "c": 714
+                        }
+                    ],
+                    [
+                        {
+                            "timeout": 1000,
+                            "check": "none",
+                            "wv": 714
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
                     "auto_FR_fiat.fr_3fh",
                     0,
                     "^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/",
-                    1,
-                    [],
-                    [
-                        {
-                            "e": 714
-                        }
-                    ],
-                    [
-                        {
-                            "v": 714
-                        }
-                    ],
-                    [
-                        {
-                            "wait": 500
-                        },
-                        {
-                            "c": 714
-                        }
-                    ],
-                    [
-                        {
-                            "timeout": 1000,
-                            "check": "none",
-                            "wv": 714
-                        }
-                    ],
-                    {}
-                ],
-                [
-                    1,
-                    "auto_FR_stellantis.com_67q",
-                    0,
-                    "^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/",
-                    1,
-                    [],
-                    [
-                        {
-                            "e": 714
-                        }
-                    ],
-                    [
-                        {
-                            "v": 714
-                        }
-                    ],
-                    [
-                        {
-                            "wait": 500
-                        },
-                        {
-                            "c": 714
-                        }
-                    ],
-                    [
-                        {
-                            "timeout": 1000,
-                            "check": "none",
-                            "wv": 714
-                        }
-                    ],
-                    {}
-                ],
-                [
-                    1,
-                    "auto_GB_alfaromeo.co.uk_0_+1",
-                    0,
-                    "^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/|^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/",
                     1,
                     [],
                     [
@@ -11021,17 +10979,60 @@
                     ],
                     [
                         {
+                            "wait": 500
+                        },
+                        {
                             "c": 715
                         }
                     ],
-                    [],
+                    [
+                        {
+                            "timeout": 1000,
+                            "check": "none",
+                            "wv": 715
+                        }
+                    ],
                     {}
                 ],
                 [
                     1,
-                    "auto_GB_dropbox.com_0_+1",
+                    "auto_FR_stellantis.com_67q",
                     0,
-                    "^https?://(www\\.)?dropbox\\.com/|^https?://(www\\.)?dropbox\\.com/",
+                    "^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/",
+                    1,
+                    [],
+                    [
+                        {
+                            "e": 715
+                        }
+                    ],
+                    [
+                        {
+                            "v": 715
+                        }
+                    ],
+                    [
+                        {
+                            "wait": 500
+                        },
+                        {
+                            "c": 715
+                        }
+                    ],
+                    [
+                        {
+                            "timeout": 1000,
+                            "check": "none",
+                            "wv": 715
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
+                    "auto_GB_alfaromeo.co.uk_0_+1",
+                    0,
+                    "^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/|^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/",
                     1,
                     [],
                     [
@@ -11054,43 +11055,9 @@
                 ],
                 [
                     1,
-                    "auto_GB_fiat.co.uk_cwa_+1",
+                    "auto_GB_dropbox.com_0_+1",
                     0,
-                    "^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/|^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/",
-                    1,
-                    [],
-                    [
-                        {
-                            "e": 708
-                        }
-                    ],
-                    [
-                        {
-                            "v": 708
-                        }
-                    ],
-                    [
-                        {
-                            "wait": 500
-                        },
-                        {
-                            "c": 708
-                        }
-                    ],
-                    [
-                        {
-                            "timeout": 1000,
-                            "check": "none",
-                            "wv": 708
-                        }
-                    ],
-                    {}
-                ],
-                [
-                    1,
-                    "auto_GB_investing.thisismoney.co.uk_0",
-                    0,
-                    "^https?://(www\\.)?thisismoney\\.co\\.uk/",
+                    "^https?://(www\\.)?dropbox\\.com/|^https?://(www\\.)?dropbox\\.com/",
                     1,
                     [],
                     [
@@ -11113,9 +11080,43 @@
                 ],
                 [
                     1,
-                    "auto_GB_lse.co.uk_0_+1",
+                    "auto_GB_fiat.co.uk_cwa_+1",
                     0,
-                    "^https?://(www\\.)?lse\\.co\\.uk/|^https?://(www\\.)?nigella\\.com/",
+                    "^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/|^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/",
+                    1,
+                    [],
+                    [
+                        {
+                            "e": 709
+                        }
+                    ],
+                    [
+                        {
+                            "v": 709
+                        }
+                    ],
+                    [
+                        {
+                            "wait": 500
+                        },
+                        {
+                            "c": 709
+                        }
+                    ],
+                    [
+                        {
+                            "timeout": 1000,
+                            "check": "none",
+                            "wv": 709
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
+                    "auto_GB_investing.thisismoney.co.uk_0",
+                    0,
+                    "^https?://(www\\.)?thisismoney\\.co\\.uk/",
                     1,
                     [],
                     [
@@ -11130,7 +11131,6 @@
                     ],
                     [
                         {
-                            "text": "Decline",
                             "c": 718
                         }
                     ],
@@ -11139,9 +11139,9 @@
                 ],
                 [
                     1,
-                    "auto_GB_vintage-erotica-forum.com_0",
+                    "auto_GB_lse.co.uk_0_+1",
                     0,
-                    "^https?://(www\\.)?best\\.aliexpress\\.com/",
+                    "^https?://(www\\.)?lse\\.co\\.uk/|^https?://(www\\.)?nigella\\.com/",
                     1,
                     [],
                     [
@@ -11156,6 +11156,7 @@
                     ],
                     [
                         {
+                            "text": "Decline",
                             "c": 719
                         }
                     ],
@@ -11164,43 +11165,9 @@
                 ],
                 [
                     1,
-                    "auto_NL_fiat.nl_trv_+1",
+                    "auto_GB_vintage-erotica-forum.com_0",
                     0,
-                    "^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/|^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/",
-                    1,
-                    [],
-                    [
-                        {
-                            "e": 714
-                        }
-                    ],
-                    [
-                        {
-                            "v": 714
-                        }
-                    ],
-                    [
-                        {
-                            "wait": 500
-                        },
-                        {
-                            "c": 714
-                        }
-                    ],
-                    [
-                        {
-                            "timeout": 1000,
-                            "check": "none",
-                            "wv": 714
-                        }
-                    ],
-                    {}
-                ],
-                [
-                    1,
-                    "auto_NL_flitsmeister.nl_ws8",
-                    0,
-                    "^https?://(www\\.)?cookies\\.flitsmeister\\.com/",
+                    "^https?://(www\\.)?best\\.aliexpress\\.com/",
                     1,
                     [],
                     [
@@ -11215,26 +11182,51 @@
                     ],
                     [
                         {
+                            "c": 720
+                        }
+                    ],
+                    [],
+                    {}
+                ],
+                [
+                    1,
+                    "auto_NL_fiat.nl_trv_+1",
+                    0,
+                    "^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/|^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/",
+                    1,
+                    [],
+                    [
+                        {
+                            "e": 715
+                        }
+                    ],
+                    [
+                        {
+                            "v": 715
+                        }
+                    ],
+                    [
+                        {
                             "wait": 500
                         },
                         {
-                            "c": 720
+                            "c": 715
                         }
                     ],
                     [
                         {
                             "timeout": 1000,
                             "check": "none",
-                            "wv": 720
+                            "wv": 715
                         }
                     ],
                     {}
                 ],
                 [
                     1,
-                    "auto_NL_interpolis.nl_jk9",
+                    "auto_NL_flitsmeister.nl_ws8",
                     0,
-                    "^https?://(www\\.)?interpolis\\.nl/",
+                    "^https?://(www\\.)?cookies\\.flitsmeister\\.com/",
                     1,
                     [],
                     [
@@ -11266,9 +11258,9 @@
                 ],
                 [
                     1,
-                    "auto_US_dropbox.com_0_+1",
+                    "auto_NL_interpolis.nl_jk9",
                     0,
-                    "^https?://(www\\.)?dropbox\\.com/|^https?://(www\\.)?dropbox\\.com/",
+                    "^https?://(www\\.)?interpolis\\.nl/",
                     1,
                     [],
                     [
@@ -11283,8 +11275,42 @@
                     ],
                     [
                         {
-                            "text": "Decline",
+                            "wait": 500
+                        },
+                        {
                             "c": 722
+                        }
+                    ],
+                    [
+                        {
+                            "timeout": 1000,
+                            "check": "none",
+                            "wv": 722
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
+                    "auto_US_dropbox.com_0_+1",
+                    0,
+                    "^https?://(www\\.)?dropbox\\.com/|^https?://(www\\.)?dropbox\\.com/",
+                    1,
+                    [],
+                    [
+                        {
+                            "e": 723
+                        }
+                    ],
+                    [
+                        {
+                            "v": 723
+                        }
+                    ],
+                    [
+                        {
+                            "text": "Decline",
+                            "c": 723
                         }
                     ],
                     [],
@@ -11299,25 +11325,25 @@
                     [],
                     [
                         {
-                            "e": 723
+                            "e": 724
                         }
                     ],
                     [
                         {
-                            "v": 723
+                            "v": 724
                         }
                     ],
                     [
                         {
-                            "k": 724
+                            "k": 725
                         },
                         {
                             "all": true,
                             "optional": true,
-                            "k": 725
+                            "k": 726
                         },
                         {
-                            "k": 726
+                            "k": 727
                         }
                     ],
                     [
@@ -11336,49 +11362,49 @@
                     "^https://cmp-consent-tool\\.privacymanager\\.io/",
                     1,
                     [
-                        727,
-                        728
+                        728,
+                        729
                     ],
                     [
                         {
-                            "e": 729
+                            "e": 730
                         }
                     ],
                     [
                         {
-                            "v": 729
+                            "v": 730
                         }
                     ],
                     [
                         {
                             "if": {
-                                "e": 730
+                                "e": 731
                             },
                             "then": [
                                 {
-                                    "k": 730
+                                    "k": 731
                                 },
                                 {
-                                    "c": 731
+                                    "c": 732
                                 }
                             ],
                             "else": [
                                 {
-                                    "c": 732
-                                },
-                                {
-                                    "w": 733
+                                    "c": 733
                                 },
                                 {
                                     "w": 734
                                 },
                                 {
-                                    "all": true,
-                                    "optional": true,
-                                    "k": 735
+                                    "w": 735
                                 },
                                 {
-                                    "k": 734
+                                    "all": true,
+                                    "optional": true,
+                                    "k": 736
+                                },
+                                {
+                                    "k": 735
                                 }
                             ]
                         }
@@ -11395,20 +11421,20 @@
                     [],
                     [
                         {
-                            "e": 736
+                            "e": 737
                         },
                         {
-                            "e": 737
+                            "e": 738
                         }
                     ],
                     [
                         {
-                            "v": 737
+                            "v": 738
                         }
                     ],
                     [
                         {
-                            "c": 737
+                            "c": 738
                         }
                     ],
                     [],
@@ -82609,12 +82635,12 @@
                     [],
                     [
                         {
-                            "e": 702
+                            "e": 703
                         }
                     ],
                     [
                         {
-                            "v": 702
+                            "v": 703
                         }
                     ],
                     [
@@ -82622,14 +82648,14 @@
                             "wait": 500
                         },
                         {
-                            "c": 702
+                            "c": 703
                         }
                     ],
                     [
                         {
                             "timeout": 1000,
                             "check": "none",
-                            "wv": 702
+                            "wv": 703
                         }
                     ],
                     {}
@@ -87378,7 +87404,7 @@
                     ],
                     [
                         {
-                            "v": 738
+                            "v": 2890
                         }
                     ],
                     [
@@ -88353,8 +88379,8 @@
                     183,
                     2554
                 ],
-                "genericStringEnd": 699,
-                "frameStringEnd": 738
+                "genericStringEnd": 700,
+                "frameStringEnd": 739
             }
         }
     }
