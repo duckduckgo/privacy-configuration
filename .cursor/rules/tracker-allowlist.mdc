@@ -41,7 +41,6 @@ type TrackerAllowlist = {
 - ✅ Be sure to apply the rule precedence logic. See [Rule Precedence (Ordering)](#3-rule-precedence-ordering)
 - ✅ Remove outdated exceptions
 - ✅ Add platform-specific exceptions with clear justification in your PR
-- ✅ Add a PR link to your `reason` field
 
 ### 2. Choosing Trackers to Allow
 
@@ -111,8 +110,7 @@ Ordering does not matter for different hosts (they never match). For example, ww
 
 3.2. **Adding domains to less-specific rules:**
 
-
-- **When correctly ordered (most-specific first):** Add the domain to both the more-specific and less-specific rules.
+Add the domain to both the more-specific and less-specific rules.
 **Why?** The first matching rule is checked. If a request matches a more-specific rule but the domain isn't in that rule's list, it blocks.
 
 ```json
@@ -121,21 +119,8 @@ Ordering does not matter for different hosts (they never match). For example, ww
   "domains": ["site1.com", "site2.com"]  // ✅ Add site2.com here too
 },
 {
-  "rule": "example.com/foo/bar",  // Less specific, and actual rule to be unblocked for site2.com
+  "rule": "example.com/foo/bar",  // Less specific
   "domains": ["site2.com"]  // ✅ Added here
-}
-```
-
-- **When incorrectly ordered (less-specific first) - temporary workaround:** Add all domains to the less-specific rule until ordering is fixed.
-
-```json
-{
-  "rule": "example.com",  // ❌ Less specific first
-  "domains": ["site1.com", "site2.com", "site3.com"]  // ✅ Add all domains for matching requests here
-},
-{
-  "rule": "example.com/foo/bar/baz",  // More specific and actual rule to be unblocked for site2.com and site3.com
-  "domains": ["site2.com", "site3.com"] // ✅ Keep domains here
 }
 ```
 
