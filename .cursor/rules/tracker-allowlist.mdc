@@ -1,0 +1,155 @@
+---
+globs: features/tracker-allowlist.json,overrides/**/*.json
+alwaysApply: false
+description: Tracker allowlist rule creation guide following SBT/PFM Onboarding Guidelines. Use this when working with tracker-allowlist rules and mitigations.
+---
+
+# Tracker Allowlist Mitigation Instructions
+
+## Schema & Configuration References
+
+- **Schema**: `schema/features/tracker-allowlist.ts` - TypeScript type definitions
+- **Configuration**: `features/tracker-allowlist.json` - Rule definitions
+
+## Type Definitions
+
+```typescript
+type AllowlistRule = {
+    /** Tracker rule path (e.g., "example.com/path/to/resource") */
+    rule: string;
+    /** List of site domains where this tracker is allowed */
+    domains: string[];
+    /** Reason for the exception (PR link) */
+    reason: string | string[];
+};
+
+type TrackerAllowlist = {
+    allowlistedTrackers: {
+        [domain: string]: {
+            /** Rules ordered from most-specific to least-specific */
+            rules: AllowlistRule[];
+        };
+    };
+};
+```
+
+## Site Mitigation Triager Guideline
+
+### 1. Before You Start
+- ✅ Search existing mitigations; include platform-specific override files in your search
+- ✅ Check if this new tracker shares a path prefix with existing rules
+- ✅ Be sure to apply the rule precedence logic. See [Rule Precedence (Ordering)](#3-rule-precedence-ordering)
+- ✅ Remove outdated exceptions
+- ✅ Add platform-specific exceptions with clear justification in your PR
+- ✅ Add a PR link to your `reason` field
+
+### 2. Choosing Trackers to Allow
+
+2.1. **Not Too Generic:**
+- ❌ Avoid domain-only rules (no path): `"rule": "tracker.com"`
+- ✅ Use specific paths: `"rule": "tracker.com/api/endpoint"`
+
+2.2. **Not Too Specific:**
+- ❌ Avoid temporary URLs with dynamic parameters that may include user or session IDs, tokens, or timestamps.
+- ✅ Use stable API endpoints
+
+
+✅ **Examples of Suitable Specific Paths:**
+```json
+{
+  "tracker.com": {
+    "rules": [
+      {
+        "rule": "tracker.com/api/analytics",  // ✅ Specific API endpoint
+        "domains": ["site.com"],
+        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/123"
+      },
+      {
+        "rule": "tracker.com/api/scripts/main.js",  // ✅ Specific file
+        "domains": ["site.com"],
+        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/456"
+      }
+    ]
+  }
+}
+```
+
+2.3. **avoid regex/wildcards**
+
+### 3. Rule Precedence (Ordering)
+
+3.1. **Critical:** Order rules **most‑specific → least‑specific,** but **only** when both can match the same request. Same-host prefix matching is required: foo.com/bar is a prefix of foo.com/bar/baz.
+
+Ordering does not matter for different hosts (they never match). For example, www.example.com/foo ≠ example.com/foo ≠ cdn.example.com/foo.
+
+**Example - Correct Ordering:**
+
+
+```json
+{
+  "example.com": {
+    "rules": [
+      {
+        "rule": "example.com/foo/bar/baz",  // ✅ Most specific first
+        "domains": ["site1.com"],
+        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/123"
+      },
+      {
+        "rule": "example.com/foo/bar",  // ✅ Less specific second
+        "domains": ["site2.com"],
+        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/456"
+      },
+      {
+        "rule": "example.com",  // ✅ Least specific last
+        "domains": ["site3.com"],
+        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/789"
+      }
+    ]
+  }
+}
+```
+
+3.2. **Adding domains to less-specific rules:**
+
+
+- **When correctly ordered (most-specific first):** Add the domain to both the more-specific and less-specific rules.
+**Why?** The first matching rule is checked. If a request matches a more-specific rule but the domain isn't in that rule's list, it blocks.
+
+```json
+{
+  "rule": "example.com/foo/bar/baz",  // More specific
+  "domains": ["site1.com", "site2.com"]  // ✅ Add site2.com here too
+},
+{
+  "rule": "example.com/foo/bar",  // Less specific, and actual rule to be unblocked for site2.com
+  "domains": ["site2.com"]  // ✅ Added here
+}
+```
+
+- **When incorrectly ordered (less-specific first) - temporary workaround:** Add all domains to the less-specific rule until ordering is fixed.
+
+```json
+{
+  "rule": "example.com",  // ❌ Less specific first
+  "domains": ["site1.com", "site2.com", "site3.com"]  // ✅ Add all domains for matching requests here
+},
+{
+  "rule": "example.com/foo/bar/baz",  // More specific and actual rule to be unblocked for site2.com and site3.com
+  "domains": ["site2.com", "site3.com"] // ✅ Keep domains here
+}
+```
+
+### 4. Cross-Entity Coverage
+
+- **Multi-country brands:** Consider adding mitigations across country sites (e.g., `vinted.com`, `vinted.fr`, `vinted.de`)
+
+- **Sibling sites under same parent company:** Check if breakage exists, then consider adding coverage across a business group
+
+### 5. Domain-Wide Exceptions
+
+**Avoid whenever possible.** If you must add one, make sure your PR clearly explains the reason, including whether this is part of a speculative mitigation experiment
+
+## See Also
+
+- **Schema**: `schema/features/tracker-allowlist.ts` - TypeScript definitions
+- **BUGBOT**: `.cursor/BUGBOT.md` - PR review guidelines

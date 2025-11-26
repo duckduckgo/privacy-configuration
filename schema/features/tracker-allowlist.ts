@@ -3,7 +3,7 @@ import { Feature } from '../feature';
 type AllowlistRule = {
     rule: string;
     domains: string[];
-    reason?: string;
+    reason: string | string[];
 };
 
 type TrackerAllowlist = {
