@@ -54,7 +54,12 @@ type FullWebCompatOptions = CSSInjectFeatureSettings<{
         }[];
     };
     enumerateDevices: StateToggle;
-    webNotifications: StateToggle;
+    webNotifications:
+        | StateToggle
+        | {
+              state: StateToggle;
+              nativeEnabled?: boolean;
+          };
     additionalCheck?: FeatureState;
 }>;
 export type WebCompatSettings = Partial<FullWebCompatOptions>;
