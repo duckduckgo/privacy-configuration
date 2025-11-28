@@ -1,7 +1,7 @@
 ﻿import { Feature } from '../feature';
 
 type Settings = {
-    allowedSchemas: string[];
+    allowedSchemes: string[];
 };
 
 export type UrlPredictorFeature<VersionType> = Feature<Settings, VersionType>;
