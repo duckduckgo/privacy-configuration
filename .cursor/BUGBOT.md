@@ -24,6 +24,14 @@
 - **Schema**: `schema/features/request-blocklist.ts` - TypeScript type definitions
 - **Configuration**: `features/request-blocklist.json` - Request blocking rule definitions
 
+## Tracker Allowlist Feature Validation
+
+### References
+
+- **Rule File**: `.cursor/rules/tracker-allowlist.mdc` - Mitigation Guidance
+- **Schema**: `schema/features/tracker-allowlist.ts` - TypeScript type definitions
+- **Configuration**: `features/tracker-allowlist.json` - Tracker allowlist rule definitions
+
 ## Adding New Features to Bugbot
 
 ### Template for New Feature Validation
