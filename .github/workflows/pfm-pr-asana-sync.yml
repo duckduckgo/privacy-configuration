@@ -16,13 +16,13 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Get task IDs in PR
-              uses: duckduckgo/native-github-asana-sync@v2.1
+              uses: duckduckgo/native-github-asana-sync@v2.2
               id: find-asana-task-ids
               with:
                   action: 'find-asana-task-ids'
 
             - name: Add PR link to Asana
-              uses: duckduckgo/native-github-asana-sync@v2.1
+              uses: duckduckgo/native-github-asana-sync@v2.2
               with:
                   asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
                   asana-task-id: '${{ steps.find-asana-task-ids.outputs.asanaTaskIds }}'
@@ -39,13 +39,13 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Get task IDs in PR
-              uses: duckduckgo/native-github-asana-sync@v2.1
+              uses: duckduckgo/native-github-asana-sync@v2.2
               id: find-asana-task-ids
               with:
                   action: 'find-asana-task-ids'
 
             - name: Close Asana task on merge
-              uses: duckduckgo/native-github-asana-sync@v2.1
+              uses: duckduckgo/native-github-asana-sync@v2.2
               with:
                   asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
                   asana-task-id: '${{ steps.find-asana-task-ids.outputs.asanaTaskIds }}'
@@ -60,14 +60,14 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Get task IDs in PR
-              uses: duckduckgo/native-github-asana-sync@v2.1
+              uses: duckduckgo/native-github-asana-sync@v2.2
               id: find-asana-task-ids
               with:
                   action: 'find-asana-task-ids'
 
             - name: Notify PR approved in Asana
               if: github.event.review.state == 'approved'
-              uses: duckduckgo/native-github-asana-sync@v2.1
+              uses: duckduckgo/native-github-asana-sync@v2.2
               with:
                   asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
                   asana-task-id: '${{ steps.find-asana-task-ids.outputs.asanaTaskIds }}'
@@ -77,7 +77,7 @@ jobs:
 
             - name: Notify changes requested in Asana
               if: github.event.review.state == 'changes_requested'
-              uses: duckduckgo/native-github-asana-sync@v2.1
+              uses: duckduckgo/native-github-asana-sync@v2.2
               with:
                   asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
                   asana-task-id: '${{ steps.find-asana-task-ids.outputs.asanaTaskIds }}'
@@ -87,7 +87,7 @@ jobs:
 
             - name: Add PR comment to Asana
               if: github.event.review.state == 'commented'
-              uses: duckduckgo/native-github-asana-sync@v2.1
+              uses: duckduckgo/native-github-asana-sync@v2.2
               with:
                   asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
                   asana-task-id: '${{ steps.find-asana-task-ids.outputs.asanaTaskIds }}'
