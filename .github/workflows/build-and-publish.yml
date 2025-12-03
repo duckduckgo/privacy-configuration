@@ -11,6 +11,9 @@ on:
 
 jobs:
     publish:
+        concurrency:
+            group: build-and-publish
+            cancel-in-progress: true
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@main
