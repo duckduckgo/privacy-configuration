@@ -1,0 +1,183 @@
+name: Feature Flag Cleanup Tracker (Android)
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    paths:
+      - 'overrides/android-override.json'
+
+jobs:
+  create-cleanup-task:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Detect new Android feature flags
+        id: detect_flags
+        run: |
+          # Get the android-override.json from base and head commits
+          BASE_FILE=$(git show ${{ github.event.pull_request.base.sha }}:overrides/android-override.json)
+          HEAD_FILE=$(git show ${{ github.event.pull_request.head.sha }}:overrides/android-override.json)
+
+          # Extract all feature keys from base and head
+          BASE_FEATURES=$(echo "$BASE_FILE" | jq -r '.features | keys[]' | sort)
+          HEAD_FEATURES=$(echo "$HEAD_FILE" | jq -r '.features | keys[]' | sort)
+
+          # Find new top-level features
+          NEW_FEATURES=$(comm -13 <(echo "$BASE_FEATURES") <(echo "$HEAD_FEATURES"))
+
+          # Also detect new sub-features within existing features
+          NEW_SUBFEATURES=""
+          for feature in $(echo "$BASE_FEATURES"); do
+            BASE_SUBS=$(echo "$BASE_FILE" | jq -r --arg f "$feature" '.features[$f].features // {} | keys[]' 2>/dev/null | sort || true)
+            HEAD_SUBS=$(echo "$HEAD_FILE" | jq -r --arg f "$feature" '.features[$f].features // {} | keys[]' 2>/dev/null | sort || true)
+
+            if [ -n "$HEAD_SUBS" ]; then
+              NEW_SUBS=$(comm -13 <(echo "$BASE_SUBS") <(echo "$HEAD_SUBS") || true)
+              if [ -n "$NEW_SUBS" ]; then
+                for sub in $NEW_SUBS; do
+                  NEW_SUBFEATURES="${NEW_SUBFEATURES}${feature}.${sub}"$'\n'
+                done
+              fi
+            fi
+          done
+
+          # Combine all new flags
+          ALL_NEW_FLAGS=""
+          if [ -n "$NEW_FEATURES" ]; then
+            ALL_NEW_FLAGS="$NEW_FEATURES"
+          fi
+          if [ -n "$NEW_SUBFEATURES" ]; then
+            if [ -n "$ALL_NEW_FLAGS" ]; then
+              ALL_NEW_FLAGS="${ALL_NEW_FLAGS}"$'\n'"${NEW_SUBFEATURES}"
+            else
+              ALL_NEW_FLAGS="$NEW_SUBFEATURES"
+            fi
+          fi
+
+          # Remove trailing newline
+          ALL_NEW_FLAGS=$(echo "$ALL_NEW_FLAGS" | sed '/^$/d')
+
+          if [ -z "$ALL_NEW_FLAGS" ]; then
+            echo "No new Android feature flags detected"
+            echo "has_new_flags=false" >> $GITHUB_OUTPUT
+          else
+            echo "New Android feature flags detected:"
+            echo "$ALL_NEW_FLAGS"
+            echo "has_new_flags=true" >> $GITHUB_OUTPUT
+            echo "flags<<EOF" >> $GITHUB_OUTPUT
+            echo "$ALL_NEW_FLAGS" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Prepare Asana task content
+        if: steps.detect_flags.outputs.has_new_flags == 'true'
+        id: asana_content
+        run: |
+          # Calculate due date (60 days from now, you can adjust this)
+          DUE_DATE=$(date -u -d "+60 days" +%Y-%m-%d 2>/dev/null || date -u -v+60d +%Y-%m-%d)
+
+          # Count how many flags were added
+          FLAG_COUNT=$(echo "${{ steps.detect_flags.outputs.flags }}" | wc -l | xargs)
+
+          if [ "$FLAG_COUNT" -eq 1 ]; then
+            # Single feature flag - create specific task
+            FEATURE_PATH=$(echo "${{ steps.detect_flags.outputs.flags }}" | head -1)
+
+            # Check if it's a sub-feature (contains a dot)
+            if [[ "$FEATURE_PATH" == *.* ]]; then
+              PARENT=$(echo "$FEATURE_PATH" | cut -d. -f1)
+              SUBFEATURE=$(echo "$FEATURE_PATH" | cut -d. -f2)
+              FEATURE_NAME="$PARENT > $SUBFEATURE"
+            else
+              FEATURE_NAME="$FEATURE_PATH"
+            fi
+
+            TASK_NAME="[Android] Remove feature flag: $FEATURE_NAME"
+            TASK_DESCRIPTION="This Android feature flag was added in PR #${{ github.event.pull_request.number }}
+
+          **PR Link:** ${{ github.event.pull_request.html_url }}
+          **Feature Path:** \`$FEATURE_PATH\`
+          **File:** \`overrides/android-override.json\`
+          **Due Date:** $DUE_DATE
+
+          **Action Required:**
+          Please review this feature flag after the due date and determine if it can be removed. Feature flags should be temporary and cleaned up once the feature is stable.
+
+          **Steps to remove:**
+          1. Verify the feature is working as expected in Android production
+          2. Remove the feature flag from \`overrides/android-override.json\` at path: \`$FEATURE_PATH\`
+          3. Remove any Android code that references this feature flag
+          4. Update any documentation
+          5. Create a PR with the cleanup changes
+
+          Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          else
+            # Multiple feature flags - create summary task
+            TASK_NAME="[Android] Remove feature flags added in PR #${{ github.event.pull_request.number }}"
+            TASK_DESCRIPTION="Multiple Android feature flags were added in PR #${{ github.event.pull_request.number }}
+
+          **PR Link:** ${{ github.event.pull_request.html_url }}
+          **File:** \`overrides/android-override.json\`
+          **Due Date:** $DUE_DATE
+
+          **Feature Flags to Review:**
+          "
+
+            # List each feature flag
+            while IFS= read -r FEATURE_PATH; do
+              if [ -n "$FEATURE_PATH" ]; then
+                if [[ "$FEATURE_PATH" == *.* ]]; then
+                  PARENT=$(echo "$FEATURE_PATH" | cut -d. -f1)
+                  SUBFEATURE=$(echo "$FEATURE_PATH" | cut -d. -f2)
+                  FEATURE_NAME="$PARENT > $SUBFEATURE"
+                else
+                  FEATURE_NAME="$FEATURE_PATH"
+                fi
+
+                TASK_DESCRIPTION="${TASK_DESCRIPTION}
+          - **$FEATURE_NAME**
+            Path: \`$FEATURE_PATH\`
+          "
+              fi
+            done <<< "${{ steps.detect_flags.outputs.flags }}"
+
+            TASK_DESCRIPTION="${TASK_DESCRIPTION}
+
+          **Action Required:**
+          Please review these feature flags after the due date and determine if they can be removed. Feature flags should be temporary and cleaned up once the feature is stable.
+
+          **Steps to remove:**
+          1. Verify each feature is working as expected in Android production
+          2. Remove the feature flags from \`overrides/android-override.json\`
+          3. Remove any Android code that references these feature flags
+          4. Update any documentation
+          5. Create a PR with the cleanup changes
+
+          Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          fi
+
+          echo "task_name=$TASK_NAME" >> $GITHUB_OUTPUT
+          {
+            echo 'task_description<<EOF'
+            echo "$TASK_DESCRIPTION"
+            echo 'EOF'
+          } >> $GITHUB_OUTPUT
+
+      - name: Create Asana Task
+        if: steps.asana_content.outcome == 'success'
+        uses: duckduckgo/native-github-asana-sync@v2.0
+        with:
+          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
+          asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
+          asana-task-name: ${{ steps.asana_content.outputs.task_name }}
+          asana-task-description: ${{ steps.asana_content.outputs.task_description }}
+          action: 'create-asana-task'
