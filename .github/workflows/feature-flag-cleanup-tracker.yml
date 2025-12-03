@@ -5,6 +5,12 @@ on:
         types: [opened, synchronize]
         paths:
             - 'overrides/android-override.json'
+    workflow_dispatch:
+        inputs:
+            pr_number:
+                description: 'PR number to check for feature flags'
+                required: true
+                type: number
 
 jobs:
     create-cleanup-task:
@@ -16,6 +22,37 @@ jobs:
               with:
                   fetch-depth: 0
 
+            - name: Get PR details (for workflow_dispatch)
+              if: github.event_name == 'workflow_dispatch'
+              id: pr_details
+              env:
+                  GH_TOKEN: ${{ github.token }}
+              run: |
+                  PR_NUMBER=${{ inputs.pr_number }}
+
+                  # Fetch PR details using gh CLI
+                  PR_DATA=$(gh pr view $PR_NUMBER --json number,headRefOid,baseRefOid,url,author)
+
+                  echo "base_sha=$(echo "$PR_DATA" | jq -r '.baseRefOid')" >> $GITHUB_OUTPUT
+                  echo "head_sha=$(echo "$PR_DATA" | jq -r '.headRefOid')" >> $GITHUB_OUTPUT
+                  echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
+                  echo "pr_url=$(echo "$PR_DATA" | jq -r '.url')" >> $GITHUB_OUTPUT
+
+            - name: Set PR context variables
+              id: pr_context
+              run: |
+                  if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+                    echo "base_sha=${{ steps.pr_details.outputs.base_sha }}" >> $GITHUB_OUTPUT
+                    echo "head_sha=${{ steps.pr_details.outputs.head_sha }}" >> $GITHUB_OUTPUT
+                    echo "pr_number=${{ steps.pr_details.outputs.pr_number }}" >> $GITHUB_OUTPUT
+                    echo "pr_url=${{ steps.pr_details.outputs.pr_url }}" >> $GITHUB_OUTPUT
+                  else
+                    echo "base_sha=${{ github.event.pull_request.base.sha }}" >> $GITHUB_OUTPUT
+                    echo "head_sha=${{ github.event.pull_request.head.sha }}" >> $GITHUB_OUTPUT
+                    echo "pr_number=${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
+                    echo "pr_url=${{ github.event.pull_request.html_url }}" >> $GITHUB_OUTPUT
+                  fi
+
             - name: Install jq
               run: sudo apt-get update && sudo apt-get install -y jq
 
@@ -23,8 +60,8 @@ jobs:
               id: detect_flags
               run: |
                   # Get the android-override.json from base and head commits
-                  BASE_FILE=$(git show ${{ github.event.pull_request.base.sha }}:overrides/android-override.json)
-                  HEAD_FILE=$(git show ${{ github.event.pull_request.head.sha }}:overrides/android-override.json)
+                  BASE_FILE=$(git show ${{ steps.pr_context.outputs.base_sha }}:overrides/android-override.json)
+                  HEAD_FILE=$(git show ${{ steps.pr_context.outputs.head_sha }}:overrides/android-override.json)
 
                   # Extract all feature keys from base and head
                   BASE_FEATURES=$(echo "$BASE_FILE" | jq -r '.features | keys[]' | sort)
@@ -101,9 +138,9 @@ jobs:
                     fi
 
                     TASK_NAME="[Android] Remove feature flag: $FEATURE_NAME"
-                    TASK_DESCRIPTION="This Android feature flag was added in PR #${{ github.event.pull_request.number }}
+                    TASK_DESCRIPTION="This Android feature flag was added in PR #${{ steps.pr_context.outputs.pr_number }}
 
-                  **PR Link:** ${{ github.event.pull_request.html_url }}
+                  **PR Link:** ${{ steps.pr_context.outputs.pr_url }}
                   **Feature Path:** \`$FEATURE_PATH\`
                   **File:** \`overrides/android-override.json\`
                   **Due Date:** $DUE_DATE
@@ -121,10 +158,10 @@ jobs:
                   Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
                   else
                     # Multiple feature flags - create summary task
-                    TASK_NAME="[Android] Remove feature flags added in PR #${{ github.event.pull_request.number }}"
-                    TASK_DESCRIPTION="Multiple Android feature flags were added in PR #${{ github.event.pull_request.number }}
+                    TASK_NAME="[Android] Remove feature flags added in PR #${{ steps.pr_context.outputs.pr_number }}"
+                    TASK_DESCRIPTION="Multiple Android feature flags were added in PR #${{ steps.pr_context.outputs.pr_number }}
 
-                  **PR Link:** ${{ github.event.pull_request.html_url }}
+                  **PR Link:** ${{ steps.pr_context.outputs.pr_url }}
                   **File:** \`overrides/android-override.json\`
                   **Due Date:** $DUE_DATE
 
