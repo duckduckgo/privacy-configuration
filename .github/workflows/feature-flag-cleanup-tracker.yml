@@ -208,6 +208,14 @@ jobs:
                     echo 'EOF'
                   } >> $GITHUB_OUTPUT
 
+
+            - name: Get PR author Asana ID
+              uses: ./actions
+              id: get-author-asana-id
+              with:
+                github-pat: ${{ secrets.GT_DAXMOBILE }}
+                action: 'get-asana-user-id'
+
             - name: Create Asana Task
               if: steps.asana_content.outcome == 'success'
               uses: duckduckgo/native-github-asana-sync@v2.0
@@ -216,5 +224,6 @@ jobs:
                   asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
                   asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
                   asana-task-name: ${{ steps.asana_content.outputs.task_name }}
+                  asana-assignee: ${{ steps.get-author-asana-id.outputs.asanaUserId }}
                   asana-task-description: ${{ steps.asana_content.outputs.task_description }}
                   action: 'create-asana-task'
