@@ -13,7 +13,7 @@ jobs:
     publish:
         concurrency:
             group: build-and-publish
-            cancel-in-progress: true
+            cancel-in-progress: false # queue concurrent tasks only.
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@main
