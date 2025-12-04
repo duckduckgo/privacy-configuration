@@ -68,6 +68,49 @@ See:
    - see [5. Domain-Wide Exceptions](#5-domain-wide-exceptions)
 
 
+### Reference Tracker Rule Set
+
+```json
+"tracker.com": {
+  "rules": [
+    {
+      "rule": "tracker.com/static/widget.js/config/analytics",  // Most specific first
+      "domains": [
+        "site1.com",
+        "site3.com" // Add site3.com so domain propagation can work
+      ],
+      "reason": [
+        "site1.com - https://github.com/duckduckgo/privacy-configuration/pull/1111",
+        "site3.com - https://github.com/duckduckgo/privacy-configuration/pull/3333"
+      ]
+    },
+    {
+      "rule": "tracker.com/static/widget.js/config",  // Less specific, shares prefix, the original tracker intended to allow on site3.com
+      "domains": [
+        "site3.com"
+      ],
+      "reason": [
+        "site3.com - https://github.com/duckduckgo/privacy-configuration/pull/3333"
+      ]
+    },
+    {
+      "rule": "tracker.com/static/widget.js",  // Least specific, shares prefix
+      "domains": [
+        "<all>" // no need to add specific domain, <all> covers all domains
+      ],
+      "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+    },
+    {
+      "rule": "tracker.com/api/collect",  // Different prefix, order doesn't matter
+      "domains": [
+        "site2.com"
+      ],
+      "reason": "site2.com - https://github.com/duckduckgo/privacy-configuration/pull/2222"
+    }
+  ]
+}
+```
+
 
 ✅ **Examples of Suitable Specific Paths:**
 ```json
