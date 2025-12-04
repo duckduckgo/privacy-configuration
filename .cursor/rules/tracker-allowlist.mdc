@@ -16,6 +16,23 @@ See:
 - [The schema for tracker allowlist rules](/schema/features/tracker-allowlist.ts)
 - [Bugbot PR review guidelines](/cursor/BUGBOT.md)
 
+## Table of Contents
+
+- [Quick Cheat Sheet](#quick-cheat-sheet)
+  - [Tracker Allowlist Decision Tree](#tracker-allowlist-decision-tree-strategy-prioritized)
+  - [Reference Tracker Rule Set](#reference-tracker-rule-set)
+- [Site Mitigation Triager In-Depth Guideline](#site-mitigation-triager-in-depth-guideline)
+  - [1. Choosing Trackers to Allow](#1-choosing-trackers-to-allow)
+    - [1.1. Not too generic nor too specific](#11-not-too-generic-nor-too-specific)
+    - [1.2. Avoid regex/wildcards](#12-avoid-regexwildcards)
+  - [2. Rule Precedence (Ordering)](#2-rule-precedence-ordering)
+    - [2.1. How the Matching Algorithm Works: First Match Wins Principle](#21-how-the-matching-algorithm-works-first-match-wins-principle)
+    - [2.2. Rule Specificity and Ordering: when order matters vs. doesn't matter](#22-rule-specificity-and-ordering-when-order-matters-vs-doesnt-matter)
+    - [2.3. Domain Propagation: when duplicating domain is required](#23-domain-propagation-when-duplicating-domain-is-required)
+    - [2.4. The `<all>` Specifier: essential considerations](#24-the-all-specifier-essential-considerations)
+  - [4. Cross-Entity Coverage](#4-cross-entity-coverage)
+  - [5. Domain-Wide Exceptions](#5-domain-wide-exceptions)
+
 
 ✅ **Examples of Suitable Specific Paths:**
 ```json
