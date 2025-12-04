@@ -286,7 +286,22 @@
                 "chatImagesIndexDbNameObjectStoreNamePairs": [[
                         "savedAIChatData",
                         "chat-images"
-                    ]]
+                    ]],
+                "additionalCheck": "disabled",
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "domain": ["duck.ai", "duckduckgo.com"]
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/additionalCheck",
+                                "value": "enabled"
+                            }
+                        ]
+                    }
+                ]
             }
         },
         "autocompleteTabs": {
