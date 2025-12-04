@@ -183,34 +183,44 @@ The algorithm follows a "first match wins" principle: it checks rules from top t
 - `tracker.com/api/analytics` on `site1.com`: Matches first rule → `site1.com` in list → **allowed**
 - `tracker.com/api/other` on any site: Doesn't match first rule, matches second rule → `<all>` applies → **allowed** 
 
+### 2.2. Rule Specificity and Ordering: when order matters vs. doesn't matter
 
-### 3. Rule Precedence (Ordering)
+Order matters only if two rules could match the same tracker request. The more specific rule must be listed first. This prevents a broad rule from "catching" a request before the rule that was meant for it.
 
-3.1. **Critical:** Order rules **most‑specific → least‑specific,** but **only** when both can match the same request. Same-host prefix matching is required: foo.com/bar is a prefix of foo.com/bar/baz.
+A rule is more specific if:
+- it uses a subdomain (e.g., `www.example.com` is more specific than `example.com`)
+- or it has a longer path (e.g., `example.com/foo/bar` is more specific than `example.com/foo`)
 
-Ordering does not matter for different hosts (they never match). For example, www.example.com/foo ≠ example.com/foo ≠ cdn.example.com/foo.
+If two rules can't match the same tracker request then their order does not matter:
+- `sub.example.com` vs `api.example.com` are different domains
+- `example.com/foo` vs `example.com/bar` don't share a prefix - one path is not a prefix of the other
 
-**Example - Correct Ordering:**
-
+**Example - Correct Ordering of same tracker request:**
 
 ```json
 {
-  "example.com": {
+  "tracker.com": {
     "rules": [
       {
-        "rule": "example.com/foo/bar/baz",  // ✅ Most specific first
+        "rule": "tracker.com/api/analytics/main.js",  // Most specific first
         "domains": ["site1.com"],
-        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/123"
+        "reason": ["site1.com - https://github.com/duckduckgo/privacy-configuration/issues/1111"]
       },
       {
-        "rule": "example.com/foo/bar",  // ✅ Less specific second
+        "rule": "tracker.com/api/analytics",  // Less specific second
         "domains": ["site2.com"],
-        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/456"
+        "reason": "site2.com - https://github.com/duckduckgo/privacy-configuration/pull/2222"
       },
       {
-        "rule": "example.com",  // ✅ Least specific last
+        "rule": "tracker.com/api",  // Least specific last
         "domains": ["site3.com"],
-        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/789"
+        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3333"
+      }
+    ]
+  }
+}
+```
+
       }
     ]
   }
