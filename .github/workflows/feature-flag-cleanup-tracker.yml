@@ -226,7 +226,8 @@ jobs:
               uses: duckduckgo/native-github-asana-sync@v2.0
               with:
                   asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-                  asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
+                  asana-project: ${{ vars.GH_ANDROID_INTERNAL_WORK_PROJECT_ID }}
+                  asana-section: ${{ vars.GH_ANDROID_FEATURE_FLAG_MAINTENANCE_SECTION_ID }}
                   asana-task-name: ${{ steps.asana_content.outputs.task_name }}
                   asana-task-assignee: ${{ steps.get-author-asana-id.outputs.asanaUserId }}
                   asana-task-description: ${{ steps.asana_content.outputs.task_description }}
