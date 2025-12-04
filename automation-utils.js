@@ -17,10 +17,7 @@ export const AUTO_APPROVABLE_FEATURES = {
     '/features/fingerprintingCanvas': ['/exceptions'],
     '/features/fingerprintingHardware': ['/exceptions'],
     '/features/fingerprintingScreenSize': ['/exceptions'],
-    '/features/trackerAllowlist': [
-        '/settings/allowlistedTrackers',
-        '/exceptions',
-    ],
+    '/features/trackerAllowlist': ['/settings/allowlistedTrackers'],
     '/features/gpc': ['/exceptions'],
     '/features/webCompat': ['/exceptions'],
     '/features/clickToLoad': ['/exceptions'],
