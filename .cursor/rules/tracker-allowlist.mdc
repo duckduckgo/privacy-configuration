@@ -269,17 +269,61 @@ This applies the "first match wins" principle. If a request matches a more-speci
 
 **Note**: Domain propagation is only needed when both rules have specific domain lists (no `<all>`; because it already covers all domain)
 
+### 2.4. The `<all>` Specifier: essential considerations
+
+The `<all>` specifier is treated as if every domain were specified in the list. This means a rule with `<all>` will allow the request for any site domain.
+
+**Example 1: More-specific rule has a site domain, less-specific rule has <all>**
+```json
+{
+  "tracker.com": {
+    "rules": [
+      {
+        "rule": "tracker.com/api/analytics", // only allowed on site1.com
+        "domains": ["site1.com"],
+        "reason": ["site1.com - https://github.com/duckduckgo/privacy-configuration/issues/1111"]
+      },
+      {
+        "rule": "tracker.com/api", // allowed on all domains
+        "domains": ["<all>"],
+        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2222"
+      }
+    ]
+  }
+}
+```
+**Key insight:** The first rule restricts the `analytics` path to `site1.com` only, while the second rule with `<all>` acts as a catch-all for other paths:
+- Anything under `tracker.com/api/analytics/*` is restricted to `site1.com` only (matches first rule)
+- Anything under `tracker.com/api/*` that doesn't start with `analytics` is allowed on all domains (matches second rule with `<all>`)
+- Consequently, `tracker.com/api/analytics` from `any-other-site.com` matches the first rule, but the domain is not in that rule's list → **blocked** ✗
+
+**Example 2: More-specific rule has <all>, less-specific rule has a site domain**
 
 ```json
 {
-  "rule": "example.com/foo/bar/baz",  // More specific
-  "domains": ["site1.com", "site2.com"]  // ✅ Add site2.com here too
-},
-{
-  "rule": "example.com/foo/bar",  // Less specific
-  "domains": ["site2.com"]  // ✅ Added here
+  "tracker.com": {
+    "rules": [
+      {
+        "rule": "tracker.com/api/specific", // allowed on all domains
+        "domains": ["<all>"],
+        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3333"
+      },
+      {
+        "rule": "tracker.com/api", // only allowed on site1.com
+        "domains": ["site1.com"],
+        "reason": ["site1.com - https://github.com/duckduckgo/privacy-configuration/issues/4444"]
+      }
+    ]
+  }
 }
 ```
+
+**Key insight:** The more-specific rule with `<all>` allows all domains for that path, while the less-specific rule restricts other paths to specific domains:
+- Anything under `tracker.com/api/specific/*` is **allowed on all domains** (matches first rule with `<all>`)
+- Anything under `tracker.com/api/*` that doesn't start with `specific` is restricted to `site1.com` only (matches second rule)
+- When any site requests `tracker.com/api/specific`, it matches the first rule → `<all>` applies, request is **allowed** ✓
+
+**Important:** Make sure the more-specific rule comes first. If the less-specific rule comes first, requests to `tracker.com/api/specific` will match the less-specific rule first and be blocked for domains not in that rule's list, preventing the more-specific rule with `<all>` from being reached.
 
 ### 4. Cross-Entity Coverage
 
