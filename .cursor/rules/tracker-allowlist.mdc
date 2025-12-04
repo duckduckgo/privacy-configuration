@@ -1,56 +1,20 @@
 ---
 globs: features/tracker-allowlist.json,overrides/**/*.json
 alwaysApply: false
-description: Tracker allowlist rule creation guide following SBT/PFM Onboarding Guidelines. Use this when working with tracker-allowlist rules and mitigations.
 ---
 
 # Tracker Allowlist Mitigation Instructions
 
-## Schema & Configuration References
+## Background
 
-- **Schema**: `schema/features/tracker-allowlist.ts` - TypeScript type definitions
-- **Configuration**: `features/tracker-allowlist.json` - Rule definitions
+Tracker Allowlist is used to allow specific tracker requests that would normally be blocked by the tracker radar, where necessary to fix website breakages. The feature configuration lists rules of which tracker requests should be allowed for which websites. Care must be taken when writing these rules, since allowing tracker requests reduces privacy protection for users.
 
-## Type Definitions
-
-```typescript
-type AllowlistRule = {
-    /** Tracker rule path (e.g., "example.com/path/to/resource") */
-    rule: string;
-    /** List of site domains where this tracker is allowed */
-    domains: string[];
-    /** Reason for the exception (PR link) */
-    reason: string | string[];
-};
-
-type TrackerAllowlist = {
-    allowlistedTrackers: {
-        [domain: string]: {
-            /** Rules ordered from most-specific to least-specific */
-            rules: AllowlistRule[];
-        };
-    };
-};
-```
-
-## Site Mitigation Triager Guideline
-
-### 1. Before You Start
-- ✅ Search existing mitigations; include platform-specific override files in your search
-- ✅ Check if this new tracker shares a path prefix with existing rules
-- ✅ Be sure to apply the rule precedence logic. See [Rule Precedence (Ordering)](#3-rule-precedence-ordering)
-- ✅ Remove outdated exceptions
-- ✅ Add platform-specific exceptions with clear justification in your PR
-
-### 2. Choosing Trackers to Allow
-
-2.1. **Not Too Generic:**
-- ❌ Avoid domain-only rules (no path): `"rule": "tracker.com"`
-- ✅ Use specific paths: `"rule": "tracker.com/api/endpoint"`
-
-2.2. **Not Too Specific:**
-- ❌ Avoid temporary URLs with dynamic parameters that may include user or session IDs, tokens, or timestamps.
-- ✅ Use stable API endpoints
+See:
+- [Tracker Allowlist rule definitions](/features/tracker-allowlist.json)
+  (Applies to all browser platforms.)
+- [Platform-specific configuration override files](/overrides/)
+- [The schema for tracker allowlist rules](/schema/features/tracker-allowlist.ts)
+- [Bugbot PR review guidelines](/cursor/BUGBOT.md)
 
 
 ✅ **Examples of Suitable Specific Paths:**
