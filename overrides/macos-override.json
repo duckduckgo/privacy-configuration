@@ -107,6 +107,27 @@
                             "weight": 1
                         }
                     ]
+                },
+                "macOSWebNotificationsFixExperiment": {
+                    "state": "enabled",
+                    "minSupportedVersion": "1.168.0",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
                 }
             }
         },
@@ -561,6 +582,23 @@
                             {
                                 "op": "replace",
                                 "path": "/messageHandlers/state",
+                                "value": "enabled"
+                            }
+                        ]
+                    }
+                ],
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "experiment": {
+                                "experimentName": "macOSWebNotificationsFixExperiment",
+                                "cohort": "treatment"
+                            }
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/webNotifications",
                                 "value": "enabled"
                             }
                         ]
