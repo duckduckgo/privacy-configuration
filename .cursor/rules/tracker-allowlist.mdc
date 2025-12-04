@@ -111,6 +111,17 @@ See:
 }
 ```
 
+## Site Mitigation Triager In-Depth Guideline
+
+### 1. Choosing Trackers to Allow
+
+### 1.1. Not too generic nor too specific
+- Avoid domain-only rules (no path): `"rule": "tracker.com"`
+- Avoid temporary URLs with dynamic parameters (eg. user or session IDs, tokens, timestamps)
+- Use specific, stable endpoint paths: `"rule": "tracker.com/api/endpoint"`
+
+### 1.2. Avoid regex/wildcards
+This is because platforms have varying support for these.
 
 ✅ **Examples of Suitable Specific Paths:**
 ```json
@@ -118,14 +129,22 @@ See:
   "tracker.com": {
     "rules": [
       {
-        "rule": "tracker.com/api/analytics",  // ✅ Specific API endpoint
-        "domains": ["site.com"],
-        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/123"
+        "rule": "tracker.com/api/scripts/main.js",  // Specific file
+        "domains": ["site1.com"],
+        "reason": [
+          "site1.com - https://github.com/duckduckgo/privacy-configuration/issues/1111"
+          ]
       },
       {
-        "rule": "tracker.com/api/scripts/main.js",  // ✅ Specific file
-        "domains": ["site.com"],
-        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/456"
+        "rule": "tracker.com/api/analytics",  // Specific API endpoint
+        "domains": ["site2.com"],
+        "reason": "site2.com - https://github.com/duckduckgo/privacy-configuration/pull/2222"
+      }
+    ]
+  }
+}
+```
+
       }
     ]
   }
