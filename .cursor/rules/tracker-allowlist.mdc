@@ -145,13 +145,44 @@ This is because platforms have varying support for these.
 }
 ```
 
+### 2. Rule Precedence (Ordering)
+
+**Critical:** Order rules **most‑specific → least‑specific,** but **only** when both can match the same tracker request. Rules must share a prefix: `foo.com/bar` is a prefix of `foo.com/bar/baz`.
+
+### 2.1. How the Matching Algorithm Works: First Match Wins Principle
+
+The algorithm follows a "first match wins" principle: it checks rules from top to bottom and stops at the first matching rule.
+
+1. **Check rules from top to bottom** until a rule matches the request URL.
+2. **When a rule matches:**
+   - If the current site domain is in the rule's `domains` list → allowlist applies (request is **not blocked**)
+   - If the rule's `domains` list contains `<all>` → allowlist applies (request is **not blocked**)
+   - Otherwise → allowlist does not apply (request is **blocked**)
+3. **The algorithm stops** at the first match and uses that rule's domain list (subsequent rules are ignored).
+
+**Example:**
+```json
+{
+  "tracker.com": {
+    "rules": [
+      {
+        "rule": "tracker.com/api/analytics", // Most specific first
+        "domains": ["site1.com"],
+        "reason": ["site1.com - https://github.com/duckduckgo/privacy-configuration/issues/1111"]
+      },
+      {
+        "rule": "tracker.com/api", // Less specific second
+        "domains": ["<all>"],
+        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2222"
       }
     ]
   }
 }
 ```
 
-2.3. **avoid regex/wildcards**
+- `tracker.com/api/analytics` on `site1.com`: Matches first rule → `site1.com` in list → **allowed**
+- `tracker.com/api/other` on any site: Doesn't match first rule, matches second rule → `<all>` applies → **allowed** 
+
 
 ### 3. Rule Precedence (Ordering)
 
