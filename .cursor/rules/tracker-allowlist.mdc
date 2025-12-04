@@ -9,29 +9,27 @@ alwaysApply: false
 
 Tracker Allowlist is used to allow specific tracker requests that would normally be blocked by the tracker radar, where necessary to fix website breakages. The feature configuration lists rules of which tracker requests should be allowed for which websites. Care must be taken when writing these rules, since allowing tracker requests reduces privacy protection for users.
 
-See:
-- [Tracker Allowlist rule definitions](/features/tracker-allowlist.json)
-  (Applies to all browser platforms.)
-- [Platform-specific configuration override files](/overrides/)
-- [The schema for tracker allowlist rules](/schema/features/tracker-allowlist.ts)
-- [Bugbot PR review guidelines](/cursor/BUGBOT.md)
+- **Configuration**: `features/tracker-allowlist.json` - Rule definitions (Applies to all browser platforms.)
+- **Override files**: `overrides/` - Platform-specific configuration override files
+- **Schema**: `schema/features/tracker-allowlist.ts` - TypeScript type definitions
+- **Bugbot guidelines**: `cursor/BUGBOT.md` - PR review guidelines
 
 ## Table of Contents
 
-- [Quick Cheat Sheet](#quick-cheat-sheet)
-  - [Tracker Allowlist Decision Tree](#tracker-allowlist-decision-tree-strategy-prioritized)
-  - [Reference Tracker Rule Set](#reference-tracker-rule-set)
-- [Site Mitigation Triager In-Depth Guideline](#site-mitigation-triager-in-depth-guideline)
-  - [1. Choosing Trackers to Allow](#1-choosing-trackers-to-allow)
-    - [1.1. Not too generic nor too specific](#11-not-too-generic-nor-too-specific)
-    - [1.2. Avoid regex/wildcards](#12-avoid-regexwildcards)
-  - [2. Rule Precedence (Ordering)](#2-rule-precedence-ordering)
-    - [2.1. How the Matching Algorithm Works: First Match Wins Principle](#21-how-the-matching-algorithm-works-first-match-wins-principle)
-    - [2.2. Rule Specificity and Ordering: when order matters vs. doesn't matter](#22-rule-specificity-and-ordering-when-order-matters-vs-doesnt-matter)
-    - [2.3. Domain Propagation: when duplicating domain is required](#23-domain-propagation-when-duplicating-domain-is-required)
-    - [2.4. The `<all>` Specifier: essential considerations](#24-the-all-specifier-essential-considerations)
-  - [4. Cross-Entity Coverage](#4-cross-entity-coverage)
-  - [5. Domain-Wide Exceptions](#5-domain-wide-exceptions)
+- Quick Cheat Sheet
+  - Tracker Allowlist Decision Tree
+  - Reference Tracker Rule Set
+- Site Mitigation Triager In-Depth Guideline
+  - 1. Choosing Trackers to Allow
+    - 1.1. Not too generic nor too specific
+    - 1.2. Avoid regex/wildcards
+  - 2. Rule Precedence (Ordering)
+    - 2.1. How the Matching Algorithm Works: First Match Wins Principle
+    - 2.2. Rule Specificity and Ordering: when order matters vs. doesn't matter
+    - 2.3. Domain Propagation: when duplicating domain is required
+    - 2.4. The `<all>` Specifier: essential considerations
+  - 4. Cross-Entity Coverage
+  - 5. Domain-Wide Exceptions
 
 ## Quick Cheat Sheet
 
@@ -39,33 +37,33 @@ See:
 
 
 1. Search existing rules first for both the domain you're mitigating and the rule you have in mind (including platform overrides)
-   - see [1. Choosing Trackers to Allow](#1-choosing-trackers-to-allow)
+   - see 1. Choosing Trackers to Allow
 ↓
 2. Rule already exists? → Update domains/reason if needed. When updating, follow step 6 guidance.
 ↓
 3. Rule doesn't exist? → Make sure your new rule is specific but stable
    - Example: "tracker.com/api/endpoint" (Avoid domain-only rules and dynamic params like user/session IDs, tokens, timestamps)
-   - see [1.1. Not too generic nor too specific](#11-not-too-generic-nor-too-specific) 
+   - see 1.1. Not too generic nor too specific
 ↓
 4. Check if the new rule shares prefix with existing rules
    - Example: "tracker.com/api/endpoint" shares prefix with "tracker.com/api", but not with "sub.tracker.com/api/endpoint"
-   - see [2.2. Rule Specificity and Ordering](#22-rule-specificity-and-ordering-when-order-matters-vs-doesnt-matter)
+   - see 2.2. Rule Specificity and Ordering
 ↓
 5. It shares prefix? → Order most-specific → least-specific
    - Example: "tracker.com/api/endpoint" comes before "tracker.com/api"
-   - see [2.2. Rule Specificity and Ordering](#22-rule-specificity-and-ordering-when-order-matters-vs-doesnt-matter)
-   - Should this apply to all domains? Use `<all>` if appropriate and see [2.4. The `<all>` Specifier](#24-the-all-specifier-essential-considerations)
+   - see 2.2. Rule Specificity and Ordering
+   - Should this apply to all domains? Use `<all>` if appropriate and see 2.4. The `<all>` Specifier
 ↓
 6. Add the site domain to all rules that share the same prefix
    - Example: If you add "site.com" to "tracker.com/api", also add it to any more-specific rule such as "tracker.com/api/endpoint"
-   - see [2.3. Domain Propagation](#23-domain-propagation-when-duplicating-domain-is-required) 
-   - Should this apply to all domains? Use `<all>` if appropriate (domain propagation not needed when using `<all>`) see [2.4. The `<all>` Specifier](#24-the-all-specifier-essential-considerations)
+   - see 2.3. Domain Propagation
+   - Should this apply to all domains? Use `<all>` if appropriate (domain propagation not needed when using `<all>`) see 2.4. The `<all>` Specifier
 ↓
 7. Multi-country/sibling sites might be affected? → Consider cross-entity coverage
-   - see [4. Cross-Entity Coverage](#4-cross-entity-coverage)
+   - see 4. Cross-Entity Coverage
 ↓
 8. Domain-wide exception needed? → Avoid if possible; document thoroughly if required
-   - see [5. Domain-Wide Exceptions](#5-domain-wide-exceptions)
+   - see 5. Domain-Wide Exceptions
 
 
 ### Reference Tracker Rule Set
@@ -123,7 +121,7 @@ See:
 ### 1.2. Avoid regex/wildcards
 This is because platforms have varying support for these.
 
-✅ **Examples of Suitable Specific Paths:**
+**Examples of Suitable Specific Paths:**
 ```json
 {
   "tracker.com": {
