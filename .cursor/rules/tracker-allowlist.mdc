@@ -221,16 +221,54 @@ If two rules can't match the same tracker request then their order does not matt
 }
 ```
 
+### 2.3. Domain Propagation: when duplicating domain is required
+
+For same trackers requests only, a domain in a less-specific rule, must also appear in all more-specific rules.
+
+This applies the "first match wins" principle. If a request matches a more-specific rule first, but the domain isn't in that rule's list, the request will be blocked, even if the domain is in a less-specific rule below it. This prevents a broad rule from "catching" a request before the rule that was meant for it.
+
+**Example (without propagation - broken):**
+```json
+{
+  "tracker.com": {
+    "rules": [
+      {
+        "rule": "tracker.com/api/specific",  // More specific (checked first)
+        "domains": ["site1.com"]  // Missing site2.com
+      },
+      {
+        "rule": "tracker.com/api",
+        "domains": ["site2.com"]
       }
     ]
   }
 }
 ```
 
-3.2. **Adding domains to less-specific rules:**
+**Problem:** `tracker.com/api` isn't allowed on `site2.com` as intended. Although `site2.com` is listed in the less specific rule (`tracker.com/api`), there's a more specific rule (`tracker.com/api/specific`) that doesn't include `site2.com`, which blocks the request.
 
-Add the domain to both the more-specific and less-specific rules.
-**Why?** The first matching rule is checked. If a request matches a more-specific rule but the domain isn't in that rule's list, it blocks.
+**Example (with propagation - fixed):**
+```json
+{
+  "tracker.com": {
+    "rules": [
+      {
+        "rule": "tracker.com/api/specific",  // More specific rule
+        "domains": ["site1.com", "site2.com"]  // site2.com added (propagation will work)
+      },
+      {
+        "rule": "tracker.com/api",  // Less specific rule (original intention for site2.com)
+        "domains": ["site2.com"]
+      }
+    ]
+  }
+}
+```
+
+**Fixed:** Unlike the previous example, `site2.com` is now in the more specific rule's domain list. As a result, `tracker.com/api` is now **allowed** on `site2.com` as intended ✓.
+
+**Note**: Domain propagation is only needed when both rules have specific domain lists (no `<all>`; because it already covers all domain)
+
 
 ```json
 {
