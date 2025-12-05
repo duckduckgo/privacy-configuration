@@ -118,9 +118,6 @@ jobs:
               if: steps.detect_flags.outputs.has_new_flags == 'true'
               id: asana_content
               run: |
-                  # Calculate due date (60 days from now, you can adjust this)
-                  DUE_DATE=$(date -u -d "+60 days" +%Y-%m-%d 2>/dev/null || date -u -v+60d +%Y-%m-%d)
-
                   # Count how many flags were added
                   FLAG_COUNT=$(echo "${{ steps.detect_flags.outputs.flags }}" | wc -l | xargs)
 
@@ -143,7 +140,6 @@ jobs:
                   **PR Link:** ${{ steps.pr_context.outputs.pr_url }}
                   **Feature Path:** \`$FEATURE_PATH\`
                   **File:** \`overrides/android-override.json\`
-                  **Due Date:** $DUE_DATE
 
                   **Action Required:**
                   Please review this feature flag after the due date and determine if it can be removed. Feature flags should be temporary and cleaned up once the feature is stable.
@@ -163,7 +159,6 @@ jobs:
 
                   **PR Link:** ${{ steps.pr_context.outputs.pr_url }}
                   **File:** \`overrides/android-override.json\`
-                  **Due Date:** $DUE_DATE
 
                   **Feature Flags to Review:**
                   "
