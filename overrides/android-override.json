@@ -47,7 +47,7 @@
             "state": "enabled",
             "features": {
                 "atpTdsExperiment002": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": 52550000,
                     "rollout": {
                         "steps": [
@@ -74,56 +74,57 @@
             }
         },
         "attributedMetrics": {
-            "state": "internal",
+            "state": "enabled",
+            "minSupportedVersion": 52580000,
             "exceptions": [],
             "features": {
                 "emitAllMetrics": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "retention": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "canEmitRetention": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "searchDaysAvg": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "canEmitSearchDaysAvg": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "searchCountAvg": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "canEmitSearchCountAvg": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "adClickCountAvg": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "canEmitAdClickCountAvg": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "aiUsageAvg": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "canEmitAIUsageAvg": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "subscriptionRetention": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "canEmitSubscriptionRetention": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "syncDevices": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "canEmitSyncDevices": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "sendOriginParam": {
-                    "state": "internal",
+                    "state": "enabled",
                     "settings": {
                         "originCampaignSubstrings": [
                             "paid"
@@ -2121,17 +2122,6 @@
                             }
                         ]
                     },
-                    "omtrdc.net": {
-                        "rules": [
-                            {
-                                "rule": "tracfonewireless.tt.omtrdc.net",
-                                "domains": [
-                                    "tracfone.com"
-                                ],
-                                "reason": "tracfone.com - https://github.com/duckduckgo/privacy-configuration/pull/4032"
-                            }
-                        ]
-                    },
                     "doubleclick.net": {
                         "rules": [
                             {
@@ -2147,6 +2137,28 @@
                                     "tractorhouse.com"
                                 ],
                                 "reason": "tractorhouse.com - https://github.com/duckduckgo/privacy-configuration/pull/4065"
+                            }
+                        ]
+                    },
+                    "omtrdc.net": {
+                        "rules": [
+                            {
+                                "rule": "tracfonewireless.tt.omtrdc.net",
+                                "domains": [
+                                    "tracfone.com"
+                                ],
+                                "reason": "tracfone.com - https://github.com/duckduckgo/privacy-configuration/pull/4032"
+                            }
+                        ]
+                    },
+                    "posthog.com": {
+                        "rules": [
+                            {
+                                "rule": "eu.i.posthog.com",
+                                "domains": [
+                                    "sciensus.com"
+                                ],
+                                "reason": "sciensus.com - https://github.com/duckduckgo/privacy-configuration/pull/4210"
                             }
                         ]
                     },

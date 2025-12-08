@@ -50,7 +50,7 @@ export type ConfigV5<VersionType> = {
         aiChat?: AiChatConfig<VersionType>;
         apiManipulation?: APIManipulationFeature<VersionType>;
         appHealth?: AppHealth<VersionType>;
-        attributedMetrics?: AttributedMetricsFeature;
+        attributedMetrics?: AttributedMetricsFeature<VersionType>;
         autoconsent?: AutoconsentFeature<VersionType>;
         autofill?: AutofillFeature<VersionType>;
         burn?: BurnFeature<VersionType>;
