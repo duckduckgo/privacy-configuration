@@ -193,7 +193,20 @@ describe('Code Review Validation Tests', () => {
                     const rollouts = findRolloutConfigs(config);
                     const issues = [];
 
+                    // Test features don't need minSupportedVersion
+                    const isTestFeature = (path) => {
+                        const parts = path.split('.');
+                        return parts.some(part =>
+                            /Test$/i.test(part) || /^test/i.test(part) || /experiment.*test/i.test(part)
+                        );
+                    };
+
                     for (const { path } of rollouts) {
+                        // Skip test features
+                        if (isTestFeature(path)) {
+                            continue;
+                        }
+
                         // Navigate to the parent feature object
                         const pathParts = path.split('.');
                         let obj = config;
