@@ -12,6 +12,9 @@ export default [
             'features/**/*.json',
             'overrides/**/*.json',
         ],
+        ignores: [
+            'features/autoconsent.json',
+        ],
     })),
     // Use strict JSON for other JSON files (generated, package.json, etc.)
     {
