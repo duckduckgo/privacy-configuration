@@ -8,4 +8,3 @@ type UaChBrandsSettings = CSSInjectFeatureSettings<{
 }>;
 
 export type UaChBrandsFeature<VersionType> = Feature<UaChBrandsSettings, VersionType>;
-
