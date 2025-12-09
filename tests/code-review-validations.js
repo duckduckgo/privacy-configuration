@@ -25,7 +25,10 @@ function findRolloutConfigs(obj, path = '') {
         results.push({ path, rollout: obj.rollout });
     }
 
-    for (const [key, value] of Object.entries(obj)) {
+    for (const [
+        key,
+        value,
+    ] of Object.entries(obj)) {
         if (typeof value === 'object' && value !== null) {
             results.push(...findRolloutConfigs(value, path ? `${path}.${key}` : key));
         }
@@ -44,7 +47,10 @@ function findSelectors(obj, path = '') {
         results.push({ path, selector: obj.selector });
     }
 
-    for (const [key, value] of Object.entries(obj)) {
+    for (const [
+        key,
+        value,
+    ] of Object.entries(obj)) {
         if (Array.isArray(value)) {
             value.forEach((item, index) => {
                 results.push(...findSelectors(item, `${path}[${index}]`));
@@ -87,7 +93,10 @@ function findExceptionDomains(obj, path = '') {
         results.push({ path, domain: obj.domain });
     }
 
-    for (const [key, value] of Object.entries(obj)) {
+    for (const [
+        key,
+        value,
+    ] of Object.entries(obj)) {
         if (Array.isArray(value)) {
             value.forEach((item, index) => {
                 results.push(...findExceptionDomains(item, `${path}.${key}[${index}]`));
@@ -99,7 +108,6 @@ function findExceptionDomains(obj, path = '') {
     return results;
 }
 
-
 /**
  * Find disable-default rules without accompanying replacement rules
  */
@@ -110,15 +118,13 @@ function findOrphanedDisableDefault(domains) {
     for (const domainConfig of domains) {
         if (!domainConfig.rules || !Array.isArray(domainConfig.rules)) continue;
 
-        const hasDisableDefault = domainConfig.rules.some(r => r.type === 'disable-default');
-        const hasReplacementRules = domainConfig.rules.some(r =>
-            r.type && r.type !== 'disable-default' && r.selector
-        );
+        const hasDisableDefault = domainConfig.rules.some((r) => r.type === 'disable-default');
+        const hasReplacementRules = domainConfig.rules.some((r) => r.type && r.type !== 'disable-default' && r.selector);
 
         if (hasDisableDefault && !hasReplacementRules) {
             results.push({
                 domain: domainConfig.domain,
-                message: 'disable-default without accompanying replacement rules'
+                message: 'disable-default without accompanying replacement rules',
             });
         }
     }
@@ -143,14 +149,17 @@ function findAllowlistRules(allowlistedTrackers) {
     const results = [];
     if (!allowlistedTrackers || typeof allowlistedTrackers !== 'object') return results;
 
-    for (const [domain, config] of Object.entries(allowlistedTrackers)) {
+    for (const [
+        domain,
+        config,
+    ] of Object.entries(allowlistedTrackers)) {
         if (config.rules && Array.isArray(config.rules)) {
             config.rules.forEach((rule, index) => {
                 results.push({
                     baseDomain: domain,
                     rule: rule.rule,
                     index,
-                    domains: rule.domains
+                    domains: rule.domains,
                 });
             });
         }
@@ -161,7 +170,7 @@ function findAllowlistRules(allowlistedTrackers) {
 describe('Code Review Validation Tests', () => {
     describe('Rollout Configuration Validation', () => {
         const overrideFiles = [
-            ...platforms.map(p => `${OVERRIDE_DIR}/${p}-override.json`),
+            ...platforms.map((p) => `${OVERRIDE_DIR}/${p}-override.json`),
         ];
 
         for (const overrideFile of overrideFiles) {
@@ -177,7 +186,7 @@ describe('Code Review Validation Tests', () => {
                     for (const { path, rollout } of rollouts) {
                         if (rollout.steps && rollout.steps.length > 1) {
                             // Steps should be in increasing order
-                            const percentages = rollout.steps.map(s => s.percent);
+                            const percentages = rollout.steps.map((s) => s.percent);
                             for (let i = 1; i < percentages.length; i++) {
                                 if (percentages[i] <= percentages[i - 1]) {
                                     issues.push(`${path}: rollout steps not in increasing order [${percentages.join(', ')}]`);
@@ -196,9 +205,7 @@ describe('Code Review Validation Tests', () => {
                     // Test features don't need minSupportedVersion
                     const isTestFeature = (path) => {
                         const parts = path.split('.');
-                        return parts.some(part =>
-                            /Test$/i.test(part) || /^test/i.test(part) || /experiment.*test/i.test(part)
-                        );
+                        return parts.some((part) => /Test$/i.test(part) || /^test/i.test(part) || /experiment.*test/i.test(part));
                     };
 
                     for (const { path } of rollouts) {
@@ -212,7 +219,10 @@ describe('Code Review Validation Tests', () => {
                         let obj = config;
                         for (const part of pathParts.slice(0, -1)) {
                             if (part.includes('[')) {
-                                const [key, indexStr] = part.split('[');
+                                const [
+                                    key,
+                                    indexStr,
+                                ] = part.split('[');
                                 const index = parseInt(indexStr.replace(']', ''));
                                 obj = obj[key]?.[index];
                             } else {
@@ -240,41 +250,53 @@ describe('Code Review Validation Tests', () => {
 
             it('should not contain logically contradictory CSS selectors', () => {
                 const selectors = findSelectors(elementHidingConfig);
-                const contradictory = selectors.filter(s => isContradictorySelector(s.selector));
+                const contradictory = selectors.filter((s) => isContradictorySelector(s.selector));
 
                 expect(contradictory).to.deep.equal(
                     [],
-                    `Found contradictory selectors:\n${contradictory.map(s => `  ${s.path}: ${s.selector}`).join('\n')}`
+                    `Found contradictory selectors:\n${contradictory.map((s) => `  ${s.path}: ${s.selector}`).join('\n')}`,
                 );
             });
         }
     });
 
     describe('Domain Format Validation', () => {
-        const overrideFiles = platforms.map(p => `${OVERRIDE_DIR}/${p}-override.json`);
+        const isInvalidDomainFormat = (domain) =>
+            domain.startsWith('http://') ||
+            domain.startsWith('https://') ||
+            domain.includes('/*') ||
+            (domain.includes('/') && !domain.includes('.'));
+
+        const validateDomainFormats = (config) => {
+            const domains = findExceptionDomains(config);
+            const invalid = domains.filter((d) => isInvalidDomainFormat(d.domain));
+
+            expect(invalid).to.deep.equal(
+                [],
+                `Found invalid domain formats (should be domain only, no protocol/path):\n${invalid.map((d) => `  ${d.path}: ${d.domain}`).join('\n')}`,
+            );
+        };
+
+        // Check override files
+        const overrideFiles = platforms.map((p) => `${OVERRIDE_DIR}/${p}-override.json`);
 
         for (const overrideFile of overrideFiles) {
             if (!fs.existsSync(overrideFile)) continue;
 
             describe(`${path.basename(overrideFile)}`, () => {
-                const config = loadJSON(overrideFile);
-
                 it('exception domains should not contain protocol or path patterns', () => {
-                    const domains = findExceptionDomains(config);
-                    const invalid = domains.filter(d => {
-                        const domain = d.domain;
-                        return (
-                            domain.startsWith('http://') ||
-                            domain.startsWith('https://') ||
-                            domain.includes('/*') ||
-                            domain.includes('/') && !domain.includes('.')
-                        );
-                    });
+                    validateDomainFormats(loadJSON(overrideFile));
+                });
+            });
+        }
 
-                    expect(invalid).to.deep.equal(
-                        [],
-                        `Found invalid domain formats (should be domain only, no protocol/path):\n${invalid.map(d => `  ${d.path}: ${d.domain}`).join('\n')}`
-                    );
+        // Check feature files
+        const featureFiles = fs.existsSync(FEATURES_DIR) ? fs.readdirSync(FEATURES_DIR).filter((f) => f.endsWith('.json')) : [];
+
+        for (const featureFile of featureFiles) {
+            describe(`features/${featureFile}`, () => {
+                it('exception domains should not contain protocol or path patterns', () => {
+                    validateDomainFormats(loadJSON(`${FEATURES_DIR}/${featureFile}`));
                 });
             });
         }
@@ -285,7 +307,7 @@ describe('Code Review Validation Tests', () => {
     // This test validates that multiple domain conditions with different constraint types
     // (like domain + urlPattern) are intentional, since mixing may have unintended effects.
     describe('Conditional Changes Mixed Constraint Validation', () => {
-        const overrideFiles = platforms.map(p => `${OVERRIDE_DIR}/${p}-override.json`);
+        const overrideFiles = platforms.map((p) => `${OVERRIDE_DIR}/${p}-override.json`);
 
         function findMixedConstraintConditions(obj, path = '') {
             const results = [];
@@ -295,9 +317,9 @@ describe('Code Review Validation Tests', () => {
                 obj.conditionalChanges.forEach((change, index) => {
                     if (change.condition && Array.isArray(change.condition)) {
                         // Check if we have mixed constraint types (both domain and urlPattern)
-                        const hasDomain = change.condition.some(c => c.domain);
-                        const hasUrlPattern = change.condition.some(c => c.urlPattern);
-                        const hasExperiment = change.condition.some(c => c.experiment);
+                        const hasDomain = change.condition.some((c) => c.domain);
+                        const hasUrlPattern = change.condition.some((c) => c.urlPattern);
+                        const hasExperiment = change.condition.some((c) => c.experiment);
 
                         // Mixing domain with urlPattern or experiment in the same condition array
                         // could be confusing - flag for review
@@ -308,14 +330,17 @@ describe('Code Review Validation Tests', () => {
                                     hasDomain ? 'domain' : null,
                                     hasUrlPattern ? 'urlPattern' : null,
                                     hasExperiment ? 'experiment' : null,
-                                ].filter(Boolean)
+                                ].filter(Boolean),
                             });
                         }
                     }
                 });
             }
 
-            for (const [key, value] of Object.entries(obj)) {
+            for (const [
+                key,
+                value,
+            ] of Object.entries(obj)) {
                 if (key === 'conditionalChanges') continue;
                 if (typeof value === 'object' && value !== null) {
                     results.push(...findMixedConstraintConditions(value, path ? `${path}.${key}` : key));
@@ -335,7 +360,7 @@ describe('Code Review Validation Tests', () => {
 
                     expect(mixedConstraints).to.deep.equal(
                         [],
-                        `Found mixed constraint types in conditionalChanges (review for clarity):\n${mixedConstraints.map(c => `  ${c.path}: uses ${c.constraints.join(' + ')}`).join('\n')}`
+                        `Found mixed constraint types in conditionalChanges (review for clarity):\n${mixedConstraints.map((c) => `  ${c.path}: uses ${c.constraints.join(' + ')}`).join('\n')}`,
                     );
                 });
             });
@@ -369,20 +394,20 @@ describe('Code Review Validation Tests', () => {
             it('disable-default rules should have accompanying replacement rules (unless explicitly allowed)', () => {
                 const domains = elementHidingConfig?.settings?.domains || [];
                 const orphaned = findOrphanedDisableDefault(domains);
-                const unexpected = orphaned.filter(o => {
+                const unexpected = orphaned.filter((o) => {
                     const domain = Array.isArray(o.domain) ? o.domain[0] : o.domain;
                     return !allowedOrphanedDisableDefault.includes(domain);
                 });
 
                 expect(unexpected).to.deep.equal(
                     [],
-                    `Found NEW disable-default without replacement rules (leaves sites unprotected):\n${unexpected.map(o => `  domain: ${o.domain} - ${o.message}`).join('\n')}\n\nIf intentional, add to allowedOrphanedDisableDefault list with documentation.`
+                    `Found NEW disable-default without replacement rules (leaves sites unprotected):\n${unexpected.map((o) => `  domain: ${o.domain} - ${o.message}`).join('\n')}\n\nIf intentional, add to allowedOrphanedDisableDefault list with documentation.`,
                 );
             });
         }
 
         // Also check override files
-        const overrideFiles = platforms.map(p => `${OVERRIDE_DIR}/${p}-override.json`);
+        const overrideFiles = platforms.map((p) => `${OVERRIDE_DIR}/${p}-override.json`);
 
         for (const overrideFile of overrideFiles) {
             if (!fs.existsSync(overrideFile)) continue;
@@ -394,14 +419,14 @@ describe('Code Review Validation Tests', () => {
                 if (elementHiding?.settings?.domains) {
                     it('disable-default rules should have accompanying replacement rules', () => {
                         const orphaned = findOrphanedDisableDefault(elementHiding.settings.domains);
-                        const unexpected = orphaned.filter(o => {
+                        const unexpected = orphaned.filter((o) => {
                             const domain = Array.isArray(o.domain) ? o.domain[0] : o.domain;
                             return !allowedOrphanedDisableDefault.includes(domain);
                         });
 
                         expect(unexpected).to.deep.equal(
                             [],
-                            `Found disable-default without replacement rules:\n${unexpected.map(o => `  domain: ${o.domain} - ${o.message}`).join('\n')}`
+                            `Found disable-default without replacement rules:\n${unexpected.map((o) => `  domain: ${o.domain} - ${o.message}`).join('\n')}`,
                         );
                     });
                 }
@@ -417,11 +442,11 @@ describe('Code Review Validation Tests', () => {
             it('should use correct regex wildcards (.* instead of standalone *)', () => {
                 const allowlistedTrackers = trackerAllowlistConfig?.settings?.allowlistedTrackers || {};
                 const rules = findAllowlistRules(allowlistedTrackers);
-                const invalidRules = rules.filter(r => hasInvalidWildcard(r.rule));
+                const invalidRules = rules.filter((r) => hasInvalidWildcard(r.rule));
 
                 expect(invalidRules).to.deep.equal(
                     [],
-                    `Found rules with invalid wildcard (* should be .* for regex):\n${invalidRules.map(r => `  ${r.baseDomain}: ${r.rule}`).join('\n')}`
+                    `Found rules with invalid wildcard (* should be .* for regex):\n${invalidRules.map((r) => `  ${r.baseDomain}: ${r.rule}`).join('\n')}`,
                 );
             });
 
@@ -429,7 +454,10 @@ describe('Code Review Validation Tests', () => {
                 const allowlistedTrackers = trackerAllowlistConfig?.settings?.allowlistedTrackers || {};
                 const issues = [];
 
-                for (const [domain, config] of Object.entries(allowlistedTrackers)) {
+                for (const [
+                    domain,
+                    config,
+                ] of Object.entries(allowlistedTrackers)) {
                     if (!config.rules || config.rules.length < 2) continue;
 
                     for (let i = 0; i < config.rules.length - 1; i++) {
@@ -444,7 +472,8 @@ describe('Code Review Validation Tests', () => {
                         // relationship - they are sibling rules.
                         //
                         // Check if currentRule is a strict prefix of nextRule (meaning nextRule is more specific)
-                        const currentIsPrefix = nextRule.startsWith(currentRule) &&
+                        const currentIsPrefix =
+                            nextRule.startsWith(currentRule) &&
                             nextRule !== currentRule &&
                             // Ensure it's a path boundary (not substring match like "iframe" vs "iframerpc")
                             (nextRule[currentRule.length] === '/' || currentRule.endsWith('/'));
@@ -457,7 +486,7 @@ describe('Code Review Validation Tests', () => {
 
                 expect(issues).to.deep.equal(
                     [],
-                    `Found rule ordering issues (specific rules should come before generic):\n${issues.join('\n')}`
+                    `Found rule ordering issues (specific rules should come before generic):\n${issues.join('\n')}`,
                 );
             });
 
@@ -465,7 +494,10 @@ describe('Code Review Validation Tests', () => {
                 const allowlistedTrackers = trackerAllowlistConfig?.settings?.allowlistedTrackers || {};
                 const issues = [];
 
-                for (const [domain, config] of Object.entries(allowlistedTrackers)) {
+                for (const [
+                    domain,
+                    config,
+                ] of Object.entries(allowlistedTrackers)) {
                     if (!config.rules) continue;
                     for (const rule of config.rules) {
                         if ('rules' in rule && !('rule' in rule)) {
@@ -474,16 +506,13 @@ describe('Code Review Validation Tests', () => {
                     }
                 }
 
-                expect(issues).to.deep.equal(
-                    [],
-                    `Found typos in rule keys:\n${issues.join('\n')}`
-                );
+                expect(issues).to.deep.equal([], `Found typos in rule keys:\n${issues.join('\n')}`);
             });
         }
     });
 
     describe('Test Feature Flag Validation', () => {
-        const overrideFiles = platforms.map(p => `${OVERRIDE_DIR}/${p}-override.json`);
+        const overrideFiles = platforms.map((p) => `${OVERRIDE_DIR}/${p}-override.json`);
 
         for (const overrideFile of overrideFiles) {
             if (!fs.existsSync(overrideFile)) continue;
@@ -495,7 +524,10 @@ describe('Code Review Validation Tests', () => {
                     const features = config?.features || {};
                     const testFeatures = [];
 
-                    for (const [name, feature] of Object.entries(features)) {
+                    for (const [
+                        name,
+                        feature,
+                    ] of Object.entries(features)) {
                         // Check for features named exactly "test" (not allowed) that are enabled
                         if (name.toLowerCase() === 'test' && feature?.state === 'enabled') {
                             testFeatures.push(name);
@@ -504,7 +536,7 @@ describe('Code Review Validation Tests', () => {
 
                     expect(testFeatures).to.deep.equal(
                         [],
-                        `Found enabled test features (should be disabled or removed):\n${testFeatures.join('\n')}`
+                        `Found enabled test features (should be disabled or removed):\n${testFeatures.join('\n')}`,
                     );
                 });
             });
@@ -513,7 +545,7 @@ describe('Code Review Validation Tests', () => {
 
     describe('Feature State Consistency Validation', () => {
         const generatedConfigFiles = fs.existsSync(`${GENERATED_DIR}/v5`)
-            ? fs.readdirSync(`${GENERATED_DIR}/v5`).filter(f => f.endsWith('.json'))
+            ? fs.readdirSync(`${GENERATED_DIR}/v5`).filter((f) => f.endsWith('.json'))
             : [];
 
         for (const configFile of generatedConfigFiles) {
@@ -524,23 +556,23 @@ describe('Code Review Validation Tests', () => {
                     const features = config?.features || {};
                     const missingState = [];
 
-                    for (const [name, feature] of Object.entries(features)) {
+                    for (const [
+                        name,
+                        feature,
+                    ] of Object.entries(features)) {
                         if (!feature.state) {
                             missingState.push(name);
                         }
                     }
 
-                    expect(missingState).to.deep.equal(
-                        [],
-                        `Features missing state property:\n${missingState.join('\n')}`
-                    );
+                    expect(missingState).to.deep.equal([], `Features missing state property:\n${missingState.join('\n')}`);
                 });
             });
         }
     });
 
     describe('JSON Patch Actions Validation', () => {
-        const overrideFiles = platforms.map(p => `${OVERRIDE_DIR}/${p}-override.json`);
+        const overrideFiles = platforms.map((p) => `${OVERRIDE_DIR}/${p}-override.json`);
 
         function findNestedArrayActions(obj, path = '') {
             const results = [];
@@ -551,13 +583,16 @@ describe('Code Review Validation Tests', () => {
                     if (patch.value && Array.isArray(patch.value) && patch.value.some(Array.isArray)) {
                         results.push({
                             path: `${path}.patchSettings`,
-                            issue: 'Nested arrays in patch value (should be flat array)'
+                            issue: 'Nested arrays in patch value (should be flat array)',
                         });
                     }
                 }
             }
 
-            for (const [key, value] of Object.entries(obj)) {
+            for (const [
+                key,
+                value,
+            ] of Object.entries(obj)) {
                 if (typeof value === 'object' && value !== null) {
                     if (Array.isArray(value)) {
                         value.forEach((item, index) => {
@@ -582,7 +617,7 @@ describe('Code Review Validation Tests', () => {
 
                     expect(nestedArrays).to.deep.equal(
                         [],
-                        `Found nested arrays in JSON patch operations:\n${nestedArrays.map(n => `  ${n.path}: ${n.issue}`).join('\n')}`
+                        `Found nested arrays in JSON patch operations:\n${nestedArrays.map((n) => `  ${n.path}: ${n.issue}`).join('\n')}`,
                     );
                 });
             });
@@ -590,9 +625,9 @@ describe('Code Review Validation Tests', () => {
     });
 
     describe('Version Format Validation', () => {
-        const overrideFiles = platforms.map(p => `${OVERRIDE_DIR}/${p}-override.json`);
+        const overrideFiles = platforms.map((p) => `${OVERRIDE_DIR}/${p}-override.json`);
         const androidOverride = `${OVERRIDE_DIR}/android-override.json`;
-        const nonAndroidOverrides = overrideFiles.filter(f => f !== androidOverride);
+        const nonAndroidOverrides = overrideFiles.filter((f) => f !== androidOverride);
 
         // Android uses integer versions
         if (fs.existsSync(androidOverride)) {
@@ -611,7 +646,10 @@ describe('Code Review Validation Tests', () => {
                             }
                         }
 
-                        for (const [key, value] of Object.entries(obj)) {
+                        for (const [
+                            key,
+                            value,
+                        ] of Object.entries(obj)) {
                             if (typeof value === 'object' && value !== null) {
                                 checkVersions(value, path ? `${path}.${key}` : key);
                             }
@@ -643,7 +681,10 @@ describe('Code Review Validation Tests', () => {
                             }
                         }
 
-                        for (const [key, value] of Object.entries(obj)) {
+                        for (const [
+                            key,
+                            value,
+                        ] of Object.entries(obj)) {
                             if (typeof value === 'object' && value !== null) {
                                 checkVersions(value, path ? `${path}.${key}` : key);
                             }
@@ -658,7 +699,7 @@ describe('Code Review Validation Tests', () => {
     });
 
     describe('A/A Experiment Configuration Validation', () => {
-        const overrideFiles = platforms.map(p => `${OVERRIDE_DIR}/${p}-override.json`);
+        const overrideFiles = platforms.map((p) => `${OVERRIDE_DIR}/${p}-override.json`);
 
         /**
          * True A/A experiments have:
@@ -683,13 +724,16 @@ describe('Code Review Validation Tests', () => {
                             path,
                             controlUrl: obj.settings.controlUrl,
                             treatmentUrl: obj.settings.treatmentUrl,
-                            issue: 'A/A experiment should have identical control and treatment URLs'
+                            issue: 'A/A experiment should have identical control and treatment URLs',
                         });
                     }
                 }
             }
 
-            for (const [key, value] of Object.entries(obj)) {
+            for (const [
+                key,
+                value,
+            ] of Object.entries(obj)) {
                 if (typeof value === 'object' && value !== null) {
                     if (Array.isArray(value)) {
                         value.forEach((item, index) => {
@@ -714,11 +758,10 @@ describe('Code Review Validation Tests', () => {
 
                     expect(issues).to.deep.equal(
                         [],
-                        `Found A/A experiments with mismatched configurations:\n${issues.map(i => `  ${i.path}: controlUrl="${i.controlUrl}" treatmentUrl="${i.treatmentUrl}"`).join('\n')}`
+                        `Found A/A experiments with mismatched configurations:\n${issues.map((i) => `  ${i.path}: controlUrl="${i.controlUrl}" treatmentUrl="${i.treatmentUrl}"`).join('\n')}`,
                     );
                 });
             });
         }
     });
 });
-
