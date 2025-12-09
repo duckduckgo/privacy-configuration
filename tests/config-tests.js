@@ -4,7 +4,7 @@ import path from 'path';
 import { createValidator, formatErrors } from './schema-validation.js';
 import platforms from './../platforms.js';
 import { immutableJSONPatch } from 'immutable-json-patch';
-import { getBaseFeatureConfigs } from '../util.js';
+import { getBaseFeatureConfigs, readJsoncFile } from '../util.js';
 
 const platformOutput = platforms.map((item) => item.replace('browsers/', 'extension-'));
 
@@ -312,7 +312,7 @@ describe('Config schema tests', () => {
         const baseFeatures = getBaseFeatureConfigs();
         for (const platform of platforms) {
             const dirname = import.meta.dirname;
-            const overrideConfig = JSON.parse(fs.readFileSync(path.join(dirname, `/../overrides/${platform}-override.json`), 'utf-8'));
+            const overrideConfig = readJsoncFile(path.join(dirname, `/../overrides/${platform}-override.json`));
             // Skip over extension platforms:
             if (platform.startsWith('browsers/')) {
                 continue;

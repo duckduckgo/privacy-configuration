@@ -8,6 +8,7 @@ import {
     addHashToFeatures,
     stripReasons,
     getBaseFeatureConfigs,
+    readJsoncFile,
 } from './util.js';
 
 import { OVERRIDE_DIR, GENERATED_DIR, LISTS_DIR, BROWSERS_SUBDIR, CURRENT_CONFIG_VERSION, UNPROTECTED_LIST_NAME } from './constants.js';
@@ -108,7 +109,7 @@ function addExceptionsToUnprotected(exceptions) {
     return exceptions.map((obj) => obj.domain);
 }
 
-const listData = JSON.parse(fs.readFileSync(`${LISTS_DIR}/${UNPROTECTED_LIST_NAME}`));
+const listData = readJsoncFile(`${LISTS_DIR}/${UNPROTECTED_LIST_NAME}`);
 addExceptionsToUnprotected(listData.exceptions);
 addExceptionsToUnprotected(defaultConfig.features.contentBlocking.exceptions);
 
@@ -237,7 +238,7 @@ async function buildPlatforms() {
         }
 
         // Handle feature overrides
-        const platformOverride = JSON.parse(fs.readFileSync(overridePath)); // throws error on missing platform file
+        const platformOverride = readJsoncFile(overridePath); // throws error on missing platform file
         for (const key of Object.keys(platformConfig.features)) {
             if (platformOverride.features[key]) {
                 // Override existing keys
