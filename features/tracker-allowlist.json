@@ -389,29 +389,35 @@
             "alicdn.com": {
                 "rules": [
                     {
-                        "rule": "alicdn.com",
-                        "domains": [
-                            "aliexpress.us"
-                        ],
-                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/460"
-                    },
-                    {
                         "rule": "alicdn.com/g/qwenweb/qwen-webui-fe/",
                         "domains": [
                             "qwenlm.ai",
-                            "qwen.ai"
+                            "qwen.ai",
+                            "aliexpress.us"
                         ],
                         "reason": [
                             "qwenlm.ai - https://github.com/duckduckgo/privacy-configuration/pull/2700",
-                            "qwen.ai - https://github.com/duckduckgo/privacy-configuration/pull/2809"
+                            "qwen.ai - https://github.com/duckduckgo/privacy-configuration/pull/2809",
+                            "aliexpress.us - https://github.com/duckduckgo/privacy-configuration/issues/460"
                         ]
                     },
                     {
                         "rule": "o.alicdn.com/frontend-lib/common-lib/jquery.min.js",
                         "domains": [
-                            "chat.qwen.ai"
+                            "chat.qwen.ai",
+                            "aliexpress.us"
                         ],
-                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3243"
+                        "reason": [
+                            "chat.qwen.ai - https://github.com/duckduckgo/privacy-configuration/pull/3243",
+                            "aliexpress.us - https://github.com/duckduckgo/privacy-configuration/issues/460"
+                        ]
+                    },
+                    {
+                        "rule": "alicdn.com",
+                        "domains": [
+                            "aliexpress.us"
+                        ],
+                        "reason": "aliexpress.us - https://github.com/duckduckgo/privacy-configuration/issues/460"
                     }
                 ]
             },
@@ -1249,17 +1255,29 @@
                         "rule": "doubleclick.net/ondemand/hls/content/",
                         "domains": [
                             "history.com",
-                            "10play.com.au"
+                            "10play.com.au",
+                            "rocketnews24.com",
+                            "wunderground.com"
                         ],
-                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1185"
+                        "reason": [
+                            "history.com, 10play.com.au - https://github.com/duckduckgo/privacy-configuration/issues/1185",
+                            "rocketnews24.com - https://github.com/duckduckgo/privacy-configuration/issues/846",
+                            "wunderground.com - https://github.com/duckduckgo/privacy-configuration/pull/3096"
+                        ]
                     },
                     {
                         "rule": "doubleclick.net/ondemand/dash/content/",
                         "domains": [
                             "cbs.com",
-                            "paramountplus.com"
+                            "paramountplus.com",
+                            "rocketnews24.com",
+                            "wunderground.com"
                         ],
-                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2410"
+                        "reason": [
+                            "cbs.com, paramountplus.com - https://github.com/duckduckgo/privacy-configuration/pull/2410",
+                            "rocketnews24.com - https://github.com/duckduckgo/privacy-configuration/issues/846",
+                            "wunderground.com - https://github.com/duckduckgo/privacy-configuration/pull/3096"
+                        ]
                     },
                     {
                         "rule": "securepubads.g.doubleclick.net/gampad/ads",
@@ -1288,44 +1306,58 @@
                             "rocketnews24.com",
                             "crunchyroll.com",
                             "pch.com",
-                            "iheart.com"
+                            "iheart.com",
+                            "wunderground.com"
                         ],
                         "reason": [
                             "https://github.com/duckduckgo/privacy-configuration/issues/1185",
                             "rocketnews24.com - https://github.com/duckduckgo/privacy-configuration/issues/846",
                             "crunchyroll.com - https://github.com/duckduckgo/privacy-configuration/issues/1140",
                             "pch.com - https://github.com/duckduckgo/privacy-configuration/pull/2793",
-                            "iheart.com - https://github.com/duckduckgo/privacy-configuration/pull/3040"
+                            "iheart.com - https://github.com/duckduckgo/privacy-configuration/pull/3040",
+                            "wunderground.com - https://github.com/duckduckgo/privacy-configuration/pull/3096"
                         ]
                     },
                     {
                         "rule": "pubads.g.doubleclick.net/ondemand/hls/content",
                         "domains": [
                             "cc.com",
-                            "paramountplus.com"
+                            "paramountplus.com",
+                            "rocketnews24.com",
+                            "wunderground.com"
                         ],
                         "reason": [
                             "cc.com - https://github.com/duckduckgo/privacy-configuration/pull/3508",
-                            "paramount - https://github.com/duckduckgo/privacy-configuration/pull/3534"
+                            "paramount - https://github.com/duckduckgo/privacy-configuration/pull/3534",
+                            "rocketnews24.com - https://github.com/duckduckgo/privacy-configuration/issues/846",
+                            "wunderground.com - https://github.com/duckduckgo/privacy-configuration/pull/3096"
                         ]
                     },
                     {
                         "rule": "pubads.g.doubleclick.net/ssai/event/",
                         "domains": [
                             "cbssports.com",
-                            "rocketnews24.com"
+                            "rocketnews24.com",
+                            "wunderground.com"
                         ],
                         "reason": [
                             "cbssports.com - Live videos do not load or render.",
-                            "rocketnews24.com - https://github.com/duckduckgo/privacy-configuration/issues/846"
+                            "rocketnews24.com - https://github.com/duckduckgo/privacy-configuration/issues/846",
+                            "wunderground.com - https://github.com/duckduckgo/privacy-configuration/pull/3096"
                         ]
                     },
                     {
                         "rule": "pubads.g.doubleclick.net/ssai/pods/",
                         "domains": [
-                            "foxweather.com"
+                            "foxweather.com",
+                            "rocketnews24.com",
+                            "wunderground.com"
                         ],
-                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1541"
+                        "reason": [
+                            "foxweather.com - https://github.com/duckduckgo/privacy-configuration/issues/1541",
+                            "rocketnews24.com - https://github.com/duckduckgo/privacy-configuration/issues/846",
+                            "wunderground.com - https://github.com/duckduckgo/privacy-configuration/pull/3096"
+                        ]
                     },
                     {
                         "rule": "securepubads.g.doubleclick.net/tag/js/gpt.js",
@@ -1543,10 +1575,14 @@
                     {
                         "rule": "securepubads.g.doubleclick.net/pagead/ima_ppub_config",
                         "domains": [
-                            "sbs.com.au"
+                            "sbs.com.au",
+                            "rocketnews24.com",
+                            "wunderground.com"
                         ],
                         "reason": [
-                            "sbs.com.au - https://github.com/duckduckgo/privacy-configuration/pull/2436"
+                            "sbs.com.au - https://github.com/duckduckgo/privacy-configuration/pull/2436",
+                            "rocketnews24.com - https://github.com/duckduckgo/privacy-configuration/issues/846",
+                            "wunderground.com - https://github.com/duckduckgo/privacy-configuration/pull/3096"
                         ]
                     },
                     {
@@ -1560,7 +1596,8 @@
                             "wunderground.com",
                             "stuff.co.nz",
                             "nationalpost.com",
-                            "modernhoney.com"
+                            "modernhoney.com",
+                            "rocketnews24.com"
                         ],
                         "reason": [
                             "applesfera.com - https://github.com/duckduckgo/privacy-configuration/issues/1723",
@@ -1571,16 +1608,34 @@
                             "wunderground.com - https://github.com/duckduckgo/privacy-configuration/pull/2885",
                             "stuff.co.nz - https://github.com/duckduckgo/privacy-configuration/issues/1740",
                             "nationalpost.com - https://github.com/duckduckgo/privacy-configuration/pull/3969",
-                            "modernhoney.com - https://github.com/duckduckgo/privacy-configuration/pull/4111"
+                            "modernhoney.com - https://github.com/duckduckgo/privacy-configuration/pull/4111",
+                            "rocketnews24.com - https://github.com/duckduckgo/privacy-configuration/issues/846"
                         ]
                     },
                     {
                         "rule": "doubleclick.net/pixel",
                         "domains": [
-                            "sbs.com.au"
+                            "sbs.com.au",
+                            "rocketnews24.com",
+                            "wunderground.com"
                         ],
                         "reason": [
-                            "www.sbs.com.au - https://github.com/duckduckgo/privacy-configuration/issues/1761"
+                            "www.sbs.com.au - https://github.com/duckduckgo/privacy-configuration/issues/1761",
+                            "rocketnews24.com - https://github.com/duckduckgo/privacy-configuration/issues/846",
+                            "wunderground.com - https://github.com/duckduckgo/privacy-configuration/pull/3096"
+                        ]
+                    },
+                    {
+                        "rule": "googleads.g.doubleclick.net/ads/preferences/naioptout",
+                        "domains": [
+                            "zojirushi.com",
+                            "rocketnews24.com",
+                            "wunderground.com"
+                        ],
+                        "reason": [
+                            "zojirushi.com - https://github.com/duckduckgo/privacy-configuration/issues/2021",
+                            "rocketnews24.com - https://github.com/duckduckgo/privacy-configuration/issues/846",
+                            "wunderground.com - https://github.com/duckduckgo/privacy-configuration/pull/3096"
                         ]
                     },
                     {
@@ -1593,13 +1648,6 @@
                             "rocketnews24.com - https://github.com/duckduckgo/privacy-configuration/issues/846",
                             "wunderground.com - https://github.com/duckduckgo/privacy-configuration/pull/3096"
                         ]
-                    },
-                    {
-                        "rule": "googleads.g.doubleclick.net/ads/preferences/naioptout",
-                        "domains": [
-                            "zojirushi.com"
-                        ],
-                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/2021"
                     }
                 ]
             },
@@ -1746,13 +1794,6 @@
             },
             "ezodn.com": {
                 "rules": [
-                    {
-                        "rule": "ezodn.com",
-                        "domains": [
-                            "reisezoom.com"
-                        ],
-                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1775"
-                    },
                     {
                         "rule": "ezodn.com/cmp",
                         "domains": [
@@ -2486,20 +2527,26 @@
                         "domains": [
                             "budgetbytes.com",
                             "foodfornet.com",
-                            "homesteadingfamily.com"
+                            "homesteadingfamily.com",
+                            "grilledcheesesocial.com"
                         ],
                         "reason": [
                             "budgetbytes.com - https://github.com/duckduckgo/privacy-configuration/issues/2039",
                             "foodfornet.com - https://github.com/duckduckgo/privacy-configuration/issues/2065",
-                            "homesteadingfamily.com - https://github.com/duckduckgo/privacy-configuration/pulls/2103"
+                            "homesteadingfamily.com - https://github.com/duckduckgo/privacy-configuration/pulls/2103",
+                            "grilledcheesesocial.com - https://github.com/duckduckgo/privacy-configuration/issues/2107"
                         ]
                     },
                     {
                         "rule": "api.grow.me",
                         "domains": [
-                            "foodfornet.com"
+                            "foodfornet.com",
+                            "grilledcheesesocial.com"
                         ],
-                        "reason": "foodfornet.com - https://github.com/duckduckgo/privacy-configuration/issues/2065"
+                        "reason": [
+                            "foodfornet.com - https://github.com/duckduckgo/privacy-configuration/issues/2065",
+                            "grilledcheesesocial.com - https://github.com/duckduckgo/privacy-configuration/issues/2107"
+                        ]
                     },
                     {
                         "rule": "grow.me",
@@ -2760,18 +2807,22 @@
             "kampyle.com": {
                 "rules": [
                     {
+                        "rule": "nebula-cdn.kampyle.com/wu/392339/onsite/embed.js",
+                        "domains": [
+                            "lowes.com",
+                            "basspro.com"
+                        ],
+                        "reason": [
+                            "lowes.com - https://github.com/duckduckgo/privacy-configuration/issues/1453",
+                            "basspro.com - https://github.com/duckduckgo/privacy-configuration/issues/783"
+                        ]
+                    },
+                    {
                         "rule": "kampyle.com",
                         "domains": [
                             "basspro.com"
                         ],
-                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/783"
-                    },
-                    {
-                        "rule": "nebula-cdn.kampyle.com/wu/392339/onsite/embed.js",
-                        "domains": [
-                            "lowes.com"
-                        ],
-                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1453"
+                        "reason": "basspro.com - https://github.com/duckduckgo/privacy-configuration/issues/783"
                     }
                 ]
             },
@@ -2886,21 +2937,23 @@
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/457"
                     },
                     {
+                        "rule": "oc.listrakbi.com/subscribestatus",
+                        "domains": [
+                            "ninjakitchen.com",
+                            "fsastore.com"
+                        ],
+                        "reason": [
+                            "ninjakitchen.com - https://github.com/duckduckgo/privacy-configuration/pull/3728",
+                            "fsastore.com - https://github.com/duckduckgo/privacy-configuration/issues/2114"
+                        ]
+                    },
+                    {
                         "rule": "listrakbi.com",
                         "domains": [
                             "fsastore.com"
                         ],
                         "reason": [
                             "fsastore.com - https://github.com/duckduckgo/privacy-configuration/issues/2114"
-                        ]
-                    },
-                    {
-                        "rule": "oc.listrakbi.com/subscribestatus",
-                        "domains": [
-                            "ninjakitchen.com"
-                        ],
-                        "reason": [
-                            "ninjakitchen.com - https://github.com/duckduckgo/privacy-configuration/pull/3728"
                         ]
                     }
                 ]
@@ -3074,21 +3127,23 @@
             "monetate.net": {
                 "rules": [
                     {
+                        "rule": "monetate.net/img",
+                        "domains": [
+                            "guitarcenter.com",
+                            "qvc.com"
+                        ],
+                        "reason": [
+                            "guitarcenter.com - https://github.com/duckduckgo/privacy-configuration/pull/2691",
+                            "qvc.com - https://github.com/duckduckgo/privacy-configuration/issues/2109"
+                        ]
+                    },
+                    {
                         "rule": "monetate.net",
                         "domains": [
                             "qvc.com"
                         ],
                         "reason": [
                             "qvc.com - https://github.com/duckduckgo/privacy-configuration/issues/2109"
-                        ]
-                    },
-                    {
-                        "rule": "monetate.net/img",
-                        "domains": [
-                            "guitarcenter.com"
-                        ],
-                        "reason": [
-                            "guitarcenter.com - https://github.com/duckduckgo/privacy-configuration/pull/2691"
                         ]
                     }
                 ]
@@ -3219,37 +3274,53 @@
                     {
                         "rule": "bankofamerica.tt.omtrdc.net/m2/bankofamerica/mbox/json",
                         "domains": [
-                            "bankofamerica.com"
+                            "bankofamerica.com",
+                            "pizzahut.com"
                         ],
-                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/798"
+                        "reason": [
+                            "https://github.com/duckduckgo/privacy-configuration/issues/798",
+                            "pizzahut.com - https://github.com/duckduckgo/privacy-configuration/issues/805"
+                        ]
                     },
                     {
                         "rule": "cigna.sc.omtrdc.net/public/digital-experience/js/common.js",
                         "domains": [
-                            "cigna.com"
+                            "cigna.com",
+                            "pizzahut.com"
                         ],
-                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/820"
+                        "reason": [
+                            "https://github.com/duckduckgo/privacy-configuration/issues/820",
+                            "pizzahut.com - https://github.com/duckduckgo/privacy-configuration/issues/805"
+                        ]
                     },
                     {
                         "rule": "altriagroupinc.tt.omtrdc.net/rest/v1/delivery",
                         "domains": [
-                            "marlboro.com"
+                            "marlboro.com",
+                            "pizzahut.com"
                         ],
-                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/2057"
+                        "reason": [
+                            "https://github.com/duckduckgo/privacy-configuration/issues/2057",
+                            "pizzahut.com - https://github.com/duckduckgo/privacy-configuration/issues/805"
+                        ]
+                    },
+                    {
+                        "rule": "whirlpool.tt.omtrdc.net/rest/v1/delivery",
+                        "domains": [
+                            "kitchenaid.com",
+                            "pizzahut.com"
+                        ],
+                        "reason": [
+                            "https://github.com/duckduckgo/privacy-configuration/issues/2070",
+                            "pizzahut.com - https://github.com/duckduckgo/privacy-configuration/issues/805"
+                        ]
                     },
                     {
                         "rule": "omtrdc.net",
                         "domains": [
                             "pizzahut.com"
                         ],
-                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/805"
-                    },
-                    {
-                        "rule": "whirlpool.tt.omtrdc.net/rest/v1/delivery",
-                        "domains": [
-                            "kitchenaid.com"
-                        ],
-                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/2070"
+                        "reason": "pizzahut.com - https://github.com/duckduckgo/privacy-configuration/issues/805"
                     }
                 ]
             },
@@ -3374,11 +3445,11 @@
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/916"
                     },
                     {
-                        "rule": "cdn.optimizely.com",
+                        "rule": "cdn.optimizely.com/js/28562140225.js",
                         "domains": [
-                            "rushordertees.com"
+                            "shipsticks.com"
                         ],
-                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2701"
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4152"
                     }
                 ]
             },
@@ -3972,7 +4043,7 @@
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1107"
                     },
                     {
-                        "rule": "server.shop.app",
+                        "rule": "shop.app",
                         "domains": [
                             "laurageller.com"
                         ],
@@ -4273,9 +4344,13 @@
                         "rule": "tags.tiqcdn.com/utag/cbsi/",
                         "domains": [
                             "paramountplus.com",
-                            "cbs.com"
+                            "cbs.com",
+                            "bankofamerica.com"
                         ],
-                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2435"
+                        "reason": [
+                            "paramountplus.com, cbs.com - https://github.com/duckduckgo/privacy-configuration/pull/2435",
+                            "bankofamerica.com - https://github.com/duckduckgo/privacy-configuration/pull/4034"
+                        ]
                     },
                     {
                         "rule": "tags.tiqcdn.com",

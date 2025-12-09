@@ -1,5 +1,130 @@
 {
     "features": {
+        "attributedMetrics": {
+            "state": "internal",
+            "minSupportedVersion": "1.168.0",
+            "exceptions": [],
+            "features": {
+                "emitAllMetrics": {
+                    "state": "internal"
+                },
+                "retention": {
+                    "state": "internal"
+                },
+                "canEmitRetention": {
+                    "state": "internal"
+                },
+                "searchDaysAvg": {
+                    "state": "internal"
+                },
+                "canEmitSearchDaysAvg": {
+                    "state": "internal"
+                },
+                "searchCountAvg": {
+                    "state": "internal"
+                },
+                "canEmitSearchCountAvg": {
+                    "state": "internal"
+                },
+                "adClickCountAvg": {
+                    "state": "internal"
+                },
+                "canEmitAdClickCountAvg": {
+                    "state": "internal"
+                },
+                "aiUsageAvg": {
+                    "state": "internal"
+                },
+                "canEmitAIUsageAvg": {
+                    "state": "internal"
+                },
+                "subscriptionRetention": {
+                    "state": "internal"
+                },
+                "canEmitSubscriptionRetention": {
+                    "state": "internal"
+                },
+                "syncDevices": {
+                    "state": "internal"
+                },
+                "canEmitSyncDevices": {
+                    "state": "internal"
+                },
+                "sendOriginParam": {
+                    "state": "internal",
+                    "settings": {
+                        "originCampaignSubstrings": [
+                            "paid"
+                        ]
+                    }
+                }
+            },
+            "settings": {
+                "attributed_metric_retention_week": {
+                    "buckets": [
+                        1,
+                        2,
+                        3
+                    ],
+                    "version": 1
+                },
+                "attributed_metric_retention_month": {
+                    "buckets": [
+                        2,
+                        3,
+                        4,
+                        5
+                    ],
+                    "version": 1
+                },
+                "attributed_metric_active_past_week": {
+                    "buckets": [
+                        2,
+                        4
+                    ],
+                    "version": 1
+                },
+                "attributed_metric_average_searches_past_week_first_month": {
+                    "buckets": [
+                        5,
+                        9
+                    ],
+                    "version": 1
+                },
+                "attributed_metric_average_searches_past_week": {
+                    "buckets": [
+                        5,
+                        9
+                    ],
+                    "version": 1
+                },
+                "attributed_metric_average_ad_clicks_past_week": {
+                    "buckets": [
+                        2,
+                        5
+                    ],
+                    "version": 1
+                },
+                "attributed_metric_average_duck_ai_usage_past_week": {
+                    "buckets": [
+                        5,
+                        9
+                    ],
+                    "version": 1
+                },
+                "attributed_metric_subscribed": {
+                    "buckets": [
+                        0,
+                        1
+                    ],
+                    "version": 1
+                },
+                "attributed_metric_synced_device": {
+                    "buckets": [1],
+                    "version": 1
+                }
+            }
+        },
         "experimentalTheming": {
             "state": "enabled",
             "exceptions": [],
@@ -94,6 +219,27 @@
                             },
                             {
                                 "percent": 100
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "webNotificationsFixExperiment": {
+                    "state": "enabled",
+                    "minSupportedVersion": "1.168.0",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
                             }
                         ]
                     },
@@ -378,7 +524,7 @@
                     ]
                 },
                 "tdsNextExperiment005": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "rollout": {
                         "steps": [
                             {
@@ -565,6 +711,23 @@
                             {
                                 "op": "replace",
                                 "path": "/messageHandlers/state",
+                                "value": "enabled"
+                            }
+                        ]
+                    }
+                ],
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "experiment": {
+                                "experimentName": "webNotificationsFixExperiment",
+                                "cohort": "treatment"
+                            }
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/webNotifications",
                                 "value": "enabled"
                             }
                         ]
@@ -966,6 +1129,9 @@
                 },
                 "newTabPageTabIDs": {
                     "state": "enabled"
+                },
+                "autoconsentStats": {
+                    "state": "internal"
                 }
             }
         },
@@ -1751,7 +1917,8 @@
                     "state": "enabled"
                 },
                 "hangReporting": {
-                    "state": "disabled"
+                    "state": "enabled",
+                    "minSupportedVersion": "1.166.0"
                 },
                 "unifiedURLPredictor": {
                     "state": "enabled",
@@ -1826,10 +1993,44 @@
             }
         },
         "popupBlocking": {
-            "state": "internal",
+            "state": "enabled",
+            "minSupportedVersion": "1.168.0",
             "exceptions": [],
             "settings": {
-                "userInitiatedPopupThreshold": 6.0
+                "userInitiatedPopupThreshold": 6.0,
+                "allowlist": [
+                    "duckduckgo.com",
+                    "amazon.com",
+                    "becu.org",
+                    "capitalone.com",
+                    "chase.com",
+                    "github.com",
+                    "google.com",
+                    "googleusercontent.com",
+                    "guitarcenter.com",
+                    "live.com",
+                    "microsoftonline.com",
+                    "msn.com",
+                    "office.com",
+                    "pnc.com",
+                    "reddit.com",
+                    "techtitute.com",
+                    "ups.com",
+                    "userinterviews.com",
+                    "zoom.com",
+                    "zoom.us",
+                    "zoomgov.com"
+                ]
+            }
+        },
+        "dataImport": {
+            "state": "enabled",
+            "exceptions": [],
+            "features": {
+                "newDataImportExperience": {
+                    "state": "enabled",
+                    "minSupportedVersion": "1.169.0"
+                }
             }
         }
     },

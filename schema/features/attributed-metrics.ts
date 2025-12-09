@@ -50,4 +50,8 @@ type SubFeatures<VersionType> = {
     >;
 };
 
-export type AttributedMetricsFeature = Feature<AttributedMetricsSettings, string, SubFeatures<string> & Record<string, SubFeature<string>>>;
+export type AttributedMetricsFeature<VersionType> = Feature<
+    AttributedMetricsSettings,
+    VersionType,
+    SubFeatures<VersionType> & Record<string, SubFeature<VersionType>>
+>;

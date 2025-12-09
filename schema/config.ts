@@ -24,6 +24,7 @@ import { Taskbar } from './features/taskbar';
 import { AppHealth } from './features/appHealth';
 import { ElementHidingFeature } from './features/element-hiding';
 import { RequestBlocklistFeature } from './features/request-blocklist';
+import { UrlPredictorFeature } from './features/url-predictor';
 
 export { WebCompatSettings } from './features/webcompat';
 export { DuckPlayerSettings } from './features/duckplayer';
@@ -49,7 +50,7 @@ export type ConfigV5<VersionType> = {
         aiChat?: AiChatConfig<VersionType>;
         apiManipulation?: APIManipulationFeature<VersionType>;
         appHealth?: AppHealth<VersionType>;
-        attributedMetrics?: AttributedMetricsFeature;
+        attributedMetrics?: AttributedMetricsFeature<VersionType>;
         autoconsent?: AutoconsentFeature<VersionType>;
         autofill?: AutofillFeature<VersionType>;
         burn?: BurnFeature<VersionType>;
@@ -72,6 +73,7 @@ export type ConfigV5<VersionType> = {
         customUserAgent?: CustomUserAgentFeature<VersionType>;
         elementHiding?: ElementHidingFeature<VersionType>;
         requestBlocklist?: RequestBlocklistFeature<VersionType>;
+        urlPredictor?: UrlPredictorFeature<VersionType>;
     };
     unprotectedTemporary: SiteException[];
 };
