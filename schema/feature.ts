@@ -65,6 +65,7 @@ type ConditionBlock = {
     minSupportedVersion?: number;
     maxSupportedVersion?: number;
     internal?: boolean;
+    preview?: boolean;
     context?: {
         top?: boolean;
         frame?: boolean;
@@ -79,7 +80,7 @@ type CSSInjectFeatureSettingsPatches = {
         patchSettings: Operation<JSONValidValueType>[];
     }[];
     conditionalChanges?: {
-        condition: ConditionBlock | ConditionBlock[];
+        condition: ConditionBlock | Array<ConditionBlock>;
         patchSettings: Operation<JSONValidValueType>[];
     }[];
 };
