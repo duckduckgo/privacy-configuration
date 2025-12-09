@@ -47,7 +47,7 @@
             "state": "enabled",
             "features": {
                 "atpTdsExperiment002": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": 52550000,
                     "rollout": {
                         "steps": [
@@ -74,56 +74,57 @@
             }
         },
         "attributedMetrics": {
-            "state": "internal",
+            "state": "enabled",
+            "minSupportedVersion": 52580000,
             "exceptions": [],
             "features": {
                 "emitAllMetrics": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "retention": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "canEmitRetention": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "searchDaysAvg": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "canEmitSearchDaysAvg": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "searchCountAvg": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "canEmitSearchCountAvg": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "adClickCountAvg": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "canEmitAdClickCountAvg": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "aiUsageAvg": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "canEmitAIUsageAvg": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "subscriptionRetention": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "canEmitSubscriptionRetention": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "syncDevices": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "canEmitSyncDevices": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "sendOriginParam": {
-                    "state": "internal",
+                    "state": "enabled",
                     "settings": {
                         "originCampaignSubstrings": [
                             "paid"
@@ -227,7 +228,7 @@
                     ]
                 },
                 "tdsNextExperiment005": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": 52361000,
                     "rollout": {
                         "steps": [
@@ -511,7 +512,7 @@
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/326"
                 },
                 {
-                    "domain": "https://www.sudouest.fr",
+                    "domain": "sudouest.fr",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2790"
                 },
                 {
@@ -1450,6 +1451,24 @@
                             }
                         ]
                     }
+                },
+                "handleAboutBlank": {
+                    "state": "disabled",
+                    "minSupportedVersion": 52590000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 20
+                            }
+                        ]
+                    }
+                },
+                "newCustomTab": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52590000
                 }
             }
         },
@@ -2037,6 +2056,21 @@
                     },
                     {
                         "packageName": "com.openai.chatgpt"
+                    },
+                    {
+                        "packageName": "com.TWCableTV"
+                    },
+                    {
+                        "packageName": "com.amazon.storm.lightning.client.aosp"
+                    },
+                    {
+                        "packageName": "com.infrasoft.uboi"
+                    },
+                    {
+                        "packageName": "com.cbq.CBMobile"
+                    },
+                    {
+                        "packageName": "com.samsung.android.oneconnect"
                     }
                 ]
             },
@@ -2103,17 +2137,6 @@
                             }
                         ]
                     },
-                    "omtrdc.net": {
-                        "rules": [
-                            {
-                                "rule": "tracfonewireless.tt.omtrdc.net",
-                                "domains": [
-                                    "tracfone.com"
-                                ],
-                                "reason": "tracfone.com - https://github.com/duckduckgo/privacy-configuration/pull/4032"
-                            }
-                        ]
-                    },
                     "doubleclick.net": {
                         "rules": [
                             {
@@ -2129,6 +2152,28 @@
                                     "tractorhouse.com"
                                 ],
                                 "reason": "tractorhouse.com - https://github.com/duckduckgo/privacy-configuration/pull/4065"
+                            }
+                        ]
+                    },
+                    "omtrdc.net": {
+                        "rules": [
+                            {
+                                "rule": "tracfonewireless.tt.omtrdc.net",
+                                "domains": [
+                                    "tracfone.com"
+                                ],
+                                "reason": "tracfone.com - https://github.com/duckduckgo/privacy-configuration/pull/4032"
+                            }
+                        ]
+                    },
+                    "posthog.com": {
+                        "rules": [
+                            {
+                                "rule": "eu.i.posthog.com",
+                                "domains": [
+                                    "sciensus.com"
+                                ],
+                                "reason": "sciensus.com - https://github.com/duckduckgo/privacy-configuration/pull/4210"
                             }
                         ]
                     },
@@ -2263,30 +2308,6 @@
                                     "key": "keyToBeDeleted",
                                     "action": "delete"
                                 }
-                            }
-                        ]
-                    },
-                    {
-                        "condition": {
-                            "domain": "realtor.com"
-                        },
-                        "patchSettings": [
-                            {
-                                "op": "replace",
-                                "path": "/notification/state",
-                                "value": "disabled"
-                            }
-                        ]
-                    },
-                    {
-                        "condition": {
-                            "domain": "chewy.com"
-                        },
-                        "patchSettings": [
-                            {
-                                "op": "replace",
-                                "path": "/notification/state",
-                                "value": "disabled"
                             }
                         ]
                     }
@@ -2910,6 +2931,18 @@
                 },
                 "subscriptionAIFeaturesRebranding": {
                     "state": "enabled"
+                },
+                "blackFridayOffer2025": {
+                    "state": "disabled",
+                    "targets": [
+                        {
+                            "localeCountry": "us"
+                        }
+                    ]
+                },
+                "supportsSwitchSubscription": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52591000
                 }
             }
         },
@@ -3401,7 +3434,7 @@
             }
         },
         "webViewCompat": {
-            "state": "enabled",
+            "state": "disabled",
             "exceptions": [],
             "settings": {
                 "jsInitialPingDelay": 0,
@@ -3411,28 +3444,28 @@
             "minSupportedVersion": 52580000,
             "features": {
                 "jsSendsInitialPing": {
-                    "state": "enabled"
+                    "state": "disabled"
                 },
                 "jsRepliesToNativeMessages": {
-                    "state": "enabled"
+                    "state": "disabled"
                 },
                 "replyToInitialPing": {
-                    "state": "enabled"
+                    "state": "disabled"
                 },
                 "useBlobDownloadsMessageListener": {
-                    "state": "enabled"
+                    "state": "disabled"
                 },
                 "sendMessageOnContexMenuOpened": {
-                    "state": "enabled"
+                    "state": "disabled"
                 },
                 "sendMessageOnPageStarted": {
                     "state": "disabled"
                 },
                 "sendMessagesUsingReplyProxy": {
-                    "state": "enabled"
+                    "state": "disabled"
                 },
                 "useComplexScript": {
-                    "state": "enabled"
+                    "state": "disabled"
                 },
                 "useLargeScript": {
                     "state": "disabled"

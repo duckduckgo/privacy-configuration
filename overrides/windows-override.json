@@ -1296,8 +1296,8 @@
                     "state": "disabled"
                 },
                 "freemium": {
-                    "state": "disabled",
-                    "minSupportedVersion": "0.137.3",
+                    "state": "preview",
+                    "minSupportedVersion": "0.140.1",
                     "targets": [
                         {
                             "localeCountry": "US"
@@ -1714,6 +1714,10 @@
                 {
                     "domain": "ashleyfurniture.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3908"
+                },
+                {
+                    "domain": "ynab.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4196"
                 }
             ]
         },
@@ -1791,7 +1795,7 @@
                     "settings": {
                         "chrome": "enabled",
                         "brave": "enabled",
-                        "edge": "disabled",
+                        "edge": "enabled",
                         "vivaldi": "disabled"
                     }
                 },
@@ -1800,7 +1804,7 @@
                     "settings": {
                         "chrome": "enabled",
                         "brave": "enabled",
-                        "edge": "disabled",
+                        "edge": "enabled",
                         "vivaldi": "disabled",
                         "chromium": "enabled"
                     }
@@ -2794,6 +2798,9 @@
                 },
                 "serviceWorkerWatchdog": {
                     "state": "enabled"
+                },
+                "serviceWorkerWatchdogUnregister": {
+                    "state": "preview"
                 }
             },
             "exceptions": []
@@ -2832,6 +2839,9 @@
                     "state": "disabled"
                 },
                 "newTabPageTabIDs": {
+                    "state": "disabled"
+                },
+                "autoconsentStats": {
                     "state": "disabled"
                 }
             },
@@ -2884,7 +2894,8 @@
                     "state": "enabled"
                 },
                 "fireproofSettingsVisibility": {
-                    "state": "disabled"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.142.0"
                 }
             }
         },
@@ -2930,10 +2941,12 @@
                     "minSupportedVersion": "0.131.0"
                 },
                 "downloadIndicatorEnhancements": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.142.0"
                 },
                 "downloadNotificationPanel": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.142.0"
                 }
             }
         },
@@ -3190,6 +3203,35 @@
                     "state": "internal"
                 }
             }
+        },
+        "urlPredictor": {
+            "state": "internal",
+            "settings": {
+                "allowedSchemes": [
+                    "http",
+                    "https",
+                    "file",
+                    "mailto",
+                    "chrome",
+                    "duck"
+                ]
+            }
+        },
+        "settingsPage": {
+            "state": "enabled",
+            "features": {
+                "uninstallButton": {
+                    "state": "enabled"
+                }
+            }
+        },
+        "combinedPermissionView": {
+            "state": "disabled",
+            "exceptions": []
+        },
+        "unsetAsDefaultMonitor": {
+            "state": "enabled",
+            "exceptions": []
         }
     },
     "unprotectedTemporary": []
