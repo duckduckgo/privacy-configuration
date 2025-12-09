@@ -24,6 +24,7 @@ import { Taskbar } from './features/taskbar';
 import { AppHealth } from './features/appHealth';
 import { ElementHidingFeature } from './features/element-hiding';
 import { RequestBlocklistFeature } from './features/request-blocklist';
+import { UaChBrandsFeature } from './features/ua-ch-brands';
 
 export { WebCompatSettings } from './features/webcompat';
 export { DuckPlayerSettings } from './features/duckplayer';
@@ -72,6 +73,7 @@ export type ConfigV5<VersionType> = {
         customUserAgent?: CustomUserAgentFeature<VersionType>;
         elementHiding?: ElementHidingFeature<VersionType>;
         requestBlocklist?: RequestBlocklistFeature<VersionType>;
+        uaChBrands?: UaChBrandsFeature<VersionType>;
     };
     unprotectedTemporary: SiteException[];
 };
