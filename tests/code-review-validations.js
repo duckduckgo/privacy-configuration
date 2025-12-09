@@ -472,21 +472,18 @@ describe('Code Review Validation Tests', () => {
     describe('Test Feature Flag Validation', () => {
         const overrideFiles = platforms.map(p => `${OVERRIDE_DIR}/${p}-override.json`);
 
-        // List of known test features that are intentionally in configs
-        const allowedTestFeatures = ['experimentTest'];
-
         for (const overrideFile of overrideFiles) {
             if (!fs.existsSync(overrideFile)) continue;
 
             describe(`${path.basename(overrideFile)}`, () => {
                 const config = loadJSON(overrideFile);
 
-                it('should not have unexpected test features enabled in production', () => {
+                it('should not have a "test" feature enabled in production', () => {
                     const features = config?.features || {};
                     const testFeatures = [];
 
                     for (const [name, feature] of Object.entries(features)) {
-                        // Check for features named "test" (not allowed) that are enabled
+                        // Check for features named exactly "test" (not allowed) that are enabled
                         if (name.toLowerCase() === 'test' && feature?.state === 'enabled') {
                             testFeatures.push(name);
                         }
