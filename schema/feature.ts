@@ -80,7 +80,7 @@ type CSSInjectFeatureSettingsPatches = {
         patchSettings: Operation<JSONValidValueType>[];
     }[];
     conditionalChanges?: {
-        condition: ConditionBlock | Array<ConditionBlock>;
+        condition: ConditionBlock | ConditionBlock[];
         patchSettings: Operation<JSONValidValueType>[];
     }[];
 };
