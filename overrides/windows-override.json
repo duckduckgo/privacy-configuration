@@ -2546,7 +2546,36 @@
             "state": "enabled"
         },
         "uaChBrands": {
-            "state": "enabled"
+            "state": "enabled",
+            "settings": {
+                "additionalCheck": "disabled",
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "internal": true
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/additionalCheck",
+                                "value": "enabled"
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "preview": true
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/additionalCheck",
+                                "value": "enabled"
+                            }
+                        ]
+                    }
+                ]
+            }
         },
         "privacyPro": {
             "state": "enabled",
