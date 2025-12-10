@@ -25,6 +25,7 @@ import { AppHealth } from './features/appHealth';
 import { ElementHidingFeature } from './features/element-hiding';
 import { RequestBlocklistFeature } from './features/request-blocklist';
 import { UrlPredictorFeature } from './features/url-predictor';
+import { WebInterferenceDetectionFeature } from './features/web-interference-detection';
 
 export { WebCompatSettings } from './features/webcompat';
 export { DuckPlayerSettings } from './features/duckplayer';
@@ -74,6 +75,7 @@ export type ConfigV5<VersionType> = {
         elementHiding?: ElementHidingFeature<VersionType>;
         requestBlocklist?: RequestBlocklistFeature<VersionType>;
         urlPredictor?: UrlPredictorFeature<VersionType>;
+        webInterferenceDetection?: WebInterferenceDetectionFeature<VersionType>;
     };
     unprotectedTemporary: SiteException[];
 };
