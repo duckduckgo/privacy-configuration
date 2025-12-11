@@ -70,7 +70,7 @@ jobs:
                   # Find new top-level features
                   NEW_FEATURES=$(comm -13 <(echo "$BASE_FEATURES") <(echo "$HEAD_FEATURES"))
 
-                  # Also detect new sub-features within existing features
+                  # Detect new sub-features in existing features
                   NEW_SUBFEATURES=""
                   for feature in $(echo "$BASE_FEATURES"); do
                     BASE_SUBS=$(echo "$BASE_FILE" | jq -r --arg f "$feature" '.features[$f].features // {} | keys[]' 2>/dev/null | sort || true)
@@ -83,6 +83,16 @@ jobs:
                           NEW_SUBFEATURES="${NEW_SUBFEATURES}${feature}.${sub}"$'\n'
                         done
                       fi
+                    fi
+                  done
+
+                  # Also check NEW top-level features for any sub-features they contain
+                  for feature in $NEW_FEATURES; do
+                    SUBS=$(echo "$HEAD_FILE" | jq -r --arg f "$feature" '.features[$f].features // {} | keys[]' 2>/dev/null || true)
+                    if [ -n "$SUBS" ]; then
+                      for sub in $SUBS; do
+                        NEW_SUBFEATURES="${NEW_SUBFEATURES}${feature}.${sub}"$'\n'
+                      done
                     fi
                   done
 
@@ -137,14 +147,14 @@ jobs:
                     TASK_NAME="[Android] Remove feature flag: $FEATURE_NAME"
                     TASK_DESCRIPTION="This Android feature flag was added in PR #${{ steps.pr_context.outputs.pr_number }}
 
-                  **PR Link:** ${{ steps.pr_context.outputs.pr_url }}
-                  **Feature Path:** \`$FEATURE_PATH\`
-                  **File:** \`overrides/android-override.json\`
+                  PR Link: ${{ steps.pr_context.outputs.pr_url }}
+                  Feature Path: \`$FEATURE_PATH\`
+                  File: \`overrides/android-override.json\`
 
-                  **Action Required:**
+                  Action Required:
                   Please review this feature flag after the due date and determine if it can be removed. Feature flags should be temporary and cleaned up once the feature is stable.
 
-                  **Steps to remove:**
+                  Steps to remove:
                   1. Verify the feature is working as expected in Android production
                   2. Remove the feature flag from \`overrides/android-override.json\` at path: \`$FEATURE_PATH\`
                   3. Remove any Android code that references this feature flag
