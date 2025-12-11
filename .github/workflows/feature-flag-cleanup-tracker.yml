@@ -220,10 +220,6 @@ jobs:
                   github-pat: ${{ secrets.GH_RO_PAT }}
                   action: 'get-asana-user-id'
 
-            - name: Debug Asana User ID
-              run: |
-                  echo "Asana User ID: ${{ steps.get-author-asana-id.outputs.asanaUserId }}"
-
             - name: Create Asana Task
               if: steps.asana_content.outcome == 'success'
               uses: duckduckgo/native-github-asana-sync@v2.0
