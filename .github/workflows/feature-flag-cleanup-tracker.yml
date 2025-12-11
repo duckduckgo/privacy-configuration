@@ -213,17 +213,16 @@ jobs:
                     echo 'EOF'
                   } >> $GITHUB_OUTPUT
 
-
             - name: Get PR author Asana ID
               uses: duckduckgo/native-github-asana-sync@v2.0
               id: get-author-asana-id
               with:
-                github-pat: ${{ secrets.GH_RO_PAT }}
-                action: 'get-asana-user-id'
+                  github-pat: ${{ secrets.GH_RO_PAT }}
+                  action: 'get-asana-user-id'
 
             - name: Debug Asana User ID
               run: |
-                echo "Asana User ID: ${{ steps.get-author-asana-id.outputs.asanaUserId }}"
+                  echo "Asana User ID: ${{ steps.get-author-asana-id.outputs.asanaUserId }}"
 
             - name: Create Asana Task
               if: steps.asana_content.outcome == 'success'
