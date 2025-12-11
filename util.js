@@ -28,7 +28,11 @@ function addDomainRules(allowlist, domain, rule) {
 
 export function addAllowlistRule(allowlist, rule) {
     const dom = tldts.getDomain(rule.rule);
-    addDomainRules(allowlist, dom, { rules: [rule] });
+    addDomainRules(allowlist, dom, {
+        rules: [
+            rule,
+        ],
+    });
 }
 
 function addPathRule(rules, rule) {
@@ -39,7 +43,9 @@ function addPathRule(rules, rule) {
     }
     existing.domains = Array.from(new Set(existing.domains.concat(rule.domains).sort()));
     if (existing.domains.includes('<all>')) {
-        existing.domains = ['<all>'];
+        existing.domains = [
+            '<all>',
+        ];
     }
 
     if (existing.reason === undefined) {
@@ -50,7 +56,9 @@ function addPathRule(rules, rule) {
     const newReason = rule.reason;
     if (!reasons.includes(rule.reason)) {
         existing.reason = reasons
-            .concat([newReason])
+            .concat([
+                newReason,
+            ])
             .filter(function (x) {
                 return x !== '';
             })
