@@ -68,7 +68,7 @@ function findOrderingIssues(rules) {
                         earlierIndex: i,
                         laterIndex: j,
                         type: 'subdomain',
-                        missingDomains: missingDomains,
+                        missingDomains,
                     });
                 }
             } else if (isMoreSpecific(laterRule.rule, earlierRule.rule)) {
@@ -167,6 +167,7 @@ function formatDomainPropagationIssues(allProblems) {
 describe('Allowlist rule ordering & domain propagation', () => {
     let trackerAllowlistData;
 
+    // eslint-disable-next-line no-undef
     before(() => {
         const fileContent = fs.readFileSync('./features/tracker-allowlist.json', 'utf8');
         trackerAllowlistData = JSON.parse(fileContent);
@@ -178,7 +179,10 @@ describe('Allowlist rule ordering & domain propagation', () => {
             config,
         ] of Object.entries(trackerAllowlistData.settings.allowlistedTrackers)) {
             for (const rule of config.rules) {
-                expect(rule.domains.length).to.be.greaterThan(0, `Rule "${rule.rule}" for tracker "${trackerDomain}" must have at least one domain`);
+                expect(rule.domains.length).to.be.greaterThan(
+                    0,
+                    `Rule "${rule.rule}" for tracker "${trackerDomain}" must have at least one domain`,
+                );
             }
         }
     });
@@ -267,7 +271,13 @@ describe('Allowlist rule ordering & domain propagation', () => {
     it('detects subdomain ordering issues', () => {
         const rules = [
             { rule: 'grow.me', domains: ['site1.com'] },
-            { rule: 'api.grow.me', domains: ['site1.com', 'site2.com'] },
+            {
+                rule: 'api.grow.me',
+                domains: [
+                    'site1.com',
+                    'site2.com',
+                ],
+            },
         ];
 
         const issues = findOrderingIssues(rules);
@@ -288,6 +298,7 @@ describe('Allowlist rule ordering & domain propagation', () => {
 
     it('validates rules are ordered most-specific to least-specific in actual tracker-allowlist.json', () => {
         const trackers = trackerAllowlistData.settings?.allowlistedTrackers;
+        // eslint-disable-next-line no-unused-expressions
         expect(trackers).to.exist;
 
         const allOrderingIssues = [];
@@ -305,7 +316,9 @@ describe('Allowlist rule ordering & domain propagation', () => {
         }
 
         if (allOrderingIssues.length > 0) {
-            throw new Error(`Rule ordering issues found (rules should be most-specific first):\n\n${formatOrderingIssues(allOrderingIssues)}`);
+            throw new Error(
+                `Rule ordering issues found (rules should be most-specific first):\n\n${formatOrderingIssues(allOrderingIssues)}`,
+            );
         }
 
         expect(allOrderingIssues).to.have.lengthOf(0);
@@ -313,6 +326,7 @@ describe('Allowlist rule ordering & domain propagation', () => {
 
     it('validates domain propagation in actual tracker-allowlist.json', () => {
         const trackers = trackerAllowlistData.settings?.allowlistedTrackers;
+        // eslint-disable-next-line no-unused-expressions
         expect(trackers).to.exist;
 
         const allProblems = [];
