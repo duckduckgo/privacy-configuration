@@ -1,7 +1,20 @@
 import tldts from 'tldts';
 import crypto from 'crypto';
 import fs from 'fs';
+import { parse as parseJsonc } from 'jsonc-parser';
 import { LISTS_DIR, UNPROTECTED_LIST_NAME } from './constants.js';
+
+/**
+ * Read and parse a JSONC file (JSON with comments).
+ * Comments are stripped and regular JSON object is returned.
+ *
+ * @param {string} filePath - path to the JSONC file
+ * @returns {object} parsed JSON object
+ */
+export function readJsoncFile(filePath) {
+    const content = fs.readFileSync(filePath, 'utf-8');
+    return parseJsonc(content);
+}
 
 function getAllowlistedRule(rules, rulePath) {
     return rules.find(function (x) {
@@ -65,7 +78,7 @@ export function getBaseFeatureConfigs() {
         return listName !== UNPROTECTED_LIST_NAME && listName !== '_template.json';
     });
     for (const jsonList of jsonListNames) {
-        const listData = JSON.parse(fs.readFileSync(`${LISTS_DIR}/${jsonList}`));
+        const listData = readJsoncFile(`${LISTS_DIR}/${jsonList}`);
         const configKey = jsonList.replace(/[.]json$/, '').replace(/-([a-z0-9])/g, function (g) {
             return g[1].toUpperCase();
         });
