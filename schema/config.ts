@@ -26,6 +26,7 @@ import { ElementHidingFeature } from './features/element-hiding';
 import { RequestBlocklistFeature } from './features/request-blocklist';
 import { UaChBrandsFeature } from './features/ua-ch-brands';
 import { UrlPredictorFeature } from './features/url-predictor';
+import { WebInterferenceDetectionFeature } from './features/web-interference-detection';
 
 export { WebCompatSettings } from './features/webcompat';
 export { DuckPlayerSettings } from './features/duckplayer';
@@ -76,6 +77,7 @@ export type ConfigV5<VersionType> = {
         requestBlocklist?: RequestBlocklistFeature<VersionType>;
         uaChBrands?: UaChBrandsFeature<VersionType>;
         urlPredictor?: UrlPredictorFeature<VersionType>;
+        webInterferenceDetection?: WebInterferenceDetectionFeature<VersionType>;
     };
     unprotectedTemporary: SiteException[];
 };
