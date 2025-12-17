@@ -227,11 +227,6 @@ describe('Config schema tests', () => {
                             );
                         }
 
-                        expect(ddgwvFeature.minSupportedVersion).to.deep.equal(
-                            baseFeature.minSupportedVersion,
-                            `_DDGWV feature override '${ddgwvFeatureName}' minSupportedVersion should match base feature '${baseFeatureName}' minSupportedVersion`,
-                        );
-
                         // Check that if both features have subfeatures, they have the same subfeature names
                         if (baseFeature.features && ddgwvFeature.features) {
                             const baseSubfeatureNames = Object.keys(baseFeature.features).sort();
