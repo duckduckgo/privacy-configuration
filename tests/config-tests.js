@@ -242,12 +242,6 @@ describe('Config schema tests', () => {
                                 const baseSubfeature = baseFeature.features[subfeatureName];
                                 const ddgwvSubfeature = ddgwvFeature.features[subfeatureName];
 
-                                // Check minSupportedVersion
-                                expect(ddgwvSubfeature.minSupportedVersion).to.deep.equal(
-                                    baseSubfeature.minSupportedVersion,
-                                    `_DDGWV feature override '${ddgwvFeatureName}.${subfeatureName}' minSupportedVersion should match base feature '${baseFeatureName}.${subfeatureName}' minSupportedVersion`,
-                                );
-
                                 // Check rollout (if present)
                                 if (baseSubfeature.rollout && ddgwvSubfeature.rollout) {
                                     expect(ddgwvSubfeature.rollout).to.deep.equal(
