@@ -51,6 +51,26 @@
                     {
                         "condition": [
                             {
+                                "domain": "facebook.com"
+                            }
+                        ],
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/apiChanges/Notification.permission",
+                                "value": {
+                                    "type": "descriptor",
+                                    "getterValue": {
+                                        "type": "string",
+                                        "value": "denied"
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "condition": [
+                            {
                                 "domain": "1cs.jp"
                             },
                             {
@@ -1275,7 +1295,8 @@
         },
         "duckAiDataClearing": {
             "exceptions": [],
-            "state": "disabled",
+            "state": "enabled",
+            "minSupportedVersion": "0.142.0",
             "settings": {
                 "chatsLocalStorageKeys": ["savedAIChats"],
                 "chatImagesIndexDbNameObjectStoreNamePairs": [
@@ -1296,13 +1317,20 @@
                     "state": "disabled"
                 },
                 "freemium": {
-                    "state": "preview",
+                    "state": "enabled",
                     "minSupportedVersion": "0.140.1",
                     "targets": [
                         {
                             "localeCountry": "US"
                         }
-                    ]
+                    ],
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 20.0
+                            }
+                        ]
+                    }
                 }
             },
             "settings": {
@@ -1324,7 +1352,7 @@
             "state": "enabled",
             "features": {
                 "startInForeground": {
-                    "state": "internal"
+                    "state": "disabled"
                 }
             }
         },
@@ -2399,6 +2427,9 @@
                 },
                 "unifyFavorites": {
                     "state": "internal"
+                },
+                "aiChatSync": {
+                    "state": "internal"
                 }
             }
         },
@@ -2548,6 +2579,26 @@
         },
         "clientBrandHint": {
             "state": "enabled"
+        },
+        "uaChBrands": {
+            "state": "enabled",
+            "settings": {
+                "additionalCheck": "disabled",
+                "conditionalChanges": [
+                    {
+                        "condition": [
+                            { "internal": true },
+                            { "preview": true }],
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/additionalCheck",
+                                "value": "enabled"
+                            }
+                        ]
+                    }
+                ]
+            }
         },
         "privacyPro": {
             "state": "enabled",
@@ -2798,10 +2849,10 @@
                     }
                 },
                 "serviceWorkerWatchdog": {
-                    "state": "enabled"
+                    "state": "disabled"
                 },
                 "serviceWorkerWatchdogUnregister": {
-                    "state": "preview"
+                    "state": "disabled"
                 }
             },
             "exceptions": []
@@ -3213,7 +3264,6 @@
                     "https",
                     "file",
                     "mailto",
-                    "chrome",
                     "duck"
                 ]
             }
