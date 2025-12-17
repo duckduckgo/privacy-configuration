@@ -45,16 +45,29 @@
                         "getterValue": {
                             "type": "undefined"
                         }
-                    },
-                    "Notification.permission": {
-                        "type": "descriptor",
-                        "getterValue": {
-                            "type": "string",
-                            "value": "denied"
-                        }
                     }
                 },
                 "conditionalChanges": [
+                    {
+                        "condition": [
+                            {
+                                "domain": "facebook.com"
+                            }
+                        ],
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/apiChanges/Notification.permission",
+                                "value": {
+                                    "type": "descriptor",
+                                    "getterValue": {
+                                        "type": "string",
+                                        "value": "denied"
+                                    }
+                                }
+                            }
+                        ]
+                    },
                     {
                         "condition": [
                             {
