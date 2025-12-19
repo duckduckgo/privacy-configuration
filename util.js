@@ -13,7 +13,12 @@ import { LISTS_DIR, UNPROTECTED_LIST_NAME } from './constants.js';
  */
 export function readJsoncFile(filePath) {
     const content = fs.readFileSync(filePath, 'utf-8');
-    return parseJsonc(content);
+    const errors = [];
+    const result = parseJsonc(content, errors);
+    if (errors.length > 0) {
+        throw new Error(`Failed to parse JSONC in ${filePath}: ${JSON.stringify(errors)}`);
+    }
+    return result;
 }
 
 function getAllowlistedRule(rules, rulePath) {
