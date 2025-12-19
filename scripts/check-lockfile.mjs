@@ -20,12 +20,8 @@ const errors = [];
 // Get the specifiers stored in the lockfile's root package entry
 const lockDeps = lock.packages?.['']?.dependencies || {};
 const lockDevDeps = lock.packages?.['']?.devDependencies || {};
-
-function normalizeSpecifier(spec) {
-    // Normalize github shorthand to match lockfile format
-    // "github:org/repo#tag" stays as is in lockfile
-    return spec;
-}
+const lockOptionalDeps = lock.packages?.['']?.optionalDependencies || {};
+const lockPeerDeps = lock.packages?.['']?.peerDependencies || {};
 
 function checkDeps(pkgDeps, lockDepsMap, type) {
     const pkgDepsMap = pkgDeps || {};
@@ -38,11 +34,10 @@ function checkDeps(pkgDeps, lockDepsMap, type) {
         if (specifier.startsWith('file:')) continue;
 
         const lockSpecifier = lockDepsMap[name];
-        const normalizedPkgSpec = normalizeSpecifier(specifier);
 
         if (!lockSpecifier) {
             errors.push(`${type} "${name}" not found in package-lock.json`);
-        } else if (lockSpecifier !== normalizedPkgSpec) {
+        } else if (lockSpecifier !== specifier) {
             errors.push(
                 `${type} "${name}" version mismatch:\n` +
                     `    package.json:      ${specifier}\n` +
@@ -61,6 +56,8 @@ function checkDeps(pkgDeps, lockDepsMap, type) {
 
 checkDeps(pkg.dependencies, lockDeps, 'dependency');
 checkDeps(pkg.devDependencies, lockDevDeps, 'devDependency');
+checkDeps(pkg.optionalDependencies, lockOptionalDeps, 'optionalDependency');
+checkDeps(pkg.peerDependencies, lockPeerDeps, 'peerDependency');
 
 if (errors.length > 0) {
     console.error('❌ package-lock.json is out of sync with package.json:\n');
