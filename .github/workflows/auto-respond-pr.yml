@@ -72,14 +72,10 @@ jobs:
                   path: pr
                   fetch-depth: 0
 
-            - name: Install dependencies
-              run: |
-                  npm install diff fast-json-patch
-
             - name: Run build script on base branch
               run: |
                   cd base
-                  npm install
+                  npm ci
                   node index.js
                   cd ..
 
@@ -89,7 +85,7 @@ jobs:
                   git config --global user.email "dax@duck.com"
                   git config --global user.name "dax"
                   git rebase -X theirs origin/${{ github.event.pull_request.base.ref }}
-                  npm install
+                  npm ci
                   node index.js
                   cd ..
 
