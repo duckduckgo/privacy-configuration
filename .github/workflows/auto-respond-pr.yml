@@ -30,6 +30,13 @@ jobs:
         concurrency: auto-respond-${{ github.event.pull_request.number }}
 
         steps:
+            - name: Check if holiday period
+              run: |
+                  if [ "$(date -u +%Y%m%d)" -lt "20260105" ]; then
+                      echo "::notice::Auto review bot disabled until Jan 5th 2026"
+                      exit 1
+                  fi
+
             - name: Debounce delay
               run: sleep 5
 
