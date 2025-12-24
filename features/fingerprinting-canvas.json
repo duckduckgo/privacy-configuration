@@ -1,153 +1,43 @@
 {
     "_meta": {
-        "description": "Protection from canvas API fingerprinting.",
-        "sampleExcludeRecords": {
-            "domain": "example.com",
-            "reason": "site breakage"
-        }
+        "description": "Protection from canvas API fingerprinting."
     },
     "settings": {
-        "webGl": "enabled"
+        "webGl": "disabled",
+        "additionalEnabledCheck": "enabled",
+        "safeMethods": ["putImageData", "drawImage"],
+        "unsafeMethods": [
+            "strokeRect",
+            "bezierCurveTo",
+            "quadraticCurveTo",
+            "arcTo",
+            "ellipse",
+            "rect",
+            "fill",
+            "stroke",
+            "lineTo",
+            "beginPath",
+            "closePath",
+            "arc",
+            "fillText",
+            "fillRect",
+            "strokeText",
+            "createConicGradient",
+            "createLinearGradient",
+            "createRadialGradient",
+            "createPattern"
+        ],
+        "unsafeGlMethods": [
+            "commit",
+            "compileShader",
+            "shaderSource",
+            "attachShader",
+            "createProgram",
+            "linkProgram",
+            "drawElements",
+            "drawArrays"
+        ],
+        "canvasMethods": ["toDataURL", "toBlob"]
     },
-    "exceptions": [
-        {
-            "domain": "adidas.com",
-            "reason": "When adding an item to the cart, there is an error 'An unexpected problem occurred' and the item is not added to the cart."
-        },
-        {
-            "domain": "adidas.co.uk",
-            "reason": "When adding an item to the cart, there is an error 'An unexpected problem occurred' and the item is not added to the cart."
-        },
-        {
-            "domain": "amtrak.com",
-            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/499"
-        },
-        {
-            "domain": "att.com",
-            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/794"
-        },
-        {
-            "domain": "bloomingdales.com",
-            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/379"
-        },
-        {
-            "domain": "capitalone.com",
-            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/794"
-        },
-        {
-            "domain": "centerwellpharmacy.com",
-            "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3185"
-        },
-        {
-            "domain": "chase.com",
-            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/499"
-        },
-        {
-            "domain": "citi.com",
-            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/499"
-        },
-        {
-            "domain": "emirates.com",
-            "reason": "After filling out flight information and clicking 'Search flights', a blank page is shown for several seconds before the page redirects."
-        },
-        {
-            "domain": "fedex.com",
-            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/927"
-        },
-        {
-            "domain": "finishline.com",
-            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1015"
-        },
-        {
-            "domain": "go365.com",
-            "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3185"
-        },
-        {
-            "domain": "gynzykids.com",
-            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/908"
-        },
-        {
-            "domain": "hm.com",
-            "reason": "When adding an item to cart, there is an error 'something went wrong', and the item does not get added to the cart."
-        },
-        {
-            "domain": "humana.com",
-            "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3185"
-        },
-        {
-            "domain": "ikea.com",
-            "reason": [
-                "When creating an account, after filling out details and going to e-mail confirmation, there is an error 'Something went wrong', and the e-mail may not be received.",
-                "Clicking 'Send new code' appears successful, but after entering the code there is often another account creation error."
-            ]
-        },
-        {
-            "domain": "litebluesso.usps.gov",
-            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1424"
-        },
-        {
-            "domain": "manulife.ca",
-            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/499"
-        },
-        {
-            "domain": "match.com",
-            "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3158"
-        },
-        {
-            "domain": "navyfederal.org",
-            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/794"
-        },
-        {
-            "domain": "nordstrom.com",
-            "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3183"
-        },
-        {
-            "domain": "northernrailway.co.uk",
-            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/350"
-        },
-        {
-            "domain": "online-calculator.com",
-            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/875"
-        },
-        {
-            "domain": "online-stopwatch.com",
-            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/875"
-        },
-        {
-            "domain": "spirit.com",
-            "reason": "When attempting to sign in, a semi-transparent overlay appears over the page which prevents further interaction with the site."
-        },
-        {
-            "domain": "suncoastcreditunion.com",
-            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/794"
-        },
-        {
-            "domain": "td.com",
-            "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3184"
-        },
-        {
-            "domain": "thetrainline.com",
-            "reason": "After filling out travel info and clicking 'Get times & tickets', there is an error warning that 'Something went wrong', which prevents further interaction."
-        },
-        {
-            "domain": "usps.com",
-            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/794"
-        },
-        {
-            "domain": "walgreens.com",
-            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/499"
-        },
-        {
-            "domain": "wellsfargo.com",
-            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/794"
-        },
-        {
-            "domain": "xfinity.com",
-            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/788"
-        },
-        {
-            "domain": "godaddy.com",
-            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/499"
-        }
-    ]
+    "exceptions": []
 }
