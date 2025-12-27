@@ -149,7 +149,9 @@ function alignArrayByLCSWithBaseContext(baseArr, updateArr) {
     const updateHashes = updateArr.map(stableJsonStringify);
 
     const common = baseHashes.filter((h) => updateHashes.includes(h));
-    const dedupedCommon = [...new Set(common)];
+    const dedupedCommon = [
+        ...new Set(common),
+    ];
 
     const seenUpdateHashes = new Set();
 
