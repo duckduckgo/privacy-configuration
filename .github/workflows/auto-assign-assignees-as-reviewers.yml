@@ -29,8 +29,7 @@ jobs:
                       const author = pr.data.user?.login;
                       const assignees = pr.data.assignees
                         .map(a => a.login)
-                        // GitHub allows requesting reviews from the author, but it's noise.
-                        // Skip requesting the PR author's own review even if assigned.
+                        // Don't request a review from the PR author (can be rejected by GitHub and is noise either way).
                         .filter(login => login && login !== author);
 
                       if (assignees.length > 0) {
