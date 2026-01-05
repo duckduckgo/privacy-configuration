@@ -472,6 +472,14 @@
                 },
                 "standaloneMigration": {
                     "state": "disabled"
+                },
+                "fullscreenMode": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52603000
+                },
+                "fullscreenModeToggle": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52603000
                 }
             }
         },
@@ -512,7 +520,7 @@
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/326"
                 },
                 {
-                    "domain": "https://www.sudouest.fr",
+                    "domain": "sudouest.fr",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2790"
                 },
                 {
@@ -1232,8 +1240,12 @@
         "androidBrowserConfig": {
             "state": "enabled",
             "features": {
+                "showInputScreenOnboarding": {
+                    "state": "enabled"
+                },
                 "useUrlPredictor": {
-                    "state": "disabled"
+                    "state": "enabled",
+                    "minSupportedVersion": 52591000
                 },
                 "collectFullWebViewVersion": {
                     "state": "enabled"
@@ -1453,15 +1465,12 @@
                     }
                 },
                 "handleAboutBlank": {
-                    "state": "disabled",
-                    "minSupportedVersion": 52590000,
+                    "state": "enabled",
+                    "minSupportedVersion": 52603000,
                     "rollout": {
                         "steps": [
                             {
                                 "percent": 5
-                            },
-                            {
-                                "percent": 20
                             }
                         ]
                     }
@@ -2056,6 +2065,21 @@
                     },
                     {
                         "packageName": "com.openai.chatgpt"
+                    },
+                    {
+                        "packageName": "com.TWCableTV"
+                    },
+                    {
+                        "packageName": "com.amazon.storm.lightning.client.aosp"
+                    },
+                    {
+                        "packageName": "com.infrasoft.uboi"
+                    },
+                    {
+                        "packageName": "com.cbq.CBMobile"
+                    },
+                    {
+                        "packageName": "com.samsung.android.oneconnect"
                     }
                 ]
             },
@@ -2083,7 +2107,30 @@
         },
         "sync": {
             "state": "enabled",
-            "minSupportedVersion": 51850000
+            "minSupportedVersion": 51850000,
+            "features": {
+                "level0ShowSync": {
+                    "state": "enabled"
+                },
+                "level1AllowDataSyncing": {
+                    "state": "enabled"
+                },
+                "level2AllowSetupFlows": {
+                    "state": "enabled"
+                },
+                "level3AllowCreateAccount": {
+                    "state": "enabled"
+                },
+                "exchangeKeysToSyncWithAnotherDevice": {
+                    "state": "enabled"
+                },
+                "syncSetupBarcodeIsUrlBased": {
+                    "state": "enabled"
+                },
+                "aiChatSync": {
+                    "state": "internal"
+                }
+            }
         },
         "syncPromotion": {
             "state": "enabled",
@@ -3313,6 +3360,26 @@
                                 "op": "add",
                                 "path": "/additionalCheck",
                                 "value": "disabled"
+                            }
+                        ]
+                    },
+                    {
+                        "condition": [
+                            {
+                                "domain": "github.dev"
+                            }
+                        ],
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/apiChanges/crossOriginIsolated",
+                                "value": {
+                                    "type": "descriptor",
+                                    "getterValue": {
+                                        "type": "boolean",
+                                        "value": true
+                                    }
+                                }
                             }
                         ]
                     }

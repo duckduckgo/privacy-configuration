@@ -1166,6 +1166,10 @@
                     {
                         "selector": "[data-freestar-ad='true']",
                         "type": "closest-empty"
+                    },
+                    {
+                        "selector": "[class*='--ad-height']",
+                        "type": "hide"
                     }
                 ]
             },
@@ -1919,11 +1923,34 @@
             },
             {
                 "domain": [
-                    "google.com",
                     "google.ca",
                     "google.de",
-                    "google.dk",
                     "google.es",
+                    "google.co.uk"
+                ],
+                "rules": [
+                    {
+                        "selector": "div:has(> iframe[src*='prid=190'])",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": "[aria-labelledby='promo-header']",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": "div:has(> [aria-labelledby='promo_label_id'])",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": "div[role='banner']:has(div > a[href='https://support.google.com/a/answer/33864'])",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": [
+                    "google.com",
+                    "google.dk",
                     "google.fr",
                     "google.ie",
                     "google.it",
@@ -1935,8 +1962,7 @@
                     "google.com.mx",
                     "google.co.in",
                     "google.co.jp",
-                    "google.co.nz",
-                    "google.co.uk"
+                    "google.co.nz"
                 ],
                 "rules": [
                     {
@@ -2417,6 +2443,15 @@
                     {
                         "selector": "[class*='adBeforeContent']",
                         "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "la7.it",
+                "rules": [
+                    {
+                        "selector": "#site-message-overlay",
+                        "type": "hide"
                     }
                 ]
             },

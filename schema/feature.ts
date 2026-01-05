@@ -65,6 +65,7 @@ type ConditionBlock = {
     minSupportedVersion?: number;
     maxSupportedVersion?: number;
     internal?: boolean;
+    preview?: boolean;
     context?: {
         top?: boolean;
         frame?: boolean;

@@ -1,57 +1,57 @@
 {
     "features": {
         "attributedMetrics": {
-            "state": "internal",
+            "state": "enabled",
             "minSupportedVersion": "7.198.0",
             "exceptions": [],
             "features": {
                 "emitAllMetrics": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "retention": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "canEmitRetention": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "searchDaysAvg": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "canEmitSearchDaysAvg": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "searchCountAvg": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "canEmitSearchCountAvg": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "adClickCountAvg": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "canEmitAdClickCountAvg": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "aiUsageAvg": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "canEmitAIUsageAvg": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "subscriptionRetention": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "canEmitSubscriptionRetention": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "syncDevices": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "canEmitSyncDevices": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "sendOriginParam": {
-                    "state": "internal",
+                    "state": "enabled",
                     "settings": {
                         "originCampaignSubstrings": [
                             "paid"
@@ -293,12 +293,13 @@
                     "state": "enabled"
                 },
                 "fullDuckAIMode": {
-                    "state": "internal",
-                    "minSupportedVersion": "7.199.0"
-                },
-                "fullDuckAIModeExperimentalSetting": {
                     "state": "enabled",
-                    "minSupportedVersion": "7.199.0"
+                    "minSupportedVersion": "7.200.0"
+                },
+                "fadeOutOnToggle": {
+                    "state": "enabled",
+                    "description": "Unify inputs for Duck.ai",
+                    "minSupportedVersion": "7.201.0"
                 }
             },
             "settings": {
@@ -1207,6 +1208,9 @@
                 "syncCreditCards": {
                     "state": "enabled",
                     "minSupportedVersion": "7.193.0"
+                },
+                "aiChatSync": {
+                    "state": "disabled"
                 }
             }
         },
@@ -1399,17 +1403,11 @@
                 },
                 "domains": [
                     {
-                        "domain": "www.cbsnews.com",
-                        "patchSettings": [
-                            {
-                                "op": "replace",
-                                "path": "/messageHandlers/state",
-                                "value": "enabled"
-                            }
-                        ]
-                    },
-                    {
-                        "domain": "myhome.experian.co.uk",
+                        "domain": [
+                            "www.cbsnews.com",
+                            "myhome.experian.co.uk",
+                            "luna.amazon.com"
+                        ],
                         "patchSettings": [
                             {
                                 "op": "replace",
@@ -1821,7 +1819,7 @@
                         "daysInactive": "7"
                     }
                 },
-                "mobileCustomization": {
+                "customization": {
                     "state": "enabled",
                     "minSupportedVersion": "7.198.0",
                     "description": "Allow users to customize button on toolbar and addressbar",
@@ -1829,9 +1827,17 @@
                         "steps": [
                             {
                                 "percent": 25
+                            },
+                            {
+                                "percent": 100
                             }
                         ]
                     }
+                },
+                "productTelemetrySurfaceUsage": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.199.0",
+                    "description": "Temporarily gather telemetry around product surfaces being used."
                 }
             }
         },
@@ -1848,12 +1854,16 @@
                     "state": "disabled"
                 },
                 "remoteBrokerDelivery": {
-                    "state": "internal",
+                    "state": "enabled",
                     "minSupportedVersion": "7.180.0"
                 },
                 "emailConfirmationDecoupling": {
-                    "state": "internal",
+                    "state": "enabled",
                     "minSupportedVersion": "7.190.0"
+                },
+                "clickActionDelayReductionOptimization": {
+                    "state": "internal",
+                    "minSupportedVersion": "7.200.0"
                 }
             },
             "minSupportedVersion": "7.180.0"
