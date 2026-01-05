@@ -26,7 +26,12 @@ jobs:
                         pull_number: context.payload.pull_request.number,
                       });
 
-                      const assignees = pr.data.assignees.map(a => a.login)
+                      const author = pr.data.user?.login;
+                      const assignees = pr.data.assignees
+                        .map(a => a.login)
+                        // GitHub allows requesting reviews from the author, but it's noise.
+                        // Skip requesting the PR author's own review even if assigned.
+                        .filter(login => login && login !== author);
 
                       if (assignees.length > 0) {
                         await github.rest.pulls.requestReviewers({
