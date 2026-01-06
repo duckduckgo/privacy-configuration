@@ -17,6 +17,18 @@ type FeatureMeta = {
     sampleExcludeRecords?: any;
 };
 
+export type FeatureTargets = {
+    variantKey?: string;
+    localeCountry?: string;
+    localeLanguage?: string;
+    isReturningUser?: boolean;
+    isPrivacyProEligible?: boolean;
+};
+
+export type FeatureRollout = {
+    steps: { percent: number }[];
+};
+
 /* Note this defaults to Record<string, string>
    but individual features can and should define their own SubFeature schema type like:
    https://github.com/duckduckgo/privacy-configuration/blob/4cc65fa5cc5244eef832440adfd40064c733e736/schema/features/android-browser-config.ts#L22-L39
@@ -24,19 +36,13 @@ type FeatureMeta = {
 export type SubFeature<VersionType, SettingsType = Record<string, string>> = {
     state: FeatureState;
     settings?: SettingsType;
-    rollout?: {
-        steps: { percent: number }[];
-    };
+    rollout?: FeatureRollout;
     description?: string;
-    targets?: {
-        variantKey?: string;
-        localeCountry?: string;
-        localeLanguage?: string;
-        isReturningUser?: boolean;
-        isPrivacyProEligible?: boolean;
-    }[];
+    targets?: FeatureTargets[];
     cohorts?: Cohort[];
     minSupportedVersion?: VersionType;
+    /** @since v6 - Domain exceptions for this sub-feature */
+    exceptions?: SiteException[];
 };
 
 export type Feature<
@@ -52,6 +58,17 @@ export type Feature<
     features?: SubFeatures;
     hash: string;
     minSupportedVersion?: VersionType;
+    /** @since v6 - Optional description for the feature */
+    description?: string;
+    /** @since v6 - Optional rollout configuration for the feature */
+    rollout?: FeatureRollout;
+    /** @since v6 - Optional targeting rules for the feature */
+    targets?: FeatureTargets[];
+    /**
+     * @since v6 - Cohorts at parent level won't be functionally supported by clients,
+     * but should not cause parse errors. Use sub-feature cohorts for experiments.
+     */
+    cohorts?: Cohort[];
 };
 
 type ConditionBlock = {

@@ -9,22 +9,22 @@ import { getBaseFeatureConfigs } from '../util.js';
 const platformOutput = platforms.map((item) => item.replace('browsers/', 'extension-'));
 
 const platformSpecificSchemas = {
-    'v5/android-config.json': 'AndroidCurrentConfig',
-    'v4/android-config.json': 'LegacyAndroidConfig',
+    'v6/android-config.json': 'AndroidCurrentConfig',
+    'v5/android-config.json': 'LegacyAndroidConfig',
 };
 
 // Test the latest 2 versions of each platform
 const latestConfigs = platformOutput.map((plat) => {
     return {
-        name: `v5/${plat}-config.json`,
-        body: JSON.parse(fs.readFileSync(`./generated/v5/${plat}-config.json`)),
+        name: `v6/${plat}-config.json`,
+        body: JSON.parse(fs.readFileSync(`./generated/v6/${plat}-config.json`)),
     };
 });
 
 const previousConfigs = platformOutput.map((plat) => {
     return {
-        name: `v4/${plat}-config.json`,
-        body: JSON.parse(fs.readFileSync(`./generated/v4/${plat}-config.json`)),
+        name: `v5/${plat}-config.json`,
+        body: JSON.parse(fs.readFileSync(`./generated/v5/${plat}-config.json`)),
     };
 });
 
@@ -54,7 +54,7 @@ describe('Config schema tests', () => {
                 );
             });
 
-            it('should validate against the full configV5 schema', () => {
+            it('should validate against the full configV6 schema', () => {
                 const validate = createValidator(platformSpecificSchemas[config.name] || 'CurrentGenericConfig');
                 expect(validate(config.body)).to.be.equal(true, formatErrors(validate.errors));
             });

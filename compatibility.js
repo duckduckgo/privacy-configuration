@@ -157,4 +157,28 @@ export const compatFunctions = {
         }
         return v4Config;
     },
+    v5: (config, unmodifiedConfig, platform) => {
+        // Breaking changes:
+        // - Added exceptions to sub-features
+        // - Added rollout, targets, description, cohorts to parent features
+
+        const v5Config = JSON.parse(JSON.stringify(config));
+
+        for (const feature of Object.values(v5Config.features)) {
+            // Strip parent-level rollout, targets, description, cohorts (v6 additions)
+            delete feature.rollout;
+            delete feature.targets;
+            delete feature.description;
+            delete feature.cohorts;
+
+            // Strip exceptions from sub-features (v6 addition)
+            if (feature.features) {
+                for (const subFeature of Object.values(feature.features)) {
+                    delete subFeature.exceptions;
+                }
+            }
+        }
+
+        return v5Config;
+    },
 };

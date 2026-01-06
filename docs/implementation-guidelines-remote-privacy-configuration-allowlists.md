@@ -35,15 +35,20 @@ Reference tests: [privacy-reference-tests](https://github.com/duckduckgo/privacy
       - `domain`: top level URL
       - `reason`: [removed from [v4](https://app.asana.com/1/137249556945/project/1200890834746050/task/1205680646032200?focus=true) onwards and should not be relied upon] the reason for the exception
     - `minSupportedVersion`: Minimum platform version for which this feature should be enabled. (Android uses numbers, others use strings)
+    - `description`: (v6+) optional human-readable description for the feature.
+    - `rollout`: (v6+) optional progressive rollout configuration (same format as sub-feature rollout).
+    - `targets`: (v6+) optional targeting rules for the feature (same format as sub-feature targets).
+    - `cohorts`: (v6+) optional, but **not functionally supported** at parent level. Use sub-feature cohorts for experiments.
     - `features`: Some features have sub-features.
       - `state`: same as parent features.
           - ⚠️ unclear if a disabled feature should make a sub-feature disabled (Android/Extensions does not but iOS/macOS and Windows does).
       - `minSupportedVersion`: same as parent features.
-      - `description`: optional and non function to describe the sub feature.
+      - `description`: optional and non functional to describe the sub feature.
       - `rollout`: They can also support progressive rollout which are described here: ✓ NetP: Feature Flag Incremental Rollouts
           - [Windows] rollout applies separately to enabled/preview states. More info here: [Add a feature flag via Remote Config](https://app.asana.com/1/137249556945/project/1208736637614995/task/1207579150090376?focus=true)
       - `targets`: Permits enabling of the features based on certain conditions.
       - `cohorts`: Enables [Native Apps Experiment Framework (A/B testing framework)](https://app.asana.com/1/137249556945/project/1208889145294658/list/1208889101183474)
+      - `exceptions`: (v6+) optional per-domain exceptions for this sub-feature (same format as parent feature exceptions). When a feature supports exceptions, sub-features should also support them for finer-grained control.
     - `settings`: Optional mapping for extra info needed for the feature. (e.g., scripts, aboutBlankEnabled, aboutBlankSites)
       - In our browser extension it may be common to see the following keys within "settings"
       - `scripts`: a list of URL regexes that are exempted from protection (follows the same format as "exceptions")

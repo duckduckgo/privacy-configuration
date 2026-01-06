@@ -6,10 +6,20 @@ Unless otherwise noted, each change in a version can be optionally implemented. 
 
 ## Config Update Steps
 
-1. Update the URL on the platform to pull from the latest version (e.g., `.../config/v4/...` → `.../config/v5/...`).
+1. Update the URL on the platform to pull from the latest version (e.g., `.../config/v5/...` → `.../config/v6/...`).
 2. Refer to this change log to determine any breaking changes that should be implemented in this update.
 
 ## Version History
+
+### v6
+- **Sub-feature exceptions**: Added support for `exceptions` array in sub-features, enabling per-domain exception control at the sub-feature level (same format as parent feature exceptions).
+  - When a feature supports exceptions (the client code disables a feature based on the current URL), support should also be added to sub-features.
+  - Note: Different clients may behave differently in terms of coupling parent to child exceptions.
+- **Parent feature enhancements**: Added support for `description`, `rollout`, and `targets` at the parent feature level (previously only available in sub-features).
+  - `description` (optional): Human-readable description of the feature.
+  - `rollout` (optional): Incremental rollout configuration (same format as sub-feature rollout).
+  - `targets` (optional): Targeting rules for the feature (same format as sub-feature targets).
+  - `cohorts` (optional): While this key is now accepted at the parent level to prevent parse errors, **cohorts are not functionally supported** at the parent feature level. Use sub-feature cohorts for experiments. Clients should prevent parent and sub-feature rollout/cohorts from being used simultaneously through linting tests.
 
 ### v5 ([PR #3358](https://github.com/duckduckgo/privacy-configuration/pull/3358))
 - `preview` added as a possible state for features and sub-features.

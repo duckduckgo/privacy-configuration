@@ -41,7 +41,7 @@ jobs:
                     exit 1
                   fi
 
-                  CONFIG_FILE="generated/v5/android-config.json"
+                  CONFIG_FILE="generated/v6/android-config.json"
                   ENABLED_LOCAL_EXPERIMENTS=$(jq -r 'if .features.contentScopeExperiments.features then .features.contentScopeExperiments.features | to_entries[] | select(.value.state == "enabled") | .key else empty end' "$CONFIG_FILE")
 
                   # --- Phase 2: Analysis & Individual Outputs ---

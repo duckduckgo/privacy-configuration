@@ -8,7 +8,7 @@ All feature files contain an `exceptions` property which contains a list of site
 
 This repo also contains the code to build and deploy the configuration files.
 These files (in the `generated` directory once built) are served from
-https://staticcdn.duckduckgo.com/trackerblocking/config/v4/...
+https://staticcdn.duckduckgo.com/trackerblocking/config/v6/...
 
 Please see the [Related Resources](#Related-Resources) section for a list of
 files used by each platform.

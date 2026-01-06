@@ -42,9 +42,14 @@ export type ExportedSchemas =
     | 'AttributedMetricsFeature';
 
 /**
- * Defines the structure of the built V5 config output as downloaded by clients.
+ * Defines the structure of the built V6 config output as downloaded by clients.
+ *
+ * V6 changes:
+ * - Added exceptions to sub-features for per-domain exception control
+ * - Added rollout, targets, description, cohorts to parent features
+ *   (cohorts at parent level won't be functionally supported, but shouldn't cause parse errors)
  */
-export type ConfigV5<VersionType> = {
+export type ConfigV6<VersionType> = {
     readme: string;
     version: number;
     features: Record<string, Feature<any, VersionType>> & {
@@ -83,11 +88,17 @@ export type ConfigV5<VersionType> = {
 };
 
 /**
+ * Legacy V5 config type - maintains backwards compatibility.
+ * @deprecated Use ConfigV6 for new implementations
+ */
+export type ConfigV5<VersionType> = ConfigV6<VersionType>;
+
+/**
  * Android:
  *  - Uses integer version numbers for minSupportedVersion
  *  - Adds 'experimentalVariants' top level property
  */
-export type AndroidCurrentConfig = ConfigV5<number> & {
+export type AndroidCurrentConfig = ConfigV6<number> & {
     experimentalVariants: {
         variants: {
             desc: string;
@@ -104,7 +115,10 @@ export type AndroidCurrentConfig = ConfigV5<number> & {
  * Generic spec: covers mac, iOS, windows and extension configs
  *  - Use string version numbers for minSupportedVersion
  */
-export type CurrentGenericConfig = ConfigV5<string>;
+export type CurrentGenericConfig = ConfigV6<string>;
 
+/**
+ * Legacy config types for backwards compatibility with v5 clients
+ */
 export type LegacyConfig = CurrentGenericConfig;
 export type LegacyAndroidConfig = AndroidCurrentConfig;
