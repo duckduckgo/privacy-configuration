@@ -51,6 +51,26 @@
                     {
                         "condition": [
                             {
+                                "domain": "facebook.com"
+                            }
+                        ],
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/apiChanges/Notification.permission",
+                                "value": {
+                                    "type": "descriptor",
+                                    "getterValue": {
+                                        "type": "string",
+                                        "value": "denied"
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "condition": [
+                            {
                                 "domain": "1cs.jp"
                             },
                             {
@@ -1275,7 +1295,8 @@
         },
         "duckAiDataClearing": {
             "exceptions": [],
-            "state": "disabled",
+            "state": "preview",
+            "minSupportedVersion": "0.142.0",
             "settings": {
                 "chatsLocalStorageKeys": ["savedAIChats"],
                 "chatImagesIndexDbNameObjectStoreNamePairs": [
@@ -1296,13 +1317,20 @@
                     "state": "disabled"
                 },
                 "freemium": {
-                    "state": "preview",
+                    "state": "enabled",
                     "minSupportedVersion": "0.140.1",
                     "targets": [
                         {
                             "localeCountry": "US"
                         }
-                    ]
+                    ],
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 20.0
+                            }
+                        ]
+                    }
                 }
             },
             "settings": {
@@ -1324,7 +1352,7 @@
             "state": "enabled",
             "features": {
                 "startInForeground": {
-                    "state": "internal"
+                    "state": "disabled"
                 }
             }
         },
@@ -1714,6 +1742,10 @@
                 {
                     "domain": "ashleyfurniture.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3908"
+                },
+                {
+                    "domain": "dillards.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4277"
                 },
                 {
                     "domain": "ynab.com",
@@ -2394,6 +2426,13 @@
                     "state": "enabled"
                 },
                 "fetchFavicons": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.143.0"
+                },
+                "unifyFavorites": {
+                    "state": "internal"
+                },
+                "aiChatSync": {
                     "state": "internal"
                 }
             }
@@ -2545,6 +2584,9 @@
         "clientBrandHint": {
             "state": "enabled"
         },
+        "uaChBrands": {
+            "state": "enabled"
+        },
         "privacyPro": {
             "state": "enabled",
             "features": {
@@ -2645,19 +2687,6 @@
                 "enumerateDevices": "enabled",
                 "domains": [
                     {
-                        "domain": [
-                            "meet.google.com",
-                            "canadiantire.ca"
-                        ],
-                        "patchSettings": [
-                            {
-                                "op": "replace",
-                                "path": "/enumerateDevices",
-                                "value": "disabled"
-                            }
-                        ]
-                    },
-                    {
                         "domain": "asana.com",
                         "patchSettings": [
                             {
@@ -2728,8 +2757,8 @@
                     "state": "enabled"
                 },
                 "crashAutoRecovery": {
-                    "state": "disabled",
-                    "minSupportedVersion": "0.125.0",
+                    "state": "enabled",
+                    "minSupportedVersion": "0.142.1",
                     "settings": {
                         "autoRecoveryBrowserEngine": true,
                         "autoRecoveryTab": true,
@@ -2794,10 +2823,10 @@
                     }
                 },
                 "serviceWorkerWatchdog": {
-                    "state": "enabled"
+                    "state": "disabled"
                 },
                 "serviceWorkerWatchdogUnregister": {
-                    "state": "preview"
+                    "state": "disabled"
                 }
             },
             "exceptions": []
@@ -3209,7 +3238,6 @@
                     "https",
                     "file",
                     "mailto",
-                    "chrome",
                     "duck"
                 ]
             }
@@ -3218,7 +3246,7 @@
             "state": "enabled",
             "features": {
                 "uninstallButton": {
-                    "state": "enabled"
+                    "state": "disabled"
                 }
             }
         },
@@ -3229,6 +3257,72 @@
         "unsetAsDefaultMonitor": {
             "state": "enabled",
             "exceptions": []
+        },
+        "attributedMetrics": {
+            "state": "enabled",
+            "minSupportedVersion": "0.141.7",
+            "exceptions": [],
+            "features": {
+                "canEmitInactivity": {
+                    "state": "enabled"
+                },
+                "emitAllMetrics": {
+                    "state": "disabled"
+                },
+                "retention": {
+                    "state": "disabled"
+                },
+                "canEmitRetention": {
+                    "state": "disabled"
+                },
+                "searchDaysAvg": {
+                    "state": "disabled"
+                },
+                "canEmitSearchDaysAvg": {
+                    "state": "disabled"
+                },
+                "searchCountAvg": {
+                    "state": "disabled"
+                },
+                "canEmitSearchCountAvg": {
+                    "state": "disabled"
+                },
+                "adClickCountAvg": {
+                    "state": "disabled"
+                },
+                "canEmitAdClickCountAvg": {
+                    "state": "disabled"
+                },
+                "aiUsageAvg": {
+                    "state": "disabled"
+                },
+                "canEmitAIUsageAvg": {
+                    "state": "disabled"
+                },
+                "subscriptionRetention": {
+                    "state": "disabled"
+                },
+                "canEmitSubscriptionRetention": {
+                    "state": "disabled"
+                },
+                "syncDevices": {
+                    "state": "disabled"
+                },
+                "canEmitSyncDevices": {
+                    "state": "disabled"
+                },
+                "sendOriginParam": {
+                    "state": "disabled",
+                    "settings": {
+                        "originCampaignSubstrings": [
+                            "paid"
+                        ]
+                    }
+                }
+            }
+        },
+        "requestBlocklist": {
+            "state": "enabled"
         }
     },
     "unprotectedTemporary": []

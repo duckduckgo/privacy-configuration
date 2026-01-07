@@ -472,6 +472,14 @@
                 },
                 "standaloneMigration": {
                     "state": "disabled"
+                },
+                "fullscreenMode": {
+                    "state": "disabled",
+                    "minSupportedVersion": 52603000
+                },
+                "fullscreenModeToggle": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52603000
                 }
             }
         },
@@ -1232,8 +1240,12 @@
         "androidBrowserConfig": {
             "state": "enabled",
             "features": {
+                "showInputScreenOnboarding": {
+                    "state": "enabled"
+                },
                 "useUrlPredictor": {
-                    "state": "disabled"
+                    "state": "enabled",
+                    "minSupportedVersion": 52591000
                 },
                 "collectFullWebViewVersion": {
                     "state": "enabled"
@@ -1453,15 +1465,12 @@
                     }
                 },
                 "handleAboutBlank": {
-                    "state": "disabled",
-                    "minSupportedVersion": 52590000,
+                    "state": "enabled",
+                    "minSupportedVersion": 52603000,
                     "rollout": {
                         "steps": [
                             {
                                 "percent": 5
-                            },
-                            {
-                                "percent": 20
                             }
                         ]
                     }
@@ -2098,7 +2107,30 @@
         },
         "sync": {
             "state": "enabled",
-            "minSupportedVersion": 51850000
+            "minSupportedVersion": 51850000,
+            "features": {
+                "level0ShowSync": {
+                    "state": "enabled"
+                },
+                "level1AllowDataSyncing": {
+                    "state": "enabled"
+                },
+                "level2AllowSetupFlows": {
+                    "state": "enabled"
+                },
+                "level3AllowCreateAccount": {
+                    "state": "enabled"
+                },
+                "exchangeKeysToSyncWithAnotherDevice": {
+                    "state": "enabled"
+                },
+                "syncSetupBarcodeIsUrlBased": {
+                    "state": "enabled"
+                },
+                "aiChatSync": {
+                    "state": "internal"
+                }
+            }
         },
         "syncPromotion": {
             "state": "enabled",
@@ -3330,6 +3362,26 @@
                                 "value": "disabled"
                             }
                         ]
+                    },
+                    {
+                        "condition": [
+                            {
+                                "domain": "github.dev"
+                            }
+                        ],
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/apiChanges/crossOriginIsolated",
+                                "value": {
+                                    "type": "descriptor",
+                                    "getterValue": {
+                                        "type": "boolean",
+                                        "value": true
+                                    }
+                                }
+                            }
+                        ]
                     }
                 ]
             }
@@ -3412,8 +3464,8 @@
             "exceptions": [],
             "features": {
                 "feature": {
-                    "state": "disabled",
-                    "minSupportedVersion": 52530000,
+                    "state": "enabled",
+                    "minSupportedVersion": 52610000,
                     "rollout": {
                         "steps": [
                             {
@@ -3421,12 +3473,6 @@
                             },
                             {
                                 "percent": 25
-                            },
-                            {
-                                "percent": 50
-                            },
-                            {
-                                "percent": 100
                             }
                         ]
                     }
