@@ -9,7 +9,7 @@ jobs:
         if: github.event.action != 'closed'
         runs-on: ubuntu-latest
         concurrency:
-            group: test-url-${{ github.event.pull_request.number }}
+            group: preview-pages-branch
             cancel-in-progress: false
         steps:
             - name: Post pending comment
@@ -86,11 +86,24 @@ jobs:
 
                       _Last updated: ${{ steps.generate_preview_links.outputs.last_updated }}_
 
+            - name: Update comment on failure
+              if: failure()
+              uses: peter-evans/create-or-update-comment@v4
+              with:
+                  token: ${{ secrets.GITHUB_TOKEN }}
+                  repository: ${{ github.repository }}
+                  comment-id: ${{ steps.pending_comment.outputs.comment-id }}
+                  edit-mode: replace
+                  body: |
+                      🔗 **Preview Config for PR #${{ github.event.pull_request.number }}**
+
+                      ❌ Failed to build or publish preview config. Check the [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details.
+
     cleanup-preview:
         if: github.event.action == 'closed'
         runs-on: ubuntu-latest
         concurrency:
-            group: test-url-${{ github.event.pull_request.number }}
+            group: preview-pages-branch
             cancel-in-progress: false
         steps:
             - name: Checkout preview-pages branch
