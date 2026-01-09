@@ -636,7 +636,24 @@
             ]
         },
         "navigatorInterface": {
-            "state": "enabled"
+            "state": "enabled",
+            "settings": {
+                "additionalCheck": "enabled",
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "internal": true
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/additionalCheck",
+                                "value": "disabled"
+                            }
+                        ]
+                    }
+                ]
+            }
         },
         "elementHiding": {
             "state": "enabled"
