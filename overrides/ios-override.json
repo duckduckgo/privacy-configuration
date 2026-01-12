@@ -1875,8 +1875,19 @@
             }
         },
         "dbp": {
-            "state": "internal",
+            "state": "enabled",
             "features": {
+                "pirRollout": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.201.1",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 1.0
+                            }
+                        ]
+                    }
+                },
                 "waitlistBetaActive": {
                     "state": "disabled"
                 },
@@ -1897,9 +1908,13 @@
                 "clickActionDelayReductionOptimization": {
                     "state": "internal",
                     "minSupportedVersion": "7.200.0"
+                },
+                "foregroundRunningOnAppActive": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.201.1"
                 }
             },
-            "minSupportedVersion": "7.180.0"
+            "minSupportedVersion": "7.201.1"
         }
     },
     "unprotectedTemporary": []
