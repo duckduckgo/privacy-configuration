@@ -235,30 +235,6 @@
                             "weight": 1
                         }
                     ]
-                },
-                "webNotificationsFixExperiment": {
-                    "state": "enabled",
-                    "minSupportedVersion": "1.168.0",
-                    "rollout": {
-                        "steps": [
-                            {
-                                "percent": 10
-                            },
-                            {
-                                "percent": 50
-                            }
-                        ]
-                    },
-                    "cohorts": [
-                        {
-                            "name": "control",
-                            "weight": 1
-                        },
-                        {
-                            "name": "treatment",
-                            "weight": 1
-                        }
-                    ]
                 }
             }
         },
@@ -681,6 +657,10 @@
                 "windowSizing": "enabled",
                 "navigatorCredentials": "enabled",
                 "safariObject": "enabled",
+                "webNotifications": {
+                    "state": "enabled",
+                    "nativeEnabled": true
+                },
                 "messageHandlers": {
                     "state": "disabled",
                     "handlerStrategies": {
@@ -715,23 +695,6 @@
                             {
                                 "op": "replace",
                                 "path": "/messageHandlers/state",
-                                "value": "enabled"
-                            }
-                        ]
-                    }
-                ],
-                "conditionalChanges": [
-                    {
-                        "condition": {
-                            "experiment": {
-                                "experimentName": "webNotificationsFixExperiment",
-                                "cohort": "treatment"
-                            }
-                        },
-                        "patchSettings": [
-                            {
-                                "op": "add",
-                                "path": "/webNotifications",
                                 "value": "enabled"
                             }
                         ]
@@ -1978,6 +1941,9 @@
                 "pinnedTabsViewRewrite": {
                     "state": "enabled",
                     "minSupportedVersion": "1.166.0"
+                },
+                "webNotifications": {
+                    "state": "internal"
                 }
             }
         },
