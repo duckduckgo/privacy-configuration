@@ -51,6 +51,26 @@
                     {
                         "condition": [
                             {
+                                "domain": "facebook.com"
+                            }
+                        ],
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/apiChanges/Notification.permission",
+                                "value": {
+                                    "type": "descriptor",
+                                    "getterValue": {
+                                        "type": "string",
+                                        "value": "denied"
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "condition": [
+                            {
                                 "domain": "1cs.jp"
                             },
                             {
@@ -1258,7 +1278,8 @@
                     "state": "disabled"
                 },
                 "omnibarToggle": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.143.0"
                 },
                 "showHideAiGeneratedImages": {
                     "state": "internal"
@@ -1275,7 +1296,8 @@
         },
         "duckAiDataClearing": {
             "exceptions": [],
-            "state": "disabled",
+            "state": "enabled",
+            "minSupportedVersion": "0.142.0",
             "settings": {
                 "chatsLocalStorageKeys": ["savedAIChats"],
                 "chatImagesIndexDbNameObjectStoreNamePairs": [
@@ -1296,13 +1318,20 @@
                     "state": "disabled"
                 },
                 "freemium": {
-                    "state": "disabled",
-                    "minSupportedVersion": "0.137.3",
+                    "state": "enabled",
+                    "minSupportedVersion": "0.140.1",
                     "targets": [
                         {
                             "localeCountry": "US"
                         }
-                    ]
+                    ],
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 20.0
+                            }
+                        ]
+                    }
                 }
             },
             "settings": {
@@ -1714,6 +1743,14 @@
                 {
                     "domain": "ashleyfurniture.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3908"
+                },
+                {
+                    "domain": "dillards.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4277"
+                },
+                {
+                    "domain": "ynab.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4196"
                 }
             ]
         },
@@ -1791,7 +1828,7 @@
                     "settings": {
                         "chrome": "enabled",
                         "brave": "enabled",
-                        "edge": "disabled",
+                        "edge": "enabled",
                         "vivaldi": "disabled"
                     }
                 },
@@ -1800,7 +1837,7 @@
                     "settings": {
                         "chrome": "enabled",
                         "brave": "enabled",
-                        "edge": "disabled",
+                        "edge": "enabled",
                         "vivaldi": "disabled",
                         "chromium": "enabled"
                     }
@@ -1941,6 +1978,16 @@
                     {
                         "domain": "google.com",
                         "name": "__Secure-3PAPISID",
+                        "reason": "Required for Google login flow"
+                    },
+                    {
+                        "domain": "google.com",
+                        "name": "__Secure-3PSIDTS",
+                        "reason": "Required for Google login flow"
+                    },
+                    {
+                        "domain": "google.com",
+                        "name": "__Secure-3PSIDRTS",
                         "reason": "Required for Google login flow"
                     },
                     {
@@ -2388,6 +2435,17 @@
                 },
                 "seamlessAccountSwitching": {
                     "state": "enabled"
+                },
+                "fetchFavicons": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.143.0"
+                },
+                "unifyFavorites": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.144.0"
+                },
+                "aiChatSync": {
+                    "state": "internal"
                 }
             }
         },
@@ -2538,6 +2596,9 @@
         "clientBrandHint": {
             "state": "enabled"
         },
+        "uaChBrands": {
+            "state": "enabled"
+        },
         "privacyPro": {
             "state": "enabled",
             "features": {
@@ -2618,12 +2679,19 @@
                     "settings": {
                         "discountPercent": "40"
                     }
+                },
+                "tierMessagingEnabled": {
+                    "state": "disabled"
+                },
+                "allowProTierPurchase": {
+                    "state": "disabled"
                 }
             },
             "settings": {
                 "authApiV2NonStableRollout": true,
                 "enableExtraDiagnostics": true,
-                "jwksCachingEnabled": false,
+                "enable401Retry": true,
+                "jwksCachingEnabled": true,
                 "saveImmediately": false
             }
         },
@@ -2636,19 +2704,6 @@
                 },
                 "enumerateDevices": "enabled",
                 "domains": [
-                    {
-                        "domain": [
-                            "meet.google.com",
-                            "canadiantire.ca"
-                        ],
-                        "patchSettings": [
-                            {
-                                "op": "replace",
-                                "path": "/enumerateDevices",
-                                "value": "disabled"
-                            }
-                        ]
-                    },
                     {
                         "domain": "asana.com",
                         "patchSettings": [
@@ -2720,8 +2775,8 @@
                     "state": "enabled"
                 },
                 "crashAutoRecovery": {
-                    "state": "disabled",
-                    "minSupportedVersion": "0.125.0",
+                    "state": "enabled",
+                    "minSupportedVersion": "0.142.1",
                     "settings": {
                         "autoRecoveryBrowserEngine": true,
                         "autoRecoveryTab": true,
@@ -2736,6 +2791,9 @@
         "webview": {
             "state": "enabled",
             "features": {
+                "webViewProviderStableOptIn": {
+                    "state": "disabled"
+                },
                 "webViewProviderPreviewOptIn": {
                     "state": "preview",
                     "minSupportedVersion": "0.136.2",
@@ -2783,7 +2841,10 @@
                     }
                 },
                 "serviceWorkerWatchdog": {
-                    "state": "preview"
+                    "state": "disabled"
+                },
+                "serviceWorkerWatchdogUnregister": {
+                    "state": "disabled"
                 }
             },
             "exceptions": []
@@ -2823,6 +2884,10 @@
                 },
                 "newTabPageTabIDs": {
                     "state": "disabled"
+                },
+                "autoconsentStats": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.143.3"
                 }
             },
             "minSupportedVersion": "0.100.0"
@@ -2837,6 +2902,10 @@
         "addressBarTldNavOrSearch": {
             "state": "enabled",
             "minSupportedVersion": "0.100.0"
+        },
+        "addressBarTrackerAnimation": {
+            "state": "disabled",
+            "exceptions": []
         },
         "fullScreenMode": {
             "state": "enabled",
@@ -2870,7 +2939,8 @@
                     "state": "enabled"
                 },
                 "fireproofSettingsVisibility": {
-                    "state": "disabled"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.142.0"
                 }
             }
         },
@@ -2916,10 +2986,12 @@
                     "minSupportedVersion": "0.131.0"
                 },
                 "downloadIndicatorEnhancements": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.142.0"
                 },
                 "downloadNotificationPanel": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.142.0"
                 }
             }
         },
@@ -3098,7 +3170,7 @@
             }
         },
         "hwAccelerationExperiment": {
-            "state": "enabled",
+            "state": "disabled",
             "features": {
                 "disableHwAccelerationOnRenderCrash": {
                     "state": "disabled",
@@ -3114,7 +3186,7 @@
                     }
                 },
                 "disableHwAccelerationExperimentGroup": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "cohorts": [
                         {
                             "name": "groupCom",
@@ -3127,7 +3199,7 @@
                     ]
                 },
                 "disableHwAccelerationOnRenderCrashCom": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "cohorts": [
                         {
                             "name": "controlCom",
@@ -3140,7 +3212,7 @@
                     ]
                 },
                 "disableHwAccelerationOnRenderCrashOom": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "cohorts": [
                         {
                             "name": "controlOom",
@@ -3176,6 +3248,109 @@
                     "state": "internal"
                 }
             }
+        },
+        "urlPredictor": {
+            "state": "internal",
+            "settings": {
+                "allowedSchemes": [
+                    "http",
+                    "https",
+                    "file",
+                    "mailto",
+                    "duck"
+                ]
+            }
+        },
+        "settingsPage": {
+            "state": "enabled",
+            "features": {
+                "uninstallButton": {
+                    "state": "disabled"
+                }
+            }
+        },
+        "combinedPermissionView": {
+            "state": "disabled",
+            "exceptions": []
+        },
+        "unsetAsDefaultMonitor": {
+            "state": "enabled",
+            "exceptions": []
+        },
+        "attributedMetrics": {
+            "state": "enabled",
+            "minSupportedVersion": "0.141.7",
+            "exceptions": [],
+            "features": {
+                "canEmitInactivity": {
+                    "state": "enabled"
+                },
+                "emitAllMetrics": {
+                    "state": "disabled"
+                },
+                "retention": {
+                    "state": "disabled"
+                },
+                "canEmitRetention": {
+                    "state": "disabled"
+                },
+                "searchDaysAvg": {
+                    "state": "disabled"
+                },
+                "canEmitSearchDaysAvg": {
+                    "state": "disabled"
+                },
+                "searchCountAvg": {
+                    "state": "disabled"
+                },
+                "canEmitSearchCountAvg": {
+                    "state": "disabled"
+                },
+                "adClickCountAvg": {
+                    "state": "disabled"
+                },
+                "canEmitAdClickCountAvg": {
+                    "state": "disabled"
+                },
+                "aiUsageAvg": {
+                    "state": "disabled"
+                },
+                "canEmitAIUsageAvg": {
+                    "state": "disabled"
+                },
+                "subscriptionRetention": {
+                    "state": "disabled"
+                },
+                "canEmitSubscriptionRetention": {
+                    "state": "disabled"
+                },
+                "syncDevices": {
+                    "state": "disabled"
+                },
+                "canEmitSyncDevices": {
+                    "state": "disabled"
+                },
+                "sendOriginParam": {
+                    "state": "disabled",
+                    "settings": {
+                        "originCampaignSubstrings": [
+                            "paid"
+                        ]
+                    }
+                }
+            }
+        },
+        "requestBlocklist": {
+            "state": "enabled"
+        },
+        "passwordManagerExtensions": {
+            "state": "disabled",
+            "features": {
+                "bitwarden": {
+                    "state": "disabled"
+                }
+            },
+            "exceptions": []
         }
     },
     "unprotectedTemporary": []

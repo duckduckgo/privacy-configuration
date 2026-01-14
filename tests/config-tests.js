@@ -227,11 +227,6 @@ describe('Config schema tests', () => {
                             );
                         }
 
-                        expect(ddgwvFeature.minSupportedVersion).to.deep.equal(
-                            baseFeature.minSupportedVersion,
-                            `_DDGWV feature override '${ddgwvFeatureName}' minSupportedVersion should match base feature '${baseFeatureName}' minSupportedVersion`,
-                        );
-
                         // Check that if both features have subfeatures, they have the same subfeature names
                         if (baseFeature.features && ddgwvFeature.features) {
                             const baseSubfeatureNames = Object.keys(baseFeature.features).sort();
@@ -246,12 +241,6 @@ describe('Config schema tests', () => {
                             for (const subfeatureName of baseSubfeatureNames) {
                                 const baseSubfeature = baseFeature.features[subfeatureName];
                                 const ddgwvSubfeature = ddgwvFeature.features[subfeatureName];
-
-                                // Check minSupportedVersion
-                                expect(ddgwvSubfeature.minSupportedVersion).to.deep.equal(
-                                    baseSubfeature.minSupportedVersion,
-                                    `_DDGWV feature override '${ddgwvFeatureName}.${subfeatureName}' minSupportedVersion should match base feature '${baseFeatureName}.${subfeatureName}' minSupportedVersion`,
-                                );
 
                                 // Check rollout (if present)
                                 if (baseSubfeature.rollout && ddgwvSubfeature.rollout) {

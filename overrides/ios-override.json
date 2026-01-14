@@ -1,5 +1,130 @@
 {
     "features": {
+        "attributedMetrics": {
+            "state": "enabled",
+            "minSupportedVersion": "7.198.0",
+            "exceptions": [],
+            "features": {
+                "emitAllMetrics": {
+                    "state": "enabled"
+                },
+                "retention": {
+                    "state": "enabled"
+                },
+                "canEmitRetention": {
+                    "state": "enabled"
+                },
+                "searchDaysAvg": {
+                    "state": "enabled"
+                },
+                "canEmitSearchDaysAvg": {
+                    "state": "enabled"
+                },
+                "searchCountAvg": {
+                    "state": "enabled"
+                },
+                "canEmitSearchCountAvg": {
+                    "state": "enabled"
+                },
+                "adClickCountAvg": {
+                    "state": "enabled"
+                },
+                "canEmitAdClickCountAvg": {
+                    "state": "enabled"
+                },
+                "aiUsageAvg": {
+                    "state": "enabled"
+                },
+                "canEmitAIUsageAvg": {
+                    "state": "enabled"
+                },
+                "subscriptionRetention": {
+                    "state": "enabled"
+                },
+                "canEmitSubscriptionRetention": {
+                    "state": "enabled"
+                },
+                "syncDevices": {
+                    "state": "enabled"
+                },
+                "canEmitSyncDevices": {
+                    "state": "enabled"
+                },
+                "sendOriginParam": {
+                    "state": "enabled",
+                    "settings": {
+                        "originCampaignSubstrings": [
+                            "paid"
+                        ]
+                    }
+                }
+            },
+            "settings": {
+                "attributed_metric_retention_week": {
+                    "buckets": [
+                        1,
+                        2,
+                        3
+                    ],
+                    "version": 1
+                },
+                "attributed_metric_retention_month": {
+                    "buckets": [
+                        2,
+                        3,
+                        4,
+                        5
+                    ],
+                    "version": 1
+                },
+                "attributed_metric_active_past_week": {
+                    "buckets": [
+                        2,
+                        4
+                    ],
+                    "version": 1
+                },
+                "attributed_metric_average_searches_past_week_first_month": {
+                    "buckets": [
+                        5,
+                        9
+                    ],
+                    "version": 1
+                },
+                "attributed_metric_average_searches_past_week": {
+                    "buckets": [
+                        5,
+                        9
+                    ],
+                    "version": 1
+                },
+                "attributed_metric_average_ad_clicks_past_week": {
+                    "buckets": [
+                        2,
+                        5
+                    ],
+                    "version": 1
+                },
+                "attributed_metric_average_duck_ai_usage_past_week": {
+                    "buckets": [
+                        5,
+                        9
+                    ],
+                    "version": 1
+                },
+                "attributed_metric_subscribed": {
+                    "buckets": [
+                        0,
+                        1
+                    ],
+                    "version": 1
+                },
+                "attributed_metric_synced_device": {
+                    "buckets": [1],
+                    "version": 1
+                }
+            }
+        },
         "experimentalTheming": {
             "state": "enabled",
             "exceptions": [],
@@ -163,6 +288,23 @@
                     "state": "enabled",
                     "description": "Toggle Choice Screen during onboarding",
                     "minSupportedVersion": "7.197.0"
+                },
+                "showHideAiGeneratedImages": {
+                    "state": "enabled"
+                },
+                "fullDuckAIMode": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.200.0"
+                },
+                "fadeOutOnToggle": {
+                    "state": "enabled",
+                    "description": "Unify inputs for Duck.ai",
+                    "minSupportedVersion": "7.201.0"
+                },
+                "aiChatAtb": {
+                    "state": "internal",
+                    "description": "Add ATB to Duck.ai",
+                    "minSupportedVersion": "7.203.0"
                 }
             },
             "settings": {
@@ -345,7 +487,7 @@
                     ]
                 },
                 "tdsNextExperiment005": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "rollout": {
                         "steps": [
                             {
@@ -530,6 +672,23 @@
         "autofill": {
             "state": "enabled",
             "features": {
+                "autofillExtensionSettings": {
+                    "state": "enabled"
+                },
+                "canPromoteAutofillExtensionInBrowser": {
+                    "state": "enabled",
+                    "settings": {
+                        "daysSinceInstalled": "7",
+                        "minNumberPasswords": "4"
+                    }
+                },
+                "canPromoteAutofillExtensionInPasswordManagement": {
+                    "state": "enabled",
+                    "settings": {
+                        "daysSinceInstalled": "7",
+                        "minNumberPasswords": "4"
+                    }
+                },
                 "autocompleteAttributeSupport": {
                     "state": "enabled"
                 },
@@ -986,6 +1145,10 @@
                     {
                         "domain": "arcteryx.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3701"
+                    },
+                    {
+                        "domain": "yahoo.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4258"
                     }
                 ],
                 "ddgDefaultSites": [
@@ -1021,6 +1184,10 @@
                     {
                         "domain": "arcteryx.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3701"
+                    },
+                    {
+                        "domain": "yahoo.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4258"
                     }
                 ],
                 "omitVersionSites": []
@@ -1054,6 +1221,9 @@
                 "syncCreditCards": {
                     "state": "enabled",
                     "minSupportedVersion": "7.193.0"
+                },
+                "aiChatSync": {
+                    "state": "disabled"
                 }
             }
         },
@@ -1127,6 +1297,17 @@
                                 "rule": "connect.facebook.net/en_US/sdk.js",
                                 "domains": ["solitaired.com"],
                                 "reason": ["solitaired.com - https://github.com/duckduckgo/privacy-configuration/pull/2329"]
+                            }
+                        ]
+                    },
+                    "featureassets.org": {
+                        "rules": [
+                            {
+                                "rule": "featureassets.org/v1/initialize",
+                                "domains": [
+                                    "growtherapy.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4276"
                             }
                         ]
                     },
@@ -1246,17 +1427,11 @@
                 },
                 "domains": [
                     {
-                        "domain": "www.cbsnews.com",
-                        "patchSettings": [
-                            {
-                                "op": "replace",
-                                "path": "/messageHandlers/state",
-                                "value": "enabled"
-                            }
-                        ]
-                    },
-                    {
-                        "domain": "myhome.experian.co.uk",
+                        "domain": [
+                            "www.cbsnews.com",
+                            "myhome.experian.co.uk",
+                            "luna.amazon.com"
+                        ],
                         "patchSettings": [
                             {
                                 "op": "replace",
@@ -1496,6 +1671,26 @@
                             "localeCountry": "US"
                         }
                     ]
+                },
+                "tierMessagingEnabled": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "minSupportedVersion": "7.199.0"
                 }
             }
         },
@@ -1667,12 +1862,46 @@
                     "settings": {
                         "daysInactive": "7"
                     }
+                },
+                "customization": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.198.0",
+                    "description": "Allow users to customize button on toolbar and addressbar",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
+                },
+                "productTelemetrySurfaceUsage": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.199.0",
+                    "description": "Temporarily gather telemetry around product surfaces being used."
                 }
             }
         },
         "dbp": {
-            "state": "internal",
+            "state": "enabled",
             "features": {
+                "pirRollout": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.201.1",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 1.0
+                            },
+                            {
+                                "percent": 5.0
+                            }
+                        ]
+                    }
+                },
                 "waitlistBetaActive": {
                     "state": "disabled"
                 },
@@ -1683,17 +1912,24 @@
                     "state": "disabled"
                 },
                 "remoteBrokerDelivery": {
-                    "state": "internal",
+                    "state": "enabled",
                     "minSupportedVersion": "7.180.0"
                 },
                 "emailConfirmationDecoupling": {
-                    "state": "internal",
+                    "state": "enabled",
                     "minSupportedVersion": "7.190.0"
+                },
+                "clickActionDelayReductionOptimization": {
+                    "state": "internal",
+                    "minSupportedVersion": "7.200.0"
+                },
+                "foregroundRunningOnAppActive": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.201.1"
                 }
             },
-            "minSupportedVersion": "7.180.0"
+            "minSupportedVersion": "7.201.1"
         }
     },
-
     "unprotectedTemporary": []
 }

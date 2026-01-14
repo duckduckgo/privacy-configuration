@@ -1,5 +1,130 @@
 {
     "features": {
+        "attributedMetrics": {
+            "state": "enabled",
+            "minSupportedVersion": "1.168.0",
+            "exceptions": [],
+            "features": {
+                "emitAllMetrics": {
+                    "state": "enabled"
+                },
+                "retention": {
+                    "state": "enabled"
+                },
+                "canEmitRetention": {
+                    "state": "enabled"
+                },
+                "searchDaysAvg": {
+                    "state": "enabled"
+                },
+                "canEmitSearchDaysAvg": {
+                    "state": "enabled"
+                },
+                "searchCountAvg": {
+                    "state": "enabled"
+                },
+                "canEmitSearchCountAvg": {
+                    "state": "enabled"
+                },
+                "adClickCountAvg": {
+                    "state": "enabled"
+                },
+                "canEmitAdClickCountAvg": {
+                    "state": "enabled"
+                },
+                "aiUsageAvg": {
+                    "state": "enabled"
+                },
+                "canEmitAIUsageAvg": {
+                    "state": "enabled"
+                },
+                "subscriptionRetention": {
+                    "state": "enabled"
+                },
+                "canEmitSubscriptionRetention": {
+                    "state": "enabled"
+                },
+                "syncDevices": {
+                    "state": "enabled"
+                },
+                "canEmitSyncDevices": {
+                    "state": "enabled"
+                },
+                "sendOriginParam": {
+                    "state": "enabled",
+                    "settings": {
+                        "originCampaignSubstrings": [
+                            "paid"
+                        ]
+                    }
+                }
+            },
+            "settings": {
+                "attributed_metric_retention_week": {
+                    "buckets": [
+                        1,
+                        2,
+                        3
+                    ],
+                    "version": 1
+                },
+                "attributed_metric_retention_month": {
+                    "buckets": [
+                        2,
+                        3,
+                        4,
+                        5
+                    ],
+                    "version": 1
+                },
+                "attributed_metric_active_past_week": {
+                    "buckets": [
+                        2,
+                        4
+                    ],
+                    "version": 1
+                },
+                "attributed_metric_average_searches_past_week_first_month": {
+                    "buckets": [
+                        5,
+                        9
+                    ],
+                    "version": 1
+                },
+                "attributed_metric_average_searches_past_week": {
+                    "buckets": [
+                        5,
+                        9
+                    ],
+                    "version": 1
+                },
+                "attributed_metric_average_ad_clicks_past_week": {
+                    "buckets": [
+                        2,
+                        5
+                    ],
+                    "version": 1
+                },
+                "attributed_metric_average_duck_ai_usage_past_week": {
+                    "buckets": [
+                        5,
+                        9
+                    ],
+                    "version": 1
+                },
+                "attributed_metric_subscribed": {
+                    "buckets": [
+                        0,
+                        1
+                    ],
+                    "version": 1
+                },
+                "attributed_metric_synced_device": {
+                    "buckets": [1],
+                    "version": 1
+                }
+            }
+        },
         "experimentalTheming": {
             "state": "enabled",
             "exceptions": [],
@@ -50,6 +175,9 @@
         },
         "brokenSitePrompt": {
             "state": "enabled"
+        },
+        "combinedPermissionView": {
+            "state": "internal"
         },
         "contentScopeExperiments": {
             "exceptions": [],
@@ -256,6 +384,10 @@
                     "state": "enabled",
                     "minSupportedVersion": "1.161.0"
                 },
+                "omnibarToggle": {
+                    "state": "enabled",
+                    "minSupportedVersion": "1.171.0"
+                },
                 "keepSession": {
                     "state": "enabled",
                     "minSupportedVersion": "1.161.0",
@@ -265,6 +397,9 @@
                 },
                 "standaloneMigration": {
                     "state": "disabled"
+                },
+                "showHideAiGeneratedImages": {
+                    "state": "enabled"
                 }
             },
             "settings": {
@@ -334,6 +469,10 @@
                             }
                         ]
                     }
+                },
+                "clickActionDelayReductionOptimization": {
+                    "state": "enabled",
+                    "minSupportedVersion": "1.171.0"
                 }
             },
             "minSupportedVersion": "1.70.0"
@@ -375,7 +514,7 @@
                     ]
                 },
                 "tdsNextExperiment005": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "rollout": {
                         "steps": [
                             {
@@ -518,6 +657,10 @@
                 "windowSizing": "enabled",
                 "navigatorCredentials": "enabled",
                 "safariObject": "enabled",
+                "webNotifications": {
+                    "state": "enabled",
+                    "nativeEnabled": true
+                },
                 "messageHandlers": {
                     "state": "disabled",
                     "handlerStrategies": {
@@ -543,17 +686,11 @@
                         ]
                     },
                     {
-                        "domain": "www.cbsnews.com",
-                        "patchSettings": [
-                            {
-                                "op": "replace",
-                                "path": "/messageHandlers/state",
-                                "value": "enabled"
-                            }
-                        ]
-                    },
-                    {
-                        "domain": "myhome.experian.co.uk",
+                        "domain": [
+                            "www.cbsnews.com",
+                            "myhome.experian.co.uk",
+                            "luna.amazon.com"
+                        ],
                         "patchSettings": [
                             {
                                 "op": "replace",
@@ -570,6 +707,19 @@
             "features": {
                 "filterlist": {
                     "state": "disabled"
+                },
+                "heuristicAction": {
+                    "state": "enabled",
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
                 }
             }
         },
@@ -959,6 +1109,10 @@
                 },
                 "newTabPageTabIDs": {
                     "state": "enabled"
+                },
+                "autoconsentStats": {
+                    "state": "enabled",
+                    "minSupportedVersion": "1.169.0"
                 }
             }
         },
@@ -1287,6 +1441,9 @@
                 "syncIdentities": {
                     "state": "enabled",
                     "minSupportedVersion": "1.163.0"
+                },
+                "aiChatSync": {
+                    "state": "disabled"
                 }
             }
         },
@@ -1404,6 +1561,17 @@
                                 "rule": "facebook.net",
                                 "domains": ["nextdoor.com"],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1190"
+                            }
+                        ]
+                    },
+                    "featureassets.org": {
+                        "rules": [
+                            {
+                                "rule": "featureassets.org/v1/initialize",
+                                "domains": [
+                                    "growtherapy.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4276"
                             }
                         ]
                     },
@@ -1652,6 +1820,26 @@
                     "settings": {
                         "discountPercent": "40"
                     }
+                },
+                "tierMessagingEnabled": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "minSupportedVersion": "1.169.0"
                 }
             }
         },
@@ -1757,6 +1945,10 @@
                     "state": "enabled"
                 },
                 "pinnedTabsViewRewrite": {
+                    "state": "enabled",
+                    "minSupportedVersion": "1.166.0"
+                },
+                "webNotifications": {
                     "state": "disabled"
                 }
             }
@@ -1818,10 +2010,94 @@
             }
         },
         "popupBlocking": {
-            "state": "internal",
+            "state": "enabled",
+            "minSupportedVersion": "1.168.0",
             "exceptions": [],
             "settings": {
-                "userInitiatedPopupThreshold": 6.0
+                "userInitiatedPopupThreshold": 6.0,
+                "allowlist": [
+                    "duckduckgo.com",
+                    "amazon.com",
+                    "becu.org",
+                    "capitalone.com",
+                    "chase.com",
+                    "github.com",
+                    "google.com",
+                    "googleusercontent.com",
+                    "guitarcenter.com",
+                    "live.com",
+                    "microsoftonline.com",
+                    "msn.com",
+                    "office.com",
+                    "pnc.com",
+                    "reddit.com",
+                    "techtitute.com",
+                    "ups.com",
+                    "userinterviews.com",
+                    "zoom.com",
+                    "zoom.us",
+                    "zoomgov.com"
+                ]
+            }
+        },
+        "dataImport": {
+            "state": "enabled",
+            "exceptions": [],
+            "features": {
+                "newDataImportExperience": {
+                    "state": "enabled",
+                    "minSupportedVersion": "1.169.0"
+                }
+            }
+        },
+        "webInterferenceDetection": {
+            "state": "enabled",
+            "minSupportedVersion": "1.172.0",
+            "exceptions": [],
+            "settings": {
+                "autoRunDelayMs": 100,
+                "interferenceTypes": {
+                    "botDetection": {
+                        "cloudflareTurnstile": {
+                            "state": "enabled",
+                            "vendor": "cloudflare",
+                            "selectors": [
+                                ".cf-turnstile",
+                                "script[src*=\"challenges.cloudflare.com\"]"
+                            ],
+                            "windowProperties": ["turnstile"],
+                            "statusSelectors": [
+                                { "status": "solved", "selectors": ["[data-state=\"success\"]"] },
+                                { "status": "failed", "selectors": ["[data-state=\"error\"]"] }
+                            ]
+                        },
+                        "hcaptcha": {
+                            "state": "enabled",
+                            "vendor": "hcaptcha",
+                            "selectors": [
+                                ".h-captcha",
+                                "[data-hcaptcha-widget-id]",
+                                "script[src*=\"hcaptcha.com\"]"
+                            ],
+                            "windowProperties": ["hcaptcha"]
+                        }
+                    },
+                    "fraudDetection": {
+                        "phishingWarning": {
+                            "state": "enabled",
+                            "type": "phishing",
+                            "selectors": [
+                                ".warning-banner",
+                                "#security-alert"
+                            ],
+                            "textPatterns": [
+                                "suspicious.*activity",
+                                "unusual.*login"
+                            ],
+                            "textSources": ["innerText"]
+                        }
+                    }
+                }
             }
         }
     },
