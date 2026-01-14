@@ -2049,6 +2049,56 @@
                     "minSupportedVersion": "1.169.0"
                 }
             }
+        },
+        "webInterferenceDetection": {
+            "state": "enabled",
+            "minSupportedVersion": "1.172.0",
+            "exceptions": [],
+            "settings": {
+                "autoRunDelayMs": 100,
+                "interferenceTypes": {
+                    "botDetection": {
+                        "cloudflareTurnstile": {
+                            "state": "enabled",
+                            "vendor": "cloudflare",
+                            "selectors": [
+                                ".cf-turnstile",
+                                "script[src*=\"challenges.cloudflare.com\"]"
+                            ],
+                            "windowProperties": ["turnstile"],
+                            "statusSelectors": [
+                                { "status": "solved", "selectors": ["[data-state=\"success\"]"] },
+                                { "status": "failed", "selectors": ["[data-state=\"error\"]"] }
+                            ]
+                        },
+                        "hcaptcha": {
+                            "state": "enabled",
+                            "vendor": "hcaptcha",
+                            "selectors": [
+                                ".h-captcha",
+                                "[data-hcaptcha-widget-id]",
+                                "script[src*=\"hcaptcha.com\"]"
+                            ],
+                            "windowProperties": ["hcaptcha"]
+                        }
+                    },
+                    "fraudDetection": {
+                        "phishingWarning": {
+                            "state": "enabled",
+                            "type": "phishing",
+                            "selectors": [
+                                ".warning-banner",
+                                "#security-alert"
+                            ],
+                            "textPatterns": [
+                                "suspicious.*activity",
+                                "unusual.*login"
+                            ],
+                            "textSources": ["innerText"]
+                        }
+                    }
+                }
+            }
         }
     },
     "unprotectedTemporary": []
