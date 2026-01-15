@@ -222,7 +222,7 @@ jobs:
 
             - name: Create comment
               if: github.event.action == 'opened' && (steps.wait-for-build.outputs.conclusion == 'success' && steps.approval.outputs.approved == 'true' && steps.check_files.outputs.files_valid == 'true') != true
-              uses: peter-evans/create-or-update-comment@v4
+              uses: peter-evans/create-or-update-comment@v5
               with:
                   issue-number: ${{ github.event.pull_request.number }}
                   body: |
@@ -261,7 +261,7 @@ jobs:
                       core.setOutput('comment_body', commentBody);
 
             - name: Create, or Update the Diff Comment
-              uses: peter-evans/create-or-update-comment@v4
+              uses: peter-evans/create-or-update-comment@v5
               with:
                   issue-number: ${{ github.event.pull_request.number }}
                   comment-id: ${{ steps.find_diff_comment.outputs.comment-id }}
@@ -269,7 +269,7 @@ jobs:
                   edit-mode: replace
 
             - name: Create, or Update the Approval Comment
-              uses: peter-evans/create-or-update-comment@v4
+              uses: peter-evans/create-or-update-comment@v5
               with:
                   issue-number: ${{ github.event.pull_request.number }}
                   comment-id: ${{ steps.find_approval_comment.outputs.comment-id }}
