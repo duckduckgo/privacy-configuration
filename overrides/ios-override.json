@@ -1929,6 +1929,52 @@
                 }
             },
             "minSupportedVersion": "7.201.1"
+        },
+        "pageContext": {
+            "state": "internal",
+            "minSupportedVersion": "7.204.0",
+            "exceptions": [],
+            "settings": {
+                "additionalCheck": "enabled",
+                "activeCaptureOnFirstMessage": "disabled",
+                "maxContentLength": 9500,
+                "mainContentSelector": "main, article, .content, .main, #content, #main",
+                "excludeSelectors": [
+                    ".ad",
+                    ".sidebar",
+                    ".footer",
+                    ".nav",
+                    ".header",
+                    ".banner",
+                    ".popup"
+                ],
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "domain": "nba.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/mainContentSelector",
+                                "value": "main"
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "domain": "reddit.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/excludeSelectors/-",
+                                "value": "shreddit-comments-page-ad"
+                            }
+                        ]
+                    }
+                ]
+            }
         }
     },
     "unprotectedTemporary": []
