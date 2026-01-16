@@ -3420,6 +3420,38 @@
                                 }
                             }
                         ]
+                    },
+                    {
+                        "condition": [
+                            {
+                                "domain": "darntough.com"
+                            }
+                        ],
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/apiChanges/window.chrome",
+                                "value": {
+                                    "type": "descriptor",
+                                    "getterValue": {
+                                        "type": "object",
+                                        "value": {}
+                                    },
+                                    "define": true
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/apiChanges/NetworkInformation.prototype.rtt",
+                                "value": {
+                                    "type": "descriptor",
+                                    "getterValue": {
+                                        "type": "number",
+                                        "value": 100
+                                    }
+                                }
+                            }
+                        ]
                     }
                 ]
             }
