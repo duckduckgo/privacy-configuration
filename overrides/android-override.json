@@ -1477,6 +1477,9 @@
                             },
                             {
                                 "percent": 50
+                            },
+                            {
+                                "percent": 100
                             }
                         ]
                     }
@@ -1713,7 +1716,12 @@
         },
         "fingerprintingBattery": {
             "state": "enabled",
-            "exceptions": [],
+            "exceptions": [
+                {
+                    "domain": "coinbase.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/4360"
+                }
+            ],
             "settings": {
                 "conditionalChanges": [
                     {
@@ -1733,6 +1741,12 @@
         },
         "fingerprintingCanvas": {
             "state": "disabled",
+            "exceptions": [
+                {
+                    "domain": "coinbase.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/4360"
+                }
+            ],
             "settings": {
                 "conditionalChanges": [
                     {
@@ -1752,6 +1766,12 @@
         },
         "fingerprintingHardware": {
             "state": "enabled",
+            "exceptions": [
+                {
+                    "domain": "coinbase.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/4360"
+                }
+            ],
             "settings": {
                 "keyboard": {
                     "type": "undefined"
@@ -1778,13 +1798,7 @@
                         ]
                     }
                 ]
-            },
-            "exceptions": [
-                {
-                    "domain": "tracfone.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/4322"
-                }
-            ]
+            }
         },
         "fingerprintingScreenSize": {
             "state": "enabled",
@@ -1796,6 +1810,10 @@
                 {
                     "domain": "tracfone.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/4143"
+                },
+                {
+                    "domain": "coinbase.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/4360"
                 }
             ],
             "settings": {
@@ -1837,6 +1855,10 @@
                 {
                     "domain": "ticketmaster.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/575"
+                },
+                {
+                    "domain": "coinbase.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/4360"
                 }
             ],
             "settings": {
@@ -2209,17 +2231,6 @@
                             }
                         ]
                     },
-                    "omtrdc.net": {
-                        "rules": [
-                            {
-                                "rule": "tracfonewireless.tt.omtrdc.net",
-                                "domains": [
-                                    "tracfone.com"
-                                ],
-                                "reason": "tracfone.com - https://github.com/duckduckgo/privacy-configuration/pull/4032"
-                            }
-                        ]
-                    },
                     "posthog.com": {
                         "rules": [
                             {
@@ -2228,35 +2239,6 @@
                                     "sciensus.com"
                                 ],
                                 "reason": "sciensus.com - https://github.com/duckduckgo/privacy-configuration/pull/4210"
-                            }
-                        ]
-                    },
-                    "tealiumiq.com": {
-                        "rules": [
-                            {
-                                "rule": "collect.tealiumiq.com",
-                                "domains": [
-                                    "tracfone.com"
-                                ],
-                                "reason": "tracfone.com - https://github.com/duckduckgo/privacy-configuration/pull/4032"
-                            },
-                            {
-                                "rule": "visitor-service.tealiumiq.com",
-                                "domains": [
-                                    "tracfone.com"
-                                ],
-                                "reason": "tracfone.com - https://github.com/duckduckgo/privacy-configuration/pull/4032"
-                            }
-                        ]
-                    },
-                    "tiqcdn.com": {
-                        "rules": [
-                            {
-                                "rule": "tags.tiqcdn.com",
-                                "domains": [
-                                    "tracfone.com"
-                                ],
-                                "reason": "tracfone.com - https://github.com/duckduckgo/privacy-configuration/pull/4077"
                             }
                         ]
                     },

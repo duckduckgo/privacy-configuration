@@ -227,6 +227,24 @@
             },
             "state": "enabled"
         },
+        "serp": {
+            "state": "enabled",
+            "exceptions": [],
+            "minSupportedVersion": "7.201.0",
+            "features": {
+                "storeSerpSettings": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.201.0",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            }
+                        ]
+                    }
+                }
+            }
+        },
         "aiChat": {
             "state": "enabled",
             "minSupportedVersion": "7.155.0",
@@ -1665,15 +1683,7 @@
                     }
                 },
                 "vpnMenuItem": {
-                    "state": "enabled",
-                    "targets": [
-                        {
-                            "localeCountry": "GB"
-                        },
-                        {
-                            "localeCountry": "US"
-                        }
-                    ]
+                    "state": "enabled"
                 },
                 "tierMessagingEnabled": {
                     "state": "enabled",
@@ -1901,6 +1911,9 @@
                             },
                             {
                                 "percent": 5.0
+                            },
+                            {
+                                "percent": 15.0
                             }
                         ]
                     }
@@ -1923,8 +1936,8 @@
                     "minSupportedVersion": "7.190.0"
                 },
                 "clickActionDelayReductionOptimization": {
-                    "state": "internal",
-                    "minSupportedVersion": "7.200.0"
+                    "state": "enabled",
+                    "minSupportedVersion": "7.201.1"
                 },
                 "foregroundRunningOnAppActive": {
                     "state": "enabled",
@@ -1932,6 +1945,52 @@
                 }
             },
             "minSupportedVersion": "7.201.1"
+        },
+        "pageContext": {
+            "state": "internal",
+            "minSupportedVersion": "7.204.0",
+            "exceptions": [],
+            "settings": {
+                "additionalCheck": "enabled",
+                "activeCaptureOnFirstMessage": "disabled",
+                "maxContentLength": 9500,
+                "mainContentSelector": "main, article, .content, .main, #content, #main",
+                "excludeSelectors": [
+                    ".ad",
+                    ".sidebar",
+                    ".footer",
+                    ".nav",
+                    ".header",
+                    ".banner",
+                    ".popup"
+                ],
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "domain": "nba.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/mainContentSelector",
+                                "value": "main"
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "domain": "reddit.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/excludeSelectors/-",
+                                "value": "shreddit-comments-page-ad"
+                            }
+                        ]
+                    }
+                ]
+            }
         },
         "webInterferenceDetection": {
             "state": "enabled",

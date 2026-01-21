@@ -20,12 +20,18 @@ type FraudDetector = {
     textPatterns?: string[];
     textSources?: string[];
 };
+type AdwallDetector = {
+    state: FeatureState;
+    textPatterns?: string[];
+    textSources?: string[];
+};
 
 type WebInterferenceDetectionSettings = CSSInjectFeatureSettings<{
     autoRunDelayMs?: number;
     interferenceTypes?: {
         botDetection?: Record<string, BotDetector>;
         fraudDetection?: Record<string, FraudDetector>;
+        adwallDetection?: Record<string, AdwallDetector>;
     };
 }>;
 

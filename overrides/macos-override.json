@@ -421,8 +421,38 @@
                     ]]
             }
         },
+        "duckAiChatHistory": {
+            "exceptions": [],
+            "state": "enabled",
+            "settings": {
+                "chatsLocalStorageKeys": ["savedAIChats"]
+            },
+            "features": {
+                "nativeUI": {
+                    "state": "internal"
+                }
+            }
+        },
         "autocompleteTabs": {
             "minSupportedVersion": "1.134.0"
+        },
+        "serp": {
+            "state": "enabled",
+            "exceptions": [],
+            "minSupportedVersion": "1.171.0",
+            "features": {
+                "storeSerpSettings": {
+                    "state": "enabled",
+                    "minSupportedVersion": "1.171.0",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            }
+                        ]
+                    }
+                }
+            }
         },
         "dbp": {
             "state": "enabled",
@@ -1949,7 +1979,8 @@
                     "minSupportedVersion": "1.166.0"
                 },
                 "webNotifications": {
-                    "state": "disabled"
+                    "state": "internal",
+                    "minSupportedVersion": "1.175.0"
                 }
             }
         },
@@ -2097,6 +2128,16 @@
                             "textSources": ["innerText"]
                         }
                     }
+                }
+            }
+        },
+        "updates": {
+            "state": "enabled",
+            "exceptions": [],
+            "features": {
+                "simplifiedFlow": {
+                    "state": "internal",
+                    "minSupportedVersion": "1.174.0"
                 }
             }
         }

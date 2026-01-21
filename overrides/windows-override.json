@@ -1282,7 +1282,7 @@
                     "minSupportedVersion": "0.143.0"
                 },
                 "showHideAiGeneratedImages": {
-                    "state": "internal"
+                    "state": "enabled"
                 }
             },
             "minSupportedVersion": "0.100.0",
@@ -1353,7 +1353,7 @@
             "state": "enabled",
             "features": {
                 "startInForeground": {
-                    "state": "preview"
+                    "state": "enabled"
                 }
             }
         },
@@ -2681,7 +2681,8 @@
                     }
                 },
                 "tierMessagingEnabled": {
-                    "state": "disabled"
+                    "state": "internal",
+                    "minSupportedVersion": "0.143.4"
                 },
                 "allowProTierPurchase": {
                     "state": "disabled"
@@ -2792,7 +2793,15 @@
             "state": "enabled",
             "features": {
                 "webViewProviderStableOptIn": {
-                    "state": "disabled"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.143.5",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 6.0
+                            }
+                        ]
+                    }
                 },
                 "webViewProviderPreviewOptIn": {
                     "state": "preview",
@@ -2807,6 +2816,9 @@
                             },
                             {
                                 "percent": 50.0
+                            },
+                            {
+                                "percent": 100.0
                             }
                         ]
                     }
@@ -2904,7 +2916,8 @@
             "minSupportedVersion": "0.100.0"
         },
         "addressBarTrackerAnimation": {
-            "state": "disabled",
+            "state": "enabled",
+            "minSupportedVersion": "0.144.0",
             "exceptions": []
         },
         "fullScreenMode": {
@@ -3001,6 +3014,13 @@
         },
         "adBlockExtension": {
             "state": "enabled",
+            "settings": {
+                "surveyRetriggerEnabled": false
+            }
+        },
+        "adBlockV2Extension": {
+            "state": "disabled",
+            "exceptions": [],
             "settings": {
                 "surveyRetriggerEnabled": false
             }
@@ -3169,6 +3189,15 @@
                 }
             }
         },
+        "nativeCrashReporting": {
+            "state": "enabled",
+            "exceptions": [],
+            "features": {
+                "canShowNativeCrashReportingDialog": {
+                    "state": "disabled"
+                }
+            }
+        },
         "hwAccelerationExperiment": {
             "state": "disabled",
             "features": {
@@ -3227,6 +3256,10 @@
             },
             "exceptions": []
         },
+        "tabProgressIndicator": {
+            "state": "disabled",
+            "exceptions": []
+        },
         "taskbar": {
             "state": "enabled",
             "exceptions": [],
@@ -3241,11 +3274,16 @@
             }
         },
         "serp": {
-            "state": "internal",
+            "state": "enabled",
             "exceptions": [],
             "features": {
                 "storeSerpSettings": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.143.4",
+                    "rollout": {
+                        "steps": [
+                            { "percent": 5 }]
+                    }
                 }
             }
         },
@@ -3344,12 +3382,40 @@
             "state": "enabled"
         },
         "passwordManagerExtensions": {
-            "state": "disabled",
+            "state": "internal",
+            "exceptions": [],
+            "settings": {
+                "manifestXml": "https://staticcdn.duckduckgo.com/d5c04536-5379-4709-8d19-d13fdd456ff6/extensions-test/manifest.xml"
+            },
             "features": {
                 "bitwarden": {
-                    "state": "disabled"
+                    "state": "internal",
+                    "settings": {
+                        "id": "nngceckbapebfimnlniiiahkandclblb"
+                    }
+                },
+                "lastpass": {
+                    "state": "internal",
+                    "settings": {
+                        "id": "hdokiejnpimakedhajhdlcegeplioahd"
+                    }
+                },
+                "onepassword": {
+                    "state": "internal",
+                    "settings": {
+                        "id": "aeblfdkhhhdcdjpifhhbdiojplfjncoa"
+                    }
+                },
+                "roboform": {
+                    "state": "internal",
+                    "settings": {
+                        "id": "pnlccmojcmeohlpggmfnbbiapkmbliob"
+                    }
                 }
-            },
+            }
+        },
+        "tabPanelDeferChanges": {
+            "state": "enabled",
             "exceptions": []
         }
     },

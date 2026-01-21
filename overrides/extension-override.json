@@ -218,6 +218,54 @@
             "settings": {
                 "autoRunDelayMs": 100,
                 "interferenceTypes": {
+                    "adwallDetection": {
+                        "generic": {
+                            "state": "enabled",
+                            "textPatterns": [
+                                "ad ?block(er)? detected",
+                                "adjust(ing)?( your)? ad blocking settings",
+                                "(turn off|disable|disabling|deactivate)( your| my)? ad ?block(er)?",
+                                "your ad ?blocker is on",
+                                "you('re| are| may be) using an ad blocker"
+                            ],
+                            "textSources": [
+                                "innerText"
+                            ]
+                        },
+                        "generic_de": {
+                            "state": "enabled",
+                            "textPatterns": [
+                                "deaktivieren sie ihren adblocker",
+                                "deaktivieren sie ihre blocker",
+                                "adblocker zu deaktivieren",
+                                "adblocker deaktivieren",
+                                "sie einen adblocker verwenden"
+                            ],
+                            "textSources": [
+                                "innerText"
+                            ]
+                        },
+                        "generic_it": {
+                            "state": "enabled",
+                            "textPatterns": [
+                                "disattiva l'ad block",
+                                "stai usando un ad block"
+                            ],
+                            "textSources": [
+                                "innerText"
+                            ]
+                        },
+                        "generic_se": {
+                            "state": "enabled",
+                            "textPatterns": [
+                                "har du en annonsblockerare igång",
+                                "avaktivera din annonsblockerare"
+                            ],
+                            "textSources": [
+                                "innerText"
+                            ]
+                        }
+                    },
                     "botDetection": {
                         "cloudflareTurnstile": {
                             "state": "enabled",
