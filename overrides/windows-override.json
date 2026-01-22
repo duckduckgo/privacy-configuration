@@ -2588,6 +2588,17 @@
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2879"
                             }
                         ]
+                    },
+                    "slickstream.com": {
+                        "rules": [
+                            {
+                                "rule": "app-sx.slickstream.com",
+                                "domains": [
+                                    "recipetineats.com"
+                                ],
+                                "reason": "recipetineats.com - https://github.com/duckduckgo/privacy-configuration/pull/4387"
+                            }
+                        ]
                     }
                 }
             }
@@ -3418,7 +3429,19 @@
         },
         "tabPanelDeferChanges": {
             "state": "enabled",
-            "exceptions": []
+            "exceptions": [],
+            "features": {
+                "tabPanelDeferChangesRollout": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 20
+                            }
+                        ]
+                    }
+                }
+            }
         }
     },
     "unprotectedTemporary": []
