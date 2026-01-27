@@ -1672,8 +1672,8 @@
                 "[data-a-target=consent-modal-save]",
                 ".ReactModalPortal:has([data-a-target=consent-modal-save])",
                 "[data-testid=\"BottomBar\"]",
-                "[data-testid=\"BottomBar\"] div",
-                "[data-testid=\"BottomBar\"] > div:has(>div:first-child>div:last-child>button[role=button]>span) > div:last-child > button[role=button]:last-child",
+                "body > div#app > div:nth-child(2):not([id]) > div:nth-child(2):not([id]) > div:nth-child(2):not([id]) > div:not([id]) > div:not([id]) > div:not([id]) > div:nth-child(2):not([id]) > button:nth-child(2):not([id]) > div:not([id])",
+                "body > div:not([id]) > div#__next > div:nth-child(2):not([id]) > div:not([id]) > div:not([id]) > div:nth-child(2):not([id]) > button:nth-child(2):not([id])",
                 ".show-cookies-modal .cookies-modal #cookies-reject",
                 ".fixed [data-testid=closeCookieBanner]",
                 "[data-testid=consent-banner]",
@@ -3843,7 +3843,12 @@
                 "body > div:not([id]) > aside:nth-child(4):not([id]) > div:nth-child(2):not([id]) > div#modal-content-24 > div#pr-cookie-notice > div:nth-child(1):not([id]) > div:nth-child(2):not([id]) > button:nth-child(2)#btn-cookie-decline",
                 "body > div:not([id]) > div:nth-child(2)#\\38 2816c67-b70a-4101-b4af-56f5172dc018 > div:nth-child(2):not([id]) > button:nth-child(2):not([id])",
                 "body > div#root > div:not([id]) > div:nth-child(5):not([id])[data-testid=\"cookies-banner\"] > div:nth-child(3):not([id]) > button:nth-child(3):not([id])",
-                "body > div:not([id]) > aside:nth-child(1):not([id]) > div:nth-child(2):not([id]) > div#modal-content-110 > div#pr-cookie-notice > div:nth-child(1):not([id]) > div:nth-child(2):not([id]) > button:nth-child(2)#btn-cookie-decline"
+                "body > div:not([id]) > aside:nth-child(1):not([id]) > div:nth-child(2):not([id]) > div#modal-content-110 > div#pr-cookie-notice > div:nth-child(1):not([id]) > div:nth-child(2):not([id]) > button:nth-child(2)#btn-cookie-decline",
+                "body > div#shopify-section-sections--20578431402223__cookies_gL67nW > sys-cookies:nth-child(2):not([id]) > div:not([id]) > div:not([id]) > div:not([id]) > div:nth-child(2):not([id]) > button:nth-child(1):not([id])",
+                "body > div:not([id]) > div:nth-child(1):not([id]) > div:not([id]) > div:not([id]) > div:not([id]) > div:not([id]) > div:nth-child(2):not([id]) > div:not([id]) > div:not([id]) > div:not([id]) > div:nth-child(2):not([id]) > button:nth-child(2):not([id])",
+                "body > div:not([id]) > div:nth-child(1):not([id]) > div:not([id]) > div:not([id]) > div:not([id]) > div:not([id]) > div:nth-child(2):not([id]) > div:not([id]) > div:not([id]) > div:not([id]) > div:nth-child(4):not([id]) > button:not([id])",
+                "#__rptl-cookiebanner #__rptl-cookiebanner-reject",
+                "body > div#react-root > div:not([id]) > div:not([id]) > div:nth-child(1)#layers > div:not([id]) > div:nth-child(2):not([id]) > div:not([id]) > div:not([id])[data-testid=BottomBar] > div:not([id]) > div:nth-child(2):not([id]) > button:nth-child(2):not([id])"
             ],
             "r": [
                 [
@@ -8979,9 +8984,33 @@
                     ],
                     [
                         {
-                            "waitForThenClick": [
-                                "#sd-cmp",
-                                "xpath///span[contains(., 'Do not accept') or contains(., 'Acceptera inte') or contains(., 'No aceptar') or contains(., 'Ikke acceptere') or contains(., 'Nicht akzeptieren') or contains(., 'Не приемам') or contains(., 'Να μην γίνει αποδοχή') or contains(., 'Niet accepteren') or contains(., 'Nepřijímat') or contains(., 'Nie akceptuj') or contains(., 'Nu acceptați') or contains(., 'Não aceitar') or contains(., 'Continuer sans accepter') or contains(., 'Non accettare') or contains(., 'Nem fogad el')]"
+                            "if": {
+                                "exists": [
+                                    "#sd-cmp",
+                                    "xpath///button[contains(., 'Do not accept') or contains(., 'Acceptera inte') or contains(., 'No aceptar') or contains(., 'Ikke acceptere') or contains(., 'Nicht akzeptieren') or contains(., 'Не приемам') or contains(., 'Να μην γίνει αποδοχή') or contains(., 'Niet accepteren') or contains(., 'Nepřijímat') or contains(., 'Nie akceptuj') or contains(., 'Nu acceptați') or contains(., 'Não aceitar') or contains(., 'Continuer sans accepter') or contains(., 'Non accettare') or contains(., 'Nem fogad el')]"
+                                ]
+                            },
+                            "then": [
+                                {
+                                    "waitForThenClick": [
+                                        "#sd-cmp",
+                                        "xpath///button[contains(., 'Do not accept') or contains(., 'Acceptera inte') or contains(., 'No aceptar') or contains(., 'Ikke acceptere') or contains(., 'Nicht akzeptieren') or contains(., 'Не приемам') or contains(., 'Να μην γίνει αποδοχή') or contains(., 'Niet accepteren') or contains(., 'Nepřijímat') or contains(., 'Nie akceptuj') or contains(., 'Nu acceptați') or contains(., 'Não aceitar') or contains(., 'Continuer sans accepter') or contains(., 'Non accettare') or contains(., 'Nem fogad el')]"
+                                    ]
+                                }
+                            ],
+                            "else": [
+                                {
+                                    "waitForThenClick": [
+                                        "#sd-cmp",
+                                        "xpath///span[contains(., 'Задайте вашите избори') or contains(., 'Nastavit vaše volby') or contains(., 'Angiv dine valg') or contains(., 'Ihre Auswahl treffen') or contains(., 'Ορίστε τις επιλογές σας') or contains(., 'Set your choices') or contains(., 'Establecer preferencias') or contains(., 'Paramétrer vos choix') or contains(., 'Válassza ki a beállításokat') or contains(., 'Imposta le tue scelte') or contains(., 'Stel uw keuzes in') or contains(., 'Ustaw swoje wybory') or contains(., 'Definir suas escolhas') or contains(., 'Setați-vă opțiunile') or contains(., 'Ställ in dina val')]"
+                                    ]
+                                },
+                                {
+                                    "waitForThenClick": [
+                                        "#sd-cmp",
+                                        "xpath///span[contains(., 'Отхвърлям всичко') or contains(., 'Odmítnout vše') or contains(., 'Afvis alt') or contains(., 'Alle ablehnen') or contains(., 'Απόρριψη όλων') or contains(., 'Reject all') or contains(., 'Rechazar todo') or contains(., 'Tout refuser') or contains(., 'Mind elutasítása') or contains(., 'Rifiuta tutto') or contains(., 'Alles weigeren') or contains(., 'Odrzuć wszystkie') or contains(., 'Rejeitar todos') or contains(., 'Respingeți toate') or contains(., 'Avvisa allt')]"
+                                    ]
+                                }
                             ]
                         }
                     ],
@@ -13821,6 +13850,40 @@
                 ],
                 [
                     1,
+                    "auto_AU_direct-book.com_zsg",
+                    0,
+                    "^https?://(www\\.)?direct-book\\.com/",
+                    10,
+                    [],
+                    [
+                        {
+                            "e": 898
+                        }
+                    ],
+                    [
+                        {
+                            "v": 898
+                        }
+                    ],
+                    [
+                        {
+                            "wait": 500
+                        },
+                        {
+                            "c": 898
+                        }
+                    ],
+                    [
+                        {
+                            "timeout": 1000,
+                            "check": "none",
+                            "wv": 898
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
                     "auto_AU_discover.utas.edu.au_k2n_+6",
                     0,
                     "^https?://(www\\.)?discover\\.utas\\.edu\\.au/|^https?://(www\\.)?experts\\.deakin\\.edu\\.au/|^https?://(www\\.)?experts\\.griffith\\.edu\\.au/|^https?://(www\\.)?profiles\\.uts\\.edu\\.au/|^https?://(www\\.)?scholars\\.latrobe\\.edu\\.au/|^https?://(www\\.)?discover\\.research\\.utoronto\\.ca/|^https?://(www\\.)?profiles\\.ucl\\.ac\\.uk/",
@@ -15757,6 +15820,40 @@
                 ],
                 [
                     1,
+                    "auto_AU_kyutai.org_gqt",
+                    0,
+                    "^https?://(www\\.)?kyutai\\.org/",
+                    10,
+                    [],
+                    [
+                        {
+                            "e": 899
+                        }
+                    ],
+                    [
+                        {
+                            "v": 899
+                        }
+                    ],
+                    [
+                        {
+                            "wait": 500
+                        },
+                        {
+                            "c": 899
+                        }
+                    ],
+                    [
+                        {
+                            "timeout": 1000,
+                            "check": "none",
+                            "wv": 899
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
                     "auto_AU_lcsc.com_cdx",
                     0,
                     "^https?://(www\\.)?lcsc\\.com/",
@@ -17099,6 +17196,40 @@
                 ],
                 [
                     1,
+                    "auto_AU_pokemonpricetracker.com_rjq",
+                    0,
+                    "^https?://(www\\.)?pokemonpricetracker\\.com/",
+                    10,
+                    [],
+                    [
+                        {
+                            "e": 1659
+                        }
+                    ],
+                    [
+                        {
+                            "v": 1659
+                        }
+                    ],
+                    [
+                        {
+                            "wait": 500
+                        },
+                        {
+                            "c": 1659
+                        }
+                    ],
+                    [
+                        {
+                            "timeout": 1000,
+                            "check": "none",
+                            "wv": 1659
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
                     "auto_AU_poolwerx.com.au_dwe",
                     0,
                     "^https?://(www\\.)?poolwerx\\.com\\.au/",
@@ -17390,6 +17521,40 @@
                             "timeout": 1000,
                             "check": "none",
                             "wv": 2907
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
+                    "auto_AU_remplenish.com_u5x",
+                    0,
+                    "^https?://(www\\.)?remplenish\\.com/",
+                    10,
+                    [],
+                    [
+                        {
+                            "e": 3070
+                        }
+                    ],
+                    [
+                        {
+                            "v": 3070
+                        }
+                    ],
+                    [
+                        {
+                            "wait": 500
+                        },
+                        {
+                            "c": 3070
+                        }
+                    ],
+                    [
+                        {
+                            "timeout": 1000,
+                            "check": "none",
+                            "wv": 3070
                         }
                     ],
                     {}
@@ -37841,6 +38006,19 @@
                         },
                         {
                             "c": 2079
+                        },
+                        {
+                            "if": {
+                                "e": 3071
+                            },
+                            "then": [
+                                {
+                                    "c": 3071
+                                },
+                                {
+                                    "c": 3072
+                                }
+                            ]
                         }
                     ],
                     [
@@ -92914,6 +93092,40 @@
                 ],
                 [
                     1,
+                    "chatgpt",
+                    0,
+                    "^https://(www\\.)?chatgpt\\.com/",
+                    10,
+                    [],
+                    [
+                        {
+                            "e": 1716
+                        }
+                    ],
+                    [
+                        {
+                            "v": 1716
+                        }
+                    ],
+                    [
+                        {
+                            "wait": 500
+                        },
+                        {
+                            "c": 1716
+                        }
+                    ],
+                    [
+                        {
+                            "timeout": 1000,
+                            "check": "none",
+                            "wv": 1716
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
                     "clustrmaps.com",
                     1,
                     "^https://(www\\.)?clustrmaps\\.com/",
@@ -94357,6 +94569,36 @@
                 ],
                 [
                     1,
+                    "raspberrypi.com",
+                    0,
+                    "^https://([a-z0-9-]+\\.)?raspberrypi\\.com/",
+                    10,
+                    [],
+                    [
+                        {
+                            "e": 3073
+                        }
+                    ],
+                    [
+                        {
+                            "v": 3073
+                        }
+                    ],
+                    [
+                        {
+                            "c": 3073
+                        }
+                    ],
+                    [
+                        {
+                            "check": "none",
+                            "v": 3073
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
                     "readly",
                     2,
                     "^https://([a-z0-9-]+\\.)?readly\\.com/",
@@ -95099,20 +95341,26 @@
                     ],
                     [
                         {
-                            "e": 898
+                            "e": 3074
                         }
                     ],
                     [
                         {
-                            "v": 898
+                            "v": 3074
                         }
                     ],
                     [
                         {
-                            "c": 899
+                            "c": 3074
                         }
                     ],
-                    [],
+                    [
+                        {
+                            "timeout": 1000,
+                            "check": "none",
+                            "wv": 3074
+                        }
+                    ],
                     {}
                 ],
                 [
@@ -95464,7 +95712,7 @@
                 ],
                 "specificRuleRange": [
                     183,
-                    2753
+                    2759
                 ],
                 "genericStringEnd": 702,
                 "frameStringEnd": 741
