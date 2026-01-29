@@ -60,6 +60,14 @@ type FullWebCompatOptions = CSSInjectFeatureSettings<{
               state: StateToggle;
               nativeEnabled?: boolean;
           };
+    browserUiLock: {
+        state: FeatureState;
+        overscrollBehavior: StateToggle;
+        overflow: StateToggle;
+        overflowClip?: StateToggle;
+        observeMutations?: StateToggle;
+        postLoadDelayMs?: number;
+    };
     additionalCheck?: FeatureState;
 }>;
 export type WebCompatSettings = Partial<FullWebCompatOptions>;
