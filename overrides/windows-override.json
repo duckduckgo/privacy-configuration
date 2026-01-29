@@ -3975,8 +3975,89 @@
             }
         },
         "webInterferenceDetection": {
-            "state": "enabled",
-            "minSupportedVersion": "0.146.0"
+            "state": "internal",
+            "exceptions": [],
+            "settings": {
+                "interferenceTypes": {
+                    "youtubeAds": {
+                        "state": "enabled",
+                        "sweepIntervalMs": 2000,
+                        "slowLoadThresholdMs": 2000,
+                        "playerSelectors": [
+                            "#movie_player",
+                            ".html5-video-player",
+                            "#player"
+                        ],
+                        "adClasses": [
+                            "ytp-ad-text",
+                            "ytp-ad-skip-button",
+                            "ytp-ad-skip-button-container",
+                            "ytp-ad-message-container",
+                            "ytp-ad-player-overlay",
+                            "ytp-ad-image-overlay",
+                            "video-ads",
+                            "ad-showing",
+                            "ad-interrupting"
+                        ],
+                        "adTextPatterns": [
+                            "\\badvertisement\\b",
+                            "\\bskip ad\\b",
+                            "\\bskip ads\\b",
+                            "^ad\\s*[•:·]"
+                        ],
+                        "staticAdSelectors": {
+                            "background": ".player-container-background",
+                            "thumbnail": ".player-container-background-image, .player-container-background ytd-thumbnail",
+                            "image": ".player-container-background yt-image"
+                        },
+                        "playabilityErrorSelectors": [
+                            "ytm-player-error-message-renderer",
+                            "yt-player-error-message-renderer",
+                            ".ytp-error",
+                            ".playability-status-message",
+                            ".playability-reason"
+                        ],
+                        "playabilityErrorPatterns": [
+                            "content isn't available",
+                            "video (is )?unavailable",
+                            "playback (is )?disabled",
+                            "confirm you're not a (ro)?bot",
+                            "sign in to confirm",
+                            "unusual traffic",
+                            "try again later"
+                        ],
+                        "adBlockerDetectionSelectors": [
+                            "ytd-enforcement-message-view-model",
+                            "ytd-popup-container tp-yt-paper-dialog",
+                            "tp-yt-paper-dialog",
+                            ".ytd-enforcement-message-view-model",
+                            "#dialog",
+                            "[role=\"dialog\"]"
+                        ],
+                        "adBlockerDetectionPatterns": [
+                            "ad\\s*blockers?\\s*(are)?\\s*not allowed",
+                            "using an ad\\s*blocker",
+                            "allow youtube ads",
+                            "disable.*ad\\s*blocker",
+                            "turn off.*ad\\s*blocker",
+                            "ad\\s*blocker.*detected",
+                            "ad\\s*blocking",
+                            "will be blocked after \\d+ videos?",
+                            "playback will be blocked",
+                            "playback is blocked",
+                            "youtube is allowlisted",
+                            "video player will be blocked",
+                            "ad\\s*blockers?\\s*violate",
+                            "violate.*terms of service"
+                        ],
+                        "loginStateSelectors": {
+                            "signInButton": "a[href*=\"accounts.google.com/ServiceLogin\"]",
+                            "avatarButton": "#avatar-btn",
+                            "premiumLogo": "ytd-topbar-logo-renderer a[title*=\"Premium\"]"
+                        }
+                    }
+                }
+            }
         },
         "addressBar": {
             "exceptions": [],
