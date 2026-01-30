@@ -72,6 +72,8 @@ type ConditionBlock = {
     };
 };
 
+export type ConditionBlockOrArray = ConditionBlock | ConditionBlock[];
+
 type JSONValidValueType = boolean | string | number | object | Array<boolean | string | number | object>;
 
 type CSSInjectFeatureSettingsPatches = {
@@ -80,7 +82,7 @@ type CSSInjectFeatureSettingsPatches = {
         patchSettings: Operation<JSONValidValueType>[];
     }[];
     conditionalChanges?: {
-        condition: ConditionBlock | ConditionBlock[];
+        condition: ConditionBlockOrArray;
         patchSettings: Operation<JSONValidValueType>[];
     }[];
 };

@@ -185,6 +185,22 @@ describe('Config schema tests', () => {
                 }
             });
 
+            it('All detectors should be named correctly', () => {
+                const detectorNameRegex = /^[a-zA-Z0-9][a-zA-Z0-9_]*$/;
+                const webDetectionFeature = config.body.features.webDetection;
+                if (webDetectionFeature?.settings?.detectors) {
+                    for (const [
+                        groupName,
+                        groupDetectors,
+                    ] of Object.entries(webDetectionFeature.settings.detectors)) {
+                        expect(groupName).to.match(detectorNameRegex);
+                        for (const detectorName of Object.keys(groupDetectors)) {
+                            expect(detectorName).to.match(detectorNameRegex);
+                        }
+                    }
+                }
+            });
+
             if (config.name.includes('windows-config.json')) {
                 // Only run this test for Windows config to validate _DDGWV features
                 it('Windows config _DDGWV features should be valid overrides of their base features', () => {
