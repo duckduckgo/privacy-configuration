@@ -9,6 +9,71 @@
     "state": "disabled",
     "exceptions": [],
     "settings": {
-        "detectors": {}
+        "detectors": {
+            "adwalls": {
+                "generic_en": {
+                    "state": "disabled",
+                    "match": {
+                        "text": {
+                            "pattern": [
+                                "ad ?block(er)? detected",
+                                "adjust(ing)?( your)? ad blocking settings",
+                                "(turn off|disable|disabling|deactivate)( your| my)? ad ?block(er)?",
+                                "your ad ?blocker is on",
+                                "you('re| are| may be) using an ad blocker"
+                            ],
+                            "selector": [
+                                "innerText"
+                            ]
+                        }
+                    }
+                },
+                "generic_de": {
+                    "state": "disabled",
+                    "match": {
+                        "text": {
+                            "pattern": [
+                                "deaktivieren sie ihren adblocker",
+                                "deaktivieren sie ihre blocker",
+                                "adblocker zu deaktivieren",
+                                "adblocker deaktivieren",
+                                "sie einen adblocker verwenden"
+                            ],
+                            "selector": [
+                                "innerText"
+                            ]
+                        }
+                    }
+                },
+                "generic_it": {
+                    "state": "disabled",
+                    "match": {
+                        "text": {
+                            "pattern": [
+                                "disattiva l'ad block",
+                                "stai usando un ad block"
+                            ],
+                            "selector": [
+                                "innerText"
+                            ]
+                        }
+                    }
+                },
+                "generic_se": {
+                    "state": "disabled",
+                    "match": {
+                        "text": {
+                            "pattern": [
+                                "har du en annonsblockerare igång",
+                                "avaktivera din annonsblockerare"
+                            ],
+                            "selector": [
+                                "innerText"
+                            ]
+                        }
+                    }
+                }
+            }
+        }
     }
 }
