@@ -1,9 +1,7 @@
 import { CSSInjectFeatureSettings, Feature, FeatureState } from '../feature';
 import { ConditionBlockOrArray } from '../feature';
 
-type OrArray<T> = T | T[];
-
-type AndArray<T> = T | T[];
+type MaybeArray<T> = T | T[];
 
 type TriggerBase = {
     state?: FeatureState;
@@ -21,19 +19,19 @@ type Actions = Partial<{
 }>;
 
 type MatchCondition = Partial<{
-    text: OrArray<{
-        pattern: AndArray<string>;
-        selector?: AndArray<string>;
+    text: MaybeArray<{
+        pattern: MaybeArray<string>;
+        selector?: MaybeArray<string>;
     }>;
-    element: OrArray<{
-        selector: AndArray<string>;
+    element: MaybeArray<{
+        selector: MaybeArray<string>;
         visibility?: 'visible' | 'hidden' | 'any';
     }>;
 }>;
 
 type DetectorConfig = {
     state?: FeatureState;
-    match: OrArray<MatchCondition>;
+    match: MaybeArray<MatchCondition>;
     triggers?: Triggers;
     actions?: Actions;
 };
