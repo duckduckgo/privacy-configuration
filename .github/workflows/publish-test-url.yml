@@ -26,7 +26,7 @@ jobs:
                       ⏳ Building and publishing preview config...
 
             - name: Checkout the repository
-              uses: actions/checkout@v5
+              uses: actions/checkout@v6
             - name: Use Node.js 20
               uses: actions/setup-node@v5
               with:
@@ -38,7 +38,7 @@ jobs:
               run: npm run build
 
             - name: Checkout preview-pages branch
-              uses: actions/checkout@v5
+              uses: actions/checkout@v6
               with:
                   ref: preview-pages
                   path: pages-branch
