@@ -28,9 +28,13 @@ export type ConditionTypes = {
     };
 };
 
-type MatchCondition = MaybeArray<{
-    [K in keyof ConditionTypes]?: MaybeArray<ConditionTypes[K]>;
-}>;
+type MatchCondition = MaybeArray<Partial<
+    {
+        [K in keyof ConditionTypes]: MaybeArray<ConditionTypes[K]>;
+    } & {
+        [K in keyof ConditionTypes as `${K}ALL`]: MaybeArray<ConditionTypes[K]>;
+    }
+>>;
 
 export type DetectorConfig = {
     state?: FeatureState;
