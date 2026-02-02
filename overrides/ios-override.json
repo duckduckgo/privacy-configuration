@@ -239,6 +239,15 @@
                         "steps": [
                             {
                                 "percent": 5
+                            },
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 20
+                            },
+                            {
+                                "percent": 50
                             }
                         ]
                     }
@@ -320,9 +329,9 @@
                     "minSupportedVersion": "7.201.0"
                 },
                 "aiChatAtb": {
-                    "state": "internal",
+                    "state": "enabled",
                     "description": "Add ATB to Duck.ai",
-                    "minSupportedVersion": "7.203.0"
+                    "minSupportedVersion": "7.204.0"
                 }
             },
             "settings": {
@@ -666,7 +675,12 @@
         },
         "autoconsent": {
             "state": "enabled",
-            "exceptions": [],
+            "exceptions": [
+                {
+                    "domain": "timesofmalta.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4401"
+                }
+            ],
             "features": {
                 "onByDefault": {
                     "state": "enabled",
@@ -1048,6 +1062,27 @@
                                         "value": {
                                             "selector": "span[data-testid='input-interactable-area'] input[type='email']",
                                             "type": "identities.emailAddress"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": ["signin.autodesk.com"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input#firstname_str",
+                                            "type": "identities.firstName"
+                                        }
+                                    },
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input#lastname_str",
+                                            "type": "identities.lastName"
                                         }
                                     }
                                 ]
@@ -1497,6 +1532,9 @@
             ]
         },
         "performanceMetrics": {
+            "state": "enabled"
+        },
+        "breakageReporting": {
             "state": "enabled"
         },
         "windowsWaitlist": {
@@ -1949,7 +1987,7 @@
             "exceptions": [],
             "settings": {
                 "additionalCheck": "enabled",
-                "activeCaptureOnFirstMessage": "disabled",
+                "activeCaptureOnFirstMessage": "enabled",
                 "maxContentLength": 9500,
                 "mainContentSelector": "main, article, .content, .main, #content, #main",
                 "excludeSelectors": [
@@ -1987,6 +2025,56 @@
                         ]
                     }
                 ]
+            }
+        },
+        "webInterferenceDetection": {
+            "state": "enabled",
+            "minSupportedVersion": "7.202.0",
+            "exceptions": [],
+            "settings": {
+                "autoRunDelayMs": 100,
+                "interferenceTypes": {
+                    "botDetection": {
+                        "cloudflareTurnstile": {
+                            "state": "enabled",
+                            "vendor": "cloudflare",
+                            "selectors": [
+                                ".cf-turnstile",
+                                "script[src*=\"challenges.cloudflare.com\"]"
+                            ],
+                            "windowProperties": ["turnstile"],
+                            "statusSelectors": [
+                                { "status": "solved", "selectors": ["[data-state=\"success\"]"] },
+                                { "status": "failed", "selectors": ["[data-state=\"error\"]"] }
+                            ]
+                        },
+                        "hcaptcha": {
+                            "state": "enabled",
+                            "vendor": "hcaptcha",
+                            "selectors": [
+                                ".h-captcha",
+                                "[data-hcaptcha-widget-id]",
+                                "script[src*=\"hcaptcha.com\"]"
+                            ],
+                            "windowProperties": ["hcaptcha"]
+                        }
+                    },
+                    "fraudDetection": {
+                        "phishingWarning": {
+                            "state": "enabled",
+                            "type": "phishing",
+                            "selectors": [
+                                ".warning-banner",
+                                "#security-alert"
+                            ],
+                            "textPatterns": [
+                                "suspicious.*activity",
+                                "unusual.*login"
+                            ],
+                            "textSources": ["innerText"]
+                        }
+                    }
+                }
             }
         }
     },

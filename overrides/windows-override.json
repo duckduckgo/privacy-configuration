@@ -1281,8 +1281,14 @@
                     "state": "enabled",
                     "minSupportedVersion": "0.143.0"
                 },
+                "omnibarOnboarding": {
+                    "state": "internal"
+                },
                 "showHideAiGeneratedImages": {
                     "state": "enabled"
+                },
+                "supportsSyncChatsDeletion": {
+                    "state": "internal"
                 }
             },
             "minSupportedVersion": "0.100.0",
@@ -1329,9 +1335,15 @@
                         "steps": [
                             {
                                 "percent": 20.0
+                            },
+                            {
+                                "percent": 100.0
                             }
                         ]
                     }
+                },
+                "namedPipesConnection": {
+                    "state": "disabled"
                 }
             },
             "settings": {
@@ -1353,7 +1365,7 @@
             "state": "enabled",
             "features": {
                 "startInForeground": {
-                    "state": "preview"
+                    "state": "enabled"
                 }
             }
         },
@@ -1714,6 +1726,27 @@
                                         }
                                     }
                                 ]
+                            },
+                            {
+                                "domain": ["signin.autodesk.com"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input#firstname_str",
+                                            "type": "identities.firstName"
+                                        }
+                                    },
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input#lastname_str",
+                                            "type": "identities.lastName"
+                                        }
+                                    }
+                                ]
                             }
                         ]
                     }
@@ -1760,6 +1793,20 @@
         },
         "navigatorInterface": {
             "state": "enabled"
+        },
+        "newTabPageSessionMonitoring": {
+            "state": "enabled",
+            "exceptions": [],
+            "features": {
+                "entryPoints": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.144.0"
+                },
+                "exitPoints": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.145.0"
+                }
+            }
         },
         "breakageReporting": {
             "state": "enabled",
@@ -1839,7 +1886,8 @@
                         "brave": "enabled",
                         "edge": "enabled",
                         "vivaldi": "disabled",
-                        "chromium": "enabled"
+                        "chromium": "enabled",
+                        "opera": "disabled"
                     }
                 },
                 "bulkBookmarksImport": {
@@ -1856,8 +1904,12 @@
                         "chrome": "enabled",
                         "brave": "enabled",
                         "edge": "enabled",
-                        "firefox": "enabled"
+                        "firefox": "enabled",
+                        "opera": "enabled"
                     }
+                },
+                "importCookies": {
+                    "state": "internal"
                 }
             }
         },
@@ -2560,6 +2612,28 @@
             "state": "enabled",
             "settings": {
                 "allowlistedTrackers": {
+                    "adlightning.com": {
+                        "rules": [
+                            {
+                                "rule": "tagan.adlightning.com",
+                                "domains": [
+                                    "timesofmalta.com"
+                                ],
+                                "reason": "timesofmalta.com - https://github.com/duckduckgo/privacy-configuration/pull/4401"
+                            }
+                        ]
+                    },
+                    "ebxcdn.com": {
+                        "rules": [
+                            {
+                                "rule": "applets.ebxcdn.com/ebx.js",
+                                "domains": [
+                                    "timesofmalta.com"
+                                ],
+                                "reason": "timesofmalta.com - https://github.com/duckduckgo/privacy-configuration/pull/4401"
+                            }
+                        ]
+                    },
                     "tiqcdn.com": {
                         "rules": [
                             {
@@ -2584,6 +2658,17 @@
                                 "rule": "npttech.com/advertising.js",
                                 "domains": ["slate.com"],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2879"
+                            }
+                        ]
+                    },
+                    "slickstream.com": {
+                        "rules": [
+                            {
+                                "rule": "app-sx.slickstream.com",
+                                "domains": [
+                                    "recipetineats.com"
+                                ],
+                                "reason": "recipetineats.com - https://github.com/duckduckgo/privacy-configuration/pull/4387"
                             }
                         ]
                     }
@@ -2681,7 +2766,23 @@
                     }
                 },
                 "tierMessagingEnabled": {
-                    "state": "internal",
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 20
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
                     "minSupportedVersion": "0.143.4"
                 },
                 "allowProTierPurchase": {
@@ -2793,7 +2894,18 @@
             "state": "enabled",
             "features": {
                 "webViewProviderStableOptIn": {
-                    "state": "disabled"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.143.5",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 6.0
+                            },
+                            {
+                                "percent": 15.0
+                            }
+                        ]
+                    }
                 },
                 "webViewProviderPreviewOptIn": {
                     "state": "preview",
@@ -2849,6 +2961,9 @@
                 },
                 "serviceWorkerWatchdogUnregister": {
                     "state": "disabled"
+                },
+                "filterServiceWorkersFromAutoAttach": {
+                    "state": "enabled"
                 }
             },
             "exceptions": []
@@ -2879,6 +2994,9 @@
                 "nextStepsWidget": {
                     "state": "enabled"
                 },
+                "nextStepsListWidget": {
+                    "state": "disabled"
+                },
                 "omnibar": {
                     "state": "enabled",
                     "minSupportedVersion": "0.130.0"
@@ -2908,7 +3026,8 @@
             "minSupportedVersion": "0.100.0"
         },
         "addressBarTrackerAnimation": {
-            "state": "disabled",
+            "state": "enabled",
+            "minSupportedVersion": "0.144.0",
             "exceptions": []
         },
         "fullScreenMode": {
@@ -3273,13 +3392,15 @@
                     "minSupportedVersion": "0.143.4",
                     "rollout": {
                         "steps": [
-                            { "percent": 5 }]
+                            { "percent": 5 },
+                            { "percent": 20 },
+                            { "percent": 50 }]
                     }
                 }
             }
         },
         "urlPredictor": {
-            "state": "internal",
+            "state": "enabled",
             "settings": {
                 "allowedSchemes": [
                     "http",
@@ -3401,6 +3522,22 @@
                     "state": "internal",
                     "settings": {
                         "id": "pnlccmojcmeohlpggmfnbbiapkmbliob"
+                    }
+                }
+            }
+        },
+        "tabPanelDeferChanges": {
+            "state": "disabled",
+            "exceptions": [],
+            "features": {
+                "tabPanelDeferChangesRollout": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 20
+                            }
+                        ]
                     }
                 }
             }
