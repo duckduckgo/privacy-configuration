@@ -52,15 +52,18 @@ jobs:
                     (cd "$dir" && npm ci && node index.js)
                   done
 
-                  CONFIG_VERSION=$(node --input-type=module -e "const { CURRENT_CONFIG_VERSION } = await import('./head/constants.js'); console.log(CURRENT_CONFIG_VERSION);")
-                  echo "config_version=$CONFIG_VERSION" >> $GITHUB_OUTPUT
+                  BASE_CONFIG_VERSION=$(node --input-type=module -e "const { CURRENT_CONFIG_VERSION } = await import('./base/constants.js'); console.log(CURRENT_CONFIG_VERSION);")
+                  HEAD_CONFIG_VERSION=$(node --input-type=module -e "const { CURRENT_CONFIG_VERSION } = await import('./head/constants.js'); console.log(CURRENT_CONFIG_VERSION);")
+                  echo "base_config_version=$BASE_CONFIG_VERSION" >> $GITHUB_OUTPUT
+                  echo "head_config_version=$HEAD_CONFIG_VERSION" >> $GITHUB_OUTPUT
 
             - name: Detect new Android feature flags (generated output)
               id: detect_flags
               run: |
-                  CONFIG_VERSION="${{ steps.build_configs.outputs.config_version }}"
-                  BASE_CONFIG="base/generated/v${CONFIG_VERSION}/android-config.json"
-                  HEAD_CONFIG="head/generated/v${CONFIG_VERSION}/android-config.json"
+                  BASE_CONFIG_VERSION="${{ steps.build_configs.outputs.base_config_version }}"
+                  HEAD_CONFIG_VERSION="${{ steps.build_configs.outputs.head_config_version }}"
+                  BASE_CONFIG="base/generated/v${BASE_CONFIG_VERSION}/android-config.json"
+                  HEAD_CONFIG="head/generated/v${HEAD_CONFIG_VERSION}/android-config.json"
 
                   # Extract all feature keys from base and head
                   BASE_FEATURES=$(jq -r '.features | keys[]' "$BASE_CONFIG" | sort)
@@ -127,8 +130,8 @@ jobs:
               if: steps.detect_flags.outputs.has_new_flags == 'true'
               id: asana_content
               run: |
-                  CONFIG_VERSION="${{ steps.build_configs.outputs.config_version }}"
-                  CONSTRUCTED_FILE="generated/v${CONFIG_VERSION}/android-config.json"
+                  HEAD_CONFIG_VERSION="${{ steps.build_configs.outputs.head_config_version }}"
+                  CONSTRUCTED_FILE="generated/v${HEAD_CONFIG_VERSION}/android-config.json"
 
                   # Count how many flags were added
                   FLAG_COUNT=$(echo "${{ steps.detect_flags.outputs.flags }}" | wc -l | xargs)
