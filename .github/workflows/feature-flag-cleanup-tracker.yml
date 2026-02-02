@@ -28,11 +28,23 @@ jobs:
             - name: Install jq
               run: sudo apt-get update && sudo apt-get install -y jq
 
+            - name: Fetch PR commits
+              run: |
+                  # Fetch the PR ref which GitHub keeps even after branch deletion
+                  # This ensures we have access to all commits from the PR
+                  git fetch origin pull/${{ steps.pr_context.outputs.pr_number }}/head
+
             - name: Detect new Android feature flags
               id: detect_flags
               run: |
                   # Get the android-override.json from base and head commits
-                  BASE_FILE=$(git show ${{ steps.pr_context.outputs.base_sha }}:overrides/android-override.json)
+                  # Check if file exists in base commit (it might not if this is the first time adding it)
+                  if git cat-file -e ${{ steps.pr_context.outputs.base_sha }}:overrides/android-override.json 2>/dev/null; then
+                    BASE_FILE=$(git show ${{ steps.pr_context.outputs.base_sha }}:overrides/android-override.json)
+                  else
+                    # File doesn't exist in base, use empty JSON object
+                    BASE_FILE='{"features":{}}'
+                  fi
                   HEAD_FILE=$(git show ${{ steps.pr_context.outputs.head_sha }}:overrides/android-override.json)
 
                   # Extract all feature keys from base and head

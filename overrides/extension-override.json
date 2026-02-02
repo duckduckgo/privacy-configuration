@@ -218,6 +218,20 @@
             "settings": {
                 "autoRunDelayMs": 100,
                 "interferenceTypes": {
+                    "adwallDetection": {
+                        "generic": {
+                            "state": "enabled",
+                            "textPatterns": [
+                                "ad ?block(er)? detected",
+                                "adjust(ing)?( your)? ad blocking settings",
+                                "(turn off|disable|disabling|deactivate)( your| my)? ad ?block(er)?",
+                                "you('re| are| may be) using an ad blocker"
+                            ],
+                            "textSources": [
+                                "innerText"
+                            ]
+                        }
+                    },
                     "botDetection": {
                         "cloudflareTurnstile": {
                             "state": "enabled",

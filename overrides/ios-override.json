@@ -227,6 +227,24 @@
             },
             "state": "enabled"
         },
+        "serp": {
+            "state": "enabled",
+            "exceptions": [],
+            "minSupportedVersion": "7.201.0",
+            "features": {
+                "storeSerpSettings": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.201.0",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            }
+                        ]
+                    }
+                }
+            }
+        },
         "aiChat": {
             "state": "enabled",
             "minSupportedVersion": "7.155.0",
@@ -300,6 +318,11 @@
                     "state": "enabled",
                     "description": "Unify inputs for Duck.ai",
                     "minSupportedVersion": "7.201.0"
+                },
+                "aiChatAtb": {
+                    "state": "internal",
+                    "description": "Add ATB to Duck.ai",
+                    "minSupportedVersion": "7.203.0"
                 }
             },
             "settings": {
@@ -1140,6 +1163,10 @@
                     {
                         "domain": "arcteryx.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3701"
+                    },
+                    {
+                        "domain": "yahoo.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4258"
                     }
                 ],
                 "ddgDefaultSites": [
@@ -1175,6 +1202,10 @@
                     {
                         "domain": "arcteryx.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3701"
+                    },
+                    {
+                        "domain": "yahoo.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4258"
                     }
                 ],
                 "omitVersionSites": []
@@ -1649,15 +1680,27 @@
                     }
                 },
                 "vpnMenuItem": {
+                    "state": "enabled"
+                },
+                "tierMessagingEnabled": {
                     "state": "enabled",
-                    "targets": [
-                        {
-                            "localeCountry": "GB"
-                        },
-                        {
-                            "localeCountry": "US"
-                        }
-                    ]
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "minSupportedVersion": "7.199.0"
                 }
             }
         },
@@ -1853,8 +1896,25 @@
             }
         },
         "dbp": {
-            "state": "internal",
+            "state": "enabled",
             "features": {
+                "pirRollout": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.201.1",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 1.0
+                            },
+                            {
+                                "percent": 5.0
+                            },
+                            {
+                                "percent": 15.0
+                            }
+                        ]
+                    }
+                },
                 "waitlistBetaActive": {
                     "state": "disabled"
                 },
@@ -1873,11 +1933,61 @@
                     "minSupportedVersion": "7.190.0"
                 },
                 "clickActionDelayReductionOptimization": {
-                    "state": "internal",
-                    "minSupportedVersion": "7.200.0"
+                    "state": "enabled",
+                    "minSupportedVersion": "7.201.1"
+                },
+                "foregroundRunningOnAppActive": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.201.1"
                 }
             },
-            "minSupportedVersion": "7.180.0"
+            "minSupportedVersion": "7.201.1"
+        },
+        "pageContext": {
+            "state": "internal",
+            "minSupportedVersion": "7.204.0",
+            "exceptions": [],
+            "settings": {
+                "additionalCheck": "enabled",
+                "activeCaptureOnFirstMessage": "disabled",
+                "maxContentLength": 9500,
+                "mainContentSelector": "main, article, .content, .main, #content, #main",
+                "excludeSelectors": [
+                    ".ad",
+                    ".sidebar",
+                    ".footer",
+                    ".nav",
+                    ".header",
+                    ".banner",
+                    ".popup"
+                ],
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "domain": "nba.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/mainContentSelector",
+                                "value": "main"
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "domain": "reddit.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/excludeSelectors/-",
+                                "value": "shreddit-comments-page-ad"
+                            }
+                        ]
+                    }
+                ]
+            }
         }
     },
     "unprotectedTemporary": []

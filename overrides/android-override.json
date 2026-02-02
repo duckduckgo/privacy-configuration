@@ -474,8 +474,8 @@
                     "state": "disabled"
                 },
                 "fullscreenMode": {
-                    "state": "disabled",
-                    "minSupportedVersion": 52603000
+                    "state": "enabled",
+                    "minSupportedVersion": 52620000
                 },
                 "fullscreenModeToggle": {
                     "state": "enabled",
@@ -1471,6 +1471,12 @@
                         "steps": [
                             {
                                 "percent": 5
+                            },
+                            {
+                                "percent": 20
+                            },
+                            {
+                                "percent": 50
                             }
                         ]
                     }
@@ -1707,7 +1713,12 @@
         },
         "fingerprintingBattery": {
             "state": "enabled",
-            "exceptions": [],
+            "exceptions": [
+                {
+                    "domain": "coinbase.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/4360"
+                }
+            ],
             "settings": {
                 "conditionalChanges": [
                     {
@@ -1727,6 +1738,12 @@
         },
         "fingerprintingCanvas": {
             "state": "disabled",
+            "exceptions": [
+                {
+                    "domain": "coinbase.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/4360"
+                }
+            ],
             "settings": {
                 "conditionalChanges": [
                     {
@@ -1746,6 +1763,12 @@
         },
         "fingerprintingHardware": {
             "state": "enabled",
+            "exceptions": [
+                {
+                    "domain": "coinbase.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/4360"
+                }
+            ],
             "settings": {
                 "keyboard": {
                     "type": "undefined"
@@ -1772,8 +1795,7 @@
                         ]
                     }
                 ]
-            },
-            "exceptions": []
+            }
         },
         "fingerprintingScreenSize": {
             "state": "enabled",
@@ -1785,6 +1807,10 @@
                 {
                     "domain": "tracfone.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/4143"
+                },
+                {
+                    "domain": "coinbase.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/4360"
                 }
             ],
             "settings": {
@@ -1826,6 +1852,10 @@
                 {
                     "domain": "ticketmaster.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/575"
+                },
+                {
+                    "domain": "coinbase.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/4360"
                 }
             ],
             "settings": {
@@ -2147,6 +2177,17 @@
             "state": "enabled",
             "settings": {
                 "allowlistedTrackers": {
+                    "audioeye.com": {
+                        "rules": [
+                            {
+                                "rule": "ws.audioeye.com/ae.js",
+                                "domains": [
+                                    "tracfone.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/4322"
+                            }
+                        ]
+                    },
                     "cedexis.net": {
                         "rules": [
                             {
@@ -2187,17 +2228,6 @@
                             }
                         ]
                     },
-                    "omtrdc.net": {
-                        "rules": [
-                            {
-                                "rule": "tracfonewireless.tt.omtrdc.net",
-                                "domains": [
-                                    "tracfone.com"
-                                ],
-                                "reason": "tracfone.com - https://github.com/duckduckgo/privacy-configuration/pull/4032"
-                            }
-                        ]
-                    },
                     "posthog.com": {
                         "rules": [
                             {
@@ -2206,35 +2236,6 @@
                                     "sciensus.com"
                                 ],
                                 "reason": "sciensus.com - https://github.com/duckduckgo/privacy-configuration/pull/4210"
-                            }
-                        ]
-                    },
-                    "tealiumiq.com": {
-                        "rules": [
-                            {
-                                "rule": "collect.tealiumiq.com",
-                                "domains": [
-                                    "tracfone.com"
-                                ],
-                                "reason": "tracfone.com - https://github.com/duckduckgo/privacy-configuration/pull/4032"
-                            },
-                            {
-                                "rule": "visitor-service.tealiumiq.com",
-                                "domains": [
-                                    "tracfone.com"
-                                ],
-                                "reason": "tracfone.com - https://github.com/duckduckgo/privacy-configuration/pull/4032"
-                            }
-                        ]
-                    },
-                    "tiqcdn.com": {
-                        "rules": [
-                            {
-                                "rule": "tags.tiqcdn.com",
-                                "domains": [
-                                    "tracfone.com"
-                                ],
-                                "reason": "tracfone.com - https://github.com/duckduckgo/privacy-configuration/pull/4077"
                             }
                         ]
                     },
@@ -2464,6 +2465,22 @@
         },
         "mediaPlaybackRequiresUserGesture": {
             "state": "enabled",
+            "settings": {
+                "exemptedDomains": [
+                    {
+                        "domain": "duck.ai",
+                        "reason": "Required for audio playback in Duck.ai"
+                    },
+                    {
+                        "domain": "duckduckgo.com",
+                        "reason": "Required for audio playback in Duck.ai"
+                    },
+                    {
+                        "domain": "duck.co",
+                        "reason": "Required for audio playback in Duck.ai"
+                    }
+                ]
+            },
             "exceptions": [
                 {
                     "domain": "pinealxtinfo.com",
@@ -3473,11 +3490,22 @@
                             },
                             {
                                 "percent": 25
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
                             }
                         ]
                     }
                 }
             }
+        },
+        "productSurfaceTelemetry": {
+            "state": "enabled",
+            "exceptions": [],
+            "minSupportedVersion": 52610000
         },
         "webViewCompat": {
             "state": "disabled",
@@ -3517,6 +3545,10 @@
                     "state": "disabled"
                 }
             }
+        },
+        "databaseProvider": {
+            "state": "enabled",
+            "exceptions": []
         }
     },
     "unprotectedTemporary": [],
