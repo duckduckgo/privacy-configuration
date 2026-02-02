@@ -1,5 +1,4 @@
-import { CSSInjectFeatureSettings, Feature, FeatureState } from '../feature';
-import { ConditionBlockOrArray } from '../feature';
+import { ConditionBlockOrArray, CSSInjectFeatureSettings, Feature, FeatureState } from '../feature';
 
 type MaybeArray<T> = T | T[];
 
