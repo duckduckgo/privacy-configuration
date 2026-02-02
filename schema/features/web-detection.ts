@@ -29,7 +29,7 @@ type MatchCondition = Partial<{
     }>;
 }>;
 
-type DetectorConfig = {
+export type DetectorConfig = {
     state?: FeatureState;
     match: MaybeArray<MatchCondition>;
     triggers?: Triggers;
