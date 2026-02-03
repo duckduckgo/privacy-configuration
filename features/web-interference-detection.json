@@ -81,13 +81,29 @@
                         }
                     ]
                 },
+                "cloudflareChallengePage": {
+                    "state": "enabled",
+                    "vendor": "cloudflare",
+                    "selectors": [
+                        "#challenge-form",
+                        ".cf-browser-verification",
+                        "#cf-wrapper",
+                        "script[src*=\"challenges.cloudflare.com\"]"
+                    ],
+                    "windowProperties": [
+                        "_cf_chl_opt",
+                        "__CF$cv$params",
+                        "cfjsd"
+                    ]
+                },
                 "hcaptcha": {
                     "state": "enabled",
                     "vendor": "hcaptcha",
                     "selectors": [
                         ".h-captcha",
                         "[data-hcaptcha-widget-id]",
-                        "script[src*=\"hcaptcha.com\"]"
+                        "script[src*=\"hcaptcha.com\"]",
+                        "script[src*=\"assets.hcaptcha.com\"]"
                     ],
                     "windowProperties": [
                         "hcaptcha"
@@ -104,7 +120,23 @@
                     ],
                     "textPatterns": [
                         "suspicious.*activity",
-                        "unusual.*login"
+                        "unusual.*login",
+                        "verify.*account"
+                    ],
+                    "textSources": [
+                        "innerText"
+                    ]
+                },
+                "accountSuspension": {
+                    "state": "enabled",
+                    "type": "suspension",
+                    "selectors": [
+                        ".account-suspended",
+                        "#suspension-notice"
+                    ],
+                    "textPatterns": [
+                        "account.*suspended",
+                        "access.*restricted"
                     ],
                     "textSources": [
                         "innerText"
