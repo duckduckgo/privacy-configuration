@@ -62,8 +62,8 @@ type ConditionBlock = {
         cohort: string;
     };
     injectName?: string;
-    minSupportedVersion?: number;
-    maxSupportedVersion?: number;
+    minSupportedVersion?: number | string;
+    maxSupportedVersion?: number | string;
     internal?: boolean;
     preview?: boolean;
     context?: {
