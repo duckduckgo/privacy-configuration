@@ -17,20 +17,24 @@ type Actions = Partial<{
     };
 }>;
 
-type MatchCondition = Partial<{
-    text: MaybeArray<{
+export type ConditionTypes = {
+    text: {
         pattern: MaybeArray<string>;
         selector?: MaybeArray<string>;
-    }>;
-    element: MaybeArray<{
+    };
+    element: {
         selector: MaybeArray<string>;
         visibility?: 'visible' | 'hidden' | 'any';
-    }>;
+    };
+};
+
+type MatchCondition = MaybeArray<{
+    [K in keyof ConditionTypes]?: MaybeArray<ConditionTypes[K]>;
 }>;
 
 export type DetectorConfig = {
     state?: FeatureState;
-    match: MaybeArray<MatchCondition>;
+    match: MatchCondition;
     triggers?: Triggers;
     actions?: Actions;
 };
