@@ -202,8 +202,10 @@ async function getPrAndDiff(sha) {
  * @returns {string} - HTML formatted comment body.
  */
 function buildComment(pr, diff) {
-    const escapedDiff = diff.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    return `<body>Feature flag changed: <a href="${pr.html_url}">${pr.title} (#${pr.number})</a>\n\n<pre>${escapedDiff}</pre></body>`;
+    const escapeHtml = (str) => str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const escapedTitle = escapeHtml(pr.title);
+    const escapedDiff = escapeHtml(diff);
+    return `<body>Feature flag changed: <a href="${pr.html_url}">${escapedTitle} (#${pr.number})</a>\n\n<pre>${escapedDiff}</pre></body>`;
 }
 
 async function run() {
