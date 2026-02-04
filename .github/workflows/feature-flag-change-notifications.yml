@@ -31,6 +31,6 @@ jobs:
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                   ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
-                  CURRENT_OBJECTIVES_PROJECT_ID: ${{ secrets.CURRENT_OBJECTIVES_PROJECT_ID }}
+                  CURRENT_OBJECTIVES_PROJECT_ID: ${{ secrets.TEST_CURRENT_OBJECTIVES_PROJECT_ID }} #replace after testing ${{ secrets.CURRENT_OBJECTIVES_PROJECT_ID }}
                   PROJECT_ADVISOR_FIELD_ID: ${{ secrets.PROJECT_ADVISOR_FIELD_ID }}
               run: node .github/scripts/feature-flag-notifications.js ${{ inputs.commit_sha || github.sha }} ${{ inputs.task_override && format('--task={0}', inputs.task_override) || '' }}
