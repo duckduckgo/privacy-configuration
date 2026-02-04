@@ -3,10 +3,10 @@ name: Feature Flag Change Notifications
 on:
     push:
         branches:
-            - kieran/feature-flag-notifications
-        # paths:
-        #     - 'features/**/*.json'
-        #     - 'overrides/**/*.json'
+            - main
+        paths:
+            - 'features/**/*.json'
+            - 'overrides/**/*.json'
     workflow_dispatch:
         inputs:
             task_override:
@@ -19,7 +19,7 @@ on:
 jobs:
     notify:
         runs-on: ubuntu-latest
-        
+
         steps:
             - name: Checkout
               uses: actions/checkout@v5

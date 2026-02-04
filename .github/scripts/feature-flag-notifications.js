@@ -1,7 +1,7 @@
-import { Octokit } from "@octokit/rest";
+import { Octokit } from '@octokit/rest';
 
 const github = new Octokit({
-  auth: process.env.GITHUB_TOKEN
+    auth: process.env.GITHUB_TOKEN,
 });
 
 const currentObjectivesProjectId = process.env.CURRENT_OBJECTIVES_PROJECT_ID;
@@ -10,28 +10,28 @@ const projectAdvisorFieldId = process.env.PROJECT_ADVISOR_FIELD_ID;
 // Asana start
 
 async function asanaGet(endpoint) {
-  const res = await fetch(`https://app.asana.com/api/1.0${endpoint}`, {
-    headers: { 'Authorization': `Bearer ${process.env.ASANA_ACCESS_TOKEN}` }
-  });
-  const data = await res.json();
-  return data.data;
+    const res = await fetch(`https://app.asana.com/api/1.0${endpoint}`, {
+        headers: { Authorization: `Bearer ${process.env.ASANA_ACCESS_TOKEN}` },
+    });
+    const data = await res.json();
+    return data.data;
 }
 
 async function asanaPost(endpoint, body) {
-  const res = await fetch(`https://app.asana.com/api/1.0${endpoint}`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${process.env.ASANA_ACCESS_TOKEN}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ data: body })
-  });
-  const data = await res.json();
-  return data.data;
+    const res = await fetch(`https://app.asana.com/api/1.0${endpoint}`, {
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${process.env.ASANA_ACCESS_TOKEN}`,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ data: body }),
+    });
+    const data = await res.json();
+    return data.data;
 }
 
 async function getTask(id) {
-  return asanaGet(`/tasks/${id}?opt_fields=name,parent,projects,assignee,custom_fields`);
+    return asanaGet(`/tasks/${id}?opt_fields=name,parent,projects,assignee,custom_fields`);
 }
 
 /**
@@ -41,33 +41,33 @@ async function getTask(id) {
  * @returns {string[]} - Array of unique Asana user GIDs.
  */
 function getCollaborators(projectTask) {
-  const collaborators = [];
-  
-  if (projectTask.assignee?.gid) {
-    collaborators.push(projectTask.assignee.gid);
-  }
-  
-  const advisorField = projectTask.custom_fields?.find(f => f.gid === projectAdvisorFieldId);
-  if (advisorField?.people_value) {
-    collaborators.push(...advisorField.people_value.map(p => p.gid));
-  }
-  
-  return [...new Set(collaborators)];
+    const collaborators = [];
+
+    if (projectTask.assignee?.gid) {
+        collaborators.push(projectTask.assignee.gid);
+    }
+
+    const advisorField = projectTask.custom_fields?.find((f) => f.gid === projectAdvisorFieldId);
+    if (advisorField?.people_value) {
+        collaborators.push(...advisorField.people_value.map((p) => p.gid));
+    }
+
+    return [...new Set(collaborators)];
 }
 
 async function getSubtasks(id) {
-  return asanaGet(`/tasks/${id}/subtasks?opt_fields=name`);
+    return asanaGet(`/tasks/${id}/subtasks?opt_fields=name`);
 }
 
 async function addComment(taskId, htmlText) {
-  return asanaPost(`/tasks/${taskId}/stories`, { html_text: htmlText });
+    return asanaPost(`/tasks/${taskId}/stories`, { html_text: htmlText });
 }
 
 // Asana end
 
 const args = process.argv.slice(2);
-const commitSha = args.find(a => !a.startsWith('--'));
-const taskOverride = args.find(a => a.startsWith('--task='))?.split('=')[1];
+const commitSha = args.find((a) => !a.startsWith('--'));
+const taskOverride = args.find((a) => a.startsWith('--task='))?.split('=')[1];
 
 /**
  * Extracts an Asana task ID from a PR body by finding the "Asana Task" section.
@@ -76,27 +76,27 @@ const taskOverride = args.find(a => a.startsWith('--task='))?.split('=')[1];
  * @returns {string|null} - The Asana task GID, or null if not found.
  */
 function extractAsanaTaskId(prBody) {
-  const lines = prBody.split('\n');
-  const taskLineIndex = lines.findIndex(line => line.toLowerCase().includes('asana task'));
-  if (taskLineIndex === -1) return null;
-  
-  // Check the header line and the next few lines for the URL
-  const searchLines = lines.slice(taskLineIndex, taskLineIndex + 5).join('\n');
-  const urlMatch = searchLines.match(/https:\/\/app\.asana\.com\/[^\s)]+/);
-  if (!urlMatch) return null;
+    const lines = prBody.split('\n');
+    const taskLineIndex = lines.findIndex((line) => line.toLowerCase().includes('asana task'));
+    if (taskLineIndex === -1) return null;
 
-  const url = urlMatch[0];
+    // Check the header line and the next few lines for the URL
+    const searchLines = lines.slice(taskLineIndex, taskLineIndex + 5).join('\n');
+    const urlMatch = searchLines.match(/https:\/\/app\.asana\.com\/[^\s)]+/);
+    if (!urlMatch) return null;
 
-  let match = url.match(/\/0\/\d+\/(\d+)/);
-  if (match) return match[1];
-  
-  match = url.match(/\/task\/(\d+)/);
-  if (match) return match[1];
-  
-  match = url.match(/\/item\/(\d+)/);
-  if (match) return match[1];
-  
-  return null;
+    const url = urlMatch[0];
+
+    let match = url.match(/\/0\/\d+\/(\d+)/);
+    if (match) return match[1];
+
+    match = url.match(/\/task\/(\d+)/);
+    if (match) return match[1];
+
+    match = url.match(/\/item\/(\d+)/);
+    if (match) return match[1];
+
+    return null;
 }
 
 /**
@@ -106,11 +106,11 @@ function extractAsanaTaskId(prBody) {
  * @returns {string|null} - The diff content, or null if not found.
  */
 function extractLatestDiff(body) {
-  const latestMatch = body.match(/<details open>\s*<summary>latest<\/summary>([\s\S]*?)(?=<\/details>\s*$)/);
-  if (!latestMatch) return null;
-  
-  const diffMatch = latestMatch[1].match(/```diff([\s\S]*?)```/);
-  return diffMatch ? diffMatch[1].trim() : null;
+    const latestMatch = body.match(/<details open>\s*<summary>latest<\/summary>([\s\S]*?)(?=<\/details>\s*$)/);
+    if (!latestMatch) return null;
+
+    const diffMatch = latestMatch[1].match(/```diff([\s\S]*?)```/);
+    return diffMatch ? diffMatch[1].trim() : null;
 }
 
 /**
@@ -120,21 +120,21 @@ function extractLatestDiff(body) {
  * @returns {Promise<Object|null>} - The project task if found, or null.
  */
 async function findProjectInCurrentObjectives(taskId) {
-  let currentId = taskId;
-  for (let i = 0; i < 10; i++) {
-    const task = await getTask(currentId);
-    if (!task) return null;
+    let currentId = taskId;
+    for (let i = 0; i < 10; i++) {
+        const task = await getTask(currentId);
+        if (!task) return null;
 
-    const inCurrentObjectives = task.projects?.some(p => p.gid === currentObjectivesProjectId);
-    if (inCurrentObjectives) {
-      console.log(`  Found project to update`);
-      return task;
+        const inCurrentObjectives = task.projects?.some((p) => p.gid === currentObjectivesProjectId);
+        if (inCurrentObjectives) {
+            console.log(`  Found project to update`);
+            return task;
+        }
+
+        if (!task.parent) return null;
+        currentId = task.parent.gid;
     }
-
-    if (!task.parent) return null;
-    currentId = task.parent.gid;
-  }
-  return null;
+    return null;
 }
 
 /**
@@ -144,23 +144,23 @@ async function findProjectInCurrentObjectives(taskId) {
  * @returns {Promise<Object>} - The existing or newly created subtask.
  */
 async function findOrCreateNotificationsSubtask(projectTask) {
-  const subtaskName = `Windows Release Notifications: ${projectTask.name}`;
-  const subtasks = await getSubtasks(projectTask.gid);
-  
-  const existing = subtasks?.find(s => s.name === subtaskName);
-  if (existing) {
-    console.log(`Found existing subtask: ${existing.gid}`);
-    return existing;
-  }
+    const subtaskName = `Windows Release Notifications: ${projectTask.name}`;
+    const subtasks = await getSubtasks(projectTask.gid);
 
-  const collaborators = getCollaborators(projectTask);
-  console.log(`Creating subtask: ${subtaskName} with followers:`, collaborators);
-  
-  return asanaPost(`/tasks/${projectTask.gid}/subtasks`, {
-    name: subtaskName,
-    notes: '',
-    followers: collaborators
-  });
+    const existing = subtasks?.find((s) => s.name === subtaskName);
+    if (existing) {
+        console.log(`Found existing subtask: ${existing.gid}`);
+        return existing;
+    }
+
+    const collaborators = getCollaborators(projectTask);
+    console.log(`Creating subtask: ${subtaskName} with followers:`, collaborators);
+
+    return asanaPost(`/tasks/${projectTask.gid}/subtasks`, {
+        name: subtaskName,
+        notes: '',
+        followers: collaborators,
+    });
 }
 
 /**
@@ -170,27 +170,28 @@ async function findOrCreateNotificationsSubtask(projectTask) {
  * @returns {Promise<{pr: Object|null, diff: string|null}>} - The PR and diff content.
  */
 async function getPrAndDiff(sha) {
-  const owner = 'duckduckgo';
-  const repo = 'privacy-configuration';
+    const owner = 'duckduckgo';
+    const repo = 'privacy-configuration';
 
-  const { data: prs } = await github.rest.repos.listPullRequestsAssociatedWithCommit({
-    owner, repo, commit_sha: sha
-  });
-  
-  const pr = prs[0];
-  if (!pr) return { pr: null, diff: null };
+    const { data: prs } = await github.rest.repos.listPullRequestsAssociatedWithCommit({
+        owner,
+        repo,
+        commit_sha: sha,
+    });
 
-  const { data: comments } = await github.rest.issues.listComments({
-    owner, repo, issue_number: pr.number
-  });
+    const pr = prs[0];
+    if (!pr) return { pr: null, diff: null };
 
-  const diffComment = comments.find(c => 
-    c.user.login === 'github-actions[bot]' && 
-    c.body.includes('Generated file outputs')
-  );
+    const { data: comments } = await github.rest.issues.listComments({
+        owner,
+        repo,
+        issue_number: pr.number,
+    });
 
-  const diff = diffComment ? extractLatestDiff(diffComment.body) : null;
-  return { pr, diff };
+    const diffComment = comments.find((c) => c.user.login === 'github-actions[bot]' && c.body.includes('Generated file outputs'));
+
+    const diff = diffComment ? extractLatestDiff(diffComment.body) : null;
+    return { pr, diff };
 }
 
 /**
@@ -201,61 +202,61 @@ async function getPrAndDiff(sha) {
  * @returns {string} - HTML formatted comment body.
  */
 function buildComment(pr, diff) {
-  const escapedDiff = diff.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  return `<body>Feature flag changed: <a href="${pr.html_url}">${pr.title} (#${pr.number})</a>\n\n<pre>${escapedDiff}</pre></body>`;
+    const escapedDiff = diff.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return `<body>Feature flag changed: <a href="${pr.html_url}">${pr.title} (#${pr.number})</a>\n\n<pre>${escapedDiff}</pre></body>`;
 }
 
 async function run() {
-  if (!commitSha) {
-    console.log('No commit SHA provided');
-    return;
-  }
+    if (!commitSha) {
+        console.log('No commit SHA provided');
+        return;
+    }
 
-  if (!process.env.ASANA_ACCESS_TOKEN || !currentObjectivesProjectId) {
-    console.log('Missing ASANA_ACCESS_TOKEN or CURRENT_OBJECTIVES_PROJECT_ID');
-    process.exit(1);
-  }
+    if (!process.env.ASANA_ACCESS_TOKEN || !currentObjectivesProjectId) {
+        console.log('Missing ASANA_ACCESS_TOKEN or CURRENT_OBJECTIVES_PROJECT_ID');
+        process.exit(1);
+    }
 
-  const { pr, diff } = await getPrAndDiff(commitSha);
-  if (!pr) {
-    console.log('No PR found');
-    return;
-  }
-  console.log('PR:', pr.number, pr.title);
+    const { pr, diff } = await getPrAndDiff(commitSha);
+    if (!pr) {
+        console.log('No PR found');
+        return;
+    }
+    console.log('PR:', pr.number, pr.title);
 
-  const prAsanaTaskId = extractAsanaTaskId(pr.body || '');
-  if (!prAsanaTaskId) {
-    console.log('No Asana task in PR, nothing to update');
-    return;
-  }
+    const prAsanaTaskId = extractAsanaTaskId(pr.body || '');
+    if (!prAsanaTaskId) {
+        console.log('No Asana task in PR, nothing to update');
+        return;
+    }
 
-  const asanaTaskId = taskOverride || prAsanaTaskId;
-  if (taskOverride) {
-    console.log('Using task override:', taskOverride);
-  }
+    const asanaTaskId = taskOverride || prAsanaTaskId;
+    if (taskOverride) {
+        console.log('Using task override:', taskOverride);
+    }
 
-  if (!diff || !diff.includes('windows-config.json')) {
-    console.log('No windows-config.json changes, skipping');
-    return;
-  }
+    if (!diff || !diff.includes('windows-config.json')) {
+        console.log('No windows-config.json changes, skipping');
+        return;
+    }
 
-  const projectTask = await findProjectInCurrentObjectives(asanaTaskId);
-  if (!projectTask) {
-    console.log('Task not in Current Objectives, skipping');
-    return;
-  }
+    const projectTask = await findProjectInCurrentObjectives(asanaTaskId);
+    if (!projectTask) {
+        console.log('Task not in Current Objectives, skipping');
+        return;
+    }
 
-  const notificationsSubtask = await findOrCreateNotificationsSubtask(projectTask);
-  if (!notificationsSubtask) {
-    console.log('Failed to find/create notifications subtask');
-    process.exit(1);
-  }
+    const notificationsSubtask = await findOrCreateNotificationsSubtask(projectTask);
+    if (!notificationsSubtask) {
+        console.log('Failed to find/create notifications subtask');
+        process.exit(1);
+    }
 
-  await addComment(notificationsSubtask.gid, buildComment(pr, diff));
-  console.log('Comment posted');
+    await addComment(notificationsSubtask.gid, buildComment(pr, diff));
+    console.log('Comment posted');
 }
 
-run().catch(err => {
-  console.error(err);
-  process.exit(1);
+run().catch((err) => {
+    console.error(err);
+    process.exit(1);
 });
