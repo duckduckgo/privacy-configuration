@@ -70,16 +70,19 @@ const commitSha = args.find(a => !a.startsWith('--'));
 const taskOverride = args.find(a => a.startsWith('--task='))?.split('=')[1];
 
 /**
- * Extracts an Asana task ID from a PR body by finding the "Asana Task" line.
+ * Extracts an Asana task ID from a PR body by finding the "Asana Task" section.
  *
  * @param {string} prBody - The pull request body/description.
  * @returns {string|null} - The Asana task GID, or null if not found.
  */
 function extractAsanaTaskId(prBody) {
-  const taskLine = prBody.split('\n').find(line => line.toLowerCase().includes('asana task'));
-  if (!taskLine) return null;
+  const lines = prBody.split('\n');
+  const taskLineIndex = lines.findIndex(line => line.toLowerCase().includes('asana task'));
+  if (taskLineIndex === -1) return null;
   
-  const urlMatch = taskLine.match(/https:\/\/app\.asana\.com\/[^\s\)]+/);
+  // Check the header line and the next few lines for the URL
+  const searchLines = lines.slice(taskLineIndex, taskLineIndex + 5).join('\n');
+  const urlMatch = searchLines.match(/https:\/\/app\.asana\.com\/[^\s)]+/);
   if (!urlMatch) return null;
 
   const url = urlMatch[0];
