@@ -210,8 +210,13 @@ jobs:
                   PR_URL: ${{ github.event.pull_request.html_url }}
                   GITHUB_TOKEN: ${{ secrets.PRIVACY_CONFIG_PAT }}
 
+            # Run Asana sync in two cases:
+            # 1. PR merged - always sync to close existing Asana tasks
+            # 2. PR not auto-approved - sync to create/update tasks for manual review
             - uses: duckduckgo/action-asana-sync@v11
-              if: (steps.wait-for-build.outputs.conclusion == 'success' && steps.approval.outputs.approved == 'true' && steps.check_files.outputs.files_valid == 'true') != true
+              if: |
+                  (github.event.action == 'closed' && github.event.pull_request.merged == true) ||
+                  ((steps.wait-for-build.outputs.conclusion == 'success' && steps.approval.outputs.approved == 'true' && steps.check_files.outputs.files_valid == 'true') != true)
               with:
                   ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
                   ASANA_WORKSPACE_ID: ${{ secrets.ASANA_WORKSPACE_ID }}
