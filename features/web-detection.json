@@ -1,9 +1,14 @@
 {
     "_meta": {
-        "description": "Detect web patterns such as adwalls.",
+        "description": "Detect web patterns such as adwalls. Supports automatic detection with telemetry.",
         "sampleExcludeRecords": {
             "domain": "example.com",
             "reason": "site breakage"
+        },
+        "featureFlags": {
+            "adwallAutoDetection": "Enable/disable automatic adwall detection",
+            "adwallTelemetryPixel": "Enable/disable daily/weekly telemetry pixels",
+            "adwallZeroCountPixel": "Enable/disable zero-count pixels (28-day window)"
         }
     },
     "state": "disabled",
@@ -12,7 +17,7 @@
         "detectors": {
             "adwalls": {
                 "generic_en": {
-                    "state": "disabled",
+                    "state": "enabled",
                     "match": {
                         "text": {
                             "pattern": [
@@ -23,10 +28,31 @@
                                 "you('re| are| may be) using an ad blocker"
                             ]
                         }
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "intervalMs": [100, 500, 1000],
+                            "runConditions": [
+                                { "context": { "top": true } }
+                            ]
+                        },
+                        "breakageReport": {
+                            "state": "enabled"
+                        }
+                    },
+                    "actions": {
+                        "fireTelemetry": {
+                            "state": "enabled",
+                            "type": "adwall"
+                        },
+                        "breakageReportData": {
+                            "state": "enabled"
+                        }
                     }
                 },
                 "generic_de": {
-                    "state": "disabled",
+                    "state": "enabled",
                     "match": {
                         "text": {
                             "pattern": [
@@ -37,10 +63,34 @@
                                 "sie einen adblocker verwenden"
                             ]
                         }
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "intervalMs": [100, 500, 1000],
+                            "runConditions": [
+                                {
+                                    "context": { "top": true },
+                                    "urlPattern": "https://*.de/*"
+                                }
+                            ]
+                        },
+                        "breakageReport": {
+                            "state": "enabled"
+                        }
+                    },
+                    "actions": {
+                        "fireTelemetry": {
+                            "state": "enabled",
+                            "type": "adwall"
+                        },
+                        "breakageReportData": {
+                            "state": "enabled"
+                        }
                     }
                 },
                 "generic_it": {
-                    "state": "disabled",
+                    "state": "enabled",
                     "match": {
                         "text": {
                             "pattern": [
@@ -48,16 +98,100 @@
                                 "stai usando un ad block"
                             ]
                         }
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "intervalMs": [100, 500, 1000],
+                            "runConditions": [
+                                {
+                                    "context": { "top": true },
+                                    "urlPattern": "https://*.it/*"
+                                }
+                            ]
+                        },
+                        "breakageReport": {
+                            "state": "enabled"
+                        }
+                    },
+                    "actions": {
+                        "fireTelemetry": {
+                            "state": "enabled",
+                            "type": "adwall"
+                        },
+                        "breakageReportData": {
+                            "state": "enabled"
+                        }
                     }
                 },
                 "generic_se": {
-                    "state": "disabled",
+                    "state": "enabled",
                     "match": {
                         "text": {
                             "pattern": [
                                 "har du en annonsblockerare igång",
                                 "avaktivera din annonsblockerare"
                             ]
+                        }
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "intervalMs": [100, 500, 1000],
+                            "runConditions": [
+                                {
+                                    "context": { "top": true },
+                                    "urlPattern": "https://*.se/*"
+                                }
+                            ]
+                        },
+                        "breakageReport": {
+                            "state": "enabled"
+                        }
+                    },
+                    "actions": {
+                        "fireTelemetry": {
+                            "state": "enabled",
+                            "type": "adwall"
+                        },
+                        "breakageReportData": {
+                            "state": "enabled"
+                        }
+                    }
+                },
+                "generic_fr": {
+                    "state": "enabled",
+                    "match": {
+                        "text": {
+                            "pattern": [
+                                "bloc ?publicitaire détecté",
+                                "désactivez votre bloqueur de publicités",
+                                "vous utilisez un bloqueur de publicités"
+                            ]
+                        }
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "intervalMs": [100, 500, 1000],
+                            "runConditions": [
+                                {
+                                    "context": { "top": true },
+                                    "urlPattern": "https://*.fr/*"
+                                }
+                            ]
+                        },
+                        "breakageReport": {
+                            "state": "enabled"
+                        }
+                    },
+                    "actions": {
+                        "fireTelemetry": {
+                            "state": "enabled",
+                            "type": "adwall"
+                        },
+                        "breakageReportData": {
+                            "state": "enabled"
                         }
                     }
                 }
