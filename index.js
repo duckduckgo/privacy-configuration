@@ -168,6 +168,7 @@ function isFeatureMissingState(feature) {
 // Don't add new items to this list, we should just add fearures to overrides/ files instead with explicit state.
 const legacyDisabledFeatures = [
     'adBlockExtension',
+    'adClickAttribution',
     'androidBrowserConfig',
     'androidNewStateKillSwitch',
     'ampLinks',
