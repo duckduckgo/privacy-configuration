@@ -480,6 +480,23 @@
                 "fullscreenModeToggle": {
                     "state": "enabled",
                     "minSupportedVersion": 52603000
+                },
+                "showHideAiGeneratedImages": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52610000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 20
+                            },
+                            {
+                                "percent": 50
+                            }
+                        ]
+                    }
                 }
             }
         },
@@ -530,6 +547,10 @@
                 {
                     "domain": "ashleyfurniture.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3908"
+                },
+                {
+                    "domain": "timesofmalta.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4401"
                 }
             ],
             "features": {
@@ -962,6 +983,27 @@
                                         }
                                     }
                                 ]
+                            },
+                            {
+                                "domain": ["signin.autodesk.com"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input#firstname_str",
+                                            "type": "identities.firstName"
+                                        }
+                                    },
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input#lastname_str",
+                                            "type": "identities.lastName"
+                                        }
+                                    }
+                                ]
                             }
                         ]
                     }
@@ -1207,6 +1249,17 @@
                 "createAsyncPreferences": {
                     "state": "enabled",
                     "minSupportedVersion": 52320000
+                },
+                "useHarmony": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52650000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 1
+                            }
+                        ]
+                    }
                 }
             }
         },
@@ -1428,6 +1481,15 @@
                         }
                     ]
                 },
+                "vpnMenuItemInternational": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52660000,
+                    "targets": [
+                        {
+                            "isPrivacyProEligible": true
+                        }
+                    ]
+                },
                 "reportWebViewCapabilities": {
                     "state": "disabled",
                     "minSupportedVersion": 52560000,
@@ -1477,6 +1539,9 @@
                             },
                             {
                                 "percent": 50
+                            },
+                            {
+                                "percent": 100
                             }
                         ]
                     }
@@ -1582,6 +1647,10 @@
                 {
                     "domain": "bluegrasslyrics.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/2084"
+                },
+                {
+                    "domain": "jonesroadbeauty.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/4403"
                 }
             ]
         },
@@ -1732,6 +1801,21 @@
                                 "value": "disabled"
                             }
                         ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": {
+                                "experimentName": "contentScopeExperiment1",
+                                "cohort": "treatment"
+                            }
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/additionalCheck",
+                                "value": "disabled"
+                            }
+                        ]
                     }
                 ]
             }
@@ -1749,6 +1833,21 @@
                     {
                         "condition": {
                             "injectName": "android-adsjs"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/additionalCheck",
+                                "value": "disabled"
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": {
+                                "experimentName": "contentScopeExperiment1",
+                                "cohort": "treatment"
+                            }
                         },
                         "patchSettings": [
                             {
@@ -1785,6 +1884,21 @@
                     {
                         "condition": {
                             "injectName": "android-adsjs"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/additionalCheck",
+                                "value": "disabled"
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": {
+                                "experimentName": "contentScopeExperiment1",
+                                "cohort": "treatment"
+                            }
                         },
                         "patchSettings": [
                             {
@@ -1842,6 +1956,21 @@
                                 "value": "disabled"
                             }
                         ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": {
+                                "experimentName": "contentScopeExperiment1",
+                                "cohort": "treatment"
+                            }
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/additionalCheck",
+                                "value": "disabled"
+                            }
+                        ]
                     }
                 ]
             }
@@ -1863,6 +1992,21 @@
                     {
                         "condition": {
                             "injectName": "android-adsjs"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/additionalCheck",
+                                "value": "disabled"
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": {
+                                "experimentName": "contentScopeExperiment1",
+                                "cohort": "treatment"
+                            }
                         },
                         "patchSettings": [
                             {
@@ -1897,6 +2041,21 @@
                     {
                         "condition": {
                             "injectName": "android-adsjs"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/additionalCheck",
+                                "value": "disabled"
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": {
+                                "experimentName": "contentScopeExperiment1",
+                                "cohort": "treatment"
+                            }
                         },
                         "patchSettings": [
                             {
@@ -2239,6 +2398,17 @@
                             }
                         ]
                     },
+                    "slickstream.com": {
+                        "rules": [
+                            {
+                                "rule": "app-sx.slickstream.com",
+                                "domains": [
+                                    "recipetineats.com"
+                                ],
+                                "reason": "recipetineats.com - https://github.com/duckduckgo/privacy-configuration/pull/4387"
+                            }
+                        ]
+                    },
                     "yandex.ru": {
                         "rules": [
                             {
@@ -2341,6 +2511,21 @@
                                     "key": "keyToBeDeleted",
                                     "action": "delete"
                                 }
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": {
+                                "experimentName": "contentScopeExperiment1",
+                                "cohort": "treatment"
+                            }
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/additionalCheck",
+                                "value": "disabled"
                             }
                         ]
                     }
@@ -2975,12 +3160,6 @@
                     "state": "enabled",
                     "minSupportedVersion": 52451000
                 },
-                "subscriptionRebranding": {
-                    "state": "enabled"
-                },
-                "subscriptionAIFeaturesRebranding": {
-                    "state": "enabled"
-                },
                 "blackFridayOffer2025": {
                     "state": "disabled",
                     "targets": [
@@ -2992,6 +3171,14 @@
                 "supportsSwitchSubscription": {
                     "state": "enabled",
                     "minSupportedVersion": 52591000
+                },
+                "vpnReminderNotification": {
+                    "state": "enabled",
+                    "targets": [
+                        {
+                            "localeLanguage": "en"
+                        }
+                    ]
                 }
             }
         },
@@ -3044,7 +3231,8 @@
                     "state": "enabled"
                 },
                 "pluginNewTabPage": {
-                    "state": "disabled"
+                    "state": "enabled",
+                    "minSupportedVersion": 52650000
                 }
             }
         },
@@ -3419,6 +3607,29 @@
                             "weight": 1
                         }
                     ]
+                },
+                "contentScopeExperiment1": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 50
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
                 }
             }
         },
@@ -3503,9 +3714,13 @@
             }
         },
         "productSurfaceTelemetry": {
-            "state": "enabled",
+            "state": "disabled",
             "exceptions": [],
             "minSupportedVersion": 52610000
+        },
+        "webViewClipboardImage": {
+            "state": "enabled",
+            "exceptions": []
         },
         "webViewCompat": {
             "state": "disabled",
@@ -3549,6 +3764,75 @@
         "databaseProvider": {
             "state": "enabled",
             "exceptions": []
+        },
+        "serp": {
+            "state": "enabled",
+            "exceptions": [],
+            "features": {
+                "storeSerpSettings": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52610000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 20
+                            },
+                            {
+                                "percent": 50
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        "pageContext": {
+            "state": "internal",
+            "minSupportedVersion": 52630000,
+            "exceptions": [],
+            "settings": {
+                "additionalCheck": "enabled",
+                "activeCaptureOnFirstMessage": "disabled",
+                "maxContentLength": 9500,
+                "mainContentSelector": "main, article, .content, .main, #content, #main",
+                "excludeSelectors": [
+                    ".ad",
+                    ".sidebar",
+                    ".footer",
+                    ".nav",
+                    ".header",
+                    ".banner",
+                    ".popup"
+                ],
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "domain": "nba.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/mainContentSelector",
+                                "value": "main"
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "domain": "reddit.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/excludeSelectors/-",
+                                "value": "shreddit-comments-page-ad"
+                            }
+                        ]
+                    }
+                ]
+            }
         }
     },
     "unprotectedTemporary": [],

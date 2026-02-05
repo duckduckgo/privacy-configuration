@@ -979,16 +979,26 @@
                     {
                         "rule": "www.datadoghq-browser-agent.com/datadog-logs-v4.js",
                         "domains": [
-                            "shapermint.com"
+                            "shapermint.com",
+                            "indeed.com",
+                            "hrblock.com"
                         ],
-                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1571"
+                        "reason": [
+                            "https://github.com/duckduckgo/privacy-configuration/issues/1571",
+                            "indeed.com - https://github.com/duckduckgo/privacy-configuration/issues/2163",
+                            "hrblock.com - https://github.com/duckduckgo/privacy-configuration/pull/4394"
+                        ]
                     },
                     {
                         "rule": "datadoghq-browser-agent.com",
                         "domains": [
-                            "indeed.com"
+                            "indeed.com",
+                            "hrblock.com"
                         ],
-                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/2163"
+                        "reason": [
+                            "indeed.com - https://github.com/duckduckgo/privacy-configuration/issues/2163",
+                            "hrblock.com - https://github.com/duckduckgo/privacy-configuration/pull/4394"
+                        ]
                     }
                 ]
             },
@@ -1013,15 +1023,6 @@
                         ],
                         "reason": [
                             "sbs.com.au - https://github.com/duckduckgo/privacy-configuration/pull/2436"
-                        ]
-                    },
-                    {
-                        "rule": "adobedc.demdex.net",
-                        "domains": [
-                            "aetna.com"
-                        ],
-                        "reason": [
-                            "aetna.com - https://github.com/duckduckgo/privacy-configuration/pull/4301"
                         ]
                     }
                 ]
@@ -1297,7 +1298,8 @@
                             "wvah.com",
                             "wwmt.com",
                             "youmath.it",
-                            "nationalpost.com"
+                            "nationalpost.com",
+                            "nationalreview.com"
                         ],
                         "reason": [
                             "ah.nl - 'Bonus offer' elements do not render and are not clickable.",
@@ -1318,7 +1320,8 @@
                             "https://github.com/duckduckgo/privacy-configuration/pull/2888",
                             "krcrtv.com - https://github.com/duckduckgo/privacy-configuration/pull/3489",
                             "webmd.com - https://github.com/duckduckgo/privacy-configuration/pull/3737",
-                            "nationalpost.com - https://github.com/duckduckgo/privacy-configuration/pull/3969"
+                            "nationalpost.com - https://github.com/duckduckgo/privacy-configuration/pull/3969",
+                            "nationalreview.com - https://github.com/duckduckgo/privacy-configuration/pull/4459"
                         ]
                     },
                     {
@@ -1473,6 +1476,17 @@
                             "harborfreight.com"
                         ],
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/2059"
+                    }
+                ]
+            },
+            "dynatrace.com": {
+                "rules": [
+                    {
+                        "rule": "js-cdn.dynatrace.com/jstag",
+                        "domains": [
+                            "statefarm.com"
+                        ],
+                        "reason": "statefarm.com - https://github.com/duckduckgo/privacy-configuration/pull/4390"
                     }
                 ]
             },
@@ -2679,6 +2693,13 @@
                             "<all>"
                         ],
                         "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2786"
+                    },
+                    {
+                        "rule": "resources.digital-cloud-west.medallia.com/",
+                        "domains": [
+                            "aetna.com"
+                        ],
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4445"
                     }
                 ]
             },

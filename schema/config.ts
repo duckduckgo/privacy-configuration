@@ -26,7 +26,9 @@ import { ElementHidingFeature } from './features/element-hiding';
 import { RequestBlocklistFeature } from './features/request-blocklist';
 import { UaChBrandsFeature } from './features/ua-ch-brands';
 import { UrlPredictorFeature } from './features/url-predictor';
+import { WebDetectionFeature } from './features/web-detection';
 import { WebInterferenceDetectionFeature } from './features/web-interference-detection';
+import { ExtendedCrashReporting } from './features/extendedCrashReporting';
 
 export { WebCompatSettings } from './features/webcompat';
 export { DuckPlayerSettings } from './features/duckplayer';
@@ -70,6 +72,7 @@ export type ConfigV5<VersionType> = {
         fingerprintingScreenSize?: FingerprintingScreenSizeFeature<VersionType>;
         networkProtection?: NetworkProtection<VersionType>;
         scriptlets?: ScriptletsFeature<VersionType>;
+        webDetection?: WebDetectionFeature<VersionType>;
         windowsWebviewFailures?: WindowsWebViewFailures<VersionType>;
         windowsWebviewFailures_DDGWV?: WindowsWebViewFailures<VersionType>;
         customUserAgent?: CustomUserAgentFeature<VersionType>;
@@ -78,6 +81,7 @@ export type ConfigV5<VersionType> = {
         uaChBrands?: UaChBrandsFeature<VersionType>;
         urlPredictor?: UrlPredictorFeature<VersionType>;
         webInterferenceDetection?: WebInterferenceDetectionFeature<VersionType>;
+        extendedCrashReporting?: ExtendedCrashReporting<VersionType>;
     };
     unprotectedTemporary: SiteException[];
 };

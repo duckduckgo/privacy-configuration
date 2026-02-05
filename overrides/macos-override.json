@@ -177,7 +177,8 @@
             "state": "enabled"
         },
         "combinedPermissionView": {
-            "state": "internal"
+            "state": "enabled",
+            "minSupportedVersion": "1.175.0"
         },
         "contentScopeExperiments": {
             "exceptions": [],
@@ -396,7 +397,7 @@
                     }
                 },
                 "standaloneMigration": {
-                    "state": "disabled"
+                    "state": "enabled"
                 },
                 "showHideAiGeneratedImages": {
                     "state": "enabled"
@@ -421,6 +422,18 @@
                     ]]
             }
         },
+        "duckAiChatHistory": {
+            "exceptions": [],
+            "state": "enabled",
+            "settings": {
+                "chatsLocalStorageKeys": ["savedAIChats"]
+            },
+            "features": {
+                "nativeUI": {
+                    "state": "internal"
+                }
+            }
+        },
         "autocompleteTabs": {
             "minSupportedVersion": "1.134.0"
         },
@@ -436,6 +449,15 @@
                         "steps": [
                             {
                                 "percent": 5
+                            },
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 20
+                            },
+                            {
+                                "percent": 50
                             }
                         ]
                     }
@@ -729,10 +751,6 @@
                 "heuristicAction": {
                     "state": "enabled",
                     "cohorts": [
-                        {
-                            "name": "control",
-                            "weight": 1
-                        },
                         {
                             "name": "treatment",
                             "weight": 1
@@ -1102,6 +1120,27 @@
                                         }
                                     }
                                 ]
+                            },
+                            {
+                                "domain": ["signin.autodesk.com"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input#firstname_str",
+                                            "type": "identities.firstName"
+                                        }
+                                    },
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input#lastname_str",
+                                            "type": "identities.lastName"
+                                        }
+                                    }
+                                ]
                             }
                         ]
                     }
@@ -1392,6 +1431,10 @@
                     {
                         "domain": "arcteryx.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3701"
+                    },
+                    {
+                        "domain": "sling.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4465"
                     }
                 ],
                 "webViewDefault": [
@@ -1487,6 +1530,17 @@
         "trackerAllowlist": {
             "settings": {
                 "allowlistedTrackers": {
+                    "adlightning.com": {
+                        "rules": [
+                            {
+                                "rule": "tagan.adlightning.com",
+                                "domains": [
+                                    "timesofmalta.com"
+                                ],
+                                "reason": "timesofmalta.com - https://github.com/duckduckgo/privacy-configuration/pull/4401"
+                            }
+                        ]
+                    },
                     "appboycdn.com": {
                         "rules": [
                             {
@@ -1543,6 +1597,17 @@
                                 "rule": "www3.doubleclick.net",
                                 "domains": ["scrolller.com"],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1968"
+                            }
+                        ]
+                    },
+                    "ebxcdn.com": {
+                        "rules": [
+                            {
+                                "rule": "applets.ebxcdn.com/ebx.js",
+                                "domains": [
+                                    "timesofmalta.com"
+                                ],
+                                "reason": "timesofmalta.com - https://github.com/duckduckgo/privacy-configuration/pull/4401"
                             }
                         ]
                     },
@@ -2071,60 +2136,14 @@
         },
         "webInterferenceDetection": {
             "state": "enabled",
-            "minSupportedVersion": "1.172.0",
-            "exceptions": [],
-            "settings": {
-                "autoRunDelayMs": 100,
-                "interferenceTypes": {
-                    "botDetection": {
-                        "cloudflareTurnstile": {
-                            "state": "enabled",
-                            "vendor": "cloudflare",
-                            "selectors": [
-                                ".cf-turnstile",
-                                "script[src*=\"challenges.cloudflare.com\"]"
-                            ],
-                            "windowProperties": ["turnstile"],
-                            "statusSelectors": [
-                                { "status": "solved", "selectors": ["[data-state=\"success\"]"] },
-                                { "status": "failed", "selectors": ["[data-state=\"error\"]"] }
-                            ]
-                        },
-                        "hcaptcha": {
-                            "state": "enabled",
-                            "vendor": "hcaptcha",
-                            "selectors": [
-                                ".h-captcha",
-                                "[data-hcaptcha-widget-id]",
-                                "script[src*=\"hcaptcha.com\"]"
-                            ],
-                            "windowProperties": ["hcaptcha"]
-                        }
-                    },
-                    "fraudDetection": {
-                        "phishingWarning": {
-                            "state": "enabled",
-                            "type": "phishing",
-                            "selectors": [
-                                ".warning-banner",
-                                "#security-alert"
-                            ],
-                            "textPatterns": [
-                                "suspicious.*activity",
-                                "unusual.*login"
-                            ],
-                            "textSources": ["innerText"]
-                        }
-                    }
-                }
-            }
+            "minSupportedVersion": "1.172.0"
         },
         "updates": {
             "state": "enabled",
             "exceptions": [],
             "features": {
                 "simplifiedFlow": {
-                    "state": "internal",
+                    "state": "enabled",
                     "minSupportedVersion": "1.174.0"
                 }
             }
