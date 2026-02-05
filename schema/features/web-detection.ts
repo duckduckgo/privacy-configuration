@@ -7,14 +7,50 @@ type TriggerBase = {
     runConditions?: ConditionBlockOrArray;
 };
 
+/**
+ * Auto trigger configuration for automatic detection after page load.
+ */
+type AutoTrigger = TriggerBase & {
+    /**
+     * Intervals (in milliseconds) after initialisation to run detection.
+     * Multiple intervals allow checking at different points during page load.
+     */
+    intervalMs: number[];
+};
+
 type Triggers = Partial<{
     breakageReport: TriggerBase;
+    /**
+     * Auto trigger enables automatic execution of detectors after page load.
+     */
+    auto: AutoTrigger;
 }>;
+
+/**
+ * Fire telemetry action configuration.
+ * Triggers a telemetry event via the web-telemetry feature.
+ */
+type FireTelemetryAction = {
+    state?: FeatureState;
+    /**
+     * The type of telemetry event to fire (e.g., "adwall").
+     */
+    type: string;
+};
 
 type Actions = Partial<{
     breakageReportData: {
         state?: FeatureState;
+        /**
+         * When debug is true, detection results include { "debug": { "didRun": boolean } }
+         * and are included in breakage reports regardless of whether detection succeeded.
+         */
+        debug?: boolean;
     };
+    /**
+     * Fire telemetry action triggers a telemetry event via the web-telemetry feature.
+     */
+    fireTelemetry: FireTelemetryAction;
 }>;
 
 export type ConditionTypes = {
