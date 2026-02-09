@@ -1757,6 +1757,395 @@
                 }
             }
         },
+        "autofill_DDGWV": {
+            "state": "enabled",
+            "exceptions": [
+                {
+                    "domain": "roll20.net",
+                    "reason": "Performance issue for too many fields."
+                }
+            ],
+            "features": {
+                "autofillPopupReuse": {
+                    "state": "disabled"
+                },
+                "deduplicateLoginsOnImport": {
+                    "state": "enabled"
+                },
+                "unknownUsernameCategorization": {
+                    "state": "enabled"
+                },
+                "passwordVariantCategorization": {
+                    "state": "enabled"
+                },
+                "credentialsImportPromotion": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.98.0"
+                },
+                "credentialsImportPromotionForExistingUsers": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.98.0"
+                },
+                "partialFormSaves": {
+                    "state": "enabled"
+                },
+                "autofillCreditCards": {
+                    "state": "enabled"
+                },
+                "autofillCreditCardsOnByDefault": {
+                    "state": "enabled"
+                },
+                "autofillIdentities": {
+                    "state": "enabled"
+                },
+                "autofillIdentitiesOnByDefault": {
+                    "state": "enabled"
+                },
+                "autofillSkipAuthenticationIfVaultEmpty": {
+                    "state": "internal"
+                },
+                "totp": {
+                    "state": "internal"
+                },
+                "siteSpecificFixes": {
+                    "state": "enabled",
+                    "settings": {
+                        "formTypeSettings": [],
+                        "inputTypeSettings": [],
+                        "formBoundarySelector": "",
+                        "failsafeSettings": {},
+                        "domains": [
+                            {
+                                "domain": ["ring.com"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "body > main > section > form:nth-child(2)",
+                                            "type": "signup"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": ["www.joinblvd.com"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "blvd-wizard-step form",
+                                            "type": "signup"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": ["alibris.com"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "form[action*=\"Guest\"]",
+                                            "type": "signup"
+                                        }
+                                    },
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "form[action*=\"CreateAccount\"]",
+                                            "type": "signup"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": ["coolors.co"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/failsafeSettings/maxInputsPerPage",
+                                        "op": "add",
+                                        "value": 110
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": ["areaclientes.orange.es"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "form",
+                                            "type": "login"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": [
+                                    "estore.archives.gov",
+                                    "localhost"
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "fieldset[id='ucContentMiddleCenter_fldLogin']",
+                                            "type": "login"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": [
+                                    "zendesk.com",
+                                    "localhost"
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "#\\:r0\\:\\-\\-input",
+                                            "type": "credentials.username"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": ["cvs.com"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "profile-lookup[app-name='account-login'] input[type='text']",
+                                            "type": "credentials.username"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": ["att.com"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input[name='Expiration Month']",
+                                            "type": "creditCards.expiration"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": ["gamestop.com"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input[name='dwfrm_profile_customer_email']",
+                                            "type": "identities.emailAddress"
+                                        }
+                                    },
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input[name='dwfrm_profile_login_password']",
+                                            "type": "credentials.password.new"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": ["asana.com"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input.TextInputBase.TokenizerInput-input[data-testid='tokenizer-input'][placeholder='Name or email']",
+                                            "type": "unknown"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": ["portal.vectorsecurity.com"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "form[method='post'][action='/index']",
+                                            "type": "login"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": ["reddit.com"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "rpl-modal-card.settings-row-modal-card[id*='settings-mfa-enable-password']",
+                                            "type": "login"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": ["netflix.com"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "div[data-uia='web-login-form']",
+                                            "type": "login"
+                                        }
+                                    },
+                                    {
+                                        "path": "/formBoundarySelector",
+                                        "op": "replace",
+                                        "value": "div[data-uia='web-login-form']"
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": ["aa.com"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formBoundarySelector",
+                                        "op": "replace",
+                                        "value": "adc-card.adc-card"
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": [
+                                    "bet365.bet.br",
+                                    "bet365.com"
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formBoundarySelector",
+                                        "op": "replace",
+                                        "value": "div[style*=transform] > div"
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": ["order.yodobashi.com"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": ".loginSelectUnit.slctInputUnit",
+                                            "type": "login"
+                                        }
+                                    },
+                                    {
+                                        "path": "/formBoundarySelector",
+                                        "op": "replace",
+                                        "value": ".loginSelectUnit.slctInputUnit"
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": [
+                                    "accounts.google.com"
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formBoundarySelector",
+                                        "op": "replace",
+                                        "value": "c-wiz > main"
+                                    },
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "c-wiz[data-p*=ServiceLogin] > main",
+                                            "type": "login"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": [
+                                    "challenge.spotify.com"
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input[inputmode=\"numeric\"]",
+                                            "type": "unknown"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": [
+                                    "login.coinbase.com"
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input[data-testid='unified-login-email-prompt-input']",
+                                            "type": "credentials.username"
+                                        }
+                                    },
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "span[data-testid='input-interactable-area'] input[type='email']",
+                                            "type": "identities.emailAddress"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": ["signin.autodesk.com"],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input#firstname_str",
+                                            "type": "identities.firstName"
+                                        }
+                                    },
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input#lastname_str",
+                                            "type": "identities.lastName"
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            }
+        },
         "bookmarks": {
             "state": "enabled",
             "features": {
