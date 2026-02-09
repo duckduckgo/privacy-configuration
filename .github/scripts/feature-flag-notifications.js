@@ -100,17 +100,19 @@ function extractAsanaTaskId(prBody) {
 }
 
 /**
- * Extracts the latest diff from a GitHub Actions bot comment.
+ * Extracts all diff blocks from the "latest" section of a GitHub Actions bot comment.
  *
  * @param {string} body - The comment body containing diff details.
- * @returns {string|null} - The diff content, or null if not found.
+ * @returns {string|null} - All diff content concatenated, or null if not found.
  */
 function extractLatestDiff(body) {
     const latestMatch = body.match(/<details open>\s*<summary>latest<\/summary>([\s\S]*?)(?=<\/details>\s*$)/);
     if (!latestMatch) return null;
 
-    const diffMatch = latestMatch[1].match(/```diff([\s\S]*?)```/);
-    return diffMatch ? diffMatch[1].trim() : null;
+    const diffBlocks = [...latestMatch[1].matchAll(/```diff([\s\S]*?)```/g)];
+    if (diffBlocks.length === 0) return null;
+
+    return diffBlocks.map((m) => m[1].trim()).join('\n\n');
 }
 
 /**
@@ -242,6 +244,13 @@ async function run() {
         return;
     }
 
+    const windowsDiffMatch = diff.match(/---[^\n]*windows-config\.json[\s\S]*?(?=---[^\n]*\.json|$)/);
+    const windowsDiff = windowsDiffMatch ? windowsDiffMatch[0].trim() : null;
+    if (!windowsDiff) {
+        console.log('Could not extract Windows diff section');
+        return;
+    }
+
     const projectTask = await findProjectInCurrentObjectives(asanaTaskId);
     if (!projectTask) {
         console.log('Task not in Current Objectives, skipping');
@@ -254,7 +263,7 @@ async function run() {
         process.exit(1);
     }
 
-    await addComment(notificationsSubtask.gid, buildComment(pr, diff));
+    await addComment(notificationsSubtask.gid, buildComment(pr, windowsDiff));
     console.log('Comment posted');
 }
 
