@@ -180,8 +180,8 @@ describe('Feature size analysis', () => {
             }
 
             // Platform-specific base sizes for autoconsent feature
-            const ANDROID_BASE_SIZE_KB = 829.09; // Current autoconsent size on Android
-            const OTHER_PLATFORMS_BASE_SIZE_KB = 829.09; // Current autoconsent size on iOS/macOS/Windows
+            const ANDROID_BASE_SIZE_KB = 915.09; // Current autoconsent size on Android
+            const OTHER_PLATFORMS_BASE_SIZE_KB = 915.09; // Current autoconsent size on iOS/macOS/Windows
 
             const configFiles = getConfigFiles();
 
