@@ -9,10 +9,14 @@ type TriggerBase = {
 
 type Triggers = Partial<{
     breakageReport: TriggerBase;
+    autoRun: TriggerBase;
 }>;
 
 type Actions = Partial<{
     breakageReportData: {
+        state?: FeatureState;
+    };
+    autoRunData: {
         state?: FeatureState;
     };
 }>;
@@ -42,6 +46,7 @@ export type DetectorConfig = {
 type DetectorGroup = Record<string, DetectorConfig>;
 
 export type WebDetectionSettings = CSSInjectFeatureSettings<{
+    autoRunDelayMs?: number;
     detectors?: Record<string, DetectorGroup>;
 }>;
 
