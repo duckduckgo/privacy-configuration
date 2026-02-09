@@ -7,14 +7,6 @@ on:
         paths:
             - 'features/**/*.json'
             - 'overrides/**/*.json'
-    workflow_dispatch:
-        inputs:
-            task_override:
-                description: 'Asana task ID to post to (for testing)'
-                required: false
-            commit_sha:
-                description: 'Commit SHA to process (for testing)'
-                required: false
 
 jobs:
     notify:
@@ -33,4 +25,4 @@ jobs:
                   ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
                   CURRENT_OBJECTIVES_PROJECT_ID: ${{ secrets.CURRENT_OBJECTIVES_PROJECT_ID }}
                   PROJECT_ADVISOR_FIELD_ID: ${{ secrets.PROJECT_ADVISOR_FIELD_ID }}
-              run: node .github/scripts/feature-flag-notifications.js ${{ inputs.commit_sha || github.sha }} ${{ inputs.task_override && format('--task={0}', inputs.task_override) || '' }}
+              run: node .github/scripts/feature-flag-notifications.js ${{ github.sha }}
