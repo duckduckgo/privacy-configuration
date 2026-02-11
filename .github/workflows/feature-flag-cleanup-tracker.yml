@@ -181,9 +181,11 @@ jobs:
                   Inputs: \`features/\` + \`$OVERRIDE_FILE\`
 
                   Action Required:
-                  Please review this feature flag after the due date and determine if it can be removed. Feature flags should be temporary and cleaned up once the feature is stable.
+                  Please review this feature flag after the due date and determine if it can be removed.
 
-                  Steps to remove:
+                  Note: Check if this is a kill switch or permanent feature toggle. If it's meant to be permanent (e.g., kill switch, long-term A/B test, or operational toggle), you can close this task without removing the flag. Only temporary rollout flags need to be cleaned up once the feature is stable.
+
+                  Steps to remove (if not a permanent flag):
                   1. Verify the feature is working as expected in $PLATFORM_NAME production
                   2. Update \`features/\` and/or \`$OVERRIDE_FILE\` so \`$CONSTRUCTED_FILE\` no longer includes \`$FEATURE_PATH\`
                   3. Remove any $PLATFORM_NAME code that references this feature flag
@@ -196,11 +198,11 @@ jobs:
                     TASK_NAME="[$PLATFORM_NAME] Remove feature flags added in PR #${{ steps.pr_context.outputs.pr_number }}"
                     TASK_DESCRIPTION="Multiple $PLATFORM_NAME feature flags were added in PR #${{ steps.pr_context.outputs.pr_number }}
 
-                  **PR Link:** ${{ steps.pr_context.outputs.pr_url }}
-                  **Constructed File:** \`$CONSTRUCTED_FILE\`
-                  **Inputs:** \`features/\` + \`$OVERRIDE_FILE\`
+                  PR Link: ${{ steps.pr_context.outputs.pr_url }}
+                  Constructed File: \`$CONSTRUCTED_FILE\`
+                  Inputs: \`features/\` + \`$OVERRIDE_FILE\`
 
-                  **Feature Flags to Review:**
+                  Feature Flags to Review:
                   "
 
                     # List each feature flag
@@ -215,7 +217,7 @@ jobs:
                         fi
 
                         TASK_DESCRIPTION="${TASK_DESCRIPTION}
-                  - **$FEATURE_NAME**
+                  - $FEATURE_NAME
                     Path: \`$FEATURE_PATH\`
                   "
                       fi
@@ -223,10 +225,12 @@ jobs:
 
                     TASK_DESCRIPTION="${TASK_DESCRIPTION}
 
-                  **Action Required:**
-                  Please review these feature flags after the due date and determine if they can be removed. Feature flags should be temporary and cleaned up once the feature is stable.
+                  Action Required:
+                  Please review these feature flags after the due date and determine if they can be removed.
 
-                  **Steps to remove:**
+                  Note: Check if any of these are kill switches or permanent feature toggles. If a flag is meant to be permanent (e.g., kill switch, long-term A/B test, or operational toggle), you can keep it and close this task. Only temporary rollout flags need to be cleaned up once the feature is stable.
+
+                  Steps to remove (for non-permanent flags):
                   1. Verify each feature is working as expected in $PLATFORM_NAME production
                   2. Update \`features/\` and/or \`$OVERRIDE_FILE\` so these flags no longer appear in \`$CONSTRUCTED_FILE\`
                   3. Remove any $PLATFORM_NAME code that references these feature flags
