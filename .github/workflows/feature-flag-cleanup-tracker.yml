@@ -196,10 +196,11 @@ jobs:
 
                   Steps to remove (if not a permanent flag):
                   1. Verify the feature is working as expected in $PLATFORM_NAME production
-                  2. Update \`features/\` and/or \`$OVERRIDE_FILE\` so \`$CONSTRUCTED_FILE\` no longer includes \`$FEATURE_PATH\`
-                  3. Remove any $PLATFORM_NAME code that references this feature flag
-                  4. Update any documentation
-                  5. Create a PR with the cleanup changes
+                  2. Remove any $PLATFORM_NAME code that references this feature flag
+                  3. Update any documentation
+                  4. Create a PR with the cleanup changes
+
+                  Note: The flag can remain in the config files (\`$CONSTRUCTED_FILE\`) for backwards compatibility with older app versions.
 
                   Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
                   else
@@ -241,10 +242,11 @@ jobs:
 
                   Steps to remove (for non-permanent flags):
                   1. Verify each feature is working as expected in $PLATFORM_NAME production
-                  2. Update \`features/\` and/or \`$OVERRIDE_FILE\` so these flags no longer appear in \`$CONSTRUCTED_FILE\`
-                  3. Remove any $PLATFORM_NAME code that references these feature flags
-                  4. Update any documentation
-                  5. Create a PR with the cleanup changes
+                  2. Remove any $PLATFORM_NAME code that references these feature flags
+                  3. Update any documentation
+                  4. Create a PR with the cleanup changes
+
+                  Note: The flags can remain in the config files (\`$CONSTRUCTED_FILE\`) for backwards compatibility with older app versions.
 
                   Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
                   fi
