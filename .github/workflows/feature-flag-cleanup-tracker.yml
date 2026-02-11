@@ -7,6 +7,7 @@ on:
             - 'overrides/android-override.json'
             - 'overrides/ios-override.json'
             - 'overrides/windows-override.json'
+            - 'overrides/macos-override.json'
             - 'features/**/*.json'
 
 jobs:
@@ -31,6 +32,11 @@ jobs:
                       override_file: 'overrides/windows-override.json'
                       asana_project: '${{ vars.GH_ANDROID_INTERNAL_WORK_PROJECT_ID }}'
                       asana_section: '${{ vars.GH_ANDROID_FEATURE_FLAG_MAINTENANCE_SECTION_ID }}'
+                    - name: 'macOS'
+                      config_file: 'macos-config.json'
+                      override_file: 'overrides/macos-override.json'
+                      asana_project: '${{ vars.GH_ANDROID_INTERNAL_WORK_PROJECT_ID }}'
+                      asana_section: '${{ vars.GH_ANDROID_FEATURE_FLAG_MAINTENANCE_SECTION_ID }}'
         name: ${{ matrix.platform.name }} cleanup task
 
         steps:
@@ -38,7 +44,10 @@ jobs:
               id: pr_context
               run: |
                   echo "base_sha=${{ github.event.pull_request.base.sha }}" >> $GITHUB_OUTPUT
-                  echo "head_sha=${{ github.event.pull_request.head.sha }}" >> $GITHUB_OUTPUT
+                  # Use merge_commit_sha for both testing and production
+                  # For open PRs: test merge commit (what would happen if merged)
+                  # For merged PRs: actual merge commit (what landed on main)
+                  echo "head_sha=${{ github.event.pull_request.merge_commit_sha }}" >> $GITHUB_OUTPUT
                   echo "pr_number=${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
                   echo "pr_url=${{ github.event.pull_request.html_url }}" >> $GITHUB_OUTPUT
 
@@ -57,10 +66,10 @@ jobs:
                   path: base
                   fetch-depth: 0
 
-            - name: Checkout PR head commit
+            - name: Checkout merge commit
               uses: actions/checkout@v4
               with:
-                  ref: refs/pull/${{ steps.pr_context.outputs.pr_number }}/head
+                  ref: ${{ steps.pr_context.outputs.head_sha }}
                   path: head
                   fetch-depth: 0
 
