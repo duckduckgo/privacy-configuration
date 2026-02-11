@@ -3976,7 +3976,226 @@
         },
         "webInterferenceDetection": {
             "state": "enabled",
-            "minSupportedVersion": "0.146.0"
+            "minSupportedVersion": "0.146.0",
+            "exceptions": [],
+            "settings": {
+                "autoRunDelayMs": 100,
+                "interferenceTypes": {
+                    "adwallDetection": {
+                        "generic": {
+                            "state": "enabled",
+                            "textPatterns": [
+                                "ad ?block(er)? detected",
+                                "adjust(ing)?( your)? ad blocking settings",
+                                "(turn off|disable|disabling|deactivate)( your| my)? ad ?block(er)?",
+                                "your ad ?blocker is on",
+                                "you('re| are| may be) using an ad blocker"
+                            ],
+                            "textSources": [
+                                "innerText"
+                            ]
+                        },
+                        "generic_de": {
+                            "state": "enabled",
+                            "textPatterns": [
+                                "deaktivieren sie ihren adblocker",
+                                "deaktivieren sie ihre blocker",
+                                "adblocker zu deaktivieren",
+                                "adblocker deaktivieren",
+                                "sie einen adblocker verwenden"
+                            ],
+                            "textSources": [
+                                "innerText"
+                            ]
+                        },
+                        "generic_it": {
+                            "state": "enabled",
+                            "textPatterns": [
+                                "disattiva l'ad block",
+                                "stai usando un ad block"
+                            ],
+                            "textSources": [
+                                "innerText"
+                            ]
+                        },
+                        "generic_se": {
+                            "state": "enabled",
+                            "textPatterns": [
+                                "har du en annonsblockerare igång",
+                                "avaktivera din annonsblockerare"
+                            ],
+                            "textSources": [
+                                "innerText"
+                            ]
+                        }
+                    },
+                    "botDetection": {
+                        "cloudflareTurnstile": {
+                            "state": "enabled",
+                            "vendor": "cloudflare",
+                            "selectors": [
+                                ".cf-turnstile",
+                                "script[src*=\"challenges.cloudflare.com\"]"
+                            ],
+                            "windowProperties": [
+                                "turnstile"
+                            ],
+                            "statusSelectors": [
+                                {
+                                    "status": "solved",
+                                    "selectors": [
+                                        "[data-state=\"success\"]"
+                                    ]
+                                },
+                                {
+                                    "status": "failed",
+                                    "selectors": [
+                                        "[data-state=\"error\"]"
+                                    ]
+                                }
+                            ]
+                        },
+                        "cloudflareChallengePage": {
+                            "state": "enabled",
+                            "vendor": "cloudflare",
+                            "selectors": [
+                                "#challenge-form",
+                                ".cf-browser-verification",
+                                "#cf-wrapper",
+                                "script[src*=\"challenges.cloudflare.com\"]"
+                            ],
+                            "windowProperties": [
+                                "_cf_chl_opt",
+                                "__CF$cv$params",
+                                "cfjsd"
+                            ]
+                        },
+                        "hcaptcha": {
+                            "state": "enabled",
+                            "vendor": "hcaptcha",
+                            "selectors": [
+                                ".h-captcha",
+                                "[data-hcaptcha-widget-id]",
+                                "script[src*=\"hcaptcha.com\"]",
+                                "script[src*=\"assets.hcaptcha.com\"]"
+                            ],
+                            "windowProperties": [
+                                "hcaptcha"
+                            ]
+                        }
+                    },
+                    "fraudDetection": {
+                        "phishingWarning": {
+                            "state": "enabled",
+                            "type": "phishing",
+                            "selectors": [
+                                ".warning-banner",
+                                "#security-alert"
+                            ],
+                            "textPatterns": [
+                                "suspicious.*activity",
+                                "unusual.*login",
+                                "verify.*account"
+                            ],
+                            "textSources": [
+                                "innerText"
+                            ]
+                        },
+                        "accountSuspension": {
+                            "state": "enabled",
+                            "type": "suspension",
+                            "selectors": [
+                                ".account-suspended",
+                                "#suspension-notice"
+                            ],
+                            "textPatterns": [
+                                "account.*suspended",
+                                "access.*restricted"
+                            ],
+                            "textSources": [
+                                "innerText"
+                            ]
+                        }
+                    },
+                    "youtubeAds": {
+                        "state": "enabled",
+                        "sweepIntervalMs": 2000,
+                        "slowLoadThresholdMs": 2000,
+                        "playerSelectors": [
+                            "#movie_player",
+                            ".html5-video-player",
+                            "#player"
+                        ],
+                        "adClasses": [
+                            "ytp-ad-text",
+                            "ytp-ad-skip-button",
+                            "ytp-ad-skip-button-container",
+                            "ytp-ad-message-container",
+                            "ytp-ad-player-overlay",
+                            "ytp-ad-image-overlay",
+                            "video-ads",
+                            "ad-showing",
+                            "ad-interrupting"
+                        ],
+                        "adTextPatterns": [
+                            "\\badvertisement\\b",
+                            "\\bskip ad\\b",
+                            "\\bskip ads\\b",
+                            "^ad\\s*[•:·]"
+                        ],
+                        "staticAdSelectors": {
+                            "background": ".player-container-background",
+                            "thumbnail": ".player-container-background-image, .player-container-background ytd-thumbnail",
+                            "image": ".player-container-background yt-image"
+                        },
+                        "playabilityErrorSelectors": [
+                            "ytm-player-error-message-renderer",
+                            "yt-player-error-message-renderer",
+                            ".ytp-error",
+                            ".playability-status-message",
+                            ".playability-reason"
+                        ],
+                        "playabilityErrorPatterns": [
+                            "content isn't available",
+                            "video (is )?unavailable",
+                            "playback (is )?disabled",
+                            "confirm you're not a (ro)?bot",
+                            "sign in to confirm",
+                            "unusual traffic",
+                            "try again later"
+                        ],
+                        "adBlockerDetectionSelectors": [
+                            "ytd-enforcement-message-view-model",
+                            "ytd-popup-container tp-yt-paper-dialog",
+                            "tp-yt-paper-dialog",
+                            ".ytd-enforcement-message-view-model",
+                            "#dialog",
+                            "[role=\"dialog\"]"
+                        ],
+                        "adBlockerDetectionPatterns": [
+                            "ad\\s*blockers?\\s*(are)?\\s*not allowed",
+                            "using an ad\\s*blocker",
+                            "allow youtube ads",
+                            "disable.*ad\\s*blocker",
+                            "turn off.*ad\\s*blocker",
+                            "ad\\s*blocker.*detected",
+                            "ad\\s*blocking",
+                            "will be blocked after \\d+ videos?",
+                            "playback will be blocked",
+                            "playback is blocked",
+                            "youtube is allowlisted",
+                            "video player will be blocked",
+                            "ad\\s*blockers?\\s*violate",
+                            "violate.*terms of service"
+                        ],
+                        "loginStateSelectors": {
+                            "signInButton": "a[href*=\"accounts.google.com/ServiceLogin\"]",
+                            "avatarButton": "#avatar-btn",
+                            "premiumLogo": "ytd-topbar-logo-renderer a[title*=\"Premium\"]"
+                        }
+                    }
+                }
+            }
         },
         "addressBar": {
             "exceptions": [],
