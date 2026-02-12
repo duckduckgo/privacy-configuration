@@ -31,7 +31,7 @@ Every client-side flag has a **default value** -- the fallback when remote confi
 
 ### Changing a default on a shipped feature
 
-If a feature has already been rolled out with `default: false` and you want to flip it to `default: true`, **set `minSupportedVersion` in the config** to the version that includes the default change. Without this, older app versions that lack the finished implementation will activate the feature via the new default when they can't reach the remote config -- potentially shipping half-finished work.
+If a feature has already been rolled out with `default: false` and you want to flip it to `default: true`, **set `minSupportedVersion` in the config** to the version that includes the default change. Without this, older app versions that lack the finished implementation will pick up the new default when they download the remote config update -- potentially shipping half-finished work to users on older versions.
 
 ## Client-Side Integration
 
