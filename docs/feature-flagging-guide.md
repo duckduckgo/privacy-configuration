@@ -27,7 +27,7 @@ Every client-side flag has a **default value** -- the fallback when remote confi
 
 **`false` (opt-in)** -- Feature stays off until explicitly enabled remotely. Use for new or experimental work.
 
-**`true` (failsafe / kill-switch)** -- Feature is on by default; you retain the ability to disable it remotely. Use for stable, already-shipping features. Apple calls this a [failsafe feature flag](https://app.asana.com/0/0/1209498782498498/f).
+**`true` (failsafe / kill-switch)** -- Feature is on by default; you retain the ability to disable it remotely. Use for stable, already-shipping features. Apple calls this a [failsafe feature flag](https://app.asana.com/1/137249556945/task/1210572145398078).
 
 ### Changing a default on a shipped feature
 
@@ -38,7 +38,7 @@ If a feature has already been rolled out with `default: false` and you want to f
 | Platform | Guide |
 |---|---|
 | Apple (iOS / macOS) | [Feature Flag Guide](https://github.com/duckduckgo/apple-browsers/blob/main/SharedPackages/BrowserServicesKit/Sources/PrivacyConfig/FeatureFlagger/feature-flag-guide.md) |
-| Android | [Feature Toggles Guide](https://github.com/duckduckgo/Android/blob/main/feature-toggles/readme.md) |
+| Android | [Feature Toggles Guide](https://app.asana.com/1/137249556945/task/1203928902316231) |
 | Windows | [Feature Flag Guide](https://github.com/duckduckgo/windows-browser/blob/main/docs/feature-flag-guide.md) |
 | Browser Extension | [Feature Flags](https://github.com/duckduckgo/duckduckgo-privacy-extension/blob/main/docs/feature-flags.md) |
 | Content Scope Scripts | [Features Guide -- Remote Configuration](https://github.com/duckduckgo/content-scope-scripts/blob/main/injected/docs/features-guide.md#remote-configuration-and-feature-flags) |
