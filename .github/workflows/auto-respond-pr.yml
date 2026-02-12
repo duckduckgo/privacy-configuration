@@ -25,10 +25,10 @@ on:
             - review_requested
 
 jobs:
-    # Dedicated job to close Asana tasks on PR merge
-    # Runs independently of the main workflow to ensure task closure even if
-    # other steps fail (e.g., branch deleted before checkout completes)
-    close_asana_on_merge:
+    # Dedicated job to sync Asana tasks when PR is closed (merged or abandoned)
+    # Closes tasks for both merged PRs and abandoned PRs to clean up dead tasks
+    # Runs independently of the main workflow
+    sync_asana_on_close:
         if: github.event.action == 'closed'
         runs-on: ubuntu-latest
         steps:
