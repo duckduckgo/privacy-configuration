@@ -7,7 +7,7 @@ This document explains how feature flagging works across DuckDuckGo clients via 
 Feature flagging at DuckDuckGo uses **two layers**:
 
 1. **Remote Configuration (this repo)** -- the server-side feature state, sub-features, rollouts, and settings defined in `features/` and `overrides/`.
-2. **Client-side feature flags** -- each native client declares its own local feature flag enum that optionally maps to a remote config feature/sub-feature.
+2. **Client-side feature flags** -- native clients declare their own local feature flag types that map to remote config features/sub-features. The browser extension reads the config directly without a separate flag layer.
 
 The remote config acts as the **source of truth for remotely-controlled flags**. Clients consume the generated `<platform>-config.json` at runtime to resolve whether a feature or sub-feature is enabled.
 
@@ -31,6 +31,7 @@ Every feature in this repo starts as a JSON file in `features/`. The template (`
 |---|---|
 | `state` | `"enabled"`, `"disabled"`, `"internal"`, or `"preview"`. Unknown values are treated as disabled. |
 | `exceptions` | Sites where the feature is disabled (breakage fixes). |
+| `minSupportedVersion` | Minimum platform version for which this feature is enabled. |
 | `settings` | Arbitrary key-value data the feature needs at runtime. |
 | `features` | Sub-features nested under this parent (see below). |
 
