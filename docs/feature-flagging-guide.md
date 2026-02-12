@@ -1,85 +1,39 @@
 # Feature Flagging with Privacy Configuration
 
-This document explains how feature flagging works across DuckDuckGo clients via the privacy remote configuration system, and how it relates to client-side feature flags.
-
 ## Overview
 
-Feature flagging at DuckDuckGo uses **two layers**:
+Feature flagging uses two layers:
 
-1. **Remote Configuration (this repo)** -- the server-side feature state, sub-features, rollouts, and settings defined in `features/` and `overrides/`.
-2. **Client-side feature flags** -- native clients declare their own local feature flag types that map to remote config features/sub-features. The browser extension reads the config directly without a separate flag layer.
+1. **Remote Configuration (this repo)** -- feature state, sub-features, rollouts, and settings defined in [`features/`](../features) and [`overrides/`](../overrides).
+2. **Client-side feature flags** -- native clients declare their own flag types that map to remote config features/sub-features. The browser extension reads the config directly.
 
-The remote config acts as the **source of truth for remotely-controlled flags**. Clients consume the generated `<platform>-config.json` at runtime to resolve whether a feature or sub-feature is enabled.
+Clients consume the generated `<platform>-config.json` at runtime. See [`features/_template.json`](../features/_template.json) for the starting point.
 
-## How the Remote Config Controls Features
+## Parent Features vs Sub-features
 
-Every feature in this repo starts as a JSON file in `features/`. The template (`features/_template.json`) looks like:
+Parent features support `state`, `exceptions`, `minSupportedVersion`, `settings`, and nested `features` (sub-features).
 
-```json
-{
-    "_meta": {
-        "description": "Explain the feature here."
-    },
-    "state": "disabled",
-    "exceptions": []
-}
-```
+Sub-features additionally support `rollout`, `targets`, and `cohorts` -- **parent features do not**. If you need progressive rollout, audience targeting, or A/B testing, use a sub-feature.
 
-### Parent feature properties
+See [v6 config parity](https://app.asana.com/1/137249556945/project/1200890834746050/task/1208934823027474) for ongoing work to align this across clients.
 
-| Field | Purpose |
-|---|---|
-| `state` | `"enabled"`, `"disabled"`, `"internal"`, or `"preview"`. Unknown values are treated as disabled. |
-| `exceptions` | Sites where the feature is disabled (breakage fixes). |
-| `minSupportedVersion` | Minimum platform version for which this feature is enabled. |
-| `settings` | Arbitrary key-value data the feature needs at runtime. |
-| `features` | Sub-features nested under this parent (see below). |
+Platform-specific overrides in [`overrides/`](../overrides) can change `state`, add sub-features, or override `settings` per platform.
 
-### Sub-feature properties
-
-Sub-features live inside a parent's `features` object and support additional capabilities that **parent features do not**:
-
-| Field | Purpose |
-|---|---|
-| `state` | Same semantics as parent features. |
-| `minSupportedVersion` | Minimum platform version for which this sub-feature is enabled. |
-| `rollout` | Progressive rollout via percentage steps. See [Incremental Rollout Guide](./incremental-rollout-implementation-guide.md). |
-| `targets` | Audience targeting conditions (variant, locale, returning user, etc.). |
-| `cohorts` | A/B test cohort definitions with weights and enrollment tracking. |
-
-> **Note:** `rollout`, `targets`, and `cohorts` are only supported on sub-features. If you need these capabilities, use a sub-feature rather than a parent feature. This distinction is important -- see [v6 config parity](https://app.asana.com/1/137249556945/project/1200890834746050/task/1208934823027474) for the ongoing work to align this across clients.
-
-Platform-specific overrides live in `overrides/<platform>-override.json` and can change `state`, add sub-features, or override `settings` for a single platform.
-
-For full format details see: [Implementation Guidelines](./implementation-guidelines-remote-privacy-configuration-allowlists.md).
+For full format details: [Implementation Guidelines](./implementation-guidelines-remote-privacy-configuration-allowlists.md).
 
 ## Choosing a Default Value
 
-Every feature flag has a **default value** -- the fallback used when the remote config is unavailable or the flag has no remote state. The choice between `false` and `true` depends on the nature of the feature.
+Every client-side flag has a **default value** -- the fallback when remote config is unavailable. The choice matters:
 
-### Default `false` (opt-in)
+**`false` (opt-in)** -- Feature stays off until explicitly enabled remotely. Use for new or experimental work.
 
-Use when the feature is **new or experimental** and should not activate without an explicit remote config push:
+**`true` (failsafe / kill-switch)** -- Feature is on by default; you retain the ability to disable it remotely. Use for stable, already-shipping features. Apple calls this a [failsafe feature flag](https://app.asana.com/0/0/1209498782498498/f).
 
-- The feature is off until remote config enables it.
-- Nothing changes for users until you are ready.
-- If remote config is unreachable, the untested code path stays inactive.
+### Changing a default on a shipped feature
 
-### Default `true` (failsafe / kill-switch)
-
-Use when the feature is **stable or already shipping** and you want the ability to disable it remotely if problems arise:
-
-- The feature is on by default, so users get the expected behaviour even if remote config fails.
-- You retain the ability to **kill-switch** the feature remotely without an app update.
-- Appropriate when migrating existing always-on behaviour behind a flag for operational safety.
-
-Apple refers to this pattern as a **failsafe feature flag** -- see [Using failsafe feature flags](https://app.asana.com/0/0/1209498782498498/f) for their guidance on when this is the right choice.
-
-Each client expresses this concept slightly differently -- see the per-client sections below.
+If a feature has already been rolled out with `default: false` and you want to flip it to `default: true`, **set `minSupportedVersion` in the config** to the version that includes the default change. Without this, older app versions that lack the finished implementation will activate the feature via the new default when they can't reach the remote config -- potentially shipping half-finished work.
 
 ## Client-Side Integration
-
-Each client has its own feature flag system that reads from the remote config. See the platform-specific guides for implementation details, code examples, and file locations:
 
 | Platform | Guide |
 |---|---|
@@ -93,21 +47,17 @@ Each client has its own feature flag system that reads from the remote config. S
 
 | What you want | Where to do it |
 |---|---|
-| **New remote config feature** (shared/cross-platform) | Create `features/myFeature.json`, optionally add platform overrides. See [Adding a New Config Feature](./feature-implementer-documentation.md). |
-| **New platform-specific sub-feature** | Add to the relevant `overrides/<platform>-override.json` or to the feature's base file under `features`. |
-| **New client-side flag backed by remote config** | See the platform-specific guide above for how to wire a remote config feature to a client-side flag. |
-| **Schema validation** | Create a TypeScript schema in `schema/features/`. See [Writing a Schema](./writing-schema-for-config-feature.md). |
-| **Incremental rollout** | Add a `rollout` object with `steps` to a sub-feature. See [Incremental Rollout Guide](./incremental-rollout-implementation-guide.md). |
+| New remote config feature | Create a file in [`features/`](../features), optionally add platform overrides. See [Adding a New Config Feature](./feature-implementer-documentation.md). |
+| Platform-specific sub-feature | Add to the relevant `overrides/<platform>-override.json` or the feature's base file. |
+| Client-side flag wired to remote config | See the platform-specific guide above. |
+| Schema validation | Create a TypeScript schema in [`schema/features/`](../schema/features). See [Writing a Schema](./writing-schema-for-config-feature.md). |
+| Incremental rollout | Add a `rollout` object to a sub-feature. See [Incremental Rollout Guide](./incremental-rollout-implementation-guide.md). |
 
-## Best Practices
+## Footguns
 
-1. **Choose the right default** -- `false` for new/experimental features; `true` (failsafe) for stable features that need a kill-switch. See [Choosing a Default Value](#choosing-a-default-value).
-2. **Use sub-features** for granular control under a parent feature. Sub-features support rollouts, targets, and cohorts; parent features do not.
-3. **Prefer platform-specific overrides** over global changes when only one platform needs the feature enabled.
-4. **Schema-validate** complex features to prevent broken merges.
-5. **Clean up stale flags** once the feature is fully launched. See platform-specific guides for cleanup tooling.
-6. **Test both states** -- verify the feature works when enabled and when disabled/unavailable.
-7. **Coordinate config and code PRs** -- don't merge code that depends on a config change before the config PR is ready.
+- **Sub-features vs parent features**: rollouts, targets, and cohorts only work on sub-features. Wiring a client flag to a parent feature silently loses these capabilities.
+- **Changing defaults without `minSupportedVersion`**: see [above](#changing-a-default-on-a-shipped-feature).
+- **Coordinate config and code PRs**: don't merge code that depends on a config change before the config PR is ready.
 
 ## Related Documentation
 
