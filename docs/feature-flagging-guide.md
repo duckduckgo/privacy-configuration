@@ -53,7 +53,7 @@ If a feature has already been rolled out with `default: false` and you want to f
 | Schema validation | Create a TypeScript schema in [`schema/features/`](../schema/features). See [Writing a Schema](./writing-schema-for-config-feature.md). |
 | Incremental rollout | Add a `rollout` object to a sub-feature. See [Incremental Rollout Guide](./incremental-rollout-implementation-guide.md). |
 
-## Footguns
+## Pitfalls
 
 - **Sub-features vs parent features**: rollouts, targets, and cohorts only work on sub-features. Wiring a client flag to a parent feature silently loses these capabilities.
 - **Changing defaults without `minSupportedVersion`**: see [above](#changing-a-default-on-a-shipped-feature).
