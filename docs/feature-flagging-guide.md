@@ -83,7 +83,7 @@ Each client has its own feature flag system that reads from the remote config. S
 | Platform | Guide |
 |---|---|
 | Apple (iOS / macOS) | [Feature Flag Guide](https://github.com/duckduckgo/apple-browsers/blob/main/SharedPackages/BrowserServicesKit/Sources/PrivacyConfig/FeatureFlagger/feature-flag-guide.md) |
-| Android | [Feature Toggles Guide](https://github.com/duckduckgo/Android/blob/main/feature-toggles/feature-toggles-guide.md) |
+| Android | [Feature Toggles Guide](https://github.com/duckduckgo/Android/blob/main/feature-toggles/readme.md) |
 | Windows | [Feature Flag Guide](https://github.com/duckduckgo/windows-browser/blob/main/docs/feature-flag-guide.md) |
 | Browser Extension | [Feature Flags](https://github.com/duckduckgo/duckduckgo-privacy-extension/blob/main/docs/feature-flags.md) |
 | Content Scope Scripts | [Features Guide -- Remote Configuration](https://github.com/duckduckgo/content-scope-scripts/blob/main/injected/docs/features-guide.md#remote-configuration-and-feature-flags) |
