@@ -82,77 +82,15 @@ Each client expresses this concept slightly differently -- see the per-client se
 
 **Terminology**: `FeatureFlag` enum, `FeatureFlagSource`, `FeatureFlagDescribing`
 
-Each Apple app declares a `FeatureFlag` enum with four computed properties:
+Each Apple app declares a `FeatureFlag` enum conforming to `FeatureFlagDescribing` with four computed properties (`defaultValue`, `source`, `supportsLocalOverriding`, `cohortType`). Remote flags map to a `PrivacyFeature` / `PrivacySubfeature` defined in `BrowserServicesKit`.
 
-| Property | Purpose |
-|---|---|
-| `defaultValue: Bool` | Fallback when remote config is unavailable. Listed in a `switch` -- flags wanting `true` are enumerated explicitly; all others fall through to `default: false`. |
-| `source: FeatureFlagSource` | Where the flag value comes from: `.remoteReleasable(...)`, `.remoteDevelopment(...)`, `.internalOnly()`, or `.disabled`. |
-| `supportsLocalOverriding: Bool` | Whether internal users can toggle it in the debug menu. |
-| `cohortType` | Optional A/B test cohort type. |
+Key points:
 
-Remote flags map to a `PrivacyFeature` / `PrivacySubfeature` defined in `BrowserServicesKit`. Platform-generic flags typically live under `iOSBrowserConfig` or `macOSBrowserConfig`; domain-specific flags live under their parent feature (e.g., `AIChatSubfeature`, `SyncSubfeature`).
+- **Always use `.remoteReleasable(.subfeature(...))`** as the source for remotely-controlled flags. Sub-features support rollouts, targets, and cohorts; parent features do not.
+- **Avoid `.remoteReleasable(.feature(...))`** -- mapping to a parent feature silently loses rollout/target/cohort support and has caused incidents.
+- Choose `defaultValue` based on whether the flag is opt-in (`false`) or failsafe (`true`) -- see [Choosing a Default Value](#choosing-a-default-value) above.
 
-**Examples of each property** (from iOS `FeatureFlag.swift`):
-
-`defaultValue` -- flags that should default to `true` (failsafe) are listed explicitly; everything else falls through to `false`:
-
-```swift
-public var defaultValue: Bool {
-    switch self {
-    case .canScanUrlBasedSyncSetupBarcodes,
-         .syncCreditCards,
-         .tabSwitcherTrackerCount:
-        true
-    default:
-        false
-    }
-}
-```
-
-`source` -- determines where the flag's value comes from:
-
-```swift
-public var source: FeatureFlagSource {
-    switch self {
-    case .sync:
-        return .remoteReleasable(.subfeature(SyncSubfeature.level0ShowSync))
-    case .duckPlayerNativeUI:
-        return .internalOnly()
-    // ...
-    }
-}
-```
-
-`supportsLocalOverriding` -- allows internal users to toggle the flag in the debug menu:
-
-```swift
-public var supportsLocalOverriding: Bool {
-    switch self {
-    case .scamSiteProtection,
-         .maliciousSiteProtection,
-         .paidAIChat:
-        true
-    default:
-        false
-    }
-}
-```
-
-**Source types**:
-- `.remoteReleasable(.subfeature(...))` -- controlled via a remote config **sub-feature** state. **This is the recommended source for most flags** because sub-features support rollouts, targets, and cohorts.
-- `.remoteReleasable(.feature(...))` -- controlled by a **top-level** remote config feature state. **Avoid this** unless you have a specific reason -- see the warning below.
-- `.internalOnly()` -- always on for internal users, always off for external.
-- `.disabled` -- always off (placeholder for future work).
-
-> **Warning: avoid `.remoteReleasable(.feature(...))`.**
-> Mapping a client flag directly to a parent feature means the flag cannot benefit from rollouts, targets, or cohorts (which are sub-feature-only). It has also caused incidents where engineers expected these capabilities to work and they silently did not. Prefer `.remoteReleasable(.subfeature(...))` and add a sub-feature to the relevant `PrivacyFeature` if one does not already exist.
-
-**File locations**:
-- iOS: `iOS/Core/FeatureFlag.swift`
-- macOS: `macOS/LocalPackages/FeatureFlags/Sources/FeatureFlags/FeatureFlag.swift`
-- Shared sub-feature enums: `SharedPackages/BrowserServicesKit/Sources/PrivacyConfig/Features/PrivacyFeature.swift`
-- Cursor rule: `.cursor/rules/feature-flags-addition.mdc`
+For detailed code examples of each property, source type explanations, file locations, and the full adding-a-flag checklist, see the [Apple Feature Flag Guide](https://github.com/duckduckgo/apple-browsers/blob/main/SharedPackages/BrowserServicesKit/Sources/PrivacyConfig/FeatureFlagger/feature-flag-guide.md).
 
 ### Android
 
