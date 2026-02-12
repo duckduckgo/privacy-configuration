@@ -25,33 +25,54 @@ Every feature in this repo starts as a JSON file in `features/`. The template (`
 }
 ```
 
-Key properties:
+### Parent feature properties
 
 | Field | Purpose |
 |---|---|
 | `state` | `"enabled"`, `"disabled"`, `"internal"`, or `"preview"`. Unknown values are treated as disabled. |
 | `exceptions` | Sites where the feature is disabled (breakage fixes). |
-| `features` (sub-features) | Nested feature toggles under a parent. Each has its own `state`, optional `rollout`, `targets`, `cohorts`, `minSupportedVersion`. |
 | `settings` | Arbitrary key-value data the feature needs at runtime. |
-| `rollout` | Progressive rollout via percentage steps (sub-features only). See [Incremental Rollout Guide](./incremental-rollout-implementation-guide.md). |
+| `features` | Sub-features nested under this parent (see below). |
+
+### Sub-feature properties
+
+Sub-features live inside a parent's `features` object and support additional capabilities that **parent features do not**:
+
+| Field | Purpose |
+|---|---|
+| `state` | Same semantics as parent features. |
+| `minSupportedVersion` | Minimum platform version for which this sub-feature is enabled. |
+| `rollout` | Progressive rollout via percentage steps. See [Incremental Rollout Guide](./incremental-rollout-implementation-guide.md). |
 | `targets` | Audience targeting conditions (variant, locale, returning user, etc.). |
 | `cohorts` | A/B test cohort definitions with weights and enrollment tracking. |
+
+> **Note:** `rollout`, `targets`, and `cohorts` are only supported on sub-features. If you need these capabilities, use a sub-feature rather than a parent feature. This distinction is important -- see [v6 config parity](https://app.asana.com/1/137249556945/project/1200890834746050/task/1208934823027474) for the ongoing work to align this across clients.
 
 Platform-specific overrides live in `overrides/<platform>-override.json` and can change `state`, add sub-features, or override `settings` for a single platform.
 
 For full format details see: [Implementation Guidelines](./implementation-guidelines-remote-privacy-configuration-allowlists.md).
 
-## Prefer `default: false` for New Flags
+## Choosing a Default Value
 
-When adding a new feature flag, **default to `false` (disabled) unless you have a strong reason not to**. This is the recommended practice across all clients:
+Every feature flag has a **default value** -- the fallback used when the remote config is unavailable or the flag has no remote state. The choice between `false` and `true` depends on the nature of the feature.
 
-- **Safer rollout**: the feature is off until explicitly enabled via remote config.
-- **Opt-in behaviour**: nothing changes for users until the config is pushed.
-- **Rollback safety**: if the remote config is unreachable, the feature stays off rather than activating an untested code path.
+### Default `false` (opt-in)
 
-A `default: true` flag is appropriate when:
-- The feature is mature/stable and you want the ability to **kill-switch** it remotely.
-- You are migrating existing always-on behaviour behind a flag for operational safety.
+Use when the feature is **new or experimental** and should not activate without an explicit remote config push:
+
+- The feature is off until remote config enables it.
+- Nothing changes for users until you are ready.
+- If remote config is unreachable, the untested code path stays inactive.
+
+### Default `true` (failsafe / kill-switch)
+
+Use when the feature is **stable or already shipping** and you want the ability to disable it remotely if problems arise:
+
+- The feature is on by default, so users get the expected behaviour even if remote config fails.
+- You retain the ability to **kill-switch** the feature remotely without an app update.
+- Appropriate when migrating existing always-on behaviour behind a flag for operational safety.
+
+Apple refers to this pattern as a **failsafe feature flag** -- see [Using failsafe feature flags](https://app.asana.com/0/0/1209498782498498/f) for their guidance on when this is the right choice.
 
 Each client expresses this concept slightly differently -- see the per-client sections below.
 
@@ -72,14 +93,15 @@ Each Apple app declares a `FeatureFlag` enum with four computed properties:
 
 Remote flags map to a `PrivacyFeature` / `PrivacySubfeature` defined in `BrowserServicesKit`. Platform-generic flags typically live under `iOSBrowserConfig` or `macOSBrowserConfig`; domain-specific flags live under their parent feature (e.g., `AIChatSubfeature`, `SyncSubfeature`).
 
-**Example -- iOS `FeatureFlag.swift` `defaultValue`** (matches the screenshot):
+**Examples of each property** (from iOS `FeatureFlag.swift`):
+
+`defaultValue` -- flags that should default to `true` (failsafe) are listed explicitly; everything else falls through to `false`:
 
 ```swift
 public var defaultValue: Bool {
     switch self {
     case .canScanUrlBasedSyncSetupBarcodes,
-         .canInterceptSyncSetupUrls,
-         // ... other flags that default to true ...
+         .syncCreditCards,
          .tabSwitcherTrackerCount:
         true
     default:
@@ -88,11 +110,43 @@ public var defaultValue: Bool {
 }
 ```
 
+`source` -- determines where the flag's value comes from:
+
+```swift
+public var source: FeatureFlagSource {
+    switch self {
+    case .sync:
+        return .remoteReleasable(.subfeature(SyncSubfeature.level0ShowSync))
+    case .duckPlayerNativeUI:
+        return .internalOnly()
+    // ...
+    }
+}
+```
+
+`supportsLocalOverriding` -- allows internal users to toggle the flag in the debug menu:
+
+```swift
+public var supportsLocalOverriding: Bool {
+    switch self {
+    case .scamSiteProtection,
+         .maliciousSiteProtection,
+         .paidAIChat:
+        true
+    default:
+        false
+    }
+}
+```
+
 **Source types**:
-- `.remoteReleasable(.subfeature(...))` -- controlled via remote config sub-feature state (recommended for most features).
-- `.remoteReleasable(.feature(...))` -- controlled by a top-level remote config feature state.
+- `.remoteReleasable(.subfeature(...))` -- controlled via a remote config **sub-feature** state. **This is the recommended source for most flags** because sub-features support rollouts, targets, and cohorts.
+- `.remoteReleasable(.feature(...))` -- controlled by a **top-level** remote config feature state. **Avoid this** unless you have a specific reason -- see the warning below.
 - `.internalOnly()` -- always on for internal users, always off for external.
 - `.disabled` -- always off (placeholder for future work).
+
+> **Warning: avoid `.remoteReleasable(.feature(...))`.**
+> Mapping a client flag directly to a parent feature means the flag cannot benefit from rollouts, targets, or cohorts (which are sub-feature-only). It has also caused incidents where engineers expected these capabilities to work and they silently did not. Prefer `.remoteReleasable(.subfeature(...))` and add a sub-feature to the relevant `PrivacyFeature` if one does not already exist.
 
 **File locations**:
 - iOS: `iOS/Core/FeatureFlag.swift`
@@ -203,7 +257,7 @@ C-S-S does not maintain its own feature flag layer; it relies on the config prov
 
 ## Best Practices
 
-1. **Default to `false`** -- opt-in is safer than opt-out.
+1. **Choose the right default** -- `false` for new/experimental features; `true` (failsafe) for stable features that need a kill-switch. See [Choosing a Default Value](#choosing-a-default-value).
 2. **Use sub-features** for granular control under a parent feature.
 3. **Prefer platform-specific overrides** over global changes when only one platform needs the feature enabled.
 4. **Schema-validate** complex features to prevent broken merges.
