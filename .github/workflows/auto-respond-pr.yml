@@ -25,21 +25,28 @@ on:
             - review_requested
 
 jobs:
-    # Dedicated job to sync Asana tasks when PR is closed (merged or abandoned)
-    # Closes tasks for both merged PRs and abandoned PRs to clean up dead tasks
+    # Dedicated job to sync Asana tasks when PR is closed (merged)
+    # Closes referenced Asana tasks when PRs are merged
     # Runs independently of the main workflow
     sync_asana_on_close:
         if: github.event.action == 'closed'
         runs-on: ubuntu-latest
         steps:
-            - uses: duckduckgo/action-asana-sync@v11
+            - name: Get task IDs in PR
+              uses: duckduckgo/native-github-asana-sync@v2.2
+              id: find-asana-task-ids
+              continue-on-error: true
               with:
-                  ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
-                  ASANA_WORKSPACE_ID: ${{ secrets.ASANA_WORKSPACE_ID }}
-                  ASANA_PROJECT_ID: '1206780406371845'
-                  GITHUB_PAT: ${{ secrets.GH_RO_PAT }}
-                  USER_MAP: ${{ vars.USER_MAP }}
-                  ASSIGN_PR_AUTHOR: 'true'
+                  action: 'find-asana-task-ids'
+
+            - name: Close Asana task on merge
+              if: github.event.pull_request.merged == true && steps.find-asana-task-ids.outcome == 'success'
+              uses: duckduckgo/native-github-asana-sync@v2.2
+              with:
+                  asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+                  asana-task-id: '${{ steps.find-asana-task-ids.outputs.asanaTaskIds }}'
+                  is-complete: true
+                  action: 'notify-pr-merged'
 
     auto_respond:
         runs-on: ubuntu-latest
@@ -227,18 +234,27 @@ jobs:
                   GITHUB_TOKEN: ${{ secrets.PRIVACY_CONFIG_PAT }}
 
             # Sync Asana tasks for PRs that need manual review (non-auto-approved)
-            # Task closure on merge is handled by the dedicated close_asana_on_merge job
-            - uses: duckduckgo/action-asana-sync@v11
+            # Task closure on merge is handled by the dedicated sync_asana_on_close job
+            - name: Find Asana task IDs in PR
+              id: find-asana-task-ids
               if: |
                   github.event.action != 'closed' &&
                   ((steps.wait-for-build.outputs.conclusion == 'success' && steps.approval.outputs.approved == 'true' && steps.check_files.outputs.files_valid == 'true') != true)
+              continue-on-error: true
+              uses: duckduckgo/native-github-asana-sync@v2.2
               with:
-                  ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
-                  ASANA_WORKSPACE_ID: ${{ secrets.ASANA_WORKSPACE_ID }}
-                  ASANA_PROJECT_ID: '1206780406371845'
-                  GITHUB_PAT: ${{ secrets.GH_RO_PAT }}
-                  USER_MAP: ${{ vars.USER_MAP }}
-                  ASSIGN_PR_AUTHOR: 'true'
+                  action: 'find-asana-task-ids'
+
+            - name: Add PR link to Asana task
+              if: |
+                  steps.find-asana-task-ids.outcome == 'success' &&
+                  (github.event.action == 'opened' || github.event.action == 'reopened')
+              uses: duckduckgo/native-github-asana-sync@v2.2
+              with:
+                  asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+                  asana-task-id: '${{ steps.find-asana-task-ids.outputs.asanaTaskIds }}'
+                  is-pinned: true
+                  action: 'add-asana-comment'
 
             - name: Create comment
               if: github.event.action == 'opened' && (steps.wait-for-build.outputs.conclusion == 'success' && steps.approval.outputs.approved == 'true' && steps.check_files.outputs.files_valid == 'true') != true
@@ -246,7 +262,7 @@ jobs:
               with:
                   issue-number: ${{ github.event.pull_request.number }}
                   body: |
-                      👋 Don't forget to **add an individual reviewer** (in addition to those auto-added), as this will create a task for them in Asana.
+                      👋 Don't forget to **add an individual reviewer** (in addition to those auto-added).
                       - The best reviewer is most likely a feature or platform owner.
                        - If they've got permission to approve, you're good to merge. See [CODEOWNERS](https://github.com/duckduckgo/privacy-configuration/blob/main/CODEOWNERS)
                        - As a fallback the Global owners are:
