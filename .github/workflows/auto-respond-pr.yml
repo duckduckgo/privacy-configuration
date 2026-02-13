@@ -48,6 +48,38 @@ jobs:
                   is-complete: true
                   action: 'notify-pr-merged'
 
+    # Post review state comments to linked Asana tasks
+    sync_asana_on_review:
+        if: github.event_name == 'pull_request_review'
+        runs-on: ubuntu-latest
+        steps:
+            - name: Get task IDs in PR
+              uses: duckduckgo/native-github-asana-sync@v2.2
+              id: find-asana-task-ids
+              continue-on-error: true
+              with:
+                  action: 'find-asana-task-ids'
+
+            - name: Notify PR approved in Asana
+              if: github.event.review.state == 'approved' && steps.find-asana-task-ids.outcome == 'success'
+              uses: duckduckgo/native-github-asana-sync@v2.2
+              with:
+                  asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+                  asana-task-id: '${{ steps.find-asana-task-ids.outputs.asanaTaskIds }}'
+                  asana-task-comment: 'PR: ${{ github.event.pull_request.html_url }} has been approved.'
+                  asana-task-comment-pinned: true
+                  action: 'post-comment-asana-task'
+
+            - name: Notify changes requested in Asana
+              if: github.event.review.state == 'changes_requested' && steps.find-asana-task-ids.outcome == 'success'
+              uses: duckduckgo/native-github-asana-sync@v2.2
+              with:
+                  asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+                  asana-task-id: '${{ steps.find-asana-task-ids.outputs.asanaTaskIds }}'
+                  asana-task-comment: 'Changes requested on PR: ${{ github.event.pull_request.html_url }}'
+                  asana-task-comment-pinned: false
+                  action: 'post-comment-asana-task'
+
     auto_respond:
         runs-on: ubuntu-latest
         concurrency: auto-respond-${{ github.event.pull_request.number }}
