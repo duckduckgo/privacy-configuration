@@ -1,11 +1,5 @@
----
-description: Guide for creating new feature schema files in the privacy-remote-configuration system. Use this when adding new features that need TypeScript type definitions and validation.
-
-alwaysApply: false
----
 # Feature Schema Creation
 
-## Description
 Guide for creating new feature schema files in the privacy-remote-configuration system. Use this when adding new features that need TypeScript type definitions and validation.
 
 ## When to Use
@@ -63,4 +57,4 @@ export type ConfigV5<VersionType> = {
 - **VersionType generic**: Include `<VersionType>` for version compatibility
 - **Testing**: Run `npm run test` to validate the output and also `npm lint` to check the formatting.
 
-When writing these rules, check against `features/` and `overrides/` for it's current usage. 
+When writing these rules, check against `features/` and `overrides/` for current usage.

@@ -1,10 +1,5 @@
----
-description: Guide for adding content scope experiments (C-S-S experiments) to privacy-remote-configuration override files. Use this when you need to test features with a subset of users before full deployment.
-alwaysApply: false
----
 # Content Scope Experiments Configuration
 
-## Description
 Guide for adding content scope experiments (C-S-S experiments) to privacy-remote-configuration override files. Use this when you need to test features with a subset of users before full deployment.
 
 ## When to Use
