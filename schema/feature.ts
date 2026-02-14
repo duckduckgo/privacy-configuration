@@ -93,7 +93,7 @@ type CSSInjectFeatureSettingsPatches = {
 export type CSSConfigSetting = CSSConfigSettingSingle | CSSConfigSettingSingle[];
 
 type CSSConfigSettingSingle = {
-    type: 'undefined' | 'number' | 'string' | 'function' | 'boolean' | 'null' | 'array' | 'object';
+    type: 'undefined' | 'number' | 'string' | 'function' | 'boolean' | 'null' | 'array' | 'object' | 'regexp';
     functionName?: string;
     value?: JSONValidValueType;
     criteria?: {
