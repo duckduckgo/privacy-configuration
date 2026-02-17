@@ -28,6 +28,7 @@ import { UaChBrandsFeature } from './features/ua-ch-brands';
 import { UrlPredictorFeature } from './features/url-predictor';
 import { WebDetectionFeature } from './features/web-detection';
 import { WebInterferenceDetectionFeature } from './features/web-interference-detection';
+import { WebTelemetryFeature } from './features/web-telemetry';
 import { ExtendedCrashReporting } from './features/extendedCrashReporting';
 import { DownloadManager } from './features/downloadManager';
 
@@ -84,6 +85,7 @@ export type ConfigV5<VersionType> = {
         uaChBrands?: UaChBrandsFeature<VersionType>;
         urlPredictor?: UrlPredictorFeature<VersionType>;
         webInterferenceDetection?: WebInterferenceDetectionFeature<VersionType>;
+        webTelemetry?: WebTelemetryFeature<VersionType>;
         extendedCrashReporting?: ExtendedCrashReporting<VersionType>;
     };
     unprotectedTemporary: SiteException[];
