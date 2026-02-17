@@ -36,7 +36,7 @@ type PixelParameter = CounterPixelParameter;
 type PixelTrigger = {
     period: {
         days: number;
-        jitterMaxPercent: number;
+        jitterMaxPercent: number; // float, e.g. 12.5
     };
 };
 
