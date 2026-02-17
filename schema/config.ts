@@ -50,7 +50,7 @@ export type ExportedSchemas =
 export type ConfigV5<VersionType> = {
     readme: string;
     version: number;
-    features: Record<string, Feature<any, VersionType>> & {
+    features: Record<string, Feature<never, VersionType>> & {
         // These features have typed settings
         aiChat?: AiChatConfig<VersionType>;
         apiManipulation?: APIManipulationFeature<VersionType>;
