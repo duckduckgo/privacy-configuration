@@ -1,4 +1,4 @@
-﻿import { Feature, SubFeature } from '../feature';
+import { Feature, SubFeature } from '../feature';
 
 type SubFeatures<VersionType> = {
     crashAutoRecovery?: SubFeature<
@@ -7,6 +7,12 @@ type SubFeatures<VersionType> = {
             autoRecoveryBrowserEngine: boolean;
             autoRecoveryTab: boolean;
             autoRecoveryTabOutOfMemory: boolean;
+        }
+    >;
+    nativeCrashDialogOneShot?: SubFeature<
+        VersionType,
+        {
+            generation: number;
         }
     >;
 };
