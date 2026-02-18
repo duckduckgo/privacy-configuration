@@ -236,6 +236,20 @@
                             "weight": 1
                         }
                     ]
+                },
+                "bloops": {
+                    "state": "enabled",
+                    "rollout": {},
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
                 }
             }
         },
@@ -1223,7 +1237,63 @@
                 ],
                 "deviceMemory": {
                     "type": "undefined"
-                }
+                },
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "experiment": {
+                                "experimentName": "bloops",
+                                "cohort": "treatment"
+                            }
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/hardwareConcurrency",
+                                "value": [
+                                    {
+                                        "type": "number",
+                                        "value": 400
+                                    },
+                                    {
+                                        "type": "number",
+                                        "value": 800,
+                                        "criteria": {
+                                            "arch": "AppleSilicon"
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": {
+                                "experimentName": "bloops",
+                                "cohort": "control"
+                            }
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/hardwareConcurrency",
+                                "value": [
+                                    {
+                                        "type": "number",
+                                        "value": 200
+                                    },
+                                    {
+                                        "type": "number",
+                                        "value": 600,
+                                        "criteria": {
+                                            "arch": "AppleSilicon"
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
             },
             "exceptions": [
                 {
