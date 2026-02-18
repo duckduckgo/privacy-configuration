@@ -1313,6 +1313,10 @@
                     [
                         "savedAIChatData",
                         "chat-images"
+                    ],
+                    [
+                        "savedAIChatData",
+                        "saved-chats"
                     ]
                 ]
             }
@@ -1346,7 +1350,8 @@
                     }
                 },
                 "namedPipesConnection": {
-                    "state": "disabled"
+                    "state": "preview",
+                    "minSupportedVersion": "0.146.5"
                 }
             },
             "settings": {
@@ -3259,6 +3264,9 @@
                         "autoRecoveryTabOutOfMemory": false
                     }
                 },
+                "nativeCrashDialog": {
+                    "state": "disabled"
+                },
                 "ignoreInvalidCastExceptionOnDisposal": {
                     "state": "enabled"
                 }
@@ -3285,6 +3293,9 @@
                         "autoRecoveryTab": true,
                         "autoRecoveryTabOutOfMemory": false
                     }
+                },
+                "nativeCrashDialog": {
+                    "state": "internal"
                 },
                 "ignoreInvalidCastExceptionOnDisposal": {
                     "state": "enabled"
@@ -3402,6 +3413,9 @@
                     "state": "enabled"
                 },
                 "nextStepsListWidget": {
+                    "state": "disabled"
+                },
+                "nextStepsListNewLogicWidget": {
                     "state": "disabled"
                 },
                 "omnibar": {
@@ -3522,6 +3536,18 @@
                 "downloadNotificationPanel": {
                     "state": "enabled",
                     "minSupportedVersion": "0.142.0"
+                },
+                "downloadOpenItemMethod": {
+                    "state": "internal",
+                    "settings": {
+                        "fileTypes": [
+                            {
+                                "extension": ".exe",
+                                "method": "explorer",
+                                "fallback": true
+                            }
+                        ]
+                    }
                 }
             }
         },
@@ -3536,10 +3562,22 @@
             }
         },
         "adBlockV2Extension": {
-            "state": "disabled",
+            "state": "preview",
+            "minSupportedVersion": "0.148.0",
             "exceptions": [],
             "settings": {
-                "surveyRetriggerEnabled": false
+                "extensionUrl": "https://staticcdn.duckduckgo.com/extensions/content-blocker/content-blocker-extension-2026.2.9.crx"
+            },
+            "features": {
+                "onboardingEnabled": {
+                    "state": "disabled"
+                },
+                "migration": {
+                    "state": "enabled"
+                },
+                "watchdog": {
+                    "state": "enabled"
+                }
             }
         },
         "releaseNotes": {
@@ -3852,7 +3890,7 @@
             }
         },
         "combinedPermissionView": {
-            "state": "disabled",
+            "state": "internal",
             "exceptions": []
         },
         "unsetAsDefaultMonitor": {
@@ -3974,6 +4012,10 @@
                 }
             }
         },
+        "webDetection": {
+            "state": "enabled",
+            "minSupportedVersion": "0.147.0"
+        },
         "webInterferenceDetection": {
             "state": "enabled",
             "minSupportedVersion": "0.146.0",
@@ -4008,11 +4050,30 @@
                                 "innerText"
                             ]
                         },
+                        "generic_es": {
+                            "state": "enabled",
+                            "textPatterns": [
+                                "en esta web no aceptamos el uso de adblock"
+                            ],
+                            "textSources": [
+                                "innerText"
+                            ]
+                        },
                         "generic_it": {
                             "state": "enabled",
                             "textPatterns": [
                                 "disattiva l'ad block",
                                 "stai usando un ad block"
+                            ],
+                            "textSources": [
+                                "innerText"
+                            ]
+                        },
+                        "generic_nl": {
+                            "state": "enabled",
+                            "textPatterns": [
+                                "adblock gedetecteerd",
+                                "schakel je adblocker uit om de video te bekijken"
                             ],
                             "textSources": [
                                 "innerText"
@@ -4205,6 +4266,10 @@
                     "state": "internal"
                 }
             }
+        },
+        "startupTiming": {
+            "state": "internal",
+            "exceptions": []
         }
     },
     "unprotectedTemporary": []

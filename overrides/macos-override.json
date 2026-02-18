@@ -416,10 +416,16 @@
             "state": "enabled",
             "settings": {
                 "chatsLocalStorageKeys": ["savedAIChats"],
-                "chatImagesIndexDbNameObjectStoreNamePairs": [[
+                "chatImagesIndexDbNameObjectStoreNamePairs": [
+                    [
                         "savedAIChatData",
                         "chat-images"
-                    ]]
+                    ],
+                    [
+                        "savedAIChatData",
+                        "saved-chats"
+                    ]
+                ]
             }
         },
         "duckAiChatHistory": {
@@ -528,8 +534,8 @@
                 }
             ],
             "features": {
-                "tdsNextExperiment004": {
-                    "state": "disabled",
+                "tdsNextExperiment006": {
+                    "state": "enabled",
                     "rollout": {
                         "steps": [
                             {
@@ -538,32 +544,8 @@
                         ]
                     },
                     "settings": {
-                        "controlUrl": "v6/experiments/202511v1-macos-tds-control.json",
-                        "treatmentUrl": "v6/experiments/202511v1-macos-tds-treatment.json"
-                    },
-                    "cohorts": [
-                        {
-                            "name": "control",
-                            "weight": 1
-                        },
-                        {
-                            "name": "treatment",
-                            "weight": 1
-                        }
-                    ]
-                },
-                "tdsNextExperiment005": {
-                    "state": "disabled",
-                    "rollout": {
-                        "steps": [
-                            {
-                                "percent": 100
-                            }
-                        ]
-                    },
-                    "settings": {
-                        "controlUrl": "v6/experiments/202511v2-macos-tds-control.json",
-                        "treatmentUrl": "v6/experiments/202511v2-macos-tds-treatment.json"
+                        "controlUrl": "v6/experiments/202602v1-macos-tds-control.json",
+                        "treatmentUrl": "v6/experiments/202602v1-macos-tds-treatment.json"
                     },
                     "cohorts": [
                         {

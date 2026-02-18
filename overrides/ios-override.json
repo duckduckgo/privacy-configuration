@@ -351,10 +351,16 @@
             "state": "enabled",
             "settings": {
                 "chatsLocalStorageKeys": ["savedAIChats"],
-                "chatImagesIndexDbNameObjectStoreNamePairs": [[
+                "chatImagesIndexDbNameObjectStoreNamePairs": [
+                    [
                         "savedAIChatData",
                         "chat-images"
-                    ]]
+                    ],
+                    [
+                        "savedAIChatData",
+                        "saved-chats"
+                    ]
+                ]
             }
         },
         "duckAiChatHistory": {
@@ -505,8 +511,8 @@
             "state": "enabled",
             "exceptions": [],
             "features": {
-                "tdsNextExperiment004": {
-                    "state": "disabled",
+                "tdsNextExperiment006": {
+                    "state": "enabled",
                     "rollout": {
                         "steps": [
                             {
@@ -515,32 +521,8 @@
                         ]
                     },
                     "settings": {
-                        "controlUrl": "v5/experiments/202511v1-ios-tds-control.json",
-                        "treatmentUrl": "v5/experiments/202511v1-ios-tds-treatment.json"
-                    },
-                    "cohorts": [
-                        {
-                            "name": "control",
-                            "weight": 1
-                        },
-                        {
-                            "name": "treatment",
-                            "weight": 1
-                        }
-                    ]
-                },
-                "tdsNextExperiment005": {
-                    "state": "disabled",
-                    "rollout": {
-                        "steps": [
-                            {
-                                "percent": 100
-                            }
-                        ]
-                    },
-                    "settings": {
-                        "controlUrl": "v5/experiments/202511v2-ios-tds-control.json",
-                        "treatmentUrl": "v5/experiments/202511v2-ios-tds-treatment.json"
+                        "controlUrl": "v5/experiments/202602v1-ios-tds-control.json",
+                        "treatmentUrl": "v5/experiments/202602v1-ios-tds-treatment.json"
                     },
                     "cohorts": [
                         {
@@ -1394,6 +1376,10 @@
                     {
                         "domain": "sling.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4465"
+                    },
+                    {
+                        "domain": "yelp.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4538"
                     }
                 ],
                 "ddgDefaultSites": [
@@ -1605,6 +1591,10 @@
                     {
                         "domain": "pinterest.vn",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "yelp.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4538"
                     }
                 ],
                 "omitVersionSites": []
@@ -2305,17 +2295,30 @@
                             },
                             {
                                 "percent": 5
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
                             }
                         ]
                     }
                 },
                 "enhancedDataClearingSettings": {
-                    "state": "internal",
+                    "state": "enabled",
                     "minSupportedVersion": "7.207.0"
                 },
                 "burnSingleTab": {
-                    "state": "internal",
-                    "minSupportedVersion": "7.207.0"
+                    "state": "enabled",
+                    "minSupportedVersion": "7.207.0",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            }
+                        ]
+                    }
                 }
             }
         },
