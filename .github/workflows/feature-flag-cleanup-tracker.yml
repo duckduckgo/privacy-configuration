@@ -5,9 +5,7 @@ on:
         types: [synchronize, opened, reopened]
         paths:
             - 'overrides/android-override.json'
-            - 'overrides/ios-override.json'
             - 'overrides/windows-override.json'
-            - 'overrides/macos-override.json'
             - 'features/**/*.json'
 
 jobs:
@@ -22,21 +20,11 @@ jobs:
                       override_file: 'overrides/android-override.json'
                       asana_project: '${{ vars.GH_ANDROID_INTERNAL_WORK_PROJECT_ID }}'
                       asana_section: '${{ vars.GH_ANDROID_FEATURE_FLAG_MAINTENANCE_SECTION_ID }}'
-                    - name: 'iOS'
-                      config_file: 'ios-config.json'
-                      override_file: 'overrides/ios-override.json'
-                      asana_project: '${{ vars.GH_ANDROID_INTERNAL_WORK_PROJECT_ID }}'
-                      asana_section: '${{ vars.GH_ANDROID_FEATURE_FLAG_MAINTENANCE_SECTION_ID }}'
                     - name: 'Windows'
                       config_file: 'windows-config.json'
                       override_file: 'overrides/windows-override.json'
-                      asana_project: '${{ vars.GH_ANDROID_INTERNAL_WORK_PROJECT_ID }}'
-                      asana_section: '${{ vars.GH_ANDROID_FEATURE_FLAG_MAINTENANCE_SECTION_ID }}'
-                    - name: 'macOS'
-                      config_file: 'macos-config.json'
-                      override_file: 'overrides/macos-override.json'
-                      asana_project: '${{ vars.GH_ANDROID_INTERNAL_WORK_PROJECT_ID }}'
-                      asana_section: '${{ vars.GH_ANDROID_FEATURE_FLAG_MAINTENANCE_SECTION_ID }}'
+                      asana_project: '${{ vars.GH_WINDOWS_PROJECT_ID }}'
+                      asana_section: '${{ vars.GH_WINDOWS_FEATURE_FLAGS_SECTION_ID }}'
         name: ${{ matrix.platform.name }} cleanup task
 
         steps:
