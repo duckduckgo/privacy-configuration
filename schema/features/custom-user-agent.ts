@@ -26,7 +26,7 @@ type VersionsOnly = {
 type CustomUserAgentSettings = {
     // Windows properties
     userAgentOverrides?: UserAgentOverride[];
-    omitClientHintMutations?: string[];
+    omitClientHintMutations?: DomainOnly[];
 
     // Common properties (can be strings for Windows or objects for mobile platforms)
     omitApplicationSites?: string[] | DomainOnly[];
