@@ -23,8 +23,7 @@ type Actions = Partial<{
         state?: FeatureState;
     };
     fireEvent: {
-        state?: FeatureState;
-        event: string;
+        type: string;
     };
 }>;
 
