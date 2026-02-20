@@ -1,0 +1,267 @@
+name: Feature Flag Cleanup Tracker
+
+on:
+    pull_request:
+        types: [closed]
+        paths:
+            - 'overrides/android-override.json'
+            - 'overrides/windows-override.json'
+            - 'features/**/*.json'
+
+jobs:
+    create-cleanup-task:
+        runs-on: ubuntu-latest
+        if: github.event.pull_request.merged == true
+        strategy:
+            fail-fast: false
+            matrix:
+                platform:
+                    - name: 'Android'
+                      config_file: 'android-config.json'
+                      override_file: 'overrides/android-override.json'
+                      asana_project: '${{ vars.GH_ANDROID_INTERNAL_WORK_PROJECT_ID }}'
+                      asana_section: '${{ vars.GH_ANDROID_FEATURE_FLAG_MAINTENANCE_SECTION_ID }}'
+                    - name: 'Windows'
+                      config_file: 'windows-config.json'
+                      override_file: 'overrides/windows-override.json'
+                      asana_project: '${{ vars.GH_WINDOWS_PROJECT_ID }}'
+                      asana_section: '${{ vars.GH_WINDOWS_FEATURE_FLAGS_SECTION_ID }}'
+        name: ${{ matrix.platform.name }} cleanup task
+
+        steps:
+            - name: Set PR context variables
+              id: pr_context
+              run: |
+                  echo "base_sha=${{ github.event.pull_request.base.sha }}" >> $GITHUB_OUTPUT
+                  # Use merge_commit_sha for both testing and production
+                  # For open PRs: test merge commit (what would happen if merged)
+                  # For merged PRs: actual merge commit (what landed on main)
+                  echo "head_sha=${{ github.event.pull_request.merge_commit_sha }}" >> $GITHUB_OUTPUT
+                  echo "pr_number=${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
+                  echo "pr_url=${{ github.event.pull_request.html_url }}" >> $GITHUB_OUTPUT
+
+            - name: Install jq
+              run: sudo apt-get update && sudo apt-get install -y jq
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '20'
+
+            - name: Checkout base commit
+              uses: actions/checkout@v4
+              with:
+                  ref: ${{ steps.pr_context.outputs.base_sha }}
+                  path: base
+                  fetch-depth: 0
+
+            - name: Checkout merge commit
+              uses: actions/checkout@v4
+              with:
+                  ref: ${{ steps.pr_context.outputs.head_sha }}
+                  path: head
+                  fetch-depth: 0
+
+            - name: Build generated configs
+              id: build_configs
+              run: |
+                  set -euo pipefail
+                  for dir in base head; do
+                    echo "Building generated output in $dir"
+                    (cd "$dir" && npm ci && node index.js)
+                  done
+
+                  BASE_CONFIG_VERSION=$(node --input-type=module -e "const { CURRENT_CONFIG_VERSION } = await import('./base/constants.js'); console.log(CURRENT_CONFIG_VERSION);")
+                  HEAD_CONFIG_VERSION=$(node --input-type=module -e "const { CURRENT_CONFIG_VERSION } = await import('./head/constants.js'); console.log(CURRENT_CONFIG_VERSION);")
+                  echo "base_config_version=$BASE_CONFIG_VERSION" >> $GITHUB_OUTPUT
+                  echo "head_config_version=$HEAD_CONFIG_VERSION" >> $GITHUB_OUTPUT
+
+            - name: Detect new ${{ matrix.platform.name }} feature flags (generated output)
+              id: detect_flags
+              run: |
+                  BASE_CONFIG_VERSION="${{ steps.build_configs.outputs.base_config_version }}"
+                  HEAD_CONFIG_VERSION="${{ steps.build_configs.outputs.head_config_version }}"
+                  BASE_CONFIG="base/generated/v${BASE_CONFIG_VERSION}/${{ matrix.platform.config_file }}"
+                  HEAD_CONFIG="head/generated/v${HEAD_CONFIG_VERSION}/${{ matrix.platform.config_file }}"
+
+                  # Extract all feature keys from base and head
+                  BASE_FEATURES=$(jq -r '.features | keys[]' "$BASE_CONFIG" | sort)
+                  HEAD_FEATURES=$(jq -r '.features | keys[]' "$HEAD_CONFIG" | sort)
+
+                  # Find new top-level features
+                  NEW_FEATURES=$(comm -13 <(echo "$BASE_FEATURES") <(echo "$HEAD_FEATURES"))
+
+                  # Detect new sub-features in existing features
+                  NEW_SUBFEATURES=""
+                  for feature in $(echo "$BASE_FEATURES"); do
+                    BASE_SUBS=$(jq -r --arg f "$feature" '.features[$f].features // {} | keys[]' "$BASE_CONFIG" 2>/dev/null | sort || true)
+                    HEAD_SUBS=$(jq -r --arg f "$feature" '.features[$f].features // {} | keys[]' "$HEAD_CONFIG" 2>/dev/null | sort || true)
+
+                    if [ -n "$HEAD_SUBS" ]; then
+                      NEW_SUBS=$(comm -13 <(echo "$BASE_SUBS") <(echo "$HEAD_SUBS") || true)
+                      if [ -n "$NEW_SUBS" ]; then
+                        for sub in $NEW_SUBS; do
+                          NEW_SUBFEATURES="${NEW_SUBFEATURES}${feature}.${sub}"$'\n'
+                        done
+                      fi
+                    fi
+                  done
+
+                  # Also check NEW top-level features for any sub-features they contain
+                  for feature in $NEW_FEATURES; do
+                    SUBS=$(jq -r --arg f "$feature" '.features[$f].features // {} | keys[]' "$HEAD_CONFIG" 2>/dev/null || true)
+                    if [ -n "$SUBS" ]; then
+                      for sub in $SUBS; do
+                        NEW_SUBFEATURES="${NEW_SUBFEATURES}${feature}.${sub}"$'\n'
+                      done
+                    fi
+                  done
+
+                  # Combine all new flags
+                  ALL_NEW_FLAGS=""
+                  if [ -n "$NEW_FEATURES" ]; then
+                    ALL_NEW_FLAGS="$NEW_FEATURES"
+                  fi
+                  if [ -n "$NEW_SUBFEATURES" ]; then
+                    if [ -n "$ALL_NEW_FLAGS" ]; then
+                      ALL_NEW_FLAGS="${ALL_NEW_FLAGS}"$'\n'"${NEW_SUBFEATURES}"
+                    else
+                      ALL_NEW_FLAGS="$NEW_SUBFEATURES"
+                    fi
+                  fi
+
+                  # Remove trailing newline
+                  ALL_NEW_FLAGS=$(echo "$ALL_NEW_FLAGS" | sed '/^$/d')
+
+                  if [ -z "$ALL_NEW_FLAGS" ]; then
+                    echo "No new ${{ matrix.platform.name }} feature flags detected"
+                    echo "has_new_flags=false" >> $GITHUB_OUTPUT
+                  else
+                    echo "New ${{ matrix.platform.name }} feature flags detected:"
+                    echo "$ALL_NEW_FLAGS"
+                    echo "has_new_flags=true" >> $GITHUB_OUTPUT
+                    echo "flags<<EOF" >> $GITHUB_OUTPUT
+                    echo "$ALL_NEW_FLAGS" >> $GITHUB_OUTPUT
+                    echo "EOF" >> $GITHUB_OUTPUT
+                  fi
+
+            - name: Prepare Asana task content
+              if: steps.detect_flags.outputs.has_new_flags == 'true'
+              id: asana_content
+              run: |
+                  HEAD_CONFIG_VERSION="${{ steps.build_configs.outputs.head_config_version }}"
+                  CONSTRUCTED_FILE="generated/v${HEAD_CONFIG_VERSION}/${{ matrix.platform.config_file }}"
+                  PLATFORM_NAME="${{ matrix.platform.name }}"
+                  OVERRIDE_FILE="${{ matrix.platform.override_file }}"
+
+                  # Count how many flags were added
+                  FLAG_COUNT=$(echo "${{ steps.detect_flags.outputs.flags }}" | wc -l | xargs)
+
+                  if [ "$FLAG_COUNT" -eq 1 ]; then
+                    # Single feature flag - create specific task
+                    FEATURE_PATH=$(echo "${{ steps.detect_flags.outputs.flags }}" | head -1)
+
+                    # Check if it's a sub-feature (contains a dot)
+                    if [[ "$FEATURE_PATH" == *.* ]]; then
+                      PARENT=$(echo "$FEATURE_PATH" | cut -d. -f1)
+                      SUBFEATURE=$(echo "$FEATURE_PATH" | cut -d. -f2)
+                      FEATURE_NAME="$PARENT > $SUBFEATURE"
+                    else
+                      FEATURE_NAME="$FEATURE_PATH"
+                    fi
+
+                    TASK_NAME="[$PLATFORM_NAME] Remove feature flag: $FEATURE_NAME"
+                    TASK_DESCRIPTION="This $PLATFORM_NAME feature flag was added in PR #${{ steps.pr_context.outputs.pr_number }}
+
+                  PR Link: ${{ steps.pr_context.outputs.pr_url }}
+                  Feature Path: \`$FEATURE_PATH\`
+                  File (constructed): \`$CONSTRUCTED_FILE\`
+                  Inputs: \`features/\` + \`$OVERRIDE_FILE\`
+
+                  Action Required:
+                  Please review this feature flag after the due date and determine if it can be removed.
+
+                  Note: Check if this is a kill switch or permanent feature toggle. If it's meant to be permanent (e.g., kill switch, long-term A/B test, or operational toggle), you can close this task without removing the flag. Only temporary rollout flags need to be cleaned up once the feature is stable.
+
+                  Steps to remove (if not a permanent flag):
+                  1. Verify the feature is working as expected in $PLATFORM_NAME production
+                  2. Remove any $PLATFORM_NAME code that references this feature flag
+                  3. Update any documentation
+                  4. Create a PR with the cleanup changes
+
+                  Note: The flag can remain in the config files (\`$CONSTRUCTED_FILE\`) for backwards compatibility with older app versions.
+
+                  Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                  else
+                    # Multiple feature flags - create summary task
+                    TASK_NAME="[$PLATFORM_NAME] Remove feature flags added in PR #${{ steps.pr_context.outputs.pr_number }}"
+                    TASK_DESCRIPTION="Multiple $PLATFORM_NAME feature flags were added in PR #${{ steps.pr_context.outputs.pr_number }}
+
+                  PR Link: ${{ steps.pr_context.outputs.pr_url }}
+                  Constructed File: \`$CONSTRUCTED_FILE\`
+                  Inputs: \`features/\` + \`$OVERRIDE_FILE\`
+
+                  Feature Flags to Review:
+                  "
+
+                    # List each feature flag
+                    while IFS= read -r FEATURE_PATH; do
+                      if [ -n "$FEATURE_PATH" ]; then
+                        if [[ "$FEATURE_PATH" == *.* ]]; then
+                          PARENT=$(echo "$FEATURE_PATH" | cut -d. -f1)
+                          SUBFEATURE=$(echo "$FEATURE_PATH" | cut -d. -f2)
+                          FEATURE_NAME="$PARENT > $SUBFEATURE"
+                        else
+                          FEATURE_NAME="$FEATURE_PATH"
+                        fi
+
+                        TASK_DESCRIPTION="${TASK_DESCRIPTION}
+                  - $FEATURE_NAME
+                    Path: \`$FEATURE_PATH\`
+                  "
+                      fi
+                    done <<< "${{ steps.detect_flags.outputs.flags }}"
+
+                    TASK_DESCRIPTION="${TASK_DESCRIPTION}
+
+                  Action Required:
+                  Please review these feature flags after the due date and determine if they can be removed.
+
+                  Note: Check if any of these are kill switches or permanent feature toggles. If a flag is meant to be permanent (e.g., kill switch, long-term A/B test, or operational toggle), you can keep it and close this task. Only temporary rollout flags need to be cleaned up once the feature is stable.
+
+                  Steps to remove (for non-permanent flags):
+                  1. Verify each feature is working as expected in $PLATFORM_NAME production
+                  2. Remove any $PLATFORM_NAME code that references these feature flags
+                  3. Update any documentation
+                  4. Create a PR with the cleanup changes
+
+                  Note: The flags can remain in the config files (\`$CONSTRUCTED_FILE\`) for backwards compatibility with older app versions.
+
+                  Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                  fi
+
+                  echo "task_name=$TASK_NAME" >> $GITHUB_OUTPUT
+                  {
+                    echo 'task_description<<EOF'
+                    echo "$TASK_DESCRIPTION"
+                    echo 'EOF'
+                  } >> $GITHUB_OUTPUT
+
+            - name: Get PR author Asana ID
+              uses: duckduckgo/native-github-asana-sync@v2.0
+              id: get-author-asana-id
+              with:
+                  github-pat: ${{ secrets.GH_RO_PAT }}
+                  action: 'get-asana-user-id'
+
+            - name: Create Asana Task
+              if: steps.asana_content.outcome == 'success'
+              uses: duckduckgo/native-github-asana-sync@v2.0
+              with:
+                  asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+                  asana-project: ${{ matrix.platform.asana_project }}
+                  asana-section: ${{ matrix.platform.asana_section }}
+                  asana-task-name: ${{ steps.asana_content.outputs.task_name }}
+                  asana-task-assignee: ${{ steps.get-author-asana-id.outputs.asanaUserId }}
+                  asana-task-description: ${{ steps.asana_content.outputs.task_description }}
+                  action: 'create-asana-task'

@@ -204,8 +204,8 @@
             "state": "enabled",
             "exceptions": [],
             "features": {
-                "tdsNextExperiment004": {
-                    "state": "disabled",
+                "tdsNextExperiment006": {
+                    "state": "enabled",
                     "minSupportedVersion": 52361000,
                     "rollout": {
                         "steps": [
@@ -215,33 +215,8 @@
                         ]
                     },
                     "settings": {
-                        "controlUrl": "v5/experiments/202511v1-android-tds-control.json",
-                        "treatmentUrl": "v5/experiments/202511v1-android-tds-treatment.json"
-                    },
-                    "cohorts": [
-                        {
-                            "name": "control",
-                            "weight": 1
-                        },
-                        {
-                            "name": "treatment",
-                            "weight": 1
-                        }
-                    ]
-                },
-                "tdsNextExperiment005": {
-                    "state": "disabled",
-                    "minSupportedVersion": 52361000,
-                    "rollout": {
-                        "steps": [
-                            {
-                                "percent": 100
-                            }
-                        ]
-                    },
-                    "settings": {
-                        "controlUrl": "v5/experiments/202511v2-android-tds-control.json",
-                        "treatmentUrl": "v5/experiments/202511v2-android-tds-treatment.json"
+                        "controlUrl": "v5/experiments/202602v1-android-tds-control.json",
+                        "treatmentUrl": "v5/experiments/202602v1-android-tds-treatment.json"
                     },
                     "cohorts": [
                         {
@@ -473,7 +448,42 @@
                     }
                 },
                 "standaloneMigration": {
-                    "state": "disabled"
+                    "state": "enabled",
+                    "minSupportedVersion": 52670000
+                },
+                "fullscreenMode": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52620000
+                },
+                "fullscreenModeToggle": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52603000
+                },
+                "showHideAiGeneratedImages": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52610000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 20
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
+                },
+                "contextualMode": {
+                    "state": "internal"
+                },
+                "automaticContextAttachment": {
+                    "state": "internal"
                 }
             }
         },
@@ -524,6 +534,10 @@
                 {
                     "domain": "ashleyfurniture.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3908"
+                },
+                {
+                    "domain": "timesofmalta.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4401"
                 }
             ],
             "features": {
@@ -964,6 +978,29 @@
                                         }
                                     }
                                 ]
+                            },
+                            {
+                                "domain": [
+                                    "signin.autodesk.com"
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input#firstname_str",
+                                            "type": "identities.firstName"
+                                        }
+                                    },
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input#lastname_str",
+                                            "type": "identities.lastName"
+                                        }
+                                    }
+                                ]
                             }
                         ]
                     }
@@ -1209,6 +1246,12 @@
                 "createAsyncPreferences": {
                     "state": "enabled",
                     "minSupportedVersion": 52320000
+                },
+                "useHarmony": {
+                    "state": "disabled"
+                },
+                "sendSanitizedStackTraces": {
+                    "state": "enabled"
                 }
             }
         },
@@ -1242,8 +1285,12 @@
         "androidBrowserConfig": {
             "state": "enabled",
             "features": {
+                "showInputScreenOnboarding": {
+                    "state": "enabled"
+                },
                 "useUrlPredictor": {
-                    "state": "disabled"
+                    "state": "enabled",
+                    "minSupportedVersion": 52591000
                 },
                 "collectFullWebViewVersion": {
                     "state": "enabled"
@@ -1426,6 +1473,15 @@
                         }
                     ]
                 },
+                "vpnMenuItemInternational": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52660000,
+                    "targets": [
+                        {
+                            "isPrivacyProEligible": true
+                        }
+                    ]
+                },
                 "reportWebViewCapabilities": {
                     "state": "disabled",
                     "minSupportedVersion": 52560000,
@@ -1463,8 +1519,8 @@
                     }
                 },
                 "handleAboutBlank": {
-                    "state": "disabled",
-                    "minSupportedVersion": 52590000,
+                    "state": "enabled",
+                    "minSupportedVersion": 52603000,
                     "rollout": {
                         "steps": [
                             {
@@ -1472,6 +1528,12 @@
                             },
                             {
                                 "percent": 20
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
                             }
                         ]
                     }
@@ -1479,6 +1541,10 @@
                 "newCustomTab": {
                     "state": "enabled",
                     "minSupportedVersion": 52590000
+                },
+                "experimentalBrowsingMenu": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52660000
                 }
             }
         },
@@ -1577,6 +1643,10 @@
                 {
                     "domain": "bluegrasslyrics.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/2084"
+                },
+                {
+                    "domain": "jonesroadbeauty.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/4403"
                 }
             ]
         },
@@ -1708,12 +1778,32 @@
         },
         "fingerprintingBattery": {
             "state": "enabled",
-            "exceptions": [],
+            "exceptions": [
+                {
+                    "domain": "coinbase.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/4360"
+                }
+            ],
             "settings": {
                 "conditionalChanges": [
                     {
                         "condition": {
                             "injectName": "android-adsjs"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/additionalCheck",
+                                "value": "disabled"
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": {
+                                "experimentName": "contentScopeExperiment1",
+                                "cohort": "treatment"
+                            }
                         },
                         "patchSettings": [
                             {
@@ -1728,11 +1818,32 @@
         },
         "fingerprintingCanvas": {
             "state": "disabled",
+            "exceptions": [
+                {
+                    "domain": "coinbase.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/4360"
+                }
+            ],
             "settings": {
                 "conditionalChanges": [
                     {
                         "condition": {
                             "injectName": "android-adsjs"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/additionalCheck",
+                                "value": "disabled"
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": {
+                                "experimentName": "contentScopeExperiment1",
+                                "cohort": "treatment"
+                            }
                         },
                         "patchSettings": [
                             {
@@ -1747,6 +1858,12 @@
         },
         "fingerprintingHardware": {
             "state": "enabled",
+            "exceptions": [
+                {
+                    "domain": "coinbase.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/4360"
+                }
+            ],
             "settings": {
                 "keyboard": {
                     "type": "undefined"
@@ -1771,10 +1888,24 @@
                                 "value": "disabled"
                             }
                         ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": {
+                                "experimentName": "contentScopeExperiment1",
+                                "cohort": "treatment"
+                            }
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/additionalCheck",
+                                "value": "disabled"
+                            }
+                        ]
                     }
                 ]
-            },
-            "exceptions": []
+            }
         },
         "fingerprintingScreenSize": {
             "state": "enabled",
@@ -1786,6 +1917,10 @@
                 {
                     "domain": "tracfone.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/4143"
+                },
+                {
+                    "domain": "coinbase.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/4360"
                 }
             ],
             "settings": {
@@ -1817,6 +1952,21 @@
                                 "value": "disabled"
                             }
                         ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": {
+                                "experimentName": "contentScopeExperiment1",
+                                "cohort": "treatment"
+                            }
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/additionalCheck",
+                                "value": "disabled"
+                            }
+                        ]
                     }
                 ]
             }
@@ -1827,6 +1977,10 @@
                 {
                     "domain": "ticketmaster.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/575"
+                },
+                {
+                    "domain": "coinbase.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/4360"
                 }
             ],
             "settings": {
@@ -1834,6 +1988,21 @@
                     {
                         "condition": {
                             "injectName": "android-adsjs"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/additionalCheck",
+                                "value": "disabled"
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": {
+                                "experimentName": "contentScopeExperiment1",
+                                "cohort": "treatment"
+                            }
                         },
                         "patchSettings": [
                             {
@@ -1868,6 +2037,21 @@
                     {
                         "condition": {
                             "injectName": "android-adsjs"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/additionalCheck",
+                                "value": "disabled"
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": {
+                                "experimentName": "contentScopeExperiment1",
+                                "cohort": "treatment"
+                            }
                         },
                         "patchSettings": [
                             {
@@ -2066,6 +2250,21 @@
                     },
                     {
                         "packageName": "com.openai.chatgpt"
+                    },
+                    {
+                        "packageName": "com.TWCableTV"
+                    },
+                    {
+                        "packageName": "com.amazon.storm.lightning.client.aosp"
+                    },
+                    {
+                        "packageName": "com.infrasoft.uboi"
+                    },
+                    {
+                        "packageName": "com.cbq.CBMobile"
+                    },
+                    {
+                        "packageName": "com.samsung.android.oneconnect"
                     }
                 ]
             },
@@ -2093,7 +2292,30 @@
         },
         "sync": {
             "state": "enabled",
-            "minSupportedVersion": 51850000
+            "minSupportedVersion": 51850000,
+            "features": {
+                "level0ShowSync": {
+                    "state": "enabled"
+                },
+                "level1AllowDataSyncing": {
+                    "state": "enabled"
+                },
+                "level2AllowSetupFlows": {
+                    "state": "enabled"
+                },
+                "level3AllowCreateAccount": {
+                    "state": "enabled"
+                },
+                "exchangeKeysToSyncWithAnotherDevice": {
+                    "state": "enabled"
+                },
+                "syncSetupBarcodeIsUrlBased": {
+                    "state": "enabled"
+                },
+                "aiChatSync": {
+                    "state": "internal"
+                }
+            }
         },
         "syncPromotion": {
             "state": "enabled",
@@ -2110,6 +2332,17 @@
             "state": "enabled",
             "settings": {
                 "allowlistedTrackers": {
+                    "audioeye.com": {
+                        "rules": [
+                            {
+                                "rule": "ws.audioeye.com/ae.js",
+                                "domains": [
+                                    "tracfone.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/4322"
+                            }
+                        ]
+                    },
                     "cedexis.net": {
                         "rules": [
                             {
@@ -2150,17 +2383,6 @@
                             }
                         ]
                     },
-                    "omtrdc.net": {
-                        "rules": [
-                            {
-                                "rule": "tracfonewireless.tt.omtrdc.net",
-                                "domains": [
-                                    "tracfone.com"
-                                ],
-                                "reason": "tracfone.com - https://github.com/duckduckgo/privacy-configuration/pull/4032"
-                            }
-                        ]
-                    },
                     "posthog.com": {
                         "rules": [
                             {
@@ -2172,32 +2394,14 @@
                             }
                         ]
                     },
-                    "tealiumiq.com": {
+                    "slickstream.com": {
                         "rules": [
                             {
-                                "rule": "collect.tealiumiq.com",
+                                "rule": "app-sx.slickstream.com",
                                 "domains": [
-                                    "tracfone.com"
+                                    "recipetineats.com"
                                 ],
-                                "reason": "tracfone.com - https://github.com/duckduckgo/privacy-configuration/pull/4032"
-                            },
-                            {
-                                "rule": "visitor-service.tealiumiq.com",
-                                "domains": [
-                                    "tracfone.com"
-                                ],
-                                "reason": "tracfone.com - https://github.com/duckduckgo/privacy-configuration/pull/4032"
-                            }
-                        ]
-                    },
-                    "tiqcdn.com": {
-                        "rules": [
-                            {
-                                "rule": "tags.tiqcdn.com",
-                                "domains": [
-                                    "tracfone.com"
-                                ],
-                                "reason": "tracfone.com - https://github.com/duckduckgo/privacy-configuration/pull/4077"
+                                "reason": "recipetineats.com - https://github.com/duckduckgo/privacy-configuration/pull/4387"
                             }
                         ]
                     },
@@ -2305,6 +2509,36 @@
                                 }
                             }
                         ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": {
+                                "experimentName": "contentScopeExperiment1",
+                                "cohort": "treatment"
+                            }
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/additionalCheck",
+                                "value": "disabled"
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": {
+                                "experimentName": "contentScopeExperiment2",
+                                "cohort": "treatment"
+                            }
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/permissionsPresent/state",
+                                "value": "enabled"
+                            }
+                        ]
                     }
                 ],
                 "cleanIframeValue": {
@@ -2397,6 +2631,9 @@
                         }
                     }
                 },
+                "permissionsPresent": {
+                    "state": "disabled"
+                },
                 "mediaSession": "enabled",
                 "presentation": "disabled",
                 "viewportWidth": "enabled",
@@ -2427,6 +2664,22 @@
         },
         "mediaPlaybackRequiresUserGesture": {
             "state": "enabled",
+            "settings": {
+                "exemptedDomains": [
+                    {
+                        "domain": "duck.ai",
+                        "reason": "Required for audio playback in Duck.ai"
+                    },
+                    {
+                        "domain": "duckduckgo.com",
+                        "reason": "Required for audio playback in Duck.ai"
+                    },
+                    {
+                        "domain": "duck.co",
+                        "reason": "Required for audio playback in Duck.ai"
+                    }
+                ]
+            },
             "exceptions": [
                 {
                     "domain": "pinealxtinfo.com",
@@ -2921,12 +3174,6 @@
                     "state": "enabled",
                     "minSupportedVersion": 52451000
                 },
-                "subscriptionRebranding": {
-                    "state": "enabled"
-                },
-                "subscriptionAIFeaturesRebranding": {
-                    "state": "enabled"
-                },
                 "blackFridayOffer2025": {
                     "state": "disabled",
                     "targets": [
@@ -2938,6 +3185,14 @@
                 "supportsSwitchSubscription": {
                     "state": "enabled",
                     "minSupportedVersion": 52591000
+                },
+                "vpnReminderNotification": {
+                    "state": "enabled",
+                    "targets": [
+                        {
+                            "localeLanguage": "en"
+                        }
+                    ]
                 }
             }
         },
@@ -2990,7 +3245,8 @@
                     "state": "enabled"
                 },
                 "pluginNewTabPage": {
-                    "state": "disabled"
+                    "state": "enabled",
+                    "minSupportedVersion": 52650000
                 }
             }
         },
@@ -3325,6 +3581,26 @@
                                 "value": "disabled"
                             }
                         ]
+                    },
+                    {
+                        "condition": [
+                            {
+                                "domain": "github.dev"
+                            }
+                        ],
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/apiChanges/crossOriginIsolated",
+                                "value": {
+                                    "type": "descriptor",
+                                    "getterValue": {
+                                        "type": "boolean",
+                                        "value": true
+                                    }
+                                }
+                            }
+                        ]
                     }
                 ]
             }
@@ -3335,6 +3611,50 @@
                 "contentScopeExperiment0": {
                     "state": "disabled",
                     "minSupportedVersion": 52410000,
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "contentScopeExperiment1": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 50
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "contentScopeExperiment2": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52680000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
                     "cohorts": [
                         {
                             "name": "control",
@@ -3368,6 +3688,17 @@
                             },
                             {
                                 "percent": 100
+                            }
+                        ]
+                    }
+                },
+                "setFavourite": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52670000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
                             }
                         ]
                     }
@@ -3407,8 +3738,8 @@
             "exceptions": [],
             "features": {
                 "feature": {
-                    "state": "disabled",
-                    "minSupportedVersion": 52530000,
+                    "state": "enabled",
+                    "minSupportedVersion": 52610000,
                     "rollout": {
                         "steps": [
                             {
@@ -3427,6 +3758,15 @@
                     }
                 }
             }
+        },
+        "productSurfaceTelemetry": {
+            "state": "disabled",
+            "exceptions": [],
+            "minSupportedVersion": 52610000
+        },
+        "webViewClipboardImage": {
+            "state": "enabled",
+            "exceptions": []
         },
         "webViewCompat": {
             "state": "disabled",
@@ -3465,6 +3805,87 @@
                 "useLargeScript": {
                     "state": "disabled"
                 }
+            }
+        },
+        "databaseProvider": {
+            "state": "enabled",
+            "exceptions": [],
+            "features": {
+                "sendSanitizedStackTraces": {
+                    "state": "enabled"
+                }
+            }
+        },
+        "serp": {
+            "state": "enabled",
+            "exceptions": [],
+            "features": {
+                "storeSerpSettings": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52610000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 20
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        "pageContext": {
+            "state": "internal",
+            "minSupportedVersion": 52630000,
+            "exceptions": [],
+            "settings": {
+                "additionalCheck": "enabled",
+                "activeCaptureOnFirstMessage": "enabled",
+                "maxContentLength": 9500,
+                "mainContentSelector": "main, article, .content, .main, #content, #main",
+                "excludeSelectors": [
+                    ".ad",
+                    ".sidebar",
+                    ".footer",
+                    ".nav",
+                    ".header",
+                    ".banner",
+                    ".popup"
+                ],
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "domain": "nba.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/mainContentSelector",
+                                "value": "main"
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "domain": "reddit.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/excludeSelectors/-",
+                                "value": "shreddit-comments-page-ad"
+                            }
+                        ]
+                    }
+                ]
             }
         }
     },

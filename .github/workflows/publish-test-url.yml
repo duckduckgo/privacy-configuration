@@ -2,14 +2,29 @@ name: Publish Test URL
 
 on:
     pull_request:
+        types: [opened, synchronize, reopened, closed]
 
 jobs:
     publish-config:
+        if: github.event.action != 'closed'
         runs-on: ubuntu-latest
         concurrency:
-            group: test-url
+            group: preview-pages-branch
             cancel-in-progress: false
         steps:
+            - name: Post pending comment
+              id: pending_comment
+              uses: peter-evans/create-or-update-comment@v4
+              with:
+                  token: ${{ secrets.GITHUB_TOKEN }}
+                  repository: ${{ github.repository }}
+                  issue-number: ${{ github.event.pull_request.number }}
+                  edit-mode: replace
+                  body: |
+                      🔗 **Preview Config for PR #${{ github.event.pull_request.number }}**
+
+                      ⏳ Building and publishing preview config...
+
             - name: Checkout the repository
               uses: actions/checkout@v5
             - name: Use Node.js 20
@@ -57,14 +72,12 @@ jobs:
                   echo "EOF" >> $GITHUB_OUTPUT
                   echo "last_updated=$LAST_UPDATED" >> $GITHUB_OUTPUT
 
-            - name: Comment preview link on PR
-              env:
-                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            - name: Update comment with preview links
               uses: peter-evans/create-or-update-comment@v4
               with:
                   token: ${{ secrets.GITHUB_TOKEN }}
                   repository: ${{ github.repository }}
-                  issue-number: ${{ github.event.pull_request.number }}
+                  comment-id: ${{ steps.pending_comment.outputs.comment-id }}
                   edit-mode: replace
                   body: |
                       🔗 **Preview Config for PR #${{ github.event.pull_request.number }}**
@@ -72,3 +85,44 @@ jobs:
                       ${{ steps.generate_preview_links.outputs.preview_links }}
 
                       _Last updated: ${{ steps.generate_preview_links.outputs.last_updated }}_
+
+            - name: Update comment on failure
+              if: failure()
+              uses: peter-evans/create-or-update-comment@v4
+              with:
+                  token: ${{ secrets.GITHUB_TOKEN }}
+                  repository: ${{ github.repository }}
+                  comment-id: ${{ steps.pending_comment.outputs.comment-id }}
+                  edit-mode: replace
+                  body: |
+                      🔗 **Preview Config for PR #${{ github.event.pull_request.number }}**
+
+                      ❌ Failed to build or publish preview config. Check the [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details.
+
+    cleanup-preview:
+        if: github.event.action == 'closed'
+        runs-on: ubuntu-latest
+        concurrency:
+            group: preview-pages-branch
+            cancel-in-progress: false
+        steps:
+            - name: Checkout preview-pages branch
+              uses: actions/checkout@v5
+              with:
+                  ref: preview-pages
+                  token: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Remove PR preview directory
+              run: |
+                  PR_DIR="pr-${{ github.event.pull_request.number }}"
+                  if [ -d "$PR_DIR" ]; then
+                    rm -rf "$PR_DIR"
+                    git config user.name "github-actions"
+                    git config user.email "actions@github.com"
+                    git add .
+                    git commit -m "Cleanup preview for PR #${{ github.event.pull_request.number }}" || echo "No changes to commit"
+                    git push origin preview-pages
+                    echo "Removed preview directory: $PR_DIR"
+                  else
+                    echo "Preview directory not found: $PR_DIR"
+                  fi

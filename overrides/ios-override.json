@@ -1,57 +1,57 @@
 {
     "features": {
         "attributedMetrics": {
-            "state": "internal",
+            "state": "enabled",
             "minSupportedVersion": "7.198.0",
             "exceptions": [],
             "features": {
                 "emitAllMetrics": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "retention": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "canEmitRetention": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "searchDaysAvg": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "canEmitSearchDaysAvg": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "searchCountAvg": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "canEmitSearchCountAvg": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "adClickCountAvg": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "canEmitAdClickCountAvg": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "aiUsageAvg": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "canEmitAIUsageAvg": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "subscriptionRetention": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "canEmitSubscriptionRetention": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "syncDevices": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "canEmitSyncDevices": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "sendOriginParam": {
-                    "state": "internal",
+                    "state": "enabled",
                     "settings": {
                         "originCampaignSubstrings": [
                             "paid"
@@ -231,6 +231,36 @@
             },
             "state": "enabled"
         },
+        "serp": {
+            "state": "enabled",
+            "exceptions": [],
+            "minSupportedVersion": "7.201.0",
+            "features": {
+                "storeSerpSettings": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.201.0",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 20
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
+                }
+            }
+        },
         "aiChat": {
             "state": "enabled",
             "minSupportedVersion": "7.155.0",
@@ -286,7 +316,7 @@
                     "minSupportedVersion": "7.189.0"
                 },
                 "standaloneMigration": {
-                    "state": "disabled"
+                    "state": "enabled"
                 },
                 "onboardingSearchExperience": {
                     "state": "enabled",
@@ -297,12 +327,22 @@
                     "state": "enabled"
                 },
                 "fullDuckAIMode": {
-                    "state": "internal",
-                    "minSupportedVersion": "7.199.0"
-                },
-                "fullDuckAIModeExperimentalSetting": {
                     "state": "enabled",
-                    "minSupportedVersion": "7.199.0"
+                    "minSupportedVersion": "7.200.0"
+                },
+                "contextualDuckAIMode": {
+                    "state": "internal",
+                    "minSupportedVersion": "7.206.0"
+                },
+                "fadeOutOnToggle": {
+                    "state": "enabled",
+                    "description": "Unify inputs for Duck.ai",
+                    "minSupportedVersion": "7.201.0"
+                },
+                "aiChatAtb": {
+                    "state": "enabled",
+                    "description": "Add ATB to Duck.ai",
+                    "minSupportedVersion": "7.204.0"
                 }
             },
             "settings": {
@@ -321,8 +361,23 @@
                     [
                         "savedAIChatData",
                         "chat-images"
+                    ],
+                    [
+                        "savedAIChatData",
+                        "saved-chats"
                     ]
                 ]
+            }
+        },
+        "duckAiChatHistory": {
+            "exceptions": [],
+            "state": "enabled",
+            "minSupportedVersion": "7.207.0",
+            "settings": {
+                "chatsLocalStorageKeys": [
+                    "savedAIChats"
+                ],
+                "maxHistoryCount": 10
             }
         },
         "duckPlayer": {
@@ -470,8 +525,8 @@
             "state": "enabled",
             "exceptions": [],
             "features": {
-                "tdsNextExperiment004": {
-                    "state": "disabled",
+                "tdsNextExperiment006": {
+                    "state": "enabled",
                     "rollout": {
                         "steps": [
                             {
@@ -480,32 +535,8 @@
                         ]
                     },
                     "settings": {
-                        "controlUrl": "v5/experiments/202511v1-ios-tds-control.json",
-                        "treatmentUrl": "v5/experiments/202511v1-ios-tds-treatment.json"
-                    },
-                    "cohorts": [
-                        {
-                            "name": "control",
-                            "weight": 1
-                        },
-                        {
-                            "name": "treatment",
-                            "weight": 1
-                        }
-                    ]
-                },
-                "tdsNextExperiment005": {
-                    "state": "disabled",
-                    "rollout": {
-                        "steps": [
-                            {
-                                "percent": 100
-                            }
-                        ]
-                    },
-                    "settings": {
-                        "controlUrl": "v5/experiments/202511v2-ios-tds-control.json",
-                        "treatmentUrl": "v5/experiments/202511v2-ios-tds-treatment.json"
+                        "controlUrl": "v5/experiments/202602v1-ios-tds-control.json",
+                        "treatmentUrl": "v5/experiments/202602v1-ios-tds-treatment.json"
                     },
                     "cohorts": [
                         {
@@ -656,7 +687,12 @@
         },
         "autoconsent": {
             "state": "enabled",
-            "exceptions": [],
+            "exceptions": [
+                {
+                    "domain": "timesofmalta.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4401"
+                }
+            ],
             "features": {
                 "onByDefault": {
                     "state": "enabled",
@@ -1069,6 +1105,29 @@
                                         }
                                     }
                                 ]
+                            },
+                            {
+                                "domain": [
+                                    "signin.autodesk.com"
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input#firstname_str",
+                                            "type": "identities.firstName"
+                                        }
+                                    },
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input#lastname_str",
+                                            "type": "identities.lastName"
+                                        }
+                                    }
+                                ]
                             }
                         ]
                     }
@@ -1181,6 +1240,190 @@
                     {
                         "domain": "arcteryx.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3701"
+                    },
+                    {
+                        "domain": "yahoo.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4258"
+                    },
+                    {
+                        "domain": "pinterest.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.at",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.be",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.ca",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.ch",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.cl",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.co",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.co.id",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.co.in",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.co.kr",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.co.nz",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.co.uk",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.com.au",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.com.bo",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.com.ec",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.com.mx",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.com.pe",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.com.py",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.com.uy",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.com.vn",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.de",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.dk",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.ec",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.es",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.fr",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.hu",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.id",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.ie",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.in",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.it",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.jp",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.kr",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.mx",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.nl",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.nz",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.pe",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.ph",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.pt",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.ru",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.se",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.tw",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.uk",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.vn",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "sling.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4465"
+                    },
+                    {
+                        "domain": "yelp.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4538"
                     }
                 ],
                 "ddgDefaultSites": [
@@ -1216,6 +1459,186 @@
                     {
                         "domain": "arcteryx.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3701"
+                    },
+                    {
+                        "domain": "yahoo.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4258"
+                    },
+                    {
+                        "domain": "pinterest.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.at",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.be",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.ca",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.ch",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.cl",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.co",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.co.id",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.co.in",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.co.kr",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.co.nz",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.co.uk",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.com.au",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.com.bo",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.com.ec",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.com.mx",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.com.pe",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.com.py",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.com.uy",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.com.vn",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.de",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.dk",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.ec",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.es",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.fr",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.hu",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.id",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.ie",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.in",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.it",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.jp",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.kr",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.mx",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.nl",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.nz",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.pe",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.ph",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.pt",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.ru",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.se",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.tw",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.uk",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "pinterest.vn",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
+                    },
+                    {
+                        "domain": "yelp.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4538"
                     }
                 ],
                 "omitVersionSites": []
@@ -1249,6 +1672,9 @@
                 "syncCreditCards": {
                     "state": "enabled",
                     "minSupportedVersion": "7.193.0"
+                },
+                "aiChatSync": {
+                    "state": "disabled"
                 }
             }
         },
@@ -1334,6 +1760,17 @@
                                 "reason": [
                                     "solitaired.com - https://github.com/duckduckgo/privacy-configuration/pull/2329"
                                 ]
+                            }
+                        ]
+                    },
+                    "featureassets.org": {
+                        "rules": [
+                            {
+                                "rule": "featureassets.org/v1/initialize",
+                                "domains": [
+                                    "growtherapy.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4276"
                             }
                         ]
                     },
@@ -1475,17 +1912,11 @@
                 },
                 "domains": [
                     {
-                        "domain": "www.cbsnews.com",
-                        "patchSettings": [
-                            {
-                                "op": "replace",
-                                "path": "/messageHandlers/state",
-                                "value": "enabled"
-                            }
-                        ]
-                    },
-                    {
-                        "domain": "myhome.experian.co.uk",
+                        "domain": [
+                            "www.cbsnews.com",
+                            "myhome.experian.co.uk",
+                            "luna.amazon.com"
+                        ],
                         "patchSettings": [
                             {
                                 "op": "replace",
@@ -1533,6 +1964,9 @@
             ]
         },
         "performanceMetrics": {
+            "state": "disabled"
+        },
+        "breakageReporting": {
             "state": "enabled"
         },
         "windowsWaitlist": {
@@ -1716,15 +2150,27 @@
                     }
                 },
                 "vpnMenuItem": {
+                    "state": "enabled"
+                },
+                "tierMessagingEnabled": {
                     "state": "enabled",
-                    "targets": [
-                        {
-                            "localeCountry": "GB"
-                        },
-                        {
-                            "localeCountry": "US"
-                        }
-                    ]
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "minSupportedVersion": "7.199.0"
                 }
             }
         },
@@ -1897,7 +2343,7 @@
                         "daysInactive": "7"
                     }
                 },
-                "mobileCustomization": {
+                "customization": {
                     "state": "enabled",
                     "minSupportedVersion": "7.198.0",
                     "description": "Allow users to customize button on toolbar and addressbar",
@@ -1905,15 +2351,79 @@
                         "steps": [
                             {
                                 "percent": 25
+                            },
+                            {
+                                "percent": 100
                             }
                         ]
                     }
+                },
+                "productTelemetrySurfaceUsage": {
+                    "state": "disabled",
+                    "minSupportedVersion": "7.199.0",
+                    "description": "Temporarily gather telemetry around product surfaces being used."
+                },
+                "browsingMenuSheetEnabledByDefault": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.206.0",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 1
+                            },
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
+                },
+                "enhancedDataClearingSettings": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.207.0"
+                },
+                "burnSingleTab": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.207.0",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            }
+                        ]
+                    }
+                },
+                "suppressTrackerAnimationOnColdStart": {
+                    "state": "internal",
+                    "minSupportedVersion": "7.207.0"
                 }
             }
         },
         "dbp": {
-            "state": "internal",
+            "state": "enabled",
             "features": {
+                "pirRollout": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.201.1",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 1.0
+                            },
+                            {
+                                "percent": 5.0
+                            },
+                            {
+                                "percent": 15.0
+                            }
+                        ]
+                    }
+                },
                 "waitlistBetaActive": {
                     "state": "disabled"
                 },
@@ -1924,15 +2434,73 @@
                     "state": "disabled"
                 },
                 "remoteBrokerDelivery": {
-                    "state": "internal",
+                    "state": "enabled",
                     "minSupportedVersion": "7.180.0"
                 },
                 "emailConfirmationDecoupling": {
-                    "state": "internal",
+                    "state": "enabled",
                     "minSupportedVersion": "7.190.0"
+                },
+                "clickActionDelayReductionOptimization": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.201.1"
+                },
+                "foregroundRunningOnAppActive": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.201.1"
                 }
             },
-            "minSupportedVersion": "7.180.0"
+            "minSupportedVersion": "7.201.1"
+        },
+        "pageContext": {
+            "state": "internal",
+            "minSupportedVersion": "7.206.0",
+            "exceptions": [],
+            "settings": {
+                "additionalCheck": "enabled",
+                "activeCaptureOnFirstMessage": "enabled",
+                "maxContentLength": 9500,
+                "mainContentSelector": "main, article, .content, .main, #content, #main",
+                "excludeSelectors": [
+                    ".ad",
+                    ".sidebar",
+                    ".footer",
+                    ".nav",
+                    ".header",
+                    ".banner",
+                    ".popup"
+                ],
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "domain": "nba.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/mainContentSelector",
+                                "value": "main"
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "domain": "reddit.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/excludeSelectors/-",
+                                "value": "shreddit-comments-page-ad"
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        "webInterferenceDetection": {
+            "state": "enabled",
+            "minSupportedVersion": "7.202.0"
         }
     },
     "unprotectedTemporary": []

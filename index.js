@@ -144,6 +144,7 @@ const featuresToIncludeTempUnprotectedExceptions = [
     'trackingCookies1p',
     'trackingCookies3p',
     'trackingParameters',
+    'uaChBrands',
     'unprotectedTemporary',
     'webCompat',
 ];

@@ -25,11 +25,34 @@ on:
             - review_requested
 
 jobs:
+    # Dedicated job to sync Asana tasks when PR is closed (merged or abandoned)
+    # Closes tasks for both merged PRs and abandoned PRs to clean up dead tasks
+    # Runs independently of the main workflow
+    sync_asana_on_close:
+        if: github.event.action == 'closed'
+        runs-on: ubuntu-latest
+        steps:
+            - uses: duckduckgo/action-asana-sync@v11
+              with:
+                  ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+                  ASANA_WORKSPACE_ID: ${{ secrets.ASANA_WORKSPACE_ID }}
+                  ASANA_PROJECT_ID: '1206780406371845'
+                  GITHUB_PAT: ${{ secrets.GH_RO_PAT }}
+                  USER_MAP: ${{ vars.USER_MAP }}
+                  ASSIGN_PR_AUTHOR: 'true'
+
     auto_respond:
         runs-on: ubuntu-latest
         concurrency: auto-respond-${{ github.event.pull_request.number }}
 
         steps:
+            - name: Check if holiday period
+              run: |
+                  if [ "$(date -u +%Y%m%d)" -lt "20260105" ]; then
+                      echo "::notice::Auto review bot disabled until Jan 5th 2026"
+                      exit 1
+                  fi
+
             - name: Debounce delay
               run: sleep 5
 
@@ -72,14 +95,10 @@ jobs:
                   path: pr
                   fetch-depth: 0
 
-            - name: Install dependencies
-              run: |
-                  npm install diff fast-json-patch
-
             - name: Run build script on base branch
               run: |
                   cd base
-                  npm install
+                  npm ci
                   node index.js
                   cd ..
 
@@ -89,7 +108,7 @@ jobs:
                   git config --global user.email "dax@duck.com"
                   git config --global user.name "dax"
                   git rebase -X theirs origin/${{ github.event.pull_request.base.ref }}
-                  npm install
+                  npm ci
                   node index.js
                   cd ..
 
@@ -207,8 +226,12 @@ jobs:
                   PR_URL: ${{ github.event.pull_request.html_url }}
                   GITHUB_TOKEN: ${{ secrets.PRIVACY_CONFIG_PAT }}
 
+            # Sync Asana tasks for PRs that need manual review (non-auto-approved)
+            # Task closure on merge is handled by the dedicated close_asana_on_merge job
             - uses: duckduckgo/action-asana-sync@v11
-              if: (steps.wait-for-build.outputs.conclusion == 'success' && steps.approval.outputs.approved == 'true' && steps.check_files.outputs.files_valid == 'true') != true
+              if: |
+                  github.event.action != 'closed' &&
+                  ((steps.wait-for-build.outputs.conclusion == 'success' && steps.approval.outputs.approved == 'true' && steps.check_files.outputs.files_valid == 'true') != true)
               with:
                   ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
                   ASANA_WORKSPACE_ID: ${{ secrets.ASANA_WORKSPACE_ID }}

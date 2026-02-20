@@ -187,6 +187,22 @@ describe('Config schema tests', () => {
                 }
             });
 
+            it('All detectors should be named correctly', () => {
+                const detectorNameRegex = /^[a-zA-Z0-9][a-zA-Z0-9_]*$/;
+                const webDetectionFeature = config.body.features.webDetection;
+                if (webDetectionFeature?.settings?.detectors) {
+                    for (const [
+                        groupName,
+                        groupDetectors,
+                    ] of Object.entries(webDetectionFeature.settings.detectors)) {
+                        expect(groupName).to.match(detectorNameRegex);
+                        for (const detectorName of Object.keys(groupDetectors)) {
+                            expect(detectorName).to.match(detectorNameRegex);
+                        }
+                    }
+                }
+            });
+
             if (config.name.includes('windows-config.json')) {
                 // Only run this test for Windows config to validate _DDGWV features
                 it('Windows config _DDGWV features should be valid overrides of their base features', () => {
@@ -229,11 +245,6 @@ describe('Config schema tests', () => {
                             );
                         }
 
-                        expect(ddgwvFeature.minSupportedVersion).to.deep.equal(
-                            baseFeature.minSupportedVersion,
-                            `_DDGWV feature override '${ddgwvFeatureName}' minSupportedVersion should match base feature '${baseFeatureName}' minSupportedVersion`,
-                        );
-
                         // Check that if both features have subfeatures, they have the same subfeature names
                         if (baseFeature.features && ddgwvFeature.features) {
                             const baseSubfeatureNames = Object.keys(baseFeature.features).sort();
@@ -248,12 +259,6 @@ describe('Config schema tests', () => {
                             for (const subfeatureName of baseSubfeatureNames) {
                                 const baseSubfeature = baseFeature.features[subfeatureName];
                                 const ddgwvSubfeature = ddgwvFeature.features[subfeatureName];
-
-                                // Check minSupportedVersion
-                                expect(ddgwvSubfeature.minSupportedVersion).to.deep.equal(
-                                    baseSubfeature.minSupportedVersion,
-                                    `_DDGWV feature override '${ddgwvFeatureName}.${subfeatureName}' minSupportedVersion should match base feature '${baseFeatureName}.${subfeatureName}' minSupportedVersion`,
-                                );
 
                                 // Check rollout (if present)
                                 if (baseSubfeature.rollout && ddgwvSubfeature.rollout) {

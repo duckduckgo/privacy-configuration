@@ -6,8 +6,9 @@
   "type": "module",
   "scripts": {
     "test": "npm run build && npm run unit-tests && npm run lint && npm run tsc",
-    "lint": "eslint . && prettier . --check",
-    "lint-fix": "eslint . --fix && prettier . --write",
+    "check-lockfile": "node scripts/check-lockfile.mjs",
+    "lint": "npm run check-lockfile && eslint . && prettier . --check",
+    "lint-fix": "npm run check-lockfile && eslint . --fix && prettier . --write",
     "tsc": "tsc",
     "tsc-watch": "tsc --watch",
     "unit-tests": "mocha ./tests/**/*.js",
@@ -19,6 +20,7 @@
   "license": "Apache 2.0",
   "devDependencies": {
     "@duckduckgo/eslint-config": "github:duckduckgo/eslint-config#v0.1.0",
+    "@octokit/rest": "^22.0.1",
     "ajv": "^8.17.1",
     "chai": "^5.2.0",
     "diff": "^7.0.0",

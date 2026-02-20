@@ -62,14 +62,17 @@ type ConditionBlock = {
         cohort: string;
     };
     injectName?: string;
-    minSupportedVersion?: number;
-    maxSupportedVersion?: number;
+    minSupportedVersion?: number | string;
+    maxSupportedVersion?: number | string;
     internal?: boolean;
+    preview?: boolean;
     context?: {
         top?: boolean;
         frame?: boolean;
     };
 };
+
+export type ConditionBlockOrArray = ConditionBlock | ConditionBlock[];
 
 type JSONValidValueType = boolean | string | number | object | Array<boolean | string | number | object>;
 
@@ -79,7 +82,7 @@ type CSSInjectFeatureSettingsPatches = {
         patchSettings: Operation<JSONValidValueType>[];
     }[];
     conditionalChanges?: {
-        condition: ConditionBlock | ConditionBlock[];
+        condition: ConditionBlockOrArray;
         patchSettings: Operation<JSONValidValueType>[];
     }[];
 };

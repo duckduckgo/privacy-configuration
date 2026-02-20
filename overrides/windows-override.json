@@ -51,6 +51,26 @@
                     {
                         "condition": [
                             {
+                                "domain": "facebook.com"
+                            }
+                        ],
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/apiChanges/Notification.permission",
+                                "value": {
+                                    "type": "descriptor",
+                                    "getterValue": {
+                                        "type": "string",
+                                        "value": "denied"
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "condition": [
+                            {
                                 "domain": "1cs.jp"
                             },
                             {
@@ -1241,7 +1261,7 @@
                 },
                 "pageContext": {
                     "minSupportedVersion": "0.136.4",
-                    "state": "preview"
+                    "state": "enabled"
                 },
                 "improvements": {
                     "state": "enabled",
@@ -1255,12 +1275,28 @@
                     }
                 },
                 "standaloneMigration": {
-                    "state": "disabled"
+                    "state": "enabled"
                 },
                 "omnibarToggle": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.143.0"
+                },
+                "omnibarOnboarding": {
+                    "state": "enabled"
+                },
+                "omnibarTools": {
+                    "state": "disabled"
                 },
                 "showHideAiGeneratedImages": {
+                    "state": "enabled"
+                },
+                "supportsSyncChatsDeletion": {
+                    "state": "internal"
+                },
+                "resizableSidebar": {
+                    "state": "enabled"
+                },
+                "detachableSidebar": {
                     "state": "internal"
                 }
             },
@@ -1275,7 +1311,8 @@
         },
         "duckAiDataClearing": {
             "exceptions": [],
-            "state": "disabled",
+            "state": "enabled",
+            "minSupportedVersion": "0.142.0",
             "settings": {
                 "chatsLocalStorageKeys": [
                     "savedAIChats"
@@ -1284,6 +1321,10 @@
                     [
                         "savedAIChatData",
                         "chat-images"
+                    ],
+                    [
+                        "savedAIChatData",
+                        "saved-chats"
                     ]
                 ]
             }
@@ -1298,13 +1339,27 @@
                     "state": "disabled"
                 },
                 "freemium": {
-                    "state": "preview",
+                    "state": "enabled",
                     "minSupportedVersion": "0.140.1",
                     "targets": [
                         {
                             "localeCountry": "US"
                         }
-                    ]
+                    ],
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 20.0
+                            },
+                            {
+                                "percent": 100.0
+                            }
+                        ]
+                    }
+                },
+                "namedPipesConnection": {
+                    "state": "preview",
+                    "minSupportedVersion": "0.146.5"
                 }
             },
             "settings": {
@@ -1318,6 +1373,10 @@
         "brokerProtection": {
             "state": "enabled"
         },
+        "verticalTabs": {
+            "state": "internal",
+            "exceptions": []
+        },
         "windowsPermissionUsage": {
             "state": "enabled"
         },
@@ -1326,7 +1385,7 @@
             "state": "enabled",
             "features": {
                 "startInForeground": {
-                    "state": "internal"
+                    "state": "enabled"
                 }
             }
         },
@@ -1373,6 +1432,9 @@
                     "state": "internal"
                 },
                 "totp": {
+                    "state": "internal"
+                },
+                "autofillOSPasskeys": {
                     "state": "internal"
                 },
                 "siteSpecificFixes": {
@@ -1715,6 +1777,451 @@
                                         }
                                     }
                                 ]
+                            },
+                            {
+                                "domain": [
+                                    "signin.autodesk.com"
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input#firstname_str",
+                                            "type": "identities.firstName"
+                                        }
+                                    },
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input#lastname_str",
+                                            "type": "identities.lastName"
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        "autofill_DDGWV": {
+            "state": "enabled",
+            "exceptions": [
+                {
+                    "domain": "roll20.net",
+                    "reason": "Performance issue for too many fields."
+                }
+            ],
+            "features": {
+                "autofillPopupReuse": {
+                    "state": "disabled"
+                },
+                "deduplicateLoginsOnImport": {
+                    "state": "enabled"
+                },
+                "unknownUsernameCategorization": {
+                    "state": "enabled"
+                },
+                "passwordVariantCategorization": {
+                    "state": "enabled"
+                },
+                "credentialsImportPromotion": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.98.0"
+                },
+                "credentialsImportPromotionForExistingUsers": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.98.0"
+                },
+                "partialFormSaves": {
+                    "state": "enabled"
+                },
+                "autofillCreditCards": {
+                    "state": "enabled"
+                },
+                "autofillCreditCardsOnByDefault": {
+                    "state": "enabled"
+                },
+                "autofillIdentities": {
+                    "state": "enabled"
+                },
+                "autofillIdentitiesOnByDefault": {
+                    "state": "enabled"
+                },
+                "autofillSkipAuthenticationIfVaultEmpty": {
+                    "state": "internal"
+                },
+                "totp": {
+                    "state": "internal"
+                },
+                "autofillOSPasskeys": {
+                    "state": "internal"
+                },
+                "siteSpecificFixes": {
+                    "state": "enabled",
+                    "settings": {
+                        "formTypeSettings": [],
+                        "inputTypeSettings": [],
+                        "formBoundarySelector": "",
+                        "failsafeSettings": {},
+                        "domains": [
+                            {
+                                "domain": [
+                                    "ring.com"
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "body > main > section > form:nth-child(2)",
+                                            "type": "signup"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": [
+                                    "www.joinblvd.com"
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "blvd-wizard-step form",
+                                            "type": "signup"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": [
+                                    "alibris.com"
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "form[action*=\"Guest\"]",
+                                            "type": "signup"
+                                        }
+                                    },
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "form[action*=\"CreateAccount\"]",
+                                            "type": "signup"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": [
+                                    "coolors.co"
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/failsafeSettings/maxInputsPerPage",
+                                        "op": "add",
+                                        "value": 110
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": [
+                                    "areaclientes.orange.es"
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "form",
+                                            "type": "login"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": [
+                                    "estore.archives.gov",
+                                    "localhost"
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "fieldset[id='ucContentMiddleCenter_fldLogin']",
+                                            "type": "login"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": [
+                                    "zendesk.com",
+                                    "localhost"
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "#\\:r0\\:\\-\\-input",
+                                            "type": "credentials.username"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": [
+                                    "cvs.com"
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "profile-lookup[app-name='account-login'] input[type='text']",
+                                            "type": "credentials.username"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": [
+                                    "att.com"
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input[name='Expiration Month']",
+                                            "type": "creditCards.expiration"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": [
+                                    "gamestop.com"
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input[name='dwfrm_profile_customer_email']",
+                                            "type": "identities.emailAddress"
+                                        }
+                                    },
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input[name='dwfrm_profile_login_password']",
+                                            "type": "credentials.password.new"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": [
+                                    "asana.com"
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input.TextInputBase.TokenizerInput-input[data-testid='tokenizer-input'][placeholder='Name or email']",
+                                            "type": "unknown"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": [
+                                    "portal.vectorsecurity.com"
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "form[method='post'][action='/index']",
+                                            "type": "login"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": [
+                                    "reddit.com"
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "rpl-modal-card.settings-row-modal-card[id*='settings-mfa-enable-password']",
+                                            "type": "login"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": [
+                                    "netflix.com"
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "div[data-uia='web-login-form']",
+                                            "type": "login"
+                                        }
+                                    },
+                                    {
+                                        "path": "/formBoundarySelector",
+                                        "op": "replace",
+                                        "value": "div[data-uia='web-login-form']"
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": [
+                                    "aa.com"
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formBoundarySelector",
+                                        "op": "replace",
+                                        "value": "adc-card.adc-card"
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": [
+                                    "bet365.bet.br",
+                                    "bet365.com"
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formBoundarySelector",
+                                        "op": "replace",
+                                        "value": "div[style*=transform] > div"
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": [
+                                    "order.yodobashi.com"
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": ".loginSelectUnit.slctInputUnit",
+                                            "type": "login"
+                                        }
+                                    },
+                                    {
+                                        "path": "/formBoundarySelector",
+                                        "op": "replace",
+                                        "value": ".loginSelectUnit.slctInputUnit"
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": [
+                                    "accounts.google.com"
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formBoundarySelector",
+                                        "op": "replace",
+                                        "value": "c-wiz > main"
+                                    },
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "c-wiz[data-p*=ServiceLogin] > main",
+                                            "type": "login"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": [
+                                    "challenge.spotify.com"
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input[inputmode=\"numeric\"]",
+                                            "type": "unknown"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": [
+                                    "login.coinbase.com"
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input[data-testid='unified-login-email-prompt-input']",
+                                            "type": "credentials.username"
+                                        }
+                                    },
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "span[data-testid='input-interactable-area'] input[type='email']",
+                                            "type": "identities.emailAddress"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domain": [
+                                    "signin.autodesk.com"
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input#firstname_str",
+                                            "type": "identities.firstName"
+                                        }
+                                    },
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input#lastname_str",
+                                            "type": "identities.lastName"
+                                        }
+                                    }
+                                ]
                             }
                         ]
                     }
@@ -1746,6 +2253,10 @@
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3908"
                 },
                 {
+                    "domain": "dillards.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4277"
+                },
+                {
                     "domain": "ynab.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4196"
                 }
@@ -1755,8 +2266,31 @@
             "state": "disabled",
             "exceptions": []
         },
+        "gpc": {
+            "state": "enabled",
+            "exceptions": [
+                {
+                    "domain": "smythstoys.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4548"
+                }
+            ]
+        },
         "navigatorInterface": {
             "state": "enabled"
+        },
+        "newTabPageSessionMonitoring": {
+            "state": "enabled",
+            "exceptions": [],
+            "features": {
+                "entryPoints": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.144.0"
+                },
+                "exitPoints": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.145.0"
+                }
+            }
         },
         "breakageReporting": {
             "state": "enabled",
@@ -1836,7 +2370,8 @@
                         "brave": "enabled",
                         "edge": "enabled",
                         "vivaldi": "disabled",
-                        "chromium": "enabled"
+                        "chromium": "enabled",
+                        "opera": "disabled"
                     }
                 },
                 "bulkBookmarksImport": {
@@ -1853,8 +2388,12 @@
                         "chrome": "enabled",
                         "brave": "enabled",
                         "edge": "enabled",
-                        "firefox": "enabled"
+                        "firefox": "enabled",
+                        "opera": "enabled"
                     }
+                },
+                "importCookies": {
+                    "state": "internal"
                 }
             }
         },
@@ -1978,6 +2517,16 @@
                         "reason": "Required for Google login flow"
                     },
                     {
+                        "domain": "google.com",
+                        "name": "__Secure-3PSIDTS",
+                        "reason": "Required for Google login flow"
+                    },
+                    {
+                        "domain": "google.com",
+                        "name": "__Secure-3PSIDRTS",
+                        "reason": "Required for Google login flow"
+                    },
+                    {
                         "domain": "facebook.com",
                         "name": "xs",
                         "reason": "Required for Facebook login flow"
@@ -1991,6 +2540,11 @@
                         "domain": "bbc.co.uk",
                         "name": "ckns_nonce",
                         "reason": "Required for BBC login flow"
+                    },
+                    {
+                        "domain": "truist.com",
+                        "name": "mrkt_cmp",
+                        "reason": "Required for Truist login flow"
                     }
                 ]
             }
@@ -2009,7 +2563,14 @@
                         "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
                     }
                 ],
-                "omitClientHintMutations": []
+                "omitClientHintMutations": [
+                    {
+                        "domain": "smythstoys.com"
+                    },
+                    {
+                        "domain": "www.smythstoys.com"
+                    }
+                ]
             },
             "features": {
                 "userAgentStrategies": {
@@ -2424,6 +2985,14 @@
                     "state": "enabled"
                 },
                 "fetchFavicons": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.143.0"
+                },
+                "unifyFavorites": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.144.0"
+                },
+                "aiChatSync": {
                     "state": "internal"
                 }
             }
@@ -2539,6 +3108,28 @@
             "state": "enabled",
             "settings": {
                 "allowlistedTrackers": {
+                    "adlightning.com": {
+                        "rules": [
+                            {
+                                "rule": "tagan.adlightning.com",
+                                "domains": [
+                                    "timesofmalta.com"
+                                ],
+                                "reason": "timesofmalta.com - https://github.com/duckduckgo/privacy-configuration/pull/4401"
+                            }
+                        ]
+                    },
+                    "ebxcdn.com": {
+                        "rules": [
+                            {
+                                "rule": "applets.ebxcdn.com/ebx.js",
+                                "domains": [
+                                    "timesofmalta.com"
+                                ],
+                                "reason": "timesofmalta.com - https://github.com/duckduckgo/privacy-configuration/pull/4401"
+                            }
+                        ]
+                    },
                     "tiqcdn.com": {
                         "rules": [
                             {
@@ -2571,6 +3162,17 @@
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2879"
                             }
                         ]
+                    },
+                    "slickstream.com": {
+                        "rules": [
+                            {
+                                "rule": "app-sx.slickstream.com",
+                                "domains": [
+                                    "recipetineats.com"
+                                ],
+                                "reason": "recipetineats.com - https://github.com/duckduckgo/privacy-configuration/pull/4387"
+                            }
+                        ]
                     }
                 }
             }
@@ -2580,6 +3182,15 @@
         },
         "clientBrandHint": {
             "state": "enabled"
+        },
+        "uaChBrands": {
+            "state": "enabled",
+            "exceptions": [
+                {
+                    "domain": "smythstoys.com",
+                    "reason": "Bot check"
+                }
+            ]
         },
         "privacyPro": {
             "state": "enabled",
@@ -2661,6 +3272,29 @@
                     "settings": {
                         "discountPercent": "40"
                     }
+                },
+                "tierMessagingEnabled": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 20
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "minSupportedVersion": "0.143.4"
+                },
+                "allowProTierPurchase": {
+                    "state": "disabled"
                 }
             },
             "settings": {
@@ -2680,19 +3314,6 @@
                 },
                 "enumerateDevices": "enabled",
                 "domains": [
-                    {
-                        "domain": [
-                            "meet.google.com",
-                            "canadiantire.ca"
-                        ],
-                        "patchSettings": [
-                            {
-                                "op": "replace",
-                                "path": "/enumerateDevices",
-                                "value": "disabled"
-                            }
-                        ]
-                    },
                     {
                         "domain": "asana.com",
                         "patchSettings": [
@@ -2745,8 +3366,14 @@
                         "autoRecoveryTabOutOfMemory": false
                     }
                 },
+                "nativeCrashDialog": {
+                    "state": "disabled"
+                },
                 "ignoreInvalidCastExceptionOnDisposal": {
                     "state": "enabled"
+                },
+                "nativeCrashDialogOneShot": {
+                    "state": "disabled"
                 }
             }
         },
@@ -2764,16 +3391,25 @@
                     "state": "enabled"
                 },
                 "crashAutoRecovery": {
-                    "state": "disabled",
-                    "minSupportedVersion": "0.125.0",
+                    "state": "enabled",
+                    "minSupportedVersion": "0.142.1",
                     "settings": {
                         "autoRecoveryBrowserEngine": true,
                         "autoRecoveryTab": true,
                         "autoRecoveryTabOutOfMemory": false
                     }
                 },
+                "nativeCrashDialog": {
+                    "state": "internal"
+                },
                 "ignoreInvalidCastExceptionOnDisposal": {
                     "state": "enabled"
+                },
+                "nativeCrashDialogOneShot": {
+                    "state": "preview",
+                    "settings": {
+                        "generation": 1
+                    }
                 }
             }
         },
@@ -2781,7 +3417,21 @@
             "state": "enabled",
             "features": {
                 "webViewProviderStableOptIn": {
-                    "state": "disabled"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.143.5",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 6.0
+                            },
+                            {
+                                "percent": 15.0
+                            },
+                            {
+                                "percent": 50.0
+                            }
+                        ]
+                    }
                 },
                 "webViewProviderPreviewOptIn": {
                     "state": "preview",
@@ -2796,6 +3446,9 @@
                             },
                             {
                                 "percent": 50.0
+                            },
+                            {
+                                "percent": 100.0
                             }
                         ]
                     }
@@ -2830,10 +3483,16 @@
                     }
                 },
                 "serviceWorkerWatchdog": {
-                    "state": "enabled"
+                    "state": "disabled"
                 },
                 "serviceWorkerWatchdogUnregister": {
-                    "state": "preview"
+                    "state": "disabled"
+                },
+                "filterServiceWorkersFromAutoAttach": {
+                    "state": "enabled",
+                    "settings": {
+                        "useStartupTimeoutInstead": "disabled"
+                    }
                 }
             },
             "exceptions": []
@@ -2864,6 +3523,12 @@
                 "nextStepsWidget": {
                     "state": "enabled"
                 },
+                "nextStepsListWidget": {
+                    "state": "disabled"
+                },
+                "nextStepsListNewLogicWidget": {
+                    "state": "disabled"
+                },
                 "omnibar": {
                     "state": "enabled",
                     "minSupportedVersion": "0.130.0"
@@ -2875,7 +3540,8 @@
                     "state": "disabled"
                 },
                 "autoconsentStats": {
-                    "state": "disabled"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.143.3"
                 }
             },
             "minSupportedVersion": "0.100.0"
@@ -2892,7 +3558,8 @@
             "minSupportedVersion": "0.100.0"
         },
         "addressBarTrackerAnimation": {
-            "state": "disabled",
+            "state": "enabled",
+            "minSupportedVersion": "0.144.0",
             "exceptions": []
         },
         "fullScreenMode": {
@@ -2980,6 +3647,18 @@
                 "downloadNotificationPanel": {
                     "state": "enabled",
                     "minSupportedVersion": "0.142.0"
+                },
+                "downloadOpenItemMethod": {
+                    "state": "internal",
+                    "settings": {
+                        "fileTypes": [
+                            {
+                                "extension": ".exe",
+                                "method": "explorer",
+                                "fallback": true
+                            }
+                        ]
+                    }
                 }
             }
         },
@@ -2991,6 +3670,25 @@
             "state": "enabled",
             "settings": {
                 "surveyRetriggerEnabled": false
+            }
+        },
+        "adBlockV2Extension": {
+            "state": "preview",
+            "minSupportedVersion": "0.148.0",
+            "exceptions": [],
+            "settings": {
+                "extensionUrl": "https://staticcdn.duckduckgo.com/extensions/content-blocker/content-blocker-extension-2026.2.9.crx"
+            },
+            "features": {
+                "onboardingEnabled": {
+                    "state": "disabled"
+                },
+                "migration": {
+                    "state": "enabled"
+                },
+                "watchdog": {
+                    "state": "enabled"
+                }
             }
         },
         "releaseNotes": {
@@ -3154,6 +3852,34 @@
             "features": {
                 "reportExtendedResourceUsageMetrics": {
                     "state": "enabled"
+                },
+                "reportMsixLogs": {
+                    "state": "enabled",
+                    "settings": {
+                        "ErrorCodes": [
+                            -2147009284
+                        ],
+                        "AllowList": [
+                            "ya2fgkz3nks94",
+                            "qzdjx70tn762j",
+                            "DuckDuckGo",
+                            "8wekyb3d8bbwe"
+                        ],
+                        "DenyList": [],
+                        "LogLevelExceptions": [
+                            1,
+                            2
+                        ]
+                    }
+                }
+            }
+        },
+        "nativeCrashReporting": {
+            "state": "enabled",
+            "exceptions": [],
+            "features": {
+                "canShowNativeCrashReportingDialog": {
+                    "state": "disabled"
                 }
             }
         },
@@ -3215,6 +3941,17 @@
             },
             "exceptions": []
         },
+        "tabProgressIndicator": {
+            "state": "internal",
+            "exceptions": []
+        },
+        "performanceMetrics": {
+            "state": "enabled",
+            "settings": {
+                "firstContentfulPaint": "enabled",
+                "expandedPerformanceMetricsOnLoad": "disabled"
+            }
+        },
         "taskbar": {
             "state": "enabled",
             "exceptions": [],
@@ -3229,23 +3966,30 @@
             }
         },
         "serp": {
-            "state": "internal",
+            "state": "enabled",
             "exceptions": [],
             "features": {
                 "storeSerpSettings": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.143.4",
+                    "rollout": {
+                        "steps": [
+                            { "percent": 5 },
+                            { "percent": 20 },
+                            { "percent": 50 },
+                            { "percent": 100 }]
+                    }
                 }
             }
         },
         "urlPredictor": {
-            "state": "internal",
+            "state": "enabled",
             "settings": {
                 "allowedSchemes": [
                     "http",
                     "https",
                     "file",
                     "mailto",
-                    "chrome",
                     "duck"
                 ]
             }
@@ -3254,17 +3998,395 @@
             "state": "enabled",
             "features": {
                 "uninstallButton": {
-                    "state": "enabled"
+                    "state": "disabled"
                 }
             }
         },
         "combinedPermissionView": {
-            "state": "disabled",
+            "state": "internal",
             "exceptions": []
         },
         "unsetAsDefaultMonitor": {
             "state": "enabled",
             "exceptions": []
+        },
+        "attributedMetrics": {
+            "state": "enabled",
+            "minSupportedVersion": "0.141.7",
+            "exceptions": [],
+            "features": {
+                "canEmitInactivity": {
+                    "state": "disabled"
+                },
+                "emitAllMetrics": {
+                    "state": "disabled"
+                },
+                "retention": {
+                    "state": "disabled"
+                },
+                "canEmitRetention": {
+                    "state": "disabled"
+                },
+                "searchDaysAvg": {
+                    "state": "disabled"
+                },
+                "canEmitSearchDaysAvg": {
+                    "state": "disabled"
+                },
+                "searchCountAvg": {
+                    "state": "disabled"
+                },
+                "canEmitSearchCountAvg": {
+                    "state": "disabled"
+                },
+                "adClickCountAvg": {
+                    "state": "disabled"
+                },
+                "canEmitAdClickCountAvg": {
+                    "state": "disabled"
+                },
+                "aiUsageAvg": {
+                    "state": "disabled"
+                },
+                "canEmitAIUsageAvg": {
+                    "state": "disabled"
+                },
+                "subscriptionRetention": {
+                    "state": "disabled"
+                },
+                "canEmitSubscriptionRetention": {
+                    "state": "disabled"
+                },
+                "syncDevices": {
+                    "state": "disabled"
+                },
+                "canEmitSyncDevices": {
+                    "state": "disabled"
+                },
+                "sendOriginParam": {
+                    "state": "disabled",
+                    "settings": {
+                        "originCampaignSubstrings": [
+                            "paid"
+                        ]
+                    }
+                }
+            }
+        },
+        "requestBlocklist": {
+            "state": "enabled"
+        },
+        "passwordManagerExtensions": {
+            "state": "internal",
+            "exceptions": [],
+            "settings": {
+                "manifestXml": "https://staticcdn.duckduckgo.com/d5c04536-5379-4709-8d19-d13fdd456ff6/extensions-test/manifest.xml"
+            },
+            "features": {
+                "bitwarden": {
+                    "state": "internal",
+                    "settings": {
+                        "id": "nngceckbapebfimnlniiiahkandclblb"
+                    }
+                },
+                "lastpass": {
+                    "state": "internal",
+                    "settings": {
+                        "id": "hdokiejnpimakedhajhdlcegeplioahd"
+                    }
+                },
+                "onepassword": {
+                    "state": "internal",
+                    "settings": {
+                        "id": "aeblfdkhhhdcdjpifhhbdiojplfjncoa"
+                    }
+                },
+                "roboform": {
+                    "state": "internal",
+                    "settings": {
+                        "id": "pnlccmojcmeohlpggmfnbbiapkmbliob"
+                    }
+                }
+            }
+        },
+        "tabPanelDeferChanges": {
+            "state": "disabled",
+            "exceptions": [],
+            "features": {
+                "tabPanelDeferChangesRollout": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 20
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        "webDetection": {
+            "state": "enabled",
+            "minSupportedVersion": "0.147.0"
+        },
+        "webInterferenceDetection": {
+            "state": "enabled",
+            "minSupportedVersion": "0.146.0",
+            "exceptions": [],
+            "settings": {
+                "autoRunDelayMs": 100,
+                "interferenceTypes": {
+                    "adwallDetection": {
+                        "generic": {
+                            "state": "enabled",
+                            "textPatterns": [
+                                "ad ?block(er)? detected",
+                                "adjust(ing)?( your)? ad blocking settings",
+                                "(turn off|disable|disabling|deactivate)( your| my)? ad ?block(er)?",
+                                "your ad ?blocker is on",
+                                "you('re| are| may be) using an ad blocker"
+                            ],
+                            "textSources": [
+                                "innerText"
+                            ]
+                        },
+                        "generic_de": {
+                            "state": "enabled",
+                            "textPatterns": [
+                                "deaktivieren sie ihren adblocker",
+                                "deaktivieren sie ihre blocker",
+                                "adblocker zu deaktivieren",
+                                "adblocker deaktivieren",
+                                "sie einen adblocker verwenden"
+                            ],
+                            "textSources": [
+                                "innerText"
+                            ]
+                        },
+                        "generic_es": {
+                            "state": "enabled",
+                            "textPatterns": [
+                                "en esta web no aceptamos el uso de adblock"
+                            ],
+                            "textSources": [
+                                "innerText"
+                            ]
+                        },
+                        "generic_it": {
+                            "state": "enabled",
+                            "textPatterns": [
+                                "disattiva l'ad block",
+                                "stai usando un ad block"
+                            ],
+                            "textSources": [
+                                "innerText"
+                            ]
+                        },
+                        "generic_nl": {
+                            "state": "enabled",
+                            "textPatterns": [
+                                "adblock gedetecteerd",
+                                "schakel je adblocker uit om de video te bekijken"
+                            ],
+                            "textSources": [
+                                "innerText"
+                            ]
+                        },
+                        "generic_se": {
+                            "state": "enabled",
+                            "textPatterns": [
+                                "har du en annonsblockerare igång",
+                                "avaktivera din annonsblockerare"
+                            ],
+                            "textSources": [
+                                "innerText"
+                            ]
+                        }
+                    },
+                    "botDetection": {
+                        "cloudflareTurnstile": {
+                            "state": "enabled",
+                            "vendor": "cloudflare",
+                            "selectors": [
+                                ".cf-turnstile",
+                                "script[src*=\"challenges.cloudflare.com\"]"
+                            ],
+                            "windowProperties": [
+                                "turnstile"
+                            ],
+                            "statusSelectors": [
+                                {
+                                    "status": "solved",
+                                    "selectors": [
+                                        "[data-state=\"success\"]"
+                                    ]
+                                },
+                                {
+                                    "status": "failed",
+                                    "selectors": [
+                                        "[data-state=\"error\"]"
+                                    ]
+                                }
+                            ]
+                        },
+                        "cloudflareChallengePage": {
+                            "state": "enabled",
+                            "vendor": "cloudflare",
+                            "selectors": [
+                                "#challenge-form",
+                                ".cf-browser-verification",
+                                "#cf-wrapper",
+                                "script[src*=\"challenges.cloudflare.com\"]"
+                            ],
+                            "windowProperties": [
+                                "_cf_chl_opt",
+                                "__CF$cv$params",
+                                "cfjsd"
+                            ]
+                        },
+                        "hcaptcha": {
+                            "state": "enabled",
+                            "vendor": "hcaptcha",
+                            "selectors": [
+                                ".h-captcha",
+                                "[data-hcaptcha-widget-id]",
+                                "script[src*=\"hcaptcha.com\"]",
+                                "script[src*=\"assets.hcaptcha.com\"]"
+                            ],
+                            "windowProperties": [
+                                "hcaptcha"
+                            ]
+                        }
+                    },
+                    "fraudDetection": {
+                        "phishingWarning": {
+                            "state": "enabled",
+                            "type": "phishing",
+                            "selectors": [
+                                ".warning-banner",
+                                "#security-alert"
+                            ],
+                            "textPatterns": [
+                                "suspicious.*activity",
+                                "unusual.*login",
+                                "verify.*account"
+                            ],
+                            "textSources": [
+                                "innerText"
+                            ]
+                        },
+                        "accountSuspension": {
+                            "state": "enabled",
+                            "type": "suspension",
+                            "selectors": [
+                                ".account-suspended",
+                                "#suspension-notice"
+                            ],
+                            "textPatterns": [
+                                "account.*suspended",
+                                "access.*restricted"
+                            ],
+                            "textSources": [
+                                "innerText"
+                            ]
+                        }
+                    },
+                    "youtubeAds": {
+                        "state": "enabled",
+                        "sweepIntervalMs": 2000,
+                        "slowLoadThresholdMs": 2000,
+                        "playerSelectors": [
+                            "#movie_player",
+                            ".html5-video-player",
+                            "#player"
+                        ],
+                        "adClasses": [
+                            "ytp-ad-text",
+                            "ytp-ad-skip-button",
+                            "ytp-ad-skip-button-container",
+                            "ytp-ad-message-container",
+                            "ytp-ad-player-overlay",
+                            "ytp-ad-image-overlay",
+                            "video-ads",
+                            "ad-showing",
+                            "ad-interrupting"
+                        ],
+                        "adTextPatterns": [
+                            "\\badvertisement\\b",
+                            "\\bskip ad\\b",
+                            "\\bskip ads\\b",
+                            "^ad\\s*[•:·]"
+                        ],
+                        "staticAdSelectors": {
+                            "background": ".player-container-background",
+                            "thumbnail": ".player-container-background-image, .player-container-background ytd-thumbnail",
+                            "image": ".player-container-background yt-image"
+                        },
+                        "playabilityErrorSelectors": [
+                            "ytm-player-error-message-renderer",
+                            "yt-player-error-message-renderer",
+                            ".ytp-error",
+                            ".playability-status-message",
+                            ".playability-reason"
+                        ],
+                        "playabilityErrorPatterns": [
+                            "content isn't available",
+                            "video (is )?unavailable",
+                            "playback (is )?disabled",
+                            "confirm you're not a (ro)?bot",
+                            "sign in to confirm",
+                            "unusual traffic",
+                            "try again later"
+                        ],
+                        "adBlockerDetectionSelectors": [
+                            "ytd-enforcement-message-view-model",
+                            "ytd-popup-container tp-yt-paper-dialog",
+                            "tp-yt-paper-dialog",
+                            ".ytd-enforcement-message-view-model",
+                            "#dialog",
+                            "[role=\"dialog\"]"
+                        ],
+                        "adBlockerDetectionPatterns": [
+                            "ad\\s*blockers?\\s*(are)?\\s*not allowed",
+                            "using an ad\\s*blocker",
+                            "allow youtube ads",
+                            "disable.*ad\\s*blocker",
+                            "turn off.*ad\\s*blocker",
+                            "ad\\s*blocker.*detected",
+                            "ad\\s*blocking",
+                            "will be blocked after \\d+ videos?",
+                            "playback will be blocked",
+                            "playback is blocked",
+                            "youtube is allowlisted",
+                            "video player will be blocked",
+                            "ad\\s*blockers?\\s*violate",
+                            "violate.*terms of service"
+                        ],
+                        "loginStateSelectors": {
+                            "signInButton": "a[href*=\"accounts.google.com/ServiceLogin\"]",
+                            "avatarButton": "#avatar-btn",
+                            "premiumLogo": "ytd-topbar-logo-renderer a[title*=\"Premium\"]"
+                        }
+                    }
+                }
+            }
+        },
+        "addressBar": {
+            "exceptions": [],
+            "state": "enabled",
+            "features": {
+                "instantSuggestions": {
+                    "state": "disabled"
+                }
+            }
+        },
+        "startupTiming": {
+            "state": "internal",
+            "exceptions": []
+        },
+        "topmostWindowActivation": {
+            "exceptions": [],
+            "state": "disabled"
         }
     },
     "unprotectedTemporary": []
