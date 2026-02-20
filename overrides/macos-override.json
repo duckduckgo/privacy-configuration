@@ -359,7 +359,7 @@
                     "state": "enabled"
                 },
                 "pageContext": {
-                    "state": "enabled",
+                    "state": "internal",
                     "minSupportedVersion": "1.177.0"
                 },
                 "applicationMenuShortcut": {
@@ -2043,6 +2043,18 @@
                     ".popup"
                 ],
                 "conditionalChanges": [
+                    {
+                        "condition": {
+                            "internal": true
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/additionalCheck",
+                                "value": "enabled"
+                            }
+                        ]
+                    },
                     {
                         "condition": {
                             "domain": "nba.com"
