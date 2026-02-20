@@ -11,17 +11,39 @@ export const AUTO_APPROVABLE_FEATURES = {
         '/settings/domains',
         '/exceptions',
     ],
-    '/features/fingerprintingTemporaryStorage': ['/exceptions'],
-    '/features/fingerprintingAudio': ['/exceptions'],
-    '/features/fingerprintingBattery': ['/exceptions'],
-    '/features/fingerprintingCanvas': ['/exceptions'],
-    '/features/fingerprintingHardware': ['/exceptions'],
-    '/features/fingerprintingScreenSize': ['/exceptions'],
-    '/features/trackerAllowlist': ['/settings/allowlistedTrackers'],
-    '/features/gpc': ['/exceptions'],
-    '/features/webCompat': ['/exceptions'],
-    '/features/clickToLoad': ['/exceptions'],
-    '/features/eme': ['/exceptions'],
+    '/features/fingerprintingTemporaryStorage': [
+        '/exceptions',
+    ],
+    '/features/fingerprintingAudio': [
+        '/exceptions',
+    ],
+    '/features/fingerprintingBattery': [
+        '/exceptions',
+    ],
+    '/features/fingerprintingCanvas': [
+        '/exceptions',
+    ],
+    '/features/fingerprintingHardware': [
+        '/exceptions',
+    ],
+    '/features/fingerprintingScreenSize': [
+        '/exceptions',
+    ],
+    '/features/trackerAllowlist': [
+        '/settings/allowlistedTrackers',
+    ],
+    '/features/gpc': [
+        '/exceptions',
+    ],
+    '/features/webCompat': [
+        '/exceptions',
+    ],
+    '/features/clickToLoad': [
+        '/exceptions',
+    ],
+    '/features/eme': [
+        '/exceptions',
+    ],
     '/features/autoconsent': [
         '/exceptions',
         '/settings/disabledCMPs',
@@ -32,7 +54,9 @@ export const AUTO_APPROVABLE_FEATURES = {
         '/settings/omitApplicationSites',
         '/settings/defaultSites',
     ],
-    '/features/mediaPlaybackRequiresUserGesture': ['/exceptions'],
+    '/features/mediaPlaybackRequiresUserGesture': [
+        '/exceptions',
+    ],
 };
 
 /**
