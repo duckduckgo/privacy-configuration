@@ -1,32 +1,29 @@
 import { CSSInjectFeatureSettings, Feature, FeatureState } from '../feature';
 
-/**
- * Counter parameter: increments when its source event fires.
- */
+type BucketDefinition = {
+    minInclusive: number;
+    maxExclusive?: number;
+    name: string;
+};
+
 type CounterParameter = {
     template: 'counter';
     source: string;
-    buckets: string[];
+    buckets: BucketDefinition[];
 };
 
 // Future parameter types would be added as union members
 type TelemetryParameter = CounterParameter;
 
-/**
- * Period trigger: fires the pixel on a regular cadence.
- */
 type PeriodTrigger = {
     period: {
+        seconds?: number;
         minutes?: number;
         hours?: number;
         days?: number;
-        maxStaggerMins?: number;
     };
 };
 
-/**
- * A telemetry pixel definition.
- */
 type TelemetryPixel = {
     state: FeatureState;
     trigger: PeriodTrigger;
