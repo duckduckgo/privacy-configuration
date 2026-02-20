@@ -1432,6 +1432,9 @@
                 "totp": {
                     "state": "internal"
                 },
+                "autofillOSPasskeys": {
+                    "state": "internal"
+                },
                 "siteSpecificFixes": {
                     "state": "enabled",
                     "settings": {
@@ -1819,6 +1822,9 @@
                     "state": "internal"
                 },
                 "totp": {
+                    "state": "internal"
+                },
+                "autofillOSPasskeys": {
                     "state": "internal"
                 },
                 "siteSpecificFixes": {
@@ -2403,6 +2409,10 @@
                     {
                         "domain": "payments.google.com",
                         "reason": "After sign-in for Google Pay flows (after flickering is resolved), blocking this causes the loading spinner to spin indefinitely, and the payment flow cannot proceed."
+                    },
+                    {
+                        "domain": "docs.google.com",
+                        "reason": "Embedded Google docs get into redirect loop if signed into a Google account"
                     },
                     {
                         "domain": "disneyplus.com",
@@ -3299,7 +3309,14 @@
                     "state": "enabled"
                 },
                 "nativeCrashDialogOneShot": {
-                    "state": "disabled"
+                    "state": "disabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5.0
+                            }
+                        ]
+                    }
                 }
             }
         },
@@ -3332,7 +3349,14 @@
                     "state": "enabled"
                 },
                 "nativeCrashDialogOneShot": {
-                    "state": "preview",
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5.0
+                            }
+                        ]
+                    },
                     "settings": {
                         "generation": 1
                     }
@@ -3450,7 +3474,7 @@
                     "state": "enabled"
                 },
                 "nextStepsListWidget": {
-                    "state": "disabled"
+                    "state": "enabled"
                 },
                 "nextStepsListNewLogicWidget": {
                     "state": "disabled"
@@ -3599,7 +3623,7 @@
             }
         },
         "adBlockV2Extension": {
-            "state": "preview",
+            "state": "disabled",
             "minSupportedVersion": "0.148.0",
             "exceptions": [],
             "settings": {
@@ -4307,6 +4331,10 @@
         "startupTiming": {
             "state": "internal",
             "exceptions": []
+        },
+        "topmostWindowActivation": {
+            "exceptions": [],
+            "state": "disabled"
         }
     },
     "unprotectedTemporary": []

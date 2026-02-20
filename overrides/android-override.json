@@ -484,7 +484,19 @@
                 "automaticContextAttachment": {
                     "state": "enabled",
                     "minSupportedVersion": 52680000
+                    "state": "internal"
+                },
+                "aiChatSuggestions": {
+                    "state": "internal"
                 }
+            }
+        },
+        "duckAiChatHistory": {
+            "state": "internal",
+            "exceptions": [],
+            "settings": {
+                "chatsLocalStorageKeys": ["savedAIChats"],
+                "maxHistoryCount": 10
             }
         },
         "ampLinks": {
@@ -2514,6 +2526,21 @@
                                 "value": "disabled"
                             }
                         ]
+                    },
+                    {
+                        "condition": {
+                            "experiment": {
+                                "experimentName": "contentScopeExperiment2",
+                                "cohort": "treatment"
+                            }
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/permissionsPresent/state",
+                                "value": "enabled"
+                            }
+                        ]
                     }
                 ],
                 "cleanIframeValue": {
@@ -2605,6 +2632,9 @@
                             "name": "window_placement"
                         }
                     }
+                },
+                "permissionsPresent": {
+                    "state": "disabled"
                 },
                 "mediaSession": "enabled",
                 "presentation": "disabled",
@@ -3603,6 +3633,27 @@
                             },
                             {
                                 "percent": 50
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "contentScopeExperiment2": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52680000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 100
                             }
                         ]
                     },
