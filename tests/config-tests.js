@@ -153,7 +153,9 @@ describe('Config schema tests', () => {
                     }
                 }
 
-                const legacyFeatures = ['networkProtection'];
+                const legacyFeatures = [
+                    'networkProtection',
+                ];
                 for (const featureName of Object.keys(config.body.features)) {
                     // Ignore a non C-S-S feature that uses "domains"
                     if (legacyFeatures.includes(featureName)) {
@@ -332,7 +334,9 @@ describe('Config schema tests', () => {
                 if (!('features' in overrideFeature)) continue;
                 // Skip over if we have no subfeatures
                 if (!('features' in baseFeature)) continue;
-                for (const [subFeatureName] of Object.entries(baseFeature.features)) {
+                for (const [
+                    subFeatureName,
+                ] of Object.entries(baseFeature.features)) {
                     expect(overrideFeature.features[subFeatureName]).to.be.an(
                         'object',
                         `Missing override for ${platform} ${featureName}.${subFeatureName}`,
