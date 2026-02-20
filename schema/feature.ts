@@ -14,7 +14,6 @@ export type FeatureState = 'enabled' | 'disabled' | 'internal' | 'preview';
 
 type FeatureMeta = {
     description: string;
-    sampleExcludeRecords?: any;
 };
 
 /* Note this defaults to Record<string, string>
