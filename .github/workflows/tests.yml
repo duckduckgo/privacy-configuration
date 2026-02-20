@@ -50,5 +50,5 @@ jobs:
                   git add .
                   if ! git diff --cached --quiet; then
                     git commit -m "chore: auto-fix lint errors"
-                    git push
+                    git push origin HEAD:${{ github.event.pull_request.head.ref }}
                   fi
