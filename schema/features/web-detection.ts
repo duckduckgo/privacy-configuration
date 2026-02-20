@@ -22,6 +22,10 @@ type Actions = Partial<{
     breakageReportData: {
         state?: FeatureState;
     };
+    fireEvent: {
+        state?: FeatureState;
+        event: string;
+    };
 }>;
 
 export type ConditionTypes = {
