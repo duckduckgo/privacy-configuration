@@ -11,7 +11,7 @@ jobs:
         steps:
             - uses: actions/checkout@v5
             - name: Use Node.js 20
-              uses: actions/setup-node@v5
+              uses: actions/setup-node@v6
               with:
                   node-version: 20.x
             - name: Install dependencies
@@ -29,7 +29,7 @@ jobs:
                   repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
                   ref: ${{ github.event.pull_request.head.ref || github.ref }}
             - name: Use Node.js 20
-              uses: actions/setup-node@v5
+              uses: actions/setup-node@v6
               with:
                   node-version: 20.x
             - name: Install dependencies
