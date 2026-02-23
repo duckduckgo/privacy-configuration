@@ -1,0 +1,57 @@
+{
+    "_meta": {
+        "description": "Event hub for client-side telemetry aggregation and pixel firing."
+    },
+    "state": "disabled",
+    "exceptions": [],
+    "settings": {
+        "telemetry": {
+            "webTelemetry_adwalls_day": {
+                "state": "enabled",
+                "trigger": {
+                    "period": {
+                        "days": 1
+                    }
+                },
+                "parameters": {
+                    "adwallCount": {
+                        "template": "counter",
+                        "source": "adwall",
+                        "buckets": [
+                            { "minInclusive": 0, "maxExclusive": 1, "name": "0" },
+                            { "minInclusive": 1, "maxExclusive": 3, "name": "1-2" },
+                            { "minInclusive": 3, "maxExclusive": 6, "name": "3-5" },
+                            { "minInclusive": 6, "maxExclusive": 11, "name": "6-10" },
+                            { "minInclusive": 11, "maxExclusive": 21, "name": "11-20" },
+                            { "minInclusive": 21, "maxExclusive": 40, "name": "21-39" },
+                            { "minInclusive": 40, "name": "40+" }
+                        ]
+                    }
+                }
+            },
+            "webTelemetry_adwalls_week": {
+                "state": "enabled",
+                "trigger": {
+                    "period": {
+                        "days": 7
+                    }
+                },
+                "parameters": {
+                    "adwallCount": {
+                        "template": "counter",
+                        "source": "adwall",
+                        "buckets": [
+                            { "minInclusive": 0, "maxExclusive": 1, "name": "0" },
+                            { "minInclusive": 1, "maxExclusive": 3, "name": "1-2" },
+                            { "minInclusive": 3, "maxExclusive": 6, "name": "3-5" },
+                            { "minInclusive": 6, "maxExclusive": 11, "name": "6-10" },
+                            { "minInclusive": 11, "maxExclusive": 21, "name": "11-20" },
+                            { "minInclusive": 21, "maxExclusive": 40, "name": "21-39" },
+                            { "minInclusive": 40, "name": "40+" }
+                        ]
+                    }
+                }
+            }
+        }
+    }
+}

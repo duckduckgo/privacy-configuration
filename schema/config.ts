@@ -23,6 +23,7 @@ import { BurnFeature } from './features/burn';
 import { Taskbar } from './features/taskbar';
 import { AppHealth } from './features/appHealth';
 import { ElementHidingFeature } from './features/element-hiding';
+import { EventHubFeature } from './features/event-hub';
 import { RequestBlocklistFeature } from './features/request-blocklist';
 import { UaChBrandsFeature } from './features/ua-ch-brands';
 import { UrlPredictorFeature } from './features/url-predictor';
@@ -82,6 +83,7 @@ export type ConfigV5<VersionType> = {
         customUserAgent?: CustomUserAgentFeature<VersionType>;
         downloadManager?: DownloadManager<VersionType>;
         elementHiding?: ElementHidingFeature<VersionType>;
+        eventHub?: EventHubFeature<VersionType>;
         requestBlocklist?: RequestBlocklistFeature<VersionType>;
         uaChBrands?: UaChBrandsFeature<VersionType>;
         urlPredictor?: UrlPredictorFeature<VersionType>;

@@ -314,6 +314,76 @@ describe('Config schema tests', () => {
     }
 });
 
+describe('EventHub validation tests', () => {
+    for (const config of latestConfigs) {
+        const eventHub = config.body.features?.eventHub;
+        if (!eventHub?.settings?.telemetry) continue;
+
+        const telemetry = eventHub.settings.telemetry;
+
+        describe(`${config.name} eventHub`, () => {
+            it('telemetry entry names should not contain dots', () => {
+                for (const name of Object.keys(telemetry)) {
+                    expect(name).to.not.include(
+                        '.',
+                        `Telemetry name '${name}' contains dots; use underscores instead`,
+                    );
+                }
+            });
+
+            it('trigger period must specify at least one time unit', () => {
+                for (const [name, entry] of Object.entries(telemetry)) {
+                    const period = entry.trigger?.period;
+                    expect(period).to.be.an('object', `Telemetry '${name}' is missing trigger.period`);
+                    const hasTimeUnit = ['seconds', 'minutes', 'hours', 'days'].some((unit) => unit in period);
+                    expect(hasTimeUnit).to.equal(
+                        true,
+                        `Telemetry '${name}' period must specify at least one of: seconds, minutes, hours, days`,
+                    );
+                }
+            });
+
+            for (const [entryName, entry] of Object.entries(telemetry)) {
+                for (const [paramName, param] of Object.entries(entry.parameters || {})) {
+                    if (!Array.isArray(param.buckets) || param.buckets.length === 0) continue;
+
+                    describe(`${entryName}.${paramName} buckets`, () => {
+                        it('should have no gaps between consecutive buckets', () => {
+                            for (let i = 1; i < param.buckets.length; i++) {
+                                const prev = param.buckets[i - 1];
+                                const curr = param.buckets[i];
+                                if (prev.maxExclusive !== undefined) {
+                                    expect(curr.minInclusive).to.equal(
+                                        prev.maxExclusive,
+                                        `Gap between bucket '${prev.name}' (maxExclusive: ${prev.maxExclusive}) and '${curr.name}' (minInclusive: ${curr.minInclusive})`,
+                                    );
+                                }
+                            }
+                        });
+
+                        it('should be ordered sequentially by minInclusive', () => {
+                            for (let i = 1; i < param.buckets.length; i++) {
+                                expect(param.buckets[i].minInclusive).to.be.greaterThan(
+                                    param.buckets[i - 1].minInclusive,
+                                    `Bucket '${param.buckets[i].name}' (minInclusive: ${param.buckets[i].minInclusive}) is not ordered after '${param.buckets[i - 1].name}' (minInclusive: ${param.buckets[i - 1].minInclusive})`,
+                                );
+                            }
+                        });
+
+                        it('should have at most one unbounded bucket (missing maxExclusive)', () => {
+                            const unbounded = param.buckets.filter((b) => b.maxExclusive === undefined);
+                            expect(unbounded.length).to.be.at.most(
+                                1,
+                                `Found ${unbounded.length} unbounded buckets: ${unbounded.map((b) => b.name).join(', ')}`,
+                            );
+                        });
+                    });
+                }
+            }
+        });
+    }
+});
+
 describe('Config schema tests', () => {
     it('All subfeatures must be defined in their overrides files if they apply', () => {
         const baseFeatures = getBaseFeatureConfigs();
