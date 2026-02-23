@@ -499,7 +499,7 @@ describe('WebDetection validation tests', () => {
                     config.body.features?.eventHub
                 )?.settings.telemetry;
                 const knownSources = new Set();
-                for (const entry of Object.values(eventHubTelemetry)) {
+                for (const entry of Object.values(eventHubTelemetry ?? {})) {
                     for (const param of Object.values(entry.parameters)) {
                         if (param.source) knownSources.add(param.source);
                     }
