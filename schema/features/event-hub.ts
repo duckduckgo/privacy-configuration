@@ -8,7 +8,7 @@ type CounterBucket = {
     minInclusive: number;
     maxExclusive?: number;
     name: string;
-}
+};
 
 type TelemetryParameterCounter = TelemetryParameterBase & {
     template: 'counter';

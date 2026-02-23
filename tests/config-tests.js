@@ -353,10 +353,18 @@ describe('EventHub validation tests', () => {
             });
 
             it('trigger period must specify at least one time unit', () => {
-                for (const [name, entry] of Object.entries(telemetry)) {
+                for (const [
+                    name,
+                    entry,
+                ] of Object.entries(telemetry)) {
                     const period = entry.trigger?.period;
                     expect(period).to.be.an('object', `Telemetry '${name}' is missing trigger.period`);
-                    const hasTimeUnit = ['seconds', 'minutes', 'hours', 'days'].some((unit) => unit in period);
+                    const hasTimeUnit = [
+                        'seconds',
+                        'minutes',
+                        'hours',
+                        'days',
+                    ].some((unit) => unit in period);
                     expect(hasTimeUnit).to.equal(
                         true,
                         `Telemetry '${name}' period must specify at least one of: seconds, minutes, hours, days`,
@@ -364,8 +372,14 @@ describe('EventHub validation tests', () => {
                 }
             });
 
-            for (const [entryName, entry] of Object.entries(telemetry)) {
-                for (const [paramName, param] of Object.entries(entry.parameters || {})) {
+            for (const [
+                entryName,
+                entry,
+            ] of Object.entries(telemetry)) {
+                for (const [
+                    paramName,
+                    param,
+                ] of Object.entries(entry.parameters || {})) {
                     if (!Array.isArray(param.buckets) || param.buckets.length === 0) continue;
 
                     describe(`${entryName}.${paramName} buckets`, () => {
@@ -415,7 +429,10 @@ describe('WebDetection validation tests', () => {
         describe(`${config.name} webDetection`, () => {
             it('detector and group names should be named correctly', () => {
                 const detectorNameRegex = /^[a-zA-Z][a-zA-Z0-9_]*$/;
-                for (const [groupName, groupDetectors] of Object.entries(detectors)) {
+                for (const [
+                    groupName,
+                    groupDetectors,
+                ] of Object.entries(detectors)) {
                     expect(groupName).to.match(detectorNameRegex);
                     for (const detectorName of Object.keys(groupDetectors)) {
                         expect(detectorName).to.match(detectorNameRegex);
@@ -432,13 +449,21 @@ describe('WebDetection validation tests', () => {
                     }
                 }
 
-                for (const [groupName, groupDetectors] of Object.entries(detectors)) {
-                    for (const [detectorName, detector] of Object.entries(groupDetectors)) {
+                for (const [
+                    groupName,
+                    groupDetectors,
+                ] of Object.entries(detectors)) {
+                    for (const [
+                        detectorName,
+                        detector,
+                    ] of Object.entries(groupDetectors)) {
                         const type = detector.actions?.fireEvent?.type;
                         if (!type) continue;
                         expect(knownSources.has(type)).to.equal(
                             true,
-                            `Detector '${groupName}.${detectorName}' fires event type '${type}' but no eventHub parameter has source '${type}' (known sources: ${[...knownSources].join(', ')})`,
+                            `Detector '${groupName}.${detectorName}' fires event type '${type}' but no eventHub parameter has source '${type}' (known sources: ${[
+                                ...knownSources,
+                            ].join(', ')})`,
                         );
                     }
                 }
