@@ -35,8 +35,10 @@
 ## Adding New Features to Bugbot
 
 ### Template for New Feature Validation
-When adding new features to this repository, follow this pattern:
+When adding new features to this repository, the following are **entirely optional** and should only be done when clearly beneficial:
 
-1. **Add a reference section to this `BUGBOT.md`** with links to the schema and configuration (see Element Hiding or Request Blocklist sections as examples)
+- **Add a reference section to this `BUGBOT.md`** with links to the schema and configuration — only if the feature has specific validation concerns that the bot should check for.
 
-2. **Optionally** create a `.cursor/rules/new-feature.mdc` if the feature has complex validation logic or non-obvious configuration patterns that benefit from developer guidance. Most features do not need one — only add it when clearly required.
+- **Create a `.cursor/rules/new-feature.mdc`** — only if the feature has complex validation logic or non-obvious configuration patterns. Most features do not need one.
+
+Do **not** flag PRs for missing documentation files.
