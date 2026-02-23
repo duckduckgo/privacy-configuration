@@ -20,7 +20,7 @@ type Triggers = Partial<{
 
 type ActionBase = {
     state?: FeatureState;
-}
+};
 
 type Actions = Partial<{
     breakageReportData: ActionBase;
