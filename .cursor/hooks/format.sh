@@ -7,7 +7,7 @@ if [[ -z "$payload" ]]; then
     exit 0
 fi
 
-file_path="$(node -e 'let input = ""; process.stdin.on("data", (chunk) => (input += chunk)); process.stdin.on("end", () => { try { const payload = JSON.parse(input); process.stdout.write(payload.file_path || ""); } catch {} });' <<< "$payload")"
+file_path="$(jq -r '.file_path // empty' <<< "$payload" 2>/dev/null || true)"
 
 if [[ -z "$file_path" ]]; then
     exit 0
