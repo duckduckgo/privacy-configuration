@@ -211,38 +211,40 @@ export function getEnabledExperimentsSummary(manifest) {
     return results;
 }
 
-// CLI entrypoint
-const args = process.argv.slice(2);
-if (args.includes('--help') || args.includes('-h')) {
-    console.log(`Usage: node scripts/extract-experiments.mjs [--output <path>] [--generated]`);
-    console.log(`  --output <path>   Write manifest to file instead of stdout`);
-    console.log(`  --generated       Read from generated/v5/*.json instead of overrides/`);
-    process.exit(0);
-}
-
-const useGenerated = args.includes('--generated');
-const outputIdx = args.indexOf('--output');
-const outputPath = outputIdx !== -1 ? args[outputIdx + 1] : null;
-
-try {
-    const manifest = useGenerated ? extractFromGenerated() : extractFromOverrides();
-
-    const json = JSON.stringify(manifest, null, 2);
-
-    if (outputPath) {
-        fs.writeFileSync(outputPath, json);
-        console.log(`Experiment manifest written to ${outputPath}`);
-    } else {
-        console.log(json);
+// CLI entrypoint — only runs when called directly, not when imported
+if (process.argv[1]?.endsWith('extract-experiments.mjs')) {
+    const args = process.argv.slice(2);
+    if (args.includes('--help') || args.includes('-h')) {
+        console.log(`Usage: node scripts/extract-experiments.mjs [--output <path>] [--generated]`);
+        console.log(`  --output <path>   Write manifest to file instead of stdout`);
+        console.log(`  --generated       Read from generated/v5/*.json instead of overrides/`);
+        process.exit(0);
     }
 
-    // Print summary to stderr
-    const enabled = getEnabledExperimentsSummary(manifest);
-    console.error(`\nSummary: ${enabled.length} enabled experiments across ${Object.keys(manifest.platforms).length} platforms`);
-    for (const exp of enabled) {
-        console.error(`  ${exp.platform}/${exp.type}: ${exp.name} (rollout: ${exp.rolloutPercent ?? 'N/A'}%, cohorts: ${exp.cohorts.join(', ')})`);
+    const useGenerated = args.includes('--generated');
+    const outputIdx = args.indexOf('--output');
+    const outputPath = outputIdx !== -1 ? args[outputIdx + 1] : null;
+
+    try {
+        const manifest = useGenerated ? extractFromGenerated() : extractFromOverrides();
+
+        const json = JSON.stringify(manifest, null, 2);
+
+        if (outputPath) {
+            fs.writeFileSync(outputPath, json);
+            console.log(`Experiment manifest written to ${outputPath}`);
+        } else {
+            console.log(json);
+        }
+
+        // Print summary to stderr
+        const enabled = getEnabledExperimentsSummary(manifest);
+        console.error(`\nSummary: ${enabled.length} enabled experiments across ${Object.keys(manifest.platforms).length} platforms`);
+        for (const exp of enabled) {
+            console.error(`  ${exp.platform}/${exp.type}: ${exp.name} (rollout: ${exp.rolloutPercent ?? 'N/A'}%, cohorts: ${exp.cohorts.join(', ')})`);
+        }
+    } catch (err) {
+        console.error(`Error: ${err.message}`);
+        process.exit(1);
     }
-} catch (err) {
-    console.error(`Error: ${err.message}`);
-    process.exit(1);
 }
