@@ -14,14 +14,14 @@ Three features work together:
 
 ```
 webDetection detector (fireEvent.type: "X")
-  → webTelemetry.fireWebEvent (gated by webEvents setting)
+  → webEvents.fireEvent (feature gate: webEvents enabled/disabled)
     → eventHub parameter (source: "X", buckets, trigger period)
       → pixel fired
 ```
 
 - **webDetection** — detectors match page conditions and fire events via `fireEvent.type`
-- **webTelemetry** — gates whether events are forwarded from the page (`webEvents` setting)
-- **eventHub** — aggregates events by `source`, buckets counts, fires pixels on a trigger period
+- **webEvents** — page-level feature that gates and forwards events from the page to the client
+- **eventHub** — client-level feature that aggregates events by `source`, buckets counts, fires pixels on a trigger period
 
 ## Adding a new telemetry entry
 

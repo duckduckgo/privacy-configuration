@@ -28,6 +28,7 @@ import { RequestBlocklistFeature } from './features/request-blocklist';
 import { UaChBrandsFeature } from './features/ua-ch-brands';
 import { UrlPredictorFeature } from './features/url-predictor';
 import { WebDetectionFeature } from './features/web-detection';
+import { WebEventsFeature } from './features/web-events';
 import { WebInterferenceDetectionFeature } from './features/web-interference-detection';
 import { WebTelemetryFeature } from './features/web-telemetry';
 import { ExtendedCrashReporting } from './features/extendedCrashReporting';
@@ -79,6 +80,7 @@ export type ConfigV5<VersionType> = {
         networkProtection?: NetworkProtection<VersionType>;
         scriptlets?: ScriptletsFeature<VersionType>;
         webDetection?: WebDetectionFeature<VersionType>;
+        webEvents?: WebEventsFeature<VersionType>;
         windowsWebviewFailures?: WindowsWebViewFailures<VersionType>;
         windowsWebviewFailures_DDGWV?: WindowsWebViewFailures<VersionType>;
         customUserAgent?: CustomUserAgentFeature<VersionType>;
