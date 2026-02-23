@@ -339,11 +339,15 @@ describe('EventHub validation tests', () => {
         const telemetry = eventHub.settings.telemetry;
 
         describe(`${config.name} eventHub`, () => {
-            it('telemetry entry names should not contain dots', () => {
+            it('telemetry entry names should be valid pixel names', () => {
+                // Segments of [a-zA-Z][a-zA-Z0-9]* separated by underscores,
+                // e.g. "webTelemetry_adwalls_day" (at least two segments must
+                // be specified)
+                const pixelNameRegex = /^[a-zA-Z][a-zA-Z0-9]*(_[a-zA-Z][a-zA-Z0-9]*)+$/;
                 for (const name of Object.keys(telemetry)) {
-                    expect(name).to.not.include(
-                        '.',
-                        `Telemetry name '${name}' contains dots; use underscores instead`,
+                    expect(name).to.match(
+                        pixelNameRegex,
+                        `Telemetry name '${name}' is not a valid pixel name (must match ${pixelNameRegex})`,
                     );
                 }
             });
