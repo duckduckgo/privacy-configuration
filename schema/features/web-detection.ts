@@ -18,11 +18,13 @@ type Triggers = Partial<{
     auto: AutoTrigger;
 }>;
 
+type ActionBase = {
+    state?: FeatureState;
+}
+
 type Actions = Partial<{
-    breakageReportData: {
-        state?: FeatureState;
-    };
-    fireEvent: {
+    breakageReportData: ActionBase;
+    fireEvent: ActionBase & {
         type: string;
     };
 }>;
