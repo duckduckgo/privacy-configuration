@@ -333,7 +333,9 @@ describe('Config schema tests', () => {
 
 describe('EventHub validation tests', () => {
     for (const config of latestConfigs) {
-        const eventHub = /** @type {import('../schema/features/event-hub').EventHubFeature<number> | undefined} */ (config.body.features?.eventHub);
+        const eventHub = /** @type {import('../schema/features/event-hub').EventHubFeature<number> | undefined} */ (
+            config.body.features?.eventHub
+        );
         if (!eventHub?.settings?.telemetry) continue;
 
         const telemetry = eventHub.settings.telemetry;
@@ -353,39 +355,47 @@ describe('EventHub validation tests', () => {
             });
 
             it('trigger period must specify at least one non-negative time unit', () => {
-                const timeUnits = ['seconds', 'minutes', 'hours', 'days'];
-                for (const [name, entry] of Object.entries(telemetry)) {
+                const timeUnits = [
+                    'seconds',
+                    'minutes',
+                    'hours',
+                    'days',
+                ];
+                for (const [
+                    name,
+                    entry,
+                ] of Object.entries(telemetry)) {
                     const period = entry.trigger.period;
                     expect(period).to.be.an('object', `Telemetry '${name}' is missing trigger.period`);
                     const hasTimeUnit = timeUnits.some((unit) => unit in period);
-                    expect(hasTimeUnit).to.equal(
-                        true,
-                        `Telemetry '${name}' period must specify at least one of: ${timeUnits.join(', ')}`,
-                    );
+                    expect(hasTimeUnit).to.equal(true, `Telemetry '${name}' period must specify at least one of: ${timeUnits.join(', ')}`);
                     for (const unit of timeUnits) {
                         if (unit in period) {
-                            expect(period[unit]).to.be.at.least(
-                                0,
-                                `Telemetry '${name}' period.${unit} must not be negative`,
-                            );
+                            expect(period[unit]).to.be.at.least(0, `Telemetry '${name}' period.${unit} must not be negative`);
                         }
                     }
                 }
             });
 
             it('each telemetry entry must have at least one parameter', () => {
-                for (const [name, entry] of Object.entries(telemetry)) {
+                for (const [
+                    name,
+                    entry,
+                ] of Object.entries(telemetry)) {
                     const params = entry.parameters;
                     expect(params).to.be.an('object', `Telemetry '${name}' is missing parameters`);
-                    expect(Object.keys(params).length).to.be.greaterThan(
-                        0,
-                        `Telemetry '${name}' must have at least one parameter`,
-                    );
+                    expect(Object.keys(params).length).to.be.greaterThan(0, `Telemetry '${name}' must have at least one parameter`);
                 }
             });
 
-            for (const [entryName, entry] of Object.entries(telemetry)) {
-                for (const [paramName, param] of Object.entries(entry.parameters || {})) {
+            for (const [
+                entryName,
+                entry,
+            ] of Object.entries(telemetry)) {
+                for (const [
+                    paramName,
+                    param,
+                ] of Object.entries(entry.parameters || {})) {
                     describe(`${entryName}.${paramName}`, () => {
                         it('source should be a non-empty string', () => {
                             expect(param.source).to.be.a('string', `Parameter '${entryName}.${paramName}' source must be a string`);
@@ -449,7 +459,9 @@ describe('EventHub validation tests', () => {
                             const dupes = names.filter((n, i) => names.indexOf(n) !== i);
                             expect(dupes.length).to.equal(
                                 0,
-                                `Duplicate bucket names: ${[...new Set(dupes)].join(', ')}`,
+                                `Duplicate bucket names: ${[
+                                    ...new Set(dupes),
+                                ].join(', ')}`,
                             );
                         });
                     });
@@ -461,7 +473,9 @@ describe('EventHub validation tests', () => {
 
 describe('WebDetection validation tests', () => {
     for (const config of latestConfigs) {
-        const webDetection = /** @type {import('../schema/features/web-detection').WebDetectionFeature<number> | undefined} */ (config.body.features?.webDetection);
+        const webDetection = /** @type {import('../schema/features/web-detection').WebDetectionFeature<number> | undefined} */ (
+            config.body.features?.webDetection
+        );
         if (!webDetection?.settings?.detectors) continue;
 
         const detectors = webDetection.settings.detectors;
@@ -481,7 +495,9 @@ describe('WebDetection validation tests', () => {
             });
 
             it('fireEvent.type values should have a corresponding eventHub parameter source', () => {
-                const eventHubTelemetry = /** @type {import('../schema/features/event-hub').EventHubFeature<number> | undefined} */ (config.body.features?.eventHub)?.settings.telemetry;
+                const eventHubTelemetry = /** @type {import('../schema/features/event-hub').EventHubFeature<number> | undefined} */ (
+                    config.body.features?.eventHub
+                )?.settings.telemetry;
                 const knownSources = new Set();
                 for (const entry of Object.values(eventHubTelemetry)) {
                     for (const param of Object.values(entry.parameters)) {
