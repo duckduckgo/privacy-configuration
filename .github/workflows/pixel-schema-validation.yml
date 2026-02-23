@@ -1,0 +1,213 @@
+name: Experiment Pixel Validation
+
+on:
+    pull_request:
+        paths:
+            - 'overrides/*.json'
+            - 'features/content-scope-experiments.json'
+
+jobs:
+    validate-experiment-pixels:
+        runs-on: ubuntu-latest
+        permissions:
+            pull-requests: write
+        steps:
+            - name: Checkout PR branch
+              uses: actions/checkout@v5
+              with:
+                  path: remote-config
+
+            - name: Checkout base branch
+              uses: actions/checkout@v5
+              with:
+                  ref: ${{ github.event.pull_request.base.ref }}
+                  path: remote-config-base
+
+            - name: Checkout pixel-schema
+              uses: actions/checkout@v5
+              with:
+                  repository: duckduckgo/pixel-schema
+                  path: pixel-schema
+
+            - name: Checkout android
+              uses: actions/checkout@v5
+              with:
+                  repository: duckduckgo/Android
+                  ref: develop
+                  path: android
+                  sparse-checkout: PixelDefinitions
+
+            - name: Checkout apple-browsers
+              uses: actions/checkout@v5
+              with:
+                  repository: duckduckgo/apple-browsers
+                  ref: main
+                  path: apple-browsers
+                  sparse-checkout: |
+                      iOS/PixelDefinitions
+                      macOS/PixelDefinitions
+
+            - name: Checkout windows-browser
+              uses: actions/checkout@v5
+              with:
+                  repository: duckduckgo/windows-browser
+                  ref: develop
+                  path: windows-browser
+                  sparse-checkout: PixelDefinitions
+                  token: ${{ secrets.WINDOWS_BROWSER_TOKEN }}
+
+            - name: Checkout extension
+              uses: actions/checkout@v5
+              with:
+                  repository: duckduckgo/duckduckgo-privacy-extension
+                  ref: main
+                  path: extension
+                  sparse-checkout: pixel-definitions
+
+            - name: Use Node.js 20
+              uses: actions/setup-node@v5
+              with:
+                  node-version: 20.x
+
+            - name: Install pixel-schema dependencies
+              run: npm ci
+              working-directory: pixel-schema
+
+            - name: Extract experiments from base branch
+              run: node scripts/extract-experiments.mjs --output /tmp/base-manifest.json
+              working-directory: remote-config-base
+
+            - name: Extract experiments from PR branch
+              run: node scripts/extract-experiments.mjs --output /tmp/head-manifest.json
+              working-directory: remote-config
+
+            - name: Diff experiments
+              id: diff
+              run: |
+                  node scripts/diff-experiments.mjs /tmp/base-manifest.json /tmp/head-manifest.json --output /tmp/diff.json 2>&1 || true
+                  CHANGES=$(node -e "const d = require('/tmp/diff.json'); console.log(d.changes.length)")
+                  echo "changes=$CHANGES" >> $GITHUB_OUTPUT
+              working-directory: remote-config
+
+            - name: Cross-validate experiment pixels
+              id: validate
+              if: steps.diff.outputs.changes != '0'
+              run: |
+                  node bin/validate_experiment_pixels.mjs /tmp/head-manifest.json \
+                    --client android=$GITHUB_WORKSPACE/android/PixelDefinitions \
+                    --client ios=$GITHUB_WORKSPACE/apple-browsers/iOS/PixelDefinitions \
+                    --client macos=$GITHUB_WORKSPACE/apple-browsers/macOS/PixelDefinitions \
+                    --client windows=$GITHUB_WORKSPACE/windows-browser/PixelDefinitions \
+                    --client extension=$GITHUB_WORKSPACE/extension/pixel-definitions \
+                    --output /tmp/validation-result.json \
+                    --format text 2>&1 | tee /tmp/validation-report.txt || true
+
+                  ERRORS=$(node -e "const r = require('/tmp/validation-result.json'); console.log(r.summary.errors)")
+                  WARNINGS=$(node -e "const r = require('/tmp/validation-result.json'); console.log(r.summary.warnings)")
+                  echo "errors=$ERRORS" >> $GITHUB_OUTPUT
+                  echo "warnings=$WARNINGS" >> $GITHUB_OUTPUT
+              working-directory: pixel-schema
+
+            - name: Post PR comment
+              if: steps.diff.outputs.changes != '0'
+              uses: actions/github-script@v7
+              with:
+                  script: |
+                      const fs = require('fs');
+
+                      let diffData, validationReport;
+                      try {
+                        diffData = JSON.parse(fs.readFileSync('/tmp/diff.json', 'utf8'));
+                        validationReport = fs.readFileSync('/tmp/validation-report.txt', 'utf8');
+                      } catch (e) {
+                        console.log('Could not read result files:', e.message);
+                        return;
+                      }
+
+                      const errors = parseInt('${{ steps.validate.outputs.errors }}' || '0');
+                      const warnings = parseInt('${{ steps.validate.outputs.warnings }}' || '0');
+
+                      let body = '## 🔍 Experiment Pixel Validation\n\n';
+
+                      // Diff summary
+                      body += `**Experiment changes detected:** ${diffData.summary.added} added, ${diffData.summary.removed} removed, ${diffData.summary.modified} modified\n\n`;
+
+                      if (diffData.changes.length > 0) {
+                        body += '<details><summary>Changed experiments</summary>\n\n';
+                        for (const c of diffData.changes) {
+                          const icon = c.changeType === 'added' ? '🆕' : c.changeType === 'removed' ? '🗑️' : '🔄';
+                          body += `- ${icon} \`${c.platform}/${c.type}\`: **${c.name}** (${c.changeType})\n`;
+                        }
+                        body += '\n</details>\n\n';
+                      }
+
+                      // Validation results
+                      if (errors > 0 || warnings > 0) {
+                        const statusIcon = errors > 0 ? '❌' : '⚠️';
+                        body += `${statusIcon} **Pixel validation:** ${errors} error(s), ${warnings} warning(s)\n\n`;
+                        body += '```\n' + validationReport + '\n```\n\n';
+
+                        if (errors > 0) {
+                          body += '> **Action required:** Errors indicate experiment pixels that will be undocumented. ';
+                          body += 'Update the relevant `native_experiments.json` in the client repo before merging.\n';
+                        }
+                      } else {
+                        body += '✅ **Pixel validation passed** — all experiment pixels are documented.\n';
+                      }
+
+                      // Find and update or create comment
+                      const { data: comments } = await github.rest.issues.listComments({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        issue_number: context.issue.number,
+                      });
+
+                      const marker = '## 🔍 Experiment Pixel Validation';
+                      const existing = comments.find(c => c.body?.includes(marker));
+
+                      if (existing) {
+                        await github.rest.issues.updateComment({
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          comment_id: existing.id,
+                          body,
+                        });
+                      } else {
+                        await github.rest.issues.createComment({
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          issue_number: context.issue.number,
+                          body,
+                        });
+                      }
+
+            - name: Post no-changes comment
+              if: steps.diff.outputs.changes == '0'
+              uses: actions/github-script@v7
+              with:
+                  script: |
+                      const marker = '## 🔍 Experiment Pixel Validation';
+                      const body = marker + '\n\n✅ No experiment changes detected in this PR.';
+
+                      const { data: comments } = await github.rest.issues.listComments({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        issue_number: context.issue.number,
+                      });
+
+                      const existing = comments.find(c => c.body?.includes(marker));
+                      if (existing) {
+                        await github.rest.issues.updateComment({
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          comment_id: existing.id,
+                          body,
+                        });
+                      } else {
+                        await github.rest.issues.createComment({
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          issue_number: context.issue.number,
+                          body,
+                        });
+                      }
