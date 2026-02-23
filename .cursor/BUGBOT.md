@@ -37,6 +37,6 @@
 ### Template for New Feature Validation
 When adding new features to this repository, follow this pattern:
 
-1. **Create `.cursor/rules/new-feature.mdc`** for developer guidance
+1. **Add a reference section to this `BUGBOT.md`** with links to the schema and configuration (see Element Hiding or Request Blocklist sections as examples)
 
-2. **Add a reference section to this `BUGBOT.md`** with links to the rule file, schema, and configuration (see Element Hiding or Request Blocklist sections as examples)
+2. **Optionally** create a `.cursor/rules/new-feature.mdc` if the feature has complex validation logic or non-obvious configuration patterns that benefit from developer guidance. Most features do not need one — only add it when clearly required.
