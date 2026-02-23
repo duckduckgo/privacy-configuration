@@ -27,4 +27,6 @@ case "$file_path" in
         ;;
 esac
 
-npx --no-install prettier --ignore-unknown --write "$file_path" >/dev/null
+if ! npx --no-install prettier --ignore-unknown --write "$file_path" >/dev/null 2>&1; then
+    exit 0
+fi
