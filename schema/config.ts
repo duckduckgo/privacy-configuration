@@ -29,6 +29,7 @@ import { UrlPredictorFeature } from './features/url-predictor';
 import { WebDetectionFeature } from './features/web-detection';
 import { WebInterferenceDetectionFeature } from './features/web-interference-detection';
 import { EventHubFeature } from './features/event-hub';
+import { WebEventsFeature } from './features/web-events';
 import { ExtendedCrashReporting } from './features/extendedCrashReporting';
 import { DownloadManager } from './features/downloadManager';
 
@@ -86,6 +87,7 @@ export type ConfigV5<VersionType> = {
         urlPredictor?: UrlPredictorFeature<VersionType>;
         webInterferenceDetection?: WebInterferenceDetectionFeature<VersionType>;
         eventHub?: EventHubFeature<VersionType>;
+        webEvents?: WebEventsFeature<VersionType>;
         extendedCrashReporting?: ExtendedCrashReporting<VersionType>;
     };
     unprotectedTemporary: SiteException[];
