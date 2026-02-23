@@ -2116,7 +2116,27 @@
         "browserUiLock": {
             "state": "enabled",
             "minSupportedVersion": 52500000,
-            "exceptions": []
+            "exceptions": [],
+            "settings": {
+                "additionalCheck": "disabled",
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "experiment": {
+                                "experimentName": "contentScopeExperiment3",
+                                "cohort": "treatment"
+                            }
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/additionalCheck",
+                                "value": "enabled"
+                            }
+                        ]
+                    }
+                ]
+            }
         },
         "navigatorInterface": {
             "state": "enabled",
@@ -3605,6 +3625,27 @@
                             },
                             {
                                 "percent": 50
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "contentScopeExperiment3": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52500000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
                             }
                         ]
                     },
