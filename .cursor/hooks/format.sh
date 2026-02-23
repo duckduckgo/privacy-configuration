@@ -27,4 +27,4 @@ case "$file_path" in
         ;;
 esac
 
-npx --no-install prettier --write "$file_path" >/dev/null 2>&1 || true
+npx --no-install prettier --ignore-unknown --write "$file_path" >/dev/null
