@@ -187,46 +187,6 @@ describe('Config schema tests', () => {
                 }
             });
 
-            it('All detectors should be named correctly', () => {
-                const detectorNameRegex = /^[a-zA-Z0-9][a-zA-Z0-9_]*$/;
-                const webDetectionFeature = config.body.features.webDetection;
-                if (webDetectionFeature?.settings?.detectors) {
-                    for (const [
-                        groupName,
-                        groupDetectors,
-                    ] of Object.entries(webDetectionFeature.settings.detectors)) {
-                        expect(groupName).to.match(detectorNameRegex);
-                        for (const detectorName of Object.keys(groupDetectors)) {
-                            expect(detectorName).to.match(detectorNameRegex);
-                        }
-                    }
-                }
-            });
-
-            it('All detector fireEvent.type values should have a corresponding eventHub parameter source', () => {
-                const webDetectionFeature = config.body.features.webDetection;
-                if (!webDetectionFeature?.settings?.detectors) return;
-
-                const eventHubTelemetry = config.body.features?.eventHub?.settings?.telemetry || {};
-                const knownSources = new Set();
-                for (const entry of Object.values(eventHubTelemetry)) {
-                    for (const param of Object.values(entry.parameters || {})) {
-                        if (param.source) knownSources.add(param.source);
-                    }
-                }
-
-                for (const [groupName, groupDetectors] of Object.entries(webDetectionFeature.settings.detectors)) {
-                    for (const [detectorName, detector] of Object.entries(groupDetectors)) {
-                        const type = detector.actions?.fireEvent?.type;
-                        if (!type) continue;
-                        expect(knownSources.has(type)).to.equal(
-                            true,
-                            `Detector '${groupName}.${detectorName}' fires event type '${type}' but no eventHub parameter has source '${type}' (known sources: ${[...knownSources].join(', ')})`,
-                        );
-                    }
-                }
-            });
-
             if (config.name.includes('windows-config.json')) {
                 // Only run this test for Windows config to validate _DDGWV features
                 it('Windows config _DDGWV features should be valid overrides of their base features', () => {
@@ -437,6 +397,48 @@ describe('EventHub validation tests', () => {
                     });
                 }
             }
+        });
+    }
+});
+
+describe('WebDetection validation tests', () => {
+    for (const config of latestConfigs) {
+        const webDetection = config.body.features?.webDetection;
+        if (!webDetection?.settings?.detectors) continue;
+
+        const detectors = webDetection.settings.detectors;
+
+        describe(`${config.name} webDetection`, () => {
+            it('detector and group names should be named correctly', () => {
+                const detectorNameRegex = /^[a-zA-Z0-9][a-zA-Z0-9_]*$/;
+                for (const [groupName, groupDetectors] of Object.entries(detectors)) {
+                    expect(groupName).to.match(detectorNameRegex);
+                    for (const detectorName of Object.keys(groupDetectors)) {
+                        expect(detectorName).to.match(detectorNameRegex);
+                    }
+                }
+            });
+
+            it('fireEvent.type values should have a corresponding eventHub parameter source', () => {
+                const eventHubTelemetry = config.body.features?.eventHub?.settings?.telemetry || {};
+                const knownSources = new Set();
+                for (const entry of Object.values(eventHubTelemetry)) {
+                    for (const param of Object.values(entry.parameters || {})) {
+                        if (param.source) knownSources.add(param.source);
+                    }
+                }
+
+                for (const [groupName, groupDetectors] of Object.entries(detectors)) {
+                    for (const [detectorName, detector] of Object.entries(groupDetectors)) {
+                        const type = detector.actions?.fireEvent?.type;
+                        if (!type) continue;
+                        expect(knownSources.has(type)).to.equal(
+                            true,
+                            `Detector '${groupName}.${detectorName}' fires event type '${type}' but no eventHub parameter has source '${type}' (known sources: ${[...knownSources].join(', ')})`,
+                        );
+                    }
+                }
+            });
         });
     }
 });
