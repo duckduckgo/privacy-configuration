@@ -1,0 +1,46 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "experiment-annotations.schema.json",
+    "title": "ExperimentAnnotations",
+    "description": "Annotations for contentScopeExperiments linking them to privacy reviews and ownership. Feature impact is auto-derived from the config's conditionalChanges.",
+    "type": "object",
+    "required": ["contentScopeExperiments"],
+    "additionalProperties": false,
+    "properties": {
+        "$schema": {
+            "type": "string"
+        },
+        "contentScopeExperiments": {
+            "type": "object",
+            "description": "Map of experiment name to its annotation",
+            "additionalProperties": {
+                "$ref": "#/$defs/experimentAnnotation"
+            }
+        }
+    },
+    "$defs": {
+        "experimentAnnotation": {
+            "type": "object",
+            "required": ["description", "owners"],
+            "additionalProperties": false,
+            "properties": {
+                "description": {
+                    "type": "string",
+                    "description": "What this experiment tests and its purpose"
+                },
+                "privacyReview": {
+                    "type": "string",
+                    "format": "uri",
+                    "description": "Link to the privacy review for this experiment"
+                },
+                "owners": {
+                    "type": "array",
+                    "description": "GitHub usernames responsible for this experiment",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    }
+}
