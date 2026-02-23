@@ -410,7 +410,7 @@ describe('WebDetection validation tests', () => {
 
         describe(`${config.name} webDetection`, () => {
             it('detector and group names should be named correctly', () => {
-                const detectorNameRegex = /^[a-zA-Z0-9][a-zA-Z0-9_]*$/;
+                const detectorNameRegex = /^[a-zA-Z][a-zA-Z0-9_]*$/;
                 for (const [groupName, groupDetectors] of Object.entries(detectors)) {
                     expect(groupName).to.match(detectorNameRegex);
                     for (const detectorName of Object.keys(groupDetectors)) {
