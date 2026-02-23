@@ -514,7 +514,7 @@ describe('WebDetection validation tests', () => {
                         detector,
                     ] of Object.entries(groupDetectors)) {
                         const type = detector.actions?.fireEvent?.type;
-                        if (!type) continue;
+                        if (type === undefined) continue;
                         expect(knownSources.has(type)).to.equal(
                             true,
                             `Detector '${groupName}.${detectorName}' fires event type '${type}' but no eventHub parameter has source '${type}' (known sources: ${[
