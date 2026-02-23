@@ -203,6 +203,30 @@ describe('Config schema tests', () => {
                 }
             });
 
+            it('All detector fireEvent.type values should have a corresponding eventHub parameter source', () => {
+                const webDetectionFeature = config.body.features.webDetection;
+                if (!webDetectionFeature?.settings?.detectors) return;
+
+                const eventHubTelemetry = config.body.features?.eventHub?.settings?.telemetry || {};
+                const knownSources = new Set();
+                for (const entry of Object.values(eventHubTelemetry)) {
+                    for (const param of Object.values(entry.parameters || {})) {
+                        if (param.source) knownSources.add(param.source);
+                    }
+                }
+
+                for (const [groupName, groupDetectors] of Object.entries(webDetectionFeature.settings.detectors)) {
+                    for (const [detectorName, detector] of Object.entries(groupDetectors)) {
+                        const type = detector.actions?.fireEvent?.type;
+                        if (!type) continue;
+                        expect(knownSources.has(type)).to.equal(
+                            true,
+                            `Detector '${groupName}.${detectorName}' fires event type '${type}' but no eventHub parameter has source '${type}' (known sources: ${[...knownSources].join(', ')})`,
+                        );
+                    }
+                }
+            });
+
             if (config.name.includes('windows-config.json')) {
                 // Only run this test for Windows config to validate _DDGWV features
                 it('Windows config _DDGWV features should be valid overrides of their base features', () => {
