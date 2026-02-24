@@ -32,11 +32,8 @@ jobs:
             - name: Set PR context variables
               id: pr_context
               run: |
-                  echo "base_sha=${{ github.event.pull_request.base.sha }}" >> $GITHUB_OUTPUT
-                  # Use merge_commit_sha for both testing and production
-                  # For open PRs: test merge commit (what would happen if merged)
-                  # For merged PRs: actual merge commit (what landed on main)
-                  echo "head_sha=${{ github.event.pull_request.merge_commit_sha }}" >> $GITHUB_OUTPUT
+                  MERGE_SHA="${{ github.event.pull_request.merge_commit_sha }}"
+                  echo "head_sha=$MERGE_SHA" >> $GITHUB_OUTPUT
                   echo "pr_number=${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
                   echo "pr_url=${{ github.event.pull_request.html_url }}" >> $GITHUB_OUTPUT
 
@@ -48,19 +45,30 @@ jobs:
               with:
                   node-version: '20'
 
-            - name: Checkout base commit
-              uses: actions/checkout@v4
-              with:
-                  ref: ${{ steps.pr_context.outputs.base_sha }}
-                  path: base
-                  fetch-depth: 0
-
             - name: Checkout merge commit
               uses: actions/checkout@v4
               with:
                   ref: ${{ steps.pr_context.outputs.head_sha }}
                   path: head
-                  fetch-depth: 0
+                  fetch-depth: 2
+
+            - name: Resolve pre-merge base SHA
+              id: resolve_base
+              run: |
+                  # The first parent of the merge commit is the exact state of the
+                  # target branch right before this PR was merged. This ensures we
+                  # only detect flags introduced by THIS PR, not by other PRs that
+                  # landed between when the PR was opened and when it was merged.
+                  BASE_SHA=$(git -C head rev-parse HEAD^1)
+                  echo "Merge commit: ${{ steps.pr_context.outputs.head_sha }}"
+                  echo "Pre-merge base (HEAD^1): $BASE_SHA"
+                  echo "base_sha=$BASE_SHA" >> $GITHUB_OUTPUT
+
+            - name: Checkout pre-merge base
+              uses: actions/checkout@v4
+              with:
+                  ref: ${{ steps.resolve_base.outputs.base_sha }}
+                  path: base
 
             - name: Build generated configs
               id: build_configs
