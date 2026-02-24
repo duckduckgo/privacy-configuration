@@ -1,15 +1,14 @@
 import { CSSInjectFeatureSettings, Feature, FeatureState } from '../feature';
 
 type BucketDefinition = {
-    minInclusive: number;
-    maxExclusive?: number;
-    name: string;
+    gte: number;
+    lt?: number;
 };
 
 type CounterParameter = {
     template: 'counter';
     source: string;
-    buckets: BucketDefinition[];
+    buckets: Record<string, BucketDefinition>;
 };
 
 // Future parameter types would be added as union members
