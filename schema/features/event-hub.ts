@@ -5,15 +5,14 @@ type TelemetryParameterBase = {
 };
 
 type CounterBucket = {
-    minInclusive: number;
-    maxExclusive?: number;
-    name: string;
+    gte: number;
+    lt?: number;
 };
 
 type TelemetryParameterCounter = TelemetryParameterBase & {
     template: 'counter';
     source: string;
-    buckets: CounterBucket[];
+    buckets: Record<string, CounterBucket>;
 };
 
 type TelemetryParameter = TelemetryParameterCounter;

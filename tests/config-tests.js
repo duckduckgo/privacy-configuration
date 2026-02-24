@@ -406,62 +406,83 @@ describe('EventHub validation tests', () => {
                         });
 
                         it('buckets should not be empty', () => {
-                            expect(param.buckets).to.be.an('array', `Parameter '${entryName}.${paramName}' buckets must be an array`);
-                            expect(param.buckets.length).to.be.greaterThan(
+                            expect(param.buckets).to.be.an('object', `Parameter '${entryName}.${paramName}' buckets must be an object`);
+                            const bucketNames = Object.keys(param.buckets);
+                            expect(bucketNames.length).to.be.greaterThan(
                                 0,
                                 `Parameter '${entryName}.${paramName}' buckets must not be empty`,
                             );
                         });
 
-                        it('maxExclusive must be greater than minInclusive', () => {
-                            for (const bucket of param.buckets) {
-                                if (bucket.maxExclusive !== undefined) {
-                                    expect(bucket.maxExclusive).to.be.greaterThan(
-                                        bucket.minInclusive,
-                                        `Bucket '${bucket.name}' maxExclusive (${bucket.maxExclusive}) must be greater than minInclusive (${bucket.minInclusive})`,
+                        it('lt must be greater than gte', () => {
+                            for (const [
+                                name,
+                                bucket,
+                            ] of Object.entries(param.buckets)) {
+                                if (bucket.lt !== undefined) {
+                                    expect(bucket.lt).to.be.greaterThan(
+                                        bucket.gte,
+                                        `Bucket '${name}' lt (${bucket.lt}) must be greater than gte (${bucket.gte})`,
                                     );
                                 }
                             }
                         });
 
-                        it('should have no gaps between consecutive buckets', () => {
-                            for (let i = 1; i < param.buckets.length; i++) {
-                                const prev = param.buckets[i - 1];
-                                const curr = param.buckets[i];
-                                if (prev.maxExclusive !== undefined) {
-                                    expect(curr.minInclusive).to.equal(
-                                        prev.maxExclusive,
-                                        `Gap between bucket '${prev.name}' (maxExclusive: ${prev.maxExclusive}) and '${curr.name}' (minInclusive: ${curr.minInclusive})`,
+                        it('every lt must match another bucket gte (no gaps)', () => {
+                            const gteValues = new Set(Object.values(param.buckets).map((b) => b.gte));
+                            for (const [
+                                name,
+                                bucket,
+                            ] of Object.entries(param.buckets)) {
+                                if (bucket.lt !== undefined) {
+                                    expect(gteValues.has(bucket.lt)).to.equal(
+                                        true,
+                                        `Bucket '${name}' lt (${bucket.lt}) does not match any bucket's gte`,
                                     );
                                 }
                             }
                         });
 
-                        it('should be ordered sequentially by minInclusive', () => {
-                            for (let i = 1; i < param.buckets.length; i++) {
-                                expect(param.buckets[i].minInclusive).to.be.greaterThan(
-                                    param.buckets[i - 1].minInclusive,
-                                    `Bucket '${param.buckets[i].name}' (minInclusive: ${param.buckets[i].minInclusive}) is not ordered after '${param.buckets[i - 1].name}' (minInclusive: ${param.buckets[i - 1].minInclusive})`,
-                                );
+                        it('gte values must be unique across buckets', () => {
+                            const seen = new Set();
+                            for (const [
+                                name,
+                                bucket,
+                            ] of Object.entries(param.buckets)) {
+                                expect(seen.has(bucket.gte)).to.equal(false, `Duplicate gte value ${bucket.gte} in bucket '${name}'`);
+                                seen.add(bucket.gte);
                             }
                         });
 
-                        it('should have at most one unbounded bucket (missing maxExclusive)', () => {
-                            const unbounded = param.buckets.filter((b) => b.maxExclusive === undefined);
+                        it('lt values must be unique across buckets', () => {
+                            const seen = new Set();
+                            for (const [
+                                name,
+                                bucket,
+                            ] of Object.entries(param.buckets)) {
+                                if (bucket.lt !== undefined) {
+                                    expect(seen.has(bucket.lt)).to.equal(false, `Duplicate lt value ${bucket.lt} in bucket '${name}'`);
+                                    seen.add(bucket.lt);
+                                }
+                            }
+                        });
+
+                        it('should have at most one unbounded bucket (missing lt)', () => {
+                            const unbounded = Object.entries(param.buckets).filter(
+                                ([
+                                    ,
+                                    b,
+                                ]) => b.lt === undefined,
+                            );
                             expect(unbounded.length).to.be.at.most(
                                 1,
-                                `Found ${unbounded.length} unbounded buckets: ${unbounded.map((b) => b.name).join(', ')}`,
-                            );
-                        });
-
-                        it('should not have duplicate bucket names', () => {
-                            const names = param.buckets.map((b) => b.name);
-                            const dupes = names.filter((n, i) => names.indexOf(n) !== i);
-                            expect(dupes.length).to.equal(
-                                0,
-                                `Duplicate bucket names: ${[
-                                    ...new Set(dupes),
-                                ].join(', ')}`,
+                                `Found ${unbounded.length} unbounded buckets: ${unbounded
+                                    .map(
+                                        ([
+                                            n,
+                                        ]) => n,
+                                    )
+                                    .join(', ')}`,
                             );
                         });
                     });
