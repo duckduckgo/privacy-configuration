@@ -32,6 +32,28 @@
 - **Schema**: `schema/features/tracker-allowlist.ts` - TypeScript type definitions
 - **Configuration**: `features/tracker-allowlist.json` - Tracker allowlist rule definitions
 
+## Page Context Feature Validation
+
+### Cross-Config Parity Check
+
+The `pageContext` feature has **two** configuration points per platform that must stay in sync:
+
+1. **Standalone `pageContext`** (C-S-S feature) — top-level entry in `features`
+2. **`aiChat.features.pageContext`** (native sub-feature) — nested under `aiChat`
+
+**When reviewing PRs that modify either entry, verify:**
+
+- If `aiChat.features.pageContext` is being enabled/disabled, the standalone `pageContext` feature must match
+- If standalone `pageContext` state changes, `aiChat.features.pageContext` must be updated accordingly
+- The standalone `pageContext` settings include `mainContentSelector` (required for C-S-S content extraction)
+- Domain-specific `conditionalChanges` (e.g., `nba.com`, `reddit.com`) are consistent across platforms
+
+### References
+
+- **Rule File**: `.cursor/rules/page-context-parity.mdc` - Parity enforcement guidance
+- **Base Configuration**: `features/page-context.json`
+- **C-S-S Implementation**: `https://github.com/duckduckgo/content-scope-scripts/blob/main/injected/src/features/page-context.js`
+
 ## Adding New Features to Bugbot
 
 ### Template for New Feature Validation

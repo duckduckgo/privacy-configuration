@@ -1,0 +1,63 @@
+---
+description: Enforce parity between C-S-S pageContext feature and native aiChat.pageContext sub-feature across all platforms. Apply when editing pageContext settings in any override file.
+alwaysApply: false
+---
+# Page Context Feature Parity
+
+## Background
+
+The `pageContext` feature exists in two places in platform override files:
+
+1. **Standalone `pageContext` feature** (top-level in `features`) — consumed by content-scope-scripts (C-S-S) for page content extraction
+2. **`aiChat.features.pageContext` sub-feature** — consumed by native apps to enable/disable page context integration in AI Chat
+
+Both must be kept in sync. If the native app enables `aiChat.features.pageContext` but the standalone C-S-S `pageContext` feature is disabled (or vice versa), page context silently fails at runtime.
+
+## Rules
+
+### 1. State parity between C-S-S and native
+
+When enabling or disabling `pageContext` on any platform, **both** entries must be updated:
+
+- `features.pageContext.state` (C-S-S)
+- `features.aiChat.features.pageContext.state` (native)
+
+If one is `"enabled"`, the other must also be `"enabled"` (or at minimum `"preview"` / `"internal"` at the same level).
+
+### 2. Required C-S-S settings
+
+The standalone `pageContext` feature **must** include these settings on all platforms where it is enabled:
+
+| Setting | Required | Notes |
+|---------|----------|-------|
+| `maxContentLength` | Yes | Typically `9500` |
+| `mainContentSelector` | Yes | Use `"main, article, .content, .main, #content, #main"` |
+| `excludeSelectors` | Yes | Standard set: `.ad`, `.sidebar`, `.footer`, `.nav`, `.header`, `.banner`, `.popup` |
+
+### 3. Cross-platform conditional changes
+
+Domain-specific conditional changes should be consistent across platforms. If a domain override is added to one platform (e.g., `nba.com`, `reddit.com`), check whether it should also apply to other platforms.
+
+Current shared conditional changes:
+
+| Domain | Patch | Platforms |
+|--------|-------|-----------|
+| `nba.com` | `mainContentSelector` → `"main"` | macOS, iOS, Android, Windows |
+| `reddit.com` | Add `shreddit-comments-page-ad` to `excludeSelectors` | macOS, Windows |
+
+### 4. Checklist for pageContext changes
+
+Before committing changes to any `pageContext` configuration:
+
+- [ ] Standalone `pageContext` state matches `aiChat.features.pageContext` state
+- [ ] `mainContentSelector` is present in C-S-S settings
+- [ ] Domain conditional changes are consistent across platforms
+- [ ] Build succeeds (`node index.js`)
+- [ ] Tests pass (`npm test`)
+
+## Files
+
+- **Base feature**: `features/page-context.json`
+- **Platform overrides**: `overrides/{windows,macos,ios,android}-override.json`
+- **C-S-S implementation**: [`content-scope-scripts/injected/src/features/page-context.js`](https://github.com/duckduckgo/content-scope-scripts/blob/main/injected/src/features/page-context.js)
+- **C-S-S platform support**: [`content-scope-scripts/injected/src/features.js`](https://github.com/duckduckgo/content-scope-scripts/blob/main/injected/src/features.js) — `platformSupport`
