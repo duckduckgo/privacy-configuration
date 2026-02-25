@@ -4957,6 +4957,7 @@
             "settings": {
                 "includeIframes": "disabled",
                 "maxContentLength": 9500,
+                "mainContentSelector": "main, article, .content, .main, #content, #main",
                 "excludeSelectors": [
                     ".ad",
                     ".sidebar",
@@ -4967,6 +4968,18 @@
                     ".popup"
                 ],
                 "conditionalChanges": [
+                    {
+                        "condition": {
+                            "domain": "nba.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/mainContentSelector",
+                                "value": "main"
+                            }
+                        ]
+                    },
                     {
                         "condition": {
                             "domain": "reddit.com"
