@@ -274,6 +274,21 @@ async function buildPlatforms() {
                             settings[settingsKey] = overrideSettings[settingsKey];
                         }
                         platformConfig.features[key][platformKey] = settings;
+                    } else if (key === 'elementHiding' && platformKey === 'settings') {
+                        const baseSettings = platformConfig.features[key].settings;
+                        const overrideSettings = platformOverride.features[key][platformKey];
+                        for (const settingsKey in overrideSettings) {
+                            if (
+                                [
+                                    'domains',
+                                    'rules',
+                                ].includes(settingsKey)
+                            ) {
+                                baseSettings[settingsKey] = (baseSettings[settingsKey] || []).concat(overrideSettings[settingsKey]);
+                            } else {
+                                baseSettings[settingsKey] = overrideSettings[settingsKey];
+                            }
+                        }
                     } else if ((key === 'clickToLoad' || key === 'clickToPlay') && platformKey === 'settings') {
                         // Handle Click to Load settings override later, so that individual entities
                         // are disabled/enabled correctly (and disabled by default).
