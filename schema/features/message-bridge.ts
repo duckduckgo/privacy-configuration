@@ -6,6 +6,9 @@ export type MessageBridgeSettings = CSSInjectFeatureSettings<{
     subscriptionPages?: FeatureState;
     getSubscriptionOptions?: FeatureState;
     serpSettings?: FeatureState;
+    dbpuiCommunication?: FeatureState;
+    useIdentityTheftRestoration?: FeatureState;
+    useSubscription?: FeatureState;
 }>;
 
 export type MessageBridgeFeature<VersionType> = Feature<MessageBridgeSettings, VersionType>;
