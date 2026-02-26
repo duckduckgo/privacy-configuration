@@ -4,6 +4,7 @@ export type MessageBridgeSettings = CSSInjectFeatureSettings<{
     aiChat: FeatureState;
     subscriptions?: FeatureState;
     subscriptionPages?: FeatureState;
+    getSubscriptionOptions?: FeatureState;
     serpSettings?: FeatureState;
 }>;
 
