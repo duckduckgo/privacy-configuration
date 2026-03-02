@@ -2056,6 +2056,31 @@
                 ]
             }
         },
+        "browserUiLock": {
+            "state": "enabled",
+            "minSupportedVersion": 52700000,
+            "exceptions": [],
+            "settings": {
+                "additionalCheck": "disabled",
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "experiment": {
+                                "experimentName": "contentScopeExperiment3",
+                                "cohort": "treatment"
+                            }
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/additionalCheck",
+                                "value": "enabled"
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
         "navigatorInterface": {
             "state": "enabled",
             "minSupportedVersion": 52250000,
@@ -3576,6 +3601,27 @@
                         "steps": [
                             {
                                 "percent": 100
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "contentScopeExperiment3": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52700000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
                             }
                         ]
                     },
