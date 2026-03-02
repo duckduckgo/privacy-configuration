@@ -29,7 +29,9 @@ import { UrlPredictorFeature } from './features/url-predictor';
 import { WebDetectionFeature } from './features/web-detection';
 import { WebInterferenceDetectionFeature } from './features/web-interference-detection';
 import { ExtendedCrashReporting } from './features/extendedCrashReporting';
+import { MacOSBrowserConfig } from './features/macos-browser-config';
 import { DownloadManager } from './features/downloadManager';
+import { WebExtensionsConfig } from './features/web-extensions';
 
 export { WebCompatSettings } from './features/webcompat';
 export { DuckPlayerSettings } from './features/duckplayer';
@@ -85,6 +87,8 @@ export type ConfigV5<VersionType> = {
         urlPredictor?: UrlPredictorFeature<VersionType>;
         webInterferenceDetection?: WebInterferenceDetectionFeature<VersionType>;
         extendedCrashReporting?: ExtendedCrashReporting<VersionType>;
+        macOSBrowserConfig?: MacOSBrowserConfig<VersionType>;
+        webExtensions?: WebExtensionsConfig<VersionType>;
     };
     unprotectedTemporary: SiteException[];
 };

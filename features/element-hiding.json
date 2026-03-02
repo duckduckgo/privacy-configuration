@@ -1,10 +1,6 @@
 {
     "_meta": {
-        "description": "Hide empty ad slots.",
-        "sampleExcludeRecords": {
-            "domain": "example.com",
-            "reason": "site breakage"
-        }
+        "description": "Hide empty ad slots."
     },
     "exceptions": [
         {
@@ -3338,6 +3334,21 @@
                 ]
             },
             {
+                "domain": "app.rippling.com",
+                "rules": [
+                    {
+                        "selector": "body",
+                        "type": "modify-style",
+                        "values": [
+                            {
+                                "property": "height",
+                                "value": "auto"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
                 "domain": "rumble.com",
                 "rules": [
                     {
@@ -3538,6 +3549,18 @@
                 "rules": [
                     {
                         "selector": ".ptgncdn_holder",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "speedweek.com",
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    },
+                    {
+                        "selector": "[style^='--ad-placeholder-width']",
                         "type": "hide"
                     }
                 ]

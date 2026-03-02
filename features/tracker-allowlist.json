@@ -1,10 +1,6 @@
 {
     "_meta": {
-        "description": "Exceptions to the tracker radar",
-        "sampleExcludeRecords": {
-            "domain": "example.com",
-            "reason": "site breakage"
-        }
+        "description": "Exceptions to the tracker radar"
     },
     "state": "enabled",
     "settings": {
@@ -1300,7 +1296,8 @@
                             "youmath.it",
                             "nationalpost.com",
                             "nationalreview.com",
-                            "supermarketperimeter.com"
+                            "supermarketperimeter.com",
+                            "speedweek.com"
                         ],
                         "reason": [
                             "ah.nl - 'Bonus offer' elements do not render and are not clickable.",
@@ -1323,7 +1320,8 @@
                             "webmd.com - https://github.com/duckduckgo/privacy-configuration/pull/3737",
                             "nationalpost.com - https://github.com/duckduckgo/privacy-configuration/pull/3969",
                             "nationalreview.com - https://github.com/duckduckgo/privacy-configuration/pull/4459",
-                            "supermarketperimeter.com - https://github.com/duckduckgo/privacy-configuration/pull/4519"
+                            "supermarketperimeter.com - https://github.com/duckduckgo/privacy-configuration/pull/4519",
+                            "speedweek.com - https://github.com/duckduckgo/privacy-configuration/pull/4579"
                         ]
                     },
                     {
@@ -1379,7 +1377,8 @@
                             "stuff.co.nz",
                             "nationalpost.com",
                             "modernhoney.com",
-                            "rocketnews24.com"
+                            "rocketnews24.com",
+                            "nytimes.com"
                         ],
                         "reason": [
                             "applesfera.com - https://github.com/duckduckgo/privacy-configuration/issues/1723",
@@ -1391,7 +1390,8 @@
                             "stuff.co.nz - https://github.com/duckduckgo/privacy-configuration/issues/1740",
                             "nationalpost.com - https://github.com/duckduckgo/privacy-configuration/pull/3969",
                             "modernhoney.com - https://github.com/duckduckgo/privacy-configuration/pull/4111",
-                            "rocketnews24.com - https://github.com/duckduckgo/privacy-configuration/issues/846"
+                            "rocketnews24.com - https://github.com/duckduckgo/privacy-configuration/issues/846",
+                            "nytimes.com - https://github.com/duckduckgo/privacy-configuration/pull/4549"
                         ]
                     },
                     {
@@ -1939,14 +1939,31 @@
                         ]
                     },
                     {
+                        "rule": "tpc.googlesyndication.com/sodar/sodar2.js",
+                        "domains": [
+                            "speedweek.com",
+                            "rocketnews24.com",
+                            "zefoy.com",
+                            "nytimes.com"
+                        ],
+                        "reason": [
+                            "speedweek.com - https://github.com/duckduckgo/privacy-configuration/pull/4579",
+                            "rocketnews24.com - https://github.com/duckduckgo/privacy-configuration/issues/846",
+                            "https://github.com/duckduckgo/privacy-configuration/issues/388",
+                            "https://github.com/duckduckgo/privacy-configuration/issues/4555"
+                        ]
+                    },
+                    {
                         "rule": "googlesyndication.com",
                         "domains": [
                             "rocketnews24.com",
-                            "zefoy.com"
+                            "zefoy.com",
+                            "nytimes.com"
                         ],
                         "reason": [
                             "https://github.com/duckduckgo/privacy-configuration/issues/388",
-                            "rocketnews24.com - https://github.com/duckduckgo/privacy-configuration/issues/846"
+                            "rocketnews24.com - https://github.com/duckduckgo/privacy-configuration/issues/846",
+                            "https://github.com/duckduckgo/privacy-configuration/issues/4555"
                         ]
                     }
                 ]
@@ -2155,7 +2172,8 @@
                             "wtwc40.com",
                             "wutv29.com",
                             "wvah.com",
-                            "wwmt.com"
+                            "wwmt.com",
+                            "speedweek.com"
                         ],
                         "reason": [
                             "https://github.com/duckduckgo/privacy-configuration/issues/1173",
@@ -2163,7 +2181,8 @@
                             "pointstreaksites.com - https://github.com/duckduckgo/privacy-configuration/issues/2197",
                             "signupgenius.com - https://github.com/duckduckgo/privacy-configuration/pull/2234",
                             "stockcharts.com - https://github.com/duckduckgo/privacy-configuration/pull/2478",
-                            "mlb.com - https://github.com/duckduckgo/privacy-configuration/pull/2345"
+                            "mlb.com - https://github.com/duckduckgo/privacy-configuration/pull/2345",
+                            "speedweek.com - https://github.com/duckduckgo/privacy-configuration/pull/4579"
                         ]
                     }
                 ]
@@ -3997,6 +4016,17 @@
                             "apnews.com, gbnews.com, independent.co.uk - https://github.com/duckduckgo/privacy-configuration/pull/4363",
                             "telegraph.co.uk - https://github.com/duckduckgo/privacy-configuration/pull/4338"
                         ]
+                    }
+                ]
+            },
+            "sardine.ai": {
+                "rules": [
+                    {
+                        "rule": "api.sardine.ai/assets/loader.min.js",
+                        "domains": [
+                            "incodesmile.com"
+                        ],
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4554"
                     }
                 ]
             }

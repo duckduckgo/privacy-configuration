@@ -1,10 +1,6 @@
 {
     "_meta": {
-        "description": "Detect web patterns such as adwalls.",
-        "sampleExcludeRecords": {
-            "domain": "example.com",
-            "reason": "site breakage"
-        }
+        "description": "Detect web patterns such as adwalls."
     },
     "state": "disabled",
     "exceptions": [],
@@ -37,12 +33,31 @@
                         }
                     }
                 },
+                "generic_es": {
+                    "match": {
+                        "text": {
+                            "pattern": [
+                                "en esta web no aceptamos el uso de adblock"
+                            ]
+                        }
+                    }
+                },
                 "generic_it": {
                     "match": {
                         "text": {
                             "pattern": [
                                 "disattiva l'ad block",
                                 "stai usando un ad block"
+                            ]
+                        }
+                    }
+                },
+                "generic_nl": {
+                    "match": {
+                        "text": {
+                            "pattern": [
+                                "adblock gedetecteerd",
+                                "schakel je adblocker uit om de video te bekijken"
                             ]
                         }
                     }
@@ -54,6 +69,15 @@
                                 "har du en annonsblockerare igång",
                                 "avaktivera din annonsblockerare"
                             ]
+                        }
+                    }
+                }
+            },
+            "commentsDisabled": {
+                "generic": {
+                    "match": {
+                        "text": {
+                            "pattern": "comments are turned off"
                         }
                     }
                 }
