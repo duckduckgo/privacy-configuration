@@ -154,7 +154,7 @@ jobs:
                   fi
 
             - name: Find Previous Diff Comment
-              uses: peter-evans/find-comment@v3
+              uses: peter-evans/find-comment@v4
               id: find_diff_comment
               with:
                   issue-number: ${{ github.event.pull_request.number }}
@@ -163,7 +163,7 @@ jobs:
                   direction: last
 
             - name: Find Previous Approval Comment
-              uses: peter-evans/find-comment@v3
+              uses: peter-evans/find-comment@v4
               id: find_approval_comment
               with:
                   issue-number: ${{ github.event.pull_request.number }}
