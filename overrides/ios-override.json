@@ -323,6 +323,32 @@
                     "description": "Toggle Choice Screen during onboarding",
                     "minSupportedVersion": "7.197.0"
                 },
+                "duckAIQueryExperiment": {
+                    "state": "enabled",
+                    "description": "Duck.ai onboarding query experiment cohorts",
+                    "minSupportedVersion": "7.197.0",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatmentA",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatmentB",
+                            "weight": 1
+                        }
+                    ]
+                },
                 "showHideAiGeneratedImages": {
                     "state": "enabled"
                 },
