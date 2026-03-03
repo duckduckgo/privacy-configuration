@@ -377,6 +377,21 @@ describe('EventHub validation tests', () => {
                 }
             });
 
+            it('total trigger period must be greater than zero', () => {
+                for (const [
+                    name,
+                    entry,
+                ] of Object.entries(telemetry)) {
+                    const period = entry.trigger.period;
+                    const totalSeconds =
+                        (period.seconds || 0) + (period.minutes || 0) * 60 + (period.hours || 0) * 3600 + (period.days || 0) * 86400;
+                    expect(totalSeconds).to.be.greaterThan(
+                        0,
+                        `Telemetry '${name}' total period is ${totalSeconds}s — must be greater than zero`,
+                    );
+                }
+            });
+
             it('each telemetry entry must have at least one parameter', () => {
                 for (const [
                     name,
