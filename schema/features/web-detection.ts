@@ -7,13 +7,25 @@ type TriggerBase = {
     runConditions?: ConditionBlockOrArray;
 };
 
+type AutoTrigger = TriggerBase & {
+    when: {
+        intervalMs: number[];
+    };
+};
+
 type Triggers = Partial<{
     breakageReport: TriggerBase;
+    auto: AutoTrigger;
 }>;
 
+type ActionBase = {
+    state?: FeatureState;
+};
+
 type Actions = Partial<{
-    breakageReportData: {
-        state?: FeatureState;
+    breakageReportData: ActionBase;
+    fireEvent: ActionBase & {
+        type: string;
     };
 }>;
 

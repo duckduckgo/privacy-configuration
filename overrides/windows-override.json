@@ -1261,7 +1261,7 @@
                 },
                 "pageContext": {
                     "minSupportedVersion": "0.136.4",
-                    "state": "preview"
+                    "state": "enabled"
                 },
                 "improvements": {
                     "state": "enabled",
@@ -1284,16 +1284,34 @@
                 "omnibarOnboarding": {
                     "state": "enabled"
                 },
+                "omnibarTools": {
+                    "state": "disabled"
+                },
                 "showHideAiGeneratedImages": {
                     "state": "enabled"
                 },
                 "supportsSyncChatsDeletion": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.147.5"
+                },
+                "resizableSidebar": {
+                    "state": "enabled"
+                },
+                "detachableSidebar": {
                     "state": "internal"
+                },
+                "entryPointExperiment": {
+                    "state": "disabled",
+                    "cohorts": [
+                        { "name": "control", "weight": 1 },
+                        { "name": "toolbarSidebar", "weight": 1 },
+                        { "name": "chromeSidebar", "weight": 1 }
+                    ]
                 }
             },
             "minSupportedVersion": "0.100.0",
             "settings": {
-                "aiChatURL": "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=3",
+                "aiChatURL": "https://duck.ai/chat?duckai=3",
                 "onboardingCookieName": "dcm",
                 "onboardingCookieDomain": "duckduckgo.com",
                 "aiChatURLIdentifiableQuery": "ia",
@@ -1305,11 +1323,17 @@
             "state": "enabled",
             "minSupportedVersion": "0.142.0",
             "settings": {
-                "chatsLocalStorageKeys": ["savedAIChats"],
+                "chatsLocalStorageKeys": [
+                    "savedAIChats"
+                ],
                 "chatImagesIndexDbNameObjectStoreNamePairs": [
                     [
                         "savedAIChatData",
                         "chat-images"
+                    ],
+                    [
+                        "savedAIChatData",
+                        "saved-chats"
                     ]
                 ]
             }
@@ -1343,7 +1367,18 @@
                     }
                 },
                 "namedPipesConnection": {
-                    "state": "disabled"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.146.5",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5.0
+                            },
+                            {
+                                "percent": 10.0
+                            }
+                        ]
+                    }
                 }
             },
             "settings": {
@@ -1418,6 +1453,9 @@
                 "totp": {
                     "state": "internal"
                 },
+                "autofillOSPasskeys": {
+                    "state": "internal"
+                },
                 "siteSpecificFixes": {
                     "state": "enabled",
                     "settings": {
@@ -1427,7 +1465,9 @@
                         "failsafeSettings": {},
                         "domains": [
                             {
-                                "domain": ["ring.com"],
+                                "domain": [
+                                    "ring.com"
+                                ],
                                 "patchSettings": [
                                     {
                                         "path": "/formTypeSettings/-",
@@ -1440,7 +1480,9 @@
                                 ]
                             },
                             {
-                                "domain": ["www.joinblvd.com"],
+                                "domain": [
+                                    "www.joinblvd.com"
+                                ],
                                 "patchSettings": [
                                     {
                                         "path": "/formTypeSettings/-",
@@ -1453,7 +1495,9 @@
                                 ]
                             },
                             {
-                                "domain": ["alibris.com"],
+                                "domain": [
+                                    "alibris.com"
+                                ],
                                 "patchSettings": [
                                     {
                                         "path": "/formTypeSettings/-",
@@ -1474,7 +1518,9 @@
                                 ]
                             },
                             {
-                                "domain": ["coolors.co"],
+                                "domain": [
+                                    "coolors.co"
+                                ],
                                 "patchSettings": [
                                     {
                                         "path": "/failsafeSettings/maxInputsPerPage",
@@ -1484,7 +1530,9 @@
                                 ]
                             },
                             {
-                                "domain": ["areaclientes.orange.es"],
+                                "domain": [
+                                    "areaclientes.orange.es"
+                                ],
                                 "patchSettings": [
                                     {
                                         "path": "/formTypeSettings/-",
@@ -1529,7 +1577,9 @@
                                 ]
                             },
                             {
-                                "domain": ["cvs.com"],
+                                "domain": [
+                                    "cvs.com"
+                                ],
                                 "patchSettings": [
                                     {
                                         "path": "/inputTypeSettings/-",
@@ -1542,7 +1592,9 @@
                                 ]
                             },
                             {
-                                "domain": ["att.com"],
+                                "domain": [
+                                    "att.com"
+                                ],
                                 "patchSettings": [
                                     {
                                         "path": "/inputTypeSettings/-",
@@ -1555,7 +1607,9 @@
                                 ]
                             },
                             {
-                                "domain": ["gamestop.com"],
+                                "domain": [
+                                    "gamestop.com"
+                                ],
                                 "patchSettings": [
                                     {
                                         "path": "/inputTypeSettings/-",
@@ -1576,7 +1630,9 @@
                                 ]
                             },
                             {
-                                "domain": ["asana.com"],
+                                "domain": [
+                                    "asana.com"
+                                ],
                                 "patchSettings": [
                                     {
                                         "path": "/inputTypeSettings/-",
@@ -1589,7 +1645,9 @@
                                 ]
                             },
                             {
-                                "domain": ["portal.vectorsecurity.com"],
+                                "domain": [
+                                    "portal.vectorsecurity.com"
+                                ],
                                 "patchSettings": [
                                     {
                                         "path": "/formTypeSettings/-",
@@ -1602,7 +1660,9 @@
                                 ]
                             },
                             {
-                                "domain": ["reddit.com"],
+                                "domain": [
+                                    "reddit.com"
+                                ],
                                 "patchSettings": [
                                     {
                                         "path": "/formTypeSettings/-",
@@ -1615,7 +1675,9 @@
                                 ]
                             },
                             {
-                                "domain": ["netflix.com"],
+                                "domain": [
+                                    "netflix.com"
+                                ],
                                 "patchSettings": [
                                     {
                                         "path": "/formTypeSettings/-",
@@ -1633,7 +1695,9 @@
                                 ]
                             },
                             {
-                                "domain": ["aa.com"],
+                                "domain": [
+                                    "aa.com"
+                                ],
                                 "patchSettings": [
                                     {
                                         "path": "/formBoundarySelector",
@@ -1656,7 +1720,9 @@
                                 ]
                             },
                             {
-                                "domain": ["order.yodobashi.com"],
+                                "domain": [
+                                    "order.yodobashi.com"
+                                ],
                                 "patchSettings": [
                                     {
                                         "path": "/formTypeSettings/-",
@@ -1732,396 +1798,9 @@
                                 ]
                             },
                             {
-                                "domain": ["signin.autodesk.com"],
-                                "patchSettings": [
-                                    {
-                                        "path": "/inputTypeSettings/-",
-                                        "op": "add",
-                                        "value": {
-                                            "selector": "input#firstname_str",
-                                            "type": "identities.firstName"
-                                        }
-                                    },
-                                    {
-                                        "path": "/inputTypeSettings/-",
-                                        "op": "add",
-                                        "value": {
-                                            "selector": "input#lastname_str",
-                                            "type": "identities.lastName"
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                }
-            }
-        },
-        "autofill_DDGWV": {
-            "state": "enabled",
-            "exceptions": [
-                {
-                    "domain": "roll20.net",
-                    "reason": "Performance issue for too many fields."
-                }
-            ],
-            "features": {
-                "autofillPopupReuse": {
-                    "state": "disabled"
-                },
-                "deduplicateLoginsOnImport": {
-                    "state": "enabled"
-                },
-                "unknownUsernameCategorization": {
-                    "state": "enabled"
-                },
-                "passwordVariantCategorization": {
-                    "state": "enabled"
-                },
-                "credentialsImportPromotion": {
-                    "state": "enabled",
-                    "minSupportedVersion": "0.98.0"
-                },
-                "credentialsImportPromotionForExistingUsers": {
-                    "state": "enabled",
-                    "minSupportedVersion": "0.98.0"
-                },
-                "partialFormSaves": {
-                    "state": "enabled"
-                },
-                "autofillCreditCards": {
-                    "state": "enabled"
-                },
-                "autofillCreditCardsOnByDefault": {
-                    "state": "enabled"
-                },
-                "autofillIdentities": {
-                    "state": "enabled"
-                },
-                "autofillIdentitiesOnByDefault": {
-                    "state": "enabled"
-                },
-                "autofillSkipAuthenticationIfVaultEmpty": {
-                    "state": "internal"
-                },
-                "totp": {
-                    "state": "internal"
-                },
-                "siteSpecificFixes": {
-                    "state": "enabled",
-                    "settings": {
-                        "formTypeSettings": [],
-                        "inputTypeSettings": [],
-                        "formBoundarySelector": "",
-                        "failsafeSettings": {},
-                        "domains": [
-                            {
-                                "domain": ["ring.com"],
-                                "patchSettings": [
-                                    {
-                                        "path": "/formTypeSettings/-",
-                                        "op": "add",
-                                        "value": {
-                                            "selector": "body > main > section > form:nth-child(2)",
-                                            "type": "signup"
-                                        }
-                                    }
-                                ]
-                            },
-                            {
-                                "domain": ["www.joinblvd.com"],
-                                "patchSettings": [
-                                    {
-                                        "path": "/formTypeSettings/-",
-                                        "op": "add",
-                                        "value": {
-                                            "selector": "blvd-wizard-step form",
-                                            "type": "signup"
-                                        }
-                                    }
-                                ]
-                            },
-                            {
-                                "domain": ["alibris.com"],
-                                "patchSettings": [
-                                    {
-                                        "path": "/formTypeSettings/-",
-                                        "op": "add",
-                                        "value": {
-                                            "selector": "form[action*=\"Guest\"]",
-                                            "type": "signup"
-                                        }
-                                    },
-                                    {
-                                        "path": "/formTypeSettings/-",
-                                        "op": "add",
-                                        "value": {
-                                            "selector": "form[action*=\"CreateAccount\"]",
-                                            "type": "signup"
-                                        }
-                                    }
-                                ]
-                            },
-                            {
-                                "domain": ["coolors.co"],
-                                "patchSettings": [
-                                    {
-                                        "path": "/failsafeSettings/maxInputsPerPage",
-                                        "op": "add",
-                                        "value": 110
-                                    }
-                                ]
-                            },
-                            {
-                                "domain": ["areaclientes.orange.es"],
-                                "patchSettings": [
-                                    {
-                                        "path": "/formTypeSettings/-",
-                                        "op": "add",
-                                        "value": {
-                                            "selector": "form",
-                                            "type": "login"
-                                        }
-                                    }
-                                ]
-                            },
-                            {
                                 "domain": [
-                                    "estore.archives.gov",
-                                    "localhost"
+                                    "signin.autodesk.com"
                                 ],
-                                "patchSettings": [
-                                    {
-                                        "path": "/formTypeSettings/-",
-                                        "op": "add",
-                                        "value": {
-                                            "selector": "fieldset[id='ucContentMiddleCenter_fldLogin']",
-                                            "type": "login"
-                                        }
-                                    }
-                                ]
-                            },
-                            {
-                                "domain": [
-                                    "zendesk.com",
-                                    "localhost"
-                                ],
-                                "patchSettings": [
-                                    {
-                                        "path": "/inputTypeSettings/-",
-                                        "op": "add",
-                                        "value": {
-                                            "selector": "#\\:r0\\:\\-\\-input",
-                                            "type": "credentials.username"
-                                        }
-                                    }
-                                ]
-                            },
-                            {
-                                "domain": ["cvs.com"],
-                                "patchSettings": [
-                                    {
-                                        "path": "/inputTypeSettings/-",
-                                        "op": "add",
-                                        "value": {
-                                            "selector": "profile-lookup[app-name='account-login'] input[type='text']",
-                                            "type": "credentials.username"
-                                        }
-                                    }
-                                ]
-                            },
-                            {
-                                "domain": ["att.com"],
-                                "patchSettings": [
-                                    {
-                                        "path": "/inputTypeSettings/-",
-                                        "op": "add",
-                                        "value": {
-                                            "selector": "input[name='Expiration Month']",
-                                            "type": "creditCards.expiration"
-                                        }
-                                    }
-                                ]
-                            },
-                            {
-                                "domain": ["gamestop.com"],
-                                "patchSettings": [
-                                    {
-                                        "path": "/inputTypeSettings/-",
-                                        "op": "add",
-                                        "value": {
-                                            "selector": "input[name='dwfrm_profile_customer_email']",
-                                            "type": "identities.emailAddress"
-                                        }
-                                    },
-                                    {
-                                        "path": "/inputTypeSettings/-",
-                                        "op": "add",
-                                        "value": {
-                                            "selector": "input[name='dwfrm_profile_login_password']",
-                                            "type": "credentials.password.new"
-                                        }
-                                    }
-                                ]
-                            },
-                            {
-                                "domain": ["asana.com"],
-                                "patchSettings": [
-                                    {
-                                        "path": "/inputTypeSettings/-",
-                                        "op": "add",
-                                        "value": {
-                                            "selector": "input.TextInputBase.TokenizerInput-input[data-testid='tokenizer-input'][placeholder='Name or email']",
-                                            "type": "unknown"
-                                        }
-                                    }
-                                ]
-                            },
-                            {
-                                "domain": ["portal.vectorsecurity.com"],
-                                "patchSettings": [
-                                    {
-                                        "path": "/formTypeSettings/-",
-                                        "op": "add",
-                                        "value": {
-                                            "selector": "form[method='post'][action='/index']",
-                                            "type": "login"
-                                        }
-                                    }
-                                ]
-                            },
-                            {
-                                "domain": ["reddit.com"],
-                                "patchSettings": [
-                                    {
-                                        "path": "/formTypeSettings/-",
-                                        "op": "add",
-                                        "value": {
-                                            "selector": "rpl-modal-card.settings-row-modal-card[id*='settings-mfa-enable-password']",
-                                            "type": "login"
-                                        }
-                                    }
-                                ]
-                            },
-                            {
-                                "domain": ["netflix.com"],
-                                "patchSettings": [
-                                    {
-                                        "path": "/formTypeSettings/-",
-                                        "op": "add",
-                                        "value": {
-                                            "selector": "div[data-uia='web-login-form']",
-                                            "type": "login"
-                                        }
-                                    },
-                                    {
-                                        "path": "/formBoundarySelector",
-                                        "op": "replace",
-                                        "value": "div[data-uia='web-login-form']"
-                                    }
-                                ]
-                            },
-                            {
-                                "domain": ["aa.com"],
-                                "patchSettings": [
-                                    {
-                                        "path": "/formBoundarySelector",
-                                        "op": "replace",
-                                        "value": "adc-card.adc-card"
-                                    }
-                                ]
-                            },
-                            {
-                                "domain": [
-                                    "bet365.bet.br",
-                                    "bet365.com"
-                                ],
-                                "patchSettings": [
-                                    {
-                                        "path": "/formBoundarySelector",
-                                        "op": "replace",
-                                        "value": "div[style*=transform] > div"
-                                    }
-                                ]
-                            },
-                            {
-                                "domain": ["order.yodobashi.com"],
-                                "patchSettings": [
-                                    {
-                                        "path": "/formTypeSettings/-",
-                                        "op": "add",
-                                        "value": {
-                                            "selector": ".loginSelectUnit.slctInputUnit",
-                                            "type": "login"
-                                        }
-                                    },
-                                    {
-                                        "path": "/formBoundarySelector",
-                                        "op": "replace",
-                                        "value": ".loginSelectUnit.slctInputUnit"
-                                    }
-                                ]
-                            },
-                            {
-                                "domain": [
-                                    "accounts.google.com"
-                                ],
-                                "patchSettings": [
-                                    {
-                                        "path": "/formBoundarySelector",
-                                        "op": "replace",
-                                        "value": "c-wiz > main"
-                                    },
-                                    {
-                                        "path": "/formTypeSettings/-",
-                                        "op": "add",
-                                        "value": {
-                                            "selector": "c-wiz[data-p*=ServiceLogin] > main",
-                                            "type": "login"
-                                        }
-                                    }
-                                ]
-                            },
-                            {
-                                "domain": [
-                                    "challenge.spotify.com"
-                                ],
-                                "patchSettings": [
-                                    {
-                                        "path": "/inputTypeSettings/-",
-                                        "op": "add",
-                                        "value": {
-                                            "selector": "input[inputmode=\"numeric\"]",
-                                            "type": "unknown"
-                                        }
-                                    }
-                                ]
-                            },
-                            {
-                                "domain": [
-                                    "login.coinbase.com"
-                                ],
-                                "patchSettings": [
-                                    {
-                                        "path": "/inputTypeSettings/-",
-                                        "op": "add",
-                                        "value": {
-                                            "selector": "input[data-testid='unified-login-email-prompt-input']",
-                                            "type": "credentials.username"
-                                        }
-                                    },
-                                    {
-                                        "path": "/inputTypeSettings/-",
-                                        "op": "add",
-                                        "value": {
-                                            "selector": "span[data-testid='input-interactable-area'] input[type='email']",
-                                            "type": "identities.emailAddress"
-                                        }
-                                    }
-                                ]
-                            },
-                            {
-                                "domain": ["signin.autodesk.com"],
                                 "patchSettings": [
                                     {
                                         "path": "/inputTypeSettings/-",
@@ -2183,6 +1862,15 @@
         "googleRejected": {
             "state": "disabled",
             "exceptions": []
+        },
+        "gpc": {
+            "state": "enabled",
+            "exceptions": [
+                {
+                    "domain": "smythstoys.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4548"
+                }
+            ]
         },
         "navigatorInterface": {
             "state": "enabled"
@@ -2382,6 +2070,10 @@
                         "reason": "After sign-in for Google Pay flows (after flickering is resolved), blocking this causes the loading spinner to spin indefinitely, and the payment flow cannot proceed."
                     },
                     {
+                        "domain": "docs.google.com",
+                        "reason": "Embedded Google docs get into redirect loop if signed into a Google account"
+                    },
+                    {
                         "domain": "disneyplus.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2906"
                     }
@@ -2472,374 +2164,1464 @@
                         "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
                     }
                 ],
-                "omitClientHintMutations": []
+                "omitClientHintMutations": [
+                    {
+                        "domain": "smythstoys.com"
+                    },
+                    {
+                        "domain": "www.smythstoys.com"
+                    }
+                ]
             },
             "features": {
                 "userAgentStrategies": {
                     "state": "enabled",
                     "settings": {
                         "strategies": [
-                            { "strategy": "ChromeUA", "domain": "1cs.jp" },
-                            { "strategy": "ChromeUA", "domain": "3min-class.offcn.mobi" },
-                            { "strategy": "ChromeUA", "domain": "99lms.com" },
-                            { "strategy": "ChromeUA", "domain": "acuvue.com" },
-                            { "strategy": "ChromeUA", "domain": "agriedu.net" },
-                            { "strategy": "ChromeUA", "domain": "aiosante.fr" },
-                            { "strategy": "ChromeUA", "domain": "ajmd-med.com" },
-                            { "strategy": "ChromeUA", "domain": "alefed.com" },
-                            { "strategy": "ChromeUA", "domain": "alema.tv" },
-                            { "strategy": "ChromeUA", "domain": "algoritmika.*" },
-                            { "strategy": "ChromeUA", "domain": "all-dream.com" },
-                            { "strategy": "ChromeUA", "domain": "alocom.co" },
-                            { "strategy": "ChromeUA", "domain": "amwater.com" },
-                            { "strategy": "ChromeUA", "domain": "apollo.varsitytutors.com" },
-                            { "strategy": "ChromeUA", "domain": "app.ascendacademic.com" },
-                            { "strategy": "ChromeUA", "domain": "app.axiumascend.com" },
-                            { "strategy": "ChromeUA", "domain": "app.boardable.com" },
-                            { "strategy": "ChromeUA", "domain": "app.bookcreator.com" },
-                            { "strategy": "ChromeUA", "domain": "app.classkick.com" },
-                            { "strategy": "ChromeUA", "domain": "app.comptalia.com" },
-                            { "strategy": "ChromeUA", "domain": "app.evisit.com" },
-                            { "strategy": "ChromeUA", "domain": "app.fields.corteva.com" },
-                            { "strategy": "ChromeUA", "domain": "app.figure1.com" },
-                            { "strategy": "ChromeUA", "domain": "app.initlive.com" },
-                            { "strategy": "ChromeUA", "domain": "app.jigsawinteractive.com" },
-                            { "strategy": "ChromeUA", "domain": "app.mytaxprepoffice.com" },
-                            { "strategy": "ChromeUA", "domain": "app.pharmulary.com" },
-                            { "strategy": "ChromeUA", "domain": "app.showit.co" },
-                            { "strategy": "ChromeUA", "domain": "app.wom.co" },
-                            { "strategy": "ChromeUA", "domain": "applychildcaresubsidy.alberta.ca" },
-                            { "strategy": "ChromeUA", "domain": "aprendizaje.mec.edu.py" },
-                            { "strategy": "ChromeUA", "domain": "arch-sticker.com" },
-                            { "strategy": "ChromeUA", "domain": "astrogo.astro.com.my" },
-                            { "strategy": "ChromeUA", "domain": "atitesting.com" },
-                            { "strategy": "ChromeUA", "domain": "aussieplaybonuses.com" },
-                            { "strategy": "ChromeUA", "domain": "aussieplaypromos.com" },
-                            { "strategy": "ChromeUA", "domain": "authoring.amirsys.com" },
-                            { "strategy": "ChromeUA", "domain": "aveeno.com" },
-                            { "strategy": "ChromeUA", "domain": "avon.com.br" },
-                            { "strategy": "ChromeUA", "domain": "axisbank.com" },
-                            { "strategy": "ChromeUA", "domain": "bancodeoccidente.com.co" },
-                            { "strategy": "ChromeUA", "domain": "band-aid.com.au" },
-                            { "strategy": "ChromeUA", "domain": "bandaid.ca" },
-                            { "strategy": "ChromeUA", "domain": "bank.dream-1.co.kr" },
-                            { "strategy": "ChromeUA", "domain": "bcpzonasegurabeta.viabcp.com" },
-                            { "strategy": "ChromeUA", "domain": "blibee.com" },
-                            { "strategy": "ChromeUA", "domain": "blog.esuteru.com" },
-                            { "strategy": "ChromeUA", "domain": "bm.chsi.com.cn" },
-                            { "strategy": "ChromeUA", "domain": "bm.cltt.org" },
-                            { "strategy": "ChromeUA", "domain": "booking.com" },
-                            { "strategy": "ChromeUA", "domain": "business.curated.com" },
-                            { "strategy": "ChromeUA", "domain": "business.xiaohe.cn" },
-                            { "strategy": "ChromeUA", "domain": "buy.icicibank.com" },
-                            { "strategy": "ChromeUA", "domain": "byjusfutureschool.com" },
-                            { "strategy": "ChromeUA", "domain": "capcut.cn" },
-                            { "strategy": "ChromeUA", "domain": "capcut.com" },
-                            { "strategy": "ChromeUA", "domain": "capitaloneoffers.com" },
-                            { "strategy": "ChromeUA", "domain": "carelogin.bryantelemedicine.com" },
-                            { "strategy": "ChromeUA", "domain": "census.gov" },
-                            { "strategy": "ChromeUA", "domain": "chat-pt.com" },
-                            { "strategy": "ChromeUA", "domain": "chatalternative.com" },
-                            { "strategy": "ChromeUA", "domain": "classcard.net" },
-                            { "strategy": "ChromeUA", "domain": "clipchamp.com" },
-                            { "strategy": "ChromeUA", "domain": "clube.dermaclub.com.br" },
-                            { "strategy": "ChromeUA", "domain": "co-verify.com" },
-                            { "strategy": "ChromeUA", "domain": "codelion.net" },
-                            { "strategy": "ChromeUA", "domain": "conalep.edu.mx" },
-                            { "strategy": "ChromeUA", "domain": "conv.gryphondds.com" },
-                            { "strategy": "ChromeUA", "domain": "conveyiq.com" },
-                            { "strategy": "ChromeUA", "domain": "coronavirus.maryland.gov" },
-                            { "strategy": "ChromeUA", "domain": "courses.fcaperformanceinstitute.com" },
-                            { "strategy": "ChromeUA", "domain": "crayondatabase.com" },
-                            { "strategy": "ChromeUA", "domain": "csia.org.cn" },
-                            { "strategy": "ChromeUA", "domain": "customs.vans.com.cn" },
-                            { "strategy": "ChromeUA", "domain": "cyedu.kead.or.kr" },
-                            { "strategy": "ChromeUA", "domain": "demos.cutcoapps.com" },
-                            { "strategy": "ChromeUA", "domain": "dentrixascend.com" },
-                            { "strategy": "ChromeUA", "domain": "digication.com" },
-                            { "strategy": "ChromeUA", "domain": "dishanywhere.com" },
-                            { "strategy": "ChromeUA", "domain": "disputeprocess.com" },
-                            { "strategy": "ChromeUA", "domain": "docs.google.com" },
-                            { "strategy": "ChromeUA", "domain": "doratoon.com" },
-                            { "strategy": "ChromeUA", "domain": "dscout.com" },
-                            { "strategy": "ChromeUA", "domain": "dsp.horse24.com" },
-                            { "strategy": "ChromeUA", "domain": "dubailand.gov.ae" },
-                            { "strategy": "ChromeUA", "domain": "educareac.com" },
-                            { "strategy": "ChromeUA", "domain": "edufe.com.cn" },
-                            { "strategy": "ChromeUA", "domain": "edunet.net" },
-                            { "strategy": "ChromeUA", "domain": "eid.belgium.be" },
-                            { "strategy": "ChromeUA", "domain": "elearning.evn.com.vn" },
-                            { "strategy": "ChromeUA", "domain": "elearning.seabank.com.vn" },
-                            { "strategy": "ChromeUA", "domain": "elroyalecasino.com" },
-                            { "strategy": "ChromeUA", "domain": "elroyalecasinobonuses.com" },
-                            { "strategy": "ChromeUA", "domain": "elroyalecasinomail.com" },
-                            { "strategy": "ChromeUA", "domain": "emblemhealth.com" },
-                            { "strategy": "ChromeUA", "domain": "englishbuddy.kr" },
-                            { "strategy": "ChromeUA", "domain": "eps.jspl.com" },
-                            { "strategy": "ChromeUA", "domain": "eqxiu.com" },
-                            { "strategy": "ChromeUA", "domain": "eu.smilemate.com" },
-                            { "strategy": "ChromeUA", "domain": "exchangeservicecenter.com" },
-                            { "strategy": "ChromeUA", "domain": "fansnet.jp" },
-                            { "strategy": "ChromeUA", "domain": "febc.net" },
-                            { "strategy": "ChromeUA", "domain": "fitnesstest.xtu.edu.cn" },
-                            { "strategy": "ChromeUA", "domain": "front.viewinter.ai" },
-                            { "strategy": "ChromeUA", "domain": "fx.dmm.com" },
-                            { "strategy": "ChromeUA", "domain": "gd.gov.cn" },
-                            { "strategy": "ChromeUA", "domain": "gfs.tokyo" },
-                            { "strategy": "ChromeUA", "domain": "givebacks.com" },
-                            { "strategy": "ChromeUA", "domain": "glive2.gaodun.com" },
-                            { "strategy": "ChromeUA", "domain": "global.talk-cloud.net" },
-                            { "strategy": "ChromeUA", "domain": "gooroomee.com" },
-                            { "strategy": "ChromeUA", "domain": "gov.pl" },
-                            { "strategy": "ChromeUA", "domain": "granbluefantasy.jp" },
-                            { "strategy": "ChromeUA", "domain": "greenxtrade.*" },
-                            { "strategy": "ChromeUA", "domain": "groove.cm" },
-                            { "strategy": "ChromeUA", "domain": "grow.google" },
-                            { "strategy": "ChromeUA", "domain": "gsop.sec.samsung.net" },
-                            { "strategy": "ChromeUA", "domain": "gsq.minornet.com" },
-                            { "strategy": "ChromeUA", "domain": "guihuayun.com" },
-                            { "strategy": "ChromeUA", "domain": "hanafloralpos2.com" },
-                            { "strategy": "ChromeUA", "domain": "hb.zcjb.com.cn" },
-                            { "strategy": "ChromeUA", "domain": "hd.kinopoisk.ru" },
-                            { "strategy": "ChromeUA", "domain": "help.hulu.com" },
-                            { "strategy": "ChromeUA", "domain": "hiflow.com" },
-                            { "strategy": "ChromeUA", "domain": "hirepro.in" },
-                            { "strategy": "ChromeUA", "domain": "hllqp.com" },
-                            { "strategy": "ChromeUA", "domain": "home.ibotta.com" },
-                            { "strategy": "ChromeUA", "domain": "honorlock.com" },
-                            { "strategy": "ChromeUA", "domain": "hubgame.cn" },
-                            { "strategy": "ChromeUA", "domain": "hunbei.com" },
-                            { "strategy": "ChromeUA", "domain": "i.cqu.edu.cn" },
-                            { "strategy": "ChromeUA", "domain": "icingimages.com" },
-                            { "strategy": "ChromeUA", "domain": "icourse163.org" },
-                            { "strategy": "ChromeUA", "domain": "iguokao.com" },
-                            { "strategy": "ChromeUA", "domain": "integra.co.in" },
-                            { "strategy": "ChromeUA", "domain": "interlakepsychiatricintouch.insynchcs.com" },
-                            { "strategy": "ChromeUA", "domain": "invest.ameritrade.com" },
-                            { "strategy": "ChromeUA", "domain": "jacquielawson.com" },
-                            { "strategy": "ChromeUA", "domain": "jianshu.com" },
-                            { "strategy": "ChromeUA", "domain": "jlau.edu.cn" },
-                            { "strategy": "ChromeUA", "domain": "jnjpediatrics.com" },
-                            { "strategy": "ChromeUA", "domain": "jobda.im" },
-                            { "strategy": "ChromeUA", "domain": "jp.glats.online" },
-                            { "strategy": "ChromeUA", "domain": "kaipoke.biz" },
-                            { "strategy": "ChromeUA", "domain": "kakao.com" },
-                            { "strategy": "ChromeUA", "domain": "kaleoz.com" },
-                            { "strategy": "ChromeUA", "domain": "kazaplan.com" },
-                            { "strategy": "ChromeUA", "domain": "keckmedicine.org" },
-                            { "strategy": "ChromeUA", "domain": "kidkids.net" },
-                            { "strategy": "ChromeUA", "domain": "knps.or.kr" },
-                            { "strategy": "ChromeUA", "domain": "kozikaza.com" },
-                            { "strategy": "ChromeUA", "domain": "kyc.icicibank.com" },
-                            { "strategy": "ChromeUA", "domain": "lacite.essentialskillsgroup.com" },
-                            { "strategy": "ChromeUA", "domain": "languageacademy.com.au" },
-                            { "strategy": "ChromeUA", "domain": "learn.alg.academy" },
-                            { "strategy": "ChromeUA", "domain": "learn.maplesoft.com" },
-                            { "strategy": "ChromeUA", "domain": "learning.apaxleaders.edu.vn" },
-                            { "strategy": "ChromeUA", "domain": "learning.chungdahm.com" },
-                            { "strategy": "ChromeUA", "domain": "leboncoin.fr" },
-                            { "strategy": "ChromeUA", "domain": "leetcode-cn.com" },
-                            { "strategy": "ChromeUA", "domain": "lemo.share-platform.de" },
-                            { "strategy": "ChromeUA", "domain": "lilyclass.com" },
-                            { "strategy": "ChromeUA", "domain": "live.remo.co" },
-                            { "strategy": "ChromeUA", "domain": "live.twebcast.com" },
-                            { "strategy": "ChromeUA", "domain": "livecourse.com" },
-                            { "strategy": "ChromeUA", "domain": "lnwlzb.com" },
-                            { "strategy": "ChromeUA", "domain": "logikaschool.com" },
-                            { "strategy": "ChromeUA", "domain": "login.hourpowerpro.com" },
-                            { "strategy": "ChromeUA", "domain": "login.smasheducation.com" },
-                            { "strategy": "ChromeUA", "domain": "logon.mykpa.com" },
-                            { "strategy": "ChromeUA", "domain": "longfor.com" },
-                            { "strategy": "ChromeUA", "domain": "luckytiger-promo.com" },
-                            { "strategy": "ChromeUA", "domain": "luckytigercasino.com" },
-                            { "strategy": "ChromeUA", "domain": "luz.tcd.gov.tw" },
-                            { "strategy": "ChromeUA", "domain": "lwss.cdgdc.edu.cn" },
-                            { "strategy": "ChromeUA", "domain": "mail.nate.com" },
-                            { "strategy": "ChromeUA", "domain": "manaba.jwu.ac.jp" },
-                            { "strategy": "ChromeUA", "domain": "managing.h-navi.jp" },
-                            { "strategy": "ChromeUA", "domain": "manulife-aor.unqork.io" },
-                            { "strategy": "ChromeUA", "domain": "mars.alg.academy" },
-                            { "strategy": "ChromeUA", "domain": "mayahii.com" },
-                            { "strategy": "ChromeUA", "domain": "mazonecec.com" },
-                            { "strategy": "ChromeUA", "domain": "mega.nz" },
-                            { "strategy": "ChromeUA", "domain": "member.goforward.com" },
-                            { "strategy": "ChromeUA", "domain": "mentora.co" },
-                            { "strategy": "ChromeUA", "domain": "mettl.com" },
-                            { "strategy": "ChromeUA", "domain": "mheducation.com" },
-                            { "strategy": "ChromeUA", "domain": "midea.com" },
-                            { "strategy": "ChromeUA", "domain": "mindbody.io" },
-                            { "strategy": "ChromeUA", "domain": "minedia.com" },
-                            { "strategy": "ChromeUA", "domain": "miricanvas.com" },
-                            { "strategy": "ChromeUA", "domain": "miro.com" },
-                            { "strategy": "ChromeUA", "domain": "moji365.com" },
-                            { "strategy": "ChromeUA", "domain": "moneygram.com" },
-                            { "strategy": "ChromeUA", "domain": "my.a-bly.com" },
-                            { "strategy": "ChromeUA", "domain": "my.globaluniversity.edu" },
-                            { "strategy": "ChromeUA", "domain": "mycreativeshop.com" },
-                            { "strategy": "ChromeUA", "domain": "myhealth.alaska.gov" },
-                            { "strategy": "ChromeUA", "domain": "myslate.sixphrase.com" },
-                            { "strategy": "ChromeUA", "domain": "nativecamp.net" },
-                            { "strategy": "ChromeUA", "domain": "netsoins.com" },
-                            { "strategy": "ChromeUA", "domain": "new.faberlic.com" },
-                            { "strategy": "ChromeUA", "domain": "newrow.com" },
-                            { "strategy": "ChromeUA", "domain": "newstudentregistration.nmsu.edu" },
-                            { "strategy": "ChromeUA", "domain": "nhisdt.el.or.kr" },
-                            { "strategy": "ChromeUA", "domain": "nowcoder.com" },
-                            { "strategy": "ChromeUA", "domain": "ome.tv" },
-                            { "strategy": "ChromeUA", "domain": "online.aufratenzur.bawagpsk.com" },
-                            { "strategy": "ChromeUA", "domain": "onlyonefoodnet.ifresh.co.kr" },
-                            { "strategy": "ChromeUA", "domain": "order.campion.com.au" },
-                            { "strategy": "ChromeUA", "domain": "orders.cutcoapps.com" },
-                            { "strategy": "ChromeUA", "domain": "oxcoder.com.cn" },
-                            { "strategy": "ChromeUA", "domain": "parivahan.gov.in" },
-                            { "strategy": "ChromeUA", "domain": "pcpm37.rekrutmenbi.id" },
-                            { "strategy": "ChromeUA", "domain": "peiliyou.com" },
-                            { "strategy": "ChromeUA", "domain": "peixunyun.cn" },
-                            { "strategy": "ChromeUA", "domain": "phx.e-carms.ca" },
-                            { "strategy": "ChromeUA", "domain": "pinfrafacturacion.com.mx" },
-                            { "strategy": "ChromeUA", "domain": "pixton.com" },
-                            { "strategy": "ChromeUA", "domain": "pjxt.lnen.cn" },
-                            { "strategy": "ChromeUA", "domain": "platinum-options.com" },
-                            { "strategy": "ChromeUA", "domain": "play.nuuvem.com" },
-                            { "strategy": "ChromeUA", "domain": "player.pl" },
-                            { "strategy": "ChromeUA", "domain": "power2patient.net" },
-                            { "strategy": "ChromeUA", "domain": "prepmod.doh.wa.gov" },
-                            { "strategy": "ChromeUA", "domain": "prepmod.health.state.mn.us" },
-                            { "strategy": "ChromeUA", "domain": "prezi.com" },
-                            { "strategy": "ChromeUA", "domain": "printful.com" },
-                            { "strategy": "ChromeUA", "domain": "proctorio.com" },
-                            { "strategy": "ChromeUA", "domain": "proctorizer.com" },
-                            { "strategy": "ChromeUA", "domain": "proctoru.com" },
-                            { "strategy": "ChromeUA", "domain": "provider.teladoc.com" },
-                            { "strategy": "ChromeUA", "domain": "providerstc.hs.utah.gov" },
-                            { "strategy": "ChromeUA", "domain": "publishinglife.com" },
-                            { "strategy": "ChromeUA", "domain": "pulse.genesisworld.com" },
-                            { "strategy": "ChromeUA", "domain": "qb.99onez.com" },
-                            { "strategy": "ChromeUA", "domain": "qceit.org.cn" },
-                            { "strategy": "ChromeUA", "domain": "qlteacher.com" },
-                            { "strategy": "ChromeUA", "domain": "remplanner.ru" },
-                            { "strategy": "ChromeUA", "domain": "researchallofus.org" },
-                            { "strategy": "ChromeUA", "domain": "rev.com" },
-                            { "strategy": "ChromeUA", "domain": "richpalms-promo.com" },
-                            { "strategy": "ChromeUA", "domain": "richpalms.com" },
-                            { "strategy": "ChromeUA", "domain": "rtvirtual.ins-cr.com" },
-                            { "strategy": "ChromeUA", "domain": "rwanda.edacy.com" },
-                            { "strategy": "ChromeUA", "domain": "sanayisicil.sanayi.gov.tr" },
-                            { "strategy": "ChromeUA", "domain": "sankuai.com" },
-                            { "strategy": "ChromeUA", "domain": "search.norton.com" },
-                            { "strategy": "ChromeUA", "domain": "secure.priviahealth.com" },
-                            { "strategy": "ChromeUA", "domain": "sellermatch.co.kr" },
-                            { "strategy": "ChromeUA", "domain": "service.medicheck.se" },
-                            { "strategy": "ChromeUA", "domain": "servicetitan.com" },
-                            { "strategy": "ChromeUA", "domain": "shipbob.com" },
-                            { "strategy": "ChromeUA", "domain": "shop.lic.co.nz" },
-                            { "strategy": "ChromeUA", "domain": "shu.edu.cn" },
-                            { "strategy": "ChromeUA", "domain": "shuishan.net.cn" },
-                            { "strategy": "ChromeUA", "domain": "siga.aduanas.gob.do" },
-                            { "strategy": "ChromeUA", "domain": "sigaexplorer.aduanas.gob.do" },
-                            { "strategy": "ChromeUA", "domain": "siharka.menpan.go.id" },
-                            { "strategy": "ChromeUA", "domain": "silhouette-web.com" },
-                            { "strategy": "ChromeUA", "domain": "sling.com" },
-                            { "strategy": "ChromeUA", "domain": "slotsempirebonuses.com" },
-                            { "strategy": "ChromeUA", "domain": "smallbusiness.yahoo.com" },
-                            { "strategy": "ChromeUA", "domain": "smarterproctoring.com" },
-                            { "strategy": "ChromeUA", "domain": "smartping.live" },
-                            { "strategy": "ChromeUA", "domain": "smartschool.be" },
-                            { "strategy": "ChromeUA", "domain": "socialive.us" },
-                            { "strategy": "ChromeUA", "domain": "spatial.chat" },
-                            { "strategy": "ChromeUA", "domain": "speechtexter.com" },
-                            { "strategy": "ChromeUA", "domain": "sspt.bjcourt.gov.cn" },
-                            { "strategy": "ChromeUA", "domain": "start.ipc.qld.edu.au" },
-                            { "strategy": "ChromeUA", "domain": "street-academy.com" },
-                            { "strategy": "ChromeUA", "domain": "stu.ityxb.com" },
-                            { "strategy": "ChromeUA", "domain": "student.atama.plus" },
-                            { "strategy": "ChromeUA", "domain": "suppliersmx.smp-automotive.com" },
-                            { "strategy": "ChromeUA", "domain": "support.proxyvote.com" },
-                            { "strategy": "ChromeUA", "domain": "syscheck.bridge.psiexams.com" },
-                            { "strategy": "ChromeUA", "domain": "talview.com" },
-                            { "strategy": "ChromeUA", "domain": "taphuan.csdl.edu.vn" },
-                            { "strategy": "ChromeUA", "domain": "tcyonline.com" },
-                            { "strategy": "ChromeUA", "domain": "telehealthportal.uofuhealth.org" },
-                            { "strategy": "ChromeUA", "domain": "teleperformance.com" },
-                            { "strategy": "ChromeUA", "domain": "test.tallyeducation.com" },
-                            { "strategy": "ChromeUA", "domain": "test.zhiding.com.cn" },
-                            { "strategy": "ChromeUA", "domain": "tkc.co.jp" },
-                            { "strategy": "ChromeUA", "domain": "tophat.com" },
-                            { "strategy": "ChromeUA", "domain": "totale.rosettastone.com" },
-                            { "strategy": "ChromeUA", "domain": "train.medcerts.com" },
-                            { "strategy": "ChromeUA", "domain": "tryca.st" },
-                            { "strategy": "ChromeUA", "domain": "tv.partner.co.il" },
-                            { "strategy": "ChromeUA", "domain": "tver.jp" },
-                            { "strategy": "ChromeUA", "domain": "ulearning.cn" },
-                            { "strategy": "ChromeUA", "domain": "unacademy.com" },
-                            { "strategy": "ChromeUA", "domain": "unfi.com" },
-                            { "strategy": "ChromeUA", "domain": "univer.kaznpu.kz" },
-                            { "strategy": "ChromeUA", "domain": "unnes.ac.id" },
-                            { "strategy": "ChromeUA", "domain": "ursdoccdn.nosdn.127.net" },
-                            { "strategy": "ChromeUA", "domain": "usac.edu.gt" },
-                            { "strategy": "ChromeUA", "domain": "vaccinereg.health.nd.gov" },
-                            { "strategy": "ChromeUA", "domain": "vc.dial070.co.kr" },
-                            { "strategy": "ChromeUA", "domain": "videobanking.aubank.in" },
-                            { "strategy": "ChromeUA", "domain": "videochatru.com" },
-                            { "strategy": "ChromeUA", "domain": "videokyc.icicibank.com" },
-                            { "strategy": "ChromeUA", "domain": "videokyc.indusind.com" },
-                            { "strategy": "ChromeUA", "domain": "virtualvisitlogin.partners.org" },
-                            { "strategy": "ChromeUA", "domain": "visitnow.org" },
-                            { "strategy": "ChromeUA", "domain": "voissnap.com" },
-                            { "strategy": "ChromeUA", "domain": "vpn.zmaxis.com" },
-                            { "strategy": "ChromeUA", "domain": "vroom.truevirtualworld.com" },
-                            { "strategy": "ChromeUA", "domain": "web-hub.gxjyzy.cn" },
-                            { "strategy": "ChromeUA", "domain": "web.openrainbow.com" },
-                            { "strategy": "ChromeUA", "domain": "web.whatsapp.com" },
-                            { "strategy": "ChromeUA", "domain": "web2020.atama.plus" },
-                            { "strategy": "ChromeUA", "domain": "webcaptioner.com" },
-                            { "strategy": "ChromeUA", "domain": "webinar.anymeeting.com" },
-                            { "strategy": "ChromeUA", "domain": "weicewang.com" },
-                            { "strategy": "ChromeUA", "domain": "whitehatjr.com" },
-                            { "strategy": "ChromeUA", "domain": "wing.coupang.com" },
-                            { "strategy": "ChromeUA", "domain": "woots.nl" },
-                            { "strategy": "ChromeUA", "domain": "wowgame.jp" },
-                            { "strategy": "ChromeUA", "domain": "wowow.co.jp" },
-                            { "strategy": "ChromeUA", "domain": "wrc.t-mobile.com" },
-                            { "strategy": "ChromeUA", "domain": "www.alarm.com" },
-                            { "strategy": "ChromeUA", "domain": "www.amway.co.kr" },
-                            { "strategy": "ChromeUA", "domain": "www.bitpaper.io" },
-                            { "strategy": "ChromeUA", "domain": "www.chess.com" },
-                            { "strategy": "ChromeUA", "domain": "www.comassvax.org" },
-                            { "strategy": "ChromeUA", "domain": "www.directvgo.com" },
-                            { "strategy": "ChromeUA", "domain": "www.filemaru.com" },
-                            { "strategy": "ChromeUA", "domain": "www.flexclip.com" },
-                            { "strategy": "ChromeUA", "domain": "www.gaosiedu.com" },
-                            { "strategy": "ChromeUA", "domain": "www.hotstar.com" },
-                            { "strategy": "ChromeUA", "domain": "www.ivi.ru" },
-                            { "strategy": "ChromeUA", "domain": "www.jkydata.com" },
-                            { "strategy": "ChromeUA", "domain": "www.languageacademy.com.au" },
-                            { "strategy": "ChromeUA", "domain": "www.marylandvax.org" },
-                            { "strategy": "ChromeUA", "domain": "www.mtreadyclinic.org" },
-                            { "strategy": "ChromeUA", "domain": "www.n-gaku.ed.jp" },
-                            { "strategy": "ChromeUA", "domain": "www.niubizenlinea.com.pe" },
-                            { "strategy": "ChromeUA", "domain": "www.protrainings.com" },
-                            { "strategy": "ChromeUA", "domain": "www.quebon.tv" },
-                            { "strategy": "ChromeUA", "domain": "www.rarejob.com" },
-                            { "strategy": "ChromeUA", "domain": "www.skyroom.online" },
-                            { "strategy": "ChromeUA", "domain": "www.storyboardthat.com" },
-                            { "strategy": "ChromeUA", "domain": "www.techfluency.org" },
-                            { "strategy": "ChromeUA", "domain": "www.typing.com" },
-                            { "strategy": "ChromeUA", "domain": "www.vaccinateri.org" },
-                            { "strategy": "ChromeUA", "domain": "www.valr.com" },
-                            { "strategy": "ChromeUA", "domain": "www.xthk.cn" },
-                            { "strategy": "ChromeUA", "domain": "www.yuque.com" },
-                            { "strategy": "ChromeUA", "domain": "www.zhihu.com" },
-                            { "strategy": "ChromeUA", "domain": "www36.uscmm.gob.mx" },
-                            { "strategy": "ChromeUA", "domain": "xiaomawang.com" },
-                            { "strategy": "ChromeUA", "domain": "xueersi.com" },
-                            { "strategy": "ChromeUA", "domain": "ykc.hanwangjiaoyu.com" },
-                            { "strategy": "ChromeUA", "domain": "yorbit.mindtree.com" },
-                            { "strategy": "ChromeUA", "domain": "ysu.edu.cn" },
-                            { "strategy": "ChromeUA", "domain": "yz.cainiao.com" },
-                            { "strategy": "ChromeUA", "domain": "zaq.ne.jp" },
-                            { "strategy": "ChromeUA", "domain": "zhihuiteacher.com" },
-                            { "strategy": "ChromeUA", "domain": "zxx.edu.cn" }
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "1cs.jp"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "3min-class.offcn.mobi"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "99lms.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "acuvue.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "agriedu.net"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "aiosante.fr"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "ajmd-med.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "alefed.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "alema.tv"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "algoritmika.*"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "all-dream.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "alocom.co"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "amwater.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "apollo.varsitytutors.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "app.ascendacademic.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "app.axiumascend.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "app.boardable.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "app.bookcreator.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "app.classkick.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "app.comptalia.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "app.evisit.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "app.fields.corteva.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "app.figure1.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "app.initlive.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "app.jigsawinteractive.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "app.mytaxprepoffice.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "app.pharmulary.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "app.showit.co"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "app.wom.co"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "applychildcaresubsidy.alberta.ca"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "aprendizaje.mec.edu.py"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "arch-sticker.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "astrogo.astro.com.my"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "atitesting.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "aussieplaybonuses.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "aussieplaypromos.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "authoring.amirsys.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "aveeno.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "avon.com.br"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "axisbank.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "bancodeoccidente.com.co"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "band-aid.com.au"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "bandaid.ca"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "bank.dream-1.co.kr"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "bcpzonasegurabeta.viabcp.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "blibee.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "blog.esuteru.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "bm.chsi.com.cn"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "bm.cltt.org"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "booking.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "business.curated.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "business.xiaohe.cn"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "buy.icicibank.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "byjusfutureschool.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "capcut.cn"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "capcut.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "capitaloneoffers.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "carelogin.bryantelemedicine.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "census.gov"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "chat-pt.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "chatalternative.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "classcard.net"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "clipchamp.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "clube.dermaclub.com.br"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "co-verify.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "codelion.net"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "conalep.edu.mx"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "conv.gryphondds.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "conveyiq.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "coronavirus.maryland.gov"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "courses.fcaperformanceinstitute.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "crayondatabase.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "csia.org.cn"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "customs.vans.com.cn"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "cyedu.kead.or.kr"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "demos.cutcoapps.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "dentrixascend.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "digication.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "dishanywhere.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "disputeprocess.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "docs.google.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "doratoon.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "dscout.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "dsp.horse24.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "dubailand.gov.ae"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "educareac.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "edufe.com.cn"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "edunet.net"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "eid.belgium.be"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "elearning.evn.com.vn"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "elearning.seabank.com.vn"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "elroyalecasino.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "elroyalecasinobonuses.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "elroyalecasinomail.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "emblemhealth.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "englishbuddy.kr"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "eps.jspl.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "eqxiu.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "eu.smilemate.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "exchangeservicecenter.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "fansnet.jp"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "febc.net"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "fitnesstest.xtu.edu.cn"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "front.viewinter.ai"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "fx.dmm.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "gd.gov.cn"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "gfs.tokyo"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "givebacks.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "glive2.gaodun.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "global.talk-cloud.net"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "gooroomee.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "gov.pl"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "granbluefantasy.jp"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "greenxtrade.*"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "groove.cm"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "grow.google"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "gsop.sec.samsung.net"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "gsq.minornet.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "guihuayun.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "hanafloralpos2.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "hb.zcjb.com.cn"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "hd.kinopoisk.ru"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "help.hulu.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "hiflow.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "hirepro.in"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "hllqp.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "home.ibotta.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "honorlock.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "hubgame.cn"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "hunbei.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "i.cqu.edu.cn"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "icingimages.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "icourse163.org"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "iguokao.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "integra.co.in"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "interlakepsychiatricintouch.insynchcs.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "invest.ameritrade.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "jacquielawson.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "jianshu.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "jlau.edu.cn"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "jnjpediatrics.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "jobda.im"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "jp.glats.online"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "kaipoke.biz"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "kakao.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "kaleoz.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "kazaplan.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "keckmedicine.org"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "kidkids.net"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "knps.or.kr"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "kozikaza.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "kyc.icicibank.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "lacite.essentialskillsgroup.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "languageacademy.com.au"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "learn.alg.academy"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "learn.maplesoft.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "learning.apaxleaders.edu.vn"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "learning.chungdahm.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "leboncoin.fr"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "leetcode-cn.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "lemo.share-platform.de"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "lilyclass.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "live.remo.co"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "live.twebcast.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "livecourse.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "lnwlzb.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "logikaschool.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "login.hourpowerpro.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "login.smasheducation.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "logon.mykpa.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "longfor.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "luckytiger-promo.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "luckytigercasino.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "luz.tcd.gov.tw"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "lwss.cdgdc.edu.cn"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "mail.nate.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "manaba.jwu.ac.jp"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "managing.h-navi.jp"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "manulife-aor.unqork.io"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "mars.alg.academy"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "mayahii.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "mazonecec.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "mega.nz"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "member.goforward.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "mentora.co"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "mettl.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "mheducation.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "midea.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "mindbody.io"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "minedia.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "miricanvas.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "miro.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "moji365.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "moneygram.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "my.a-bly.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "my.globaluniversity.edu"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "mycreativeshop.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "myhealth.alaska.gov"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "myslate.sixphrase.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "nativecamp.net"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "netsoins.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "new.faberlic.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "newrow.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "newstudentregistration.nmsu.edu"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "nhisdt.el.or.kr"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "nowcoder.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "ome.tv"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "online.aufratenzur.bawagpsk.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "onlyonefoodnet.ifresh.co.kr"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "order.campion.com.au"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "orders.cutcoapps.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "oxcoder.com.cn"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "parivahan.gov.in"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "pcpm37.rekrutmenbi.id"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "peiliyou.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "peixunyun.cn"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "phx.e-carms.ca"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "pinfrafacturacion.com.mx"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "pixton.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "pjxt.lnen.cn"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "platinum-options.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "play.nuuvem.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "player.pl"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "power2patient.net"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "prepmod.doh.wa.gov"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "prepmod.health.state.mn.us"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "prezi.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "printful.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "proctorio.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "proctorizer.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "proctoru.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "provider.teladoc.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "providerstc.hs.utah.gov"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "publishinglife.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "pulse.genesisworld.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "qb.99onez.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "qceit.org.cn"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "qlteacher.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "remplanner.ru"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "researchallofus.org"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "rev.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "richpalms-promo.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "richpalms.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "rtvirtual.ins-cr.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "rwanda.edacy.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "sanayisicil.sanayi.gov.tr"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "sankuai.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "search.norton.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "secure.priviahealth.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "sellermatch.co.kr"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "service.medicheck.se"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "servicetitan.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "shipbob.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "shop.lic.co.nz"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "shu.edu.cn"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "shuishan.net.cn"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "siga.aduanas.gob.do"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "sigaexplorer.aduanas.gob.do"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "siharka.menpan.go.id"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "silhouette-web.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "sling.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "slotsempirebonuses.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "smallbusiness.yahoo.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "smarterproctoring.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "smartping.live"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "smartschool.be"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "socialive.us"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "spatial.chat"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "speechtexter.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "sspt.bjcourt.gov.cn"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "start.ipc.qld.edu.au"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "street-academy.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "stu.ityxb.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "student.atama.plus"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "suppliersmx.smp-automotive.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "support.proxyvote.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "syscheck.bridge.psiexams.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "talview.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "taphuan.csdl.edu.vn"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "tcyonline.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "telehealthportal.uofuhealth.org"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "teleperformance.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "test.tallyeducation.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "test.zhiding.com.cn"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "tkc.co.jp"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "tophat.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "totale.rosettastone.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "train.medcerts.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "tryca.st"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "tv.partner.co.il"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "tver.jp"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "ulearning.cn"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "unacademy.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "unfi.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "univer.kaznpu.kz"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "unnes.ac.id"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "ursdoccdn.nosdn.127.net"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "usac.edu.gt"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "vaccinereg.health.nd.gov"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "vc.dial070.co.kr"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "videobanking.aubank.in"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "videochatru.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "videokyc.icicibank.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "videokyc.indusind.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "virtualvisitlogin.partners.org"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "visitnow.org"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "voissnap.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "vpn.zmaxis.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "vroom.truevirtualworld.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "web-hub.gxjyzy.cn"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "web.openrainbow.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "web.whatsapp.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "web2020.atama.plus"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "webcaptioner.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "webinar.anymeeting.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "weicewang.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "whitehatjr.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "wing.coupang.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "woots.nl"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "wowgame.jp"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "wowow.co.jp"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "wrc.t-mobile.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "www.alarm.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "www.amway.co.kr"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "www.bitpaper.io"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "www.chess.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "www.comassvax.org"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "www.directvgo.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "www.filemaru.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "www.flexclip.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "www.gaosiedu.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "www.hotstar.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "www.ivi.ru"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "www.jkydata.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "www.languageacademy.com.au"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "www.marylandvax.org"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "www.mtreadyclinic.org"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "www.n-gaku.ed.jp"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "www.niubizenlinea.com.pe"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "www.protrainings.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "www.quebon.tv"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "www.rarejob.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "www.skyroom.online"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "www.storyboardthat.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "www.techfluency.org"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "www.typing.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "www.vaccinateri.org"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "www.valr.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "www.xthk.cn"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "www.yuque.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "www.zhihu.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "www36.uscmm.gob.mx"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "xiaomawang.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "xueersi.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "ykc.hanwangjiaoyu.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "yorbit.mindtree.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "ysu.edu.cn"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "yz.cainiao.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "zaq.ne.jp"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "zhihuiteacher.com"
+                            },
+                            {
+                                "strategy": "ChromeUA",
+                                "domain": "zxx.edu.cn"
+                            }
                         ]
                     }
                 }
@@ -2895,7 +3677,8 @@
                     "minSupportedVersion": "0.144.0"
                 },
                 "aiChatSync": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.147.5"
                 }
             }
         },
@@ -2907,8 +3690,13 @@
                     "minSupportedVersion": "0.128.3",
                     "rollout": {
                         "steps": [
-                            { "percent": 10 },
-                            { "percent": 100 }]
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
                     }
                 },
                 "bookmarksBarEmpty": {
@@ -2916,8 +3704,13 @@
                     "minSupportedVersion": "0.128.3",
                     "rollout": {
                         "steps": [
-                            { "percent": 10 },
-                            { "percent": 100 }]
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
                     }
                 },
                 "bookmarksBarNonEmpty": {
@@ -2925,8 +3718,13 @@
                     "minSupportedVersion": "0.128.3",
                     "rollout": {
                         "steps": [
-                            { "percent": 10 },
-                            { "percent": 100 }]
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
                     }
                 },
                 "bookmarks": {
@@ -2934,8 +3732,13 @@
                     "minSupportedVersion": "0.128.3",
                     "rollout": {
                         "steps": [
-                            { "percent": 10 },
-                            { "percent": 100 }]
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
                     }
                 },
                 "bookmarkManagerEmpty": {
@@ -2943,8 +3746,13 @@
                     "minSupportedVersion": "0.128.3",
                     "rollout": {
                         "steps": [
-                            { "percent": 10 },
-                            { "percent": 100 }]
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
                     }
                 },
                 "passwordNew": {
@@ -2955,8 +3763,13 @@
                     "minSupportedVersion": "0.128.3",
                     "rollout": {
                         "steps": [
-                            { "percent": 10 },
-                            { "percent": 100 }]
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
                     }
                 },
                 "passwordManagerEmptyAllItems": {
@@ -2964,8 +3777,13 @@
                     "minSupportedVersion": "0.128.3",
                     "rollout": {
                         "steps": [
-                            { "percent": 10 },
-                            { "percent": 100 }]
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
                     }
                 },
                 "passwordManagerEmptyPasswords": {
@@ -2973,8 +3791,13 @@
                     "minSupportedVersion": "0.128.3",
                     "rollout": {
                         "steps": [
-                            { "percent": 10 },
-                            { "percent": 100 }]
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
                     }
                 },
                 "bookmarksAndPasswordsBannersOpenSyncSetupDialog": {
@@ -2982,8 +3805,13 @@
                     "minSupportedVersion": "0.128.3",
                     "rollout": {
                         "steps": [
-                            { "percent": 10 },
-                            { "percent": 100 }]
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
                     }
                 },
                 "importStart": {
@@ -2991,8 +3819,13 @@
                     "minSupportedVersion": "0.128.3",
                     "rollout": {
                         "steps": [
-                            { "percent": 10 },
-                            { "percent": 100 }]
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
                     }
                 },
                 "importEnd": {
@@ -3000,8 +3833,13 @@
                     "minSupportedVersion": "0.128.3",
                     "rollout": {
                         "steps": [
-                            { "percent": 10 },
-                            { "percent": 100 }]
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
                     }
                 }
             }
@@ -3010,33 +3848,13 @@
             "state": "enabled",
             "settings": {
                 "allowlistedTrackers": {
-                    "adlightning.com": {
-                        "rules": [
-                            {
-                                "rule": "tagan.adlightning.com",
-                                "domains": [
-                                    "timesofmalta.com"
-                                ],
-                                "reason": "timesofmalta.com - https://github.com/duckduckgo/privacy-configuration/pull/4401"
-                            }
-                        ]
-                    },
-                    "ebxcdn.com": {
-                        "rules": [
-                            {
-                                "rule": "applets.ebxcdn.com/ebx.js",
-                                "domains": [
-                                    "timesofmalta.com"
-                                ],
-                                "reason": "timesofmalta.com - https://github.com/duckduckgo/privacy-configuration/pull/4401"
-                            }
-                        ]
-                    },
                     "tiqcdn.com": {
                         "rules": [
                             {
                                 "rule": "tags.tiqcdn.com/utag/",
-                                "domains": ["<all>"],
+                                "domains": [
+                                    "<all>"
+                                ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1534"
                             }
                         ]
@@ -3045,7 +3863,9 @@
                         "rules": [
                             {
                                 "rule": "tractorsupply.tt.omtrdc.net/rest/v1/delivery",
-                                "domains": ["tractorsupply.com"],
+                                "domains": [
+                                    "tractorsupply.com"
+                                ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/2042"
                             }
                         ]
@@ -3054,7 +3874,9 @@
                         "rules": [
                             {
                                 "rule": "npttech.com/advertising.js",
-                                "domains": ["slate.com"],
+                                "domains": [
+                                    "slate.com"
+                                ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2879"
                             }
                         ]
@@ -3080,7 +3902,13 @@
             "state": "enabled"
         },
         "uaChBrands": {
-            "state": "enabled"
+            "state": "enabled",
+            "exceptions": [
+                {
+                    "domain": "smythstoys.com",
+                    "reason": "Bot check"
+                }
+            ]
         },
         "privacyPro": {
             "state": "enabled",
@@ -3256,8 +4084,21 @@
                         "autoRecoveryTabOutOfMemory": false
                     }
                 },
+                "nativeCrashDialog": {
+                    "state": "disabled"
+                },
                 "ignoreInvalidCastExceptionOnDisposal": {
                     "state": "enabled"
+                },
+                "nativeCrashDialogOneShot": {
+                    "state": "disabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5.0
+                            }
+                        ]
+                    }
                 }
             }
         },
@@ -3283,8 +4124,24 @@
                         "autoRecoveryTabOutOfMemory": false
                     }
                 },
+                "nativeCrashDialog": {
+                    "state": "internal"
+                },
                 "ignoreInvalidCastExceptionOnDisposal": {
                     "state": "enabled"
+                },
+                "nativeCrashDialogOneShot": {
+                    "state": "disabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5.0
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "generation": 1
+                    }
                 }
             }
         },
@@ -3366,7 +4223,7 @@
                 "filterServiceWorkersFromAutoAttach": {
                     "state": "enabled",
                     "settings": {
-                        "useStartupTimeoutInstead": "enabled"
+                        "useStartupTimeoutInstead": "disabled"
                     }
                 }
             },
@@ -3399,6 +4256,10 @@
                     "state": "enabled"
                 },
                 "nextStepsListWidget": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.150.0"
+                },
+                "nextStepsListNewLogicWidget": {
                     "state": "disabled"
                 },
                 "omnibar": {
@@ -3519,6 +4380,19 @@
                 "downloadNotificationPanel": {
                     "state": "enabled",
                     "minSupportedVersion": "0.142.0"
+                },
+                "downloadOpenItemMethod": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.148.0",
+                    "settings": {
+                        "fileTypes": [
+                            {
+                                "extension": ".exe",
+                                "method": "explorer",
+                                "fallback": true
+                            }
+                        ]
+                    }
                 }
             }
         },
@@ -3533,10 +4407,25 @@
             }
         },
         "adBlockV2Extension": {
-            "state": "disabled",
+            "state": "preview",
+            "minSupportedVersion": "0.148.0",
             "exceptions": [],
             "settings": {
-                "surveyRetriggerEnabled": false
+                "extensionUrl": "https://staticcdn.duckduckgo.com/extensions/content-blocker/content-blocker-extension-2026.3.2.crx"
+            },
+            "features": {
+                "onboardingEnabled": {
+                    "state": "disabled"
+                },
+                "migration": {
+                    "state": "enabled"
+                },
+                "watchdog": {
+                    "state": "enabled"
+                },
+                "fixWatchdogDiscoveredIssues": {
+                    "state": "enabled"
+                }
             }
         },
         "releaseNotes": {
@@ -3573,7 +4462,8 @@
                     }
                 },
                 "colorThemes": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.149.0"
                 }
             }
         },
@@ -3638,7 +4528,6 @@
             "state": "enabled",
             "exceptions": [],
             "settings": {
-                "additionalCheck": "disabled",
                 "includeIframes": "disabled",
                 "maxContentLength": 9500,
                 "excludeSelectors": [
@@ -3651,30 +4540,6 @@
                     ".popup"
                 ],
                 "conditionalChanges": [
-                    {
-                        "condition": {
-                            "internal": true
-                        },
-                        "patchSettings": [
-                            {
-                                "op": "replace",
-                                "path": "/additionalCheck",
-                                "value": "enabled"
-                            }
-                        ]
-                    },
-                    {
-                        "condition": {
-                            "preview": true
-                        },
-                        "patchSettings": [
-                            {
-                                "op": "replace",
-                                "path": "/additionalCheck",
-                                "value": "enabled"
-                            }
-                        ]
-                    },
                     {
                         "condition": {
                             "domain": "reddit.com"
@@ -3704,7 +4569,9 @@
                 "reportMsixLogs": {
                     "state": "enabled",
                     "settings": {
-                        "ErrorCodes": [-2147009284],
+                        "ErrorCodes": [
+                            -2147009284
+                        ],
                         "AllowList": [
                             "ya2fgkz3nks94",
                             "qzdjx70tn762j",
@@ -3788,7 +4655,7 @@
             "exceptions": []
         },
         "tabProgressIndicator": {
-            "state": "disabled",
+            "state": "internal",
             "exceptions": []
         },
         "performanceMetrics": {
@@ -3820,10 +4687,19 @@
                     "minSupportedVersion": "0.143.4",
                     "rollout": {
                         "steps": [
-                            { "percent": 5 },
-                            { "percent": 20 },
-                            { "percent": 50 },
-                            { "percent": 100 }]
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 20
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
                     }
                 }
             }
@@ -3849,7 +4725,8 @@
             }
         },
         "combinedPermissionView": {
-            "state": "disabled",
+            "state": "enabled",
+            "minSupportedVersion": "0.149.0",
             "exceptions": []
         },
         "unsetAsDefaultMonitor": {
@@ -3858,59 +4735,59 @@
         },
         "attributedMetrics": {
             "state": "enabled",
-            "minSupportedVersion": "0.141.7",
+            "minSupportedVersion": "0.150.0",
             "exceptions": [],
             "features": {
                 "canEmitInactivity": {
                     "state": "enabled"
                 },
                 "emitAllMetrics": {
-                    "state": "disabled"
+                    "state": "enabled"
                 },
                 "retention": {
-                    "state": "disabled"
+                    "state": "enabled"
                 },
                 "canEmitRetention": {
-                    "state": "disabled"
+                    "state": "enabled"
                 },
                 "searchDaysAvg": {
-                    "state": "disabled"
+                    "state": "enabled"
                 },
                 "canEmitSearchDaysAvg": {
-                    "state": "disabled"
+                    "state": "enabled"
                 },
                 "searchCountAvg": {
-                    "state": "disabled"
+                    "state": "enabled"
                 },
                 "canEmitSearchCountAvg": {
-                    "state": "disabled"
+                    "state": "enabled"
                 },
                 "adClickCountAvg": {
-                    "state": "disabled"
+                    "state": "enabled"
                 },
                 "canEmitAdClickCountAvg": {
-                    "state": "disabled"
+                    "state": "enabled"
                 },
                 "aiUsageAvg": {
-                    "state": "disabled"
+                    "state": "enabled"
                 },
                 "canEmitAIUsageAvg": {
-                    "state": "disabled"
+                    "state": "enabled"
                 },
                 "subscriptionRetention": {
-                    "state": "disabled"
+                    "state": "enabled"
                 },
                 "canEmitSubscriptionRetention": {
-                    "state": "disabled"
+                    "state": "enabled"
                 },
                 "syncDevices": {
-                    "state": "disabled"
+                    "state": "enabled"
                 },
                 "canEmitSyncDevices": {
-                    "state": "disabled"
+                    "state": "enabled"
                 },
                 "sendOriginParam": {
-                    "state": "disabled",
+                    "state": "enabled",
                     "settings": {
                         "originCampaignSubstrings": [
                             "paid"
@@ -3971,18 +4848,276 @@
                 }
             }
         },
+        "webDetection": {
+            "state": "enabled",
+            "minSupportedVersion": "0.147.0"
+        },
         "webInterferenceDetection": {
             "state": "enabled",
-            "minSupportedVersion": "0.146.0"
+            "minSupportedVersion": "0.146.0",
+            "exceptions": [],
+            "settings": {
+                "autoRunDelayMs": 100,
+                "interferenceTypes": {
+                    "adwallDetection": {
+                        "generic": {
+                            "state": "enabled",
+                            "textPatterns": [
+                                "ad ?block(er)? detected",
+                                "adjust(ing)?( your)? ad blocking settings",
+                                "(turn off|disable|disabling|deactivate)( your| my)? ad ?block(er)?",
+                                "your ad ?blocker is on",
+                                "you('re| are| may be) using an ad blocker"
+                            ],
+                            "textSources": [
+                                "innerText"
+                            ]
+                        },
+                        "generic_de": {
+                            "state": "enabled",
+                            "textPatterns": [
+                                "deaktivieren sie ihren adblocker",
+                                "deaktivieren sie ihre blocker",
+                                "adblocker zu deaktivieren",
+                                "adblocker deaktivieren",
+                                "sie einen adblocker verwenden"
+                            ],
+                            "textSources": [
+                                "innerText"
+                            ]
+                        },
+                        "generic_es": {
+                            "state": "enabled",
+                            "textPatterns": [
+                                "en esta web no aceptamos el uso de adblock"
+                            ],
+                            "textSources": [
+                                "innerText"
+                            ]
+                        },
+                        "generic_it": {
+                            "state": "enabled",
+                            "textPatterns": [
+                                "disattiva l'ad block",
+                                "stai usando un ad block"
+                            ],
+                            "textSources": [
+                                "innerText"
+                            ]
+                        },
+                        "generic_nl": {
+                            "state": "enabled",
+                            "textPatterns": [
+                                "adblock gedetecteerd",
+                                "schakel je adblocker uit om de video te bekijken"
+                            ],
+                            "textSources": [
+                                "innerText"
+                            ]
+                        },
+                        "generic_se": {
+                            "state": "enabled",
+                            "textPatterns": [
+                                "har du en annonsblockerare igång",
+                                "avaktivera din annonsblockerare"
+                            ],
+                            "textSources": [
+                                "innerText"
+                            ]
+                        }
+                    },
+                    "botDetection": {
+                        "cloudflareTurnstile": {
+                            "state": "enabled",
+                            "vendor": "cloudflare",
+                            "selectors": [
+                                ".cf-turnstile",
+                                "script[src*=\"challenges.cloudflare.com\"]"
+                            ],
+                            "windowProperties": [
+                                "turnstile"
+                            ],
+                            "statusSelectors": [
+                                {
+                                    "status": "solved",
+                                    "selectors": [
+                                        "[data-state=\"success\"]"
+                                    ]
+                                },
+                                {
+                                    "status": "failed",
+                                    "selectors": [
+                                        "[data-state=\"error\"]"
+                                    ]
+                                }
+                            ]
+                        },
+                        "cloudflareChallengePage": {
+                            "state": "enabled",
+                            "vendor": "cloudflare",
+                            "selectors": [
+                                "#challenge-form",
+                                ".cf-browser-verification",
+                                "#cf-wrapper",
+                                "script[src*=\"challenges.cloudflare.com\"]"
+                            ],
+                            "windowProperties": [
+                                "_cf_chl_opt",
+                                "__CF$cv$params",
+                                "cfjsd"
+                            ]
+                        },
+                        "hcaptcha": {
+                            "state": "enabled",
+                            "vendor": "hcaptcha",
+                            "selectors": [
+                                ".h-captcha",
+                                "[data-hcaptcha-widget-id]",
+                                "script[src*=\"hcaptcha.com\"]",
+                                "script[src*=\"assets.hcaptcha.com\"]"
+                            ],
+                            "windowProperties": [
+                                "hcaptcha"
+                            ]
+                        }
+                    },
+                    "fraudDetection": {
+                        "phishingWarning": {
+                            "state": "enabled",
+                            "type": "phishing",
+                            "selectors": [
+                                ".warning-banner",
+                                "#security-alert"
+                            ],
+                            "textPatterns": [
+                                "suspicious.*activity",
+                                "unusual.*login",
+                                "verify.*account"
+                            ],
+                            "textSources": [
+                                "innerText"
+                            ]
+                        },
+                        "accountSuspension": {
+                            "state": "enabled",
+                            "type": "suspension",
+                            "selectors": [
+                                ".account-suspended",
+                                "#suspension-notice"
+                            ],
+                            "textPatterns": [
+                                "account.*suspended",
+                                "access.*restricted"
+                            ],
+                            "textSources": [
+                                "innerText"
+                            ]
+                        }
+                    },
+                    "youtubeAds": {
+                        "state": "enabled",
+                        "sweepIntervalMs": 2000,
+                        "slowLoadThresholdMs": 2000,
+                        "playerSelectors": [
+                            "#movie_player",
+                            ".html5-video-player",
+                            "#player"
+                        ],
+                        "adClasses": [
+                            "ytp-ad-text",
+                            "ytp-ad-skip-button",
+                            "ytp-ad-skip-button-container",
+                            "ytp-ad-message-container",
+                            "ytp-ad-player-overlay",
+                            "ytp-ad-image-overlay",
+                            "video-ads",
+                            "ad-showing",
+                            "ad-interrupting"
+                        ],
+                        "adTextPatterns": [
+                            "\\badvertisement\\b",
+                            "\\bskip ad\\b",
+                            "\\bskip ads\\b",
+                            "^ad\\s*[•:·]"
+                        ],
+                        "staticAdSelectors": {
+                            "background": ".player-container-background",
+                            "thumbnail": ".player-container-background-image, .player-container-background ytd-thumbnail",
+                            "image": ".player-container-background yt-image"
+                        },
+                        "playabilityErrorSelectors": [
+                            "ytm-player-error-message-renderer",
+                            "yt-player-error-message-renderer",
+                            ".ytp-error",
+                            ".playability-status-message",
+                            ".playability-reason"
+                        ],
+                        "playabilityErrorPatterns": [
+                            "content isn't available",
+                            "video (is )?unavailable",
+                            "playback (is )?disabled",
+                            "confirm you're not a (ro)?bot",
+                            "sign in to confirm",
+                            "unusual traffic",
+                            "try again later"
+                        ],
+                        "adBlockerDetectionSelectors": [
+                            "ytd-enforcement-message-view-model",
+                            "ytd-popup-container tp-yt-paper-dialog",
+                            "tp-yt-paper-dialog",
+                            ".ytd-enforcement-message-view-model",
+                            "#dialog",
+                            "[role=\"dialog\"]"
+                        ],
+                        "adBlockerDetectionPatterns": [
+                            "ad\\s*blockers?\\s*(are)?\\s*not allowed",
+                            "using an ad\\s*blocker",
+                            "allow youtube ads",
+                            "disable.*ad\\s*blocker",
+                            "turn off.*ad\\s*blocker",
+                            "ad\\s*blocker.*detected",
+                            "ad\\s*blocking",
+                            "will be blocked after \\d+ videos?",
+                            "playback will be blocked",
+                            "playback is blocked",
+                            "youtube is allowlisted",
+                            "video player will be blocked",
+                            "ad\\s*blockers?\\s*violate",
+                            "violate.*terms of service"
+                        ],
+                        "loginStateSelectors": {
+                            "signInButton": "a[href*=\"accounts.google.com/ServiceLogin\"]",
+                            "avatarButton": "#avatar-btn",
+                            "premiumLogo": "ytd-topbar-logo-renderer a[title*=\"Premium\"]"
+                        }
+                    }
+                }
+            }
         },
         "addressBar": {
             "exceptions": [],
             "state": "enabled",
             "features": {
                 "instantSuggestions": {
-                    "state": "internal"
+                    "state": "disabled"
                 }
             }
+        },
+        "startupTiming": {
+            "state": "enabled",
+            "exceptions": []
+        },
+        "topmostWindowActivation": {
+            "exceptions": [],
+            "state": "disabled"
+        },
+        "nativeRequestInterception": {
+            "state": "disabled",
+            "exceptions": []
+        },
+        "promoQueue": {
+            "state": "internal",
+            "exceptions": []
         }
     },
     "unprotectedTemporary": []

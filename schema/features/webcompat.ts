@@ -24,6 +24,9 @@ type FullWebCompatOptions = CSSInjectFeatureSettings<{
         validPermissionNames: string[];
         supportedPermissions: object;
     };
+    permissionsPresent: {
+        state: StateToggle;
+    };
     mediaSession: StateToggle;
     presentation: StateToggle;
     webShare: StateToggle;

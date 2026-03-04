@@ -113,3 +113,40 @@ Guide for adding content scope experiments (C-S-S experiments) to privacy-remote
     }
 }
 ```
+## Expanding experiment rollout
+To expand experiment rollout, add a new rollout step rather than incrementing
+the percentage. For example, to go from 25% to 100% rollout:
+
+```json
+"contentScopeExperiments": {
+    "state": "enabled",
+    "features": {
+        "fingerprintingCanvasAdditionalEnabledCheck": {
+            "state": "enabled",
+            "rollout": { "steps": [{ "percent": 25 }] },
+            "cohorts": [
+                { "name": "control", "weight": 1 },
+                { "name": "treatment", "weight": 1 }
+            ]
+        }
+    }
+}
+```
+
+Becomes
+
+```json
+"contentScopeExperiments": {
+    "state": "enabled",
+    "features": {
+        "fingerprintingCanvasAdditionalEnabledCheck": {
+            "state": "enabled",
+            "rollout": { "steps": [{ "percent": 25 }, { "percent": 100 }] },
+            "cohorts": [
+                { "name": "control", "weight": 1 },
+                { "name": "treatment", "weight": 1 }
+            ]
+        }
+    }
+}
+```

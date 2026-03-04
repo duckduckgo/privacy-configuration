@@ -26,12 +26,36 @@ type AdwallDetector = {
     textSources?: string[];
 };
 
+type YoutubeAdsDetector = {
+    state: FeatureState;
+    sweepIntervalMs?: number;
+    slowLoadThresholdMs?: number;
+    playerSelectors?: string[];
+    adClasses?: string[];
+    adTextPatterns?: string[];
+    staticAdSelectors?: {
+        background?: string;
+        thumbnail?: string;
+        image?: string;
+    };
+    playabilityErrorSelectors?: string[];
+    playabilityErrorPatterns?: string[];
+    adBlockerDetectionSelectors?: string[];
+    adBlockerDetectionPatterns?: string[];
+    loginStateSelectors?: {
+        signInButton?: string;
+        avatarButton?: string;
+        premiumLogo?: string;
+    };
+};
+
 type WebInterferenceDetectionSettings = CSSInjectFeatureSettings<{
     autoRunDelayMs?: number;
     interferenceTypes?: {
         botDetection?: Record<string, BotDetector>;
         fraudDetection?: Record<string, FraudDetector>;
         adwallDetection?: Record<string, AdwallDetector>;
+        youtubeAds?: YoutubeAdsDetector;
     };
 }>;
 
