@@ -1,5 +1,7 @@
-import { Feature } from '../feature';
+import { Feature, FeatureState, CSSInjectFeatureSettings } from '../feature';
 
-type WebEventsSettings = {};
+type WebEventsSettings = CSSInjectFeatureSettings<{
+    additionalCheck?: FeatureState;
+}>;
 
 export type WebEventsFeature<VersionType> = Feature<WebEventsSettings, VersionType>;
