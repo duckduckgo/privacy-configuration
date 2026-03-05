@@ -30,10 +30,43 @@ type TelemetryEntry = {
     parameters: Record<string, TelemetryParameter>;
 };
 
+type MessageActionDisplay = {
+    text: string;
+    actionText?: string;
+    dismissible?: boolean;
+};
+
+type MessageActionEvents = {
+    onAction?: string;
+    onDismiss?: string;
+};
+
+type MessageAction = {
+    state?: FeatureState;
+    trigger: {
+        source: string;
+    };
+    type: 'message';
+    display: MessageActionDisplay;
+    events?: MessageActionEvents;
+};
+
+type OpenUrlAction = {
+    state?: FeatureState;
+    trigger: {
+        source: string;
+    };
+    type: 'openUrl';
+    url: string;
+};
+
+type ActionEntry = MessageAction | OpenUrlAction;
+
 // intentionally not using CSSInjectFeatureSettings here as this does not
 // support conditional changes
 export type EventHubSettings = {
     telemetry?: Record<string, TelemetryEntry>;
+    actions?: Record<string, ActionEntry>;
 };
 
 export type EventHubFeature<VersionType> = Feature<EventHubSettings, VersionType>;
