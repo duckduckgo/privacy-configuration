@@ -13,9 +13,15 @@
 export function splitDomainPath(rule) {
     const slashIndex = rule.indexOf('/');
     if (slashIndex === -1) {
-        return [rule, ''];
+        return [
+            rule,
+            '',
+        ];
     }
-    return [rule.slice(0, slashIndex), rule.slice(slashIndex)];
+    return [
+        rule.slice(0, slashIndex),
+        rule.slice(slashIndex),
+    ];
 }
 
 /**
@@ -83,8 +89,14 @@ export function compareRules(ruleA, ruleB) {
         return 'incomparable';
     }
 
-    const [domA, pathA] = splitDomainPath(ruleA);
-    const [domB, pathB] = splitDomainPath(ruleB);
+    const [
+        domA,
+        pathA,
+    ] = splitDomainPath(ruleA);
+    const [
+        domB,
+        pathB,
+    ] = splitDomainPath(ruleB);
 
     const pathComp = compareRulePaths(pathA, pathB);
 
@@ -104,4 +116,104 @@ export function compareRules(ruleA, ruleB) {
     }
 
     return 'incomparable';
+}
+
+/** @typedef {{ type: string, tracker: string, ruleA: object, ruleB: object, message: string, suggestion: string }} ValidationError */
+
+/**
+ * Validate rules for a single tracker. Checks ordering, domain propagation, and duplicates.
+ *
+ * @param {string} trackerDomain - Tracker domain (e.g. "tracker.com")
+ * @param {Array<{ rule: string, domains: string[] }>} rules - Rules for this tracker (order = file order)
+ * @returns {ValidationError[]}
+ */
+export function validateTrackerRules(trackerDomain, rules) {
+    const errors = [];
+    if (!rules || rules.length <= 1) {
+        return errors;
+    }
+
+    for (let i = 0; i < rules.length; i++) {
+        for (let j = i + 1; j < rules.length; j++) {
+            const ruleA = rules[i];
+            const ruleB = rules[j];
+            const rel = compareRules(ruleA.rule, ruleB.rule);
+
+            if (rel === 'equal') {
+                errors.push({
+                    type: 'DUPLICATE_RULE',
+                    tracker: trackerDomain,
+                    ruleA,
+                    ruleB,
+                    message: `Duplicate rule: "${ruleA.rule}" appears more than once.`,
+                    suggestion: 'Remove the duplicate rule.',
+                });
+                continue;
+            }
+
+            if (rel === 'moreGeneral') {
+                errors.push({
+                    type: 'ORDERING_VIOLATION',
+                    tracker: trackerDomain,
+                    ruleA,
+                    ruleB,
+                    message: `Wrong order: more-general rule "${ruleA.rule}" appears before more-specific rule "${ruleB.rule}"; the more-specific rule will never be reached.`,
+                    suggestion: 'Move the more-specific rule above the more-general rule.',
+                });
+                continue;
+            }
+
+            if (rel === 'moreSpecific') {
+                const domainsA = ruleA.domains || [];
+                const domainsB = ruleB.domains || [];
+
+                if (domainsA.includes('<all>')) {
+                    continue;
+                }
+
+                if (domainsB.includes('<all>')) {
+                    errors.push({
+                        type: 'DOMAIN_PROPAGATION_VIOLATION',
+                        tracker: trackerDomain,
+                        ruleA,
+                        ruleB,
+                        message: `More-specific rule narrows <all>: "${ruleA.rule}" has [${domainsA.join(', ')}] while "${ruleB.rule}" has <all>.`,
+                        suggestion: 'Add <all> to the more-specific rule, or remove it if redundant.',
+                    });
+                    continue;
+                }
+
+                const missing = domainsB.filter((d) => !domainsA.includes(d));
+                if (missing.length > 0) {
+                    errors.push({
+                        type: 'DOMAIN_PROPAGATION_VIOLATION',
+                        tracker: trackerDomain,
+                        ruleA,
+                        ruleB,
+                        message: `Missing domain propagation: more-specific rule "${ruleA.rule}" is missing domain(s) from less-specific rule "${ruleB.rule}": [${missing.join(', ')}].`,
+                        suggestion: 'Add the missing domain(s) to the more-specific rule.',
+                    });
+                }
+            }
+        }
+    }
+
+    return errors;
+}
+
+/**
+ * Validate an entire allowlist. Iterates over all trackers and collects errors.
+ *
+ * @param {Object<string, { rules: Array<{ rule: string, domains: string[] }> }>} allowlistedTrackers
+ * @returns {ValidationError[]}
+ */
+export function validateAllowlist(allowlistedTrackers) {
+    const errors = [];
+    for (const [
+        trackerDomain,
+        tracker,
+    ] of Object.entries(allowlistedTrackers)) {
+        errors.push(...validateTrackerRules(trackerDomain, tracker.rules));
+    }
+    return errors;
 }
