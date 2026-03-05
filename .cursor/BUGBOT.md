@@ -13,6 +13,9 @@
 ### Minimum Supported Version Bumps
 When a feature transitions from `internal` to `enabled` (or from `enabled` to `internal`), the minimum supported version **must** be bumped. Clients rely on the version to detect config changes; without a bump, the state transition will be silently ignored.
 
+### Parent and Subfeature Independence
+Parent features and their subfeatures are **not** co-dependent — a subfeature's state is evaluated independently of its parent. Because of this, they often require the exact same gating (e.g. matching `state`, `minSupportedVersion`, rollout targets). When transitioning a subfeature, ensure its gating is explicitly set rather than assuming it inherits from the parent.
+
 ## Element Hiding Feature Validation
 
 ### Schema & Implementation References
