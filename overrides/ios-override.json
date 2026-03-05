@@ -365,6 +365,10 @@
                 "supportsSyncChatsDeletion": {
                     "state": "enabled",
                     "minSupportedVersion": "7.208.2"
+                },
+                "multiplePageContexts": {
+                    "state": "internal",
+                    "minSupportedVersion": "7.210.0"
                 }
             },
             "settings": {
@@ -548,7 +552,7 @@
             "exceptions": [],
             "features": {
                 "tdsNextExperiment006": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "rollout": {
                         "steps": [
                             {
@@ -601,7 +605,13 @@
             "state": "enabled"
         },
         "fingerprintingScreenSize": {
-            "state": "enabled"
+            "state": "enabled",
+            "exceptions": [
+                {
+                    "domain": "yelp.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4668"
+                }
+            ]
         },
         "fingerprintingBattery": {
             "state": "enabled"
@@ -627,6 +637,10 @@
                 {
                     "domain": "target.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/2225"
+                },
+                {
+                    "domain": "yelp.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4668"
                 }
             ]
         },
@@ -714,8 +728,12 @@
             "state": "enabled",
             "exceptions": [
                 {
-                    "domain": "timesofmalta.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4401"
+                    "domain": "postnl.nl",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4648"
+                },
+                {
+                    "domain": "newrepublic.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4652"
                 }
             ],
             "features": {
@@ -1206,6 +1224,28 @@
                 },
                 "canPromoteImportPasswordsInBrowser": {
                     "state": "enabled"
+                },
+                "onboardingExperiment": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.209.0",
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "variant1",
+                            "weight": 1
+                        },
+                        {
+                            "name": "variant2",
+                            "weight": 1
+                        },
+                        {
+                            "name": "variant3",
+                            "weight": 1
+                        }
+                    ]
                 }
             }
         },
@@ -2458,6 +2498,9 @@
                             },
                             {
                                 "percent": 15.0
+                            },
+                            {
+                                "percent": 100.0
                             }
                         ]
                     }
@@ -2541,7 +2584,13 @@
             "minSupportedVersion": "7.202.0"
         },
         "forceDarkModeOnWebsites": {
-            "state": "internal"
+            "state": "internal",
+            "minSupportedVersion": "7.210.0",
+            "features": {
+                "featureRollout": {
+                    "state": "internal"
+                }
+            }
         },
         "webExtensions": {
             "state": "internal",

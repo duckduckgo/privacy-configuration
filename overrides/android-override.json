@@ -205,7 +205,7 @@
             "exceptions": [],
             "features": {
                 "tdsNextExperiment006": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": 52361000,
                     "rollout": {
                         "steps": [
@@ -554,10 +554,6 @@
                 {
                     "domain": "ashleyfurniture.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3908"
-                },
-                {
-                    "domain": "timesofmalta.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4401"
                 }
             ],
             "features": {
@@ -1558,6 +1554,17 @@
                         ]
                     }
                 },
+                "reduceBrowserTabBundleSize": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52690000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            }
+                        ]
+                    }
+                },
                 "newCustomTab": {
                     "state": "enabled",
                     "minSupportedVersion": 52590000
@@ -1565,6 +1572,17 @@
                 "experimentalBrowsingMenu": {
                     "state": "enabled",
                     "minSupportedVersion": 52660000
+                },
+                "sendPageLoadWideEvent": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52690000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            }
+                        ]
+                    }
                 }
             }
         },
@@ -1817,21 +1835,6 @@
                                 "value": "disabled"
                             }
                         ]
-                    },
-                    {
-                        "condition": {
-                            "experiment": {
-                                "experimentName": "contentScopeExperiment1",
-                                "cohort": "treatment"
-                            }
-                        },
-                        "patchSettings": [
-                            {
-                                "op": "add",
-                                "path": "/additionalCheck",
-                                "value": "disabled"
-                            }
-                        ]
                     }
                 ]
             }
@@ -1849,21 +1852,6 @@
                     {
                         "condition": {
                             "injectName": "android-adsjs"
-                        },
-                        "patchSettings": [
-                            {
-                                "op": "add",
-                                "path": "/additionalCheck",
-                                "value": "disabled"
-                            }
-                        ]
-                    },
-                    {
-                        "condition": {
-                            "experiment": {
-                                "experimentName": "contentScopeExperiment1",
-                                "cohort": "treatment"
-                            }
                         },
                         "patchSettings": [
                             {
@@ -1900,21 +1888,6 @@
                     {
                         "condition": {
                             "injectName": "android-adsjs"
-                        },
-                        "patchSettings": [
-                            {
-                                "op": "add",
-                                "path": "/additionalCheck",
-                                "value": "disabled"
-                            }
-                        ]
-                    },
-                    {
-                        "condition": {
-                            "experiment": {
-                                "experimentName": "contentScopeExperiment1",
-                                "cohort": "treatment"
-                            }
                         },
                         "patchSettings": [
                             {
@@ -1972,21 +1945,6 @@
                                 "value": "disabled"
                             }
                         ]
-                    },
-                    {
-                        "condition": {
-                            "experiment": {
-                                "experimentName": "contentScopeExperiment1",
-                                "cohort": "treatment"
-                            }
-                        },
-                        "patchSettings": [
-                            {
-                                "op": "add",
-                                "path": "/additionalCheck",
-                                "value": "disabled"
-                            }
-                        ]
                     }
                 ]
             }
@@ -2008,21 +1966,6 @@
                     {
                         "condition": {
                             "injectName": "android-adsjs"
-                        },
-                        "patchSettings": [
-                            {
-                                "op": "add",
-                                "path": "/additionalCheck",
-                                "value": "disabled"
-                            }
-                        ]
-                    },
-                    {
-                        "condition": {
-                            "experiment": {
-                                "experimentName": "contentScopeExperiment1",
-                                "cohort": "treatment"
-                            }
                         },
                         "patchSettings": [
                             {
@@ -2057,21 +2000,6 @@
                     {
                         "condition": {
                             "injectName": "android-adsjs"
-                        },
-                        "patchSettings": [
-                            {
-                                "op": "add",
-                                "path": "/additionalCheck",
-                                "value": "disabled"
-                            }
-                        ]
-                    },
-                    {
-                        "condition": {
-                            "experiment": {
-                                "experimentName": "contentScopeExperiment1",
-                                "cohort": "treatment"
-                            }
                         },
                         "patchSettings": [
                             {
@@ -2139,6 +2067,31 @@
                             {
                                 "op": "replace",
                                 "path": "/serpSettings",
+                                "value": "enabled"
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        "browserUiLock": {
+            "state": "enabled",
+            "minSupportedVersion": 52700000,
+            "exceptions": [],
+            "settings": {
+                "additionalCheck": "disabled",
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "experiment": {
+                                "experimentName": "contentScopeExperiment3",
+                                "cohort": "treatment"
+                            }
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/additionalCheck",
                                 "value": "enabled"
                             }
                         ]
@@ -2289,6 +2242,32 @@
                 ]
             },
             "minSupportedVersion": 51670000
+        },
+        "pir": {
+            "state": "enabled",
+            "minSupportedVersion": 52701000,
+            "exceptions": [],
+            "features": {
+                "pirBeta": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52701000,
+                    "targets": [
+                        {
+                            "entitlement": "Data Broker Protection"
+                        }
+                    ],
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 0.5
+                            },
+                            {
+                                "percent": 1
+                            }
+                        ]
+                    }
+                }
+            }
         },
         "privacyDashboard": {
             "state": "enabled"
@@ -2533,25 +2512,7 @@
                     },
                     {
                         "condition": {
-                            "experiment": {
-                                "experimentName": "contentScopeExperiment1",
-                                "cohort": "treatment"
-                            }
-                        },
-                        "patchSettings": [
-                            {
-                                "op": "add",
-                                "path": "/additionalCheck",
-                                "value": "disabled"
-                            }
-                        ]
-                    },
-                    {
-                        "condition": {
-                            "experiment": {
-                                "experimentName": "contentScopeExperiment2",
-                                "cohort": "treatment"
-                            }
+                            "minSupportedVersion": 52680000
                         },
                         "patchSettings": [
                             {
@@ -3652,7 +3613,7 @@
                     ]
                 },
                 "contentScopeExperiment1": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "rollout": {
                         "steps": [
                             {
@@ -3675,12 +3636,33 @@
                     ]
                 },
                 "contentScopeExperiment2": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": 52680000,
                     "rollout": {
                         "steps": [
                             {
                                 "percent": 100
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "contentScopeExperiment3": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52700000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
                             }
                         ]
                     },
@@ -3734,6 +3716,9 @@
                             },
                             {
                                 "percent": 50
+                            },
+                            {
+                                "percent": 100
                             }
                         ]
                     }

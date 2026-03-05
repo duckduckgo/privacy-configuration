@@ -545,7 +545,7 @@
             ],
             "features": {
                 "tdsNextExperiment006": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "rollout": {
                         "steps": [
                             {
@@ -740,6 +740,16 @@
         },
         "autoconsent": {
             "state": "enabled",
+            "exceptions": [
+                {
+                    "domain": "postnl.nl",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4648"
+                },
+                {
+                    "domain": "newrepublic.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4652"
+                }
+            ],
             "features": {
                 "filterlist": {
                     "state": "disabled"
@@ -1198,7 +1208,8 @@
                     "minSupportedVersion": "1.169.0"
                 },
                 "nextStepsListWidget": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": "1.180.0"
                 }
             }
         },
@@ -1559,17 +1570,6 @@
         "trackerAllowlist": {
             "settings": {
                 "allowlistedTrackers": {
-                    "adlightning.com": {
-                        "rules": [
-                            {
-                                "rule": "tagan.adlightning.com",
-                                "domains": [
-                                    "timesofmalta.com"
-                                ],
-                                "reason": "timesofmalta.com - https://github.com/duckduckgo/privacy-configuration/pull/4401"
-                            }
-                        ]
-                    },
                     "appboycdn.com": {
                         "rules": [
                             {
@@ -1638,17 +1638,6 @@
                                     "scrolller.com"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1968"
-                            }
-                        ]
-                    },
-                    "ebxcdn.com": {
-                        "rules": [
-                            {
-                                "rule": "applets.ebxcdn.com/ebx.js",
-                                "domains": [
-                                    "timesofmalta.com"
-                                ],
-                                "reason": "timesofmalta.com - https://github.com/duckduckgo/privacy-configuration/pull/4401"
                             }
                         ]
                     },

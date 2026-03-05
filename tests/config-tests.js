@@ -187,22 +187,6 @@ describe('Config schema tests', () => {
                 }
             });
 
-            it('All detectors should be named correctly', () => {
-                const detectorNameRegex = /^[a-zA-Z0-9][a-zA-Z0-9_]*$/;
-                const webDetectionFeature = config.body.features.webDetection;
-                if (webDetectionFeature?.settings?.detectors) {
-                    for (const [
-                        groupName,
-                        groupDetectors,
-                    ] of Object.entries(webDetectionFeature.settings.detectors)) {
-                        expect(groupName).to.match(detectorNameRegex);
-                        for (const detectorName of Object.keys(groupDetectors)) {
-                            expect(detectorName).to.match(detectorNameRegex);
-                        }
-                    }
-                }
-            });
-
             if (config.name.includes('windows-config.json')) {
                 // Only run this test for Windows config to validate _DDGWV features
                 it('Windows config _DDGWV features should be valid overrides of their base features', () => {
@@ -345,4 +329,237 @@ describe('Config schema tests', () => {
             }
         }
     });
+});
+
+describe('EventHub validation tests', () => {
+    for (const config of latestConfigs) {
+        const eventHub = /** @type {import('../schema/features/event-hub').EventHubFeature<number> | undefined} */ (
+            config.body.features?.eventHub
+        );
+        if (!eventHub?.settings?.telemetry) continue;
+
+        const telemetry = eventHub.settings.telemetry;
+
+        describe(`${config.name} eventHub`, () => {
+            it('telemetry entry names should be valid pixel names', () => {
+                // Segments of [a-zA-Z][a-zA-Z0-9]* separated by underscores,
+                // e.g. "webTelemetry_adwalls_day" (at least two segments must
+                // be specified)
+                const pixelNameRegex = /^[a-zA-Z][a-zA-Z0-9]*(_[a-zA-Z][a-zA-Z0-9]*)+$/;
+                for (const name of Object.keys(telemetry)) {
+                    expect(name).to.match(
+                        pixelNameRegex,
+                        `Telemetry name '${name}' is not a valid pixel name (must match ${pixelNameRegex})`,
+                    );
+                }
+            });
+
+            it('trigger period must specify at least one non-negative time unit', () => {
+                const timeUnits = [
+                    'seconds',
+                    'minutes',
+                    'hours',
+                    'days',
+                ];
+                for (const [
+                    name,
+                    entry,
+                ] of Object.entries(telemetry)) {
+                    const period = entry.trigger.period;
+                    expect(period).to.be.an('object', `Telemetry '${name}' is missing trigger.period`);
+                    const hasTimeUnit = timeUnits.some((unit) => unit in period);
+                    expect(hasTimeUnit).to.equal(true, `Telemetry '${name}' period must specify at least one of: ${timeUnits.join(', ')}`);
+                    for (const unit of timeUnits) {
+                        if (unit in period) {
+                            expect(period[unit]).to.be.at.least(0, `Telemetry '${name}' period.${unit} must not be negative`);
+                        }
+                    }
+                }
+            });
+
+            it('total trigger period must be greater than zero', () => {
+                for (const [
+                    name,
+                    entry,
+                ] of Object.entries(telemetry)) {
+                    const period = entry.trigger.period;
+                    const totalSeconds =
+                        (period.seconds || 0) + (period.minutes || 0) * 60 + (period.hours || 0) * 3600 + (period.days || 0) * 86400;
+                    expect(totalSeconds).to.be.greaterThan(
+                        0,
+                        `Telemetry '${name}' total period is ${totalSeconds}s — must be greater than zero`,
+                    );
+                }
+            });
+
+            it('each telemetry entry must have at least one parameter', () => {
+                for (const [
+                    name,
+                    entry,
+                ] of Object.entries(telemetry)) {
+                    const params = entry.parameters;
+                    expect(params).to.be.an('object', `Telemetry '${name}' is missing parameters`);
+                    expect(Object.keys(params).length).to.be.greaterThan(0, `Telemetry '${name}' must have at least one parameter`);
+                }
+            });
+
+            for (const [
+                entryName,
+                entry,
+            ] of Object.entries(telemetry)) {
+                for (const [
+                    paramName,
+                    param,
+                ] of Object.entries(entry.parameters || {})) {
+                    describe(`${entryName}.${paramName}`, () => {
+                        it('source should be a non-empty string', () => {
+                            expect(param.source).to.be.a('string', `Parameter '${entryName}.${paramName}' source must be a string`);
+                            expect(param.source.length).to.be.greaterThan(
+                                0,
+                                `Parameter '${entryName}.${paramName}' source must not be empty`,
+                            );
+                        });
+
+                        it('buckets should not be empty', () => {
+                            expect(param.buckets).to.be.an('object', `Parameter '${entryName}.${paramName}' buckets must be an object`);
+                            const bucketNames = Object.keys(param.buckets);
+                            expect(bucketNames.length).to.be.greaterThan(
+                                0,
+                                `Parameter '${entryName}.${paramName}' buckets must not be empty`,
+                            );
+                        });
+
+                        it('lt must be greater than gte', () => {
+                            for (const [
+                                name,
+                                bucket,
+                            ] of Object.entries(param.buckets)) {
+                                if (bucket.lt !== undefined) {
+                                    expect(bucket.lt).to.be.greaterThan(
+                                        bucket.gte,
+                                        `Bucket '${name}' lt (${bucket.lt}) must be greater than gte (${bucket.gte})`,
+                                    );
+                                }
+                            }
+                        });
+
+                        it('every lt must match another bucket gte (no gaps)', () => {
+                            const gteValues = new Set(Object.values(param.buckets).map((b) => b.gte));
+                            for (const [
+                                name,
+                                bucket,
+                            ] of Object.entries(param.buckets)) {
+                                if (bucket.lt !== undefined) {
+                                    expect(gteValues.has(bucket.lt)).to.equal(
+                                        true,
+                                        `Bucket '${name}' lt (${bucket.lt}) does not match any bucket's gte`,
+                                    );
+                                }
+                            }
+                        });
+
+                        it('gte values must be unique across buckets', () => {
+                            const seen = new Set();
+                            for (const [
+                                name,
+                                bucket,
+                            ] of Object.entries(param.buckets)) {
+                                expect(seen.has(bucket.gte)).to.equal(false, `Duplicate gte value ${bucket.gte} in bucket '${name}'`);
+                                seen.add(bucket.gte);
+                            }
+                        });
+
+                        it('lt values must be unique across buckets', () => {
+                            const seen = new Set();
+                            for (const [
+                                name,
+                                bucket,
+                            ] of Object.entries(param.buckets)) {
+                                if (bucket.lt !== undefined) {
+                                    expect(seen.has(bucket.lt)).to.equal(false, `Duplicate lt value ${bucket.lt} in bucket '${name}'`);
+                                    seen.add(bucket.lt);
+                                }
+                            }
+                        });
+
+                        it('should have at most one unbounded bucket (missing lt)', () => {
+                            const unbounded = Object.entries(param.buckets).filter(
+                                ([
+                                    ,
+                                    b,
+                                ]) => b.lt === undefined,
+                            );
+                            expect(unbounded.length).to.be.at.most(
+                                1,
+                                `Found ${unbounded.length} unbounded buckets: ${unbounded
+                                    .map(
+                                        ([
+                                            n,
+                                        ]) => n,
+                                    )
+                                    .join(', ')}`,
+                            );
+                        });
+                    });
+                }
+            }
+        });
+    }
+});
+
+describe('WebDetection validation tests', () => {
+    for (const config of latestConfigs) {
+        const webDetection = /** @type {import('../schema/features/web-detection').WebDetectionFeature<number> | undefined} */ (
+            config.body.features?.webDetection
+        );
+        if (!webDetection?.settings?.detectors) continue;
+
+        const detectors = webDetection.settings.detectors;
+
+        describe(`${config.name} webDetection`, () => {
+            it('detector and group names should be named correctly', () => {
+                const detectorNameRegex = /^[a-zA-Z][a-zA-Z0-9_]*$/;
+                for (const [
+                    groupName,
+                    groupDetectors,
+                ] of Object.entries(detectors)) {
+                    expect(groupName).to.match(detectorNameRegex);
+                    for (const detectorName of Object.keys(groupDetectors)) {
+                        expect(detectorName).to.match(detectorNameRegex);
+                    }
+                }
+            });
+
+            it('fireEvent.type values should have a corresponding eventHub parameter source', () => {
+                const eventHubTelemetry = /** @type {import('../schema/features/event-hub').EventHubFeature<number> | undefined} */ (
+                    config.body.features?.eventHub
+                )?.settings.telemetry;
+                const knownSources = new Set();
+                for (const entry of Object.values(eventHubTelemetry ?? {})) {
+                    for (const param of Object.values(entry.parameters)) {
+                        if (param.source) knownSources.add(param.source);
+                    }
+                }
+
+                for (const [
+                    groupName,
+                    groupDetectors,
+                ] of Object.entries(detectors)) {
+                    for (const [
+                        detectorName,
+                        detector,
+                    ] of Object.entries(groupDetectors)) {
+                        const type = detector.actions?.fireEvent?.type;
+                        if (type === undefined) continue;
+                        expect(knownSources.has(type)).to.equal(
+                            true,
+                            `Detector '${groupName}.${detectorName}' fires event type '${type}' but no eventHub parameter has source '${type}' (known sources: ${[
+                                ...knownSources,
+                            ].join(', ')})`,
+                        );
+                    }
+                }
+            });
+        });
+    }
 });
