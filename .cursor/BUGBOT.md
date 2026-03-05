@@ -8,6 +8,11 @@
 - **Validate JSON structure** and syntax
 - **Ensure TypeScript type compliance**
 
+## Feature State Transitions
+
+### Minimum Supported Version Bumps
+When a feature transitions from `internal` to `enabled` (or from `enabled` to `internal`), the minimum supported version **must** be bumped. Clients rely on the version to detect config changes; without a bump, the state transition will be silently ignored.
+
 ## Element Hiding Feature Validation
 
 ### Schema & Implementation References
