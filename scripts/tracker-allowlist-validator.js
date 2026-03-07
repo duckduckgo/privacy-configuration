@@ -105,13 +105,13 @@ export function compareRules(ruleA, ruleB) {
         return 'equal';
     }
 
-    // ruleA more specific than ruleB: domainA is subdomain-or-equal of domainB, pathA more specific than pathB
-    if (isSubdomainOrEqual(domA, domB) && pathComp === -1) {
+    // ruleA more specific than ruleB: domainA is subdomain-or-equal of domainB, pathB is prefix of pathA (or equal)
+    if (isSubdomainOrEqual(domA, domB) && (pathComp === -1 || pathComp === 0)) {
         return 'moreSpecific';
     }
 
-    // ruleA more general than ruleB: domainB is subdomain-or-equal of domainA, pathA more general than pathB
-    if (isSubdomainOrEqual(domB, domA) && pathComp === 1) {
+    // ruleA more general than ruleB: domainB is subdomain-or-equal of domainA, pathA is prefix of pathB (or equal)
+    if (isSubdomainOrEqual(domB, domA) && (pathComp === 1 || pathComp === 0)) {
         return 'moreGeneral';
     }
 
