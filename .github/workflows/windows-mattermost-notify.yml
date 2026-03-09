@@ -1,0 +1,61 @@
+name: Notify Windows Devs MM channel on Windows PR
+
+on:
+    pull_request:
+        types:
+            - opened
+            - edited
+            - reopened
+
+jobs:
+    notify:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Check Windows checkbox and notify
+              uses: actions/github-script@v8
+              env:
+                  MM_WEBHOOK_URL: ${{ secrets.MM_WINDOWS_NOTIFY_WEBHOOK_URL }}
+              with:
+                  script: |
+                      const body = context.payload.pull_request.body || '';
+                      const windowsChecked = /- \[x\]\s*Windows/i.test(body);
+
+                      if (!windowsChecked) {
+                          console.log('Windows checkbox not checked, skipping');
+                          return;
+                      }
+
+                      // For edited events, only notify if the body changed AND Windows wasn't already checked
+                      if (context.payload.action === 'edited') {
+                          if (!context.payload.changes?.body) {
+                              console.log('Body not modified in this edit, skipping');
+                              return;
+                          }
+                          const previousBody = context.payload.changes.body.from || '';
+                          if (/- \[x\]\s*Windows/i.test(previousBody)) {
+                              console.log('Windows was already checked before edit, skipping');
+                              return;
+                          }
+                      }
+
+                      const webhookUrl = process.env.MM_WEBHOOK_URL;
+                      if (!webhookUrl) {
+                          core.setFailed('MM_WINDOWS_NOTIFY_WEBHOOK_URL is missing from GHA secrets');
+                          return;
+                      }
+
+                      const pr = context.payload.pull_request;
+                      const text = `:wave: Please review this :windows: Privacy Config PR for ${pr.user.login}:\n[${pr.title} - #${pr.number}](${pr.html_url})`;
+
+                      const response = await fetch(webhookUrl, {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ text }),
+                      });
+
+                      if (!response.ok) {
+                          core.setFailed(`Mattermost webhook returned ${response.status}: ${await response.text()}`);
+                      } else {
+                          console.log('Mattermost notification sent');
+                      }
