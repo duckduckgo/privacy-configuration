@@ -1563,21 +1563,6 @@
                             },
                             {
                                 "domain": [
-                                    "visa.vfsglobal.com"
-                                ],
-                                "patchSettings": [
-                                    {
-                                        "path": "/formTypeSettings/-",
-                                        "op": "add",
-                                        "value": {
-                                            "selector": "form",
-                                            "type": "login"
-                                        }
-                                    }
-                                ]
-                            },
-                            {
-                                "domain": [
                                     "estore.archives.gov",
                                     "localhost"
                                 ],
@@ -1848,6 +1833,23 @@
                                         "value": {
                                             "selector": "input#lastname_str",
                                             "type": "identities.lastName"
+                                        }
+                                    }
+                                ]
+                            }
+                        ],
+                        "conditionalChanges": [
+                            {
+                                "condition": {
+                                    "urlPattern": "https://visa.vfsglobal.com/tur/tr/bgr/login*"
+                                },
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "form",
+                                            "type": "login"
                                         }
                                     }
                                 ]
