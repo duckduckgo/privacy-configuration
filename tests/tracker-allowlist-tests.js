@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+import fs from 'fs';
 import {
     splitDomainPath,
     isSubdomainOrEqual,
@@ -541,6 +542,19 @@ describe('tracker-allowlist-validator', () => {
             expect(errors[0].type).to.equal('ORDERING_VIOLATION');
             expect(errors[1].tracker).to.equal('tracker2.com');
             expect(errors[1].type).to.equal('DUPLICATE_RULE');
+        });
+    });
+
+    describe('validate real tracker-allowlist.json', () => {
+        it('has no violations in features/tracker-allowlist.json', () => {
+            const raw = fs.readFileSync('./features/tracker-allowlist.json', 'utf-8');
+            const config = JSON.parse(raw);
+            const allowlistedTrackers = config.settings.allowlistedTrackers;
+            const errors = validateAllowlist(allowlistedTrackers);
+            if (errors.length > 0) {
+                const messages = errors.map((e) => `[${e.type}] ${e.tracker}: ${e.message} Suggestion: ${e.suggestion}`);
+                throw new Error(`Found ${errors.length} violation(s):\n${messages.join('\n')}`);
+            }
         });
     });
 });
