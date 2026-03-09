@@ -4,6 +4,6 @@ export type WebExtensionsConfig<VersionType> = Feature<
     {},
     VersionType,
     {
-        embeddedExtension?: SubFeature<VersionType>;
+        embedded?: SubFeature<VersionType>;
     }
 >;

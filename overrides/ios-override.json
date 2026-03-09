@@ -2620,10 +2620,19 @@
             }
         },
         "webExtensions": {
-            "state": "enabled",
+            "state": "internal",
+            "minSupportedVersion": "7.211.0",
             "features": {
-                "embeddedExtension": {
-                    "state": "internal"
+                "embedded": {
+                    "state": "internal",
+                    "minSupportedVersion": "7.211.0",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 50
+                            }
+                        ]
+                    }
                 }
             }
         }
