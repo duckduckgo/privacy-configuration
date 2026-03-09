@@ -20,21 +20,24 @@ jobs:
                   script: |
                       const body = context.payload.pull_request.body || '';
                       const windowsChecked = /- \[x\]\s*Windows/i.test(body);
+                      const readyToMerge = /- \[x\]\s*This code for the config change is ready to merge\./i.test(body);
 
-                      if (!windowsChecked) {
-                          console.log('Windows checkbox not checked, skipping');
+                      if (!windowsChecked || !readyToMerge) {
+                          console.log('Windows not checked or not a ready-to-merge feature change, skipping');
                           return;
                       }
 
-                      // For edited events, only notify if the body changed AND Windows wasn't already checked
+                      // For edited events, only notify if the body changed AND both weren't already checked
                       if (context.payload.action === 'edited') {
                           if (!context.payload.changes?.body) {
                               console.log('Body not modified in this edit, skipping');
                               return;
                           }
                           const previousBody = context.payload.changes.body.from || '';
-                          if (/- \[x\]\s*Windows/i.test(previousBody)) {
-                              console.log('Windows was already checked before edit, skipping');
+                          const wasWindows = /- \[x\]\s*Windows/i.test(previousBody);
+                          const wasReady = /- \[x\]\s*This code for the config change is ready to merge\./i.test(previousBody);
+                          if (wasWindows && wasReady) {
+                              console.log('Both checkboxes were already checked before edit, skipping');
                               return;
                           }
                       }
