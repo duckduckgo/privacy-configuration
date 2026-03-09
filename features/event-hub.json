@@ -1,0 +1,57 @@
+{
+    "_meta": {
+        "description": "Event hub for client-side telemetry aggregation and pixel firing."
+    },
+    "state": "disabled",
+    "exceptions": [],
+    "settings": {
+        "telemetry": {
+            "webTelemetry_adwalls_day": {
+                "state": "enabled",
+                "trigger": {
+                    "period": {
+                        "days": 1
+                    }
+                },
+                "parameters": {
+                    "adwallCount": {
+                        "template": "counter",
+                        "source": "adwall",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-5": { "gte": 3, "lt": 6 },
+                            "6-10": { "gte": 6, "lt": 11 },
+                            "11-20": { "gte": 11, "lt": 21 },
+                            "21-39": { "gte": 21, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    }
+                }
+            },
+            "webTelemetry_adwalls_week": {
+                "state": "enabled",
+                "trigger": {
+                    "period": {
+                        "days": 7
+                    }
+                },
+                "parameters": {
+                    "adwallCount": {
+                        "template": "counter",
+                        "source": "adwall",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-5": { "gte": 3, "lt": 6 },
+                            "6-10": { "gte": 6, "lt": 11 },
+                            "11-20": { "gte": 11, "lt": 21 },
+                            "21-39": { "gte": 21, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

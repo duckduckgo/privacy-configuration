@@ -1295,6 +1295,18 @@
                 ]
             },
             {
+                "domain": "ctinsider.com",
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    },
+                    {
+                        "selector": "[data-block-type='ad']",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
                 "domain": "cubbyathome.com",
                 "rules": [
                     {
@@ -1988,6 +2000,10 @@
                         "type": "hide"
                     },
                     {
+                        "selector": "div:has(> iframe[src='about:blank'][name='callout'])",
+                        "type": "hide"
+                    },
+                    {
                         "selector": "[aria-labelledby='promo-header']",
                         "type": "hide"
                     },
@@ -2431,6 +2447,15 @@
                     {
                         "selector": ".zmgad-full-width",
                         "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "lifestories7.com",
+                "rules": [
+                    {
+                        "selector": "#zdn-adblock-overlay",
+                        "type": "hide"
                     }
                 ]
             },
@@ -3385,6 +3410,18 @@
                 ]
             },
             {
+                "domain": "scimagojr.com",
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    },
+                    {
+                        "selector": ".contentAds",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
                 "domain": "scmp.com",
                 "rules": [
                     {
@@ -3789,6 +3826,43 @@
                 "rules": [
                     {
                         "selector": "[class*='AdCard__leaderboard']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "timesofmalta.com",
+                "rules": [
+                    {
+                        "selector": "[class*='Advert']",
+                        "type": "modify-style",
+                        "values": [
+                            {
+                                "property": "display",
+                                "value": "none"
+                            }
+                        ]
+                    },
+                    {
+                        "selector": "#ad-banner",
+                        "type": "modify-style",
+                        "values": [
+                            {
+                                "property": "display",
+                                "value": "none"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "domain": "timesunion.com",
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    },
+                    {
+                        "selector": "[data-block-type='ad']",
                         "type": "hide-empty"
                     }
                 ]

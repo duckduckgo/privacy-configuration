@@ -205,7 +205,7 @@
             "exceptions": [],
             "features": {
                 "tdsNextExperiment006": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": 52361000,
                     "rollout": {
                         "steps": [
@@ -554,10 +554,6 @@
                 {
                     "domain": "ashleyfurniture.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3908"
-                },
-                {
-                    "domain": "timesofmalta.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4401"
                 }
             ],
             "features": {
@@ -1558,6 +1554,17 @@
                         ]
                     }
                 },
+                "reduceBrowserTabBundleSize": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52690000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            }
+                        ]
+                    }
+                },
                 "newCustomTab": {
                     "state": "enabled",
                     "minSupportedVersion": 52590000
@@ -1565,6 +1572,17 @@
                 "experimentalBrowsingMenu": {
                     "state": "enabled",
                     "minSupportedVersion": 52660000
+                },
+                "sendPageLoadWideEvent": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52690000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            }
+                        ]
+                    }
                 }
             }
         },
@@ -2227,12 +2245,12 @@
         },
         "pir": {
             "state": "enabled",
-            "minSupportedVersion": 52690000,
+            "minSupportedVersion": 52701000,
             "exceptions": [],
             "features": {
                 "pirBeta": {
                     "state": "enabled",
-                    "minSupportedVersion": 52690000,
+                    "minSupportedVersion": 52701000,
                     "targets": [
                         {
                             "entitlement": "Data Broker Protection"
@@ -2242,6 +2260,12 @@
                         "steps": [
                             {
                                 "percent": 0.5
+                            },
+                            {
+                                "percent": 1
+                            },
+                            {
+                                "percent": 2
                             }
                         ]
                     }
@@ -2491,10 +2515,7 @@
                     },
                     {
                         "condition": {
-                            "experiment": {
-                                "experimentName": "contentScopeExperiment2",
-                                "cohort": "treatment"
-                            }
+                            "minSupportedVersion": 52680000
                         },
                         "patchSettings": [
                             {
@@ -3618,7 +3639,7 @@
                     ]
                 },
                 "contentScopeExperiment2": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": 52680000,
                     "rollout": {
                         "steps": [
@@ -3645,6 +3666,9 @@
                         "steps": [
                             {
                                 "percent": 10
+                            },
+                            {
+                                "percent": 50
                             }
                         ]
                     },
@@ -3698,6 +3722,9 @@
                             },
                             {
                                 "percent": 50
+                            },
+                            {
+                                "percent": 100
                             }
                         ]
                     }
@@ -3839,6 +3866,13 @@
                         ]
                     }
                 }
+            }
+        },
+        "appStartupMetrics": {
+            "state": "internal",
+            "exceptions": [],
+            "settings": {
+                "sampling": 1.0
             }
         },
         "pageContext": {
