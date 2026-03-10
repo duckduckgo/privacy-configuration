@@ -733,7 +733,7 @@
                     {
                         "rule": "cdnjs.cloudflare.com/ajax/libs/fingerprintjs2/1.8.6/fingerprint2.min.js",
                         "domains": [
-                            "winnipegfreepress.com"
+                            "<all>"
                         ],
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1066"
                     },
@@ -1776,14 +1776,14 @@
             "google.com": {
                 "rules": [
                     {
-                        "rule": "accounts.google.com/o/oauth2/iframe",
+                        "rule": "accounts.google.com/o/oauth2/iframerpc",
                         "domains": [
                             "<all>"
                         ],
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/489"
                     },
                     {
-                        "rule": "accounts.google.com/o/oauth2/iframerpc",
+                        "rule": "accounts.google.com/o/oauth2/iframe",
                         "domains": [
                             "<all>"
                         ],
@@ -2592,19 +2592,9 @@
             "klaviyo.com": {
                 "rules": [
                     {
-                        "rule": "klaviyo.com/",
-                        "domains": [
-                            "<all>"
-                        ],
-                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/362"
-                    },
-                    {
                         "rule": "www.klaviyo.com/media/js/public/klaviyo_subscribe.js",
                         "domains": [
-                            "fearofgod.com",
-                            "shopyalehome.com",
-                            "silhouetteu.com",
-                            "restrap.com"
+                            "<all>"
                         ],
                         "reason": [
                             "fearofgod.com and shopyalehome.com - https://github.com/duckduckgo/privacy-configuration/issues/362",
@@ -2622,10 +2612,16 @@
                     {
                         "rule": "a.klaviyo.com/media/js/onsite/onsite.js",
                         "domains": [
-                            "tanglefree.com",
-                            "bonescoffee.com"
+                            "<all>"
                         ],
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1453"
+                    },
+                    {
+                        "rule": "klaviyo.com/",
+                        "domains": [
+                            "<all>"
+                        ],
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/362"
                     }
                 ]
             },
@@ -3262,21 +3258,26 @@
                     {
                         "rule": "a.pub.network/newser-com/cls.css",
                         "domains": [
-                            "newser.com"
+                            "newser.com",
+                            "pc-builds.com"
                         ],
-                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1689"
+                        "reason": [
+                            "https://github.com/duckduckgo/privacy-configuration/issues/1689",
+                            "pc-builds.com - https://github.com/duckduckgo/privacy-configuration/pull/4092"
+                        ]
                     },
                     {
                         "rule": "a.pub.network/core/prebid-universal-creative.js",
                         "domains": [
                             "boingboing.net",
-                            "signupgenius.com",
+                            "newrepublic.com",
+                            "pc-builds.com",
                             "sciencenews.org",
+                            "signupgenius.com",
                             "smithsonianmag.com",
                             "stockcharts.com",
-                            "titantv.com",
-                            "newrepublic.com",
-                            "thenation.com"
+                            "thenation.com",
+                            "titantv.com"
                         ],
                         "reason": [
                             "newrepublic.com - https://github.com/duckduckgo/privacy-configuration/pull/2807",
@@ -3286,29 +3287,42 @@
                             "smithsonianmag.com - https://github.com/duckduckgo/privacy-configuration/pull/2346",
                             "stockcharts.com - https://github.com/duckduckgo/privacy-configuration/pull/2478",
                             "titantv.com - https://github.com/duckduckgo/privacy-configuration/issues/1925",
-                            "thenation.com - https://github.com/duckduckgo/privacy-configuration/pull/2846"
+                            "thenation.com - https://github.com/duckduckgo/privacy-configuration/pull/2846",
+                            "pc-builds.com - https://github.com/duckduckgo/privacy-configuration/pull/4092"
                         ]
                     },
                     {
                         "rule": "a.pub.network/virtualpiano-net/pubfig.min.js",
                         "domains": [
+                            "pc-builds.com",
                             "virtualpiano.net"
                         ],
-                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2251"
+                        "reason": [
+                            "https://github.com/duckduckgo/privacy-configuration/pull/2251",
+                            "pc-builds.com - https://github.com/duckduckgo/privacy-configuration/pull/4092"
+                        ]
                     },
                     {
                         "rule": "a.pub.network/thenation-com/pubfig.min.js",
                         "domains": [
+                            "pc-builds.com",
                             "thenation.com"
                         ],
-                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2829"
+                        "reason": [
+                            "https://github.com/duckduckgo/privacy-configuration/pull/2829",
+                            "pc-builds.com - https://github.com/duckduckgo/privacy-configuration/pull/4092"
+                        ]
                     },
                     {
                         "rule": "a.pub.network/ukutabs-com/pubfig.min.js",
                         "domains": [
+                            "pc-builds.com",
                             "ukutabs.com"
                         ],
-                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3501"
+                        "reason": [
+                            "https://github.com/duckduckgo/privacy-configuration/pull/3501",
+                            "pc-builds.com - https://github.com/duckduckgo/privacy-configuration/pull/4092"
+                        ]
                     },
                     {
                         "rule": "pub.network/",
