@@ -507,6 +507,25 @@
                 "maxHistoryCount": 10
             }
         },
+        "duckAiDataClearing": {
+            "state": "enabled",
+            "exceptions": [],
+            "settings": {
+                "chatsLocalStorageKeys": [
+                    "savedAIChats"
+                ],
+                "chatImagesIndexDbNameObjectStoreNamePairs": [
+                    [
+                        "savedAIChatData",
+                        "chat-images"
+                    ],
+                    [
+                        "savedAIChatData",
+                        "saved-chats"
+                    ]
+                ]
+            }
+        },
         "ampLinks": {
             "state": "enabled",
             "exceptions": [
@@ -1014,6 +1033,23 @@
                                         "value": {
                                             "selector": "input#lastname_str",
                                             "type": "identities.lastName"
+                                        }
+                                    }
+                                ]
+                            }
+                        ],
+                        "conditionalChanges": [
+                            {
+                                "condition": {
+                                    "urlPattern": "https://visa.vfsglobal.com/tur/tr/bgr/login*"
+                                },
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "form",
+                                            "type": "login"
                                         }
                                     }
                                 ]
@@ -1561,6 +1597,9 @@
                         "steps": [
                             {
                                 "percent": 5
+                            },
+                            {
+                                "percent": 10
                             }
                         ]
                     }
@@ -2245,12 +2284,12 @@
         },
         "pir": {
             "state": "enabled",
-            "minSupportedVersion": 52690000,
+            "minSupportedVersion": 52701000,
             "exceptions": [],
             "features": {
                 "pirBeta": {
                     "state": "enabled",
-                    "minSupportedVersion": 52690000,
+                    "minSupportedVersion": 52701000,
                     "targets": [
                         {
                             "entitlement": "Data Broker Protection"
@@ -2263,6 +2302,12 @@
                             },
                             {
                                 "percent": 1
+                            },
+                            {
+                                "percent": 2
+                            },
+                            {
+                                "percent": 5
                             }
                         ]
                     }
@@ -3663,6 +3708,12 @@
                         "steps": [
                             {
                                 "percent": 10
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
                             }
                         ]
                     },
@@ -3862,6 +3913,13 @@
                 }
             }
         },
+        "appStartupMetrics": {
+            "state": "internal",
+            "exceptions": [],
+            "settings": {
+                "sampling": 1.0
+            }
+        },
         "pageContext": {
             "state": "enabled",
             "minSupportedVersion": 52680000,
@@ -3907,6 +3965,10 @@
                     }
                 ]
             }
+        },
+        "webDetection": {
+            "state": "enabled",
+            "minSupportedVersion": 52700000
         }
     },
     "unprotectedTemporary": [],

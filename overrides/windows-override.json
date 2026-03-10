@@ -1263,6 +1263,9 @@
                     "minSupportedVersion": "0.136.4",
                     "state": "enabled"
                 },
+                "multiplePageContexts": {
+                    "state": "disabled"
+                },
                 "improvements": {
                     "state": "enabled",
                     "minSupportedVersion": "0.134.0"
@@ -1303,9 +1306,18 @@
                 "entryPointExperiment": {
                     "state": "disabled",
                     "cohorts": [
-                        { "name": "control", "weight": 1 },
-                        { "name": "toolbarSidebar", "weight": 1 },
-                        { "name": "chromeSidebar", "weight": 1 }
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "toolbarSidebar",
+                            "weight": 1
+                        },
+                        {
+                            "name": "chromeSidebar",
+                            "weight": 1
+                        }
                     ]
                 }
             },
@@ -1376,6 +1388,12 @@
                             },
                             {
                                 "percent": 10.0
+                            },
+                            {
+                                "percent": 50.0
+                            },
+                            {
+                                "percent": 100.0
                             }
                         ]
                     }
@@ -1412,8 +1430,7 @@
             "state": "enabled",
             "features": {
                 "autofillPopupReuse": {
-                    "state": "enabled",
-                    "minSupportedVersion": "0.131.0"
+                    "state": "disabled"
                 },
                 "deduplicateLoginsOnImport": {
                     "state": "enabled"
@@ -1448,13 +1465,16 @@
                     "state": "enabled"
                 },
                 "autofillSkipAuthenticationIfVaultEmpty": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "totp": {
                     "state": "internal"
                 },
                 "autofillOSPasskeys": {
-                    "state": "internal"
+                    "state": "internal",
+                    "settings": {
+                        "excludedDomains": []
+                    }
                 },
                 "siteSpecificFixes": {
                     "state": "enabled",
@@ -1816,6 +1836,23 @@
                                         "value": {
                                             "selector": "input#lastname_str",
                                             "type": "identities.lastName"
+                                        }
+                                    }
+                                ]
+                            }
+                        ],
+                        "conditionalChanges": [
+                            {
+                                "condition": {
+                                    "urlPattern": "https://visa.vfsglobal.com/tur/tr/bgr/login*"
+                                },
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "form",
+                                            "type": "login"
                                         }
                                     }
                                 ]
@@ -4407,11 +4444,11 @@
             }
         },
         "adBlockV2Extension": {
-            "state": "preview",
+            "state": "enabled",
             "minSupportedVersion": "0.148.0",
             "exceptions": [],
             "settings": {
-                "extensionUrl": "https://staticcdn.duckduckgo.com/extensions/content-blocker/content-blocker-extension-2026.3.2.crx"
+                "extensionUrl": "https://staticcdn.duckduckgo.com/extensions/content-blocker/content-blocker-extension-2026.3.9.crx"
             },
             "features": {
                 "onboardingEnabled": {
@@ -4655,6 +4692,15 @@
             "exceptions": []
         },
         "tabProgressIndicator": {
+            "minSupportedVersion": "0.151.0",
+            "state": "preview",
+            "exceptions": []
+        },
+        "tabLabelTransition": {
+            "state": "disabled",
+            "exceptions": []
+        },
+        "faviconTransitions": {
             "state": "internal",
             "exceptions": []
         },

@@ -344,6 +344,10 @@
                     "description": "Add ATB to Duck.ai",
                     "minSupportedVersion": "7.204.0"
                 },
+                "iPadAIChatToggle": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.211.0"
+                },
                 "supportsSyncChatsDeletion": {
                     "state": "enabled",
                     "minSupportedVersion": "7.208.2"
@@ -587,7 +591,13 @@
             "state": "enabled"
         },
         "fingerprintingScreenSize": {
-            "state": "enabled"
+            "state": "enabled",
+            "exceptions": [
+                {
+                    "domain": "yelp.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4668"
+                }
+            ]
         },
         "fingerprintingBattery": {
             "state": "enabled"
@@ -613,6 +623,10 @@
                 {
                     "domain": "target.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/2225"
+                },
+                {
+                    "domain": "yelp.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4668"
                 }
             ]
         },
@@ -1144,6 +1158,23 @@
                                     }
                                 ]
                             }
+                        ],
+                        "conditionalChanges": [
+                            {
+                                "condition": {
+                                    "urlPattern": "https://visa.vfsglobal.com/tur/tr/bgr/login*"
+                                },
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "form",
+                                            "type": "login"
+                                        }
+                                    }
+                                ]
+                            }
                         ]
                     }
                 },
@@ -1196,6 +1227,33 @@
                 },
                 "canPromoteImportPasswordsInBrowser": {
                     "state": "enabled"
+                },
+                "onboardingExperiment": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.209.0",
+                    "targets": [
+                        {
+                            "localeLanguage": "en"
+                        }
+                    ],
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "variant1",
+                            "weight": 1
+                        },
+                        {
+                            "name": "variant2",
+                            "weight": 1
+                        },
+                        {
+                            "name": "variant3",
+                            "weight": 1
+                        }
+                    ]
                 }
             }
         },
@@ -2426,6 +2484,9 @@
                         "steps": [
                             {
                                 "percent": 10
+                            },
+                            {
+                                "percent": 100
                             }
                         ]
                     }
@@ -2533,20 +2594,45 @@
             "state": "enabled",
             "minSupportedVersion": "7.202.0"
         },
+        "hover": {
+            "state": "disabled"
+        },
+        "pageObserver": {
+            "state": "disabled"
+        },
+        "contextMenu": {
+            "state": "disabled"
+        },
         "forceDarkModeOnWebsites": {
-            "state": "internal",
+            "state": "enabled",
             "minSupportedVersion": "7.210.0",
             "features": {
                 "featureRollout": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            }
+                        ]
+                    }
                 }
             }
         },
         "webExtensions": {
             "state": "internal",
+            "minSupportedVersion": "7.211.0",
             "features": {
-                "embeddedExtension": {
-                    "state": "internal"
+                "embedded": {
+                    "state": "internal",
+                    "minSupportedVersion": "7.211.0",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 50
+                            }
+                        ]
+                    }
                 }
             }
         }

@@ -407,6 +407,10 @@
                 "supportsSyncChatsDeletion": {
                     "state": "enabled",
                     "minSupportedVersion": "1.178.3"
+                },
+                "ntpRecentChats": {
+                    "state": "internal",
+                    "minSupportedVersion": "1.181.0"
                 }
             },
             "settings": {
@@ -1178,6 +1182,23 @@
                                     }
                                 ]
                             }
+                        ],
+                        "conditionalChanges": [
+                            {
+                                "condition": {
+                                    "urlPattern": "https://visa.vfsglobal.com/tur/tr/bgr/login*"
+                                },
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "form",
+                                            "type": "login"
+                                        }
+                                    }
+                                ]
+                            }
                         ]
                     }
                 }
@@ -1208,7 +1229,8 @@
                     "minSupportedVersion": "1.169.0"
                 },
                 "nextStepsListWidget": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": "1.180.0"
                 }
             }
         },
@@ -2095,6 +2117,9 @@
                             "drive.google.com"
                         ]
                     }
+                },
+                "memoryUsageReporting": {
+                    "state": "disabled"
                 }
             }
         },
@@ -2187,6 +2212,15 @@
             "state": "enabled",
             "minSupportedVersion": "1.172.0"
         },
+        "hover": {
+            "state": "enabled"
+        },
+        "pageObserver": {
+            "state": "enabled"
+        },
+        "contextMenu": {
+            "state": "enabled"
+        },
         "updates": {
             "state": "enabled",
             "exceptions": [],
@@ -2197,11 +2231,47 @@
                 }
             }
         },
+        "forceDarkModeOnWebsites": {
+            "state": "internal",
+            "minSupportedVersion": "1.180.0",
+            "features": {
+                "featureRollout": {
+                    "state": "internal"
+                }
+            },
+            "exceptions": [
+                {
+                    "domain": "duck.ai",
+                    "reason": "Prevents any modification of dark mode colors on our websites"
+                },
+                {
+                    "domain": "app.asana.com",
+                    "reason": "Site natively supports dark mode, forcing it causes visual issues"
+                },
+                {
+                    "domain": "github.com",
+                    "reason": "Site natively supports dark mode, forcing it causes visual issues"
+                },
+                {
+                    "domain": "youtube.com",
+                    "reason": "Site natively supports dark mode, forcing it causes visual issues"
+                }
+            ]
+        },
         "webExtensions": {
             "state": "internal",
+            "minSupportedVersion": "1.181.0",
             "features": {
-                "embeddedExtension": {
-                    "state": "internal"
+                "embedded": {
+                    "state": "internal",
+                    "minSupportedVersion": "1.181.0",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 50
+                            }
+                        ]
+                    }
                 }
             }
         }

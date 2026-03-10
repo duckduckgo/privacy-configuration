@@ -1,4 +1,4 @@
-import { CSSInjectFeatureSettings, Feature, SubFeature } from '../feature';
+import { CSSInjectFeatureSettings, Feature, SiteException, SubFeature } from '../feature';
 import { Operation } from '../json-patch';
 
 // Type of the feature `settings` object
@@ -58,6 +58,10 @@ type DeprecatedAutofillImportSettings<T> = {
     };
 };
 
+export type AutofillOSPasskeysSettings = {
+    excludedDomains?: SiteException[];
+};
+
 // Any subfeatures that have typed `settings` should be defined here.
 // Subfeatures without settings (or just string:string mappings for settings) will be automatically validated.
 type SubFeatures<VersionType> = {
@@ -73,6 +77,7 @@ type SubFeatures<VersionType> = {
 
     // Standard schema structure
     siteSpecificFixes?: SubFeature<VersionType, CSSInjectFeatureSettings<SiteSpecificFixes>>;
+    autofillOSPasskeys?: SubFeature<VersionType, AutofillOSPasskeysSettings>;
 };
 
 export type AutofillFeature<VersionType> = Feature<
