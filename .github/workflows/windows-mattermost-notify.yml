@@ -1,4 +1,4 @@
-name: Notify Windows Devs MM channel on Windows PR
+name: Notify platform teams on Manual Review Required PRs
 
 on:
     issue_comment:
@@ -13,10 +13,14 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
-            - name: Check approval analysis and notify
+            - name: Check approval analysis and notify platform teams
               uses: actions/github-script@v8
               env:
-                  MM_WEBHOOK_URL: ${{ secrets.MM_WINDOWS_NOTIFY_WEBHOOK_URL }}
+                  MM_WINDOWS_NOTIFY_WEBHOOK_URL: ${{ secrets.MM_WINDOWS_NOTIFY_WEBHOOK_URL }}
+                  MM_ANDROID_NOTIFY_WEBHOOK_URL: ${{ secrets.MM_ANDROID_NOTIFY_WEBHOOK_URL }}
+                  MM_IOS_NOTIFY_WEBHOOK_URL: ${{ secrets.MM_IOS_NOTIFY_WEBHOOK_URL }}
+                  MM_MACOS_NOTIFY_WEBHOOK_URL: ${{ secrets.MM_MACOS_NOTIFY_WEBHOOK_URL }}
+                  MM_EXTENSIONS_NOTIFY_WEBHOOK_URL: ${{ secrets.MM_EXTENSIONS_NOTIFY_WEBHOOK_URL }}
               with:
                   script: |
                       const comment = context.payload.comment;
@@ -31,35 +35,65 @@ jobs:
                           return;
                       }
 
-                      // Check if windows-config.json appears in the Manual Review Required section
+                      // Extract the Manual Review Required section content
                       const manualReviewMatch = comment.body.match(/## ❌ Manual Review Required([\s\S]*?)(?=\n## |$)/);
-                      if (!manualReviewMatch || !manualReviewMatch[1].includes('windows-config.json')) {
-                          console.log('No Windows config manual review required, skipping');
+                      if (!manualReviewMatch) {
+                          console.log('No Manual Review Required section, skipping');
+                          return;
+                      }
+                      const manualReviewSection = manualReviewMatch[1];
+
+                      const TEAMS = [
+                          {
+                              name: 'Windows',
+                              emoji: ':windows:',
+                              matches: (s) => s.includes('windows-config.json'),
+                              webhookEnv: 'MM_WINDOWS_NOTIFY_WEBHOOK_URL',
+                              marker: 'windows-mm-notified',
+                          },
+                          {
+                              name: 'Android',
+                              emoji: ':android:',
+                              matches: (s) => s.includes('android-config.json'),
+                              webhookEnv: 'MM_ANDROID_NOTIFY_WEBHOOK_URL',
+                              marker: 'android-mm-notified',
+                          },
+                          {
+                              name: 'iOS',
+                              emoji: ':iphone:',
+                              matches: (s) => s.includes('ios-config.json'),
+                              webhookEnv: 'MM_IOS_NOTIFY_WEBHOOK_URL',
+                              marker: 'ios-mm-notified',
+                          },
+                          {
+                              name: 'macOS',
+                              emoji: ':macos:',
+                              matches: (s) => s.includes('macos-config.json'),
+                              webhookEnv: 'MM_MACOS_NOTIFY_WEBHOOK_URL',
+                              marker: 'macos-mm-notified',
+                          },
+                          {
+                              name: 'Extensions',
+                              emoji: ':spider_web:',
+                              matches: (s) => /extension-.*-config\.json/.test(s),
+                              webhookEnv: 'MM_EXTENSIONS_NOTIFY_WEBHOOK_URL',
+                              marker: 'extensions-mm-notified',
+                          },
+                      ];
+
+                      // Filter to teams that have configs requiring manual review
+                      const teamsToNotify = TEAMS.filter((team) => team.matches(manualReviewSection));
+                      if (teamsToNotify.length === 0) {
+                          console.log('No relevant platform configs require manual review, skipping');
                           return;
                       }
 
-                      // Check if we already sent a notification for this PR
-                      const { data: comments } = await github.rest.issues.listComments({
+                      // Fetch existing comments once to check for per-team markers
+                      const { data: existingComments } = await github.rest.issues.listComments({
                           owner: context.repo.owner,
                           repo: context.repo.repo,
                           issue_number: context.payload.issue.number,
                       });
-
-                      const alreadyNotified = comments.some(c =>
-                          c.user.login === 'github-actions[bot]' &&
-                          c.body.includes('<!-- windows-mm-notified -->')
-                      );
-
-                      if (alreadyNotified) {
-                          console.log('Notification already sent for this PR, skipping');
-                          return;
-                      }
-
-                      const webhookUrl = process.env.MM_WEBHOOK_URL;
-                      if (!webhookUrl) {
-                          core.setFailed('MM_WINDOWS_NOTIFY_WEBHOOK_URL is missing from GHA secrets');
-                          return;
-                      }
 
                       // Get PR details
                       const { data: pr } = await github.rest.pulls.get({
@@ -68,25 +102,43 @@ jobs:
                           pull_number: context.payload.issue.number,
                       });
 
-                      const text = `:wave: Please review this :windows: Privacy Config PR for ${pr.user.login}:\n[${pr.title} - #${pr.number}](${pr.html_url})`;
+                      for (const team of teamsToNotify) {
+                          const alreadyNotified = existingComments.some((c) =>
+                              c.user.login === 'github-actions[bot]' &&
+                              c.body.includes(`<!-- ${team.marker} -->`)
+                          );
 
-                      const response = await fetch(webhookUrl, {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({ text }),
-                      });
+                          if (alreadyNotified) {
+                              console.log(`${team.name} already notified, skipping`);
+                              continue;
+                          }
 
-                      if (!response.ok) {
-                          core.setFailed(`Mattermost webhook returned ${response.status}: ${await response.text()}`);
-                          return;
+                          const webhookUrl = process.env[team.webhookEnv];
+                          if (!webhookUrl) {
+                              core.setFailed(`${team.webhookEnv} is missing from GHA secrets`);
+                              continue;
+                          }
+
+                          const text = `:wave: Please review this ${team.emoji} Privacy Config PR for ${pr.user.login}:\n[${pr.title} - #${pr.number}](${pr.html_url})`;
+
+                          const response = await fetch(webhookUrl, {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ text }),
+                          });
+
+                          if (!response.ok) {
+                              core.setFailed(`Mattermost webhook for ${team.name} returned ${response.status}: ${await response.text()}`);
+                              continue;
+                          }
+
+                          console.log(`Mattermost notification sent for ${team.name}`);
+
+                          // Post a per-team marker so we don't notify this team again for this PR
+                          await github.rest.issues.createComment({
+                              owner: context.repo.owner,
+                              repo: context.repo.repo,
+                              issue_number: context.payload.issue.number,
+                              body: `<!-- ${team.marker} -->\n:bell: ${team.name} team notified via Mattermost.`,
+                          });
                       }
-
-                      console.log('Mattermost notification sent');
-
-                      // Post a marker comment so we don't notify again for this PR
-                      await github.rest.issues.createComment({
-                          owner: context.repo.owner,
-                          repo: context.repo.repo,
-                          issue_number: context.payload.issue.number,
-                          body: '<!-- windows-mm-notified -->\n:bell: Windows team notified via Mattermost.',
-                      });
