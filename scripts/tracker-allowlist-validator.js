@@ -47,7 +47,7 @@ export function isSubdomainOrEqual(domA, domB) {
  * @returns {boolean} True if the rule appears to contain regex
  */
 export function isRegexRule(rule) {
-    return /\.\*|\\\.|[\[\]|]/.test(rule);
+    return /\.\*|\\\.|[[\]|]/.test(rule);
 }
 
 /**
