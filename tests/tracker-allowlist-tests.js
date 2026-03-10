@@ -118,8 +118,8 @@ describe('tracker-allowlist-validator', () => {
             expect(compareRulePaths('/api/', '/api')).to.equal(-1);
         });
 
-        it('returns -1 for similar prefix without shared boundary', () => {
-            expect(compareRulePaths('/products-new', '/products')).to.equal(-1);
+        it('returns 2 for similar prefix without shared boundary', () => {
+            expect(compareRulePaths('/products-new', '/products')).to.equal(2);
         });
     });
 
@@ -223,7 +223,7 @@ describe('tracker-allowlist-validator', () => {
             expect(errors[0].type).to.equal('DOMAIN_PROPAGATION_VIOLATION');
         });
 
-        it('detects <all> narrowing', () => {
+        it('does not require domain propagation when less-specific rule has <all>', () => {
             const rules = [
                 {
                     rule: 'tracker.com/api/endpoint',
@@ -239,11 +239,10 @@ describe('tracker-allowlist-validator', () => {
                 },
             ];
             const errors = validateTrackerRules('tracker.com', rules);
-            expect(errors).to.have.length(1);
-            expect(errors[0].type).to.equal('DOMAIN_PROPAGATION_VIOLATION');
+            expect(errors).to.deep.equal([]);
         });
 
-        it('detects ordering violation: similar prefix without slash', () => {
+        it('does not detect ordering violation: similar prefix without slash', () => {
             const rules = [
                 {
                     rule: 'tracker.com/products',
@@ -259,8 +258,7 @@ describe('tracker-allowlist-validator', () => {
                 },
             ];
             const errors = validateTrackerRules('tracker.com', rules);
-            expect(errors).to.have.length(1);
-            expect(errors[0].type).to.equal('ORDERING_VIOLATION');
+            expect(errors).to.deep.equal([]);
         });
 
         it('detects ordering violation: trailing slash', () => {

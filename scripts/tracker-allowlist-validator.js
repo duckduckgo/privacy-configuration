@@ -52,7 +52,8 @@ export function isRegexRule(rule) {
 
 /**
  * Compare two path strings (the path part after the domain).
- * Uses string prefix: pathA is more specific than pathB if pathB is a prefix of pathA.
+ * Uses segment-aware prefix: pathA is more specific than pathB if pathB is a prefix of pathA
+ * and the prefix ends at a path boundary.
  *
  * @param {string} path1 - First path (e.g. "/api/endpoint")
  * @param {string} path2 - Second path (e.g. "/api")
@@ -61,14 +62,26 @@ export function isRegexRule(rule) {
 export function compareRulePaths(path1, path2) {
     const p1 = path1 || '';
     const p2 = path2 || '';
+    const hasPathPrefix = (prefix, path) => {
+        if (!path.startsWith(prefix)) {
+            return false;
+        }
+        if (prefix === path) {
+            return true;
+        }
+        if (prefix.endsWith('/')) {
+            return true;
+        }
+        return path[prefix.length] === '/';
+    };
 
     if (p1 === p2) {
         return 0;
     }
-    if (p2.startsWith(p1)) {
+    if (hasPathPrefix(p1, p2)) {
         return 1; // path1 is prefix of path2 → path1 more general
     }
-    if (p1.startsWith(p2)) {
+    if (hasPathPrefix(p2, p1)) {
         return -1; // path2 is prefix of path1 → path1 more specific
     }
     return 2; // incomparable
@@ -167,19 +180,7 @@ export function validateTrackerRules(trackerDomain, rules) {
                 const domainsA = ruleA.domains || [];
                 const domainsB = ruleB.domains || [];
 
-                if (domainsA.includes('<all>')) {
-                    continue;
-                }
-
-                if (domainsB.includes('<all>')) {
-                    errors.push({
-                        type: 'DOMAIN_PROPAGATION_VIOLATION',
-                        tracker: trackerDomain,
-                        ruleA,
-                        ruleB,
-                        message: `More-specific rule narrows <all>: "${ruleA.rule}" has [${domainsA.join(', ')}] while "${ruleB.rule}" has <all>.`,
-                        suggestion: 'Add <all> to the more-specific rule, or remove it if redundant.',
-                    });
+                if (domainsA.includes('<all>') || domainsB.includes('<all>')) {
                     continue;
                 }
 
