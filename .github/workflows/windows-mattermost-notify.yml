@@ -72,13 +72,13 @@ jobs:
                               webhookEnv: 'MM_MACOS_NOTIFY_WEBHOOK_URL',
                               marker: 'macos-mm-notified',
                           },
-                          {
-                              name: 'Extensions',
-                              emoji: ':spider_web:',
-                              matches: (s) => /extension-.*-config\.json/.test(s),
-                              webhookEnv: 'MM_EXTENSIONS_NOTIFY_WEBHOOK_URL',
-                              marker: 'extensions-mm-notified',
-                          },
+                        {
+                            name: 'Extensions',
+                            emoji: ':spider_web:',
+                            matches: (s) => /extension(-\w+)?-config\.json/.test(s),
+                            webhookEnv: 'MM_EXTENSIONS_NOTIFY_WEBHOOK_URL',
+                            marker: 'extensions-mm-notified',
+                        },
                       ];
 
                       // Filter to teams that have configs requiring manual review
@@ -89,7 +89,7 @@ jobs:
                       }
 
                       // Fetch existing comments once to check for per-team markers
-                      const { data: existingComments } = await github.rest.issues.listComments({
+                      const existingComments = await github.paginate(github.rest.issues.listComments, {
                           owner: context.repo.owner,
                           repo: context.repo.repo,
                           issue_number: context.payload.issue.number,
