@@ -57,7 +57,7 @@ Tracker Allowlist is used to allow specific tracker requests that would normally
 6. Add the site domain to all rules that share the same prefix
    - Example: If you add "site.com" to "tracker.com/api", also add it to any more-specific rule such as "tracker.com/api/endpoint"
    - see 2.3. Domain Propagation
-   - Should this apply to all domains? Use `<all>` if appropriate (domain propagation not needed when using `<all>`) see 2.4. The `<all>` Specifier
+   - Should this apply to all domains? Use `<all>` if appropriate — but `<all>` must also be propagated to more-specific rules. See 2.4. The `<all>` Specifier
 ↓
 7. Multi-country/sibling sites might be affected? → Consider cross-entity coverage
    - see 4. Cross-Entity Coverage
@@ -75,7 +75,7 @@ Tracker Allowlist is used to allow specific tracker requests that would normally
       "rule": "tracker.com/static/widget.js/config/analytics",  // Most specific first
       "domains": [
         "site1.com",
-        "site3.com" // Add site3.com so domain propagation can work
+        "site3.com" // site3.com propagated from less-specific rule below
       ],
       "reason": [
         "site1.com - https://github.com/duckduckgo/privacy-configuration/pull/1111",
@@ -83,7 +83,7 @@ Tracker Allowlist is used to allow specific tracker requests that would normally
       ]
     },
     {
-      "rule": "tracker.com/static/widget.js/config",  // Less specific, shares prefix, the original tracker intended to allow on site3.com
+      "rule": "tracker.com/static/widget.js/config",  // Less specific, shares prefix
       "domains": [
         "site3.com"
       ],
@@ -92,14 +92,7 @@ Tracker Allowlist is used to allow specific tracker requests that would normally
       ]
     },
     {
-      "rule": "tracker.com/static/widget.js",  // Least specific, shares prefix
-      "domains": [
-        "<all>" // no need to add specific domain, <all> covers all domains
-      ],
-      "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
-    },
-    {
-      "rule": "tracker.com/api/collect",  // Different prefix, order doesn't matter
+      "rule": "tracker.com/api/collect",  // Different path, order doesn't matter
       "domains": [
         "site2.com"
       ],
@@ -165,12 +158,12 @@ The algorithm follows a "first match wins" principle: it checks rules from top t
     "rules": [
       {
         "rule": "tracker.com/api/analytics", // Most specific first
-        "domains": ["site1.com"],
+        "domains": ["site1.com", "site2.com"],
         "reason": ["site1.com - https://github.com/duckduckgo/privacy-configuration/issues/1111"]
       },
       {
         "rule": "tracker.com/api", // Less specific second
-        "domains": ["<all>"],
+        "domains": ["site2.com"],
         "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2222"
       }
     ]
@@ -179,7 +172,7 @@ The algorithm follows a "first match wins" principle: it checks rules from top t
 ```
 
 - `tracker.com/api/analytics` on `site1.com`: Matches first rule → `site1.com` in list → **allowed**
-- `tracker.com/api/other` on any site: Doesn't match first rule, matches second rule → `<all>` applies → **allowed** 
+- `tracker.com/api/other` on `site2.com`: Doesn't match first rule, matches second rule → `site2.com` in list → **allowed** 
 
 ### 2.2. Rule Specificity and Ordering: when order matters vs. doesn't matter
 
