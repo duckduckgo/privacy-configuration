@@ -11,6 +11,7 @@ jobs:
         # Only run on PR comments, not plain issue comments
         if: github.event.issue.pull_request != null
         runs-on: ubuntu-latest
+        concurrency: mattermost-notify-${{ github.event.issue.number }}
 
         steps:
             - name: Check approval analysis and notify platform teams
