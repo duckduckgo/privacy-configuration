@@ -52,7 +52,8 @@ export function isRegexRule(rule) {
 
 /**
  * Compare two path strings (the path part after the domain).
- * Uses string prefix: pathA is more specific than pathB if pathB is a prefix of pathA.
+ * Uses path-segment-aware prefix matching: pathA is more specific than pathB
+ * only when pathB is a prefix ending at a segment boundary.
  *
  * @param {string} path1 - First path (e.g. "/api/endpoint")
  * @param {string} path2 - Second path (e.g. "/api")
@@ -62,13 +63,23 @@ export function compareRulePaths(path1, path2) {
     const p1 = path1 || '';
     const p2 = path2 || '';
 
+    const hasBoundaryPrefix = (prefix, fullPath) => {
+        if (!fullPath.startsWith(prefix)) {
+            return false;
+        }
+        if (prefix === '' || prefix.endsWith('/')) {
+            return true;
+        }
+        return fullPath[prefix.length] === '/';
+    };
+
     if (p1 === p2) {
         return 0;
     }
-    if (p2.startsWith(p1)) {
+    if (hasBoundaryPrefix(p1, p2)) {
         return 1; // path1 is prefix of path2 → path1 more general
     }
-    if (p1.startsWith(p2)) {
+    if (hasBoundaryPrefix(p2, p1)) {
         return -1; // path2 is prefix of path1 → path1 more specific
     }
     return 2; // incomparable

@@ -119,7 +119,7 @@ describe('tracker-allowlist-validator', () => {
         });
 
         it('returns 2 for similar prefix without shared boundary', () => {
-            expect(compareRulePaths('/products-new', '/products')).to.equal(-1);
+            expect(compareRulePaths('/products-new', '/products')).to.equal(2);
         });
     });
 
@@ -243,7 +243,7 @@ describe('tracker-allowlist-validator', () => {
             expect(errors[0].type).to.equal('DOMAIN_PROPAGATION_VIOLATION');
         });
 
-        it('detects ordering violation: similar prefix without slash', () => {
+        it('does not detect ordering violation: similar prefix without slash', () => {
             const rules = [
                 {
                     rule: 'tracker.com/products',
@@ -259,8 +259,7 @@ describe('tracker-allowlist-validator', () => {
                 },
             ];
             const errors = validateTrackerRules('tracker.com', rules);
-            expect(errors).to.have.length(1);
-            expect(errors[0].type).to.equal('ORDERING_VIOLATION');
+            expect(errors).to.deep.equal([]);
         });
 
         it('detects ordering violation: trailing slash', () => {
