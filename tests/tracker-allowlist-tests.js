@@ -118,7 +118,7 @@ describe('tracker-allowlist-validator', () => {
             expect(compareRulePaths('/api/', '/api')).to.equal(-1);
         });
 
-        it('returns 2 for similar prefix without shared boundary', () => {
+        it('returns -1 for similar prefix without shared boundary', () => {
             expect(compareRulePaths('/products-new', '/products')).to.equal(-1);
         });
     });
