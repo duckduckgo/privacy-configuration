@@ -182,6 +182,8 @@ A rule is more specific if:
 - it uses a subdomain (e.g., `www.example.com` is more specific than `example.com`)
 - or it has a longer path (e.g., `example.com/foo/bar` is more specific than `example.com/foo`)
 
+**Note:** Prefix matching is string-based, not segment-based. This means `example.com/products` is a prefix of `example.com/products-new` (not just `example.com/products/`), so `products-new` is considered more specific than `products` and ordering matters between them.
+
 If two rules can't match the same tracker request then their order does not matter:
 - `sub.example.com` vs `api.example.com` are different domains
 - `example.com/foo` vs `example.com/bar` don't share a prefix - one path is not a prefix of the other
