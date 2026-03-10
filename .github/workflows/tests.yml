@@ -50,11 +50,15 @@ jobs:
               if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
               env:
                   HEAD_REF: ${{ github.event.pull_request.head.ref }}
+                  # Use PAT for pushes so the new commit triggers follow-up PR checks.
+                  # Pushes made with the default GITHUB_TOKEN do not trigger new workflow runs.
+                  PRIVACY_CONFIG_PAT: ${{ secrets.PRIVACY_CONFIG_PAT }}
               run: |
                   git config --global user.name "github-actions[bot]"
                   git config --global user.email "github-actions[bot]@users.noreply.github.com"
                   git add .
                   if ! git diff --cached --quiet; then
                     git commit -m "chore: auto-fix lint errors"
-                    git push origin "HEAD:$HEAD_REF"
+                    # Push directly with PAT credentials to allow pull_request synchronize checks to rerun.
+                    git push "https://x-access-token:${PRIVACY_CONFIG_PAT}@github.com/${{ github.repository }}.git" "HEAD:$HEAD_REF"
                   fi
