@@ -1,45 +1,58 @@
 name: Notify Windows Devs MM channel on Windows PR
 
 on:
-    pull_request:
+    issue_comment:
         types:
-            - opened
+            - created
             - edited
-            - reopened
 
 jobs:
     notify:
+        # Only run on PR comments, not plain issue comments
+        if: github.event.issue.pull_request != null
         runs-on: ubuntu-latest
 
         steps:
-            - name: Check Windows checkbox and notify
+            - name: Check approval analysis and notify
               uses: actions/github-script@v8
               env:
                   MM_WEBHOOK_URL: ${{ secrets.MM_WINDOWS_NOTIFY_WEBHOOK_URL }}
               with:
                   script: |
-                      const body = context.payload.pull_request.body || '';
-                      const windowsChecked = /- \[x\]\s*Windows/i.test(body);
-                      const readyToMerge = /- \[x\]\s*This code for the config change is ready to merge\./i.test(body);
+                      const comment = context.payload.comment;
 
-                      if (!windowsChecked || !readyToMerge) {
-                          console.log('Windows not checked or not a ready-to-merge feature change, skipping');
+                      // Only process the JSON approval analysis comment from github-actions[bot]
+                      if (comment.user.login !== 'github-actions[bot]') {
+                          console.log('Not a github-actions[bot] comment, skipping');
+                          return;
+                      }
+                      if (!comment.body.includes('JSON approval analysis')) {
+                          console.log('Not an approval analysis comment, skipping');
                           return;
                       }
 
-                      // For edited events, only notify if the body changed AND both weren't already checked
-                      if (context.payload.action === 'edited') {
-                          if (!context.payload.changes?.body) {
-                              console.log('Body not modified in this edit, skipping');
-                              return;
-                          }
-                          const previousBody = context.payload.changes.body.from || '';
-                          const wasWindows = /- \[x\]\s*Windows/i.test(previousBody);
-                          const wasReady = /- \[x\]\s*This code for the config change is ready to merge\./i.test(previousBody);
-                          if (wasWindows && wasReady) {
-                              console.log('Both checkboxes were already checked before edit, skipping');
-                              return;
-                          }
+                      // Check if windows-config.json appears in the Manual Review Required section
+                      const manualReviewMatch = comment.body.match(/## ❌ Manual Review Required([\s\S]*?)(?=\n## |$)/);
+                      if (!manualReviewMatch || !manualReviewMatch[1].includes('windows-config.json')) {
+                          console.log('No Windows config manual review required, skipping');
+                          return;
+                      }
+
+                      // Check if we already sent a notification for this PR
+                      const { data: comments } = await github.rest.issues.listComments({
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          issue_number: context.payload.issue.number,
+                      });
+
+                      const alreadyNotified = comments.some(c =>
+                          c.user.login === 'github-actions[bot]' &&
+                          c.body.includes('<!-- windows-mm-notified -->')
+                      );
+
+                      if (alreadyNotified) {
+                          console.log('Notification already sent for this PR, skipping');
+                          return;
                       }
 
                       const webhookUrl = process.env.MM_WEBHOOK_URL;
@@ -48,7 +61,13 @@ jobs:
                           return;
                       }
 
-                      const pr = context.payload.pull_request;
+                      // Get PR details
+                      const { data: pr } = await github.rest.pulls.get({
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          pull_number: context.payload.issue.number,
+                      });
+
                       const text = `:wave: Please review this :windows: Privacy Config PR for ${pr.user.login}:\n[${pr.title} - #${pr.number}](${pr.html_url})`;
 
                       const response = await fetch(webhookUrl, {
@@ -59,6 +78,15 @@ jobs:
 
                       if (!response.ok) {
                           core.setFailed(`Mattermost webhook returned ${response.status}: ${await response.text()}`);
-                      } else {
-                          console.log('Mattermost notification sent');
+                          return;
                       }
+
+                      console.log('Mattermost notification sent');
+
+                      // Post a marker comment so we don't notify again for this PR
+                      await github.rest.issues.createComment({
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          issue_number: context.payload.issue.number,
+                          body: '<!-- windows-mm-notified -->\n:bell: Windows team notified via Mattermost.',
+                      });
