@@ -88,11 +88,12 @@ jobs:
                           return;
                       }
 
-                      // Fetch existing comments once to check for per-team markers
+                      // Fetch all comments to check for per-team markers. listComments defaults to 30/page.
                       const existingComments = await github.paginate(github.rest.issues.listComments, {
                           owner: context.repo.owner,
                           repo: context.repo.repo,
                           issue_number: context.payload.issue.number,
+                          per_page: 100,
                       });
 
                       // Get PR details
