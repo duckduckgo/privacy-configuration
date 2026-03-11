@@ -139,12 +139,12 @@ describe('tracker-allowlist-validator', () => {
             expect(compareRules('tracker.com/api', 'tracker.com/api/endpoint')).to.equal('moreGeneral');
         });
 
-        it('returns moreSpecific when subdomain is more specific', () => {
-            expect(compareRules('cdn.tracker.com/api', 'tracker.com/api')).to.equal('moreSpecific');
+        it('returns incomparable for parent/subdomain pairs', () => {
+            expect(compareRules('cdn.tracker.com/api', 'tracker.com/api')).to.equal('incomparable');
         });
 
-        it('returns moreGeneral when subdomain is more general', () => {
-            expect(compareRules('tracker.com/api', 'cdn.tracker.com/api')).to.equal('moreGeneral');
+        it('returns incomparable for subdomain/parent pairs', () => {
+            expect(compareRules('tracker.com/api', 'cdn.tracker.com/api')).to.equal('incomparable');
         });
 
         it('returns incomparable for sibling subdomains', () => {
@@ -294,7 +294,7 @@ describe('tracker-allowlist-validator', () => {
             expect(errors[0].type).to.equal('ORDERING_VIOLATION');
         });
 
-        it('detects ordering violation: subdomain wrong order', () => {
+        it('does not detect ordering violation for parent/subdomain pairs', () => {
             const rules = [
                 {
                     rule: 'tracker.com/api',
@@ -310,8 +310,7 @@ describe('tracker-allowlist-validator', () => {
                 },
             ];
             const errors = validateTrackerRules('tracker.com', rules);
-            expect(errors).to.have.length(1);
-            expect(errors[0].type).to.equal('ORDERING_VIOLATION');
+            expect(errors).to.deep.equal([]);
         });
     });
 

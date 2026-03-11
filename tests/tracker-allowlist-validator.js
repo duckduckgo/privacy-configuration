@@ -78,7 +78,7 @@ export function compareRulePaths(path1, path2) {
 
 /**
  * Compare two rules (full rule strings) to determine their relationship.
- * Combines domain (subdomain) and path (prefix) comparison.
+ * Uses same-domain and path-prefix comparison.
  *
  * @param {string} ruleA - First rule string (e.g. "tracker.com/api/endpoint")
  * @param {string} ruleB - Second rule string (e.g. "tracker.com/api")
@@ -105,13 +105,13 @@ export function compareRules(ruleA, ruleB) {
         return 'equal';
     }
 
-    // ruleA more specific than ruleB: domainA is subdomain-or-equal of domainB, pathB is prefix of pathA (or equal)
-    if (isSubdomainOrEqual(domA, domB) && (pathComp === -1 || pathComp === 0)) {
+    // ruleA more specific than ruleB: same domain and pathB is prefix of pathA (or equal)
+    if (domA === domB && (pathComp === -1 || pathComp === 0)) {
         return 'moreSpecific';
     }
 
-    // ruleA more general than ruleB: domainB is subdomain-or-equal of domainA, pathA is prefix of pathB (or equal)
-    if (isSubdomainOrEqual(domB, domA) && (pathComp === 1 || pathComp === 0)) {
+    // ruleA more general than ruleB: same domain and pathA is prefix of pathB (or equal)
+    if (domA === domB && (pathComp === 1 || pathComp === 0)) {
         return 'moreGeneral';
     }
 
