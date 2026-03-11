@@ -151,8 +151,16 @@ describe('tracker-allowlist-validator', () => {
             expect(compareRules('cdn.tracker.com/api', 'media.tracker.com/api')).to.equal('incomparable');
         });
 
+        it('returns moreGeneral for domain-only vs domain with path', () => {
+            expect(compareRules('tracker.com', 'tracker.com/api')).to.equal('moreGeneral');
+        });
+
         it('returns incomparable for different paths', () => {
             expect(compareRules('tracker.com/api', 'tracker.com/other')).to.equal('incomparable');
+        });
+
+        it('returns incomparable for subdomain with differing path', () => {
+            expect(compareRules('sub.tracker.com/foo', 'tracker.com/bar')).to.equal('incomparable');
         });
 
         it('returns incomparable when either rule is regex', () => {
