@@ -56,7 +56,7 @@ export function isRegexRule(rule) {
  *
  * @param {string} path1 - First path (e.g. "/api/endpoint")
  * @param {string} path2 - Second path (e.g. "/api")
- * @returns {number} -1 if path1 more specific, 0 if equal, 1 if path1 more general, 2 if incomparable
+ * @returns {-1 | 0 | 1 | 2} -1 if path1 more specific, 0 if equal, 1 if path1 more general, 2 if incomparable
  */
 export function compareRulePaths(path1, path2) {
     const p1 = path1 || '';
@@ -118,13 +118,14 @@ export function compareRules(ruleA, ruleB) {
     return 'incomparable';
 }
 
-/** @typedef {{ type: string, tracker: string, ruleA: object, ruleB: object, message: string, suggestion: string }} ValidationError */
+/** @typedef {{ rule: string, domains: string[] }} AllowlistRule */
+/** @typedef {{ type: 'ORDERING_VIOLATION' | 'DOMAIN_PROPAGATION_VIOLATION' | 'DUPLICATE_RULE', tracker: string, ruleA: AllowlistRule, ruleB: AllowlistRule, message: string, suggestion: string }} ValidationError */
 
 /**
  * Validate rules for a single tracker. Checks ordering, domain propagation, and duplicates.
  *
  * @param {string} trackerDomain - Tracker domain (e.g. "tracker.com")
- * @param {Array<{ rule: string, domains: string[] }>} rules - Rules for this tracker (order = file order)
+ * @param {AllowlistRule[]} rules - Rules for this tracker (order = file order)
  * @returns {ValidationError[]}
  */
 export function validateTrackerRules(trackerDomain, rules) {
@@ -204,7 +205,7 @@ export function validateTrackerRules(trackerDomain, rules) {
 /**
  * Validate an entire allowlist. Iterates over all trackers and collects errors.
  *
- * @param {Object<string, { rules: Array<{ rule: string, domains: string[] }> }>} allowlistedTrackers
+ * @param {Object<string, { rules: AllowlistRule[] }>} allowlistedTrackers
  * @returns {ValidationError[]}
  */
 export function validateAllowlist(allowlistedTrackers) {
