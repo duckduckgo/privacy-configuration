@@ -1,5 +1,6 @@
 import { expect } from 'chai';
 import fs from 'fs';
+import platforms from '../platforms.js';
 import {
     splitDomainPath,
     isSubdomainOrEqual,
@@ -9,6 +10,8 @@ import {
     validateTrackerRules,
     validateAllowlist,
 } from './tracker-allowlist-validator.js';
+
+const platformOutput = platforms.map((item) => item.replace('browsers/', 'extension-'));
 
 describe('tracker-allowlist-validator', () => {
     describe('splitDomainPath', () => {
@@ -556,5 +559,30 @@ describe('tracker-allowlist-validator', () => {
                 throw new Error(`Found ${errors.length} violation(s):\n${messages.join('\n')}`);
             }
         });
+    });
+
+    describe('validate generated platform configs', () => {
+        const baseRaw = fs.readFileSync('./features/tracker-allowlist.json', 'utf-8');
+        const baseConfig = JSON.parse(baseRaw);
+        const baseErrors = validateAllowlist(baseConfig.settings.allowlistedTrackers);
+        const baseErrorKeys = new Set(baseErrors.map((e) => `${e.type}|${e.tracker}|${e.message}`));
+
+        for (const platform of platformOutput) {
+            const configPath = `./generated/v5/${platform}-config.json`;
+
+            it(`has no override-introduced violations in ${platform}`, () => {
+                const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+                const allowlistedTrackers = config.features?.trackerAllowlist?.settings?.allowlistedTrackers;
+                if (!allowlistedTrackers) {
+                    return;
+                }
+                const allErrors = validateAllowlist(allowlistedTrackers);
+                const newErrors = allErrors.filter((e) => !baseErrorKeys.has(`${e.type}|${e.tracker}|${e.message}`));
+                if (newErrors.length > 0) {
+                    const messages = newErrors.map((e) => `[${e.type}] ${e.tracker}: ${e.message} Suggestion: ${e.suggestion}`);
+                    throw new Error(`Found ${newErrors.length} override-introduced violation(s) in ${platform}:\n${messages.join('\n')}`);
+                }
+            });
+        }
     });
 });
