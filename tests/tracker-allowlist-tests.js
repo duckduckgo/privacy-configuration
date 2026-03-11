@@ -8,7 +8,7 @@ import {
     compareRules,
     validateTrackerRules,
     validateAllowlist,
-} from '../scripts/tracker-allowlist-validator.js';
+} from './tracker-allowlist-validator.js';
 
 describe('tracker-allowlist-validator', () => {
     describe('splitDomainPath', () => {
