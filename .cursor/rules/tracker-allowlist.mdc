@@ -12,7 +12,9 @@ Tracker Allowlist is used to allow specific tracker requests that would normally
 - **Configuration**: `features/tracker-allowlist.json` - Rule definitions (Applies to all browser platforms.)
 - **Override files**: `overrides/` - Platform-specific configuration override files
 - **Schema**: `schema/features/tracker-allowlist.ts` - TypeScript type definitions
-- **Bugbot guidelines**: `cursor/BUGBOT.md` - PR review guidelines
+- **Bugbot guidelines**: `.cursor/BUGBOT.md` - PR review guidelines
+- **Validator**: `tests/tracker-allowlist-validator.js` - Rule precedence and domain propagation validation logic
+- **Tests**: `tests/tracker-allowlist-tests.js` - Unit tests enforcing ordering, propagation, and duplicate detection
 
 ## Table of Contents
 
@@ -27,9 +29,9 @@ Tracker Allowlist is used to allow specific tracker requests that would normally
     - 2.1. How the Matching Algorithm Works: First Match Wins Principle
     - 2.2. Rule Specificity and Ordering: when order matters vs. doesn't matter
     - 2.3. Domain Propagation: when duplicating domain is required
-    - 2.4. The `<all>` Specifier: essential considerations
-  - 4. Cross-Entity Coverage
-  - 5. Domain-Wide Exceptions
+    - 2.4. The `<all>` Specifier
+  - 3. Cross-Entity Coverage
+  - 4. Domain-Wide Exceptions
 
 ## Quick Cheat Sheet
 
@@ -60,10 +62,10 @@ Tracker Allowlist is used to allow specific tracker requests that would normally
    - Should this apply to all domains? Use `<all>` if appropriate — but `<all>` must also be propagated to more-specific rules. See 2.4. The `<all>` Specifier
 ↓
 7. Multi-country/sibling sites might be affected? → Consider cross-entity coverage
-   - see 4. Cross-Entity Coverage
+   - see 3. Cross-Entity Coverage
 ↓
 8. Domain-wide exception needed? → Avoid if possible; document thoroughly if required
-   - see 5. Domain-Wide Exceptions
+   - see 4. Domain-Wide Exceptions
 
 
 ### Reference Tracker Rule Set
@@ -264,13 +266,13 @@ This applies the "first match wins" principle. If a request matches a more-speci
 
 The `<all>` specifier allows the request for any site domain. It follows the same propagation rules as specific domains: if a less-specific rule uses `<all>`, all more-specific rules sharing that prefix must also use `<all>`. Otherwise, the more-specific rule will match first and block `<all>` domains that the less-specific rule intended to allow.
 
-### 4. Cross-Entity Coverage
+### 3. Cross-Entity Coverage
 
 - **Multi-country brands:** Consider adding mitigations across country sites (e.g., `vinted.com`, `vinted.fr`, `vinted.de`)
 
 - **Sibling sites under same parent company:** Check if breakage exists, then consider adding coverage across a business group
 
-### 5. Domain-Wide Exceptions
+### 4. Domain-Wide Exceptions
 
 A domain-wide exception is added to the `"exceptions"` array of the `features/content-blocking.json` file. This allows all tracker requests from that domain without restriction, which is why it should be avoided.
 **Avoid whenever possible.** If you must add one, make sure your PR clearly explains the reason, including whether this is part of a speculative mitigation experiment.
