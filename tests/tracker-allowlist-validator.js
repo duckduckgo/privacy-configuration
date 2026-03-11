@@ -1,6 +1,6 @@
 /**
  * Validates tracker allowlist rules for ordering, domain propagation, and duplicates.
- * @module scripts/tracker-allowlist-validator
+ * @module tests/tracker-allowlist-validator
  */
 
 /**
