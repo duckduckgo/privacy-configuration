@@ -31,7 +31,6 @@
 - **Rule File**: `.cursor/rules/tracker-allowlist.mdc` - Mitigation Guidance
 - **Schema**: `schema/features/tracker-allowlist.ts` - TypeScript type definitions
 - **Configuration**: `features/tracker-allowlist.json` - Tracker allowlist rule definitions
-- **Validator**: `tests/tracker-allowlist-validator.js` - Rule precedence and domain propagation validation logic
 - **Tests**: `tests/tracker-allowlist-tests.js` - Unit tests enforcing ordering, propagation, and duplicate detection
 
 ## Adding New Features to Bugbot
