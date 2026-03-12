@@ -39,21 +39,9 @@ function compareRulePaths(path1, path2) {
 /** @returns {'equal' | 'moreSpecific' | 'moreGeneral' | 'incomparable'} */
 function compareRules(ruleA, ruleB) {
     if (isRegexRule(ruleA) || isRegexRule(ruleB)) return 'incomparable';
-
-    const [
-        domA,
-        pathA,
-    ] = splitDomainPath(ruleA);
-    const [
-        domB,
-        pathB,
-    ] = splitDomainPath(ruleB);
-    const pathComp = compareRulePaths(pathA, pathB);
-
-    if (domA === domB && pathComp === 0) return 'equal';
-    // Domain and path compared separately, then combined for overall relationship
-    if (isSubdomainOrEqual(domA, domB) && (pathComp === -1 || pathComp === 0)) return 'moreSpecific';
-    if (isSubdomainOrEqual(domB, domA) && (pathComp === 1 || pathComp === 0)) return 'moreGeneral';
+    if (ruleA === ruleB) return 'equal';
+    if (ruleA.startsWith(ruleB)) return 'moreSpecific';
+    if (ruleB.startsWith(ruleA)) return 'moreGeneral';
     return 'incomparable';
 }
 
@@ -333,12 +321,12 @@ describe('tracker-allowlist-validator', () => {
             [
                 'cdn.tracker.com/api',
                 'tracker.com/api',
-                'moreSpecific',
+                'incomparable',
             ],
             [
                 'tracker.com/api',
                 'cdn.tracker.com/api',
-                'moreGeneral',
+                'incomparable',
             ],
             [
                 'cdn.tracker.com/api',
@@ -437,13 +425,12 @@ describe('tracker-allowlist-validator', () => {
             expect(errors[0].type).to.equal('ORDERING_VIOLATION');
         });
 
-        it('detects ordering violation: subdomain wrong order', () => {
+        it('does not detect ordering violation for cross-subdomain rules', () => {
             const errors = validateTrackerRules('tracker.com', [
                 r('tracker.com/api', 'site1.com'),
                 r('cdn.tracker.com/api', 'site1.com'),
             ]);
-            expect(errors).to.have.length(1);
-            expect(errors[0].type).to.equal('ORDERING_VIOLATION');
+            expect(errors).to.deep.equal([]);
         });
     });
 
