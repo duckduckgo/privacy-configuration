@@ -14,7 +14,23 @@ let allRows = [];
 let sortKey = "feature";
 let sortDir = "asc";
 
-function init() {
+function readHash() {
+  const params = new URLSearchParams(location.hash.slice(1));
+  return {
+    platform: params.get("platform") ?? "",
+    search: params.get("search") ?? "",
+  };
+}
+
+function writeHash() {
+  const params = new URLSearchParams();
+  if (platformSelect.value) params.set("platform", platformSelect.value);
+  if (searchInput.value.trim()) params.set("search", searchInput.value.trim());
+  const fragment = params.toString();
+  history.replaceState(null, "", fragment ? `#${fragment}` : location.pathname);
+}
+
+async function init() {
   for (const p of PLATFORMS) {
     const opt = document.createElement("option");
     opt.value = p.id;
@@ -27,12 +43,19 @@ function init() {
   document.querySelectorAll("th.sortable").forEach((th) => {
     th.addEventListener("click", () => onSort(th.dataset.key));
   });
+
+  const initial = readHash();
+  if (initial.platform && PLATFORMS.some((p) => p.id === initial.platform)) {
+    platformSelect.value = initial.platform;
+    await onPlatformChange(initial.search);
+  }
 }
 
-async function onPlatformChange() {
+async function onPlatformChange(initialSearch) {
   const id = platformSelect.value;
   if (!id) {
     reset();
+    writeHash();
     return;
   }
 
@@ -40,7 +63,7 @@ async function onPlatformChange() {
   tableWrap.hidden = true;
   emptyEl.hidden = true;
   statsEl.hidden = true;
-  searchInput.value = "";
+  if (typeof initialSearch !== "string") searchInput.value = "";
   searchInput.disabled = true;
 
   try {
@@ -48,6 +71,8 @@ async function onPlatformChange() {
     allRows = extractSubfeatures(config);
     allRows.sort(comparator());
     searchInput.disabled = false;
+    if (typeof initialSearch === "string") searchInput.value = initialSearch;
+    writeHash();
     applyFilter();
   } catch (err) {
     loadingEl.hidden = true;
@@ -57,6 +82,7 @@ async function onPlatformChange() {
 }
 
 function onFilter() {
+  writeHash();
   applyFilter();
 }
 
