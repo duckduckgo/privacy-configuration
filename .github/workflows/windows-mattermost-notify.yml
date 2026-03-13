@@ -1,0 +1,148 @@
+name: Notify platform teams on Manual Review Required PRs
+
+on:
+    issue_comment:
+        types:
+            - created
+            - edited
+
+jobs:
+    notify:
+        # Only run on PR comments, not plain issue comments
+        if: github.event.issue.pull_request != null
+        runs-on: ubuntu-latest
+        concurrency:
+            group: windows-mattermost-notify-${{ github.event.issue.number }}
+            cancel-in-progress: false
+
+        steps:
+            - name: Check approval analysis and notify platform teams
+              uses: actions/github-script@v8
+              env:
+                  MM_WINDOWS_NOTIFY_WEBHOOK_URL: ${{ secrets.MM_WINDOWS_NOTIFY_WEBHOOK_URL }}
+                  MM_ANDROID_NOTIFY_WEBHOOK_URL: ${{ secrets.MM_ANDROID_NOTIFY_WEBHOOK_URL }}
+                  MM_IOS_NOTIFY_WEBHOOK_URL: ${{ secrets.MM_IOS_NOTIFY_WEBHOOK_URL }}
+                  MM_MACOS_NOTIFY_WEBHOOK_URL: ${{ secrets.MM_MACOS_NOTIFY_WEBHOOK_URL }}
+                  MM_EXTENSIONS_NOTIFY_WEBHOOK_URL: ${{ secrets.MM_EXTENSIONS_NOTIFY_WEBHOOK_URL }}
+              with:
+                  script: |
+                      const comment = context.payload.comment;
+
+                      // Only process the JSON approval analysis comment from github-actions[bot]
+                      if (comment.user.login !== 'github-actions[bot]') {
+                          console.log('Not a github-actions[bot] comment, skipping');
+                          return;
+                      }
+                      if (!comment.body.includes('JSON approval analysis')) {
+                          console.log('Not an approval analysis comment, skipping');
+                          return;
+                      }
+
+                      // Extract the Manual Review Required section content
+                      const manualReviewMatch = comment.body.match(/## ❌ Manual Review Required([\s\S]*?)(?=\n## |$)/);
+                      if (!manualReviewMatch) {
+                          console.log('No Manual Review Required section, skipping');
+                          return;
+                      }
+                      const manualReviewSection = manualReviewMatch[1];
+
+                      const TEAMS = [
+                          {
+                              name: 'Windows',
+                              emoji: ':windows:',
+                              matches: (s) => s.includes('windows-config.json'),
+                              webhookEnv: 'MM_WINDOWS_NOTIFY_WEBHOOK_URL',
+                              marker: 'windows-mm-notified',
+                          },
+                          {
+                              name: 'Android',
+                              emoji: ':android:',
+                              matches: (s) => s.includes('android-config.json'),
+                              webhookEnv: 'MM_ANDROID_NOTIFY_WEBHOOK_URL',
+                              marker: 'android-mm-notified',
+                          },
+                          {
+                              name: 'iOS',
+                              emoji: ':iphone:',
+                              matches: (s) => s.includes('ios-config.json'),
+                              webhookEnv: 'MM_IOS_NOTIFY_WEBHOOK_URL',
+                              marker: 'ios-mm-notified',
+                          },
+                          {
+                              name: 'macOS',
+                              emoji: ':macos:',
+                              matches: (s) => s.includes('macos-config.json'),
+                              webhookEnv: 'MM_MACOS_NOTIFY_WEBHOOK_URL',
+                              marker: 'macos-mm-notified',
+                          },
+                        {
+                            name: 'Extensions',
+                            emoji: ':spider_web:',
+                            matches: (s) => /extension(-\w+)?-config\.json/.test(s),
+                            webhookEnv: 'MM_EXTENSIONS_NOTIFY_WEBHOOK_URL',
+                            marker: 'extensions-mm-notified',
+                        },
+                      ];
+
+                      // Filter to teams that have configs requiring manual review
+                      const teamsToNotify = TEAMS.filter((team) => team.matches(manualReviewSection));
+                      if (teamsToNotify.length === 0) {
+                          console.log('No relevant platform configs require manual review, skipping');
+                          return;
+                      }
+
+                      // Fetch all comments to check for per-team markers. listComments defaults to 30/page.
+                      const existingComments = await github.paginate(github.rest.issues.listComments, {
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          issue_number: context.payload.issue.number,
+                          per_page: 100,
+                      });
+
+                      // Get PR details
+                      const { data: pr } = await github.rest.pulls.get({
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          pull_number: context.payload.issue.number,
+                      });
+
+                      for (const team of teamsToNotify) {
+                          const alreadyNotified = existingComments.some((c) =>
+                              c.user.login === 'github-actions[bot]' &&
+                              c.body.includes(`<!-- ${team.marker} -->`)
+                          );
+
+                          if (alreadyNotified) {
+                              console.log(`${team.name} already notified, skipping`);
+                              continue;
+                          }
+
+                          const webhookUrl = process.env[team.webhookEnv];
+                          if (!webhookUrl) {
+                              core.setFailed(`${team.webhookEnv} is missing from GHA secrets`);
+                              continue;
+                          }
+
+                          const text = `:wave: Please review this ${team.emoji} Privacy Config PR for ${pr.user.login}:\n[${pr.title} - #${pr.number}](${pr.html_url})`;
+
+                          const response = await fetch(webhookUrl, {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ text }),
+                          });
+
+                          if (!response.ok) {
+                              core.setFailed(`Mattermost webhook for ${team.name} returned ${response.status}: ${await response.text()}`);
+                              continue;
+                          }
+
+                          console.log(`Mattermost notification sent for ${team.name}`);
+
+                          // Post a per-team marker so we don't notify this team again for this PR
+                          await github.rest.issues.createComment({
+                              owner: context.repo.owner,
+                              repo: context.repo.repo,
+                              issue_number: context.payload.issue.number,
+                              body: `<!-- ${team.marker} -->\n:bell: ${team.name} team notified via Mattermost.`,
+                          });
+                      }
