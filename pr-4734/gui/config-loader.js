@@ -15,25 +15,14 @@ const PLATFORMS = [
   { id: "extension-safarimv3",   label: "Extension — Safari MV3",     file: "extension-safarimv3-config.json" },
 ];
 
-const cache = new Map();
-
-/**
- * Fetch and cache a platform config. Returns the parsed JSON.
- * Configs are resolved relative to `../v5/` from this module's location.
- */
 export async function loadConfig(platformId) {
-  if (cache.has(platformId)) return cache.get(platformId);
-
   const platform = PLATFORMS.find((p) => p.id === platformId);
   if (!platform) throw new Error(`Unknown platform: ${platformId}`);
 
   const url = `../v5/${platform.file}`;
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Failed to load ${url}: ${res.status}`);
-
-  const data = await res.json();
-  cache.set(platformId, data);
-  return data;
+  return res.json();
 }
 
 /**
