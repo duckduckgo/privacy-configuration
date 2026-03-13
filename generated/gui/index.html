@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Config Status — Sub-feature Inspector</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>Sub-feature Status Inspector</h1>
+    <p class="subtitle">Privacy Remote Configuration — Generated v5 Configs</p>
+  </header>
+
+  <main>
+    <div class="controls">
+      <div class="control-group">
+        <label for="platform-select">Platform</label>
+        <select id="platform-select">
+          <option value="">— Select a platform —</option>
+        </select>
+      </div>
+      <div class="control-group">
+        <label for="search-input">Search</label>
+        <input type="text" id="search-input" placeholder="Filter by feature or subfeature name…" disabled>
+      </div>
+      <div class="control-group stats" id="stats" hidden>
+        <span id="stats-text"></span>
+      </div>
+    </div>
+
+    <div id="loading" class="message" hidden>Loading config…</div>
+    <div id="empty" class="message" hidden>No matching subfeatures found.</div>
+
+    <div class="table-wrap" id="table-wrap" hidden>
+      <table id="results-table">
+        <thead>
+          <tr>
+            <th class="sortable" data-key="feature">Feature</th>
+            <th class="sortable" data-key="subfeature">Subfeature</th>
+            <th class="sortable" data-key="state">State</th>
+            <th>Rollout</th>
+            <th>Cohorts</th>
+          </tr>
+        </thead>
+        <tbody id="results-body"></tbody>
+      </table>
+    </div>
+  </main>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
