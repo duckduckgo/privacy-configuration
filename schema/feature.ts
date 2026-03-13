@@ -39,8 +39,8 @@ export type SubFeature<VersionType, SettingsType = Record<string, string>> = {
     minSupportedVersion?: VersionType;
 };
 
-export type Feature<
-    SettingsType,
+// Base feature type that prevents settings by default but allows subfeatures
+export type BaseFeature<
     VersionType,
     SubFeatures extends Record<string, SubFeature<VersionType>> = Record<string, SubFeature<VersionType>>,
 > = {
@@ -48,11 +48,26 @@ export type Feature<
     _meta?: FeatureMeta;
     state: FeatureState;
     exceptions: SiteException[];
-    settings?: SettingsType;
     features?: SubFeatures;
     hash: string;
     minSupportedVersion?: VersionType;
 };
+
+// Feature type that allows settings when explicitly defined
+export type FeatureWithSettings<
+    SettingsType,
+    VersionType,
+    SubFeatures extends Record<string, SubFeature<VersionType>> = Record<string, SubFeature<VersionType>>,
+> = BaseFeature<VersionType, SubFeatures> & {
+    settings: SettingsType;
+};
+
+// Union type that allows either no settings or explicitly defined settings, with support for subfeatures
+export type Feature<
+    SettingsType = never,
+    VersionType = string | number,
+    SubFeatures extends Record<string, SubFeature<VersionType>> = Record<string, SubFeature<VersionType>>,
+> = SettingsType extends never ? BaseFeature<VersionType, SubFeatures> : FeatureWithSettings<SettingsType, VersionType, SubFeatures>;
 
 type ConditionBlock = {
     domain?: string;
