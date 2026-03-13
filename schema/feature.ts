@@ -34,7 +34,7 @@ export type SubFeature<VersionType, SettingsType = Record<string, string>> = {
         isReturningUser?: boolean;
         isPrivacyProEligible?: boolean;
         entitlement?: string;
-        minSdkVersion?: number,
+        minSdkVersion?: number;
     }[];
     cohorts?: Cohort[];
     minSupportedVersion?: VersionType;
