@@ -1,5 +1,6 @@
 import { Feature } from '../feature';
 
+// Also referenced in tests/tracker-allowlist-tests.js — keep in sync
 type AllowlistRule = {
     rule: string;
     domains: string[];
