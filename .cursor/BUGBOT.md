@@ -32,6 +32,7 @@
 - **Schema**: `schema/features/tracker-allowlist.ts` - TypeScript type definitions
 - **Configuration**: `features/tracker-allowlist.json` - Tracker allowlist rule definitions
 - **Tests**: `tests/tracker-allowlist-tests.js` - Unit tests enforcing ordering, propagation, and duplicate detection
+- **Matching algorithm**: [tracker_allowlist_matching_tests.json](https://github.com/duckduckgo/privacy-reference-tests/blob/main/tracker-radar-tests/TR-domain-matching/tracker_allowlist_matching_tests.json) - Client matching is subdomain-aware, not pure string prefix. A subdomain rule does not match the parent domain.
 
 ## Adding New Features to Bugbot
 
