@@ -31,6 +31,15 @@
 - **Rule File**: `.cursor/rules/tracker-allowlist.mdc` - Mitigation Guidance
 - **Schema**: `schema/features/tracker-allowlist.ts` - TypeScript type definitions
 - **Configuration**: `features/tracker-allowlist.json` - Tracker allowlist rule definitions
+- **Tests**: `tests/tracker-allowlist-tests.js` - Unit tests enforcing ordering, propagation, and duplicate detection
+- **Matching algorithm**: [tracker_allowlist_matching_tests.json](https://github.com/duckduckgo/privacy-reference-tests/blob/main/tracker-radar-tests/TR-domain-matching/tracker_allowlist_matching_tests.json) - Client matching is subdomain-aware, not pure string prefix. A subdomain rule does not match the parent domain.
+
+### Violation Fix Patterns
+
+- **DOMAIN_PROPAGATION_VIOLATION (missing domains)**: Add the more-specific rule with the missing domain(s) to the platform override file. Do not modify the base config.
+- **DOMAIN_PROPAGATION_VIOLATION (<all> narrowing)**: Add the more-specific rule with `<all>` to the platform override file. Do not modify the base config.
+- **ORDERING_VIOLATION**: Reorder rules so most-specific appears before least-specific within the same file.
+- **DUPLICATE_RULE**: Remove the duplicate entry from the override file if it exists in both base and override.
 
 ## Adding New Features to Bugbot
 
