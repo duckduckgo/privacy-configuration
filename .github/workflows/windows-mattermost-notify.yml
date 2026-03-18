@@ -28,9 +28,9 @@ jobs:
                   script: |
                       const comment = context.payload.comment;
 
-                      // Only process the JSON approval analysis comment from github-actions[bot]
-                      if (comment.user.login !== 'github-actions[bot]') {
-                          console.log('Not a github-actions[bot] comment, skipping');
+                      // Only process the JSON approval analysis comment from daxtheduck (posted via PAT)
+                      if (comment.user.login !== 'daxtheduck') {
+                          console.log('Not a daxtheduck comment, skipping');
                           return;
                       }
                       if (!comment.body.includes('JSON approval analysis')) {

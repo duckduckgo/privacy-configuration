@@ -291,6 +291,7 @@ jobs:
             - name: Create, or Update the Approval Comment
               uses: peter-evans/create-or-update-comment@v4
               with:
+                  token: ${{ secrets.PRIVACY_CONFIG_PAT }}
                   issue-number: ${{ github.event.pull_request.number }}
                   comment-id: ${{ steps.find_approval_comment.outputs.comment-id }}
                   body: ${{ steps.create_approval_body.outputs.comment_body }}
