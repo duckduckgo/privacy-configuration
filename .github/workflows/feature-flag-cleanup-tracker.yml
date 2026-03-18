@@ -84,7 +84,7 @@ jobs:
                   echo "base_config_version=$BASE_CONFIG_VERSION" >> $GITHUB_OUTPUT
                   echo "head_config_version=$HEAD_CONFIG_VERSION" >> $GITHUB_OUTPUT
 
-            - name: Detect new ${{ matrix.platform.name }} feature flags (generated output)
+            - name: Detect enabled ${{ matrix.platform.name }} feature flags (generated output)
               id: detect_flags
               run: |
                   BASE_CONFIG_VERSION="${{ steps.build_configs.outputs.base_config_version }}"
@@ -92,60 +92,107 @@ jobs:
                   BASE_CONFIG="base/generated/v${BASE_CONFIG_VERSION}/${{ matrix.platform.config_file }}"
                   HEAD_CONFIG="head/generated/v${HEAD_CONFIG_VERSION}/${{ matrix.platform.config_file }}"
 
+                  # Helper: get state of a top-level feature (defaults to "disabled")
+                  get_feature_state() {
+                    local config="$1" feature="$2"
+                    jq -r --arg f "$feature" '.features[$f].state // "disabled"' "$config"
+                  }
+
+                  # Helper: get state of a sub-feature (defaults to "disabled")
+                  get_subfeature_state() {
+                    local config="$1" feature="$2" sub="$3"
+                    jq -r --arg f "$feature" --arg s "$sub" '.features[$f].features[$s].state // "disabled"' "$config"
+                  }
+
                   # Extract all feature keys from base and head
                   BASE_FEATURES=$(jq -r '.features | keys[]' "$BASE_CONFIG" | sort)
                   HEAD_FEATURES=$(jq -r '.features | keys[]' "$HEAD_CONFIG" | sort)
 
-                  # Find new top-level features
-                  NEW_FEATURES=$(comm -13 <(echo "$BASE_FEATURES") <(echo "$HEAD_FEATURES"))
+                  # Find new top-level features (only if enabled in head)
+                  NEW_FEATURES=""
+                  for feature in $(comm -13 <(echo "$BASE_FEATURES") <(echo "$HEAD_FEATURES")); do
+                    HEAD_STATE=$(get_feature_state "$HEAD_CONFIG" "$feature")
+                    if [ "$HEAD_STATE" = "enabled" ]; then
+                      NEW_FEATURES="${NEW_FEATURES}${feature}"$'\n'
+                    fi
+                  done
 
-                  # Detect new sub-features in existing features
+                  # Detect existing top-level features that changed from disabled to enabled
+                  NEWLY_ENABLED=""
+                  for feature in $(comm -12 <(echo "$BASE_FEATURES") <(echo "$HEAD_FEATURES")); do
+                    BASE_STATE=$(get_feature_state "$BASE_CONFIG" "$feature")
+                    HEAD_STATE=$(get_feature_state "$HEAD_CONFIG" "$feature")
+                    if [ "$BASE_STATE" = "disabled" ] && [ "$HEAD_STATE" = "enabled" ]; then
+                      NEWLY_ENABLED="${NEWLY_ENABLED}${feature}"$'\n'
+                    fi
+                  done
+
+                  # Detect new and newly-enabled sub-features in existing features
                   NEW_SUBFEATURES=""
                   for feature in $(echo "$BASE_FEATURES"); do
                     BASE_SUBS=$(jq -r --arg f "$feature" '.features[$f].features // {} | keys[]' "$BASE_CONFIG" 2>/dev/null | sort || true)
                     HEAD_SUBS=$(jq -r --arg f "$feature" '.features[$f].features // {} | keys[]' "$HEAD_CONFIG" 2>/dev/null | sort || true)
 
                     if [ -n "$HEAD_SUBS" ]; then
+                      # New sub-features (only if enabled)
                       NEW_SUBS=$(comm -13 <(echo "$BASE_SUBS") <(echo "$HEAD_SUBS") || true)
                       if [ -n "$NEW_SUBS" ]; then
                         for sub in $NEW_SUBS; do
-                          NEW_SUBFEATURES="${NEW_SUBFEATURES}${feature}.${sub}"$'\n'
+                          SUB_STATE=$(get_subfeature_state "$HEAD_CONFIG" "$feature" "$sub")
+                          if [ "$SUB_STATE" = "enabled" ]; then
+                            NEW_SUBFEATURES="${NEW_SUBFEATURES}${feature}.${sub}"$'\n'
+                          fi
+                        done
+                      fi
+
+                      # Existing sub-features that changed from disabled to enabled
+                      COMMON_SUBS=$(comm -12 <(echo "$BASE_SUBS") <(echo "$HEAD_SUBS") || true)
+                      if [ -n "$COMMON_SUBS" ]; then
+                        for sub in $COMMON_SUBS; do
+                          BASE_SUB_STATE=$(get_subfeature_state "$BASE_CONFIG" "$feature" "$sub")
+                          HEAD_SUB_STATE=$(get_subfeature_state "$HEAD_CONFIG" "$feature" "$sub")
+                          if [ "$BASE_SUB_STATE" = "disabled" ] && [ "$HEAD_SUB_STATE" = "enabled" ]; then
+                            NEW_SUBFEATURES="${NEW_SUBFEATURES}${feature}.${sub}"$'\n'
+                          fi
                         done
                       fi
                     fi
                   done
 
-                  # Also check NEW top-level features for any sub-features they contain
-                  for feature in $NEW_FEATURES; do
+                  # Also check NEW enabled top-level features for any enabled sub-features
+                  for feature in $(echo "$NEW_FEATURES"); do
+                    [ -z "$feature" ] && continue
                     SUBS=$(jq -r --arg f "$feature" '.features[$f].features // {} | keys[]' "$HEAD_CONFIG" 2>/dev/null || true)
                     if [ -n "$SUBS" ]; then
                       for sub in $SUBS; do
-                        NEW_SUBFEATURES="${NEW_SUBFEATURES}${feature}.${sub}"$'\n'
+                        SUB_STATE=$(get_subfeature_state "$HEAD_CONFIG" "$feature" "$sub")
+                        if [ "$SUB_STATE" = "enabled" ]; then
+                          NEW_SUBFEATURES="${NEW_SUBFEATURES}${feature}.${sub}"$'\n'
+                        fi
                       done
                     fi
                   done
 
-                  # Combine all new flags
+                  # Combine all flags that need cleanup tasks
                   ALL_NEW_FLAGS=""
-                  if [ -n "$NEW_FEATURES" ]; then
-                    ALL_NEW_FLAGS="$NEW_FEATURES"
-                  fi
-                  if [ -n "$NEW_SUBFEATURES" ]; then
-                    if [ -n "$ALL_NEW_FLAGS" ]; then
-                      ALL_NEW_FLAGS="${ALL_NEW_FLAGS}"$'\n'"${NEW_SUBFEATURES}"
-                    else
-                      ALL_NEW_FLAGS="$NEW_SUBFEATURES"
+                  for flags_list in "$NEW_FEATURES" "$NEWLY_ENABLED" "$NEW_SUBFEATURES"; do
+                    if [ -n "$flags_list" ]; then
+                      if [ -n "$ALL_NEW_FLAGS" ]; then
+                        ALL_NEW_FLAGS="${ALL_NEW_FLAGS}${flags_list}"
+                      else
+                        ALL_NEW_FLAGS="$flags_list"
+                      fi
                     fi
-                  fi
+                  done
 
-                  # Remove trailing newline
-                  ALL_NEW_FLAGS=$(echo "$ALL_NEW_FLAGS" | sed '/^$/d')
+                  # Remove empty lines and deduplicate
+                  ALL_NEW_FLAGS=$(echo "$ALL_NEW_FLAGS" | sed '/^$/d' | sort -u)
 
                   if [ -z "$ALL_NEW_FLAGS" ]; then
-                    echo "No new ${{ matrix.platform.name }} feature flags detected"
+                    echo "No new/newly enabled ${{ matrix.platform.name }} feature flags detected"
                     echo "has_new_flags=false" >> $GITHUB_OUTPUT
                   else
-                    echo "New ${{ matrix.platform.name }} feature flags detected:"
+                    echo "New/newly enabled ${{ matrix.platform.name }} feature flags detected:"
                     echo "$ALL_NEW_FLAGS"
                     echo "has_new_flags=true" >> $GITHUB_OUTPUT
                     echo "flags<<EOF" >> $GITHUB_OUTPUT
