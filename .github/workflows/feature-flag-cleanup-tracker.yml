@@ -2,7 +2,7 @@ name: Feature Flag Cleanup Tracker
 
 on:
     pull_request:
-        types: [closed]
+        types: [opened, synchronize, reopened, closed]
         paths:
             - 'overrides/android-override.json'
             - 'overrides/windows-override.json'
@@ -11,7 +11,6 @@ on:
 jobs:
     create-cleanup-task:
         runs-on: ubuntu-latest
-        if: github.event.pull_request.merged == true
         strategy:
             fail-fast: false
             matrix:
