@@ -197,7 +197,7 @@ jobs:
                   3. Update any documentation
                   4. Create a PR with the cleanup changes
 
-                  Note: The flag can remain in the config files (\`$CONSTRUCTED_FILE\`) for backwards compatibility with older app versions.
+                  Important: Do NOT remove the flag from the config files (\`$CONSTRUCTED_FILE\`) unless it is default-enabled in the client code. Removing a flag that is not default-enabled will disable the feature for older app versions and break ContentScopeScripts features entirely.
 
                   Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
                   else
@@ -243,7 +243,7 @@ jobs:
                   3. Update any documentation
                   4. Create a PR with the cleanup changes
 
-                  Note: The flags can remain in the config files (\`$CONSTRUCTED_FILE\`) for backwards compatibility with older app versions.
+                  Important: Do NOT remove the flags from the config files (\`$CONSTRUCTED_FILE\`) unless they are default-enabled in the client code. Removing flags that are not default-enabled will disable the feature for older app versions and break ContentScopeScripts features entirely.
 
                   Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
                   fi
