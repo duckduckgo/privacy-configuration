@@ -42,6 +42,7 @@ jobs:
                   ASSIGN_PR_AUTHOR: 'true'
 
     auto_respond:
+        if: github.event.action != 'closed'
         runs-on: ubuntu-latest
         concurrency: auto-respond-${{ github.event.pull_request.number }}
 
