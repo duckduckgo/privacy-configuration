@@ -119,7 +119,7 @@ jobs:
 
                           const webhookUrl = process.env[team.webhookEnv];
                           if (!webhookUrl) {
-                              core.setFailed(`${team.webhookEnv} is missing from GHA secrets`);
+                              console.log(`${team.name} has no webhook URL configured, skipping`);
                               continue;
                           }
 
