@@ -158,7 +158,7 @@ jobs:
               id: find_diff_comment
               with:
                   issue-number: ${{ github.event.pull_request.number }}
-                  comment-author: 'github-actions[bot]'
+                  comment-author: 'github-actions[bot]' # posted with default GITHUB_TOKEN
                   body-includes: 'Generated file outputs'
                   direction: last
 
@@ -167,7 +167,7 @@ jobs:
               id: find_approval_comment
               with:
                   issue-number: ${{ github.event.pull_request.number }}
-                  comment-author: 'daxtheduck'
+                  comment-author: 'daxtheduck' # posted with PRIVACY_CONFIG_PAT to trigger issue_comment events
                   body-includes: 'JSON approval analysis'
                   direction: last
 
@@ -288,6 +288,9 @@ jobs:
                   body: ${{ steps.create_diff_body.outputs.comment_body }}
                   edit-mode: replace
 
+            # Uses PAT (not GITHUB_TOKEN) so this comment triggers issue_comment
+            # events for downstream workflows (e.g., auto-notify-mattermost.yml).
+            # See: https://docs.github.com/en/actions/using-workflows/triggering-a-workflow#triggering-a-workflow-from-a-workflow
             - name: Create, or Update the Approval Comment
               uses: peter-evans/create-or-update-comment@v4
               with:

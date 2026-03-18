@@ -1,5 +1,9 @@
 name: Notify platform teams on Manual Review Required PRs
 
+permissions:
+    issues: write
+    pull-requests: read
+
 on:
     issue_comment:
         types:
@@ -12,8 +16,8 @@ jobs:
         if: github.event.issue.pull_request != null
         runs-on: ubuntu-latest
         concurrency:
-            group: windows-mattermost-notify-${{ github.event.issue.number }}
-            cancel-in-progress: false
+            group: auto-notify-mattermost-${{ github.event.issue.number }}
+            cancel-in-progress: true
 
         steps:
             - name: Check approval analysis and notify platform teams
@@ -75,13 +79,13 @@ jobs:
                               webhookEnv: 'MM_MACOS_NOTIFY_WEBHOOK_URL',
                               marker: 'macos-mm-notified',
                           },
-                        {
-                            name: 'Extensions',
-                            emoji: ':spider_web:',
-                            matches: (s) => /extension(-\w+)?-config\.json/.test(s),
-                            webhookEnv: 'MM_EXTENSIONS_NOTIFY_WEBHOOK_URL',
-                            marker: 'extensions-mm-notified',
-                        },
+                          {
+                              name: 'Extensions',
+                              emoji: ':spider_web:',
+                              matches: (s) => /extension(-\w+)?-config\.json/.test(s),
+                              webhookEnv: 'MM_EXTENSIONS_NOTIFY_WEBHOOK_URL',
+                              marker: 'extensions-mm-notified',
+                          },
                       ];
 
                       // Filter to teams that have configs requiring manual review
