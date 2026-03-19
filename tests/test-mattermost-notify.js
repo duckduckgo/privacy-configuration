@@ -4,7 +4,7 @@ import {
     extractManualReviewSection,
     getTeamsRequiringReview,
     formatNotificationText,
-} from '../.github/scripts/mattermost-notify.js';
+} from '../.github/scripts/mattermost-notify.mjs';
 
 describe('mattermost-notify', () => {
     describe('extractManualReviewSection', () => {

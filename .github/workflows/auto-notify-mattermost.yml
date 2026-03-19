@@ -36,7 +36,7 @@ jobs:
                   MM_EXTENSIONS_NOTIFY_WEBHOOK_URL: ${{ secrets.MM_EXTENSIONS_NOTIFY_WEBHOOK_URL }}
               with:
                   script: |
-                      const { extractManualReviewSection, getTeamsRequiringReview, formatNotificationText } = await import(`${process.env.GITHUB_WORKSPACE}/.github/scripts/mattermost-notify.js`);
+                      const { extractManualReviewSection, getTeamsRequiringReview, formatNotificationText } = await import(`${process.env.GITHUB_WORKSPACE}/.github/scripts/mattermost-notify.mjs`);
                       const comment = context.payload.comment;
 
                       // Only process the JSON approval analysis comment from daxtheduck (posted via PAT)
