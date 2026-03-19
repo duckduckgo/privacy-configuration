@@ -20,6 +20,12 @@ jobs:
             cancel-in-progress: true
 
         steps:
+            - name: Checkout scripts
+              uses: actions/checkout@v5
+              with:
+                  sparse-checkout: .github/scripts
+                  sparse-checkout-cone-mode: false
+
             - name: Check approval analysis and notify platform teams
               uses: actions/github-script@v8
               env:
@@ -30,6 +36,7 @@ jobs:
                   MM_EXTENSIONS_NOTIFY_WEBHOOK_URL: ${{ secrets.MM_EXTENSIONS_NOTIFY_WEBHOOK_URL }}
               with:
                   script: |
+                      const { extractManualReviewSection, getTeamsRequiringReview, formatNotificationText } = require('./.github/scripts/mattermost-notify.js');
                       const comment = context.payload.comment;
 
                       // Only process the JSON approval analysis comment from daxtheduck (posted via PAT)
@@ -42,54 +49,13 @@ jobs:
                           return;
                       }
 
-                      // Extract the Manual Review Required section content
-                      const manualReviewMatch = comment.body.match(/## ❌ Manual Review Required([\s\S]*?)(?=\n## |$)/);
-                      if (!manualReviewMatch) {
+                      const manualReviewSection = extractManualReviewSection(comment.body);
+                      if (!manualReviewSection) {
                           console.log('No Manual Review Required section, skipping');
                           return;
                       }
-                      const manualReviewSection = manualReviewMatch[1];
 
-                      const TEAMS = [
-                          {
-                              name: 'Windows',
-                              emoji: ':windows:',
-                              matches: (s) => s.includes('windows-config.json'),
-                              webhookEnv: 'MM_WINDOWS_NOTIFY_WEBHOOK_URL',
-                              marker: 'windows-mm-notified',
-                          },
-                          {
-                              name: 'Android',
-                              emoji: ':android:',
-                              matches: (s) => s.includes('android-config.json'),
-                              webhookEnv: 'MM_ANDROID_NOTIFY_WEBHOOK_URL',
-                              marker: 'android-mm-notified',
-                          },
-                          {
-                              name: 'iOS',
-                              emoji: ':iphone:',
-                              matches: (s) => s.includes('ios-config.json'),
-                              webhookEnv: 'MM_IOS_NOTIFY_WEBHOOK_URL',
-                              marker: 'ios-mm-notified',
-                          },
-                          {
-                              name: 'macOS',
-                              emoji: ':macos:',
-                              matches: (s) => s.includes('macos-config.json'),
-                              webhookEnv: 'MM_MACOS_NOTIFY_WEBHOOK_URL',
-                              marker: 'macos-mm-notified',
-                          },
-                          {
-                              name: 'Extensions',
-                              emoji: ':spider_web:',
-                              matches: (s) => /extension(-\w+)?-config\.json/.test(s),
-                              webhookEnv: 'MM_EXTENSIONS_NOTIFY_WEBHOOK_URL',
-                              marker: 'extensions-mm-notified',
-                          },
-                      ];
-
-                      // Filter to teams that have configs requiring manual review
-                      const teamsToNotify = TEAMS.filter((team) => team.matches(manualReviewSection));
+                      const teamsToNotify = getTeamsRequiringReview(manualReviewSection);
                       if (teamsToNotify.length === 0) {
                           console.log('No relevant platform configs require manual review, skipping');
                           return;
@@ -103,7 +69,6 @@ jobs:
                           per_page: 100,
                       });
 
-                      // Get PR details
                       const { data: pr } = await github.rest.pulls.get({
                           owner: context.repo.owner,
                           repo: context.repo.repo,
@@ -127,7 +92,7 @@ jobs:
                               continue;
                           }
 
-                          const text = `:wave: Please review this ${team.emoji} Privacy Config PR for ${pr.user.login}:\n[\`${pr.title}\` - #${pr.number}](${pr.html_url})`;
+                          const text = formatNotificationText(team, pr);
 
                           const response = await fetch(webhookUrl, {
                               method: 'POST',
