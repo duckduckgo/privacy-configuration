@@ -19,11 +19,11 @@ describe('mattermost-notify', () => {
         });
 
         it('returns null when no Manual Review Required section exists', () => {
-            expect(extractManualReviewSection('## Auto-Approved\nall good')).to.be.null;
+            expect(extractManualReviewSection('## Auto-Approved\nall good')).to.equal(null);
         });
 
         it('returns null for empty string', () => {
-            expect(extractManualReviewSection('')).to.be.null;
+            expect(extractManualReviewSection('')).to.equal(null);
         });
     });
 
