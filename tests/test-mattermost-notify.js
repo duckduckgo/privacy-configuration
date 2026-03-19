@@ -1,13 +1,10 @@
-import { createRequire } from 'module';
 import { expect } from 'chai';
-
-const require = createRequire(import.meta.url);
-const {
+import {
     TEAMS,
     extractManualReviewSection,
     getTeamsRequiringReview,
     formatNotificationText,
-} = require('../.github/scripts/mattermost-notify.cjs');
+} from '../.github/scripts/mattermost-notify.js';
 
 describe('mattermost-notify', () => {
     describe('extractManualReviewSection', () => {

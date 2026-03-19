@@ -1,4 +1,4 @@
-const TEAMS = [
+export const TEAMS = [
     {
         name: 'Windows',
         emoji: ':windows:',
@@ -36,17 +36,15 @@ const TEAMS = [
     },
 ];
 
-function extractManualReviewSection(commentBody) {
+export function extractManualReviewSection(commentBody) {
     const match = commentBody.match(/## ❌ Manual Review Required([\s\S]*?)(?=\n## |$)/);
     return match ? match[1] : null;
 }
 
-function getTeamsRequiringReview(section) {
+export function getTeamsRequiringReview(section) {
     return TEAMS.filter((t) => (typeof t.pattern === 'string' ? section.includes(t.pattern) : t.pattern.test(section)));
 }
 
-function formatNotificationText(team, pr) {
+export function formatNotificationText(team, pr) {
     return `:wave: Please review this ${team.emoji} Privacy Config PR for ${pr.user.login}:\n[\`${pr.title}\` - #${pr.number}](${pr.html_url})`;
 }
-
-module.exports = { TEAMS, extractManualReviewSection, getTeamsRequiringReview, formatNotificationText };
