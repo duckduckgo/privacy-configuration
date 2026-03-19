@@ -2,7 +2,12 @@ import { createRequire } from 'module';
 import { expect } from 'chai';
 
 const require = createRequire(import.meta.url);
-const { TEAMS, extractManualReviewSection, getTeamsRequiringReview, formatNotificationText } = require('../.github/scripts/mattermost-notify.cjs');
+const {
+    TEAMS,
+    extractManualReviewSection,
+    getTeamsRequiringReview,
+    formatNotificationText,
+} = require('../.github/scripts/mattermost-notify.cjs');
 
 describe('mattermost-notify', () => {
     describe('extractManualReviewSection', () => {
@@ -69,7 +74,12 @@ describe('mattermost-notify', () => {
     });
 
     describe('formatNotificationText', () => {
-        const mockPr = { user: { login: 'testuser' }, title: 'Fix breakage on example.com', number: 42, html_url: 'https://github.com/org/repo/pull/42' };
+        const mockPr = {
+            user: { login: 'testuser' },
+            title: 'Fix breakage on example.com',
+            number: 42,
+            html_url: 'https://github.com/org/repo/pull/42',
+        };
 
         it('includes team emoji', () => {
             const text = formatNotificationText(TEAMS[0], mockPr);
