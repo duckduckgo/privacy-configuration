@@ -1,0 +1,117 @@
+name: Notify platform teams on Manual Review Required PRs
+
+permissions:
+    issues: write
+    pull-requests: read
+
+on:
+    issue_comment:
+        types:
+            - created
+            - edited
+
+jobs:
+    notify:
+        # Only run on PR comments, not plain issue comments
+        if: github.event.issue.pull_request != null
+        runs-on: ubuntu-latest
+        concurrency:
+            group: auto-notify-mattermost-${{ github.event.issue.number }}
+            cancel-in-progress: true
+
+        steps:
+            - name: Checkout scripts
+              uses: actions/checkout@v5
+              with:
+                  sparse-checkout: .github/scripts
+                  sparse-checkout-cone-mode: false
+
+            - name: Check approval analysis and notify platform teams
+              uses: actions/github-script@v8
+              env:
+                  MM_WINDOWS_NOTIFY_WEBHOOK_URL: ${{ secrets.MM_WINDOWS_NOTIFY_WEBHOOK_URL }}
+                  MM_ANDROID_NOTIFY_WEBHOOK_URL: ${{ secrets.MM_ANDROID_NOTIFY_WEBHOOK_URL }}
+                  MM_IOS_NOTIFY_WEBHOOK_URL: ${{ secrets.MM_IOS_NOTIFY_WEBHOOK_URL }}
+                  MM_MACOS_NOTIFY_WEBHOOK_URL: ${{ secrets.MM_MACOS_NOTIFY_WEBHOOK_URL }}
+                  MM_EXTENSIONS_NOTIFY_WEBHOOK_URL: ${{ secrets.MM_EXTENSIONS_NOTIFY_WEBHOOK_URL }}
+              with:
+                  script: |
+                      const { extractManualReviewSection, getTeamsRequiringReview, formatNotificationText } = await import(`${process.env.GITHUB_WORKSPACE}/.github/scripts/mattermost-notify.mjs`);
+                      const comment = context.payload.comment;
+
+                      // Only process the JSON approval analysis comment from daxtheduck (posted via PAT)
+                      if (comment.user.login !== 'daxtheduck') {
+                          console.log('Not a daxtheduck comment, skipping');
+                          return;
+                      }
+                      if (!comment.body.includes('JSON approval analysis')) {
+                          console.log('Not an approval analysis comment, skipping');
+                          return;
+                      }
+
+                      const manualReviewSection = extractManualReviewSection(comment.body);
+                      if (!manualReviewSection) {
+                          console.log('No Manual Review Required section, skipping');
+                          return;
+                      }
+
+                      const teamsToNotify = getTeamsRequiringReview(manualReviewSection);
+                      if (teamsToNotify.length === 0) {
+                          console.log('No relevant platform configs require manual review, skipping');
+                          return;
+                      }
+
+                      // Fetch all comments to check for per-team markers. listComments defaults to 30/page.
+                      const existingComments = await github.paginate(github.rest.issues.listComments, {
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          issue_number: context.payload.issue.number,
+                          per_page: 100,
+                      });
+
+                      const { data: pr } = await github.rest.pulls.get({
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          pull_number: context.payload.issue.number,
+                      });
+
+                      for (const team of teamsToNotify) {
+                          const alreadyNotified = existingComments.some((c) =>
+                              c.user.login === 'github-actions[bot]' &&
+                              c.body.includes(`<!-- ${team.marker} -->`)
+                          );
+
+                          if (alreadyNotified) {
+                              console.log(`${team.name} already notified, skipping`);
+                              continue;
+                          }
+
+                          const webhookUrl = process.env[team.webhookEnv];
+                          if (!webhookUrl) {
+                              console.log(`${team.name} has no webhook URL configured, skipping`);
+                              continue;
+                          }
+
+                          const text = formatNotificationText(team, pr);
+
+                          const response = await fetch(webhookUrl, {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ text }),
+                          });
+
+                          if (!response.ok) {
+                              core.setFailed(`Mattermost webhook for ${team.name} returned ${response.status}: ${await response.text()}`);
+                              continue;
+                          }
+
+                          console.log(`Mattermost notification sent for ${team.name}`);
+
+                          // Post a per-team marker so we don't notify this team again for this PR
+                          await github.rest.issues.createComment({
+                              owner: context.repo.owner,
+                              repo: context.repo.repo,
+                              issue_number: context.payload.issue.number,
+                              body: `<!-- ${team.marker} -->\n:bell: ${team.name} team notified via Mattermost.`,
+                          });
+                      }
