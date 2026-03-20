@@ -962,6 +962,18 @@
                                 ]
                             },
                             {
+                                "condition": {
+                                    "urlPattern": "https://identity.gamestop.com/interaction/:uid"
+                                },
+                                "patchSettings": [
+                                    {
+                                        "path": "/formBoundarySelector",
+                                        "op": "replace",
+                                        "value": ".gamestop-card__root"
+                                    }
+                                ]
+                            },
+                            {
                                 "condition": [
                                     { "domain": "asana.com" }],
                                 "patchSettings": [
