@@ -3,6 +3,7 @@ name: Test
 on:
     push:
     pull_request:
+    workflow_dispatch:
     merge_group:
 
 jobs:
@@ -21,13 +22,59 @@ jobs:
               run: npm run test
     lint:
         runs-on: ubuntu-latest
+        permissions:
+            contents: write
         steps:
             - uses: actions/checkout@v5
+              with:
+                  repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
+                  ref: ${{ github.event.pull_request.head.ref || github.ref }}
             - name: Use Node.js 20
               uses: actions/setup-node@v5
               with:
                   node-version: 20.x
             - name: Install dependencies
               run: npm ci
-            - name: Lint JSON
-              run: npm run lint && echo 'No lint issues!' || (npm run lint-fix; git diff; echo 'Lint check failed, review diff above or run "npm run lint-fix"'; return 1)
+            - name: Check or Fix lint
+              env:
+                  EVENT_NAME: ${{ github.event_name }}
+                  HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+                  THIS_REPO: ${{ github.repository }}
+              run: |
+                  if [[ "$EVENT_NAME" == "pull_request" && "$HEAD_REPO" == "$THIS_REPO" ]]; then
+                    npm run lint-fix
+                    npm run lint
+                  else
+                    npm run lint
+                  fi
+            - name: Commit and push linter fixes (PRs only)
+              id: push_lint_fixes
+              if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+              env:
+                  HEAD_REF: ${{ github.event.pull_request.head.ref }}
+                  # Keep using PAT for auto-fix push (GITHUB_TOKEN pushes do not retrigger workflows).
+                  PRIVACY_CONFIG_PAT: ${{ secrets.PRIVACY_CONFIG_PAT }}
+              run: |
+                  git config --global user.name "github-actions[bot]"
+                  git config --global user.email "github-actions[bot]@users.noreply.github.com"
+                  pushed_fixes=false
+                  git add .
+                  if ! git diff --cached --quiet; then
+                    git commit -m "chore: auto-fix lint errors"
+                    git push "https://x-access-token:${PRIVACY_CONFIG_PAT}@github.com/${{ github.repository }}.git" "HEAD:$HEAD_REF"
+                    pushed_fixes=true
+                  fi
+                  echo "pushed_fixes=$pushed_fixes" >> "$GITHUB_OUTPUT"
+            - name: Dispatch Test rerun after auto-fix push
+              if: steps.push_lint_fixes.outputs.pushed_fixes == 'true'
+              env:
+                  GH_TOKEN: ${{ secrets.PRIVACY_CONFIG_PAT }}
+                  HEAD_REF: ${{ github.event.pull_request.head.ref }}
+              run: |
+                  # Auto-fix pushes can miss pull_request:synchronize in this repo.
+                  # Explicitly dispatch Test so unit+lint run on the new lint-fix commit.
+                  gh api \
+                    --method POST \
+                    -H "Accept: application/vnd.github+json" \
+                    "/repos/${{ github.repository }}/actions/workflows/tests.yml/dispatches" \
+                    -f ref="$HEAD_REF"

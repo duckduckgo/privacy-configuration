@@ -1,0 +1,184 @@
+{
+    "_meta": {
+        "description": "Detect web patterns such as adwalls."
+    },
+    "state": "disabled",
+    "exceptions": [],
+    "settings": {
+        "detectors": {
+            "adwalls": {
+                "generic_en": {
+                    "match": {
+                        "text": {
+                            "pattern": [
+                                "ad ?block(er)? detected",
+                                "adjust(ing)?( your)? ad blocking settings",
+                                "(turn off|disable|disabling|deactivate)( your| my)? ad ?block(er)?",
+                                "your ad ?blocker is on",
+                                "you('re| are| may be) using an ad blocker"
+                            ]
+                        }
+                    }
+                },
+                "generic_de": {
+                    "match": {
+                        "text": {
+                            "pattern": [
+                                "deaktivieren sie ihren adblocker",
+                                "deaktivieren sie ihre blocker",
+                                "adblocker zu deaktivieren",
+                                "adblocker deaktivieren",
+                                "sie einen adblocker verwenden"
+                            ]
+                        }
+                    }
+                },
+                "generic_es": {
+                    "match": {
+                        "text": {
+                            "pattern": [
+                                "en esta web no aceptamos el uso de adblock",
+                                "bloqueador de anuncios"
+                            ]
+                        }
+                    }
+                },
+                "generic_it": {
+                    "match": {
+                        "text": {
+                            "pattern": [
+                                "disattiva l'ad block",
+                                "stai usando un ad block"
+                            ]
+                        }
+                    }
+                },
+                "generic_nl": {
+                    "match": {
+                        "text": {
+                            "pattern": [
+                                "adblock gedetecteerd",
+                                "schakel je adblocker uit om de video te bekijken"
+                            ]
+                        }
+                    }
+                },
+                "generic_se": {
+                    "match": {
+                        "text": {
+                            "pattern": [
+                                "har du en annonsblockerare igång",
+                                "avaktivera din annonsblockerare"
+                            ]
+                        }
+                    }
+                }
+            },
+            "commentsDisabled": {
+                "generic": {
+                    "match": {
+                        "text": {
+                            "pattern": "comments are turned off"
+                        }
+                    }
+                }
+            }
+        },
+        "conditionalChanges": [
+            {
+                "condition": {
+                    "experiment": {
+                        "experimentName": "contentScopeExperiment4",
+                        "cohort": "treatment"
+                    }
+                },
+                "patchSettings": [
+                    {
+                        "op": "add",
+                        "path": "/detectors/adwalls/generic_en/triggers",
+                        "value": { "auto": { "state": "enabled", "when": { "intervalMs": [
+                                        500,
+                                        1000,
+                                        5000
+                                    ] } } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/adwalls/generic_en/actions",
+                        "value": { "fireEvent": { "state": "enabled", "type": "adwall" } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/adwalls/generic_de/triggers",
+                        "value": { "auto": { "state": "enabled", "when": { "intervalMs": [
+                                        500,
+                                        1000,
+                                        5000
+                                    ] } } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/adwalls/generic_de/actions",
+                        "value": { "fireEvent": { "state": "enabled", "type": "adwall" } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/adwalls/generic_es/triggers",
+                        "value": { "auto": { "state": "enabled", "when": { "intervalMs": [
+                                        500,
+                                        1000,
+                                        5000
+                                    ] } } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/adwalls/generic_es/actions",
+                        "value": { "fireEvent": { "state": "enabled", "type": "adwall" } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/adwalls/generic_it/triggers",
+                        "value": { "auto": { "state": "enabled", "when": { "intervalMs": [
+                                        500,
+                                        1000,
+                                        5000
+                                    ] } } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/adwalls/generic_it/actions",
+                        "value": { "fireEvent": { "state": "enabled", "type": "adwall" } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/adwalls/generic_nl/triggers",
+                        "value": { "auto": { "state": "enabled", "when": { "intervalMs": [
+                                        500,
+                                        1000,
+                                        5000
+                                    ] } } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/adwalls/generic_nl/actions",
+                        "value": { "fireEvent": { "state": "enabled", "type": "adwall" } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/adwalls/generic_se/triggers",
+                        "value": { "auto": { "state": "enabled", "when": { "intervalMs": [
+                                        500,
+                                        1000,
+                                        5000
+                                    ] } } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/adwalls/generic_se/actions",
+                        "value": { "fireEvent": { "state": "enabled", "type": "adwall" } }
+                    }
+                ]
+            }
+        ]
+    }
+}

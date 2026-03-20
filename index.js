@@ -181,6 +181,7 @@ const legacyDisabledFeatures = [
     'clickToLoad',
     'clickToPlay',
     'clientBrandHint',
+    'contextMenu',
     'contextualOnboarding',
     'cookie',
     'customUserAgent',
@@ -192,11 +193,13 @@ const legacyDisabledFeatures = [
     'fingerprintingTemporaryStorage',
     'googleRejected',
     'harmfulApis',
+    'hover',
     'incontextSignup',
     'mediaPlaybackRequiresUserGesture',
     'messageBridge',
     'newTabContinueSetUp',
     'nonTracking3pCookies',
+    'pageObserver',
     'privacyDashboard',
     'referrer',
     'serviceworkerInitiatedRequests',
@@ -353,6 +356,8 @@ async function buildPlatforms() {
 
 buildPlatforms().then((platformConfigs) => {
     // Generate legacy Safari format
-    const legacyTextDomains = [...unprotectedDomains].join('\n');
+    const legacyTextDomains = [
+        ...unprotectedDomains,
+    ].join('\n');
     fs.writeFileSync(`${GENERATED_DIR}/trackers-unprotected-temporary.txt`, legacyTextDomains);
 });

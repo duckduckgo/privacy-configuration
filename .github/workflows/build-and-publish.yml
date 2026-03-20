@@ -8,9 +8,13 @@ on:
             - '**.json'
             - '**.js'
             - '**.yml'
+            - '**.ts' # For schema changes that other repos may rely on.
 
 jobs:
     publish:
+        concurrency:
+            group: build-and-publish
+            cancel-in-progress: false # queue concurrent tasks only.
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@main

@@ -1,106 +1,198 @@
-name: Feature Flag Cleanup Tracker (Android)
+name: Feature Flag Cleanup Tracker
 
 on:
     pull_request:
         types: [closed]
         paths:
             - 'overrides/android-override.json'
+            - 'overrides/windows-override.json'
+            - 'features/**/*.json'
 
 jobs:
     create-cleanup-task:
         runs-on: ubuntu-latest
         if: github.event.pull_request.merged == true
+        strategy:
+            fail-fast: false
+            matrix:
+                platform:
+                    - name: 'Android'
+                      config_file: 'android-config.json'
+                      override_file: 'overrides/android-override.json'
+                      asana_project: '${{ vars.GH_ANDROID_INTERNAL_WORK_PROJECT_ID }}'
+                      asana_section: '${{ vars.GH_ANDROID_FEATURE_FLAG_MAINTENANCE_SECTION_ID }}'
+                    - name: 'Windows'
+                      config_file: 'windows-config.json'
+                      override_file: 'overrides/windows-override.json'
+                      asana_project: '${{ vars.GH_WINDOWS_PROJECT_ID }}'
+                      asana_section: '${{ vars.GH_WINDOWS_FEATURE_FLAGS_SECTION_ID }}'
+        name: ${{ matrix.platform.name }} cleanup task
 
         steps:
-            - name: Checkout code
-              uses: actions/checkout@v4
-              with:
-                  fetch-depth: 0
-
             - name: Set PR context variables
               id: pr_context
               run: |
-                  echo "base_sha=${{ github.event.pull_request.base.sha }}" >> $GITHUB_OUTPUT
-                  echo "head_sha=${{ github.event.pull_request.head.sha }}" >> $GITHUB_OUTPUT
+                  MERGE_SHA="${{ github.event.pull_request.merge_commit_sha }}"
+                  echo "head_sha=$MERGE_SHA" >> $GITHUB_OUTPUT
                   echo "pr_number=${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
                   echo "pr_url=${{ github.event.pull_request.html_url }}" >> $GITHUB_OUTPUT
 
             - name: Install jq
               run: sudo apt-get update && sudo apt-get install -y jq
 
-            - name: Fetch PR commits
-              run: |
-                  # Fetch the PR ref which GitHub keeps even after branch deletion
-                  # This ensures we have access to all commits from the PR
-                  git fetch origin pull/${{ steps.pr_context.outputs.pr_number }}/head
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '20'
 
-            - name: Detect new Android feature flags
+            - name: Checkout merge commit
+              uses: actions/checkout@v4
+              with:
+                  ref: ${{ steps.pr_context.outputs.head_sha }}
+                  path: head
+                  fetch-depth: 2
+
+            - name: Resolve pre-merge base SHA
+              id: resolve_base
+              run: |
+                  # The first parent of the merge commit is the exact state of the
+                  # target branch right before this PR was merged. This ensures we
+                  # only detect flags introduced by THIS PR, not by other PRs that
+                  # landed between when the PR was opened and when it was merged.
+                  BASE_SHA=$(git -C head rev-parse HEAD^1)
+                  echo "Merge commit: ${{ steps.pr_context.outputs.head_sha }}"
+                  echo "Pre-merge base (HEAD^1): $BASE_SHA"
+                  echo "base_sha=$BASE_SHA" >> $GITHUB_OUTPUT
+
+            - name: Checkout pre-merge base
+              uses: actions/checkout@v4
+              with:
+                  ref: ${{ steps.resolve_base.outputs.base_sha }}
+                  path: base
+
+            - name: Build generated configs
+              id: build_configs
+              run: |
+                  set -euo pipefail
+                  for dir in base head; do
+                    echo "Building generated output in $dir"
+                    (cd "$dir" && npm ci && node index.js)
+                  done
+
+                  BASE_CONFIG_VERSION=$(node --input-type=module -e "const { CURRENT_CONFIG_VERSION } = await import('./base/constants.js'); console.log(CURRENT_CONFIG_VERSION);")
+                  HEAD_CONFIG_VERSION=$(node --input-type=module -e "const { CURRENT_CONFIG_VERSION } = await import('./head/constants.js'); console.log(CURRENT_CONFIG_VERSION);")
+                  echo "base_config_version=$BASE_CONFIG_VERSION" >> $GITHUB_OUTPUT
+                  echo "head_config_version=$HEAD_CONFIG_VERSION" >> $GITHUB_OUTPUT
+
+            - name: Detect enabled ${{ matrix.platform.name }} feature flags (generated output)
               id: detect_flags
               run: |
-                  # Get the android-override.json from base and head commits
-                  # Check if file exists in base commit (it might not if this is the first time adding it)
-                  if git cat-file -e ${{ steps.pr_context.outputs.base_sha }}:overrides/android-override.json 2>/dev/null; then
-                    BASE_FILE=$(git show ${{ steps.pr_context.outputs.base_sha }}:overrides/android-override.json)
-                  else
-                    # File doesn't exist in base, use empty JSON object
-                    BASE_FILE='{"features":{}}'
-                  fi
-                  HEAD_FILE=$(git show ${{ steps.pr_context.outputs.head_sha }}:overrides/android-override.json)
+                  BASE_CONFIG_VERSION="${{ steps.build_configs.outputs.base_config_version }}"
+                  HEAD_CONFIG_VERSION="${{ steps.build_configs.outputs.head_config_version }}"
+                  BASE_CONFIG="base/generated/v${BASE_CONFIG_VERSION}/${{ matrix.platform.config_file }}"
+                  HEAD_CONFIG="head/generated/v${HEAD_CONFIG_VERSION}/${{ matrix.platform.config_file }}"
+
+                  # Helper: get state of a top-level feature (defaults to "disabled")
+                  get_feature_state() {
+                    local config="$1" feature="$2"
+                    jq -r --arg f "$feature" '.features[$f].state // "disabled"' "$config"
+                  }
+
+                  # Helper: get state of a sub-feature (defaults to "disabled")
+                  get_subfeature_state() {
+                    local config="$1" feature="$2" sub="$3"
+                    jq -r --arg f "$feature" --arg s "$sub" '.features[$f].features[$s].state // "disabled"' "$config"
+                  }
 
                   # Extract all feature keys from base and head
-                  BASE_FEATURES=$(echo "$BASE_FILE" | jq -r '.features | keys[]' | sort)
-                  HEAD_FEATURES=$(echo "$HEAD_FILE" | jq -r '.features | keys[]' | sort)
+                  BASE_FEATURES=$(jq -r '.features | keys[]' "$BASE_CONFIG" | sort)
+                  HEAD_FEATURES=$(jq -r '.features | keys[]' "$HEAD_CONFIG" | sort)
 
-                  # Find new top-level features
-                  NEW_FEATURES=$(comm -13 <(echo "$BASE_FEATURES") <(echo "$HEAD_FEATURES"))
+                  # Find new top-level features (only if enabled in head)
+                  NEW_FEATURES=""
+                  for feature in $(comm -13 <(echo "$BASE_FEATURES") <(echo "$HEAD_FEATURES")); do
+                    HEAD_STATE=$(get_feature_state "$HEAD_CONFIG" "$feature")
+                    if [ "$HEAD_STATE" = "enabled" ]; then
+                      NEW_FEATURES="${NEW_FEATURES}${feature}"$'\n'
+                    fi
+                  done
 
-                  # Detect new sub-features in existing features
+                  # Detect existing top-level features that changed to enabled
+                  NEWLY_ENABLED=""
+                  for feature in $(comm -12 <(echo "$BASE_FEATURES") <(echo "$HEAD_FEATURES")); do
+                    BASE_STATE=$(get_feature_state "$BASE_CONFIG" "$feature")
+                    HEAD_STATE=$(get_feature_state "$HEAD_CONFIG" "$feature")
+                    if [ "$BASE_STATE" != "enabled" ] && [ "$HEAD_STATE" = "enabled" ]; then
+                      NEWLY_ENABLED="${NEWLY_ENABLED}${feature}"$'\n'
+                    fi
+                  done
+
+                  # Detect new and newly-enabled sub-features in existing features
                   NEW_SUBFEATURES=""
                   for feature in $(echo "$BASE_FEATURES"); do
-                    BASE_SUBS=$(echo "$BASE_FILE" | jq -r --arg f "$feature" '.features[$f].features // {} | keys[]' 2>/dev/null | sort || true)
-                    HEAD_SUBS=$(echo "$HEAD_FILE" | jq -r --arg f "$feature" '.features[$f].features // {} | keys[]' 2>/dev/null | sort || true)
+                    BASE_SUBS=$(jq -r --arg f "$feature" '.features[$f].features // {} | keys[]' "$BASE_CONFIG" 2>/dev/null | sort || true)
+                    HEAD_SUBS=$(jq -r --arg f "$feature" '.features[$f].features // {} | keys[]' "$HEAD_CONFIG" 2>/dev/null | sort || true)
 
                     if [ -n "$HEAD_SUBS" ]; then
+                      # New sub-features (only if enabled)
                       NEW_SUBS=$(comm -13 <(echo "$BASE_SUBS") <(echo "$HEAD_SUBS") || true)
                       if [ -n "$NEW_SUBS" ]; then
                         for sub in $NEW_SUBS; do
-                          NEW_SUBFEATURES="${NEW_SUBFEATURES}${feature}.${sub}"$'\n'
+                          SUB_STATE=$(get_subfeature_state "$HEAD_CONFIG" "$feature" "$sub")
+                          if [ "$SUB_STATE" = "enabled" ]; then
+                            NEW_SUBFEATURES="${NEW_SUBFEATURES}${feature}.${sub}"$'\n'
+                          fi
+                        done
+                      fi
+
+                      # Existing sub-features that changed to enabled
+                      COMMON_SUBS=$(comm -12 <(echo "$BASE_SUBS") <(echo "$HEAD_SUBS") || true)
+                      if [ -n "$COMMON_SUBS" ]; then
+                        for sub in $COMMON_SUBS; do
+                          BASE_SUB_STATE=$(get_subfeature_state "$BASE_CONFIG" "$feature" "$sub")
+                          HEAD_SUB_STATE=$(get_subfeature_state "$HEAD_CONFIG" "$feature" "$sub")
+                          if [ "$BASE_SUB_STATE" != "enabled" ] && [ "$HEAD_SUB_STATE" = "enabled" ]; then
+                            NEW_SUBFEATURES="${NEW_SUBFEATURES}${feature}.${sub}"$'\n'
+                          fi
                         done
                       fi
                     fi
                   done
 
-                  # Also check NEW top-level features for any sub-features they contain
-                  for feature in $NEW_FEATURES; do
-                    SUBS=$(echo "$HEAD_FILE" | jq -r --arg f "$feature" '.features[$f].features // {} | keys[]' 2>/dev/null || true)
+                  # Also check NEW enabled top-level features for any enabled sub-features
+                  for feature in $(echo "$NEW_FEATURES"); do
+                    [ -z "$feature" ] && continue
+                    SUBS=$(jq -r --arg f "$feature" '.features[$f].features // {} | keys[]' "$HEAD_CONFIG" 2>/dev/null || true)
                     if [ -n "$SUBS" ]; then
                       for sub in $SUBS; do
-                        NEW_SUBFEATURES="${NEW_SUBFEATURES}${feature}.${sub}"$'\n'
+                        SUB_STATE=$(get_subfeature_state "$HEAD_CONFIG" "$feature" "$sub")
+                        if [ "$SUB_STATE" = "enabled" ]; then
+                          NEW_SUBFEATURES="${NEW_SUBFEATURES}${feature}.${sub}"$'\n'
+                        fi
                       done
                     fi
                   done
 
-                  # Combine all new flags
+                  # Combine all flags that need cleanup tasks
                   ALL_NEW_FLAGS=""
-                  if [ -n "$NEW_FEATURES" ]; then
-                    ALL_NEW_FLAGS="$NEW_FEATURES"
-                  fi
-                  if [ -n "$NEW_SUBFEATURES" ]; then
-                    if [ -n "$ALL_NEW_FLAGS" ]; then
-                      ALL_NEW_FLAGS="${ALL_NEW_FLAGS}"$'\n'"${NEW_SUBFEATURES}"
-                    else
-                      ALL_NEW_FLAGS="$NEW_SUBFEATURES"
+                  for flags_list in "$NEW_FEATURES" "$NEWLY_ENABLED" "$NEW_SUBFEATURES"; do
+                    if [ -n "$flags_list" ]; then
+                      if [ -n "$ALL_NEW_FLAGS" ]; then
+                        ALL_NEW_FLAGS="${ALL_NEW_FLAGS}${flags_list}"
+                      else
+                        ALL_NEW_FLAGS="$flags_list"
+                      fi
                     fi
-                  fi
+                  done
 
-                  # Remove trailing newline
-                  ALL_NEW_FLAGS=$(echo "$ALL_NEW_FLAGS" | sed '/^$/d')
+                  # Remove empty lines and deduplicate
+                  ALL_NEW_FLAGS=$(echo "$ALL_NEW_FLAGS" | sed '/^$/d' | sort -u)
 
                   if [ -z "$ALL_NEW_FLAGS" ]; then
-                    echo "No new Android feature flags detected"
+                    echo "No new/newly enabled ${{ matrix.platform.name }} feature flags detected"
                     echo "has_new_flags=false" >> $GITHUB_OUTPUT
                   else
-                    echo "New Android feature flags detected:"
+                    echo "New/newly enabled ${{ matrix.platform.name }} feature flags detected:"
                     echo "$ALL_NEW_FLAGS"
                     echo "has_new_flags=true" >> $GITHUB_OUTPUT
                     echo "flags<<EOF" >> $GITHUB_OUTPUT
@@ -112,6 +204,11 @@ jobs:
               if: steps.detect_flags.outputs.has_new_flags == 'true'
               id: asana_content
               run: |
+                  HEAD_CONFIG_VERSION="${{ steps.build_configs.outputs.head_config_version }}"
+                  CONSTRUCTED_FILE="generated/v${HEAD_CONFIG_VERSION}/${{ matrix.platform.config_file }}"
+                  PLATFORM_NAME="${{ matrix.platform.name }}"
+                  OVERRIDE_FILE="${{ matrix.platform.override_file }}"
+
                   # Count how many flags were added
                   FLAG_COUNT=$(echo "${{ steps.detect_flags.outputs.flags }}" | wc -l | xargs)
 
@@ -128,33 +225,38 @@ jobs:
                       FEATURE_NAME="$FEATURE_PATH"
                     fi
 
-                    TASK_NAME="[Android] Remove feature flag: $FEATURE_NAME"
-                    TASK_DESCRIPTION="This Android feature flag was added in PR #${{ steps.pr_context.outputs.pr_number }}
+                    TASK_NAME="[$PLATFORM_NAME] Remove feature flag: $FEATURE_NAME"
+                    TASK_DESCRIPTION="This $PLATFORM_NAME feature flag was added in PR #${{ steps.pr_context.outputs.pr_number }}
 
                   PR Link: ${{ steps.pr_context.outputs.pr_url }}
                   Feature Path: \`$FEATURE_PATH\`
-                  File: \`overrides/android-override.json\`
+                  File (constructed): \`$CONSTRUCTED_FILE\`
+                  Inputs: \`features/\` + \`$OVERRIDE_FILE\`
 
                   Action Required:
-                  Please review this feature flag after the due date and determine if it can be removed. Feature flags should be temporary and cleaned up once the feature is stable.
+                  Please review this feature flag after the due date and determine if it can be removed.
 
-                  Steps to remove:
-                  1. Verify the feature is working as expected in Android production
-                  2. Remove the feature flag from \`overrides/android-override.json\` at path: \`$FEATURE_PATH\`
-                  3. Remove any Android code that references this feature flag
-                  4. Update any documentation
-                  5. Create a PR with the cleanup changes
+                  Note: Check if this is a kill switch or permanent feature toggle. If it's meant to be permanent (e.g., kill switch, long-term A/B test, or operational toggle), you can close this task without removing the flag. Only temporary rollout flags need to be cleaned up once the feature is stable.
+
+                  Steps to remove (if not a permanent flag):
+                  1. Verify the feature is working as expected in $PLATFORM_NAME production
+                  2. Remove any $PLATFORM_NAME code that references this feature flag
+                  3. Update any documentation
+                  4. Create a PR with the cleanup changes
+
+                  Important: Do NOT remove the flag from the config files (\`$CONSTRUCTED_FILE\`) unless it is default-enabled in the client code. Removing a flag that is not default-enabled will disable the feature for older app versions and break ContentScopeScripts features entirely.
 
                   Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
                   else
                     # Multiple feature flags - create summary task
-                    TASK_NAME="[Android] Remove feature flags added in PR #${{ steps.pr_context.outputs.pr_number }}"
-                    TASK_DESCRIPTION="Multiple Android feature flags were added in PR #${{ steps.pr_context.outputs.pr_number }}
+                    TASK_NAME="[$PLATFORM_NAME] Remove feature flags added in PR #${{ steps.pr_context.outputs.pr_number }}"
+                    TASK_DESCRIPTION="Multiple $PLATFORM_NAME feature flags were added in PR #${{ steps.pr_context.outputs.pr_number }}
 
-                  **PR Link:** ${{ steps.pr_context.outputs.pr_url }}
-                  **File:** \`overrides/android-override.json\`
+                  PR Link: ${{ steps.pr_context.outputs.pr_url }}
+                  Constructed File: \`$CONSTRUCTED_FILE\`
+                  Inputs: \`features/\` + \`$OVERRIDE_FILE\`
 
-                  **Feature Flags to Review:**
+                  Feature Flags to Review:
                   "
 
                     # List each feature flag
@@ -169,7 +271,7 @@ jobs:
                         fi
 
                         TASK_DESCRIPTION="${TASK_DESCRIPTION}
-                  - **$FEATURE_NAME**
+                  - $FEATURE_NAME
                     Path: \`$FEATURE_PATH\`
                   "
                       fi
@@ -177,15 +279,18 @@ jobs:
 
                     TASK_DESCRIPTION="${TASK_DESCRIPTION}
 
-                  **Action Required:**
-                  Please review these feature flags after the due date and determine if they can be removed. Feature flags should be temporary and cleaned up once the feature is stable.
+                  Action Required:
+                  Please review these feature flags after the due date and determine if they can be removed.
 
-                  **Steps to remove:**
-                  1. Verify each feature is working as expected in Android production
-                  2. Remove the feature flags from \`overrides/android-override.json\`
-                  3. Remove any Android code that references these feature flags
-                  4. Update any documentation
-                  5. Create a PR with the cleanup changes
+                  Note: Check if any of these are kill switches or permanent feature toggles. If a flag is meant to be permanent (e.g., kill switch, long-term A/B test, or operational toggle), you can keep it and close this task. Only temporary rollout flags need to be cleaned up once the feature is stable.
+
+                  Steps to remove (for non-permanent flags):
+                  1. Verify each feature is working as expected in $PLATFORM_NAME production
+                  2. Remove any $PLATFORM_NAME code that references these feature flags
+                  3. Update any documentation
+                  4. Create a PR with the cleanup changes
+
+                  Important: Do NOT remove the flags from the config files (\`$CONSTRUCTED_FILE\`) unless they are default-enabled in the client code. Removing flags that are not default-enabled will disable the feature for older app versions and break ContentScopeScripts features entirely.
 
                   Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
                   fi
@@ -209,8 +314,8 @@ jobs:
               uses: duckduckgo/native-github-asana-sync@v2.0
               with:
                   asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-                  asana-project: ${{ vars.GH_ANDROID_INTERNAL_WORK_PROJECT_ID }}
-                  asana-section: ${{ vars.GH_ANDROID_FEATURE_FLAG_MAINTENANCE_SECTION_ID }}
+                  asana-project: ${{ matrix.platform.asana_project }}
+                  asana-section: ${{ matrix.platform.asana_section }}
                   asana-task-name: ${{ steps.asana_content.outputs.task_name }}
                   asana-task-assignee: ${{ steps.get-author-asana-id.outputs.asanaUserId }}
                   asana-task-description: ${{ steps.asana_content.outputs.task_description }}

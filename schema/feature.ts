@@ -14,7 +14,6 @@ export type FeatureState = 'enabled' | 'disabled' | 'internal' | 'preview';
 
 type FeatureMeta = {
     description: string;
-    sampleExcludeRecords?: any;
 };
 
 /* Note this defaults to Record<string, string>
@@ -34,6 +33,7 @@ export type SubFeature<VersionType, SettingsType = Record<string, string>> = {
         localeLanguage?: string;
         isReturningUser?: boolean;
         isPrivacyProEligible?: boolean;
+        entitlement?: string;
     }[];
     cohorts?: Cohort[];
     minSupportedVersion?: VersionType;
@@ -62,8 +62,8 @@ type ConditionBlock = {
         cohort: string;
     };
     injectName?: string;
-    minSupportedVersion?: number;
-    maxSupportedVersion?: number;
+    minSupportedVersion?: number | string;
+    maxSupportedVersion?: number | string;
     internal?: boolean;
     preview?: boolean;
     context?: {
@@ -71,6 +71,8 @@ type ConditionBlock = {
         frame?: boolean;
     };
 };
+
+export type ConditionBlockOrArray = ConditionBlock | ConditionBlock[];
 
 type JSONValidValueType = boolean | string | number | object | Array<boolean | string | number | object>;
 
@@ -80,7 +82,7 @@ type CSSInjectFeatureSettingsPatches = {
         patchSettings: Operation<JSONValidValueType>[];
     }[];
     conditionalChanges?: {
-        condition: ConditionBlock | ConditionBlock[];
+        condition: ConditionBlockOrArray;
         patchSettings: Operation<JSONValidValueType>[];
     }[];
 };

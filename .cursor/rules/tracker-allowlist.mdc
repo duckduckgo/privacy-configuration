@@ -12,7 +12,8 @@ Tracker Allowlist is used to allow specific tracker requests that would normally
 - **Configuration**: `features/tracker-allowlist.json` - Rule definitions (Applies to all browser platforms.)
 - **Override files**: `overrides/` - Platform-specific configuration override files
 - **Schema**: `schema/features/tracker-allowlist.ts` - TypeScript type definitions
-- **Bugbot guidelines**: `cursor/BUGBOT.md` - PR review guidelines
+- **Bugbot guidelines**: `.cursor/BUGBOT.md` - PR review guidelines
+- **Tests**: `tests/tracker-allowlist-tests.js` - Unit tests enforcing ordering, propagation, and duplicate detection
 
 ## Table of Contents
 
@@ -27,9 +28,9 @@ Tracker Allowlist is used to allow specific tracker requests that would normally
     - 2.1. How the Matching Algorithm Works: First Match Wins Principle
     - 2.2. Rule Specificity and Ordering: when order matters vs. doesn't matter
     - 2.3. Domain Propagation: when duplicating domain is required
-    - 2.4. The `<all>` Specifier: essential considerations
-  - 4. Cross-Entity Coverage
-  - 5. Domain-Wide Exceptions
+    - 2.4. The `<all>` Specifier
+  - 3. Cross-Entity Coverage
+  - 4. Domain-Wide Exceptions
 
 ## Quick Cheat Sheet
 
@@ -57,13 +58,13 @@ Tracker Allowlist is used to allow specific tracker requests that would normally
 6. Add the site domain to all rules that share the same prefix
    - Example: If you add "site.com" to "tracker.com/api", also add it to any more-specific rule such as "tracker.com/api/endpoint"
    - see 2.3. Domain Propagation
-   - Should this apply to all domains? Use `<all>` if appropriate (domain propagation not needed when using `<all>`) see 2.4. The `<all>` Specifier
+   - Should this apply to all domains? Use `<all>` if appropriate — but `<all>` must also be propagated to more-specific rules. See 2.4. The `<all>` Specifier
 ↓
 7. Multi-country/sibling sites might be affected? → Consider cross-entity coverage
-   - see 4. Cross-Entity Coverage
+   - see 3. Cross-Entity Coverage
 ↓
 8. Domain-wide exception needed? → Avoid if possible; document thoroughly if required
-   - see 5. Domain-Wide Exceptions
+   - see 4. Domain-Wide Exceptions
 
 
 ### Reference Tracker Rule Set
@@ -75,7 +76,7 @@ Tracker Allowlist is used to allow specific tracker requests that would normally
       "rule": "tracker.com/static/widget.js/config/analytics",  // Most specific first
       "domains": [
         "site1.com",
-        "site3.com" // Add site3.com so domain propagation can work
+        "site3.com" // site3.com propagated from less-specific rule below
       ],
       "reason": [
         "site1.com - https://github.com/duckduckgo/privacy-configuration/pull/1111",
@@ -83,7 +84,7 @@ Tracker Allowlist is used to allow specific tracker requests that would normally
       ]
     },
     {
-      "rule": "tracker.com/static/widget.js/config",  // Less specific, shares prefix, the original tracker intended to allow on site3.com
+      "rule": "tracker.com/static/widget.js/config",  // Less specific, shares prefix
       "domains": [
         "site3.com"
       ],
@@ -92,14 +93,7 @@ Tracker Allowlist is used to allow specific tracker requests that would normally
       ]
     },
     {
-      "rule": "tracker.com/static/widget.js",  // Least specific, shares prefix
-      "domains": [
-        "<all>" // no need to add specific domain, <all> covers all domains
-      ],
-      "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4444"
-    },
-    {
-      "rule": "tracker.com/api/collect",  // Different prefix, order doesn't matter
+      "rule": "tracker.com/api/collect",  // Different path, order doesn't matter
       "domains": [
         "site2.com"
       ],
@@ -165,12 +159,12 @@ The algorithm follows a "first match wins" principle: it checks rules from top t
     "rules": [
       {
         "rule": "tracker.com/api/analytics", // Most specific first
-        "domains": ["site1.com"],
+        "domains": ["site1.com", "site2.com"],
         "reason": ["site1.com - https://github.com/duckduckgo/privacy-configuration/issues/1111"]
       },
       {
         "rule": "tracker.com/api", // Less specific second
-        "domains": ["<all>"],
+        "domains": ["site2.com"],
         "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2222"
       }
     ]
@@ -179,7 +173,7 @@ The algorithm follows a "first match wins" principle: it checks rules from top t
 ```
 
 - `tracker.com/api/analytics` on `site1.com`: Matches first rule → `site1.com` in list → **allowed**
-- `tracker.com/api/other` on any site: Doesn't match first rule, matches second rule → `<all>` applies → **allowed** 
+- `tracker.com/api/other` on `site2.com`: Doesn't match first rule, matches second rule → `site2.com` in list → **allowed** 
 
 ### 2.2. Rule Specificity and Ordering: when order matters vs. doesn't matter
 
@@ -188,6 +182,8 @@ Order matters only if two rules could match the same tracker request. The more s
 A rule is more specific if:
 - it uses a subdomain (e.g., `www.example.com` is more specific than `example.com`)
 - or it has a longer path (e.g., `example.com/foo/bar` is more specific than `example.com/foo`)
+
+**Note:** Prefix matching is string-based, not segment-based. This means `example.com/products` is a prefix of `example.com/products-new` (not just `example.com/products/`), so `products-new` is considered more specific than `products` and ordering matters between them.
 
 If two rules can't match the same tracker request then their order does not matter:
 - `sub.example.com` vs `api.example.com` are different domains
@@ -265,71 +261,17 @@ This applies the "first match wins" principle. If a request matches a more-speci
 
 **Fixed:** Unlike the previous example, `site2.com` is now in the more specific rule's domain list. As a result, `tracker.com/api` is now **allowed** on `site2.com` as intended ✓.
 
-**Note**: Domain propagation is only needed when both rules have specific domain lists (no `<all>`; because it already covers all domain)
+### 2.4. The `<all>` Specifier
 
-### 2.4. The `<all>` Specifier: essential considerations
+The `<all>` specifier allows the request for any site domain. It follows the same propagation rules as specific domains: if a less-specific rule uses `<all>`, all more-specific rules sharing that prefix must also use `<all>`. Otherwise, the more-specific rule will match first and block `<all>` domains that the less-specific rule intended to allow.
 
-The `<all>` specifier is treated as if every domain were specified in the list. This means a rule with `<all>` will allow the request for any site domain.
-
-**Example 1: More-specific rule has a site domain, less-specific rule has <all>**
-```json
-{
-  "tracker.com": {
-    "rules": [
-      {
-        "rule": "tracker.com/api/analytics", // only allowed on site1.com
-        "domains": ["site1.com"],
-        "reason": ["site1.com - https://github.com/duckduckgo/privacy-configuration/issues/1111"]
-      },
-      {
-        "rule": "tracker.com/api", // allowed on all domains
-        "domains": ["<all>"],
-        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2222"
-      }
-    ]
-  }
-}
-```
-**Key insight:** The first rule restricts the `analytics` path to `site1.com` only, while the second rule with `<all>` acts as a catch-all for other paths:
-- Anything under `tracker.com/api/analytics/*` is restricted to `site1.com` only (matches first rule)
-- Anything under `tracker.com/api/*` that doesn't start with `analytics` is allowed on all domains (matches second rule with `<all>`)
-- Consequently, `tracker.com/api/analytics` from `any-other-site.com` matches the first rule, but the domain is not in that rule's list → **blocked** ✗
-
-**Example 2: More-specific rule has <all>, less-specific rule has a site domain**
-
-```json
-{
-  "tracker.com": {
-    "rules": [
-      {
-        "rule": "tracker.com/api/specific", // allowed on all domains
-        "domains": ["<all>"],
-        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3333"
-      },
-      {
-        "rule": "tracker.com/api", // only allowed on site1.com
-        "domains": ["site1.com"],
-        "reason": ["site1.com - https://github.com/duckduckgo/privacy-configuration/issues/4444"]
-      }
-    ]
-  }
-}
-```
-
-**Key insight:** The more-specific rule with `<all>` allows all domains for that path, while the less-specific rule restricts other paths to specific domains:
-- Anything under `tracker.com/api/specific/*` is **allowed on all domains** (matches first rule with `<all>`)
-- Anything under `tracker.com/api/*` that doesn't start with `specific` is restricted to `site1.com` only (matches second rule)
-- When any site requests `tracker.com/api/specific`, it matches the first rule → `<all>` applies, request is **allowed** ✓
-
-**Important:** Make sure the more-specific rule comes first. If the less-specific rule comes first, requests to `tracker.com/api/specific` will match the less-specific rule first and be blocked for domains not in that rule's list, preventing the more-specific rule with `<all>` from being reached.
-
-### 4. Cross-Entity Coverage
+### 3. Cross-Entity Coverage
 
 - **Multi-country brands:** Consider adding mitigations across country sites (e.g., `vinted.com`, `vinted.fr`, `vinted.de`)
 
 - **Sibling sites under same parent company:** Check if breakage exists, then consider adding coverage across a business group
 
-### 5. Domain-Wide Exceptions
+### 4. Domain-Wide Exceptions
 
 A domain-wide exception is added to the `"exceptions"` array of the `features/content-blocking.json` file. This allows all tracker requests from that domain without restriction, which is why it should be avoided.
 **Avoid whenever possible.** If you must add one, make sure your PR clearly explains the reason, including whether this is part of a speculative mitigation experiment.

@@ -1,10 +1,6 @@
 {
     "_meta": {
-        "description": "Hide empty ad slots.",
-        "sampleExcludeRecords": {
-            "domain": "example.com",
-            "reason": "site breakage"
-        }
+        "description": "Hide empty ad slots."
     },
     "exceptions": [
         {
@@ -752,6 +748,15 @@
                 ]
             },
             {
+                "domain": "all-models.top",
+                "rules": [
+                    {
+                        "selector": "#banner_ad",
+                        "type": "override"
+                    }
+                ]
+            },
+            {
                 "domain": "allgemeine-zeitung.de",
                 "rules": [
                     {
@@ -784,6 +789,23 @@
                 ]
             },
             {
+                "domain": "amateurphotographer.com",
+                "rules": [
+                    {
+                        "selector": ".header-ad",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".post-content-ad",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".side-ad",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
                 "domain": "androidauthority.com",
                 "rules": [
                     {
@@ -798,6 +820,15 @@
                     {
                         "selector": "[class*='ad-zone']",
                         "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "aol.com",
+                "rules": [
+                    {
+                        "selector": ".m-gam__container",
+                        "type": "hide-empty"
                     }
                 ]
             },
@@ -1040,6 +1071,15 @@
                 ]
             },
             {
+                "domain": "business-standard.com",
+                "rules": [
+                    {
+                        "selector": ".advertisement-bg",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
                 "domain": "businessinsider.com",
                 "rules": [
                     {
@@ -1264,6 +1304,27 @@
                 ]
             },
             {
+                "domain": "ctinsider.com",
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    },
+                    {
+                        "selector": "[data-block-type='ad']",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "ctvnews.ca",
+                "rules": [
+                    {
+                        "selector": "[class*='-ads-custom']",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
                 "domain": "cubbyathome.com",
                 "rules": [
                     {
@@ -1409,11 +1470,15 @@
                         "type": "hide"
                     },
                     {
-                        "selector": ".jupiter-placement-middle-module_content__Z4Fc0",
+                        "selector": "[class^='jupiter-placement-sticky-header-module']",
                         "type": "hide-empty"
                     },
                     {
-                        "selector": ".jupiter-placement-middle_content__mxFQ3",
+                        "selector": "[class^='jupiter-placement-middle-module']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[class^='jupiter-placement-sticky-footer-module']",
                         "type": "hide-empty"
                     },
                     {
@@ -1957,6 +2022,10 @@
                         "type": "hide"
                     },
                     {
+                        "selector": "div:has(> iframe[src='about:blank'][name='callout'])",
+                        "type": "hide"
+                    },
+                    {
                         "selector": "[aria-labelledby='promo-header']",
                         "type": "hide"
                     },
@@ -2177,6 +2246,18 @@
                     {
                         "selector": ".paisa-wrapper",
                         "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".mPws3.d_jsH",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "._MxBD",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".mgid_second_mrec_parent",
+                        "type": "hide-empty"
                     }
                 ]
             },
@@ -2186,6 +2267,19 @@
                     {
                         "selector": "[id*='thirdparty']",
                         "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "inews.co.uk",
+                "rules": [
+                    {
+                        "selector": ".inews__advert",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": ".inews__post-section__leaderboard-ad",
+                        "type": "closest-empty"
                     }
                 ]
             },
@@ -2229,6 +2323,36 @@
                     {
                         "selector": ".ad-wrapper",
                         "type": "override"
+                    }
+                ]
+            },
+            {
+                "domain": "japantimes.co.jp",
+                "rules": [
+                    {
+                        "selector": "#header_ad_id",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".DisplayAd",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "joemonster.org",
+                "rules": [
+                    {
+                        "selector": ".right-column-rectangle-advert",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "#rightSky",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".rectangleAdvert",
+                        "type": "hide-empty"
                     }
                 ]
             },
@@ -2349,6 +2473,24 @@
                     {
                         "selector": ".dfp__container",
                         "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "lifehacker.com",
+                "rules": [
+                    {
+                        "selector": ".zmgad-full-width",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "lifestories7.com",
+                "rules": [
+                    {
+                        "selector": "#zdn-adblock-overlay",
+                        "type": "hide"
                     }
                 ]
             },
@@ -2497,6 +2639,15 @@
                 ]
             },
             {
+                "domain": "mashable.com",
+                "rules": [
+                    {
+                        "selector": ".zmgad-full-width",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
                 "domain": "messenger.com",
                 "rules": [
                     {
@@ -2513,6 +2664,19 @@
                     },
                     {
                         "selector": ".ad-slot-container",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "mini2.com",
+                "rules": [
+                    {
+                        "selector": "[id^='RightRail_']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".primis-wrapper",
                         "type": "hide-empty"
                     }
                 ]
@@ -2578,6 +2742,23 @@
                     },
                     {
                         "selector": "#mw_all_1r_gam",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "mumsnet.com",
+                "rules": [
+                    {
+                        "selector": "[data-v-app]",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[data-id^='feed-ad-']",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": "[class*='advertisement']",
                         "type": "closest-empty"
                     }
                 ]
@@ -2760,6 +2941,19 @@
                 "rules": [
                     {
                         "selector": ".DFPad",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "northwichguardian.co.uk",
+                "rules": [
+                    {
+                        "selector": ".ad-sticky",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[data-uses-js='dfp-top-ad-fixed']",
                         "type": "hide-empty"
                     }
                 ]
@@ -3213,6 +3407,21 @@
                 ]
             },
             {
+                "domain": "app.rippling.com",
+                "rules": [
+                    {
+                        "selector": "body",
+                        "type": "modify-style",
+                        "values": [
+                            {
+                                "property": "height",
+                                "value": "auto"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
                 "domain": "rumble.com",
                 "rules": [
                     {
@@ -3244,6 +3453,18 @@
                 "rules": [
                     {
                         "selector": "[class*='ad-block']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "scimagojr.com",
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    },
+                    {
+                        "selector": ".contentAds",
                         "type": "hide-empty"
                     }
                 ]
@@ -3413,6 +3634,18 @@
                 "rules": [
                     {
                         "selector": ".ptgncdn_holder",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "speedweek.com",
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    },
+                    {
+                        "selector": "[style^='--ad-placeholder-width']",
                         "type": "hide"
                     }
                 ]
@@ -3646,6 +3879,43 @@
                 ]
             },
             {
+                "domain": "timesofmalta.com",
+                "rules": [
+                    {
+                        "selector": "[class*='Advert']",
+                        "type": "modify-style",
+                        "values": [
+                            {
+                                "property": "display",
+                                "value": "none"
+                            }
+                        ]
+                    },
+                    {
+                        "selector": "#ad-banner",
+                        "type": "modify-style",
+                        "values": [
+                            {
+                                "property": "display",
+                                "value": "none"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "domain": "timesunion.com",
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    },
+                    {
+                        "selector": "[data-block-type='ad']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
                 "domain": "tinybeans.com",
                 "rules": [
                     {
@@ -3770,6 +4040,15 @@
                     {
                         "selector": ".model-base-bnr",
                         "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "upi.com",
+                "rules": [
+                    {
+                        "selector": ".playwire-ad-unit",
+                        "type": "closest-empty"
                     }
                 ]
             },
@@ -3965,6 +4244,14 @@
                     },
                     {
                         "selector": "ul.flex > li.relative",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[data-pw='top-center-ad']",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": "[id^='sda-WFPAD-'], .native-ad-item, .stream-ad",
                         "type": "hide-empty"
                     }
                 ]
@@ -4415,6 +4702,36 @@
                     {
                         "type": "hide-empty",
                         "selector": ".consumption-page-banner-ad"
+                    },
+                    {
+                        "type": "hide",
+                        "selector": "views-promo-card:first-of-type"
+                    }
+                ]
+            },
+            {
+                "domain": "okdiario.com",
+                "rules": [
+                    {
+                        "type": "hide-empty",
+                        "selector": ".publicidad"
+                    },
+                    {
+                        "type": "hide-empty",
+                        "selector": ".ad-slot-ph"
+                    },
+                    {
+                        "type": "hide-empty",
+                        "selector": ".catfish-space"
+                    }
+                ]
+            },
+            {
+                "domain": "n-tv.de",
+                "rules": [
+                    {
+                        "type": "hide-empty",
+                        "selector": "[class^='Ada_wrapper']"
                     }
                 ]
             }

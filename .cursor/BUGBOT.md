@@ -31,12 +31,16 @@
 - **Rule File**: `.cursor/rules/tracker-allowlist.mdc` - Mitigation Guidance
 - **Schema**: `schema/features/tracker-allowlist.ts` - TypeScript type definitions
 - **Configuration**: `features/tracker-allowlist.json` - Tracker allowlist rule definitions
+- **Tests**: `tests/tracker-allowlist-tests.js` - Unit tests enforcing ordering, propagation, and duplicate detection
+- **Matching algorithm**: [tracker_allowlist_matching_tests.json](https://github.com/duckduckgo/privacy-reference-tests/blob/main/tracker-radar-tests/TR-domain-matching/tracker_allowlist_matching_tests.json) - Client matching is subdomain-aware, not pure string prefix. A subdomain rule does not match the parent domain.
 
 ## Adding New Features to Bugbot
 
 ### Template for New Feature Validation
-When adding new features to this repository, follow this pattern:
+When adding new features to this repository, the following are **entirely optional** and should only be done when clearly beneficial:
 
-1. **Create `.cursor/rules/new-feature.mdc`** for developer guidance
+- **Add a reference section to this `BUGBOT.md`** with links to the schema and configuration — only if the feature has specific validation concerns that the bot should check for.
 
-2. **Add a reference section to this `BUGBOT.md`** with links to the rule file, schema, and configuration (see Element Hiding or Request Blocklist sections as examples)
+- **Create a `.cursor/rules/new-feature.mdc`** — only if the feature has complex validation logic or non-obvious configuration patterns. Most features do not need one.
+
+Do **not** flag PRs for missing documentation files.
