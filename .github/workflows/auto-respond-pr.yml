@@ -118,6 +118,75 @@ jobs:
             - name: Create JSON approval analysis
               run: node pr/.github/scripts/json-diff-directories.js base/generated pr/generated > approval_output.txt
 
+            - name: Analyze branch content for tagging
+              id: content_tags
+              run: |
+                  node pr/.github/scripts/branch-content-tagging.js base/generated pr/generated > tagging_output.txt 2> tagging_json.txt
+                  echo "Tagging output:"
+                  cat tagging_output.txt
+
+                  PLATFORMS=$(node -e "const d = JSON.parse(require('fs').readFileSync('tagging_json.txt','utf8')); console.log(d.platforms.join(','))")
+                  echo "platforms=$PLATFORMS" >> $GITHUB_OUTPUT
+
+                  HAS_FEATURE_CHANGES=$(node -e "const d = JSON.parse(require('fs').readFileSync('tagging_json.txt','utf8')); console.log(d.featureChanges.length > 0)")
+                  echo "has_feature_changes=$HAS_FEATURE_CHANGES" >> $GITHUB_OUTPUT
+
+            - name: Apply platform labels
+              if: steps.content_tags.outputs.platforms != ''
+              uses: actions/github-script@v8
+              with:
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  script: |
+                      const platforms = '${{ steps.content_tags.outputs.platforms }}'.split(',').filter(Boolean);
+                      const labelMap = {
+                          windows: 'platform: windows',
+                          macos: 'platform: macOS',
+                          ios: 'platform: iOS',
+                          android: 'platform: android',
+                          extension: 'platform: extension',
+                      };
+
+                      const labels = platforms.map(p => labelMap[p]).filter(Boolean);
+                      if (labels.length === 0) return;
+
+                      const owner = context.repo.owner;
+                      const repo = context.repo.repo;
+
+                      for (const label of labels) {
+                          try {
+                              await github.rest.issues.getLabel({ owner, repo, name: label });
+                          } catch {
+                              await github.rest.issues.createLabel({
+                                  owner, repo, name: label,
+                                  color: label.includes('windows') ? '0078D4' :
+                                         label.includes('macOS')   ? '999999' :
+                                         label.includes('iOS')     ? '000000' :
+                                         label.includes('android') ? '3DDC84' :
+                                         label.includes('extension') ? 'FF6600' : 'EDEDED',
+                              });
+                          }
+                      }
+
+                      const { data: currentLabels } = await github.rest.issues.listLabelsOnIssue({
+                          owner, repo, issue_number: context.payload.pull_request.number,
+                      });
+                      const currentPlatformLabels = currentLabels.map(l => l.name).filter(n => n.startsWith('platform: '));
+
+                      const toRemove = currentPlatformLabels.filter(l => !labels.includes(l));
+                      for (const label of toRemove) {
+                          await github.rest.issues.removeLabel({
+                              owner, repo, issue_number: context.payload.pull_request.number, name: label,
+                          });
+                      }
+
+                      if (labels.length > 0) {
+                          await github.rest.issues.addLabels({
+                              owner, repo, issue_number: context.payload.pull_request.number, labels,
+                          });
+                      }
+
+                      console.log(`Applied platform labels: ${labels.join(', ')}`);
+
             - name: Check changed files
               id: check_files
               run: |
@@ -152,6 +221,15 @@ jobs:
                   else
                     echo "approved=false" >> $GITHUB_OUTPUT
                   fi
+
+            - name: Find Previous Content Tags Comment
+              uses: peter-evans/find-comment@v3
+              id: find_tags_comment
+              with:
+                  issue-number: ${{ github.event.pull_request.number }}
+                  comment-author: 'github-actions[bot]'
+                  body-includes: 'Branch content analysis'
+                  direction: last
 
             - name: Find Previous Diff Comment
               uses: peter-evans/find-comment@v3
@@ -279,6 +357,30 @@ jobs:
                           commentBody = '❌ Approval analysis output is too large to post as a comment, run locally to see the analysis and validate'
                       }
                       core.setOutput('comment_body', commentBody);
+
+            - name: Create Content Tags Comment Body
+              uses: actions/github-script@v8
+              id: create_tags_body
+              with:
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  script: |
+                      const fs = require('fs');
+                      const taggingOutput = fs.readFileSync('tagging_output.txt', 'utf8').trim();
+                      if (!taggingOutput) {
+                          core.setOutput('comment_body', '');
+                          return;
+                      }
+                      const commentBody = `### Branch content analysis\n*Time updated:* ${new Date().toUTCString()}\n\n${taggingOutput}`;
+                      core.setOutput('comment_body', commentBody);
+
+            - name: Create, or Update the Content Tags Comment
+              if: steps.create_tags_body.outputs.comment_body != ''
+              uses: peter-evans/create-or-update-comment@v4
+              with:
+                  issue-number: ${{ github.event.pull_request.number }}
+                  comment-id: ${{ steps.find_tags_comment.outputs.comment-id }}
+                  body: ${{ steps.create_tags_body.outputs.comment_body }}
+                  edit-mode: replace
 
             - name: Create, or Update the Diff Comment
               uses: peter-evans/create-or-update-comment@v4
