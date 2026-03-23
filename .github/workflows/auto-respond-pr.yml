@@ -132,7 +132,6 @@ jobs:
                   echo "has_feature_changes=$HAS_FEATURE_CHANGES" >> $GITHUB_OUTPUT
 
             - name: Apply platform labels
-              if: steps.content_tags.outputs.platforms != ''
               uses: actions/github-script@v8
               with:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -147,7 +146,6 @@ jobs:
                       };
 
                       const labels = platforms.map(p => labelMap[p]).filter(Boolean);
-                      if (labels.length === 0) return;
 
                       const owner = context.repo.owner;
                       const repo = context.repo.repo;
@@ -381,6 +379,18 @@ jobs:
                   comment-id: ${{ steps.find_tags_comment.outputs.comment-id }}
                   body: ${{ steps.create_tags_body.outputs.comment_body }}
                   edit-mode: replace
+
+            - name: Delete stale Content Tags Comment
+              if: steps.create_tags_body.outputs.comment_body == '' && steps.find_tags_comment.outputs.comment-id != ''
+              uses: actions/github-script@v8
+              with:
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  script: |
+                      await github.rest.issues.deleteComment({
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          comment_id: ${{ steps.find_tags_comment.outputs.comment-id }},
+                      });
 
             - name: Create, or Update the Diff Comment
               uses: peter-evans/create-or-update-comment@v4
