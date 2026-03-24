@@ -177,7 +177,6 @@ describe('Config schema tests', () => {
                     }
                 }
             });
-
         });
     }
 
