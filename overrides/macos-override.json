@@ -841,11 +841,10 @@
                         "inputTypeSettings": [],
                         "formBoundarySelector": "",
                         "failsafeSettings": {},
-                        "domains": [
+                        "conditionalChanges": [
                             {
-                                "domain": [
-                                    "ring.com"
-                                ],
+                                "condition": [
+                                    { "domain": "ring.com" }],
                                 "patchSettings": [
                                     {
                                         "path": "/formTypeSettings/-",
@@ -858,9 +857,8 @@
                                 ]
                             },
                             {
-                                "domain": [
-                                    "coolors.co"
-                                ],
+                                "condition": [
+                                    { "domain": "coolors.co" }],
                                 "patchSettings": [
                                     {
                                         "path": "/failsafeSettings/maxInputsPerPage",
@@ -870,9 +868,8 @@
                                 ]
                             },
                             {
-                                "domain": [
-                                    "www.joinblvd.com"
-                                ],
+                                "condition": [
+                                    { "domain": "www.joinblvd.com" }],
                                 "patchSettings": [
                                     {
                                         "path": "/formTypeSettings/-",
@@ -885,9 +882,8 @@
                                 ]
                             },
                             {
-                                "domain": [
-                                    "alibris.com"
-                                ],
+                                "condition": [
+                                    { "domain": "alibris.com" }],
                                 "patchSettings": [
                                     {
                                         "path": "/formTypeSettings/-",
@@ -908,9 +904,8 @@
                                 ]
                             },
                             {
-                                "domain": [
-                                    "areaclientes.orange.es"
-                                ],
+                                "condition": [
+                                    { "domain": "areaclientes.orange.es" }],
                                 "patchSettings": [
                                     {
                                         "path": "/formTypeSettings/-",
@@ -923,10 +918,9 @@
                                 ]
                             },
                             {
-                                "domain": [
-                                    "estore.archives.gov",
-                                    "localhost"
-                                ],
+                                "condition": [
+                                    { "domain": "estore.archives.gov" },
+                                    { "domain": "localhost" }],
                                 "patchSettings": [
                                     {
                                         "path": "/formTypeSettings/-",
@@ -939,10 +933,9 @@
                                 ]
                             },
                             {
-                                "domain": [
-                                    "zendesk.com",
-                                    "localhost"
-                                ],
+                                "condition": [
+                                    { "domain": "zendesk.com" },
+                                    { "domain": "localhost" }],
                                 "patchSettings": [
                                     {
                                         "path": "/inputTypeSettings/-",
@@ -955,9 +948,8 @@
                                 ]
                             },
                             {
-                                "domain": [
-                                    "cvs.com"
-                                ],
+                                "condition": [
+                                    { "domain": "cvs.com" }],
                                 "patchSettings": [
                                     {
                                         "path": "/inputTypeSettings/-",
@@ -970,9 +962,8 @@
                                 ]
                             },
                             {
-                                "domain": [
-                                    "att.com"
-                                ],
+                                "condition": [
+                                    { "domain": "att.com" }],
                                 "patchSettings": [
                                     {
                                         "path": "/inputTypeSettings/-",
@@ -985,9 +976,8 @@
                                 ]
                             },
                             {
-                                "domain": [
-                                    "gamestop.com"
-                                ],
+                                "condition": [
+                                    { "domain": "gamestop.com" }],
                                 "patchSettings": [
                                     {
                                         "path": "/inputTypeSettings/-",
@@ -1008,9 +998,20 @@
                                 ]
                             },
                             {
-                                "domain": [
-                                    "asana.com"
-                                ],
+                                "condition": {
+                                    "urlPattern": "https://identity.gamestop.com/interaction/:uid"
+                                },
+                                "patchSettings": [
+                                    {
+                                        "path": "/formBoundarySelector",
+                                        "op": "replace",
+                                        "value": ".gamestop-card__root"
+                                    }
+                                ]
+                            },
+                            {
+                                "condition": [
+                                    { "domain": "asana.com" }],
                                 "patchSettings": [
                                     {
                                         "path": "/inputTypeSettings/-",
@@ -1023,9 +1024,8 @@
                                 ]
                             },
                             {
-                                "domain": [
-                                    "portal.vectorsecurity.com"
-                                ],
+                                "condition": [
+                                    { "domain": "portal.vectorsecurity.com" }],
                                 "patchSettings": [
                                     {
                                         "path": "/formTypeSettings/-",
@@ -1038,9 +1038,8 @@
                                 ]
                             },
                             {
-                                "domain": [
-                                    "reddit.com"
-                                ],
+                                "condition": [
+                                    { "domain": "reddit.com" }],
                                 "patchSettings": [
                                     {
                                         "path": "/formTypeSettings/-",
@@ -1053,9 +1052,8 @@
                                 ]
                             },
                             {
-                                "domain": [
-                                    "netflix.com"
-                                ],
+                                "condition": [
+                                    { "domain": "netflix.com" }],
                                 "patchSettings": [
                                     {
                                         "path": "/formTypeSettings/-",
@@ -1073,9 +1071,8 @@
                                 ]
                             },
                             {
-                                "domain": [
-                                    "aa.com"
-                                ],
+                                "condition": [
+                                    { "domain": "aa.com" }],
                                 "patchSettings": [
                                     {
                                         "path": "/formBoundarySelector",
@@ -1085,22 +1082,20 @@
                                 ]
                             },
                             {
-                                "domain": [
-                                    "bet365.bet.br",
-                                    "bet365.com"
-                                ],
+                                "condition": [
+                                    { "domain": "bet365.bet.br" },
+                                    { "domain": "bet365.com" }],
                                 "patchSettings": [
                                     {
                                         "path": "/formBoundarySelector",
                                         "op": "replace",
-                                        "value": "div[style*=transform] > div"
+                                        "value": "div.slm2-d"
                                     }
                                 ]
                             },
                             {
-                                "domain": [
-                                    "order.yodobashi.com"
-                                ],
+                                "condition": [
+                                    { "domain": "order.yodobashi.com" }],
                                 "patchSettings": [
                                     {
                                         "path": "/formTypeSettings/-",
@@ -1118,9 +1113,8 @@
                                 ]
                             },
                             {
-                                "domain": [
-                                    "accounts.google.com"
-                                ],
+                                "condition": [
+                                    { "domain": "accounts.google.com" }],
                                 "patchSettings": [
                                     {
                                         "path": "/formBoundarySelector",
@@ -1138,9 +1132,8 @@
                                 ]
                             },
                             {
-                                "domain": [
-                                    "challenge.spotify.com"
-                                ],
+                                "condition": [
+                                    { "domain": "challenge.spotify.com" }],
                                 "patchSettings": [
                                     {
                                         "path": "/inputTypeSettings/-",
@@ -1153,9 +1146,8 @@
                                 ]
                             },
                             {
-                                "domain": [
-                                    "login.coinbase.com"
-                                ],
+                                "condition": [
+                                    { "domain": "login.coinbase.com" }],
                                 "patchSettings": [
                                     {
                                         "path": "/inputTypeSettings/-",
@@ -1176,9 +1168,8 @@
                                 ]
                             },
                             {
-                                "domain": [
-                                    "signin.autodesk.com"
-                                ],
+                                "condition": [
+                                    { "domain": "signin.autodesk.com" }],
                                 "patchSettings": [
                                     {
                                         "path": "/inputTypeSettings/-",
@@ -1197,9 +1188,7 @@
                                         }
                                     }
                                 ]
-                            }
-                        ],
-                        "conditionalChanges": [
+                            },
                             {
                                 "condition": {
                                     "urlPattern": "https://visa.vfsglobal.com/tur/tr/bgr/login*"
