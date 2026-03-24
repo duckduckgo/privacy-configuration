@@ -190,10 +190,12 @@ const dir2 = process.argv[3];
 
 if (!fs.existsSync(`${dir1}/v${CURRENT_CONFIG_VERSION}`)) {
     console.log(`New config version: v${CURRENT_CONFIG_VERSION}`);
-    console.error(JSON.stringify({
-        platforms: [],
-        featureChanges: [],
-    }));
+    console.error(
+        JSON.stringify({
+            platforms: [],
+            featureChanges: [],
+        }),
+    );
     process.exit(0);
 }
 

@@ -316,7 +316,11 @@ describe('Branch content tagging CLI regressions', () => {
                 'v4/extension-config.json': JSON.stringify({ features: {}, version: 4 }, null, 4),
             });
             writeGeneratedTree(prGeneratedDir, {
-                [`v${CURRENT_CONFIG_VERSION}/extension-config.json`]: JSON.stringify({ features: {}, version: CURRENT_CONFIG_VERSION }, null, 4),
+                [`v${CURRENT_CONFIG_VERSION}/extension-config.json`]: JSON.stringify(
+                    { features: {}, version: CURRENT_CONFIG_VERSION },
+                    null,
+                    4,
+                ),
             });
 
             const stdout = execFileSync(
