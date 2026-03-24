@@ -1,7 +1,7 @@
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import { execFileSync } from 'child_process';
+import { execFileSync, spawnSync } from 'child_process';
 import { expect } from 'chai';
 import { analyzePatchesForApproval, generateChangeSummary } from '../automation-utils.js';
 import { CURRENT_CONFIG_VERSION } from '../constants.js';
@@ -323,7 +323,7 @@ describe('Branch content tagging CLI regressions', () => {
                 ),
             });
 
-            const stdout = execFileSync(
+            const scriptResult = spawnSync(
                 'node',
                 [
                     path.join(import.meta.dirname, '..', '.github', 'scripts', 'branch-content-tagging.js'),
@@ -333,15 +333,11 @@ describe('Branch content tagging CLI regressions', () => {
                 {
                     cwd: path.join(import.meta.dirname, '..'),
                     encoding: 'utf-8',
-                    stdio: [
-                        'ignore',
-                        'pipe',
-                        'pipe',
-                    ],
                 },
             );
 
-            expect(stdout).to.include(`New config version: v${CURRENT_CONFIG_VERSION}`);
+            expect(scriptResult.status).to.equal(0);
+            expect(scriptResult.stdout).to.include(`New config version: v${CURRENT_CONFIG_VERSION}`);
 
             try {
                 execFileSync(
@@ -356,23 +352,7 @@ describe('Branch content tagging CLI regressions', () => {
                         `,
                     ],
                     {
-                        input: execFileSync(
-                            'node',
-                            [
-                                path.join(import.meta.dirname, '..', '.github', 'scripts', 'branch-content-tagging.js'),
-                                baseGeneratedDir,
-                                prGeneratedDir,
-                            ],
-                            {
-                                cwd: path.join(import.meta.dirname, '..'),
-                                encoding: 'utf-8',
-                                stdio: [
-                                    'ignore',
-                                    'ignore',
-                                    'pipe',
-                                ],
-                            },
-                        ),
+                        input: scriptResult.stderr,
                     },
                 );
             } catch (error) {
