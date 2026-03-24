@@ -1,5 +1,10 @@
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
+import { execFileSync } from 'child_process';
 import { expect } from 'chai';
 import { analyzePatchesForApproval, generateChangeSummary } from '../automation-utils.js';
+import { CURRENT_CONFIG_VERSION } from '../constants.js';
 
 describe('Auto-approval logic tests', () => {
     const testCases = [
@@ -283,5 +288,94 @@ describe('generateChangeSummary specific tests', () => {
         expect(summary.otherChanges).to.equal(0);
         expect(Object.keys(summary.byOperation)).to.have.length(0);
         expect(Object.keys(summary.byPath)).to.have.length(0);
+    });
+});
+
+describe('Branch content tagging CLI regressions', () => {
+    function writeGeneratedTree(rootDir, files) {
+        for (const [
+            relativePath,
+            contents,
+        ] of Object.entries(files)) {
+            const filePath = path.join(rootDir, relativePath);
+            fs.mkdirSync(path.dirname(filePath), { recursive: true });
+            fs.writeFileSync(filePath, contents);
+        }
+    }
+
+    it('emits valid JSON to stderr when the base branch lacks the latest config version directory', () => {
+        const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'branch-content-tagging-'));
+        const baseGeneratedDir = path.join(tempRoot, 'base-generated');
+        const prGeneratedDir = path.join(tempRoot, 'pr-generated');
+
+        try {
+            fs.mkdirSync(baseGeneratedDir, { recursive: true });
+            fs.mkdirSync(prGeneratedDir, { recursive: true });
+
+            writeGeneratedTree(baseGeneratedDir, {
+                'v4/extension-config.json': JSON.stringify({ features: {}, version: 4 }, null, 4),
+            });
+            writeGeneratedTree(prGeneratedDir, {
+                [`v${CURRENT_CONFIG_VERSION}/extension-config.json`]: JSON.stringify({ features: {}, version: CURRENT_CONFIG_VERSION }, null, 4),
+            });
+
+            const stdout = execFileSync(
+                'node',
+                [
+                    path.join(import.meta.dirname, '..', '.github', 'scripts', 'branch-content-tagging.js'),
+                    baseGeneratedDir,
+                    prGeneratedDir,
+                ],
+                {
+                    cwd: path.join(import.meta.dirname, '..'),
+                    encoding: 'utf-8',
+                    stdio: [
+                        'ignore',
+                        'pipe',
+                        'pipe',
+                    ],
+                },
+            );
+
+            expect(stdout).to.include(`New config version: v${CURRENT_CONFIG_VERSION}`);
+
+            try {
+                execFileSync(
+                    'node',
+                    [
+                        '-e',
+                        `
+                            const d = JSON.parse(require('fs').readFileSync(0, 'utf8'));
+                            if (!Array.isArray(d.platforms) || !Array.isArray(d.featureChanges)) {
+                                process.exit(1);
+                            }
+                        `,
+                    ],
+                    {
+                        input: execFileSync(
+                            'node',
+                            [
+                                path.join(import.meta.dirname, '..', '.github', 'scripts', 'branch-content-tagging.js'),
+                                baseGeneratedDir,
+                                prGeneratedDir,
+                            ],
+                            {
+                                cwd: path.join(import.meta.dirname, '..'),
+                                encoding: 'utf-8',
+                                stdio: [
+                                    'ignore',
+                                    'ignore',
+                                    'pipe',
+                                ],
+                            },
+                        ),
+                    },
+                );
+            } catch (error) {
+                throw new Error(`Expected parse-safe JSON on stderr, got error: ${error.message}`);
+            }
+        } finally {
+            fs.rmSync(tempRoot, { recursive: true, force: true });
+        }
     });
 });
