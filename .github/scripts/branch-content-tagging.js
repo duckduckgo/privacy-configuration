@@ -139,63 +139,12 @@ export function analyzeConfigs(dir1, dir2) {
     };
 }
 
-export function formatOutput(analysis) {
-    const lines = [];
-
-    if (analysis.platforms.length > 0) {
-        lines.push('## Affected Platforms');
-        lines.push(analysis.platforms.map((p) => `\`${p}\``).join(', '));
-    }
-
-    if (analysis.featureChanges.length > 0) {
-        const enabled = analysis.featureChanges.filter((c) => c.to === 'enabled');
-        const disabled = analysis.featureChanges.filter((c) => c.to === 'disabled');
-        const other = analysis.featureChanges.filter((c) => c.to !== 'enabled' && c.to !== 'disabled');
-
-        if (enabled.length > 0) {
-            lines.push('');
-            lines.push('### Features/Subfeatures Enabled');
-            for (const c of enabled) {
-                lines.push(`- \`${c.feature}\` on **${c.platform}** (was: ${c.from})`);
-            }
-        }
-
-        if (disabled.length > 0) {
-            lines.push('');
-            lines.push('### Features/Subfeatures Disabled');
-            for (const c of disabled) {
-                lines.push(`- \`${c.feature}\` on **${c.platform}** (was: ${c.from})`);
-            }
-        }
-
-        if (other.length > 0) {
-            lines.push('');
-            lines.push('### Other State Changes');
-            for (const c of other) {
-                lines.push(`- \`${c.feature}\` on **${c.platform}**: ${c.from} → ${c.to}`);
-            }
-        }
-    }
-
-    return lines.join('\n');
-}
-
 export function runBranchContentTagging(dir1, dir2) {
     if (!fs.existsSync(`${dir1}/v${CURRENT_CONFIG_VERSION}`)) {
-        return {
-            analysis: {
-                platforms: [],
-                featureChanges: [],
-            },
-            output: `New config version: v${CURRENT_CONFIG_VERSION}`,
-        };
+        return { platforms: [], featureChanges: [] };
     }
 
-    const analysis = analyzeConfigs(dir1, dir2);
-    return {
-        analysis,
-        output: formatOutput(analysis),
-    };
+    return analyzeConfigs(dir1, dir2);
 }
 
 function isExecutedAsScript() {
@@ -208,13 +157,6 @@ if (isExecutedAsScript()) {
         process.exit(1);
     }
 
-    const dir1 = process.argv[2];
-    const dir2 = process.argv[3];
-    const { analysis, output } = runBranchContentTagging(dir1, dir2);
-
-    // Output human-readable summary to stdout
-    console.log(output);
-
-    // Output structured JSON to stderr for consumption by the workflow
-    console.error(JSON.stringify(analysis));
+    const analysis = runBranchContentTagging(process.argv[2], process.argv[3]);
+    console.log(JSON.stringify(analysis, null, 2));
 }

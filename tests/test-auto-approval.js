@@ -304,7 +304,7 @@ describe('Branch content tagging CLI regressions', () => {
         }
     }
 
-    it('returns empty analysis and readable output when the base branch lacks the latest config version directory', () => {
+    it('returns empty analysis when the base branch lacks the latest config version directory', () => {
         const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'branch-content-tagging-'));
         const baseGeneratedDir = path.join(tempRoot, 'base-generated');
         const prGeneratedDir = path.join(tempRoot, 'pr-generated');
@@ -325,11 +325,10 @@ describe('Branch content tagging CLI regressions', () => {
             });
 
             const result = runBranchContentTagging(baseGeneratedDir, prGeneratedDir);
-            expect(result.analysis).to.deep.equal({
+            expect(result).to.deep.equal({
                 platforms: [],
                 featureChanges: [],
             });
-            expect(result.output).to.equal(`New config version: v${CURRENT_CONFIG_VERSION}`);
 
             const scriptResult = spawnSync(
                 'node',
@@ -345,7 +344,9 @@ describe('Branch content tagging CLI regressions', () => {
             );
 
             expect(scriptResult.status).to.equal(0);
-            expect(scriptResult.stdout).to.include(`New config version: v${CURRENT_CONFIG_VERSION}`);
+            const parsed = JSON.parse(scriptResult.stdout);
+            expect(parsed.platforms).to.deep.equal([]);
+            expect(parsed.featureChanges).to.deep.equal([]);
         } finally {
             fs.rmSync(tempRoot, { recursive: true, force: true });
         }

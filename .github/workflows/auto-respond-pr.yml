@@ -126,25 +126,16 @@ jobs:
                   script: |
                       const path = await import('node:path');
                       const { pathToFileURL } = await import('node:url');
-                      const fs = await import('node:fs/promises');
 
                       const scriptPath = path.join(process.env.GITHUB_WORKSPACE, 'pr', '.github', 'scripts', 'branch-content-tagging.js');
                       const scriptUrl = pathToFileURL(scriptPath).href;
                       const { runBranchContentTagging } = await import(scriptUrl);
-                      const {
-                          analysis,
-                          output: taggingOutput,
-                      } = runBranchContentTagging('base/generated', 'pr/generated');
+                      const analysis = runBranchContentTagging('base/generated', 'pr/generated');
 
-                      await fs.writeFile('tagging_output.txt', taggingOutput ? `${taggingOutput}\n` : '');
-
-                      console.log('Tagging output:');
-                      if (taggingOutput) {
-                          console.log(taggingOutput);
-                      }
+                      console.log('Platforms:', analysis.platforms.join(', ') || '(none)');
+                      console.log('Feature state changes:', analysis.featureChanges.length);
 
                       core.setOutput('platforms', analysis.platforms.join(','));
-                      core.setOutput('has_feature_changes', String(analysis.featureChanges.length > 0));
 
             - name: Apply platform labels
               uses: actions/github-script@v8
@@ -234,15 +225,6 @@ jobs:
                   else
                     echo "approved=false" >> $GITHUB_OUTPUT
                   fi
-
-            - name: Find Previous Content Tags Comment
-              uses: peter-evans/find-comment@v3
-              id: find_tags_comment
-              with:
-                  issue-number: ${{ github.event.pull_request.number }}
-                  comment-author: 'github-actions[bot]'
-                  body-includes: 'Branch content analysis'
-                  direction: last
 
             - name: Find Previous Diff Comment
               uses: peter-evans/find-comment@v3
@@ -370,42 +352,6 @@ jobs:
                           commentBody = '❌ Approval analysis output is too large to post as a comment, run locally to see the analysis and validate'
                       }
                       core.setOutput('comment_body', commentBody);
-
-            - name: Create Content Tags Comment Body
-              uses: actions/github-script@v8
-              id: create_tags_body
-              with:
-                  github-token: ${{ secrets.GITHUB_TOKEN }}
-                  script: |
-                      const fs = require('fs');
-                      const taggingOutput = fs.readFileSync('tagging_output.txt', 'utf8').trim();
-                      if (!taggingOutput) {
-                          core.setOutput('comment_body', '');
-                          return;
-                      }
-                      const commentBody = `### Branch content analysis\n*Time updated:* ${new Date().toUTCString()}\n\n${taggingOutput}`;
-                      core.setOutput('comment_body', commentBody);
-
-            - name: Create, or Update the Content Tags Comment
-              if: steps.create_tags_body.outputs.comment_body != ''
-              uses: peter-evans/create-or-update-comment@v4
-              with:
-                  issue-number: ${{ github.event.pull_request.number }}
-                  comment-id: ${{ steps.find_tags_comment.outputs.comment-id }}
-                  body: ${{ steps.create_tags_body.outputs.comment_body }}
-                  edit-mode: replace
-
-            - name: Delete stale Content Tags Comment
-              if: steps.create_tags_body.outputs.comment_body == '' && steps.find_tags_comment.outputs.comment-id != ''
-              uses: actions/github-script@v8
-              with:
-                  github-token: ${{ secrets.GITHUB_TOKEN }}
-                  script: |
-                      await github.rest.issues.deleteComment({
-                          owner: context.repo.owner,
-                          repo: context.repo.repo,
-                          comment_id: ${{ steps.find_tags_comment.outputs.comment-id }},
-                      });
 
             - name: Create, or Update the Diff Comment
               uses: peter-evans/create-or-update-comment@v4
