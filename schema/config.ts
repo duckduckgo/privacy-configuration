@@ -62,7 +62,6 @@ export type ConfigV5<VersionType> = {
         attributedMetrics?: AttributedMetricsFeature<VersionType>;
         autoconsent?: AutoconsentFeature<VersionType>;
         autofill?: AutofillFeature<VersionType>;
-        autofill_DDGWV?: AutofillFeature<VersionType>;
         burn?: BurnFeature<VersionType>;
         taskbar?: Taskbar<VersionType>;
         import?: ImportFeature<VersionType>;
@@ -81,7 +80,6 @@ export type ConfigV5<VersionType> = {
         webDetection?: WebDetectionFeature<VersionType>;
         webEvents?: WebEventsFeature<VersionType>;
         windowsWebviewFailures?: WindowsWebViewFailures<VersionType>;
-        windowsWebviewFailures_DDGWV?: WindowsWebViewFailures<VersionType>;
         customUserAgent?: CustomUserAgentFeature<VersionType>;
         downloadManager?: DownloadManager<VersionType>;
         elementHiding?: ElementHidingFeature<VersionType>;
