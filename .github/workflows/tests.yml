@@ -24,6 +24,7 @@ jobs:
         runs-on: ubuntu-latest
         permissions:
             contents: write
+            actions: write
         steps:
             - uses: actions/checkout@v5
               with:
@@ -68,11 +69,9 @@ jobs:
             - name: Dispatch Test rerun after auto-fix push
               if: steps.push_lint_fixes.outputs.pushed_fixes == 'true'
               env:
-                  GH_TOKEN: ${{ secrets.PRIVACY_CONFIG_PAT }}
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                   HEAD_REF: ${{ github.event.pull_request.head.ref }}
               run: |
-                  # Auto-fix pushes can miss pull_request:synchronize in this repo.
-                  # Explicitly dispatch Test so unit+lint run on the new lint-fix commit.
                   gh api \
                     --method POST \
                     -H "Accept: application/vnd.github+json" \
