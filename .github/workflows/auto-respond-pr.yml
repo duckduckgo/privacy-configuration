@@ -120,16 +120,31 @@ jobs:
 
             - name: Analyze branch content for tagging
               id: content_tags
-              run: |
-                  node pr/.github/scripts/branch-content-tagging.js base/generated pr/generated > tagging_output.txt 2> tagging_json.txt
-                  echo "Tagging output:"
-                  sed -n '1,200p' tagging_output.txt
+              uses: actions/github-script@v8
+              with:
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  script: |
+                      const path = await import('node:path');
+                      const { pathToFileURL } = await import('node:url');
+                      const fs = await import('node:fs/promises');
 
-                  PLATFORMS=$(node -e "const d = JSON.parse(require('fs').readFileSync('tagging_json.txt','utf8')); console.log(d.platforms.join(','))")
-                  echo "platforms=$PLATFORMS" >> $GITHUB_OUTPUT
+                      const scriptPath = path.join(process.env.GITHUB_WORKSPACE, 'pr', '.github', 'scripts', 'branch-content-tagging.js');
+                      const scriptUrl = pathToFileURL(scriptPath).href;
+                      const { runBranchContentTagging } = await import(scriptUrl);
+                      const {
+                          analysis,
+                          output: taggingOutput,
+                      } = runBranchContentTagging('base/generated', 'pr/generated');
 
-                  HAS_FEATURE_CHANGES=$(node -e "const d = JSON.parse(require('fs').readFileSync('tagging_json.txt','utf8')); console.log(d.featureChanges.length > 0)")
-                  echo "has_feature_changes=$HAS_FEATURE_CHANGES" >> $GITHUB_OUTPUT
+                      await fs.writeFile('tagging_output.txt', taggingOutput ? `${taggingOutput}\n` : '');
+
+                      console.log('Tagging output:');
+                      if (taggingOutput) {
+                          console.log(taggingOutput);
+                      }
+
+                      core.setOutput('platforms', analysis.platforms.join(','));
+                      core.setOutput('has_feature_changes', String(analysis.featureChanges.length > 0));
 
             - name: Apply platform labels
               uses: actions/github-script@v8

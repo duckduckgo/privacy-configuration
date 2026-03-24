@@ -1,10 +1,13 @@
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import { execFileSync, spawnSync } from 'child_process';
+import { spawnSync } from 'child_process';
 import { expect } from 'chai';
 import { analyzePatchesForApproval, generateChangeSummary } from '../automation-utils.js';
 import { CURRENT_CONFIG_VERSION } from '../constants.js';
+import {
+    runBranchContentTagging,
+} from '../.github/scripts/branch-content-tagging.js';
 
 describe('Auto-approval logic tests', () => {
     const testCases = [
@@ -303,7 +306,7 @@ describe('Branch content tagging CLI regressions', () => {
         }
     }
 
-    it('emits valid JSON to stderr when the base branch lacks the latest config version directory', () => {
+    it('returns empty analysis and readable output when the base branch lacks the latest config version directory', () => {
         const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'branch-content-tagging-'));
         const baseGeneratedDir = path.join(tempRoot, 'base-generated');
         const prGeneratedDir = path.join(tempRoot, 'pr-generated');
@@ -323,6 +326,13 @@ describe('Branch content tagging CLI regressions', () => {
                 ),
             });
 
+            const result = runBranchContentTagging(baseGeneratedDir, prGeneratedDir);
+            expect(result.analysis).to.deep.equal({
+                platforms: [],
+                featureChanges: [],
+            });
+            expect(result.output).to.equal(`New config version: v${CURRENT_CONFIG_VERSION}`);
+
             const scriptResult = spawnSync(
                 'node',
                 [
@@ -338,26 +348,6 @@ describe('Branch content tagging CLI regressions', () => {
 
             expect(scriptResult.status).to.equal(0);
             expect(scriptResult.stdout).to.include(`New config version: v${CURRENT_CONFIG_VERSION}`);
-
-            try {
-                execFileSync(
-                    'node',
-                    [
-                        '-e',
-                        `
-                            const d = JSON.parse(require('fs').readFileSync(0, 'utf8'));
-                            if (!Array.isArray(d.platforms) || !Array.isArray(d.featureChanges)) {
-                                process.exit(1);
-                            }
-                        `,
-                    ],
-                    {
-                        input: scriptResult.stderr,
-                    },
-                );
-            } catch (error) {
-                throw new Error(`Expected parse-safe JSON on stderr, got error: ${error.message}`);
-            }
         } finally {
             fs.rmSync(tempRoot, { recursive: true, force: true });
         }

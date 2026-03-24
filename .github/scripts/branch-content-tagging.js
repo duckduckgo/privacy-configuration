@@ -64,7 +64,7 @@ function detectFeatureStateChanges(baseConfig, prConfig) {
     return changes;
 }
 
-function analyzeConfigs(dir1, dir2) {
+export function analyzeConfigs(dir1, dir2) {
     const latestPrefix = `v${CURRENT_CONFIG_VERSION}/`;
 
     const dir1Files = readFilesRecursively(dir1);
@@ -139,7 +139,7 @@ function analyzeConfigs(dir1, dir2) {
     };
 }
 
-function formatOutput(analysis) {
+export function formatOutput(analysis) {
     const lines = [];
 
     if (analysis.platforms.length > 0) {
@@ -180,29 +180,41 @@ function formatOutput(analysis) {
     return lines.join('\n');
 }
 
-if (process.argv.length !== 4) {
-    console.error('Usage: node branch-content-tagging.js <base_generated_dir> <pr_generated_dir>');
-    process.exit(1);
+export function runBranchContentTagging(dir1, dir2) {
+    if (!fs.existsSync(`${dir1}/v${CURRENT_CONFIG_VERSION}`)) {
+        return {
+            analysis: {
+                platforms: [],
+                featureChanges: [],
+            },
+            output: `New config version: v${CURRENT_CONFIG_VERSION}`,
+        };
+    }
+
+    const analysis = analyzeConfigs(dir1, dir2);
+    return {
+        analysis,
+        output: formatOutput(analysis),
+    };
 }
 
-const dir1 = process.argv[2];
-const dir2 = process.argv[3];
-
-if (!fs.existsSync(`${dir1}/v${CURRENT_CONFIG_VERSION}`)) {
-    console.log(`New config version: v${CURRENT_CONFIG_VERSION}`);
-    console.error(
-        JSON.stringify({
-            platforms: [],
-            featureChanges: [],
-        }),
-    );
-    process.exit(0);
+function isExecutedAsScript() {
+    return import.meta.url === new URL(process.argv[1], 'file:').href;
 }
 
-const analysis = analyzeConfigs(dir1, dir2);
+if (isExecutedAsScript()) {
+    if (process.argv.length !== 4) {
+        console.error('Usage: node branch-content-tagging.js <base_generated_dir> <pr_generated_dir>');
+        process.exit(1);
+    }
 
-// Output human-readable summary to stdout
-console.log(formatOutput(analysis));
+    const dir1 = process.argv[2];
+    const dir2 = process.argv[3];
+    const { analysis, output } = runBranchContentTagging(dir1, dir2);
 
-// Output structured JSON to stderr for consumption by the workflow
-console.error(JSON.stringify(analysis));
+    // Output human-readable summary to stdout
+    console.log(output);
+
+    // Output structured JSON to stderr for consumption by the workflow
+    console.error(JSON.stringify(analysis));
+}
