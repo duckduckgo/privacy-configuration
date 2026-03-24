@@ -72,6 +72,8 @@ jobs:
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                   HEAD_REF: ${{ github.event.pull_request.head.ref }}
               run: |
+                  # Auto-fix pushes can miss pull_request:synchronize in this repo.
+                  # Explicitly dispatch Test so unit+lint run on the new lint-fix commit.
                   gh api \
                     --method POST \
                     -H "Accept: application/vnd.github+json" \
