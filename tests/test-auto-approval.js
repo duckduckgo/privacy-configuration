@@ -5,9 +5,7 @@ import { spawnSync } from 'child_process';
 import { expect } from 'chai';
 import { analyzePatchesForApproval, generateChangeSummary } from '../automation-utils.js';
 import { CURRENT_CONFIG_VERSION } from '../constants.js';
-import {
-    runBranchContentTagging,
-} from '../.github/scripts/branch-content-tagging.js';
+import { runBranchContentTagging } from '../.github/scripts/branch-content-tagging.js';
 
 describe('Auto-approval logic tests', () => {
     const testCases = [
