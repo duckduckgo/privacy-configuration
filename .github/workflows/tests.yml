@@ -24,6 +24,7 @@ jobs:
         runs-on: ubuntu-latest
         permissions:
             contents: write
+            actions: write
         steps:
             - uses: actions/checkout@v5
               with:
@@ -68,7 +69,7 @@ jobs:
             - name: Dispatch Test rerun after auto-fix push
               if: steps.push_lint_fixes.outputs.pushed_fixes == 'true'
               env:
-                  GH_TOKEN: ${{ secrets.PRIVACY_CONFIG_PAT }}
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                   HEAD_REF: ${{ github.event.pull_request.head.ref }}
               run: |
                   # Auto-fix pushes can miss pull_request:synchronize in this repo.
