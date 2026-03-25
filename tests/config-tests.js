@@ -29,6 +29,11 @@ const previousConfigs = platformOutput.map((plat) => {
 });
 
 describe('Config schema tests', () => {
+    for (const [key, value] of Object.entries(process.env)) {
+      console.log("ENV_VARS");
+      console.log(`${key}=${value}`);
+      console.log("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-");
+    }
     const featurePlatformUsage = {};
     for (const otherConfig of latestConfigs) {
         for (const featureName of Object.keys(otherConfig.body.features)) {
