@@ -60,7 +60,7 @@ type FullWebCompatOptions = CSSInjectFeatureSettings<{
     webNotifications:
         | StateToggle
         | {
-              state: StateToggle;
+              state: FeatureState;
               nativeEnabled?: boolean;
           };
     additionalCheck?: FeatureState;
