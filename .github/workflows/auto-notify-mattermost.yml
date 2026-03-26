@@ -29,7 +29,8 @@ jobs:
             - name: Check approval analysis and notify platform teams
               uses: actions/github-script@v8
               env:
-                  MM_WINDOWS_NOTIFY_WEBHOOK_URL: ${{ secrets.MM_WINDOWS_NOTIFY_WEBHOOK_URL }}
+                  # TEMP: comment out the envvar to disable notifications.
+                  # MM_WINDOWS_NOTIFY_WEBHOOK_URL: ${{ secrets.MM_WINDOWS_NOTIFY_WEBHOOK_URL }}
                   MM_ANDROID_NOTIFY_WEBHOOK_URL: ${{ secrets.MM_ANDROID_NOTIFY_WEBHOOK_URL }}
                   MM_IOS_NOTIFY_WEBHOOK_URL: ${{ secrets.MM_IOS_NOTIFY_WEBHOOK_URL }}
                   MM_MACOS_NOTIFY_WEBHOOK_URL: ${{ secrets.MM_MACOS_NOTIFY_WEBHOOK_URL }}
