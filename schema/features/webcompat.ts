@@ -1,15 +1,14 @@
 import { Feature, CSSInjectFeatureSettings, FeatureState } from '../feature';
 
-type StateToggle = 'enabled' | 'disabled';
 type FullWebCompatOptions = CSSInjectFeatureSettings<{
     cleanIframeValue: {
-        state: StateToggle;
+        state: FeatureState;
     };
-    windowSizing: StateToggle;
-    navigatorCredentials: StateToggle;
-    safariObject: StateToggle;
+    windowSizing: FeatureState;
+    navigatorCredentials: FeatureState;
+    safariObject: FeatureState;
     messageHandlers: {
-        state: StateToggle;
+        state: FeatureState;
         handlerStrategies: {
             polyfill: string[];
             reflect: string[];
@@ -17,38 +16,38 @@ type FullWebCompatOptions = CSSInjectFeatureSettings<{
         };
     };
     notification: {
-        state: StateToggle;
+        state: FeatureState;
     };
     permissions: {
-        state: StateToggle;
+        state: FeatureState;
         validPermissionNames: string[];
         supportedPermissions: object;
     };
     permissionsPresent: {
-        state: StateToggle;
+        state: FeatureState;
     };
-    mediaSession: StateToggle;
-    presentation: StateToggle;
-    webShare: StateToggle;
+    mediaSession: FeatureState;
+    presentation: FeatureState;
+    webShare: FeatureState;
     viewportWidth:
-        | StateToggle
+        | FeatureState
         | {
-              state: StateToggle;
+              state: FeatureState;
               forcedDesktopValue: string;
               forcedMobileValue: string;
           };
-    viewportWidthLegacy: StateToggle;
-    screenLock: StateToggle;
-    plainTextViewPort: StateToggle;
+    viewportWidthLegacy: FeatureState;
+    screenLock: FeatureState;
+    plainTextViewPort: FeatureState;
     modifyLocalStorage: {
-        state: StateToggle;
+        state: FeatureState;
         changes: {
             key: string;
             action: 'delete';
         }[];
     };
     modifyCookies: {
-        state: StateToggle;
+        state: FeatureState;
         changes: {
             key: string;
             action: 'delete';
@@ -56,9 +55,9 @@ type FullWebCompatOptions = CSSInjectFeatureSettings<{
             domain?: string;
         }[];
     };
-    enumerateDevices: StateToggle;
+    enumerateDevices: FeatureState;
     webNotifications:
-        | StateToggle
+        | FeatureState
         | {
               state: FeatureState;
               nativeEnabled?: boolean;
