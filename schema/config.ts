@@ -20,6 +20,7 @@ import { ScriptletsFeature } from './features/scriptlets';
 import { WindowsWebViewFailures } from './features/windows-webview-failures';
 import { CustomUserAgentFeature } from './features/custom-user-agent';
 import { BurnFeature } from './features/burn';
+import { ClientBrandHintFeature } from './features/client-brand-hint';
 import { Taskbar } from './features/taskbar';
 import { AppHealth } from './features/appHealth';
 import { ElementHidingFeature } from './features/element-hiding';
@@ -63,6 +64,7 @@ export type ConfigV5<VersionType> = {
         autoconsent?: AutoconsentFeature<VersionType>;
         autofill?: AutofillFeature<VersionType>;
         burn?: BurnFeature<VersionType>;
+        clientBrandHint?: ClientBrandHintFeature<VersionType>;
         taskbar?: Taskbar<VersionType>;
         import?: ImportFeature<VersionType>;
         cookie?: CookieFeature<VersionType>;
