@@ -15,6 +15,7 @@ import { FingerprintingHardwareFeature } from './features/fingerprinting-hardwar
 import { FingerprintingCanvasFeature } from './features/fingerprinting-canvas';
 import { FingerprintingScreenSizeFeature } from './features/fingerprinting-screen-size';
 import { NetworkProtection } from './features/network-protection';
+import { PrivacyPassFeature } from './features/privacy-pass';
 import { AiChatConfig } from './features/ai-chat';
 import { ScriptletsFeature } from './features/scriptlets';
 import { WindowsWebViewFailures } from './features/windows-webview-failures';
@@ -76,6 +77,7 @@ export type ConfigV5<VersionType> = {
         fingerprintingCanvas?: FingerprintingCanvasFeature<VersionType>;
         fingerprintingScreenSize?: FingerprintingScreenSizeFeature<VersionType>;
         networkProtection?: NetworkProtection<VersionType>;
+        privacyPass?: PrivacyPassFeature<VersionType>;
         scriptlets?: ScriptletsFeature<VersionType>;
         webDetection?: WebDetectionFeature<VersionType>;
         webEvents?: WebEventsFeature<VersionType>;
