@@ -4125,11 +4125,25 @@
                 ]
             },
             {
-                "domain": "westernjournal.com",
+                "domain": "walesonline.co.uk",
                 "rules": [
                     {
-                        "selector": ".sponsor",
-                        "type": "hide-empty"
+                        "selector": "[data-testid='commercial-label-gpt'], [data-testid='commercial-1'], [data-testid='commercial-2'], [data-testid='commercial-3'], [data-testid='commercial-4']",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".vf3-conversations-list__promo",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".Rbaif.sticky ~ header",
+                        "type": "modify-style",
+                        "values": [
+                            {
+                                "property": "top",
+                                "value": "0px"
+                            }
+                        ]
                     }
                 ]
             },
@@ -4146,6 +4160,15 @@
                     },
                     {
                         "selector": ".outbrain-wrapper",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "westernjournal.com",
+                "rules": [
+                    {
+                        "selector": ".sponsor",
                         "type": "hide-empty"
                     }
                 ]
