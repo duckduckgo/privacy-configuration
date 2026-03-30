@@ -1,8 +1,7 @@
-import { Feature, CSSInjectFeatureSettings } from '../feature';
+import { Feature, CSSInjectFeatureSettings, FeatureState } from '../feature';
 
-type State = 'enabled' | 'disabled';
 type StateObject = {
-    state: State;
+    state: FeatureState;
 };
 export type DuckPlayerSettings = CSSInjectFeatureSettings<{
     tryDuckPlayerLink: string;
@@ -15,7 +14,7 @@ export type DuckPlayerSettings = CSSInjectFeatureSettings<{
     youTubeVideoIDQueryParam: string;
     overlays: {
         youtube: {
-            state: State;
+            state: FeatureState;
             selectors: {
                 thumbLink: string;
                 excludedRegions: string[];

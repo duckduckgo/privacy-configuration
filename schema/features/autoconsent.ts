@@ -1,4 +1,4 @@
-import { Feature } from '../feature';
+import { Feature, FeatureState } from '../feature';
 
 export type AutoconsentFeature<VersionType> = Feature<
     {
@@ -6,7 +6,7 @@ export type AutoconsentFeature<VersionType> = Feature<
         filterlistExceptions: string[];
         enableIfMainWorldIsSupported:
             | {
-                  state: 'enabled' | 'disabled';
+                  state: FeatureState;
                   minSupportedVersion: VersionType;
               }
             | undefined;
