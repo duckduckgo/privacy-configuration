@@ -34,6 +34,7 @@ import { ExtendedCrashReporting } from './features/extendedCrashReporting';
 import { MacOSBrowserConfig } from './features/macos-browser-config';
 import { DownloadManager } from './features/downloadManager';
 import { WebExtensionsConfig } from './features/web-extensions';
+import { AdBlockingExtensionConfig } from './features/ad-blocking-extension';
 
 export { WebCompatSettings } from './features/webcompat';
 export { DuckPlayerSettings } from './features/duckplayer';
@@ -56,6 +57,7 @@ export type ConfigV5<VersionType> = {
     version: number;
     features: Record<string, Feature<any, VersionType>> & {
         // These features have typed settings
+        adBlockingExtension?: AdBlockingExtensionConfig<VersionType>;
         aiChat?: AiChatConfig<VersionType>;
         apiManipulation?: APIManipulationFeature<VersionType>;
         appHealth?: AppHealth<VersionType>;
