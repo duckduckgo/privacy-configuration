@@ -6,7 +6,4 @@ type SettingsType = {
     };
 };
 
-export type TabSuspension<VersionType> = Feature<
-    SettingsType,
-    VersionType
->;
+export type TabSuspension<VersionType> = Feature<SettingsType, VersionType>;
