@@ -36,6 +36,7 @@ import { MacOSBrowserConfig } from './features/macos-browser-config';
 import { DownloadManager } from './features/downloadManager';
 import { WebExtensionsConfig } from './features/web-extensions';
 import { AdBlockingExtensionConfig } from './features/ad-blocking-extension';
+import { TabSuspension } from './features/tab-suspension';
 
 export { WebCompatSettings } from './features/webcompat';
 export { DuckPlayerSettings } from './features/duckplayer';
@@ -94,6 +95,7 @@ export type ConfigV5<VersionType> = {
         webInterferenceDetection?: WebInterferenceDetectionFeature<VersionType>;
         extendedCrashReporting?: ExtendedCrashReporting<VersionType>;
         macOSBrowserConfig?: MacOSBrowserConfig<VersionType>;
+        tabSuspension?: TabSuspension<VersionType>;
         webExtensions?: WebExtensionsConfig<VersionType>;
     };
     unprotectedTemporary: SiteException[];
