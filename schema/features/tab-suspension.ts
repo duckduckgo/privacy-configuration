@@ -1,13 +1,12 @@
-import { Feature, SubFeature } from '../feature';
+import { Feature } from '../feature';
 
-type SettingsType = undefined;
-
-type SubFeatures<VersionType> = {
-    inputFieldFocusDetection?: SubFeature<VersionType>;
+type SettingsType = {
+    inputFieldFocusDetection?: {
+        state: string;
+    };
 };
 
 export type TabSuspension<VersionType> = Feature<
     SettingsType,
-    VersionType,
-    SubFeatures<VersionType> & Record<string, SubFeature<VersionType>>
+    VersionType
 >;
