@@ -1,8 +1,8 @@
-import { Feature } from '../feature';
+import { Feature, FeatureState } from '../feature';
 
 type SettingsType = {
     inputFieldFocusDetection?: {
-        state: string;
+        state: FeatureState;
     };
 };
 
