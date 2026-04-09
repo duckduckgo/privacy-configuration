@@ -2273,7 +2273,7 @@
                 "body > div#__next > div:nth-child(3):not([id]) > dialog:nth-child(2):not([id]) > div:not([id]) > div:nth-child(2):not([id]) > div:nth-child(2):not([id]) > button:nth-child(2):not([id])",
                 "body:not([id]) > div#abedcfbae-7589-497a-bf0e-a5e627359ac0 > dialog:not([id]) > div:not([id]) > div:not([id]) > div:nth-child(3):not([id]) > div:nth-child(1):not([id]) > div:nth-child(2):not([id]) > a:nth-child(2):not([id])",
                 "body:not([id]) > div:not([id]) > div:not([id]) > div:not([id]) > div:nth-child(2):not([id]) > button:nth-child(2)#cookieBannerAcceptEssential",
-                "body:not([id]) > div:not([id]) > div:nth-child(1):not([id]) > div:nth-child(2):not([id]) > div:not([id]) > div:nth-child(1):not([id]) > button:nth-child(2)#banner-reject-btn",
+                "dialog.cookie-consent-popup",
                 "body > div#CookieAcceptance > div:not([id]) > div:not([id]) > div:nth-child(2):not([id]) > div:not([id]) > button:nth-child(2):not([id])",
                 "body > div:not([id]) > div:not([id]) > div:nth-child(1):not([id]) > div:nth-child(2):not([id]) > button:nth-child(3):not([id])",
                 "body:not([id]) > div#app > div#app > div:nth-child(1):not([id]) > div:nth-child(3):not([id]) > div:not([id]) > div:nth-child(2):not([id]) > button:nth-child(1):not([id])",
@@ -3474,7 +3474,7 @@
                 "body > div:not([id]) > div:nth-child(1):not([id]) > div:not([id]) > div:nth-child(4):not([id]) > div:nth-child(1):not([id]) > button:nth-child(2)#banner-reject-btn",
                 "body > main#content > aside:nth-child(10):not([id]) > div:not([id]) > wm-stack:nth-child(2):not([id]) > wm-button:nth-child(1):not([id]) > button:not([id])",
                 "body > div#a227a3618-31b4-4d59-a7cb-0e1ac2b4d6e7 > dialog:not([id]) > div:not([id]) > div:not([id]) > div:nth-child(3):not([id]) > div:nth-child(1):not([id]) > div:nth-child(2):not([id]) > a:nth-child(2):not([id])",
-                "body > div:not([id]) > dialog:nth-child(1):not([id]) > div:nth-child(2):not([id]) > div:not([id]) > div:nth-child(1):not([id]) > button:nth-child(2)#banner-reject-btn",
+                "#banner-reject-btn",
                 "body > div:not([id]) > div:nth-child(2):not([id]) > div#cdk-overlay-0 > mat-dialog-container:nth-child(2)#mat-mdc-dialog-0 > div:not([id]) > div:not([id]) > app-cookie-dialog:not([id]) > div:nth-child(3):not([id]) > button:nth-child(1):not([id]) > span:nth-child(3):not([id])",
                 "body > div:not([id]) > div:not([id]) > div:nth-child(1):not([id]) > p:nth-child(1):not([id]) > a:not([id])",
                 "body > div#bandeau_cgv > div:not([id]) > div:not([id]) > a:nth-child(1)#dismiss-cookies",
@@ -3977,7 +3977,9 @@
                 ".cookie-dialog-initial",
                 ".cookie-dialog-initial button.g-button.outline",
                 "cookie_preferences=%7B%22allow%22%3A%5B%5D",
-                "#cookie-consent-banner .all4-cc-primary-button"
+                "#cookie-consent-banner .all4-cc-primary-button",
+                "#banner-cookie-setting-btn",
+                "#settings-only-required-btn"
             ],
             "r": [
                 [
@@ -49838,40 +49840,6 @@
                 ],
                 [
                     1,
-                    "auto_DE_www2.hm.com_beo",
-                    0,
-                    "^https?://(www\\.)?www2\\.hm\\.com/",
-                    10,
-                    [],
-                    [
-                        {
-                            "e": 2660
-                        }
-                    ],
-                    [
-                        {
-                            "v": 2660
-                        }
-                    ],
-                    [
-                        {
-                            "wait": 500
-                        },
-                        {
-                            "c": 2660
-                        }
-                    ],
-                    [
-                        {
-                            "timeout": 1000,
-                            "check": "none",
-                            "wv": 2660
-                        }
-                    ],
-                    {}
-                ],
-                [
-                    1,
                     "auto_DE_zoo-leipzig.de_yen",
                     0,
                     "^https?://(www\\.)?zoo-leipzig\\.de/",
@@ -76137,7 +76105,9 @@
                     0,
                     "^https?://(www\\.)?www2\\.hm\\.com/",
                     10,
-                    [],
+                    [
+                        1459
+                    ],
                     [
                         {
                             "e": 1459
@@ -76150,7 +76120,25 @@
                     ],
                     [
                         {
-                            "c": 1459
+                            "if": {
+                                "e": 2660
+                            },
+                            "then": [
+                                {
+                                    "c": 2660
+                                }
+                            ],
+                            "else": [
+                                {
+                                    "c": 3164
+                                },
+                                {
+                                    "wv": 3165
+                                },
+                                {
+                                    "c": 3165
+                                }
+                            ]
                         }
                     ],
                     [],
@@ -99374,7 +99362,7 @@
                 ],
                 "specificRuleRange": [
                     181,
-                    2860
+                    2859
                 ],
                 "genericStringEnd": 701,
                 "frameStringEnd": 742
