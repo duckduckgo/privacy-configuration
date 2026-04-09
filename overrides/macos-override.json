@@ -174,6 +174,14 @@
                 }
             }
         },
+        "webTelemetry": {
+            "state": "enabled",
+            "exceptions": [],
+            "settings": {
+                "videoPlayback": "enabled",
+                "urlChanged": "enabled"
+            }
+        },
         "networkProtection": {
             "state": "enabled",
             "features": {
@@ -497,21 +505,18 @@
                 }
             ],
             "features": {
-                "tdsNextExperiment006": {
-                    "state": "disabled",
+                "tdsNextExperiment007": {
+                    "state": "enabled",
                     "rollout": {
                         "steps": [
                             {
                                 "percent": 25
-                            },
-                            {
-                                "percent": 100
                             }
                         ]
                     },
                     "settings": {
-                        "controlUrl": "v6/experiments/202602v1-macos-tds-control.json",
-                        "treatmentUrl": "v6/experiments/202602v1-macos-tds-treatment.json"
+                        "controlUrl": "v6/experiments/202604v1-macos-tds-control.json",
+                        "treatmentUrl": "v6/experiments/202604v1-macos-tds-treatment.json"
                     },
                     "cohorts": [
                         {
@@ -2519,20 +2524,17 @@
             "features": {
                 "embedded": {
                     "state": "enabled",
-                    "minSupportedVersion": "1.183.0",
-                    "rollout": {
-                        "steps": [
-                            {
-                                "percent": 50
-                            }
-                        ]
-                    }
+                    "minSupportedVersion": "1.183.0"
                 }
             }
         },
         "adBlockingExtension": {
             "state": "disabled",
             "minSupportedVersion": "1.183.0"
+        },
+        "webDetection": {
+            "state": "enabled",
+            "minSupportedVersion": "1.184.0"
         }
     },
     "unprotectedTemporary": []

@@ -500,21 +500,18 @@
             "state": "enabled",
             "exceptions": [],
             "features": {
-                "tdsNextExperiment006": {
-                    "state": "disabled",
+                "tdsNextExperiment007": {
+                    "state": "enabled",
                     "rollout": {
                         "steps": [
                             {
                                 "percent": 25
-                            },
-                            {
-                                "percent": 100
                             }
                         ]
                     },
                     "settings": {
-                        "controlUrl": "v5/experiments/202602v1-ios-tds-control.json",
-                        "treatmentUrl": "v5/experiments/202602v1-ios-tds-treatment.json"
+                        "controlUrl": "v5/experiments/202604v1-ios-tds-control.json",
+                        "treatmentUrl": "v5/experiments/202604v1-ios-tds-treatment.json"
                     },
                     "cohorts": [
                         {
@@ -2468,6 +2465,17 @@
                 "onboardingRebranding": {
                     "state": "enabled",
                     "minSupportedVersion": "7.214.0"
+                },
+                "fireproofingETLDPlus1": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.214.0",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            }
+                        ]
+                    }
                 }
             }
         },
@@ -2845,8 +2853,8 @@
             "minSupportedVersion": "7.210.0",
             "features": {
                 "embedded": {
-                    "state": "internal",
-                    "minSupportedVersion": "7.211.0",
+                    "state": "enabled",
+                    "minSupportedVersion": "7.213.0",
                     "rollout": {
                         "steps": [
                             {
@@ -2854,15 +2862,16 @@
                             }
                         ]
                     }
-                },
-                "embeddedRollout": {
-                    "state": "internal"
                 }
             }
         },
         "adBlockingExtension": {
             "state": "disabled",
             "minSupportedVersion": "7.210.0"
+        },
+        "webDetection": {
+            "state": "enabled",
+            "minSupportedVersion": "7.214.0"
         }
     },
     "unprotectedTemporary": []

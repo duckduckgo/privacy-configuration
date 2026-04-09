@@ -137,22 +137,19 @@
             "state": "enabled",
             "exceptions": [],
             "features": {
-                "tdsNextExperiment006": {
-                    "state": "disabled",
+                "tdsNextExperiment007": {
+                    "state": "enabled",
                     "minSupportedVersion": 52361000,
                     "rollout": {
                         "steps": [
                             {
                                 "percent": 25
-                            },
-                            {
-                                "percent": 100
                             }
                         ]
                     },
                     "settings": {
-                        "controlUrl": "v5/experiments/202602v1-android-tds-control.json",
-                        "treatmentUrl": "v5/experiments/202602v1-android-tds-treatment.json"
+                        "controlUrl": "v5/experiments/202604v1-android-tds-control.json",
+                        "treatmentUrl": "v5/experiments/202604v1-android-tds-treatment.json"
                     },
                     "cohorts": [
                         {
@@ -1250,6 +1247,12 @@
                             },
                             {
                                 "percent": 10
+                            },
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 50
                             }
                         ]
                     }
@@ -1561,6 +1564,9 @@
                             },
                             {
                                 "percent": 50
+                            },
+                            {
+                                "percent": 100
                             }
                         ]
                     }
@@ -1605,6 +1611,20 @@
                     "state": "disabled",
                     "settings": {
                         "defaultIdleThresholdSeconds": "300"
+                    }
+                },
+                "singleTabFireDialog": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52742000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 10
+                            }
+                        ]
                     }
                 }
             }
@@ -2276,6 +2296,9 @@
                             },
                             {
                                 "percent": 10
+                            },
+                            {
+                                "percent": 15
                             }
                         ]
                     }
@@ -3252,7 +3275,8 @@
                     "state": "disabled"
                 },
                 "subscriptionPromoModalCta": {
-                    "state": "disabled"
+                    "state": "enabled",
+                    "minSupportedVersion": 52750000
                 }
             }
         },
