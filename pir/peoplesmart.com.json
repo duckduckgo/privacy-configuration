@@ -1,0 +1,22 @@
+{
+    "broker": "peoplesmart.com",
+    "master_list_row": 34,
+    "opt_out_url": "https://www.peoplesmart.com/svc/optout/search/contact_optouts",
+    "method_pattern": "Native opt-out with email confirmation",
+    "method_description": "PeopleSmart's homepage (peoplesmart.com) is a B2B professional contact search — search is by name + company + job title, not name + city + state. The 'Do Not Sell My Personal Information' footer link redirects to beenverified.com/app/optout/contact-search (cross-domain). The privacy policy and FAQ link to a native opt-out page at /svc/optout/search/contact_optouts. Per the FAQ, the opt-out flow is: (1) search by first/last name + state, (2) select matching record, (3) enter email address + complete CAPTCHA, (4) receive verification email and click confirmation link, (5) record removed within 24-72 hours. Both the PeopleSmart opt-out page and the BeenVerified cross-domain opt-out are behind Cloudflare Turnstile managed challenge, returning 403 and never resolving in automated browsers.",
+    "bot_check": "Cloudflare Turnstile managed challenge on the opt-out page (/svc/optout/search/contact_optouts) — confirmed. Returns 403 with 'Just a moment...' interstitial. The challenge did not resolve after 60+ seconds of waiting with multiple retry attempts. This is NOT reCAPTCHA — it is Cloudflare Turnstile. The BeenVerified cross-domain opt-out is also behind the same Cloudflare Turnstile challenge. The FAQ also mentions a CAPTCHA on the opt-out form itself, but this could not be confirmed due to the Turnstile block.",
+    "profile_used": "no matching record found",
+    "email_used": "N/A",
+    "california": "Not checked",
+    "tier_1": {
+        "passed": "No",
+        "failure_cause": "Requires inbox access to complete verification"
+    },
+    "tier_2": {
+        "passed": "Not tested",
+        "failure_cause": "Not tested"
+    },
+    "record_removed": "Not tested",
+    "engineering_difficulty": "N/A",
+    "notes": "PeopleSmart (owned by The Lifetime Value Co. LLC, acquired by BeenVerified in 2014) is primarily a B2B professional contacts platform — 'Find Emails & Phone Numbers for Millions of People'. Homepage search is by name + company + job title, NOT by name + city + state. B2B scope concern: strong B2B indicators found (professional, business, b2b, company, recruit). The only consumer indicator found was 'criminal' (likely from background check text). The 'Do Not Sell My Personal Information' footer link redirects cross-domain to beenverified.com/app/optout/contact-search (redirects further to beenverified.com/svc/optout/search/contact_optouts). The native PeopleSmart opt-out URL (/svc/optout/search/contact_optouts) was found in the privacy policy and FAQ. Both opt-out endpoints (PeopleSmart and BeenVerified) are blocked by Cloudflare Turnstile managed challenge — not reCAPTCHA. Per the FAQ, the opt-out explicitly requires email verification: 'verify your request to opt out by clicking on the link in our verification email'. This constitutes inbox access requirement and fails Tier 1 non-sensitive check. Profile search was not attempted on the opt-out page due to Cloudflare block, and the homepage B2B search does not support name + city + state. California check could not be performed because the opt-out page was inaccessible behind Cloudflare. Only one record can be opted out at a time through the online process — additional records require emailing privacy@PeopleSmart.com."
+}
