@@ -1,0 +1,22 @@
+{
+    "broker": "staterecords.org",
+    "master_list_row": 236,
+    "opt_out_url": "https://staterecords.org/optout",
+    "method_pattern": "Standalone form + record selection",
+    "method_description": "Opt-out page at /optout presents a simple form with first name, last name, state (dropdown), and city fields. After submitting, the page redirects to members.staterecords.org/removeMyData/ which presents a custom slide-to-verify CAPTCHA. After CAPTCHA completion, a CONTINUE button leads to a record selection page (could not verify record selection or subsequent steps due to anti-automation timing check in the custom CAPTCHA). The opt-out form requires only non-sensitive information (name, state, city).",
+    "bot_check": "Custom proprietary slider CAPTCHA at members.staterecords.org/removeMyData/ — NOT reCAPTCHA or hCaptcha. Labeled 'Are you human? Slide to verify. No cookies, no tracking.' Uses four verification indicators: gesture, timing, entropy, token. The timing check is specifically designed to detect and block automated interactions. When completed via Playwright, gesture and entropy checks pass but the timing check blocks automated completion, yielding a 'Malformed!' error on the next page.",
+    "profile_used": "Could not reach record selection page due to custom CAPTCHA anti-automation blocking. Intended profile: James Smith, 1541 Mims St SW, Birmingham, AL 35211, age 63.",
+    "email_used": "N/A — could not reach email field due to CAPTCHA blocking",
+    "california": "Yes — same flow. Both Alabama and California submissions redirect to the same members.staterecords.org/removeMyData/ page with identical custom slider CAPTCHA. No state-specific differences observed through Tier 1.",
+    "tier_1": {
+        "passed": "Yes",
+        "failure_cause": null
+    },
+    "tier_2": {
+        "passed": "Not tested",
+        "failure_cause": "Not tested"
+    },
+    "record_removed": "Not tested",
+    "engineering_difficulty": "Medium",
+    "notes": "Opt-out URL found in footer via 'Your Privacy Choices' and 'Do Not Sell / Share My Personal Information' links — both point to /optout. Opt-out form fields: first name, last name, state (dropdown), city — all non-sensitive. After form submission, redirects to subdomain members.staterecords.org/removeMyData/ for CAPTCHA. Custom slider CAPTCHA is NOT reCAPTCHA — this is a Tier 2 concern (PIR only supports reCAPTCHA and reCAPTCHA Enterprise). Main site search (homepage and /peoplesearch) uses name + city + state fields, stays on staterecords.org domain, but search results require a paid subscription ($1.00 for 7-day trial, then $19.95/month). Opt-out search is separate from main site search. The opt-out form uses InfoPay framework fields (InfoPay_Core_Components_OptOuts_DataRemovalServiceModel). Site operated by InfoPay, Inc. and Intermedia Ventures, LLC. California and Alabama/Texas flows are identical through Tier 1. Privacy policy page at /privacy, also links to members.staterecords.org/customer/privacy. Daniel Anderl Judicial Security Act covered-person removal available via email to privacy@staterecords.org."
+}
