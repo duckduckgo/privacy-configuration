@@ -1,6 +1,7 @@
 import { Feature, FeatureState, SubFeature } from '../feature';
 
 type SettingsType = {
+    memoryPressureTriggerTabInactivityPeriod?: number;
     inputFieldFocusDetection?: {
         state: FeatureState;
     };
