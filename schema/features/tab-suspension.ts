@@ -8,7 +8,7 @@ type SettingsType = {
 };
 
 type SubFeatures<VersionType> = {
-    isMemoryPressureTriggerEnabled?: SubFeature<VersionType>;
+    memoryPressureTrigger?: SubFeature<VersionType>;
 };
 
 export type TabSuspension<VersionType> = Feature<
