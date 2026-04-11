@@ -9,6 +9,12 @@ type SubFeatures<VersionType> = {
             domains: string[];
         }
     >;
+    autoplayPolicy?: SubFeature<
+        VersionType,
+        {
+            domainsAllowList: string[];
+        }
+    >;
 };
 
 export type MacOSBrowserConfig<VersionType> = Feature<
