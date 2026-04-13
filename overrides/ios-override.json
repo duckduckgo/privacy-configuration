@@ -1,5 +1,9 @@
 {
     "features": {
+        "duckAiNativeStorage": {
+            "state": "enabled",
+            "exceptions": []
+        },
         "attributedMetrics": {
             "state": "enabled",
             "minSupportedVersion": "7.198.0",
@@ -135,6 +139,7 @@
                 "aiChat": "disabled",
                 "subscriptions": "disabled",
                 "serpSettings": "disabled",
+                "duckAiNativeStorage": "enabled",
                 "domains": [
                     {
                         "domain": [
@@ -156,6 +161,18 @@
                             {
                                 "op": "replace",
                                 "path": "/serpSettings",
+                                "value": "enabled"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": [
+                            "euw-serp-dev-testing19.duck.ai"
+                        ],
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/aiChat",
                                 "value": "enabled"
                             }
                         ]
@@ -300,6 +317,12 @@
                 "voiceShortcut": {
                     "state": "internal",
                     "minSupportedVersion": "7.212.0"
+                },
+                "nativeStorage": {
+                    "state": "enabled"
+                },
+                "nativeDataAccess": {
+                    "state": "enabled"
                 }
             },
             "settings": {
