@@ -1,4 +1,4 @@
-import { Feature, FeatureState } from '../feature';
+import { Feature, FeatureState, SubFeature } from '../feature';
 
 type SettingsType = {
     inputFieldFocusDetection?: {
@@ -6,4 +6,17 @@ type SettingsType = {
     };
 };
 
-export type TabSuspension<VersionType> = Feature<SettingsType, VersionType>;
+type SubFeatures<VersionType> = {
+    memoryPressureTrigger?: SubFeature<
+        VersionType,
+        {
+            tabInactivityPeriod?: number;
+        }
+    >;
+};
+
+export type TabSuspension<VersionType> = Feature<
+    SettingsType,
+    VersionType,
+    SubFeatures<VersionType> & Record<string, SubFeature<VersionType>>
+>;

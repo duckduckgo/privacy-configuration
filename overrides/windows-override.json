@@ -1313,23 +1313,30 @@
                     "minSupportedVersion": "0.152.0"
                 },
                 "suggestions": {
-                    "state": "enabled"
+                    "state": "internal"
                 },
                 "suggestionsDeletion": {
                     "state": "disabled"
                 },
                 "ntpRecentChats": {
-                    "state": "enabled",
-                    "minSupportedVersion": "0.153.0"
+                    "state": "internal"
                 },
                 "imageGeneration": {
                     "state": "internal"
                 },
-                "viewAllFromRecentChats": {
+                "omnibarWebSearch": {
                     "state": "internal"
                 },
-                "menuInApplicationMenu": {
+                "dragAndDropImages": {
                     "state": "internal"
+                },
+                "viewAllFromRecentChats": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.154.0"
+                },
+                "menuInApplicationMenu": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.154.0"
                 }
             },
             "minSupportedVersion": "0.100.0",
@@ -2123,6 +2130,7 @@
                 "subscriptions": "disabled",
                 "subscriptionPages": "disabled",
                 "serpSettings": "disabled",
+                "duckAiNativeStorage": "internal",
                 "domains": [
                     {
                         "domain": [
@@ -2149,6 +2157,18 @@
                             {
                                 "op": "replace",
                                 "path": "/serpSettings",
+                                "value": "enabled"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": [
+                            "euw-serp-dev-testing19.duck.ai"
+                        ],
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/aiChat",
                                 "value": "enabled"
                             }
                         ]
@@ -4336,7 +4356,8 @@
                     }
                 },
                 "useSingleWebViewEnvironment": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.155.0"
                 }
             },
             "exceptions": []
@@ -4523,7 +4544,7 @@
             "minSupportedVersion": "0.148.0",
             "exceptions": [],
             "settings": {
-                "extensionUrl": "https://staticcdn.duckduckgo.com/extensions/content-blocker/content-blocker-extension-2026.3.30.crx"
+                "extensionUrl": "https://staticcdn.duckduckgo.com/extensions/content-blocker/content-blocker-extension-2026.4.13.crx"
             },
             "features": {
                 "onboardingEnabled": {
@@ -4542,7 +4563,7 @@
                     "state": "disabled"
                 },
                 "softLaunch": {
-                    "state": "preview"
+                    "state": "enabled"
                 }
             }
         },
@@ -4778,11 +4799,13 @@
             "exceptions": []
         },
         "tabLabelTransition": {
-            "state": "internal",
+            "minSupportedVersion": "0.155.0",
+            "state": "preview",
             "exceptions": []
         },
         "faviconTransitions": {
-            "state": "internal",
+            "minSupportedVersion": "0.155.0",
+            "state": "preview",
             "exceptions": []
         },
         "tabNavigationHistoryRestore": {
@@ -5260,7 +5283,7 @@
         },
         "unsetAsDefaultSurvey": {
             "state": "enabled",
-            "minSupportedVersion": "0.152.2",
+            "minSupportedVersion": "0.152.3",
             "settings": {
                 "url": "https://duckduckgo.com/windows-unset-as-default-survey",
                 "minDaysSinceInstall": 0,
@@ -5276,6 +5299,27 @@
             },
             "exceptions": [],
             "state": "internal"
+        },
+        "browserUpdater": {
+            "exceptions": [],
+            "features": {
+                "desktopLauncher": {
+                    "state": "internal"
+                }
+            },
+            "state": "enabled"
+        },
+        "browserIsInteractiveFix": {
+            "exceptions": [],
+            "state": "enabled"
+        },
+        "duckAiNativeStorage": {
+            "state": "internal",
+            "exceptions": []
+        },
+        "multiDownloadPermission": {
+            "state": "disabled",
+            "exceptions": []
         }
     },
     "unprotectedTemporary": []

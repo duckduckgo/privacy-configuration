@@ -256,6 +256,24 @@
                     "description": "Toggle Choice Screen during onboarding",
                     "minSupportedVersion": "7.197.0"
                 },
+                "onboardingDuckAIQueryExperiment": {
+                    "state": "enabled",
+                    "description": "Duck.ai onboarding query experiment cohorts",
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatmentA",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatmentB",
+                            "weight": 1
+                        }
+                    ]
+                },
                 "showHideAiGeneratedImages": {
                     "state": "enabled"
                 },
@@ -482,21 +500,18 @@
             "state": "enabled",
             "exceptions": [],
             "features": {
-                "tdsNextExperiment006": {
-                    "state": "disabled",
+                "tdsNextExperiment007": {
+                    "state": "enabled",
                     "rollout": {
                         "steps": [
                             {
                                 "percent": 25
-                            },
-                            {
-                                "percent": 100
                             }
                         ]
                     },
                     "settings": {
-                        "controlUrl": "v5/experiments/202602v1-ios-tds-control.json",
-                        "treatmentUrl": "v5/experiments/202602v1-ios-tds-treatment.json"
+                        "controlUrl": "v5/experiments/202604v1-ios-tds-control.json",
+                        "treatmentUrl": "v5/experiments/202604v1-ios-tds-treatment.json"
                     },
                     "cohorts": [
                         {
@@ -684,6 +699,9 @@
                             }
                         ]
                     }
+                },
+                "heuristicAction": {
+                    "state": "enabled"
                 }
             }
         },
@@ -2392,7 +2410,7 @@
                     }
                 },
                 "productTelemetrySurfaceUsage": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": "7.199.0",
                     "description": "Temporarily gather telemetry around product surfaces being used."
                 },
@@ -2458,9 +2476,24 @@
                         "steps": [
                             {
                                 "percent": 10
+                            },
+                            {
+                                "percent": 100
                             }
                         ]
                     }
+                },
+                "fireButtonRefinements": {
+                    "state": "internal",
+                    "minSupportedVersion": "7.215.0"
+                },
+                "fireMode": {
+                    "state": "internal",
+                    "minSupportedVersion": "7.215.0"
+                },
+                "minimalChromeInLandscape": {
+                    "state": "internal",
+                    "minSupportedVersion": "7.215.0"
                 }
             }
         },
@@ -2838,24 +2871,18 @@
             "minSupportedVersion": "7.210.0",
             "features": {
                 "embedded": {
-                    "state": "internal",
-                    "minSupportedVersion": "7.211.0",
-                    "rollout": {
-                        "steps": [
-                            {
-                                "percent": 50
-                            }
-                        ]
-                    }
-                },
-                "embeddedRollout": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": "7.213.0"
                 }
             }
         },
         "adBlockingExtension": {
             "state": "disabled",
             "minSupportedVersion": "7.210.0"
+        },
+        "webDetection": {
+            "state": "enabled",
+            "minSupportedVersion": "7.214.0"
         }
     },
     "unprotectedTemporary": []
