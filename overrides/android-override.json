@@ -137,22 +137,19 @@
             "state": "enabled",
             "exceptions": [],
             "features": {
-                "tdsNextExperiment006": {
-                    "state": "disabled",
+                "tdsNextExperiment007": {
+                    "state": "enabled",
                     "minSupportedVersion": 52361000,
                     "rollout": {
                         "steps": [
                             {
                                 "percent": 25
-                            },
-                            {
-                                "percent": 100
                             }
                         ]
                     },
                     "settings": {
-                        "controlUrl": "v5/experiments/202602v1-android-tds-control.json",
-                        "treatmentUrl": "v5/experiments/202602v1-android-tds-treatment.json"
+                        "controlUrl": "v5/experiments/202604v1-android-tds-control.json",
+                        "treatmentUrl": "v5/experiments/202604v1-android-tds-treatment.json"
                     },
                     "cohorts": [
                         {
@@ -441,6 +438,10 @@
                     "state": "enabled",
                     "minSupportedVersion": 52720000
                 },
+                "contextualFireButton": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52760000
+                },
                 "rememberTogglePosition": {
                     "state": "enabled",
                     "minSupportedVersion": 52760000
@@ -543,7 +544,7 @@
                     }
                 },
                 "heuristicAction": {
-                    "state": "disabled"
+                    "state": "enabled"
                 }
             }
         },
@@ -1254,6 +1255,15 @@
                             },
                             {
                                 "percent": 10
+                            },
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
                             }
                         ]
                     }
@@ -1565,6 +1575,9 @@
                             },
                             {
                                 "percent": 50
+                            },
+                            {
+                                "percent": 100
                             }
                         ]
                     }
@@ -1574,22 +1587,34 @@
                     "minSupportedVersion": 52590000
                 },
                 "experimentalBrowsingMenu": {
-                    "state": "disabled",
+                    "state": "enabled",
                     "minSupportedVersion": 52660000
                 },
                 "rolloutBrowsingMenu": {
-                    "state": "disabled",
-                    "minSupportedVersion": 52741000,
+                    "state": "enabled",
+                    "minSupportedVersion": 52742000,
                     "rollout": {
                         "steps": [
                             {
                                 "percent": 5
+                            },
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 75
+                            },
+                            {
+                                "percent": 100
                             }
                         ]
                     }
                 },
                 "serpLogoInMenu": {
-                    "state": "disabled"
+                    "state": "enabled"
                 },
                 "sendPageLoadWideEvent": {
                     "state": "enabled",
@@ -1606,6 +1631,29 @@
                     "state": "disabled",
                     "settings": {
                         "defaultIdleThresholdSeconds": "300"
+                    }
+                },
+                "singleTabFireDialog": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52742000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
                     }
                 }
             }
@@ -2102,7 +2150,12 @@
             "state": "enabled",
             "minSupportedVersion": 52700000,
             "exceptions": [],
-            "settings": {}
+            "settings": {
+                "overflowTypes": [
+                    "hidden",
+                    "clip"
+                ]
+            }
         },
         "navigatorInterface": {
             "state": "enabled",
@@ -2277,6 +2330,9 @@
                             },
                             {
                                 "percent": 10
+                            },
+                            {
+                                "percent": 15
                             }
                         ]
                     }
@@ -3253,7 +3309,8 @@
                     "state": "disabled"
                 },
                 "subscriptionPromoModalCta": {
-                    "state": "disabled"
+                    "state": "enabled",
+                    "minSupportedVersion": 52750000
                 }
             }
         },
@@ -3857,9 +3914,15 @@
             }
         },
         "productSurfaceTelemetry": {
-            "state": "disabled",
+            "state": "enabled",
             "exceptions": [],
-            "minSupportedVersion": 52610000
+            "minSupportedVersion": 52751000,
+            "features": {
+                "enableTelemetry": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52751000
+                }
+            }
         },
         "remoteMessaging": {
             "state": "enabled",
@@ -4023,6 +4086,30 @@
         "eventHub": {
             "state": "enabled",
             "minSupportedVersion": 52720000
+        },
+        "progressBarUpgrade": {
+            "state": "disabled",
+            "minSupportedVersion": 52760000,
+            "exceptions": [],
+            "features": {
+                "behaviourUpdate": {
+                    "state": "disabled",
+                    "minSupportedVersion": 52760000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
+                }
+            }
         }
     },
     "unprotectedTemporary": [],

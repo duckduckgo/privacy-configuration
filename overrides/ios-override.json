@@ -256,6 +256,24 @@
                     "description": "Toggle Choice Screen during onboarding",
                     "minSupportedVersion": "7.197.0"
                 },
+                "onboardingDuckAIQueryExperiment": {
+                    "state": "enabled",
+                    "description": "Duck.ai onboarding query experiment cohorts",
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatmentA",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatmentB",
+                            "weight": 1
+                        }
+                    ]
+                },
                 "showHideAiGeneratedImages": {
                     "state": "enabled"
                 },
@@ -298,8 +316,8 @@
                     "minSupportedVersion": "7.214.0"
                 },
                 "voiceShortcut": {
-                    "state": "internal",
-                    "minSupportedVersion": "7.212.0"
+                    "state": "enabled",
+                    "minSupportedVersion": "7.216.0"
                 }
             },
             "settings": {
@@ -482,21 +500,18 @@
             "state": "enabled",
             "exceptions": [],
             "features": {
-                "tdsNextExperiment006": {
-                    "state": "disabled",
+                "tdsNextExperiment007": {
+                    "state": "enabled",
                     "rollout": {
                         "steps": [
                             {
                                 "percent": 25
-                            },
-                            {
-                                "percent": 100
                             }
                         ]
                     },
                     "settings": {
-                        "controlUrl": "v5/experiments/202602v1-ios-tds-control.json",
-                        "treatmentUrl": "v5/experiments/202602v1-ios-tds-treatment.json"
+                        "controlUrl": "v5/experiments/202604v1-ios-tds-control.json",
+                        "treatmentUrl": "v5/experiments/202604v1-ios-tds-treatment.json"
                     },
                     "cohorts": [
                         {
@@ -665,6 +680,10 @@
                 {
                     "domain": "newrepublic.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4652"
+                },
+                {
+                    "domain": "theguardian.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4985"
                 }
             ],
             "features": {
@@ -684,6 +703,9 @@
                             }
                         ]
                     }
+                },
+                "heuristicAction": {
+                    "state": "enabled"
                 }
             }
         },
@@ -2392,7 +2414,7 @@
                     }
                 },
                 "productTelemetrySurfaceUsage": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": "7.199.0",
                     "description": "Temporarily gather telemetry around product surfaces being used."
                 },
@@ -2441,7 +2463,15 @@
                     "state": "disabled"
                 },
                 "autoplayBlocking": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": "7.216.0",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            }
+                        ]
+                    }
                 },
                 "showNTPAfterIdleReturn": {
                     "state": "enabled",
@@ -2450,6 +2480,32 @@
                 "onboardingRebranding": {
                     "state": "enabled",
                     "minSupportedVersion": "7.214.0"
+                },
+                "fireproofingETLDPlus1": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.214.0",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
+                },
+                "fireButtonRefinements": {
+                    "state": "internal",
+                    "minSupportedVersion": "7.215.0"
+                },
+                "fireMode": {
+                    "state": "internal",
+                    "minSupportedVersion": "7.215.0"
+                },
+                "minimalChromeInLandscape": {
+                    "state": "disabled",
+                    "minSupportedVersion": "7.215.0"
                 }
             }
         },
@@ -2502,6 +2558,9 @@
                     "minSupportedVersion": "7.201.1"
                 },
                 "goToMarket": {
+                    "state": "disabled"
+                },
+                "freemiumPIR": {
                     "state": "disabled"
                 }
             },
@@ -2827,24 +2886,18 @@
             "minSupportedVersion": "7.210.0",
             "features": {
                 "embedded": {
-                    "state": "internal",
-                    "minSupportedVersion": "7.211.0",
-                    "rollout": {
-                        "steps": [
-                            {
-                                "percent": 50
-                            }
-                        ]
-                    }
-                },
-                "embeddedRollout": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": "7.213.0"
                 }
             }
         },
         "adBlockingExtension": {
-            "state": "disabled",
-            "minSupportedVersion": "7.210.0"
+            "state": "internal",
+            "minSupportedVersion": "7.216.0"
+        },
+        "webDetection": {
+            "state": "enabled",
+            "minSupportedVersion": "7.214.0"
         }
     },
     "unprotectedTemporary": []
