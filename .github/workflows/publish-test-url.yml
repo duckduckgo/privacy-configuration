@@ -6,7 +6,7 @@ on:
 
 jobs:
     publish-config:
-        if: github.event.action != 'closed' && github.event.pull_request.user.login != 'dependabot[bot]' && github.event.pull_request.user.login != 'app/dependabot'
+        if: github.event.action != 'closed' && github.event.pull_request.user.login != 'dependabot[bot]'
         runs-on: ubuntu-latest
         concurrency:
             group: preview-pages-branch
@@ -100,7 +100,7 @@ jobs:
                       ❌ Failed to build or publish preview config. Check the [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details.
 
     cleanup-preview:
-        if: github.event.action == 'closed' && github.event.pull_request.user.login != 'dependabot[bot]' && github.event.pull_request.user.login != 'app/dependabot'
+        if: github.event.action == 'closed' && github.event.pull_request.user.login != 'dependabot[bot]'
         runs-on: ubuntu-latest
         concurrency:
             group: preview-pages-branch
