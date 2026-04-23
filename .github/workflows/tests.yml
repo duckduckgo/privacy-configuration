@@ -13,7 +13,7 @@ jobs:
             contents: read
             statuses: write
         steps:
-            - uses: actions/checkout@v5
+            - uses: actions/checkout@v6
             - name: Use Node.js 20
               uses: actions/setup-node@v5
               with:
@@ -44,7 +44,7 @@ jobs:
             actions: write
             statuses: write
         steps:
-            - uses: actions/checkout@v5
+            - uses: actions/checkout@v6
               with:
                   repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
                   ref: ${{ github.event.pull_request.head.ref || github.ref }}

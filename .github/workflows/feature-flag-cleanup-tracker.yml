@@ -46,7 +46,7 @@ jobs:
                   node-version: '20'
 
             - name: Checkout merge commit
-              uses: actions/checkout@v4
+              uses: actions/checkout@v6
               with:
                   ref: ${{ steps.pr_context.outputs.head_sha }}
                   path: head
@@ -65,7 +65,7 @@ jobs:
                   echo "base_sha=$BASE_SHA" >> $GITHUB_OUTPUT
 
             - name: Checkout pre-merge base
-              uses: actions/checkout@v4
+              uses: actions/checkout@v6
               with:
                   ref: ${{ steps.resolve_base.outputs.base_sha }}
                   path: base
