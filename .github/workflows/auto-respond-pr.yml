@@ -58,7 +58,7 @@ jobs:
               run: sleep 5
 
             - name: Check repository permissions
-              uses: actions/github-script@v8
+              uses: actions/github-script@v9
               with:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
                   script: |
@@ -173,7 +173,7 @@ jobs:
                   direction: last
 
             - name: Create Diff Comment Body
-              uses: actions/github-script@v8
+              uses: actions/github-script@v9
               id: create_diff_body
               with:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -200,7 +200,7 @@ jobs:
                   timeoutSeconds: 600
 
             - name: Check for existing approved reviews
-              uses: actions/github-script@v8
+              uses: actions/github-script@v9
               id: check_reviews
               with:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -264,7 +264,7 @@ jobs:
                        - [Feature Implementer Documentation](https://github.com/duckduckgo/privacy-configuration/blob/main/docs/feature-implementer-documentation.md)
 
             - name: Create Approval Comment Body
-              uses: actions/github-script@v8
+              uses: actions/github-script@v9
               id: create_approval_body
               with:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
