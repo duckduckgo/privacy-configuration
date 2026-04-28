@@ -445,6 +445,14 @@
                 "rememberTogglePosition": {
                     "state": "enabled",
                     "minSupportedVersion": 52760000
+                },
+                "duckAiNativeStorage": {
+                    "state": "internal",
+                    "minSupportedVersion": 52770000
+                },
+                "useNativeStorageChatData": {
+                    "state": "disabled",
+                    "minSupportedVersion": 52770000
                 }
             }
         },
@@ -2133,6 +2141,7 @@
                 "aiChat": "disabled",
                 "subscriptions": "disabled",
                 "serpSettings": "disabled",
+                "duckAiNativeStorage": "disabled",
                 "domains": [
                     {
                         "domain": [
@@ -2154,6 +2163,11 @@
                             {
                                 "op": "replace",
                                 "path": "/serpSettings",
+                                "value": "enabled"
+                            },
+                            {
+                                "op": "replace",
+                                "path": "/duckAiNativeStorage",
                                 "value": "enabled"
                             }
                         ]
