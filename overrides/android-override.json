@@ -138,7 +138,7 @@
             "exceptions": [],
             "features": {
                 "tdsNextExperiment007": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": 52361000,
                     "rollout": {
                         "steps": [
@@ -150,6 +150,31 @@
                     "settings": {
                         "controlUrl": "v5/experiments/202604v1-android-tds-control.json",
                         "treatmentUrl": "v5/experiments/202604v1-android-tds-treatment.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "tdsNextExperiment008": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52361000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "v5/experiments/202604v3-android-tds-control.json",
+                        "treatmentUrl": "v5/experiments/202604v3-android-tds-treatment.json"
                     },
                     "cohorts": [
                         {
