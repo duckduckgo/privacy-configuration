@@ -47,6 +47,12 @@ type YoutubeAdsDetector = {
         avatarButton?: string;
         premiumLogo?: string;
     };
+    fireDetectionEvents?: {
+        adBlocker?: boolean;
+        playabilityError?: boolean;
+        videoAd?: boolean;
+        staticAd?: boolean;
+    };
 };
 
 type WebInterferenceDetectionSettings = CSSInjectFeatureSettings<{
