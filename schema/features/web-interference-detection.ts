@@ -52,6 +52,7 @@ type YoutubeAdsDetector = {
         playabilityError?: boolean;
         videoAd?: boolean;
         staticAd?: boolean;
+        buffering?: boolean;
     };
 };
 
