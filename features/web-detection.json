@@ -197,6 +197,20 @@
                         "op": "add",
                         "path": "/detectors/adwalls/generic_se/actions",
                         "value": { "fireEvent": { "state": "enabled", "type": "adwall" } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/adwalls/admiral/triggers",
+                        "value": { "auto": { "state": "enabled", "when": { "intervalMs": [
+                                        500,
+                                        1000,
+                                        5000
+                                    ] } } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/adwalls/admiral/actions",
+                        "value": { "fireEvent": { "state": "enabled", "type": "admiralAdwall" } }
                     }
                 ]
             }
