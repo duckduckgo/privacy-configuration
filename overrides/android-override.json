@@ -3420,6 +3420,32 @@
                 "subscriptionPromoModalCta": {
                     "state": "enabled",
                     "minSupportedVersion": 52750000
+                },
+                "onboardingDuckAiExperimentMay26": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52790000,
+                    "description": "Duck.ai onboarding query experiment cohorts",
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatmentWithDuckAiDefault",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatmentWithSearchDefault",
+                            "weight": 1
+                        }
+                    ],
+                    "targets": [
+                        {
+                            "localeCountry": "us",
+                            "localeLanguage": "en",
+                            "isReturningUser": false
+                        }
+                    ]
                 }
             }
         },
