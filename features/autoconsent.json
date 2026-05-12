@@ -1806,7 +1806,7 @@
                 "div.b-cookies-informer",
                 "div.b-cookies-informer__nav > button:nth-child(1)",
                 "body > div#cookieChoiceInfo > div:nth-child(2)#cookieButtonBar > a:nth-child(2)#cookieChoiceRefuse",
-                "[status=open]:has([aria-label=\"Privacy Disclosure\"])",
+                "div[role=\"dialog\"][aria-label^=\"Privacy Disclosure\"]",
                 "div.b-cookies-informer__switchers",
                 "div.b-cookies-informer__switchers input:not([disabled])",
                 "div.b-cookies-informer__nav > button",
@@ -2279,7 +2279,9 @@
                 "body > div#cookieNotice > span:not([id])",
                 "#react-consent-modal",
                 "#react-consent-modal .flex.flex-column",
-                "#react-consent-modal .flex.flex-row.justify-between button:first-child"
+                "#react-consent-modal .flex.flex-row.justify-between button:first-child",
+                "cookie-banner#cookie-banner-host",
+                "groups=C1%3A1%2CC3%3A0"
             ],
             "r": [
                 [
@@ -26059,6 +26061,39 @@
                 ],
                 [
                     1,
+                    "hearst-us",
+                    1,
+                    "^https://(www\\.)?(menshealth|womenshealthmag|cosmopolitan|esquire|elle|elledecor|harpersbazaar|goodhousekeeping|popularmechanics|caranddriver|delish|veranda|roadandtrack|bestproducts|countryliving|housebeautiful|bicycling|biography|pitchfork|prevention|runnersworld|thepioneerwoman|townandcountrymag)\\.com/",
+                    10,
+                    [
+                        952
+                    ],
+                    [
+                        {
+                            "e": 952
+                        }
+                    ],
+                    [
+                        {
+                            "check": "any",
+                            "v": 952
+                        }
+                    ],
+                    [
+                        {
+                            "h": 952
+                        }
+                    ],
+                    [
+                        {
+                            "check": "none",
+                            "v": 952
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
                     "hetzner.com",
                     2,
                     "^https://www\\.hetzner\\.com/",
@@ -27881,6 +27916,57 @@
                 ],
                 [
                     1,
+                    "volvocars-com",
+                    2,
+                    "^https://([a-z0-9-]+\\.)?volvocars\\.com/",
+                    10,
+                    [
+                        1426
+                    ],
+                    [
+                        {
+                            "exists": [
+                                "cookie-banner#cookie-banner-host",
+                                "#dialog_cookie_consent"
+                            ]
+                        }
+                    ],
+                    [
+                        {
+                            "visible": [
+                                "cookie-banner#cookie-banner-host",
+                                "#dialog_cookie_consent"
+                            ]
+                        }
+                    ],
+                    [
+                        {
+                            "wait": 500
+                        },
+                        {
+                            "waitForThenClick": [
+                                "cookie-banner#cookie-banner-host",
+                                "#onetrust-reject-all-handler"
+                            ]
+                        },
+                        {
+                            "waitForVisible": [
+                                "cookie-banner#cookie-banner-host",
+                                "#dialog_cookie_consent"
+                            ],
+                            "check": "none",
+                            "timeout": 5000
+                        }
+                    ],
+                    [
+                        {
+                            "cc": 1427
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
                     "wikiwand",
                     1,
                     "^https://(www\\.)?wikiwand\\.com/",
@@ -27901,33 +27987,6 @@
                     [
                         {
                             "h": 947
-                        }
-                    ],
-                    [],
-                    {}
-                ],
-                [
-                    1,
-                    "womenshealthmag-us",
-                    1,
-                    "^https://(www\\.)?womenshealthmag\\.com/",
-                    10,
-                    [
-                        952
-                    ],
-                    [
-                        {
-                            "e": 952
-                        }
-                    ],
-                    [
-                        {
-                            "v": 952
-                        }
-                    ],
-                    [
-                        {
-                            "h": 952
                         }
                     ],
                     [],
@@ -28147,7 +28206,7 @@
                 ],
                 "specificRuleRange": [
                     185,
-                    755
+                    756
                 ],
                 "genericStringEnd": 717,
                 "frameStringEnd": 752
