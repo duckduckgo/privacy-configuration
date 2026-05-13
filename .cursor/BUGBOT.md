@@ -16,6 +16,9 @@ When a feature transitions from `internal` to `enabled` (or from `enabled` to `i
 ### Parent and Subfeature Independence
 Parent features and their subfeatures are **not** co-dependent — a subfeature's state is evaluated independently of its parent. Because of this, they often require the exact same gating (e.g. matching `state`, `minSupportedVersion`, rollout targets). When transitioning a subfeature, ensure its gating is explicitly set rather than assuming it inherits from the parent.
 
+### Rollout Step Edits
+When a rollout percentage changes, the diff must **append** a new entry to `rollout.steps[]` rather than mutate an existing entry. Each step is a discrete event clients persist; modifying an existing `percent` is silently ignored for already-enrolled users. Flag any PR that edits or removes an existing step object instead of appending a new one. See [`.cursor/rules/rollout-steps.mdc`](../.cursor/rules/rollout-steps.mdc) and [`docs/incremental-rollout-implementation-guide.md`](../docs/incremental-rollout-implementation-guide.md).
+
 ## Element Hiding Feature Validation
 
 ### Schema & Implementation References
