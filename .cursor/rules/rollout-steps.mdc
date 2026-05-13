@@ -1,0 +1,85 @@
+---
+description: Rules for editing rollout `steps[]` arrays in privacy-remote-configuration features and overrides. Use when bumping, lowering, or otherwise changing a feature's rollout percentage in `features/*.json` or `overrides/*-override.json`.
+globs: features/**/*.json,overrides/**/*.json
+alwaysApply: false
+---
+
+# Rollout Step Edits
+
+## Rule: append a new step, never modify an existing one
+
+When changing a rollout percentage, **append a new entry to `rollout.steps[]`**.
+Never edit the `percent` of an existing entry, and never delete prior entries.
+
+Each step is a discrete rollout event that clients persist. Mutating an existing
+step is silent: clients that have already processed that step skip re-evaluation,
+so the bump does not reach already-seen users. Appending a new step is the only
+way to enroll additional users (or roll back, on Android).
+
+This applies to every rollout block in this repo:
+
+- Top-level feature `rollout`
+- Sub-feature `rollout` (the common case)
+- `contentScopeExperiments` features
+- TDS experiments (`tdsNextExperimentNNN`) and similar A/B-cohort experiments
+
+## Examples
+
+### Bumping 25% → 100% (correct)
+
+```json
+"rollout": {
+    "steps": [
+        { "percent": 25 },
+        { "percent": 100 }
+    ]
+}
+```
+
+### Bumping 25% → 100% (incorrect — mutates existing step)
+
+```json
+"rollout": {
+    "steps": [
+        { "percent": 100 }
+    ]
+}
+```
+
+### Multi-step ramp (correct)
+
+```json
+"rollout": {
+    "steps": [
+        { "percent": 1 },
+        { "percent": 10 },
+        { "percent": 25 },
+        { "percent": 50 },
+        { "percent": 100 }
+    ]
+}
+```
+
+## Halting or rolling back a rollout
+
+- **Halt entirely**: set the sub-feature's `state` to `disabled`. This disables
+  the feature for everyone, including already-enrolled users. Do not touch the
+  `steps[]` array.
+- **Lower the percentage** (Android-only, where rollbacks are supported): append
+  a new step with the lower `percent`. Still do not edit prior steps.
+
+## Reviewer checklist
+
+When reviewing a PR that changes a `rollout.steps[]` array:
+
+1. Confirm the diff is purely additive — only `+` lines for new step objects.
+2. If a step object is being modified or deleted, flag it: this is almost
+   always wrong and should be a new appended step instead.
+3. Confirm step `percent` values are monotonic for ramp-ups, or explicitly
+   documented as a rollback for ramp-downs.
+
+## Reference
+
+- Canonical doc: [docs/incremental-rollout-implementation-guide.md](../../docs/incremental-rollout-implementation-guide.md)
+- Examples in git history: PRs #5111, #5104, #5093, #5053 (each appends one
+  new step per rollout bump).
