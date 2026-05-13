@@ -1293,7 +1293,8 @@
                     "minSupportedVersion": "0.150.0"
                 },
                 "ntpChatTools": {
-                    "state": "disabled"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.155.0"
                 },
                 "showHideAiGeneratedImages": {
                     "state": "enabled"
@@ -1313,22 +1314,28 @@
                     "minSupportedVersion": "0.152.0"
                 },
                 "suggestions": {
-                    "state": "internal"
+                    "state": "internal",
+                    "minSupportedVersion": "0.155.0"
                 },
                 "suggestionsDeletion": {
-                    "state": "disabled"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.155.0"
                 },
                 "ntpRecentChats": {
-                    "state": "internal"
+                    "state": "internal",
+                    "minSupportedVersion": "0.155.0"
                 },
                 "imageGeneration": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.155.0"
                 },
                 "omnibarWebSearch": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.156.0"
                 },
                 "dragAndDropImages": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.155.0"
                 },
                 "viewAllFromRecentChats": {
                     "state": "enabled",
@@ -1339,7 +1346,42 @@
                     "minSupportedVersion": "0.154.0"
                 },
                 "selectionContext": {
-                    "state": "disabled"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.156.0"
+                },
+                "nativeStorage": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.157.0",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25.0
+                            }
+                        ]
+                    }
+                },
+                "omnibarReasoningEffort": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.157.0"
+                },
+                "omnibarVoiceChatAccess": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.157.0"
+                },
+                "ntpImageGeneration": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.156.0"
+                },
+                "ntpWebSearch": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.156.0"
+                },
+                "settingsLinkInAiFeatures": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.158.0"
+                },
+                "attachMoreTabs": {
+                    "state": "internal"
                 }
             },
             "minSupportedVersion": "0.100.0",
@@ -1360,6 +1402,10 @@
                 ],
                 "maxHistoryCount": 5
             }
+        },
+        "autocompleteTabs": {
+            "state": "enabled",
+            "exceptions": []
         },
         "duckAiDataClearing": {
             "exceptions": [],
@@ -2133,7 +2179,7 @@
                 "subscriptions": "disabled",
                 "subscriptionPages": "disabled",
                 "serpSettings": "disabled",
-                "duckAiNativeStorage": "internal",
+                "duckAiNativeStorage": "disabled",
                 "domains": [
                     {
                         "domain": [
@@ -2161,17 +2207,10 @@
                                 "op": "replace",
                                 "path": "/serpSettings",
                                 "value": "enabled"
-                            }
-                        ]
-                    },
-                    {
-                        "domain": [
-                            "euw-serp-dev-testing19.duck.ai"
-                        ],
-                        "patchSettings": [
+                            },
                             {
                                 "op": "replace",
-                                "path": "/aiChat",
+                                "path": "/duckAiNativeStorage",
                                 "value": "enabled"
                             }
                         ]
@@ -4187,11 +4226,9 @@
         "webNotifications": {
             "state": "enabled",
             "features": {
-                "permissionRequests": {
-                    "state": "internal"
-                },
                 "showNotifications": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.156.0"
                 }
             },
             "exceptions": []
@@ -4215,6 +4252,46 @@
                                     "key": "is_ms_teams_iframe",
                                     "action": "delete"
                                 }
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "meet.google.com",
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/enumerateDevices",
+                                "value": "disabled"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "teams.microsoft.com",
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/enumerateDevices",
+                                "value": "disabled"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "teams.live.com",
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/enumerateDevices",
+                                "value": "disabled"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "teams.cloud.microsoft",
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/enumerateDevices",
+                                "value": "disabled"
                             }
                         ]
                     }
@@ -4551,7 +4628,7 @@
             "minSupportedVersion": "0.148.0",
             "exceptions": [],
             "settings": {
-                "extensionUrl": "https://staticcdn.duckduckgo.com/extensions/content-blocker/content-blocker-extension-2026.4.23.crx"
+                "extensionUrl": "https://staticcdn.duckduckgo.com/extensions/content-blocker/content-blocker-extension-2026.5.12.crx"
             },
             "features": {
                 "onboardingEnabled": {
@@ -4661,6 +4738,17 @@
                 }
             }
         },
+        "uiResponsiveness": {
+            "state": "internal",
+            "features": {
+                "keypressToCharacterRender": {
+                    "state": "internal"
+                },
+                "keypressToSuggestionRender": {
+                    "state": "internal"
+                }
+            }
+        },
         "diskSpaceMonitoring": {
             "state": "enabled",
             "exceptions": [],
@@ -4733,6 +4821,12 @@
                             2
                         ]
                     }
+                },
+                "processStatusTracking": {
+                    "state": "enabled"
+                },
+                "reportStackTrace": {
+                    "state": "disabled"
                 }
             }
         },
@@ -4805,17 +4899,17 @@
         },
         "tabProgressIndicator": {
             "minSupportedVersion": "0.151.0",
-            "state": "preview",
+            "state": "enabled",
             "exceptions": []
         },
         "tabLabelTransition": {
             "minSupportedVersion": "0.155.0",
-            "state": "preview",
+            "state": "enabled",
             "exceptions": []
         },
         "faviconTransitions": {
             "minSupportedVersion": "0.155.0",
-            "state": "preview",
+            "state": "enabled",
             "exceptions": []
         },
         "tabNavigationHistoryRestore": {
@@ -5017,6 +5111,10 @@
         "webDetection": {
             "state": "enabled",
             "minSupportedVersion": "0.147.0"
+        },
+        "webEvents": {
+            "state": "enabled",
+            "minSupportedVersion": "0.157.0"
         },
         "webInterferenceDetection": {
             "state": "enabled",
@@ -5255,6 +5353,13 @@
                             "signInButton": "a[href*=\"accounts.google.com/ServiceLogin\"]",
                             "avatarButton": "#avatar-btn",
                             "premiumLogo": "ytd-topbar-logo-renderer a[title*=\"Premium\"]"
+                        },
+                        "fireDetectionEvents": {
+                            "adBlocker": true,
+                            "playabilityError": true,
+                            "videoAd": true,
+                            "staticAd": true,
+                            "buffering": true
                         }
                     }
                 }
@@ -5278,11 +5383,32 @@
             "state": "disabled"
         },
         "nativeRequestInterception": {
-            "state": "disabled",
+            "state": "enabled",
+            "minSupportedVersion": "0.155.5",
             "exceptions": [],
             "features": {
                 "disableFirstAboutBlankNavigation": {
                     "state": "disabled"
+                },
+                "enableNativeRequestInterception": {
+                    "state": "disabled",
+                    "minSupportedVersion": "0.155.5",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 15
+                            },
+                            {
+                                "percent": 40
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
                 }
             }
         },
@@ -5314,7 +5440,8 @@
             "exceptions": [],
             "features": {
                 "desktopLauncher": {
-                    "state": "internal"
+                    "minSupportedVersion": "0.155.0",
+                    "state": "enabled"
                 }
             },
             "state": "enabled"
@@ -5323,12 +5450,9 @@
             "exceptions": [],
             "state": "enabled"
         },
-        "duckAiNativeStorage": {
-            "state": "internal",
-            "exceptions": []
-        },
         "multiDownloadPermission": {
-            "state": "disabled",
+            "state": "enabled",
+            "minSupportedVersion": "0.158.0",
             "exceptions": []
         }
     },

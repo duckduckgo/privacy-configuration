@@ -33,6 +33,7 @@ import { WebEventsFeature } from './features/web-events';
 import { WebInterferenceDetectionFeature } from './features/web-interference-detection';
 import { ExtendedCrashReporting } from './features/extendedCrashReporting';
 import { MacOSBrowserConfig } from './features/macos-browser-config';
+import { IOSBrowserConfig } from './features/ios-browser-config';
 import { DownloadManager } from './features/downloadManager';
 import { WebExtensionsConfig } from './features/web-extensions';
 import { AdBlockingExtensionConfig } from './features/ad-blocking-extension';
@@ -95,6 +96,7 @@ export type ConfigV5<VersionType> = {
         webInterferenceDetection?: WebInterferenceDetectionFeature<VersionType>;
         extendedCrashReporting?: ExtendedCrashReporting<VersionType>;
         macOSBrowserConfig?: MacOSBrowserConfig<VersionType>;
+        iOSBrowserConfig?: IOSBrowserConfig<VersionType>;
         tabSuspension?: TabSuspension<VersionType>;
         webExtensions?: WebExtensionsConfig<VersionType>;
     };

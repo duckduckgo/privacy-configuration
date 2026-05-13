@@ -138,7 +138,7 @@
             "exceptions": [],
             "features": {
                 "tdsNextExperiment007": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": 52361000,
                     "rollout": {
                         "steps": [
@@ -150,6 +150,56 @@
                     "settings": {
                         "controlUrl": "v5/experiments/202604v1-android-tds-control.json",
                         "treatmentUrl": "v5/experiments/202604v1-android-tds-treatment.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "tdsNextExperiment008": {
+                    "state": "disabled",
+                    "minSupportedVersion": 52361000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "v5/experiments/202604v3-android-tds-control.json",
+                        "treatmentUrl": "v5/experiments/202604v3-android-tds-treatment.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "tdsNextExperiment009": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52361000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "v5/experiments/202605adm01-android-tds-control.json",
+                        "treatmentUrl": "v5/experiments/202605adm01-android-tds-treatment.json"
                     },
                     "cohorts": [
                         {
@@ -445,6 +495,35 @@
                 "rememberTogglePosition": {
                     "state": "enabled",
                     "minSupportedVersion": 52760000
+                },
+                "duckAiNativeStorage": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52780000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 20
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
+                },
+                "useNativeStorageChatData": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52780000
+                },
+                "duckAiVoiceEntryPoint": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52780000
+                },
+                "digitalAssistantDuckAi": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52780000
                 }
             }
         },
@@ -1287,20 +1366,37 @@
             }
         },
         "autofillService": {
-            "state": "disabled",
-            "minSupportedVersion": 52290000,
+            "state": "enabled",
+            "minSupportedVersion": 52760000,
             "features": {
                 "canUpdateAppToDomainDataset": {
-                    "state": "disabled",
-                    "minSupportedVersion": 52290000
+                    "state": "enabled",
+                    "minSupportedVersion": 52760000
                 },
                 "canMapAppToDomain": {
-                    "state": "disabled",
-                    "minSupportedVersion": 52290000
+                    "state": "enabled",
+                    "minSupportedVersion": 52760000
                 },
                 "canAutofillInsideDDG": {
-                    "state": "disabled",
-                    "minSupportedVersion": 52290000
+                    "state": "enabled",
+                    "minSupportedVersion": 52760000
+                },
+                "canProcessSystemFillRequests": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52760000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
                 }
             }
         },
@@ -1629,9 +1725,10 @@
                     }
                 },
                 "showNTPAfterIdleReturn": {
-                    "state": "disabled",
+                    "state": "enabled",
+                    "minSupportedVersion": 52780000,
                     "settings": {
-                        "defaultIdleThresholdSeconds": "300"
+                        "defaultIdleThresholdSeconds": "1800"
                     }
                 },
                 "singleTabFireDialog": {
@@ -1656,6 +1753,10 @@
                             }
                         ]
                     }
+                },
+                "pdfViewer": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52790000
                 }
             }
         },
@@ -2119,6 +2220,7 @@
                 "aiChat": "disabled",
                 "subscriptions": "disabled",
                 "serpSettings": "disabled",
+                "duckAiNativeStorage": "disabled",
                 "domains": [
                     {
                         "domain": [
@@ -2140,6 +2242,11 @@
                             {
                                 "op": "replace",
                                 "path": "/serpSettings",
+                                "value": "enabled"
+                            },
+                            {
+                                "op": "replace",
+                                "path": "/duckAiNativeStorage",
                                 "value": "enabled"
                             }
                         ]
@@ -3204,7 +3311,12 @@
                     "minSupportedVersion": 52220000
                 },
                 "allowPurchase": {
-                    "state": "enabled"
+                    "state": "enabled",
+                    "targets": [
+                        {
+                            "minSdkVersion": 28
+                        }
+                    ]
                 },
                 "useUnifiedFeedback": {
                     "state": "enabled",
@@ -3312,6 +3424,32 @@
                 "subscriptionPromoModalCta": {
                     "state": "enabled",
                     "minSupportedVersion": 52750000
+                },
+                "onboardingDuckAiExperimentMay26": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52790000,
+                    "description": "Duck.ai onboarding query experiment cohorts",
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatmentWithDuckAiDefault",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatmentWithSearchDefault",
+                            "weight": 1
+                        }
+                    ],
+                    "targets": [
+                        {
+                            "localeCountry": "us",
+                            "localeLanguage": "en",
+                            "isReturningUser": false
+                        }
+                    ]
                 }
             }
         },
@@ -3612,6 +3750,10 @@
                             }
                         ]
                     }
+                },
+                "defaultBrowserWinBackPrompt": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52800000
                 }
             }
         },
@@ -3915,12 +4057,12 @@
             }
         },
         "productSurfaceTelemetry": {
-            "state": "enabled",
+            "state": "disabled",
             "exceptions": [],
             "minSupportedVersion": 52751000,
             "features": {
                 "enableTelemetry": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": 52751000
                 }
             }
@@ -4089,28 +4231,23 @@
             "minSupportedVersion": 52720000
         },
         "progressBarUpgrade": {
-            "state": "disabled",
-            "minSupportedVersion": 52760000,
+            "state": "enabled",
+            "minSupportedVersion": 52781000,
             "exceptions": [],
             "features": {
                 "behaviourUpdate": {
-                    "state": "disabled",
-                    "minSupportedVersion": 52760000,
-                    "rollout": {
-                        "steps": [
-                            {
-                                "percent": 10
-                            },
-                            {
-                                "percent": 50
-                            },
-                            {
-                                "percent": 100
-                            }
-                        ]
-                    }
+                    "state": "enabled",
+                    "minSupportedVersion": 52781000
                 }
             }
+        },
+        "defaultBrowserChangedSurvey": {
+            "state": "enabled",
+            "minSupportedVersion": 52770000,
+            "settings": {
+                "samplingRate": 40
+            },
+            "exceptions": []
         }
     },
     "unprotectedTemporary": [],

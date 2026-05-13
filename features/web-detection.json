@@ -13,7 +13,7 @@
                             "pattern": [
                                 "ad ?block(er)? detected",
                                 "adjust(ing)?( your)? ad blocking settings",
-                                "(turn off|disable|disabling|deactivate)( your| my)? ad ?block(er)?",
+                                "(turn(ing)? off|disable|disabling|deactivate)( your| my)? ad ?block(er)?",
                                 "your ad ?blocker is on",
                                 "you('re| are| may be) using an ad blocker"
                             ]
@@ -72,6 +72,20 @@
                             ]
                         }
                     }
+                },
+                "admiral": {
+                    "match": {
+                        "text": {
+                            "pattern": [
+                                "contact support"
+                            ],
+                            "selector": [
+                                "a[href*='forms.gle/6M6VTS3mmHXGbFjM8']",
+                                "a[href^='http://forms.gle/6M6VTS3mmHXGbFjM8']",
+                                "a[href^='https://forms.gle/6M6VTS3mmHXGbFjM8']"
+                            ]
+                        }
+                    }
                 }
             },
             "commentsDisabled": {
@@ -79,6 +93,19 @@
                     "match": {
                         "text": {
                             "pattern": "comments are turned off"
+                        }
+                    }
+                }
+            },
+            "other": {
+                "dismissible_en": {
+                    "match": {
+                        "text": {
+                            "pattern": [
+                                "Continue to the site",
+                                "Continue without disabling",
+                                "Continue without supporting"
+                            ]
                         }
                     }
                 }
@@ -174,6 +201,20 @@
                         "op": "add",
                         "path": "/detectors/adwalls/generic_se/actions",
                         "value": { "fireEvent": { "state": "enabled", "type": "adwall" } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/adwalls/admiral/triggers",
+                        "value": { "auto": { "state": "enabled", "when": { "intervalMs": [
+                                        500,
+                                        1000,
+                                        5000
+                                    ] } } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/adwalls/admiral/actions",
+                        "value": { "fireEvent": { "state": "enabled", "type": "admiralAdwall" } }
                     }
                 ]
             }
