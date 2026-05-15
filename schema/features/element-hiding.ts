@@ -8,7 +8,7 @@ type ElementHidingValue = {
 type ElementHidingRuleHide = {
     selector: string;
     type: 'hide-empty' | 'hide' | 'closest-empty' | 'override';
-    // No values field allowed for hide rules
+    hasText?: string;
 };
 
 type ElementHidingRuleModify = {
