@@ -71,6 +71,29 @@
                     {
                         "condition": [
                             {
+                                "domain": "claude.ai"
+                            }
+                        ],
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/apiChanges/MediaDevices.prototype.enumerateDevices",
+                                "value": {
+                                    "type": "remove"
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/apiChanges/MediaDevices.prototype.getUserMedia",
+                                "value": {
+                                    "type": "remove"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "condition": [
+                            {
                                 "domain": "1cs.jp"
                             },
                             {
