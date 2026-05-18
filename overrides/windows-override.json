@@ -71,6 +71,27 @@
                     {
                         "condition": [
                             {
+                                "domain": "claude.ai"
+                            }
+                        ],
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/apiChanges/MediaDevices.prototype.getUserMedia",
+                                "value": {
+                                    "type": "descriptor",
+                                    "define": true,
+                                    "getterValue": {
+                                        "type": "function",
+                                        "functionName": "noop"
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "condition": [
+                            {
                                 "domain": "1cs.jp"
                             },
                             {
