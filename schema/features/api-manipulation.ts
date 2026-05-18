@@ -4,16 +4,25 @@ type RemoveAPIChange = {
     type: 'remove';
 };
 
-type DescriptorAPIChange = {
+type BaseDescriptorAPIChange = {
     type: 'descriptor';
     enumerable?: boolean;
     configurable?: boolean;
-    getterValue: CSSConfigSetting;
     define?: boolean; // If this is true, it permits defining new properties on the object. Otherwise, it only permits modifying existing properties.
 };
 
+type GetterDescriptorAPIChange = BaseDescriptorAPIChange & {
+    getterValue: CSSConfigSetting;
+    value?: never;
+};
+
+type ValueDescriptorAPIChange = BaseDescriptorAPIChange & {
+    value: CSSConfigSetting;
+    getterValue?: never;
+};
+
 type FullAPIManipulationOptions = CSSInjectFeatureSettings<{
-    apiChanges: Record<string, RemoveAPIChange | DescriptorAPIChange>;
+    apiChanges: Record<string, RemoveAPIChange | GetterDescriptorAPIChange | ValueDescriptorAPIChange>;
     additionalCheck?: FeatureState;
 }>;
 export type APIManipulationSettings = Partial<FullAPIManipulationOptions>;
