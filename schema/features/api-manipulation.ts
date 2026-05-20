@@ -4,26 +4,61 @@ type RemoveAPIChange = {
     type: 'remove';
 };
 
-type DescriptorAPIChange = {
+type DescriptorTarget = 'own' | 'existing' | 'missing';
+
+type DescriptorPlacement =
+    | {
+          // Defaults to "own" in Content Scope Scripts. Use "existing" to allow shadow-defining
+          // inherited DOM APIs; use "missing" to define a new API only when absent from the
+          // target and its prototype chain.
+          target?: DescriptorTarget;
+          define?: never;
+      }
+    | {
+          target?: never;
+          // Deprecated compatibility alias for target: "missing". Do not use in new config.
+          define?: boolean;
+      };
+
+type BaseDescriptorAPIChange = {
     type: 'descriptor';
     enumerable?: boolean;
     configurable?: boolean;
-    // Accessor-style overrides: supply `getterValue` to override the property's getter, and/or
-    // `setterValue` to override its setter (each invoked on access/assignment respectively).
-    // Either or both may be supplied; mutually exclusive with `value`.
-    getterValue?: CSSConfigSetting;
-    setterValue?: CSSConfigSetting;
-    // Value-style overrides: supply `value` to replace the property with a data descriptor
-    // (also used to replace methods, including DOM methods - the runtime masks the replacement
-    // so `toString()`, `name`, and `length` continue to resemble the original).
-    // Mutually exclusive with `getterValue`/`setterValue`. At least one of `getterValue`,
-    // `setterValue`, or `value` must be supplied; this is enforced at runtime.
-    value?: CSSConfigSetting;
-    define?: boolean; // If this is true, it permits defining new properties on the object. Otherwise, it only permits modifying existing properties.
 };
+
+type ValueDescriptorAPIChange = BaseDescriptorAPIChange &
+    DescriptorPlacement & {
+        // Value-style overrides replace the property with a data descriptor. Use this for
+        // methods; C-S-S masks function replacements so toString(), name, and length resemble
+        // the original DOM API when one exists.
+        value: CSSConfigSetting;
+        getterValue?: never;
+        setterValue?: never;
+    };
+
+type GetterDescriptorAPIChange = BaseDescriptorAPIChange &
+    DescriptorPlacement & {
+        // Accessor-style override. May be combined with setterValue. Mutually exclusive with value.
+        getterValue: CSSConfigSetting;
+        setterValue?: CSSConfigSetting;
+        value?: never;
+    };
+
+type SetterDescriptorAPIChange = BaseDescriptorAPIChange &
+    DescriptorPlacement & {
+        // Setter-only accessor override. The original getter is preserved when one exists.
+        setterValue: CSSConfigSetting;
+        getterValue?: CSSConfigSetting;
+        value?: never;
+    };
+
+type DescriptorAPIChange = ValueDescriptorAPIChange | GetterDescriptorAPIChange | SetterDescriptorAPIChange;
 
 type FullAPIManipulationOptions = CSSInjectFeatureSettings<{
     apiChanges: Record<string, RemoveAPIChange | DescriptorAPIChange>;
+    serviceAreas?: {
+        mediaDevicesDeviceChangeEvents?: FeatureState;
+    };
     additionalCheck?: FeatureState;
 }>;
 export type APIManipulationSettings = Partial<FullAPIManipulationOptions>;
