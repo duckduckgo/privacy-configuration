@@ -512,7 +512,10 @@
                 },
                 "domains": [
                     {
-                        "domain": "www.youtube.com",
+                        "domain": [
+                            "www.youtube.com",
+                            "m.youtube.com"
+                        ],
                         "patchSettings": [
                             {
                                 "op": "replace",
@@ -522,21 +525,14 @@
                         ]
                     },
                     {
-                        "domain": "duckduckgo.com",
+                        "domain": [
+                            "duckduckgo.com",
+                            "duck.co"
+                        ],
                         "patchSettings": [
                             {
                                 "op": "replace",
                                 "path": "/overlays/serpProxy/state",
-                                "value": "enabled"
-                            }
-                        ]
-                    },
-                    {
-                        "domain": "m.youtube.com",
-                        "patchSettings": [
-                            {
-                                "op": "replace",
-                                "path": "/overlays/youtube/state",
                                 "value": "enabled"
                             }
                         ]
