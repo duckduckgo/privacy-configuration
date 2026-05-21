@@ -55,7 +55,13 @@ type FullWebCompatOptions = CSSInjectFeatureSettings<{
             domain?: string;
         }[];
     };
-    enumerateDevices: FeatureState;
+    enumerateDevices:
+        | FeatureState
+        | {
+              state: FeatureState;
+              timeoutMs?: number;
+              timeoutEnabled?: boolean;
+          };
     webNotifications:
         | FeatureState
         | {
