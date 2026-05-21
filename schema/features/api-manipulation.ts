@@ -56,9 +56,6 @@ type DescriptorAPIChange = ValueDescriptorAPIChange | GetterDescriptorAPIChange 
 
 type FullAPIManipulationOptions = CSSInjectFeatureSettings<{
     apiChanges: Record<string, RemoveAPIChange | DescriptorAPIChange>;
-    serviceAreas?: {
-        mediaDevicesDeviceChangeEvents?: FeatureState;
-    };
     additionalCheck?: FeatureState;
 }>;
 export type APIManipulationSettings = Partial<FullAPIManipulationOptions>;

@@ -1,18 +1,6 @@
 # API manipulation config
 
-`apiManipulation` changes page-visible DOM APIs from Content Scope Scripts. Prefer `serviceAreas` when a reviewed bundle exists; use raw `apiChanges` only for targeted webcompat fixes.
-
-## Service areas
-
-```json
-{
-    "serviceAreas": {
-        "mediaDevicesDeviceChangeEvents": "enabled"
-    }
-}
-```
-
-`mediaDevicesDeviceChangeEvents` suppresses JavaScript-side `MediaDevices` `devicechange` subscription APIs. This is the preferred shape for the Claude/LinkedIn/Youtube media prompt mitigation class.
+`apiManipulation` changes page-visible DOM APIs from Content Scope Scripts. Use raw `apiChanges` narrowly and prefer platform/domain scoping for targeted webcompat fixes.
 
 ## Raw descriptor targets
 

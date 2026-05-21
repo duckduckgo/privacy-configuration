@@ -50,19 +50,6 @@ describe('ApiManipulation schema tests', () => {
         expect(validate(config)).to.equal(true, formatErrors(validate.errors));
     });
 
-    it('accepts service area settings', () => {
-        const config = createConfig({
-            type: 'descriptor',
-            getterValue: {
-                type: 'undefined',
-            },
-        });
-        config.features.apiManipulation.settings.serviceAreas = {
-            mediaDevicesDeviceChangeEvents: 'enabled',
-        };
-        expect(validate(config)).to.equal(true, formatErrors(validate.errors));
-    });
-
     it('rejects mixed accessor and value descriptor shapes', () => {
         const config = createConfig({
             type: 'descriptor',
