@@ -31,6 +31,12 @@
         },
         "apiManipulation": {
             "state": "enabled",
+            "exceptions": [
+                {
+                    "domain": "x.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5211"
+                }
+            ],
             "settings": {
                 "apiChanges": {
                     "Navigator.prototype.deviceMemory": {
@@ -63,6 +69,63 @@
                                     "getterValue": {
                                         "type": "string",
                                         "value": "denied"
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "condition": [
+                            {
+                                "domain": "youtube.com"
+                            },
+                            {
+                                "domain": "linkedin.com"
+                            },
+                            {
+                                "domain": "claude.ai"
+                            },
+                            {
+                                "domain": "claude.com"
+                            },
+                            {
+                                "domain": "privacy-test-pages.site"
+                            }
+                        ],
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/apiChanges/MediaDevices.prototype.addEventListener",
+                                "value": {
+                                    "type": "descriptor",
+                                    "value": {
+                                        "type": "function",
+                                        "functionName": "noop"
+                                    }
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/apiChanges/MediaDevices.prototype.removeEventListener",
+                                "value": {
+                                    "type": "descriptor",
+                                    "value": {
+                                        "type": "function",
+                                        "functionName": "noop"
+                                    }
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/apiChanges/MediaDevices.prototype.ondevicechange",
+                                "value": {
+                                    "type": "descriptor",
+                                    "getterValue": {
+                                        "type": "undefined"
+                                    },
+                                    "setterValue": {
+                                        "type": "function",
+                                        "functionName": "noop"
                                     }
                                 }
                             }
@@ -1314,16 +1377,16 @@
                     "minSupportedVersion": "0.152.0"
                 },
                 "suggestions": {
-                    "state": "internal",
-                    "minSupportedVersion": "0.155.0"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.157.0"
                 },
                 "suggestionsDeletion": {
-                    "state": "enabled",
+                    "state": "internal",
                     "minSupportedVersion": "0.155.0"
                 },
                 "ntpRecentChats": {
-                    "state": "internal",
-                    "minSupportedVersion": "0.155.0"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.157.0"
                 },
                 "imageGeneration": {
                     "state": "enabled",
@@ -3873,6 +3936,9 @@
                 "aiChatSync": {
                     "state": "enabled",
                     "minSupportedVersion": "0.147.5"
+                },
+                "scopedAccessCredentials": {
+                    "state": "internal"
                 }
             }
         },
@@ -4112,6 +4178,10 @@
                 {
                     "domain": "smythstoys.com",
                     "reason": "Bot check"
+                },
+                {
+                    "domain": "facebook.com",
+                    "reason": "reCAPTCHA failing on Facebook login"
                 }
             ]
         },
@@ -4634,7 +4704,7 @@
             "minSupportedVersion": "0.148.0",
             "exceptions": [],
             "settings": {
-                "extensionUrl": "https://staticcdn.duckduckgo.com/extensions/content-blocker/content-blocker-extension-2026.5.17.crx"
+                "extensionUrl": "https://staticcdn.duckduckgo.com/extensions/content-blocker/content-blocker-extension-2026.5.19.crx"
             },
             "features": {
                 "onboardingEnabled": {
@@ -4836,6 +4906,9 @@
                 },
                 "reportStackTrace": {
                     "state": "disabled"
+                },
+                "detectInstalledAv": {
+                    "state": "enabled"
                 }
             }
         },
@@ -5069,7 +5142,44 @@
             }
         },
         "requestBlocklist": {
-            "state": "enabled"
+            "state": "enabled",
+            "settings": {
+                "blockedRequests": {
+                    "privacy-test-pages.site": {
+                        "rules": [
+                            {
+                                "rule": "privacy-test-pages.site/privacy-protections/request-blocklist/*?block=true",
+                                "domains": [
+                                    "privacy-test-pages.site"
+                                ],
+                                "reason": "Testing rule for the privacy test page, see https://privacy-test-pages.site/privacy-protections/request-blocklist/"
+                            }
+                        ]
+                    },
+                    "third-party.site": {
+                        "rules": [
+                            {
+                                "rule": "third-party.site/privacy-protections/request-blocklist/*?block=true",
+                                "domains": [
+                                    "privacy-test-pages.site"
+                                ],
+                                "reason": "Testing rule for the privacy test page, see https://privacy-test-pages.site/privacy-protections/request-blocklist/"
+                            }
+                        ]
+                    },
+                    "protechts.net": {
+                        "rules": [
+                            {
+                                "rule": "protechts.net",
+                                "domains": [
+                                    "linkedin.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5218"
+                            }
+                        ]
+                    }
+                }
+            }
         },
         "passwordManagerExtensions": {
             "state": "internal",
