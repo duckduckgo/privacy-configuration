@@ -13,6 +13,7 @@ type SubFeatures<VersionType> = {
         VersionType,
         {
             generation: number;
+            probability: number;
         }
     >;
 };
