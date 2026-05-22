@@ -55,7 +55,18 @@ type FullWebCompatOptions = CSSInjectFeatureSettings<{
             domain?: string;
         }[];
     };
-    enumerateDevices: FeatureState;
+    enumerateDevices:
+        | FeatureState
+        | {
+              state: FeatureState;
+              deviceChangePollIntervalMs?: number;
+          };
+    deviceChangeListeners:
+        | FeatureState
+        | {
+              state: FeatureState;
+              pollIntervalMs?: number;
+          };
     webNotifications:
         | FeatureState
         | {
