@@ -77,63 +77,6 @@
                     {
                         "condition": [
                             {
-                                "domain": "youtube.com"
-                            },
-                            {
-                                "domain": "linkedin.com"
-                            },
-                            {
-                                "domain": "claude.ai"
-                            },
-                            {
-                                "domain": "claude.com"
-                            },
-                            {
-                                "domain": "privacy-test-pages.site"
-                            }
-                        ],
-                        "patchSettings": [
-                            {
-                                "op": "add",
-                                "path": "/apiChanges/MediaDevices.prototype.addEventListener",
-                                "value": {
-                                    "type": "descriptor",
-                                    "value": {
-                                        "type": "function",
-                                        "functionName": "noop"
-                                    }
-                                }
-                            },
-                            {
-                                "op": "add",
-                                "path": "/apiChanges/MediaDevices.prototype.removeEventListener",
-                                "value": {
-                                    "type": "descriptor",
-                                    "value": {
-                                        "type": "function",
-                                        "functionName": "noop"
-                                    }
-                                }
-                            },
-                            {
-                                "op": "add",
-                                "path": "/apiChanges/MediaDevices.prototype.ondevicechange",
-                                "value": {
-                                    "type": "descriptor",
-                                    "getterValue": {
-                                        "type": "undefined"
-                                    },
-                                    "setterValue": {
-                                        "type": "function",
-                                        "functionName": "noop"
-                                    }
-                                }
-                            }
-                        ]
-                    },
-                    {
-                        "condition": [
-                            {
                                 "domain": "1cs.jp"
                             },
                             {
