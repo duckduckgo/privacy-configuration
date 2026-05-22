@@ -31,6 +31,12 @@
         },
         "apiManipulation": {
             "state": "enabled",
+            "exceptions": [
+                {
+                    "domain": "x.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5211"
+                }
+            ],
             "settings": {
                 "apiChanges": {
                     "Navigator.prototype.deviceMemory": {
@@ -63,6 +69,63 @@
                                     "getterValue": {
                                         "type": "string",
                                         "value": "denied"
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "condition": [
+                            {
+                                "domain": "youtube.com"
+                            },
+                            {
+                                "domain": "linkedin.com"
+                            },
+                            {
+                                "domain": "claude.ai"
+                            },
+                            {
+                                "domain": "claude.com"
+                            },
+                            {
+                                "domain": "privacy-test-pages.site"
+                            }
+                        ],
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/apiChanges/MediaDevices.prototype.addEventListener",
+                                "value": {
+                                    "type": "descriptor",
+                                    "value": {
+                                        "type": "function",
+                                        "functionName": "noop"
+                                    }
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/apiChanges/MediaDevices.prototype.removeEventListener",
+                                "value": {
+                                    "type": "descriptor",
+                                    "value": {
+                                        "type": "function",
+                                        "functionName": "noop"
+                                    }
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/apiChanges/MediaDevices.prototype.ondevicechange",
+                                "value": {
+                                    "type": "descriptor",
+                                    "getterValue": {
+                                        "type": "undefined"
+                                    },
+                                    "setterValue": {
+                                        "type": "function",
+                                        "functionName": "noop"
                                     }
                                 }
                             }
@@ -1293,7 +1356,8 @@
                     "minSupportedVersion": "0.150.0"
                 },
                 "ntpChatTools": {
-                    "state": "disabled"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.155.0"
                 },
                 "showHideAiGeneratedImages": {
                     "state": "enabled"
@@ -1313,22 +1377,28 @@
                     "minSupportedVersion": "0.152.0"
                 },
                 "suggestions": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.157.0"
                 },
                 "suggestionsDeletion": {
-                    "state": "disabled"
+                    "state": "internal",
+                    "minSupportedVersion": "0.155.0"
                 },
                 "ntpRecentChats": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.157.0"
                 },
                 "imageGeneration": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.155.0"
                 },
                 "omnibarWebSearch": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.156.0"
                 },
                 "dragAndDropImages": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.155.0"
                 },
                 "viewAllFromRecentChats": {
                     "state": "enabled",
@@ -1339,6 +1409,44 @@
                     "minSupportedVersion": "0.154.0"
                 },
                 "selectionContext": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.156.0"
+                },
+                "nativeStorage": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.157.0",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25.0
+                            }
+                        ]
+                    }
+                },
+                "omnibarReasoningEffort": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.157.0"
+                },
+                "omnibarVoiceChatAccess": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.157.0"
+                },
+                "ntpImageGeneration": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.156.0"
+                },
+                "ntpWebSearch": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.156.0"
+                },
+                "settingsLinkInAiFeatures": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.158.0"
+                },
+                "sidebarAttachMoreTabs": {
+                    "state": "disabled"
+                },
+                "omnibarAttachMoreTabs": {
                     "state": "disabled"
                 }
             },
@@ -1360,6 +1468,10 @@
                 ],
                 "maxHistoryCount": 5
             }
+        },
+        "autocompleteTabs": {
+            "state": "enabled",
+            "exceptions": []
         },
         "duckAiDataClearing": {
             "exceptions": [],
@@ -1962,6 +2074,9 @@
                 },
                 "sort": {
                     "state": "enabled"
+                },
+                "bookmarkAllOpenTabs": {
+                    "state": "internal"
                 }
             }
         },
@@ -2133,7 +2248,7 @@
                 "subscriptions": "disabled",
                 "subscriptionPages": "disabled",
                 "serpSettings": "disabled",
-                "duckAiNativeStorage": "internal",
+                "duckAiNativeStorage": "disabled",
                 "domains": [
                     {
                         "domain": [
@@ -2161,17 +2276,10 @@
                                 "op": "replace",
                                 "path": "/serpSettings",
                                 "value": "enabled"
-                            }
-                        ]
-                    },
-                    {
-                        "domain": [
-                            "euw-serp-dev-testing19.duck.ai"
-                        ],
-                        "patchSettings": [
+                            },
                             {
                                 "op": "replace",
-                                "path": "/aiChat",
+                                "path": "/duckAiNativeStorage",
                                 "value": "enabled"
                             }
                         ]
@@ -3828,6 +3936,9 @@
                 "aiChatSync": {
                     "state": "enabled",
                     "minSupportedVersion": "0.147.5"
+                },
+                "scopedAccessCredentials": {
+                    "state": "internal"
                 }
             }
         },
@@ -4067,6 +4178,10 @@
                 {
                     "domain": "smythstoys.com",
                     "reason": "Bot check"
+                },
+                {
+                    "domain": "facebook.com",
+                    "reason": "reCAPTCHA failing on Facebook login"
                 }
             ]
         },
@@ -4187,11 +4302,9 @@
         "webNotifications": {
             "state": "enabled",
             "features": {
-                "permissionRequests": {
-                    "state": "internal"
-                },
                 "showNotifications": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.156.0"
                 }
             },
             "exceptions": []
@@ -4215,6 +4328,46 @@
                                     "key": "is_ms_teams_iframe",
                                     "action": "delete"
                                 }
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "meet.google.com",
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/enumerateDevices",
+                                "value": "disabled"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "teams.microsoft.com",
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/enumerateDevices",
+                                "value": "disabled"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "teams.live.com",
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/enumerateDevices",
+                                "value": "disabled"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "teams.cloud.microsoft",
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/enumerateDevices",
+                                "value": "disabled"
                             }
                         ]
                     }
@@ -4264,16 +4417,11 @@
                     "state": "enabled"
                 },
                 "nativeCrashDialogOneShot": {
-                    "state": "disabled",
-                    "rollout": {
-                        "steps": [
-                            {
-                                "percent": 5.0
-                            }
-                        ]
-                    },
+                    "state": "enabled",
+                    "minSupportedVersion": "0.157.4",
                     "settings": {
-                        "generation": 1
+                        "probability": 5,
+                        "generation": 2
                     }
                 }
             }
@@ -4551,7 +4699,7 @@
             "minSupportedVersion": "0.148.0",
             "exceptions": [],
             "settings": {
-                "extensionUrl": "https://staticcdn.duckduckgo.com/extensions/content-blocker/content-blocker-extension-2026.4.23.crx"
+                "extensionUrl": "https://staticcdn.duckduckgo.com/extensions/content-blocker/content-blocker-extension-2026.5.21.crx"
             },
             "features": {
                 "onboardingEnabled": {
@@ -4661,6 +4809,20 @@
                 }
             }
         },
+        "uiResponsiveness": {
+            "state": "enabled",
+            "minSupportedVersion": "0.158.0",
+            "features": {
+                "keypressToCharacterRender": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.158.0"
+                },
+                "keypressToSuggestionRender": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.158.0"
+                }
+            }
+        },
         "diskSpaceMonitoring": {
             "state": "enabled",
             "exceptions": [],
@@ -4733,6 +4895,15 @@
                             2
                         ]
                     }
+                },
+                "processStatusTracking": {
+                    "state": "enabled"
+                },
+                "reportStackTrace": {
+                    "state": "disabled"
+                },
+                "detectInstalledAv": {
+                    "state": "enabled"
                 }
             }
         },
@@ -4805,7 +4976,7 @@
         },
         "tabProgressIndicator": {
             "minSupportedVersion": "0.151.0",
-            "state": "preview",
+            "state": "enabled",
             "exceptions": []
         },
         "tabLabelTransition": {
@@ -4959,11 +5130,51 @@
                             "paid"
                         ]
                     }
+                },
+                "distributionSource": {
+                    "state": "enabled"
                 }
             }
         },
         "requestBlocklist": {
-            "state": "enabled"
+            "state": "enabled",
+            "settings": {
+                "blockedRequests": {
+                    "privacy-test-pages.site": {
+                        "rules": [
+                            {
+                                "rule": "privacy-test-pages.site/privacy-protections/request-blocklist/*?block=true",
+                                "domains": [
+                                    "privacy-test-pages.site"
+                                ],
+                                "reason": "Testing rule for the privacy test page, see https://privacy-test-pages.site/privacy-protections/request-blocklist/"
+                            }
+                        ]
+                    },
+                    "third-party.site": {
+                        "rules": [
+                            {
+                                "rule": "third-party.site/privacy-protections/request-blocklist/*?block=true",
+                                "domains": [
+                                    "privacy-test-pages.site"
+                                ],
+                                "reason": "Testing rule for the privacy test page, see https://privacy-test-pages.site/privacy-protections/request-blocklist/"
+                            }
+                        ]
+                    },
+                    "protechts.net": {
+                        "rules": [
+                            {
+                                "rule": "protechts.net",
+                                "domains": [
+                                    "linkedin.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5218"
+                            }
+                        ]
+                    }
+                }
+            }
         },
         "passwordManagerExtensions": {
             "state": "internal",
@@ -5017,6 +5228,10 @@
         "webDetection": {
             "state": "enabled",
             "minSupportedVersion": "0.147.0"
+        },
+        "webEvents": {
+            "state": "enabled",
+            "minSupportedVersion": "0.157.0"
         },
         "webInterferenceDetection": {
             "state": "enabled",
@@ -5255,6 +5470,13 @@
                             "signInButton": "a[href*=\"accounts.google.com/ServiceLogin\"]",
                             "avatarButton": "#avatar-btn",
                             "premiumLogo": "ytd-topbar-logo-renderer a[title*=\"Premium\"]"
+                        },
+                        "fireDetectionEvents": {
+                            "adBlocker": true,
+                            "playabilityError": true,
+                            "videoAd": true,
+                            "staticAd": true,
+                            "buffering": true
                         }
                     }
                 }
@@ -5278,11 +5500,32 @@
             "state": "disabled"
         },
         "nativeRequestInterception": {
-            "state": "disabled",
+            "state": "enabled",
+            "minSupportedVersion": "0.155.5",
             "exceptions": [],
             "features": {
                 "disableFirstAboutBlankNavigation": {
-                    "state": "disabled"
+                    "state": "enabled"
+                },
+                "enableNativeRequestInterception": {
+                    "state": "disabled",
+                    "minSupportedVersion": "0.155.5",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 15
+                            },
+                            {
+                                "percent": 40
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
                 }
             }
         },
@@ -5314,7 +5557,8 @@
             "exceptions": [],
             "features": {
                 "desktopLauncher": {
-                    "state": "internal"
+                    "minSupportedVersion": "0.155.0",
+                    "state": "preview"
                 }
             },
             "state": "enabled"
@@ -5323,12 +5567,9 @@
             "exceptions": [],
             "state": "enabled"
         },
-        "duckAiNativeStorage": {
-            "state": "internal",
-            "exceptions": []
-        },
         "multiDownloadPermission": {
-            "state": "disabled",
+            "state": "enabled",
+            "minSupportedVersion": "0.158.0",
             "exceptions": []
         }
     },

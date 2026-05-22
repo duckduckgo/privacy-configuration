@@ -245,6 +245,7 @@
                 "aiChat": "disabled",
                 "subscriptions": "disabled",
                 "serpSettings": "disabled",
+                "duckAiNativeStorage": "disabled",
                 "domains": [
                     {
                         "domain": [
@@ -266,6 +267,11 @@
                             {
                                 "op": "replace",
                                 "path": "/serpSettings",
+                                "value": "enabled"
+                            },
+                            {
+                                "op": "replace",
+                                "path": "/duckAiNativeStorage",
                                 "value": "enabled"
                             }
                         ]
@@ -311,6 +317,30 @@
                 },
                 "applicationMenuShortcut": {
                     "state": "enabled"
+                },
+                "nativeStorage": {
+                    "state": "enabled",
+                    "minSupportedVersion": "1.187.0",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 20
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
+                },
+                "nativeDataAccess": {
+                    "state": "enabled",
+                    "minSupportedVersion": "1.187.0"
                 },
                 "sidebar": {
                     "state": "enabled",
@@ -370,7 +400,8 @@
                     "minSupportedVersion": "1.186.0"
                 },
                 "omnibarWebSearch": {
-                    "state": "disabled"
+                    "state": "enabled",
+                    "minSupportedVersion": "1.188.0"
                 }
             },
             "settings": {
@@ -409,9 +440,6 @@
                 ],
                 "maxHistoryCount": 5
             }
-        },
-        "autocompleteTabs": {
-            "minSupportedVersion": "1.134.0"
         },
         "serp": {
             "state": "enabled",
@@ -494,7 +522,7 @@
                     "minSupportedVersion": "1.171.0"
                 },
                 "webViewUserAgent": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": "1.182.0"
                 }
             },
@@ -513,7 +541,7 @@
             ],
             "features": {
                 "tdsNextExperiment007": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "rollout": {
                         "steps": [
                             {
@@ -524,6 +552,57 @@
                     "settings": {
                         "controlUrl": "v6/experiments/202604v1-macos-tds-control.json",
                         "treatmentUrl": "v6/experiments/202604v1-macos-tds-treatment.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "tdsNextExperiment008": {
+                    "state": "disabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "v6/experiments/202604v3-macos-tds-control.json",
+                        "treatmentUrl": "v6/experiments/202604v3-macos-tds-treatment.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "tdsNextExperiment009": {
+                    "state": "disabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "v6/experiments/202605adm01-macos-tds-control.json",
+                        "treatmentUrl": "v6/experiments/202605adm01-macos-tds-treatment.json"
                     },
                     "cohorts": [
                         {
@@ -642,13 +721,7 @@
             ]
         },
         "gpc": {
-            "state": "enabled",
-            "exceptions": [
-                {
-                    "domain": "claude.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4970"
-                }
-            ]
+            "state": "enabled"
         },
         "webCompat": {
             "state": "enabled",
@@ -719,6 +792,10 @@
                 {
                     "domain": "newrepublic.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4652"
+                },
+                {
+                    "domain": "mumsnet.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5119"
                 }
             ],
             "features": {
@@ -758,6 +835,10 @@
                 {
                     "domain": "zoosk.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2646"
+                },
+                {
+                    "domain": "bandsintown.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5149"
                 }
             ]
         },
@@ -1463,6 +1544,10 @@
                     {
                         "domain": "hilton.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4722"
+                    },
+                    {
+                        "domain": "xvideos.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5160"
                     }
                 ],
                 "webViewDefault": [
@@ -2018,6 +2103,16 @@
                 "allowProTierPurchase": {
                     "state": "enabled",
                     "minSupportedVersion": "1.180.0"
+                },
+                "subscriptionPromoFireWindow": {
+                    "state": "enabled",
+                    "minSupportedVersion": "1.189.0",
+                    "targets": [
+                        {
+                            "localeLanguage": "en",
+                            "localeCountry": "US"
+                        }
+                    ]
                 }
             }
         },
@@ -2166,7 +2261,7 @@
                     "minSupportedVersion": "1.183.0"
                 },
                 "semaphoreAlwaysVisible": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "autoplayPolicy": {
                     "state": "internal",
@@ -2504,10 +2599,21 @@
                             "signInButton": "a[href*=\"accounts.google.com/ServiceLogin\"]",
                             "avatarButton": "#avatar-btn",
                             "premiumLogo": "ytd-topbar-logo-renderer a[title*=\"Premium\"]"
+                        },
+                        "fireDetectionEvents": {
+                            "adBlocker": true,
+                            "playabilityError": true,
+                            "videoAd": true,
+                            "staticAd": true,
+                            "buffering": true
                         }
                     }
                 }
             }
+        },
+        "webEvents": {
+            "state": "enabled",
+            "minSupportedVersion": "1.189.0"
         },
         "hover": {
             "state": "enabled"
@@ -2566,8 +2672,14 @@
             }
         },
         "adBlockingExtension": {
-            "state": "internal",
-            "minSupportedVersion": "1.186.0"
+            "state": "enabled",
+            "minSupportedVersion": "1.186.0",
+            "features": {
+                "featureEnabled": {
+                    "state": "enabled",
+                    "minSupportedVersion": "1.186.0"
+                }
+            }
         },
         "webDetection": {
             "state": "enabled",

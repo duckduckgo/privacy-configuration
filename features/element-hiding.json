@@ -854,6 +854,21 @@
                 ]
             },
             {
+                "domain": "apple.com",
+                "rules": [
+                    {
+                        "selector": ".rf-paymentoptions-image",
+                        "type": "modify-style",
+                        "values": [
+                            {
+                                "property": "background-image",
+                                "value": "none"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
                 "domain": "asuracomic.net",
                 "rules": [
                     {
@@ -1727,6 +1742,15 @@
                 "rules": [
                     {
                         "selector": ".top-ads-container",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "findagrave.com",
+                "rules": [
+                    {
+                        "selector": ".ad__slot--wrapper",
                         "type": "hide-empty"
                     }
                 ]
@@ -3751,6 +3775,15 @@
                 ]
             },
             {
+                "domain": "stereogum.com",
+                "rules": [
+                    {
+                        "selector": "[class*='AdBlockerGate_overlay']",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
                 "domain": "takealot.com",
                 "rules": [
                     {
@@ -4137,15 +4170,6 @@
                 ]
             },
             {
-                "domain": "vinted.fr",
-                "rules": [
-                    {
-                        "selector": ".ad-container--leaderboard",
-                        "type": "hide"
-                    }
-                ]
-            },
-            {
                 "domain": "vice.com",
                 "rules": [
                     {
@@ -4158,6 +4182,27 @@
                     },
                     {
                         "selector": ".fixed-slot",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "vidbox.dev",
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    },
+                    {
+                        "selector": "[aria-label='Sponsored content']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "vinted.fr",
+                "rules": [
+                    {
+                        "selector": ".ad-container--leaderboard",
                         "type": "hide"
                     }
                 ]
@@ -4427,6 +4472,15 @@
                 ]
             },
             {
+                "domain": "walkerplus.com",
+                "rules": [
+                    {
+                        "selector": "[id='pfx_interstitial']",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
                 "domain": "washingtontimes.com",
                 "rules": [
                     {
@@ -4482,7 +4536,7 @@
                         "type": "hide"
                     },
                     {
-                        "selector": "#toast[role='region']:has(yt-button-shape > a[href='https://support.google.com/youtube/answer/3037019#check_ad_blockers&zippy=%2Ccheck-your-extensions-including-ad-blockers'])",
+                        "selector": "#toast:has(> #text-container > yt-formatted-string#text.yt-notification-action-renderer)",
                         "type": "hide"
                     }
                 ]

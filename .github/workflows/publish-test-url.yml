@@ -6,7 +6,7 @@ on:
 
 jobs:
     publish-config:
-        if: github.event.action != 'closed'
+        if: github.event.action != 'closed' && github.event.pull_request.user.login != 'dependabot[bot]'
         runs-on: ubuntu-latest
         concurrency:
             group: preview-pages-branch
@@ -26,9 +26,9 @@ jobs:
                       ⏳ Building and publishing preview config...
 
             - name: Checkout the repository
-              uses: actions/checkout@v5
+              uses: actions/checkout@v6
             - name: Use Node.js 20
-              uses: actions/setup-node@v5
+              uses: actions/setup-node@v6
               with:
                   node-version: 20.x
             - name: Install dependencies
@@ -38,7 +38,7 @@ jobs:
               run: npm run build
 
             - name: Checkout preview-pages branch
-              uses: actions/checkout@v5
+              uses: actions/checkout@v6
               with:
                   ref: preview-pages
                   path: pages-branch
@@ -100,14 +100,14 @@ jobs:
                       ❌ Failed to build or publish preview config. Check the [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details.
 
     cleanup-preview:
-        if: github.event.action == 'closed'
+        if: github.event.action == 'closed' && github.event.pull_request.user.login != 'dependabot[bot]'
         runs-on: ubuntu-latest
         concurrency:
             group: preview-pages-branch
             cancel-in-progress: false
         steps:
             - name: Checkout preview-pages branch
-              uses: actions/checkout@v5
+              uses: actions/checkout@v6
               with:
                   ref: preview-pages
                   token: ${{ secrets.GITHUB_TOKEN }}
