@@ -1,128 +1,169 @@
 name: Publish Test URL
 
 on:
-    pull_request:
-        types: [opened, synchronize, reopened, closed]
+    push:
+        branches-ignore:
+            - main
+            - preview-pages
+            - 'pr-releases/**'
+    delete:
+
+permissions: write-all
 
 jobs:
     publish-config:
-        if: github.event.action != 'closed' && github.event.pull_request.user.login != 'dependabot[bot]'
+        # Only run on push events (not delete)
+        if: github.event_name == 'push'
         runs-on: ubuntu-latest
-        concurrency:
-            group: preview-pages-branch
-            cancel-in-progress: false
+
         steps:
-            - name: Post pending comment
-              id: pending_comment
-              uses: peter-evans/create-or-update-comment@v4
-              with:
-                  token: ${{ secrets.GITHUB_TOKEN }}
-                  repository: ${{ github.repository }}
-                  issue-number: ${{ github.event.pull_request.number }}
-                  edit-mode: replace
-                  body: |
-                      🔗 **Preview Config for PR #${{ github.event.pull_request.number }}**
-
-                      ⏳ Building and publishing preview config...
-
-            - name: Checkout the repository
+            - name: Checkout repository
               uses: actions/checkout@v6
-            - name: Use Node.js 20
+
+            - name: Use Node.js
               uses: actions/setup-node@v6
               with:
-                  node-version: 20.x
+                  node-version-file: '.nvmrc'
+                  cache: 'npm'
+
             - name: Install dependencies
               run: npm ci
+
             - uses: ./
-            - name: build
+
+            - name: Build config
               run: npm run build
 
-            - name: Checkout preview-pages branch
-              uses: actions/checkout@v6
-              with:
-                  ref: preview-pages
-                  path: pages-branch
-                  token: ${{ secrets.GITHUB_TOKEN }}
-
-            - name: Copy PR content into pages branch
+            - name: Create and push preview branch
+              id: create_branch
+              env:
+                  SOURCE_BRANCH: ${{ github.ref_name }}
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: |
-                  PR_DIR="pr-${{ github.event.pull_request.number }}"
-                  TARGET_DIR="pages-branch/$PR_DIR"
-                  rm -rf "$TARGET_DIR"
-                  mkdir -p "$TARGET_DIR"
-                  cp -r generated/* "$TARGET_DIR"
-                  cd pages-branch
-                  git config user.name "github-actions"
-                  git config user.email "actions@github.com"
-                  git add .
-                  git commit -m "Publish config for PR #${{ github.event.pull_request.number }}" || echo "No changes to commit"
-                  git push origin preview-pages
+                  git config --global user.name "github-actions[bot]"
+                  git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+                  # Preview branch uses the pr-releases/ prefix to avoid ref conflicts.
+                  # A branch named "foo" prevents creating "foo/bar" (and vice-versa)
+                  # because git refs are a filesystem hierarchy.  pr-releases/ is a
+                  # separate namespace that can never collide with the source branch.
+                  PREVIEW_BRANCH="pr-releases/${SOURCE_BRANCH}"
+
+                  git checkout -b "${PREVIEW_BRANCH}"
+                  git add -f generated
+                  git commit -m "Build config for ${SOURCE_BRANCH}"
+                  git push -u origin "${PREVIEW_BRANCH}" --force
+
+                  echo "PREVIEW_BRANCH=${PREVIEW_BRANCH}" >> "$GITHUB_ENV"
+                  echo "COMMIT_HASH=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
 
             - name: Generate preview links
               id: generate_preview_links
+              env:
+                  COMMIT_HASH: ${{ env.COMMIT_HASH }}
               run: |
-                  PR_NUMBER=${{ github.event.pull_request.number || 'unknown' }}
-                  PREVIEW_LINKS=$(find generated/v4 -type f | while read -r file; do
+                  PREVIEW_BASE_URL="https://rawcdn.githack.com/${{ github.repository }}/${COMMIT_HASH}"
+                  PREVIEW_LINKS=$(find generated/v4 -type f | sort | while read -r file; do
                     RELATIVE_PATH=${file#generated/v4/}
-                    echo "- [${RELATIVE_PATH}](https://${{ github.repository_owner }}.github.io/$(basename "${{ github.repository }}")/pr-${PR_NUMBER}/v4/${RELATIVE_PATH})"
+                    echo "- [${RELATIVE_PATH}](${PREVIEW_BASE_URL}/generated/v4/${RELATIVE_PATH})"
                   done)
                   LAST_UPDATED=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
-                  echo "preview_links<<EOF" >> $GITHUB_OUTPUT
-                  echo "$PREVIEW_LINKS" >> $GITHUB_OUTPUT
-                  echo "EOF" >> $GITHUB_OUTPUT
-                  echo "last_updated=$LAST_UPDATED" >> $GITHUB_OUTPUT
 
-            - name: Update comment with preview links
-              uses: peter-evans/create-or-update-comment@v4
+                  echo "preview_links<<EOF" >> "$GITHUB_OUTPUT"
+                  echo "$PREVIEW_LINKS" >> "$GITHUB_OUTPUT"
+                  echo "EOF" >> "$GITHUB_OUTPUT"
+                  echo "last_updated=$LAST_UPDATED" >> "$GITHUB_OUTPUT"
+
+            - name: Comment on associated PR
+              uses: actions/github-script@v9
+              env:
+                  PREVIEW_BRANCH: ${{ env.PREVIEW_BRANCH }}
+                  COMMIT_HASH: ${{ env.COMMIT_HASH }}
+                  SOURCE_BRANCH: ${{ github.ref_name }}
+                  PREVIEW_LINKS: ${{ steps.generate_preview_links.outputs.preview_links }}
+                  LAST_UPDATED: ${{ steps.generate_preview_links.outputs.last_updated }}
               with:
-                  token: ${{ secrets.GITHUB_TOKEN }}
-                  repository: ${{ github.repository }}
-                  comment-id: ${{ steps.pending_comment.outputs.comment-id }}
-                  edit-mode: replace
-                  body: |
-                      🔗 **Preview Config for PR #${{ github.event.pull_request.number }}**
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  script: |
+                      const previewBranch = process.env.PREVIEW_BRANCH;
+                      const commitHash = process.env.COMMIT_HASH;
+                      const sourceBranch = process.env.SOURCE_BRANCH;
+                      const previewLinks = process.env.PREVIEW_LINKS;
+                      const lastUpdated = process.env.LAST_UPDATED;
+                      const repoUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}`;
+                      const branchUrl = `${repoUrl}/tree/${previewBranch}`;
+                      const commitUrl = `${repoUrl}/commit/${commitHash}`;
+                      const marker = '<!-- PREVIEW_CONFIG_BRANCH_COMMENT -->';
 
-                      ${{ steps.generate_preview_links.outputs.preview_links }}
+                      const commentBody = [
+                          marker,
+                          `### Preview Config`,
+                          ``,
+                          `| | |`,
+                          `|---|---|`,
+                          `| **Branch** | [\`${previewBranch}\`](${branchUrl}) |`,
+                          `| **Commit** | [\`${commitHash.slice(0, 10)}\`](${commitUrl}) |`,
+                          `| **Updated** | ${lastUpdated} |`,
+                          ``,
+                          `#### Generated config entry points`,
+                          ``,
+                          previewLinks,
+                      ].join('\n');
 
-                      _Last updated: ${{ steps.generate_preview_links.outputs.last_updated }}_
+                      // Find open PRs for this branch.
+                      const { data: prs } = await github.rest.pulls.list({
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          head: `${context.repo.owner}:${sourceBranch}`,
+                          state: 'open',
+                      });
 
-            - name: Update comment on failure
-              if: failure()
-              uses: peter-evans/create-or-update-comment@v4
-              with:
-                  token: ${{ secrets.GITHUB_TOKEN }}
-                  repository: ${{ github.repository }}
-                  comment-id: ${{ steps.pending_comment.outputs.comment-id }}
-                  edit-mode: replace
-                  body: |
-                      🔗 **Preview Config for PR #${{ github.event.pull_request.number }}**
+                      for (const pr of prs) {
+                          // Find existing bot comment by marker.
+                          const { data: comments } = await github.rest.issues.listComments({
+                              owner: context.repo.owner,
+                              repo: context.repo.repo,
+                              issue_number: pr.number,
+                          });
 
-                      ❌ Failed to build or publish preview config. Check the [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details.
+                          const botComment = comments.find(
+                              c => c.user.login === 'github-actions[bot]' && c.body.includes(marker)
+                          );
 
-    cleanup-preview:
-        if: github.event.action == 'closed' && github.event.pull_request.user.login != 'dependabot[bot]'
+                          if (botComment) {
+                              await github.rest.issues.updateComment({
+                                  owner: context.repo.owner,
+                                  repo: context.repo.repo,
+                                  comment_id: botComment.id,
+                                  body: commentBody,
+                              });
+                              console.log(`Updated preview config comment on PR #${pr.number}`);
+                          } else {
+                              await github.rest.issues.createComment({
+                                  owner: context.repo.owner,
+                                  repo: context.repo.repo,
+                                  issue_number: pr.number,
+                                  body: commentBody,
+                              });
+                              console.log(`Created preview config comment on PR #${pr.number}`);
+                          }
+                      }
+
+                      if (prs.length === 0) {
+                          console.log(`No open PR found for branch ${sourceBranch} — preview branch pushed but no PR to annotate.`);
+                      }
+
+    clean_up:
+        # Only run when a branch is deleted, and only for non-pr-releases branches
+        if: github.event_name == 'delete' && github.event.ref_type == 'branch' && !startsWith(github.event.ref, 'pr-releases/')
         runs-on: ubuntu-latest
-        concurrency:
-            group: preview-pages-branch
-            cancel-in-progress: false
         steps:
-            - name: Checkout preview-pages branch
+            - name: Checkout repository
               uses: actions/checkout@v6
-              with:
-                  ref: preview-pages
-                  token: ${{ secrets.GITHUB_TOKEN }}
 
-            - name: Remove PR preview directory
+            - name: Delete preview branch
+              env:
+                  DELETED_BRANCH: ${{ github.event.ref }}
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: |
-                  PR_DIR="pr-${{ github.event.pull_request.number }}"
-                  if [ -d "$PR_DIR" ]; then
-                    rm -rf "$PR_DIR"
-                    git config user.name "github-actions"
-                    git config user.email "actions@github.com"
-                    git add .
-                    git commit -m "Cleanup preview for PR #${{ github.event.pull_request.number }}" || echo "No changes to commit"
-                    git push origin preview-pages
-                    echo "Removed preview directory: $PR_DIR"
-                  else
-                    echo "Preview directory not found: $PR_DIR"
-                  fi
+                  git push origin --delete "pr-releases/${DELETED_BRANCH}" || echo "Preview branch pr-releases/${DELETED_BRANCH} not found (may already be deleted)"
