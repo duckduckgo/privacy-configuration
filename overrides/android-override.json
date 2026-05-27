@@ -3693,6 +3693,75 @@
                                 }
                             }
                         ]
+                    },
+                    {
+                        "condition": [
+                            {
+                                "domain": "target.com"
+                            }
+                        ],
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/apiChanges/PublicKeyCredential",
+                                "value": {
+                                    "type": "descriptor",
+                                    "getterValue": {
+                                        "type": "object",
+                                        "value": {}
+                                    },
+                                    "define": true
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/apiChanges/PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable",
+                                "value": {
+                                    "type": "descriptor",
+                                    "getterValue": {
+                                        "type": "function",
+                                        "functionValue": {
+                                            "type": "boolean",
+                                            "value": false,
+                                            "async": true
+                                        }
+                                    },
+                                    "define": true
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/apiChanges/PublicKeyCredential.isConditionalMediationAvailable",
+                                "value": {
+                                    "type": "descriptor",
+                                    "getterValue": {
+                                        "type": "function",
+                                        "functionValue": {
+                                            "type": "boolean",
+                                            "value": false,
+                                            "async": true
+                                        }
+                                    },
+                                    "define": true
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/apiChanges/PublicKeyCredential.isExternalCtap2SecurityKeySupported",
+                                "value": {
+                                    "type": "descriptor",
+                                    "getterValue": {
+                                        "type": "function",
+                                        "functionValue": {
+                                            "type": "boolean",
+                                            "value": false,
+                                            "async": true
+                                        }
+                                    },
+                                    "define": true
+                                }
+                            }
+                        ]
                     }
                 ]
             }
