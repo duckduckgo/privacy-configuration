@@ -2059,6 +2059,21 @@
                                         }
                                     }
                                 ]
+                            },
+                            {
+                                "condition": {
+                                    "urlPattern": "https://my.stubhub.com/secure/login*"
+                                },
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "form",
+                                            "type": "login"
+                                        }
+                                    }
+                                ]
                             }
                         ]
                     }
