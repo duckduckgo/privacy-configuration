@@ -313,6 +313,40 @@ describe('EventHub validation tests', () => {
                     param,
                 ] of Object.entries(entry.parameters || {})) {
                     describe(`${entryName}.${paramName}`, () => {
+                        it('template must be a known value', () => {
+                            expect(param.template).to.be.oneOf(
+                                [
+                                    'counter',
+                                    'experiments',
+                                ],
+                                `Parameter '${entryName}.${paramName}' has unknown template '${param.template}'`,
+                            );
+                        });
+
+                        if (param.template === 'experiments') {
+                            it('matchExperiments, when present, must be a non-empty valid regular expression', () => {
+                                if (param.matchExperiments === undefined) return;
+                                expect(param.matchExperiments).to.be.a(
+                                    'string',
+                                    `Parameter '${entryName}.${paramName}' matchExperiments must be a string`,
+                                );
+                                expect(param.matchExperiments.length).to.be.greaterThan(
+                                    0,
+                                    `Parameter '${entryName}.${paramName}' matchExperiments must not be empty`,
+                                );
+                                expect(() => new RegExp(param.matchExperiments)).to.not.throw(
+                                    `Parameter '${entryName}.${paramName}' matchExperiments must be a valid regular expression`,
+                                );
+                            });
+
+                            it('experiments parameters must not declare counter fields', () => {
+                                expect(param.source, `Parameter '${entryName}.${paramName}' must not set 'source'`).to.equal(undefined);
+                                expect(param.buckets, `Parameter '${entryName}.${paramName}' must not set 'buckets'`).to.equal(undefined);
+                            });
+
+                            return;
+                        }
+
                         it('source should be a non-empty string', () => {
                             expect(param.source).to.be.a('string', `Parameter '${entryName}.${paramName}' source must be a string`);
                             expect(param.source.length).to.be.greaterThan(
