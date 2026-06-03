@@ -35,6 +35,14 @@
                 {
                     "domain": "x.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5211"
+                },
+                {
+                    "domain": "facebook.com",
+                    "reason": "reCAPTCHA failing on Facebook login"
+                },
+                {
+                    "domain": "instagram.com",
+                    "reason": "reCAPTCHA failing on Instagram login"
                 }
             ],
             "settings": {
@@ -54,26 +62,6 @@
                     }
                 },
                 "conditionalChanges": [
-                    {
-                        "condition": [
-                            {
-                                "domain": "facebook.com"
-                            }
-                        ],
-                        "patchSettings": [
-                            {
-                                "op": "add",
-                                "path": "/apiChanges/Notification.permission",
-                                "value": {
-                                    "type": "descriptor",
-                                    "getterValue": {
-                                        "type": "string",
-                                        "value": "denied"
-                                    }
-                                }
-                            }
-                        ]
-                    },
                     {
                         "condition": [
                             {
@@ -2124,7 +2112,17 @@
             ]
         },
         "navigatorInterface": {
-            "state": "enabled"
+            "state": "enabled",
+            "exceptions": [
+                {
+                    "domain": "facebook.com",
+                    "reason": "reCAPTCHA failing on Facebook login"
+                },
+                {
+                    "domain": "instagram.com",
+                    "reason": "reCAPTCHA failing on Instagram login"
+                }
+            ]
         },
         "newTabPageSessionMonitoring": {
             "state": "enabled",
