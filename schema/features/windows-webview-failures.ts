@@ -14,6 +14,7 @@ type SubFeatures<VersionType> = {
         {
             generation: number;
             probability: number;
+            showInSuspendedState: boolean;
         }
     >;
 };
