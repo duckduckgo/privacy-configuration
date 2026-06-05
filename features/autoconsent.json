@@ -1561,8 +1561,8 @@
                 ".consent-banner-button-accept-overlay",
                 "userConsent=%7B%22marketing%22%3Afalse",
                 "#cookies-use-alert",
-                ".euCookieModal, #js_euCookieModal",
-                ".euCookieModal",
+                "#cookie_consent_wrapper, #cookie_consent_min_wrapper, #manage_cookie_consent_modal",
+                "#cookie_consent_wrapper:not(.hideConsent)",
                 "tp-yt-iron-overlay-backdrop.opened",
                 "ytd-consent-bump-v2-lightbox",
                 ".gdpr-wrapper",
@@ -1621,6 +1621,14 @@
                 "#consent-banner-modal a[href=\"#reject\"]",
                 "#consent-banner-modal a[href=\"#settings\"]",
                 "#consent-banner-settings a[href=\"#reject\"]",
+                "#cookie_consent_wrapper #consent_accept_essential, #manage_cookie_consent_modal #modal_consent_accept_essential",
+                "#age_disclaimer_window,#ageDisclaimerWrapper",
+                "#cookie_consent_min_wrapper #close_minimized_banner",
+                "cookieConsent=1",
+                "#js-consent-banner",
+                "#js-consent-banner #js-cookie-reject-button",
+                "#js-consent-banner #js-cookie-dismiss-button",
+                "cookie-consent=",
                 "body > div#root > div#ccpa-iframe-theme-provider[data-testid=\"ccpa-iframe-theme-provider\"] > div#ccpa-iframe[data-testid=\"ccpa-iframe\"] > div#ccpa_consent_banner[data-testid=\"ccpa_consent_banner\"] > div:not([id]) > div:nth-child(3):not([id]) > span:not([id]) > span:not([id]) > div:nth-child(2):not([id]) > span:nth-child(1):not([id]) > button#decline_cookies_button[data-testid=\"decline_cookies_button\"]",
                 "body:not([id]) > div#banner-0 > div:nth-child(1)#grouped-pageload-Banner > div:not([id]) > div:not([id]) > div:not([id]) > div:nth-child(3):not([id]) > button:nth-child(2):not([id])",
                 "body > div#iubenda-cs-banner > div:not([id]) > div:not([id]) > div:not([id]) > div:nth-child(5):not([id]) > div:nth-child(2):not([id]) > button:nth-child(1):not([id])",
@@ -1656,14 +1664,6 @@
                 "span[role=checkbox][aria-checked=true]",
                 "#save-all-pur",
                 "#reminder",
-                "#gdpr-new-container .btn-more",
-                "#gdpr-new-container .gdpr-dialog-switcher",
-                ".consent__wrapper",
-                ".consent",
-                "button.consentSettings",
-                "button#consentSubmit",
-                "#gdpr-new-container .switcher-on",
-                "#gdpr-new-container .btn-save",
                 "div:has(> div > button[allytmln=ally-cookie-consent])",
                 "button[allytmln=ally-cookie-consent]",
                 "#footer-container ~ div",
@@ -2238,7 +2238,7 @@
                 "body > div[class][tabindex] > div > div > div:nth-child(2) > div:nth-child(2) > button:nth-child(2)",
                 "body > div[class][id][tabindex][role][aria-labelledby][aria-modal][style] > div > div > div:nth-child(3) > div > div > p > button:nth-child(3)",
                 "body > div[id] > div:nth-child(2) > div:nth-child(4) > div > div:nth-child(2) > button:nth-child(2)",
-                "body:not([id]) > div#cookie_consent_wrapper > div:not([id]) > div:nth-child(4):not([id]) > button:nth-child(2)#consent_accept_essential",
+                "#gdpr-new-container .btn-more",
                 "body > div#cassie-widget > div:nth-child(4)#cassie_cookie_module > div:nth-child(2)#cassie_pre_banner > div:nth-child(3)#cassie_pre_banner__footer > button:nth-child(2)#cassie_reject_all_pre_banner",
                 "body > div:not([id]) > div:nth-child(17):not([id]) > div:not([id]) > a:nth-child(3):not([id])",
                 "body:not([id]) > div#__next > div:not([id]) > main:nth-child(3):not([id]) > div:not([id]) > div:nth-child(1):not([id]) > div:not([id]) > div:nth-child(27):not([id]) > div:not([id]) > div:not([id]) > div:nth-child(2):not([id]) > div:not([id]) > div:nth-child(2):not([id]) > button:nth-child(2):not([id])",
@@ -2359,7 +2359,18 @@
                 "#voyager-gdpr > div",
                 "#voyager-gdpr > div > div > button:nth-child(2)",
                 ".ind-cbar[data-testid=\"ind-cbar\"]",
-                ".ind-cbar[data-testid=\"ind-cbar\"] button[save-cookie][data-value=\"0\"]"
+                ".ind-cbar[data-testid=\"ind-cbar\"] button[save-cookie][data-value=\"0\"]",
+                "#gdpr-new-container .gdpr-dialog-switcher",
+                "#gdpr-new-container .switcher-on",
+                "#gdpr-new-container .btn-save",
+                "dialog.cookieconsent__dialog",
+                ".cookieconsent__base[data-component=\"cookieconsent\"]",
+                ".cookieconsent__buttonAcceptNecessary",
+                "consent_choice=",
+                ".consent__wrapper",
+                ".consent",
+                "button.consentSettings",
+                "button#consentSubmit"
             ],
             "r": [
                 [
@@ -2889,6 +2900,49 @@
                     [
                         {
                             "cc": 82
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
+                    "aylo-cookie-banner",
+                    2,
+                    "",
+                    22,
+                    [
+                        679
+                    ],
+                    [
+                        {
+                            "e": 680
+                        },
+                        {
+                            "e": 739
+                        }
+                    ],
+                    [
+                        {
+                            "v": 680
+                        },
+                        {
+                            "check": "none",
+                            "v": 740
+                        }
+                    ],
+                    [
+                        {
+                            "all": true,
+                            "c": 739
+                        },
+                        {
+                            "optional": true,
+                            "c": 741
+                        }
+                    ],
+                    [
+                        {
+                            "cc": 742
                         }
                     ],
                     {}
@@ -7292,6 +7346,46 @@
                 ],
                 [
                     1,
+                    "police-uk",
+                    2,
+                    "",
+                    22,
+                    [
+                        743
+                    ],
+                    [
+                        {
+                            "e": 744
+                        }
+                    ],
+                    [
+                        {
+                            "v": 744
+                        }
+                    ],
+                    [
+                        {
+                            "c": 744
+                        },
+                        {
+                            "timeout": 5000,
+                            "optional": true,
+                            "wv": 745
+                        },
+                        {
+                            "optional": true,
+                            "k": 745
+                        }
+                    ],
+                    [
+                        {
+                            "cc": 746
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
                     "pornhat",
                     1,
                     "",
@@ -9590,33 +9684,6 @@
                 ],
                 [
                     1,
-                    "youporn.com",
-                    1,
-                    "",
-                    22,
-                    [
-                        679
-                    ],
-                    [
-                        {
-                            "e": 680
-                        }
-                    ],
-                    [
-                        {
-                            "e": 679
-                        }
-                    ],
-                    [
-                        {
-                            "h": 680
-                        }
-                    ],
-                    [],
-                    {}
-                ],
-                [
-                    1,
                     "youtube-desktop",
                     2,
                     "",
@@ -9771,269 +9838,6 @@
                     [],
                     [
                         {
-                            "e": 739
-                        }
-                    ],
-                    [
-                        {
-                            "v": 739
-                        }
-                    ],
-                    [
-                        {
-                            "wait": 500
-                        },
-                        {
-                            "c": 739
-                        }
-                    ],
-                    [
-                        {
-                            "timeout": 1000,
-                            "check": "none",
-                            "wv": 739
-                        }
-                    ],
-                    {}
-                ],
-                [
-                    1,
-                    "auto_CA_coasthotels.com_f8m",
-                    0,
-                    "^https?://(www\\.)?coasthotels\\.com/",
-                    1,
-                    [],
-                    [
-                        {
-                            "e": 740
-                        }
-                    ],
-                    [
-                        {
-                            "v": 740
-                        }
-                    ],
-                    [
-                        {
-                            "c": 740
-                        }
-                    ],
-                    [],
-                    {}
-                ],
-                [
-                    1,
-                    "auto_CA_epihunter.eu_hd4",
-                    0,
-                    "^https?://(www\\.)?combell\\.com/",
-                    1,
-                    [],
-                    [
-                        {
-                            "e": 741
-                        }
-                    ],
-                    [
-                        {
-                            "v": 741
-                        }
-                    ],
-                    [
-                        {
-                            "wait": 500
-                        },
-                        {
-                            "c": 741
-                        }
-                    ],
-                    [
-                        {
-                            "timeout": 1000,
-                            "check": "none",
-                            "wv": 741
-                        }
-                    ],
-                    {}
-                ],
-                [
-                    1,
-                    "auto_CA_nationalarchives.gov.uk_rx0",
-                    0,
-                    "^https?://(www\\.)?webarchive\\.nationalarchives\\.gov\\.uk/",
-                    1,
-                    [],
-                    [
-                        {
-                            "e": 742
-                        }
-                    ],
-                    [
-                        {
-                            "v": 742
-                        }
-                    ],
-                    [
-                        {
-                            "wait": 500
-                        },
-                        {
-                            "c": 742
-                        }
-                    ],
-                    [
-                        {
-                            "timeout": 1000,
-                            "check": "none",
-                            "wv": 742
-                        }
-                    ],
-                    {}
-                ],
-                [
-                    1,
-                    "auto_CA_natureconservancy.ca_3pp",
-                    0,
-                    "^https?://(www\\.)?natureconservancy\\.ca/",
-                    1,
-                    [],
-                    [
-                        {
-                            "e": 743
-                        }
-                    ],
-                    [
-                        {
-                            "v": 743
-                        }
-                    ],
-                    [
-                        {
-                            "wait": 500
-                        },
-                        {
-                            "c": 743
-                        }
-                    ],
-                    [
-                        {
-                            "timeout": 1000,
-                            "check": "none",
-                            "wv": 743
-                        }
-                    ],
-                    {}
-                ],
-                [
-                    1,
-                    "auto_CA_ontariospca.ca_k32",
-                    0,
-                    "^https?://(www\\.)?widget-next\\.clym-sdk\\.net/",
-                    1,
-                    [],
-                    [
-                        {
-                            "e": 744
-                        }
-                    ],
-                    [
-                        {
-                            "v": 744
-                        }
-                    ],
-                    [
-                        {
-                            "wait": 500
-                        },
-                        {
-                            "c": 744
-                        }
-                    ],
-                    [
-                        {
-                            "timeout": 1000,
-                            "check": "none",
-                            "wv": 744
-                        }
-                    ],
-                    {}
-                ],
-                [
-                    1,
-                    "auto_CA_phoenixnap.com_hrb",
-                    0,
-                    "^https?://(www\\.)?widget-next\\.clym-sdk\\.net/",
-                    1,
-                    [],
-                    [
-                        {
-                            "e": 745
-                        }
-                    ],
-                    [
-                        {
-                            "v": 745
-                        }
-                    ],
-                    [
-                        {
-                            "wait": 500
-                        },
-                        {
-                            "c": 745
-                        }
-                    ],
-                    [
-                        {
-                            "timeout": 1000,
-                            "check": "none",
-                            "wv": 745
-                        }
-                    ],
-                    {}
-                ],
-                [
-                    1,
-                    "auto_CH_phoenixnap.com_lx5",
-                    0,
-                    "^https?://(www\\.)?widget-next\\.clym-sdk\\.net/",
-                    1,
-                    [],
-                    [
-                        {
-                            "e": 746
-                        }
-                    ],
-                    [
-                        {
-                            "v": 746
-                        }
-                    ],
-                    [
-                        {
-                            "wait": 500
-                        },
-                        {
-                            "c": 746
-                        }
-                    ],
-                    [
-                        {
-                            "timeout": 1000,
-                            "check": "none",
-                            "wv": 746
-                        }
-                    ],
-                    {}
-                ],
-                [
-                    1,
-                    "auto_CH_swisscare.com_arx",
-                    0,
-                    "^https?://(www\\.)?swisscare\\.com/",
-                    1,
-                    [],
-                    [
-                        {
                             "e": 747
                         }
                     ],
@@ -10061,9 +9865,9 @@
                 ],
                 [
                     1,
-                    "auto_DE_alfaromeo.de_gvg_+2",
+                    "auto_CA_coasthotels.com_f8m",
                     0,
-                    "^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/|^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/|^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/",
+                    "^https?://(www\\.)?coasthotels\\.com/",
                     1,
                     [],
                     [
@@ -10078,26 +9882,17 @@
                     ],
                     [
                         {
-                            "wait": 500
-                        },
-                        {
                             "c": 748
                         }
                     ],
-                    [
-                        {
-                            "timeout": 1000,
-                            "check": "none",
-                            "wv": 748
-                        }
-                    ],
+                    [],
                     {}
                 ],
                 [
                     1,
-                    "auto_DE_huss-licht-ton.de_jj0",
+                    "auto_CA_epihunter.eu_hd4",
                     0,
-                    "^https?://(www\\.)?huss-licht-ton\\.de/",
+                    "^https?://(www\\.)?combell\\.com/",
                     1,
                     [],
                     [
@@ -10129,9 +9924,9 @@
                 ],
                 [
                     1,
-                    "auto_DE_modellbau-berlinski.de_8vm",
+                    "auto_CA_nationalarchives.gov.uk_rx0",
                     0,
-                    "^https?://(www\\.)?modellbau-berlinski\\.de/",
+                    "^https?://(www\\.)?webarchive\\.nationalarchives\\.gov\\.uk/",
                     1,
                     [],
                     [
@@ -10163,9 +9958,9 @@
                 ],
                 [
                     1,
-                    "auto_DE_phoenixnap.com_xq7",
+                    "auto_CA_natureconservancy.ca_3pp",
                     0,
-                    "^https?://(www\\.)?widget-next\\.clym-sdk\\.net/",
+                    "^https?://(www\\.)?natureconservancy\\.ca/",
                     1,
                     [],
                     [
@@ -10197,9 +9992,9 @@
                 ],
                 [
                     1,
-                    "auto_FR_fiat.fr_3fh",
+                    "auto_CA_ontariospca.ca_k32",
                     0,
-                    "^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/",
+                    "^https?://(www\\.)?widget-next\\.clym-sdk\\.net/",
                     1,
                     [],
                     [
@@ -10231,43 +10026,9 @@
                 ],
                 [
                     1,
-                    "auto_FR_stellantis.com_67q",
+                    "auto_CA_phoenixnap.com_hrb",
                     0,
-                    "^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/",
-                    1,
-                    [],
-                    [
-                        {
-                            "e": 752
-                        }
-                    ],
-                    [
-                        {
-                            "v": 752
-                        }
-                    ],
-                    [
-                        {
-                            "wait": 500
-                        },
-                        {
-                            "c": 752
-                        }
-                    ],
-                    [
-                        {
-                            "timeout": 1000,
-                            "check": "none",
-                            "wv": 752
-                        }
-                    ],
-                    {}
-                ],
-                [
-                    1,
-                    "auto_GB_dropbox.com_0_+1",
-                    0,
-                    "^https?://(www\\.)?dropbox\\.com/|^https?://(www\\.)?dropbox\\.com/",
+                    "^https?://(www\\.)?widget-next\\.clym-sdk\\.net/",
                     1,
                     [],
                     [
@@ -10282,17 +10043,26 @@
                     ],
                     [
                         {
+                            "wait": 500
+                        },
+                        {
                             "c": 753
                         }
                     ],
-                    [],
+                    [
+                        {
+                            "timeout": 1000,
+                            "check": "none",
+                            "wv": 753
+                        }
+                    ],
                     {}
                 ],
                 [
                     1,
-                    "auto_GB_investing.thisismoney.co.uk_0",
+                    "auto_CH_phoenixnap.com_lx5",
                     0,
-                    "^https?://(www\\.)?thisismoney\\.co\\.uk/",
+                    "^https?://(www\\.)?widget-next\\.clym-sdk\\.net/",
                     1,
                     [],
                     [
@@ -10307,17 +10077,26 @@
                     ],
                     [
                         {
+                            "wait": 500
+                        },
+                        {
                             "c": 754
                         }
                     ],
-                    [],
+                    [
+                        {
+                            "timeout": 1000,
+                            "check": "none",
+                            "wv": 754
+                        }
+                    ],
                     {}
                 ],
                 [
                     1,
-                    "auto_GB_village-hotels.co.uk_hsa",
+                    "auto_CH_swisscare.com_arx",
                     0,
-                    "^https?://(www\\.)?village-hotels\\.co\\.uk/",
+                    "^https?://(www\\.)?swisscare\\.com/",
                     1,
                     [],
                     [
@@ -10349,43 +10128,9 @@
                 ],
                 [
                     1,
-                    "auto_NL_fiat.nl_trv_+1",
+                    "auto_DE_alfaromeo.de_gvg_+2",
                     0,
-                    "^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/|^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/",
-                    1,
-                    [],
-                    [
-                        {
-                            "e": 752
-                        }
-                    ],
-                    [
-                        {
-                            "v": 752
-                        }
-                    ],
-                    [
-                        {
-                            "wait": 500
-                        },
-                        {
-                            "c": 752
-                        }
-                    ],
-                    [
-                        {
-                            "timeout": 1000,
-                            "check": "none",
-                            "wv": 752
-                        }
-                    ],
-                    {}
-                ],
-                [
-                    1,
-                    "auto_NL_flitsmeister.nl_ws8",
-                    0,
-                    "^https?://(www\\.)?cookies\\.flitsmeister\\.com/",
+                    "^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/|^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/|^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/",
                     1,
                     [],
                     [
@@ -10417,9 +10162,9 @@
                 ],
                 [
                     1,
-                    "auto_NL_interpolis.nl_jk9",
+                    "auto_DE_huss-licht-ton.de_jj0",
                     0,
-                    "^https?://(www\\.)?interpolis\\.nl/",
+                    "^https?://(www\\.)?huss-licht-ton\\.de/",
                     1,
                     [],
                     [
@@ -10451,9 +10196,9 @@
                 ],
                 [
                     1,
-                    "auto_US_dropbox.com_0_+1",
+                    "auto_DE_modellbau-berlinski.de_8vm",
                     0,
-                    "^https?://(www\\.)?dropbox\\.com/|^https?://(www\\.)?dropbox\\.com/",
+                    "^https?://(www\\.)?modellbau-berlinski\\.de/",
                     1,
                     [],
                     [
@@ -10468,8 +10213,330 @@
                     ],
                     [
                         {
-                            "text": "Decline",
+                            "wait": 500
+                        },
+                        {
                             "c": 758
+                        }
+                    ],
+                    [
+                        {
+                            "timeout": 1000,
+                            "check": "none",
+                            "wv": 758
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
+                    "auto_DE_phoenixnap.com_xq7",
+                    0,
+                    "^https?://(www\\.)?widget-next\\.clym-sdk\\.net/",
+                    1,
+                    [],
+                    [
+                        {
+                            "e": 759
+                        }
+                    ],
+                    [
+                        {
+                            "v": 759
+                        }
+                    ],
+                    [
+                        {
+                            "wait": 500
+                        },
+                        {
+                            "c": 759
+                        }
+                    ],
+                    [
+                        {
+                            "timeout": 1000,
+                            "check": "none",
+                            "wv": 759
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
+                    "auto_FR_fiat.fr_3fh",
+                    0,
+                    "^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/",
+                    1,
+                    [],
+                    [
+                        {
+                            "e": 760
+                        }
+                    ],
+                    [
+                        {
+                            "v": 760
+                        }
+                    ],
+                    [
+                        {
+                            "wait": 500
+                        },
+                        {
+                            "c": 760
+                        }
+                    ],
+                    [
+                        {
+                            "timeout": 1000,
+                            "check": "none",
+                            "wv": 760
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
+                    "auto_FR_stellantis.com_67q",
+                    0,
+                    "^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/",
+                    1,
+                    [],
+                    [
+                        {
+                            "e": 760
+                        }
+                    ],
+                    [
+                        {
+                            "v": 760
+                        }
+                    ],
+                    [
+                        {
+                            "wait": 500
+                        },
+                        {
+                            "c": 760
+                        }
+                    ],
+                    [
+                        {
+                            "timeout": 1000,
+                            "check": "none",
+                            "wv": 760
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
+                    "auto_GB_dropbox.com_0_+1",
+                    0,
+                    "^https?://(www\\.)?dropbox\\.com/|^https?://(www\\.)?dropbox\\.com/",
+                    1,
+                    [],
+                    [
+                        {
+                            "e": 761
+                        }
+                    ],
+                    [
+                        {
+                            "v": 761
+                        }
+                    ],
+                    [
+                        {
+                            "c": 761
+                        }
+                    ],
+                    [],
+                    {}
+                ],
+                [
+                    1,
+                    "auto_GB_investing.thisismoney.co.uk_0",
+                    0,
+                    "^https?://(www\\.)?thisismoney\\.co\\.uk/",
+                    1,
+                    [],
+                    [
+                        {
+                            "e": 762
+                        }
+                    ],
+                    [
+                        {
+                            "v": 762
+                        }
+                    ],
+                    [
+                        {
+                            "c": 762
+                        }
+                    ],
+                    [],
+                    {}
+                ],
+                [
+                    1,
+                    "auto_GB_village-hotels.co.uk_hsa",
+                    0,
+                    "^https?://(www\\.)?village-hotels\\.co\\.uk/",
+                    1,
+                    [],
+                    [
+                        {
+                            "e": 763
+                        }
+                    ],
+                    [
+                        {
+                            "v": 763
+                        }
+                    ],
+                    [
+                        {
+                            "wait": 500
+                        },
+                        {
+                            "c": 763
+                        }
+                    ],
+                    [
+                        {
+                            "timeout": 1000,
+                            "check": "none",
+                            "wv": 763
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
+                    "auto_NL_fiat.nl_trv_+1",
+                    0,
+                    "^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/|^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/",
+                    1,
+                    [],
+                    [
+                        {
+                            "e": 760
+                        }
+                    ],
+                    [
+                        {
+                            "v": 760
+                        }
+                    ],
+                    [
+                        {
+                            "wait": 500
+                        },
+                        {
+                            "c": 760
+                        }
+                    ],
+                    [
+                        {
+                            "timeout": 1000,
+                            "check": "none",
+                            "wv": 760
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
+                    "auto_NL_flitsmeister.nl_ws8",
+                    0,
+                    "^https?://(www\\.)?cookies\\.flitsmeister\\.com/",
+                    1,
+                    [],
+                    [
+                        {
+                            "e": 764
+                        }
+                    ],
+                    [
+                        {
+                            "v": 764
+                        }
+                    ],
+                    [
+                        {
+                            "wait": 500
+                        },
+                        {
+                            "c": 764
+                        }
+                    ],
+                    [
+                        {
+                            "timeout": 1000,
+                            "check": "none",
+                            "wv": 764
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
+                    "auto_NL_interpolis.nl_jk9",
+                    0,
+                    "^https?://(www\\.)?interpolis\\.nl/",
+                    1,
+                    [],
+                    [
+                        {
+                            "e": 765
+                        }
+                    ],
+                    [
+                        {
+                            "v": 765
+                        }
+                    ],
+                    [
+                        {
+                            "wait": 500
+                        },
+                        {
+                            "c": 765
+                        }
+                    ],
+                    [
+                        {
+                            "timeout": 1000,
+                            "check": "none",
+                            "wv": 765
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
+                    "auto_US_dropbox.com_0_+1",
+                    0,
+                    "^https?://(www\\.)?dropbox\\.com/|^https?://(www\\.)?dropbox\\.com/",
+                    1,
+                    [],
+                    [
+                        {
+                            "e": 766
+                        }
+                    ],
+                    [
+                        {
+                            "v": 766
+                        }
+                    ],
+                    [
+                        {
+                            "text": "Decline",
+                            "c": 766
                         }
                     ],
                     [],
@@ -10484,25 +10551,25 @@
                     [],
                     [
                         {
-                            "e": 759
+                            "e": 767
                         }
                     ],
                     [
                         {
-                            "v": 759
+                            "v": 767
                         }
                     ],
                     [
                         {
-                            "k": 760
+                            "k": 768
                         },
                         {
                             "all": true,
                             "optional": true,
-                            "k": 761
+                            "k": 769
                         },
                         {
-                            "k": 762
+                            "k": 770
                         }
                     ],
                     [
@@ -10521,49 +10588,49 @@
                     "^https://cmp-consent-tool\\.privacymanager\\.io/",
                     1,
                     [
-                        763,
-                        764
+                        771,
+                        772
                     ],
                     [
                         {
-                            "e": 765
+                            "e": 773
                         }
                     ],
                     [
                         {
-                            "v": 765
+                            "v": 773
                         }
                     ],
                     [
                         {
                             "if": {
-                                "e": 766
+                                "e": 774
                             },
                             "then": [
                                 {
-                                    "k": 766
+                                    "k": 774
                                 },
                                 {
-                                    "c": 767
+                                    "c": 775
                                 }
                             ],
                             "else": [
                                 {
-                                    "c": 768
+                                    "c": 776
                                 },
                                 {
-                                    "w": 769
+                                    "w": 777
                                 },
                                 {
-                                    "w": 770
+                                    "w": 778
                                 },
                                 {
                                     "all": true,
                                     "optional": true,
-                                    "k": 771
+                                    "k": 779
                                 },
                                 {
-                                    "k": 770
+                                    "k": 778
                                 }
                             ]
                         }
@@ -10580,20 +10647,20 @@
                     [],
                     [
                         {
-                            "e": 772
+                            "e": 780
                         },
                         {
-                            "e": 773
+                            "e": 781
                         }
                     ],
                     [
                         {
-                            "v": 773
+                            "v": 781
                         }
                     ],
                     [
                         {
-                            "c": 773
+                            "c": 781
                         }
                     ],
                     [],
@@ -10769,18 +10836,18 @@
                             ],
                             "else": [
                                 {
-                                    "c": 774
+                                    "c": 1356
                                 },
                                 {
-                                    "w": 775
+                                    "w": 1478
                                 },
                                 {
                                     "all": true,
                                     "optional": true,
-                                    "k": 780
+                                    "k": 1479
                                 },
                                 {
-                                    "k": 781
+                                    "k": 1480
                                 }
                             ]
                         }
@@ -21496,31 +21563,6 @@
                 ],
                 [
                     1,
-                    "auto_GB_tube8.com_0_+1",
-                    0,
-                    "^https?://(www\\.)?tube8\\.com/|^https?://(www\\.)?youporn\\.com/",
-                    10,
-                    [],
-                    [
-                        {
-                            "e": 1356
-                        }
-                    ],
-                    [
-                        {
-                            "v": 1356
-                        }
-                    ],
-                    [
-                        {
-                            "c": 1356
-                        }
-                    ],
-                    [],
-                    {}
-                ],
-                [
-                    1,
                     "auto_GB_vetuk.co.uk_0",
                     0,
                     "^https?://(www\\.)?vetuk\\.co\\.uk/",
@@ -26936,6 +26978,40 @@
                 ],
                 [
                     1,
+                    "miles-and-more",
+                    2,
+                    "^https://(www\\.)?miles-and-more\\.com/",
+                    22,
+                    [
+                        1481
+                    ],
+                    [
+                        {
+                            "e": 1482
+                        }
+                    ],
+                    [
+                        {
+                            "v": 1483
+                        }
+                    ],
+                    [
+                        {
+                            "wait": 500
+                        },
+                        {
+                            "c": 1483
+                        }
+                    ],
+                    [
+                        {
+                            "cc": 1484
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
                     "nba.com",
                     1,
                     "^https://(www\\.)?nba\\.com/",
@@ -27999,24 +28075,24 @@
                     "^https://www\\.strato\\.de/",
                     22,
                     [
-                        776
+                        1485
                     ],
                     [
                         {
-                            "e": 777
+                            "e": 1486
                         }
                     ],
                     [
                         {
-                            "v": 777
+                            "v": 1486
                         }
                     ],
                     [
                         {
-                            "k": 778
+                            "k": 1487
                         },
                         {
-                            "c": 779
+                            "c": 1488
                         }
                     ],
                     [],
@@ -28795,18 +28871,18 @@
             "index": {
                 "genericRuleRange": [
                     0,
-                    188
+                    189
                 ],
                 "frameRuleRange": [
-                    187,
-                    213
+                    188,
+                    214
                 ],
                 "specificRuleRange": [
-                    188,
-                    767
+                    189,
+                    768
                 ],
-                "genericStringEnd": 739,
-                "frameStringEnd": 774
+                "genericStringEnd": 747,
+                "frameStringEnd": 782
             }
         }
     }
