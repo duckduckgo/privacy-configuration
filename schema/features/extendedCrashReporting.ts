@@ -12,6 +12,12 @@ type SubFeatures<VersionType> = {
             OtherLogsCount?: number;
         }
     >;
+    sendIncidentCrashReports?: SubFeature<
+        VersionType,
+        {
+            ExceptionTypes?: string[];
+        }
+    >;
 };
 
 export type ExtendedCrashReporting<VersionType> = Feature<
