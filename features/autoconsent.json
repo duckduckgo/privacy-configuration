@@ -1847,7 +1847,7 @@
                 "[class*=ConsentBanner] .frDWEu",
                 "[class*=ConsentBanner] .hXIpFU",
                 "xeConsentState={%22performance%22:false%2C%22marketing%22:false%2C%22compliance%22:false}",
-                "#cookie-consent .cookie-consent__switch:not(.always_on)",
+                "#cookie-consent[style*=\"max-height\"] #cookie-status-reject",
                 "#cookie-consent .cookie-selection__btn",
                 "[class*=modal]",
                 "[class*=modal] a[href*='/cookie-policy']",
@@ -2370,7 +2370,8 @@
                 ".consent__wrapper",
                 ".consent",
                 "button.consentSettings",
-                "button#consentSubmit"
+                "button#consentSubmit",
+                "#cookie-consent .cookie-consent__switch.active:not(.always_on)"
             ],
             "r": [
                 [
@@ -25671,6 +25672,33 @@
                 ],
                 [
                     1,
+                    "aytm",
+                    2,
+                    "^https?://(www\\.|)?aytm\\.com/",
+                    22,
+                    [
+                        959
+                    ],
+                    [
+                        {
+                            "e": 965
+                        }
+                    ],
+                    [
+                        {
+                            "v": 965
+                        }
+                    ],
+                    [
+                        {
+                            "c": 965
+                        }
+                    ],
+                    [],
+                    {}
+                ],
+                [
+                    1,
                     "bahn-de",
                     0,
                     "^https://(www\\.)?bahn\\.de/",
@@ -27335,7 +27363,9 @@
                     [
                         {
                             "all": true,
-                            "c": 965
+                            "timeout": 500,
+                            "optional": true,
+                            "c": 1489
                         },
                         {
                             "c": 966
@@ -28879,7 +28909,7 @@
                 ],
                 "specificRuleRange": [
                     189,
-                    768
+                    769
                 ],
                 "genericStringEnd": 747,
                 "frameStringEnd": 782
