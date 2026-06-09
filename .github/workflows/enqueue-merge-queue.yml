@@ -1,0 +1,36 @@
+name: Enqueue PRs to Merge Queue
+
+on:
+    workflow_dispatch:
+        inputs:
+            pr_numbers:
+                description: 'Comma-separated PR numbers to enqueue'
+                required: true
+
+jobs:
+    enqueue:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Enqueue pull requests
+              env:
+                  GH_TOKEN: ${{ secrets.PRIVACY_CONFIG_PAT }}
+                  PR_NUMBERS: ${{ inputs.pr_numbers }}
+              run: |
+                  set -euo pipefail
+                  IFS=',' read -ra PRS <<< "${PR_NUMBERS// /}"
+                  for pr in "${PRS[@]}"; do
+                    echo "Enqueuing PR #${pr}..."
+                    pr_id=$(gh api graphql -f query='query($n:Int!){repository(owner:"duckduckgo",name:"privacy-configuration"){pullRequest(number:$n){id title mergeQueueEntry{state}}}}' -F n="${pr}" --jq '.data.repository.pullRequest')
+                    pr_node_id=$(echo "$pr_id" | jq -r '.id')
+                    pr_title=$(echo "$pr_id" | jq -r '.title')
+                    queue_state=$(echo "$pr_id" | jq -r '.mergeQueueEntry.state // "NOT_QUEUED"')
+                    if [ "$queue_state" != "NOT_QUEUED" ] && [ "$queue_state" != "null" ]; then
+                      echo "PR #${pr} (${pr_title}) already in merge queue: ${queue_state}"
+                      continue
+                    fi
+                    result=$(gh api graphql -f query='mutation($id:ID!){enqueuePullRequest(input:{pullRequestId:$id}){mergeQueueEntry{position state}}}' -f id="${pr_node_id}" 2>&1) || {
+                      echo "Failed to enqueue PR #${pr}: ${result}"
+                      exit 1
+                    }
+                    echo "Enqueued PR #${pr} (${pr_title}): ${result}"
+                  done
