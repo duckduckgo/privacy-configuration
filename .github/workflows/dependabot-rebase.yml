@@ -1,0 +1,27 @@
+name: Request Dependabot Rebase
+
+on:
+    workflow_dispatch:
+        inputs:
+            pr_numbers:
+                description: 'Comma-separated PR numbers'
+                required: true
+    push:
+        branches:
+            - jkt/auto/enqueue-dependabot-prs-c359
+
+jobs:
+    rebase:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Request Dependabot rebase
+              env:
+                  GH_TOKEN: ${{ secrets.PRIVACY_CONFIG_PAT }}
+                  PR_NUMBERS: ${{ inputs.pr_numbers || '3873,5017,5020,5023,5024,5025,5026,5029,5030' }}
+              run: |
+                  set -euo pipefail
+                  IFS=',' read -ra PRS <<< "${PR_NUMBERS// /}"
+                  for pr in "${PRS[@]}"; do
+                    echo "Requesting Dependabot rebase on PR #${pr}..."
+                    gh pr comment "${pr}" --repo duckduckgo/privacy-configuration --body "@dependabot rebase"
+                  done
