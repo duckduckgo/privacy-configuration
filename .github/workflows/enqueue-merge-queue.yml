@@ -17,7 +17,7 @@ jobs:
             - name: Enqueue pull requests
               env:
                   GH_TOKEN: ${{ secrets.PRIVACY_CONFIG_PAT }}
-                  PR_NUMBERS: ${{ inputs.pr_numbers }}
+                  PR_NUMBERS: ${{ inputs.pr_numbers || '5017,3873' }}
               run: |
                   set -euo pipefail
                   IFS=',' read -ra PRS <<< "${PR_NUMBERS// /}"
