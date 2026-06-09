@@ -101,6 +101,51 @@
                         }
                     }
                 }
+            },
+            "webTelemetry_youtubeInterference_day": {
+                "state": "enabled",
+                "trigger": {
+                    "period": {
+                        "days": 1
+                    }
+                },
+                "parameters": {
+                    "videoAd": {
+                        "template": "counter",
+                        "source": "youtube_videoAd",
+                        "buckets": {
+                            "true": { "gte": 1 }
+                        }
+                    },
+                    "staticAd": {
+                        "template": "counter",
+                        "source": "youtube_staticAd",
+                        "buckets": {
+                            "true": { "gte": 1 }
+                        }
+                    },
+                    "playabilityError": {
+                        "template": "counter",
+                        "source": "youtube_playabilityError",
+                        "buckets": {
+                            "true": { "gte": 1 }
+                        }
+                    },
+                    "adBlocker": {
+                        "template": "counter",
+                        "source": "youtube_adBlocker",
+                        "buckets": {
+                            "true": { "gte": 1 }
+                        }
+                    },
+                    "buffering": {
+                        "template": "counter",
+                        "source": "youtube_buffering",
+                        "buckets": {
+                            "true": { "gte": 1 }
+                        }
+                    }
+                }
             }
         }
     }
