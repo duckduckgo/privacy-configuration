@@ -5,11 +5,7 @@ on:
         inputs:
             pr_numbers:
                 description: 'Comma-separated PR numbers to enqueue'
-                required: false
-                default: '5284,5251,5227,5095,5050'
-    push:
-        branches:
-            - jkt/auto/enqueue-dependabot-prs-c359
+                required: true
 
 jobs:
     enqueue:
@@ -18,7 +14,7 @@ jobs:
             - name: Enqueue pull requests
               env:
                   GH_TOKEN: ${{ secrets.PRIVACY_CONFIG_PAT }}
-                  PR_NUMBERS: ${{ inputs.pr_numbers || '5284,5251,5227,5095,5050' }}
+                  PR_NUMBERS: ${{ inputs.pr_numbers }}
               run: |
                   set -euo pipefail
                   IFS=',' read -ra PRS <<< "${PR_NUMBERS// /}"
