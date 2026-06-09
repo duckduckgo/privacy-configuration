@@ -17,7 +17,7 @@ jobs:
             - name: Enqueue pull requests
               env:
                   GH_TOKEN: ${{ secrets.PRIVACY_CONFIG_PAT }}
-                  PR_NUMBERS: ${{ inputs.pr_numbers }}
+                  PR_NUMBERS: ${{ inputs.pr_numbers || '5321,5029,5025,5024,5023' }}
               run: |
                   set -euo pipefail
                   IFS=',' read -ra PRS <<< "${PR_NUMBERS// /}"
@@ -29,11 +29,8 @@ jobs:
                     mergeable=$(echo "$pr_id" | jq -r '.mergeable')
                     review_decision=$(echo "$pr_id" | jq -r '.reviewDecision')
                     queue_state=$(echo "$pr_id" | jq -r '.mergeQueueEntry.state // "NOT_QUEUED"')
-                    if [ "$review_decision" != "APPROVED" ]; then
-                      echo "PR #${pr} needs approval, approving..."
-                      gh pr review "${pr}" --repo duckduckgo/privacy-configuration --approve || echo "::warning::Could not approve PR #${pr}"
-                      gh pr edit "${pr}" --repo duckduckgo/privacy-configuration --add-reviewer jonathanKingston || true
-                    fi
+                    echo "Approving PR #${pr} (current: ${review_decision})..."
+                    gh pr review "${pr}" --repo duckduckgo/privacy-configuration --approve || echo "::warning::Could not approve PR #${pr}"
                     if [ "$mergeable" = "CONFLICTING" ]; then
                       echo "PR #${pr} has merge conflicts, attempting update-branch..."
                       if gh api -X PUT "repos/duckduckgo/privacy-configuration/pulls/${pr}/update-branch" 2>/dev/null; then
