@@ -23,7 +23,11 @@ jobs:
                   IFS=',' read -ra PRS <<< "${PR_NUMBERS// /}"
                   for pr in "${PRS[@]}"; do
                     echo "Processing PR #${pr}..."
-                    mergeable=$(gh pr view "${pr}" --json mergeable --jq '.mergeable')
+                    pr_id=$(gh api graphql -f query='query($n:Int!){repository(owner:"duckduckgo",name:"privacy-configuration"){pullRequest(number:$n){id title mergeable mergeQueueEntry{state}}}}' -F n="${pr}" --jq '.data.repository.pullRequest')
+                    pr_node_id=$(echo "$pr_id" | jq -r '.id')
+                    pr_title=$(echo "$pr_id" | jq -r '.title')
+                    mergeable=$(echo "$pr_id" | jq -r '.mergeable')
+                    queue_state=$(echo "$pr_id" | jq -r '.mergeQueueEntry.state // "NOT_QUEUED"')
                     if [ "$mergeable" = "CONFLICTING" ]; then
                       echo "PR #${pr} has merge conflicts, attempting update-branch..."
                       if gh api -X PUT "repos/duckduckgo/privacy-configuration/pulls/${pr}/update-branch" 2>/dev/null; then
@@ -35,10 +39,6 @@ jobs:
                       fi
                     fi
                     echo "Enqueuing PR #${pr}..."
-                    pr_id=$(gh api graphql -f query='query($n:Int!){repository(owner:"duckduckgo",name:"privacy-configuration"){pullRequest(number:$n){id title mergeQueueEntry{state}}}}' -F n="${pr}" --jq '.data.repository.pullRequest')
-                    pr_node_id=$(echo "$pr_id" | jq -r '.id')
-                    pr_title=$(echo "$pr_id" | jq -r '.title')
-                    queue_state=$(echo "$pr_id" | jq -r '.mergeQueueEntry.state // "NOT_QUEUED"')
                     if [ "$queue_state" != "NOT_QUEUED" ] && [ "$queue_state" != "null" ]; then
                       echo "PR #${pr} (${pr_title}) already in merge queue: ${queue_state}"
                       continue
