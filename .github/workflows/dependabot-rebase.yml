@@ -14,7 +14,7 @@ jobs:
             - name: Request Dependabot rebase
               env:
                   GH_TOKEN: ${{ secrets.PRIVACY_CONFIG_PAT }}
-                  PR_NUMBERS: ${{ inputs.pr_numbers || '3873,5017,5020,5023,5024,5025,5026,5029,5030' }}
+                  PR_NUMBERS: ${{ inputs.pr_numbers }}
               run: |
                   set -euo pipefail
                   IFS=',' read -ra PRS <<< "${PR_NUMBERS// /}"
