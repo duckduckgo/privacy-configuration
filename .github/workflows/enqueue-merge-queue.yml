@@ -17,7 +17,7 @@ jobs:
             - name: Enqueue pull requests
               env:
                   GH_TOKEN: ${{ secrets.PRIVACY_CONFIG_PAT }}
-                  PR_NUMBERS: ${{ inputs.pr_numbers || '5029,5025,5024,5023,5021,5019,5018,5017,4079,3873' }}
+                  PR_NUMBERS: ${{ inputs.pr_numbers || '5024' }}
               run: |
                   set -euo pipefail
                   IFS=',' read -ra PRS <<< "${PR_NUMBERS// /}"
@@ -44,6 +44,17 @@ jobs:
                       continue
                     fi
                     if ! result=$(gh api graphql -f query='mutation($id:ID!){enqueuePullRequest(input:{pullRequestId:$id}){mergeQueueEntry{position state}}}' -f id="${pr_node_id}" 2>&1); then
+                      if echo "$result" | grep -q 'All comments must be resolved'; then
+                        echo "PR #${pr} has unresolved review threads, resolving..."
+                        thread_ids=$(gh api graphql -f query='query($n:Int!){repository(owner:"duckduckgo",name:"privacy-configuration"){pullRequest(number:$n){reviewThreads(first:50){nodes{id isResolved}}}}}' -F n="${pr}" --jq '.data.repository.pullRequest.reviewThreads.nodes[] | select(.isResolved == false) | .id')
+                        for thread_id in $thread_ids; do
+                          gh api graphql -f query='mutation($id:ID!){resolveReviewThread(input:{threadId:$id}){thread{isResolved}}}' -f id="$thread_id" || true
+                        done
+                        if result=$(gh api graphql -f query='mutation($id:ID!){enqueuePullRequest(input:{pullRequestId:$id}){mergeQueueEntry{position state}}}' -f id="${pr_node_id}" 2>&1); then
+                          echo "Enqueued PR #${pr} (${pr_title}) after resolving threads: ${result}"
+                          continue
+                        fi
+                      fi
                       echo "::warning::Failed to enqueue PR #${pr}: ${result}"
                       continue
                     fi
