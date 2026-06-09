@@ -303,7 +303,7 @@ jobs:
                   } >> $GITHUB_OUTPUT
 
             - name: Get PR author Asana ID
-              uses: duckduckgo/native-github-asana-sync@v2.0
+              uses: duckduckgo/native-github-asana-sync@v2.3
               id: get-author-asana-id
               with:
                   github-pat: ${{ secrets.GH_RO_PAT }}
@@ -311,7 +311,7 @@ jobs:
 
             - name: Create Asana Task
               if: steps.asana_content.outcome == 'success'
-              uses: duckduckgo/native-github-asana-sync@v2.0
+              uses: duckduckgo/native-github-asana-sync@v2.3
               with:
                   asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
                   asana-project: ${{ matrix.platform.asana_project }}
