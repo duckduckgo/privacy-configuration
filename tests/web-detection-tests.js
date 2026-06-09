@@ -293,7 +293,9 @@ describe('webDetection config tests', () => {
                                 'line 1',
                                 'line 2',
                             ],
-                            any: [{ pattern: 'foo' }],
+                            any: [
+                                { pattern: 'foo' },
+                            ],
                         },
                     },
                     '$',
