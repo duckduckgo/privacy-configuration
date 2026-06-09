@@ -1,0 +1,27 @@
+name: Request Codeowner Review
+
+on:
+    workflow_dispatch:
+        inputs:
+            pr_numbers:
+                description: 'Comma-separated PR numbers'
+                required: true
+    push:
+        branches:
+            - jkt/auto/enqueue-dependabot-prs-c359
+
+jobs:
+    request-review:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Request codeowner re-review
+              env:
+                  GH_TOKEN: ${{ secrets.PRIVACY_CONFIG_PAT }}
+                  PR_NUMBERS: ${{ inputs.pr_numbers || '5321,5029,5025,5024,5023' }}
+              run: |
+                  set -euo pipefail
+                  IFS=',' read -ra PRS <<< "${PR_NUMBERS// /}"
+                  for pr in "${PRS[@]}"; do
+                    echo "Requesting codeowner review on PR #${pr}..."
+                    gh pr edit "${pr}" --repo duckduckgo/privacy-configuration --add-reviewer jonathanKingston
+                  done

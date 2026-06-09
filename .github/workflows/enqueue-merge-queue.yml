@@ -32,6 +32,7 @@ jobs:
                     if [ "$review_decision" != "APPROVED" ]; then
                       echo "PR #${pr} needs approval, approving..."
                       gh pr review "${pr}" --repo duckduckgo/privacy-configuration --approve || echo "::warning::Could not approve PR #${pr}"
+                      gh pr edit "${pr}" --repo duckduckgo/privacy-configuration --add-reviewer jonathanKingston || true
                     fi
                     if [ "$mergeable" = "CONFLICTING" ]; then
                       echo "PR #${pr} has merge conflicts, attempting update-branch..."
