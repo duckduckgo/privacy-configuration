@@ -16,6 +16,15 @@ type SubFeatures<VersionType> = {
         VersionType,
         {
             ExceptionTypes?: string[];
+            Redaction?: {
+                IncludePackageLogs?: boolean;
+                IncludeSha256Hashes?: boolean;
+                IncludeLaunchFlags?: boolean;
+                UseStrictSqliteErrorPattern?: boolean;
+                IncludeStackTraces?: boolean;
+                IncludeRenderFailureProbe?: boolean;
+                IncludeZombieBeacon?: boolean;
+            };
         }
     >;
 };
