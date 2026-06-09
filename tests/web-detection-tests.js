@@ -8,14 +8,21 @@ const OPERATOR_KEYS = [
     'none',
 ];
 
+// `comment` is a documentation-only modifier — counts toward the leaf-vs-modifier
+// distinction but is not a condition tree itself, so we don't recurse into it.
+const MODIFIER_KEYS = [
+    ...OPERATOR_KEYS,
+    'comment',
+];
+
 const MATCH_LEVEL_KEYS = [
     'text',
     'element',
 ];
 
 /**
- * Recursively walk a condition node, asserting it contains either only operator
- * keys or only level-appropriate leaf keys (never both).
+ * Recursively walk a condition node, asserting it contains either only modifier
+ * keys (operators + comment) or only level-appropriate leaf keys (never both).
  *
  * Operator children stay at the same level (operators are level-preserving);
  * descending into a `text`/`element` key transitions the walk into a per-type
@@ -33,16 +40,16 @@ function assertConditionNode(node, path) {
     if (node === null || typeof node !== 'object') return;
 
     const keys = Object.keys(node);
-    const opKeys = keys.filter((k) => OPERATOR_KEYS.includes(k));
-    const otherKeys = keys.filter((k) => !OPERATOR_KEYS.includes(k));
+    const modKeys = keys.filter((k) => MODIFIER_KEYS.includes(k));
+    const otherKeys = keys.filter((k) => !MODIFIER_KEYS.includes(k));
 
     expect(
-        opKeys.length === 0 || otherKeys.length === 0,
-        `${path}: condition node mixes operator keys [${opKeys.join(', ')}] with non-operator keys [${otherKeys.join(', ')}]`,
+        modKeys.length === 0 || otherKeys.length === 0,
+        `${path}: condition node mixes modifier keys [${modKeys.join(', ')}] with non-modifier keys [${otherKeys.join(', ')}]`,
     ).to.equal(true);
 
-    if (opKeys.length > 0) {
-        for (const op of opKeys) {
+    if (modKeys.length > 0) {
+        for (const op of modKeys.filter((k) => OPERATOR_KEYS.includes(k))) {
             assertConditionNode(node[op], `${path}.${op}`);
         }
         return;
@@ -254,6 +261,58 @@ describe('webDetection config tests', () => {
                                 pattern: 'bar',
                             },
                         ],
+                    },
+                    '$',
+                ),
+            ).to.throw();
+        });
+
+        it('allows comment alongside operator keys', () => {
+            expect(() =>
+                assertConditionNode(
+                    {
+                        text: {
+                            comment: 'requires both foo and bar in the body',
+                            all: [
+                                { pattern: 'foo' },
+                                { pattern: 'bar' },
+                            ],
+                        },
+                    },
+                    '$',
+                ),
+            ).to.not.throw();
+        });
+
+        it('allows comment as array of strings', () => {
+            expect(() =>
+                assertConditionNode(
+                    {
+                        text: {
+                            comment: [
+                                'line 1',
+                                'line 2',
+                            ],
+                            any: [{ pattern: 'foo' }],
+                        },
+                    },
+                    '$',
+                ),
+            ).to.not.throw();
+        });
+
+        it('allows comment as the only modifier (no-op block)', () => {
+            expect(() => assertConditionNode({ text: { comment: 'documentation only' } }, '$')).to.not.throw();
+        });
+
+        it('rejects mixing comment with leaf fields', () => {
+            expect(() =>
+                assertConditionNode(
+                    {
+                        text: {
+                            comment: 'docs',
+                            pattern: 'foo',
+                        },
                     },
                     '$',
                 ),

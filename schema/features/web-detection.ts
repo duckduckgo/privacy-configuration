@@ -33,7 +33,13 @@ export type ConditionBranch<Final> = ConditionNode<Final> | ConditionNode<Final>
 
 type ConditionOperator = 'any' | 'all' | 'none';
 
-type ConditionNode<Final> = Final | { [K in ConditionOperator]?: ConditionBranch<Final> };
+type ConditionModifiers<Final> = {
+    [K in ConditionOperator]?: ConditionBranch<Final>;
+} & {
+    comment?: string | string[];
+};
+
+type ConditionNode<Final> = Final | ConditionModifiers<Final>;
 
 export type ConditionTypes = {
     text: {
