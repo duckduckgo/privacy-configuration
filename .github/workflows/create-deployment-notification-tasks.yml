@@ -1,0 +1,60 @@
+name: Create Deployment Notification Tasks
+
+# Announces config deployments as Asana tasks - one task per platform whose override file
+# changed in the push. Only Apple (iOS/macOS) is wired up today. To enable another platform,
+# add its override file to the `paths` filter below and a matching entry to the `platform`
+# matrix (name + override path + Asana project/section vars).
+
+on:
+    push:
+        branches:
+            - main
+        paths:
+            - 'overrides/ios-override.json'
+            - 'overrides/macos-override.json'
+
+jobs:
+    notify:
+        runs-on: ubuntu-latest
+        strategy:
+            fail-fast: false
+            matrix:
+                platform:
+                    - name: 'iOS'
+                      override: 'overrides/ios-override.json'
+                      asana_project: '${{ vars.APPLE_DEPLOYMENTS_ASANA_PROJECT_ID }}'
+                      asana_section: '${{ vars.APPLE_DEPLOYMENTS_SECTION_ID }}'
+                    - name: 'macOS'
+                      override: 'overrides/macos-override.json'
+                      asana_project: '${{ vars.APPLE_DEPLOYMENTS_ASANA_PROJECT_ID }}'
+                      asana_section: '${{ vars.APPLE_DEPLOYMENTS_SECTION_ID }}'
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v6
+              with:
+                  fetch-depth: 2 # need HEAD~1 to see which override changed
+
+            - name: Check whether the ${{ matrix.platform.name }} override changed
+              id: changed
+              env:
+                  OVERRIDE: ${{ matrix.platform.override }}
+              run: |
+                  if git diff --name-only HEAD~1 HEAD | grep -qx "$OVERRIDE"; then
+                      echo "changed=true" >> "$GITHUB_OUTPUT"
+                  else
+                      echo "changed=false" >> "$GITHUB_OUTPUT"
+                  fi
+
+            - name: Create ${{ matrix.platform.name }} deployment notification task
+              if: steps.changed.outputs.changed == 'true'
+              uses: duckduckgo/native-github-asana-sync@v2.3
+              with:
+                  asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+                  asana-project: ${{ matrix.platform.asana_project }}
+                  asana-section: ${{ matrix.platform.asana_section }}
+                  asana-task-name: '${{ matrix.platform.name }} privacy config deployed'
+                  asana-task-description: |
+                      ${{ matrix.platform.name }} privacy config override deployed.
+                      Commit: ${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}
+                  action: 'create-asana-task'
