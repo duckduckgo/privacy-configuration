@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import fs from 'fs';
 import platforms from '../platforms.js';
+import { readJsoncFile } from '../util.js';
 
 /**
  * Split a rule string into domain and path components.
@@ -852,7 +853,7 @@ describe('tracker-allowlist-validator', () => {
                 const ovrFile = overridePath(platform);
                 let overrideTrackers = null;
                 if (fs.existsSync(ovrFile)) {
-                    const override = JSON.parse(fs.readFileSync(ovrFile, 'utf-8'));
+                    const override = readJsoncFile(ovrFile);
                     overrideTrackers = override.features?.trackerAllowlist?.settings?.allowlistedTrackers || null;
                 }
 
