@@ -5345,7 +5345,222 @@
         },
         "eventHub": {
             "state": "internal",
-            "minSupportedVersion": "0.162.0"
+            "minSupportedVersion": "0.162.0",
+            "settings": {
+                "telemetry": {
+                    "webTelemetry_adwalls_day": {
+                        "state": "enabled",
+                        "trigger": {
+                            "period": {
+                                "days": 1
+                            }
+                        },
+                        "parameters": {
+                            "adwallCount": {
+                                "template": "counter",
+                                "source": "adwall",
+                                "buckets": {
+                                    "0": { "gte": 0, "lt": 1 },
+                                    "1": { "gte": 1, "lt": 2 },
+                                    "2-3": { "gte": 2, "lt": 4 },
+                                    "4-7": { "gte": 4, "lt": 8 },
+                                    "8-14": { "gte": 8, "lt": 15 },
+                                    "15-20": { "gte": 15, "lt": 21 },
+                                    "21-39": { "gte": 21, "lt": 40 },
+                                    "40+": { "gte": 40 }
+                                }
+                            }
+                        }
+                    },
+                    "webTelemetry_adwalls_week": {
+                        "state": "enabled",
+                        "trigger": {
+                            "period": {
+                                "days": 7
+                            }
+                        },
+                        "parameters": {
+                            "adwallCount": {
+                                "template": "counter",
+                                "source": "adwall",
+                                "buckets": {
+                                    "0": { "gte": 0, "lt": 1 },
+                                    "1": { "gte": 1, "lt": 2 },
+                                    "2-3": { "gte": 2, "lt": 4 },
+                                    "4-7": { "gte": 4, "lt": 8 },
+                                    "8-14": { "gte": 8, "lt": 15 },
+                                    "15-20": { "gte": 15, "lt": 21 },
+                                    "21-39": { "gte": 21, "lt": 40 },
+                                    "40+": { "gte": 40 }
+                                }
+                            }
+                        }
+                    },
+                    "webTelemetry_admiralAdwalls_day": {
+                        "state": "enabled",
+                        "trigger": {
+                            "period": {
+                                "days": 1
+                            }
+                        },
+                        "parameters": {
+                            "admiralAdwallCount": {
+                                "template": "counter",
+                                "source": "admiralAdwall",
+                                "buckets": {
+                                    "0": { "gte": 0, "lt": 1 },
+                                    "1": { "gte": 1, "lt": 2 },
+                                    "2-3": { "gte": 2, "lt": 4 },
+                                    "4-7": { "gte": 4, "lt": 8 },
+                                    "8-14": { "gte": 8, "lt": 15 },
+                                    "15-20": { "gte": 15, "lt": 21 },
+                                    "21-39": { "gte": 21, "lt": 40 },
+                                    "40+": { "gte": 40 }
+                                }
+                            }
+                        }
+                    },
+                    "webTelemetry_admiralAdwalls_week": {
+                        "state": "enabled",
+                        "trigger": {
+                            "period": {
+                                "days": 7
+                            }
+                        },
+                        "parameters": {
+                            "admiralAdwallCount": {
+                                "template": "counter",
+                                "source": "admiralAdwall",
+                                "buckets": {
+                                    "0": { "gte": 0, "lt": 1 },
+                                    "1": { "gte": 1, "lt": 2 },
+                                    "2-3": { "gte": 2, "lt": 4 },
+                                    "4-7": { "gte": 4, "lt": 8 },
+                                    "8-14": { "gte": 8, "lt": 15 },
+                                    "15-20": { "gte": 15, "lt": 21 },
+                                    "21-39": { "gte": 21, "lt": 40 },
+                                    "40+": { "gte": 40 }
+                                }
+                            }
+                        }
+                    },
+                    "webTelemetry_youtube_adBlocker_day": {
+                        "state": "enabled",
+                        "trigger": {
+                            "period": {
+                                "days": 1
+                            }
+                        },
+                        "parameters": {
+                            "count": {
+                                "template": "counter",
+                                "source": "youtube_adBlocker",
+                                "buckets": {
+                                    "0": { "gte": 0, "lt": 1 },
+                                    "1+": { "gte": 1 }
+                                }
+                            },
+                            "loginState": {
+                                "template": "data",
+                                "source": "youtube_adBlocker",
+                                "dataKey": "loginState"
+                            }
+                        }
+                    },
+                    "webTelemetry_youtube_playabilityError_day": {
+                        "state": "enabled",
+                        "trigger": {
+                            "period": {
+                                "days": 1
+                            }
+                        },
+                        "parameters": {
+                            "count": {
+                                "template": "counter",
+                                "source": "youtube_playabilityError",
+                                "buckets": {
+                                    "0": { "gte": 0, "lt": 1 },
+                                    "1+": { "gte": 1 }
+                                }
+                            },
+                            "loginState": {
+                                "template": "data",
+                                "source": "youtube_playabilityError",
+                                "dataKey": "loginState"
+                            }
+                        }
+                    },
+                    "webTelemetry_youtube_videoAd_day": {
+                        "state": "enabled",
+                        "trigger": {
+                            "period": {
+                                "days": 1
+                            }
+                        },
+                        "parameters": {
+                            "count": {
+                                "template": "counter",
+                                "source": "youtube_videoAd",
+                                "buckets": {
+                                    "0": { "gte": 0, "lt": 1 },
+                                    "1+": { "gte": 1 }
+                                }
+                            },
+                            "loginState": {
+                                "template": "data",
+                                "source": "youtube_videoAd",
+                                "dataKey": "loginState"
+                            }
+                        }
+                    },
+                    "webTelemetry_youtube_staticAd_day": {
+                        "state": "enabled",
+                        "trigger": {
+                            "period": {
+                                "days": 1
+                            }
+                        },
+                        "parameters": {
+                            "count": {
+                                "template": "counter",
+                                "source": "youtube_staticAd",
+                                "buckets": {
+                                    "0": { "gte": 0, "lt": 1 },
+                                    "1+": { "gte": 1 }
+                                }
+                            },
+                            "loginState": {
+                                "template": "data",
+                                "source": "youtube_staticAd",
+                                "dataKey": "loginState"
+                            }
+                        }
+                    },
+                    "webTelemetry_youtube_buffering_day": {
+                        "state": "enabled",
+                        "trigger": {
+                            "period": {
+                                "days": 1
+                            }
+                        },
+                        "parameters": {
+                            "count": {
+                                "template": "counter",
+                                "source": "youtube_buffering",
+                                "buckets": {
+                                    "0": { "gte": 0, "lt": 1 },
+                                    "1+": { "gte": 1 }
+                                }
+                            },
+                            "loginState": {
+                                "template": "data",
+                                "source": "youtube_buffering",
+                                "dataKey": "loginState"
+                            }
+                        }
+                    }
+                }
+            }
         },
         "webDetection": {
             "state": "enabled",
