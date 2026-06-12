@@ -1,0 +1,111 @@
+name: Dependabot auto-approve and auto-merge
+
+on:
+    pull_request:
+        types: [opened, reopened, synchronize, ready_for_review]
+
+concurrency:
+    group: dependabot-gate-${{ github.event.pull_request.number }}
+    cancel-in-progress: true
+
+permissions:
+    actions: read
+    checks: read
+    contents: read
+    pull-requests: write
+
+jobs:
+    dependabot:
+        runs-on: ubuntu-latest
+        if: |
+            github.event.pull_request.user.login == 'dependabot[bot]' &&
+            github.event.pull_request.head.repo.full_name == github.repository
+        steps:
+            - name: Checkout base branch
+              uses: actions/checkout@v6
+              with:
+                  ref: ${{ github.event.pull_request.base.ref }}
+                  path: base
+
+            - name: Checkout PR branch
+              uses: actions/checkout@v6
+              with:
+                  ref: ${{ github.event.pull_request.head.ref }}
+                  path: pr
+
+            - name: Build generated configs on base branch
+              run: |
+                  cd base
+                  npm ci
+                  node index.js
+
+            - name: Build generated configs on PR branch
+              run: |
+                  cd pr
+                  npm ci
+                  node index.js
+
+            - name: Analyze generated config output
+              run: node pr/.github/scripts/json-diff-directories.js base/generated pr/generated > approval_output.txt
+
+            - name: Assess Dependabot merge gate
+              id: gate
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+                  CONFIG_APPROVAL_OUTPUT_PATH: approval_output.txt
+              run: node pr/.github/scripts/dependabot-gate.mjs assess
+
+            - name: Approve Dependabot update
+              if: steps.gate.outputs.safe_to_merge == 'true'
+              env:
+                  GH_TOKEN: ${{ secrets.PRIVACY_CONFIG_PAT }}
+                  PR_NUMBER: ${{ github.event.pull_request.number }}
+                  PR_HEAD_SHA: ${{ steps.gate.outputs.assessed_head_sha }}
+                  REPO: ${{ github.repository }}
+              run: |
+                  set -euo pipefail
+                  current_head="$(gh pr view "$PR_NUMBER" --repo "$REPO" --json headRefOid --jq '.headRefOid')"
+                  if [[ "$current_head" != "$PR_HEAD_SHA" ]]; then
+                    echo "PR head advanced from $PR_HEAD_SHA to $current_head; refusing to approve using stale evidence."
+                    exit 1
+                  fi
+                  gh pr review "$PR_NUMBER" --repo "$REPO" --approve
+
+            - name: Enable auto-merge for Dependabot update
+              if: steps.gate.outputs.safe_to_merge == 'true'
+              env:
+                  GH_TOKEN: ${{ secrets.PRIVACY_CONFIG_PAT }}
+                  PR_NUMBER: ${{ github.event.pull_request.number }}
+                  PR_HEAD_SHA: ${{ steps.gate.outputs.assessed_head_sha }}
+                  REPO: ${{ github.repository }}
+              run: |
+                  set -euo pipefail
+                  current_head="$(gh pr view "$PR_NUMBER" --repo "$REPO" --json headRefOid --jq '.headRefOid')"
+                  if [[ "$current_head" != "$PR_HEAD_SHA" ]]; then
+                    echo "PR head advanced from $PR_HEAD_SHA to $current_head; refusing to enable auto-merge using stale evidence."
+                    exit 1
+                  fi
+
+                  merge_state="$(gh pr view "$PR_NUMBER" --repo "$REPO" --json mergeStateStatus,isDraft --jq '.mergeStateStatus + " " + (if .isDraft then "draft" else "ready" end)')"
+                  echo "merge_state=$merge_state"
+
+                  if [[ "$merge_state" == *" draft" ]]; then
+                    echo "PR is a draft; skipping."
+                    exit 0
+                  fi
+
+                  state="${merge_state%% *}"
+                  case "$state" in
+                    DIRTY)
+                      echo "PR has conflicts (DIRTY); skipping."
+                      exit 0
+                      ;;
+                  esac
+
+                  if ! out="$(gh pr merge "$PR_NUMBER" --repo "$REPO" --auto --match-head-commit "$PR_HEAD_SHA" 2>&1)"; then
+                    echo "Could not enable auto-merge for PR; leaving it unqueued."
+                    echo "$out"
+                    exit 0
+                  fi
+                  echo "$out"
