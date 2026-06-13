@@ -15,7 +15,15 @@ type TelemetryParameterCounter = TelemetryParameterBase & {
     buckets: Record<string, CounterBucket>;
 };
 
-type TelemetryParameter = TelemetryParameterCounter;
+// Forwards a value from the event payload (under `dataKey`) as the parameter, rather than counting.
+// Aggregate-period data params carry a `source`; immediate-trigger ones may omit it.
+type TelemetryParameterData = TelemetryParameterBase & {
+    template: 'data';
+    source?: string;
+    dataKey: string;
+};
+
+type TelemetryParameter = TelemetryParameterCounter | TelemetryParameterData;
 
 type TelemetryEntry = {
     state: FeatureState;

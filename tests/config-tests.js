@@ -321,6 +321,25 @@ describe('EventHub validation tests', () => {
                             );
                         });
 
+                        // Only the "counter" template defines buckets; other templates (e.g. "data",
+                        // which forwards a value from the event payload) carry none, so skip the
+                        // bucket-schema checks below for them.
+                        if (param.template !== 'counter') {
+                            if (param.template === 'data') {
+                                it('dataKey should be a non-empty string', () => {
+                                    expect(param.dataKey).to.be.a(
+                                        'string',
+                                        `Parameter '${entryName}.${paramName}' dataKey must be a string`,
+                                    );
+                                    expect(param.dataKey.length).to.be.greaterThan(
+                                        0,
+                                        `Parameter '${entryName}.${paramName}' dataKey must not be empty`,
+                                    );
+                                });
+                            }
+                            return;
+                        }
+
                         it('buckets should not be empty', () => {
                             expect(param.buckets).to.be.an('object', `Parameter '${entryName}.${paramName}' buckets must be an object`);
                             const bucketNames = Object.keys(param.buckets);
