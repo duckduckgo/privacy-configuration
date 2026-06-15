@@ -6,6 +6,9 @@
  * Usage:
  *   echo '"enabled"' | node scripts/set-jsonc-path.mjs features/foo.json state > features/foo.json
  *
+ * Paths use dot notation for object properties only (e.g. foo.bar, buckets.0.gte).
+ * Array indices are not supported.
+ *
  * Comments in the source file outside the modified region are preserved. The
  * result is written to stdout; the input file is not modified.
  */
@@ -24,30 +27,27 @@ const FORMATTING_OPTIONS = {
 function usage() {
     console.error(`Usage: set-jsonc-path.mjs <filename> <jsonpath>
 
-Replace the JSON value at <jsonpath> (dot notation) in <filename> with JSONC
-read from stdin. Array indices use numeric segments, e.g. exceptions.0.rules.
+Replace the JSON value at <jsonpath> in <filename> with JSONC read from stdin.
+Paths use dot notation for object properties (e.g. features.autofill.settings).
+Array indices are not supported.
 
 Examples:
   echo '"enabled"' | node scripts/set-jsonc-path.mjs features/foo.json state > features/foo.json
   cat patch.jsonc | node scripts/set-jsonc-path.mjs overrides/ios-override.json features.autofill.settings
+  echo '"18_7"' | node scripts/set-jsonc-path.mjs overrides/ios-override.json features.customUserAgent.settings.safariVersionMappings.26
 `);
 }
 
 /**
  * @param {string} dotPath
- * @returns {(string | number)[]}
+ * @returns {string[]}
  */
 export function parseDotPath(dotPath) {
     if (!dotPath) {
         return [];
     }
 
-    return dotPath.split('.').map((segment) => {
-        if (/^\d+$/.test(segment)) {
-            return Number(segment);
-        }
-        return segment;
-    });
+    return dotPath.split('.');
 }
 
 /**

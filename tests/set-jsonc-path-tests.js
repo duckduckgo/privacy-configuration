@@ -15,11 +15,11 @@ describe('set-jsonc-path', () => {
             ]);
         });
 
-        it('parses numeric segments as array indices', () => {
-            expect(parseDotPath('exceptions.0.rules')).to.deep.equal([
-                'exceptions',
-                0,
-                'rules',
+        it('keeps numeric segments as strings', () => {
+            expect(parseDotPath('buckets.0.gte')).to.deep.equal([
+                'buckets',
+                '0',
+                'gte',
             ]);
         });
     });
@@ -52,15 +52,43 @@ describe('set-jsonc-path', () => {
             expect(parseJsonc(result, 'result').settings.foo).to.equal('baz');
         });
 
-        it('replaces an array element by index', () => {
+        it('replaces a value at a numeric object key', () => {
+            const document = `{
+    "buckets": {
+        "0": { "gte": 0, "lt": 1 }
+    }
+}`;
+            const result = setJsoncAtPath(document, 'buckets.0.gte', '1');
+            expect(parseJsonc(result, 'result').buckets['0'].gte).to.equal(1);
+        });
+
+        it('replaces a value at a hyphenated object key', () => {
+            const document = `{
+    "buckets": {
+        "2-3": { "gte": 2, "lt": 4 }
+    }
+}`;
+            const result = setJsoncAtPath(document, 'buckets.2-3.gte', '3');
+            expect(parseJsonc(result, 'result').buckets['2-3'].gte).to.equal(3);
+        });
+
+        it('replaces a value in safariVersionMappings', () => {
+            const document = `{
+    "safariVersionMappings": {
+        "26": "18_6"
+    }
+}`;
+            const result = setJsoncAtPath(document, 'safariVersionMappings.26', '"18_7"');
+            expect(parseJsonc(result, 'result').safariVersionMappings['26']).to.equal('18_7');
+        });
+
+        it('does not support array indices', () => {
             const document = `{
     "exceptions": [
-        { "domain": "a.com" },
-        { "domain": "b.com" }
+        { "domain": "a.com" }
     ]
 }`;
-            const result = setJsoncAtPath(document, 'exceptions.1', '{ "domain": "c.com" }');
-            expect(parseJsonc(result, 'result').exceptions[1].domain).to.equal('c.com');
+            expect(() => setJsoncAtPath(document, 'exceptions.0.domain', '"b.com"')).to.throw('Path not found');
         });
 
         it('preserves comments in the source file outside the replaced region', () => {
