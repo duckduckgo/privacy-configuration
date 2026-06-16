@@ -2,7 +2,7 @@ import { Feature } from '../feature';
 
 type ClientBrandHintDomain = {
     domain: string;
-    brand: 'DDG' | 'CHROME' | 'WEBVIEW';
+    brand: 'DDG' | 'CHROME' | 'WEBVIEW' | 'Google Chrome';
 };
 
 type ClientBrandHintSettings = {
