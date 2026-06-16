@@ -12,8 +12,6 @@ type DomainWithReason = {
 
 type DomainOnly = {
     domain: string;
-    /** Windows only: append Google Chrome brand without the default DuckDuckGo append */
-    includeGoogleChrome?: boolean;
 };
 
 type UserAgentConfig = {
