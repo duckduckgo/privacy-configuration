@@ -148,6 +148,51 @@ export function inlineReasonArrays(data) {
     }
 }
 
+const PERIOD_UNIT_SECONDS = {
+    seconds: 1,
+    minutes: 60,
+    hours: 3600,
+    days: 86400,
+};
+
+/**
+ * Collapse each eventHub telemetry entry's `trigger.period` into a single integer `{ seconds }`.
+ *
+ * Authors may express a period in any unit (`days` / `hours` / `minutes` / `seconds`, per the
+ * schema). The Windows client only reads `trigger.period.seconds` and ignores the other units, so a
+ * period authored as e.g. `{ "days": 1 }` would parse as 0 seconds and the pixel would be silently
+ * dropped. Summing the units to seconds here is what fulfils that delivery contract.
+ *
+ * Mutates the config in place; no-ops when the feature, telemetry, or a period is absent.
+ *
+ * @param {object} config - a fully-merged platform config
+ */
+export function collapseEventHubTelemetryPeriods(config) {
+    const telemetry = config?.features?.eventHub?.settings?.telemetry;
+    if (!telemetry) {
+        return;
+    }
+
+    for (const entry of Object.values(telemetry)) {
+        const period = entry?.trigger?.period;
+        if (!period || typeof period !== 'object') {
+            continue;
+        }
+
+        let totalSeconds = 0;
+        for (const [
+            unit,
+            multiplier,
+        ] of Object.entries(PERIOD_UNIT_SECONDS)) {
+            if (typeof period[unit] === 'number') {
+                totalSeconds += period[unit] * multiplier;
+            }
+        }
+
+        entry.trigger.period = { seconds: Math.round(totalSeconds) };
+    }
+}
+
 /**
  * All domains that may map to the given cnameTarget.
  */

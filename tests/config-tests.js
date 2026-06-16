@@ -304,6 +304,31 @@ describe('EventHub validation tests', () => {
                 }
             });
 
+            // The Windows client only reads an integer `trigger.period.seconds` and ignores
+            // days/hours/minutes, so config generation must collapse any unit object to a single
+            // integer `seconds` for the Windows config. Other platforms keep the authored units.
+            if (config.name === 'v5/windows-config.json') {
+                it('trigger period must be collapsed to a single integer seconds value', () => {
+                    for (const [
+                        name,
+                        entry,
+                    ] of Object.entries(telemetry)) {
+                        const period = entry.trigger.period;
+                        expect(Object.keys(period)).to.deep.equal(
+                            [
+                                'seconds',
+                            ],
+                            `Telemetry '${name}' period must be collapsed to only { seconds }, got: ${JSON.stringify(period)}`,
+                        );
+                        expect(Number.isInteger(period.seconds)).to.equal(
+                            true,
+                            `Telemetry '${name}' period.seconds must be an integer, got: ${period.seconds}`,
+                        );
+                        expect(period.seconds).to.be.greaterThan(0, `Telemetry '${name}' period.seconds must be greater than zero`);
+                    }
+                });
+            }
+
             for (const [
                 entryName,
                 entry,
