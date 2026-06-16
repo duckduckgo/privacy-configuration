@@ -348,11 +348,9 @@ async function buildPlatforms() {
         addCnameEntriesToAllowlist(tds, platformConfig.features.trackerAllowlist.settings.allowlistedTrackers);
         platformConfig = inlineReasonArrays(platformConfig);
 
-        // The Windows client reads eventHub periods as integer seconds only; collapse any authored
-        // unit object (days/hours/minutes) to seconds so period pixels are not silently dropped.
-        if (platform === 'windows') {
-            collapseEventHubTelemetryPeriods(platformConfig);
-        }
+        // Clients read eventHub periods as integer seconds; collapse any authored unit object
+        // (days/hours/minutes) to seconds so period pixels are not silently dropped.
+        collapseEventHubTelemetryPeriods(platformConfig);
 
         platformConfigs[platform] = platformConfig;
 

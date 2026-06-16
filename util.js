@@ -159,8 +159,8 @@ const PERIOD_UNIT_SECONDS = {
  * Collapse each eventHub telemetry entry's `trigger.period` into a single integer `{ seconds }`.
  *
  * Authors may express a period in any unit (`days` / `hours` / `minutes` / `seconds`, per the
- * schema). The Windows client only reads `trigger.period.seconds` and ignores the other units, so a
- * period authored as e.g. `{ "days": 1 }` would parse as 0 seconds and the pixel would be silently
+ * schema). Clients only read `trigger.period.seconds` and ignore the other units, so a period
+ * authored as e.g. `{ "days": 1 }` would parse as 0 seconds and the pixel would be silently
  * dropped. Summing the units to seconds here is what fulfils that delivery contract.
  *
  * Mutates the config in place; no-ops when the feature, telemetry, or a period is absent.
