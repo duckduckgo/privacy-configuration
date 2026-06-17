@@ -244,6 +244,29 @@
                     "state": "enabled",
                     "minSupportedVersion": "7.217.0"
                 },
+                "nativeStoragePathMigration": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.222.0",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 2
+                            },
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 20
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
+                },
                 "showAIChatAddressBarChoiceScreen": {
                     "state": "enabled",
                     "minSupportedVersion": "7.220.0",
@@ -287,7 +310,7 @@
                     "minSupportedVersion": "7.197.0"
                 },
                 "onboardingDuckAIQueryExperiment": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "description": "Duck.ai onboarding query experiment cohorts",
                     "cohorts": [
                         {
@@ -320,6 +343,11 @@
                     "description": "Unify inputs for Duck.ai",
                     "minSupportedVersion": "7.201.0"
                 },
+                "unifiedToggleInput": {
+                    "state": "internal",
+                    "description": "Unified Toggle Input (UTI) for Duck.ai",
+                    "minSupportedVersion": "7.223.0"
+                },
                 "aiChatAtb": {
                     "state": "enabled",
                     "description": "Add ATB to Duck.ai",
@@ -348,6 +376,30 @@
                 "voiceShortcut": {
                     "state": "enabled",
                     "minSupportedVersion": "7.216.0"
+                },
+                "onboardingDuckAIQueryTrackersDemoExperiment": {
+                    "state": "enabled",
+                    "description": "Duck.ai onboarding trackers demo experiment cohorts",
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatmentA",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatmentB",
+                            "weight": 1
+                        }
+                    ],
+                    "targets": [
+                        {
+                            "localeLanguage": "en",
+                            "localeCountry": "US"
+                        }
+                    ]
                 }
             },
             "settings": {
@@ -488,7 +540,10 @@
                 },
                 "domains": [
                     {
-                        "domain": "www.youtube.com",
+                        "domain": [
+                            "www.youtube.com",
+                            "m.youtube.com"
+                        ],
                         "patchSettings": [
                             {
                                 "op": "replace",
@@ -498,21 +553,14 @@
                         ]
                     },
                     {
-                        "domain": "duckduckgo.com",
+                        "domain": [
+                            "duckduckgo.com",
+                            "duck.co"
+                        ],
                         "patchSettings": [
                             {
                                 "op": "replace",
                                 "path": "/overlays/serpProxy/state",
-                                "value": "enabled"
-                            }
-                        ]
-                    },
-                    {
-                        "domain": "m.youtube.com",
-                        "patchSettings": [
-                            {
-                                "op": "replace",
-                                "path": "/overlays/youtube/state",
                                 "value": "enabled"
                             }
                         ]
@@ -579,7 +627,7 @@
                     ]
                 },
                 "tdsNextExperiment009": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "rollout": {
                         "steps": [
                             {
@@ -759,10 +807,6 @@
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4648"
                 },
                 {
-                    "domain": "newrepublic.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4652"
-                },
-                {
                     "domain": "theguardian.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4985"
                 },
@@ -856,7 +900,8 @@
                         "conditionalChanges": [
                             {
                                 "condition": [
-                                    { "domain": "ring.com" }],
+                                    { "domain": "ring.com" }
+                                ],
                                 "patchSettings": [
                                     {
                                         "path": "/formTypeSettings/-",
@@ -870,7 +915,8 @@
                             },
                             {
                                 "condition": [
-                                    { "domain": "coolors.co" }],
+                                    { "domain": "coolors.co" }
+                                ],
                                 "patchSettings": [
                                     {
                                         "path": "/failsafeSettings/maxInputsPerPage",
@@ -881,7 +927,8 @@
                             },
                             {
                                 "condition": [
-                                    { "domain": "areaclientes.orange.es" }],
+                                    { "domain": "areaclientes.orange.es" }
+                                ],
                                 "patchSettings": [
                                     {
                                         "path": "/formTypeSettings/-",
@@ -895,7 +942,8 @@
                             },
                             {
                                 "condition": [
-                                    { "domain": "www.joinblvd.com" }],
+                                    { "domain": "www.joinblvd.com" }
+                                ],
                                 "patchSettings": [
                                     {
                                         "path": "/formTypeSettings/-",
@@ -909,7 +957,8 @@
                             },
                             {
                                 "condition": [
-                                    { "domain": "alibris.com" }],
+                                    { "domain": "alibris.com" }
+                                ],
                                 "patchSettings": [
                                     {
                                         "path": "/formTypeSettings/-",
@@ -932,7 +981,8 @@
                             {
                                 "condition": [
                                     { "domain": "estore.archives.gov" },
-                                    { "domain": "localhost" }],
+                                    { "domain": "localhost" }
+                                ],
                                 "patchSettings": [
                                     {
                                         "path": "/formTypeSettings/-",
@@ -947,7 +997,8 @@
                             {
                                 "condition": [
                                     { "domain": "zendesk.com" },
-                                    { "domain": "localhost" }],
+                                    { "domain": "localhost" }
+                                ],
                                 "patchSettings": [
                                     {
                                         "path": "/inputTypeSettings/-",
@@ -961,7 +1012,8 @@
                             },
                             {
                                 "condition": [
-                                    { "domain": "cvs.com" }],
+                                    { "domain": "cvs.com" }
+                                ],
                                 "patchSettings": [
                                     {
                                         "path": "/inputTypeSettings/-",
@@ -975,7 +1027,8 @@
                             },
                             {
                                 "condition": [
-                                    { "domain": "att.com" }],
+                                    { "domain": "att.com" }
+                                ],
                                 "patchSettings": [
                                     {
                                         "path": "/inputTypeSettings/-",
@@ -989,7 +1042,8 @@
                             },
                             {
                                 "condition": [
-                                    { "domain": "gamestop.com" }],
+                                    { "domain": "gamestop.com" }
+                                ],
                                 "patchSettings": [
                                     {
                                         "path": "/inputTypeSettings/-",
@@ -1023,7 +1077,8 @@
                             },
                             {
                                 "condition": [
-                                    { "domain": "asana.com" }],
+                                    { "domain": "asana.com" }
+                                ],
                                 "patchSettings": [
                                     {
                                         "path": "/inputTypeSettings/-",
@@ -1037,7 +1092,8 @@
                             },
                             {
                                 "condition": [
-                                    { "domain": "portal.vectorsecurity.com" }],
+                                    { "domain": "portal.vectorsecurity.com" }
+                                ],
                                 "patchSettings": [
                                     {
                                         "path": "/formTypeSettings/-",
@@ -1051,7 +1107,8 @@
                             },
                             {
                                 "condition": [
-                                    { "domain": "reddit.com" }],
+                                    { "domain": "reddit.com" }
+                                ],
                                 "patchSettings": [
                                     {
                                         "path": "/formTypeSettings/-",
@@ -1065,7 +1122,8 @@
                             },
                             {
                                 "condition": [
-                                    { "domain": "netflix.com" }],
+                                    { "domain": "netflix.com" }
+                                ],
                                 "patchSettings": [
                                     {
                                         "path": "/formTypeSettings/-",
@@ -1084,7 +1142,8 @@
                             },
                             {
                                 "condition": [
-                                    { "domain": "aa.com" }],
+                                    { "domain": "aa.com" }
+                                ],
                                 "patchSettings": [
                                     {
                                         "path": "/formBoundarySelector",
@@ -1096,7 +1155,8 @@
                             {
                                 "condition": [
                                     { "domain": "bet365.bet.br" },
-                                    { "domain": "bet365.com" }],
+                                    { "domain": "bet365.com" }
+                                ],
                                 "patchSettings": [
                                     {
                                         "path": "/formBoundarySelector",
@@ -1107,7 +1167,8 @@
                             },
                             {
                                 "condition": [
-                                    { "domain": "order.yodobashi.com" }],
+                                    { "domain": "order.yodobashi.com" }
+                                ],
                                 "patchSettings": [
                                     {
                                         "path": "/formTypeSettings/-",
@@ -1126,7 +1187,8 @@
                             },
                             {
                                 "condition": [
-                                    { "domain": "accounts.google.com" }],
+                                    { "domain": "accounts.google.com" }
+                                ],
                                 "patchSettings": [
                                     {
                                         "path": "/formBoundarySelector",
@@ -1145,7 +1207,8 @@
                             },
                             {
                                 "condition": [
-                                    { "domain": "challenge.spotify.com" }],
+                                    { "domain": "challenge.spotify.com" }
+                                ],
                                 "patchSettings": [
                                     {
                                         "path": "/inputTypeSettings/-",
@@ -1159,7 +1222,8 @@
                             },
                             {
                                 "condition": [
-                                    { "domain": "login.coinbase.com" }],
+                                    { "domain": "login.coinbase.com" }
+                                ],
                                 "patchSettings": [
                                     {
                                         "path": "/inputTypeSettings/-",
@@ -1181,7 +1245,8 @@
                             },
                             {
                                 "condition": [
-                                    { "domain": "signin.autodesk.com" }],
+                                    { "domain": "signin.autodesk.com" }
+                                ],
                                 "patchSettings": [
                                     {
                                         "path": "/inputTypeSettings/-",
@@ -1288,14 +1353,6 @@
                     "state": "enabled",
                     "minSupportedVersion": "7.218.0",
                     "cohorts": [
-                        {
-                            "name": "control",
-                            "weight": 1
-                        },
-                        {
-                            "name": "variant1",
-                            "weight": 1
-                        },
                         {
                             "name": "variant2",
                             "weight": 1
@@ -1552,6 +1609,10 @@
                     {
                         "domain": "xvideos.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5160"
+                    },
+                    {
+                        "domain": "hulu.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5327"
                     }
                 ],
                 "ddgDefaultSites": [
@@ -1771,6 +1832,10 @@
                     {
                         "domain": "xvideos.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5160"
+                    },
+                    {
+                        "domain": "hulu.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5327"
                     }
                 ],
                 "omitVersionSites": []
@@ -1813,10 +1878,6 @@
                     "state": "enabled",
                     "minSupportedVersion": "7.219.0",
                     "cohorts": [
-                        {
-                            "name": "control",
-                            "weight": 1
-                        },
                         {
                             "name": "treatment",
                             "weight": 1
@@ -2144,7 +2205,12 @@
             ]
         },
         "performanceMetrics": {
-            "state": "disabled"
+            "state": "enabled",
+            "minSupportedVersion": "7.224.0",
+            "settings": {
+                "firstContentfulPaint": "disabled",
+                "expandedPerformanceMetricsOnLoad": "enabled"
+            }
         },
         "breakageReporting": {
             "state": "enabled"
@@ -2522,7 +2588,8 @@
                     "minSupportedVersion": "7.187.0",
                     "description": "Local inactivity provisional notifications delivered to Notification Center.",
                     "targets": [
-                        { "localeLanguage": "en", "localeCountry": "US" }],
+                        { "localeLanguage": "en", "localeCountry": "US" }
+                    ],
                     "settings": {
                         "daysInactive": "7"
                     }
@@ -2618,6 +2685,17 @@
                         "idleThresholdSeconds": 1800
                     }
                 },
+                "defaultExistingIPhoneUsersToNewTabAfterIdle": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.220.0",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 2
+                            }
+                        ]
+                    }
+                },
                 "onboardingRebranding": {
                     "state": "enabled",
                     "minSupportedVersion": "7.214.0"
@@ -2653,6 +2731,9 @@
                             },
                             {
                                 "percent": 50
+                            },
+                            {
+                                "percent": 100
                             }
                         ]
                     }
@@ -2660,6 +2741,14 @@
                 "minimalChromeInLandscape": {
                     "state": "enabled",
                     "minSupportedVersion": "7.217.0"
+                },
+                "escapeHatchActions": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.222.0"
+                },
+                "removeChatHistory": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.225.0"
                 }
             }
         },
@@ -2715,6 +2804,12 @@
                     "state": "disabled"
                 },
                 "freemiumPIR": {
+                    "state": "disabled"
+                },
+                "contentBlocking": {
+                    "state": "enabled"
+                },
+                "webViewUserAgent": {
                     "state": "disabled"
                 }
             },
@@ -2930,7 +3025,7 @@
                     "youtubeAds": {
                         "state": "enabled",
                         "sweepIntervalMs": 2000,
-                        "slowLoadThresholdMs": 2000,
+                        "slowLoadThresholdMs": 15000,
                         "playerSelectors": [
                             "#movie_player",
                             ".html5-video-player",
@@ -3063,6 +3158,20 @@
                 "featureEnabled": {
                     "state": "enabled",
                     "minSupportedVersion": "7.216.0"
+                },
+                "featureEnabledByDefault": {
+                    "state": "disabled",
+                    "minSupportedVersion": "7.222.0",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
                 }
             }
         },

@@ -31,6 +31,20 @@
         },
         "apiManipulation": {
             "state": "enabled",
+            "exceptions": [
+                {
+                    "domain": "x.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5211"
+                },
+                {
+                    "domain": "facebook.com",
+                    "reason": "reCAPTCHA failing on Facebook login"
+                },
+                {
+                    "domain": "instagram.com",
+                    "reason": "reCAPTCHA failing on Instagram login"
+                }
+            ],
             "settings": {
                 "apiChanges": {
                     "Navigator.prototype.deviceMemory": {
@@ -51,18 +65,55 @@
                     {
                         "condition": [
                             {
-                                "domain": "facebook.com"
+                                "domain": "youtube.com"
+                            },
+                            {
+                                "domain": "linkedin.com"
+                            },
+                            {
+                                "domain": "claude.ai"
+                            },
+                            {
+                                "domain": "claude.com"
+                            },
+                            {
+                                "domain": "privacy-test-pages.site"
                             }
                         ],
                         "patchSettings": [
                             {
                                 "op": "add",
-                                "path": "/apiChanges/Notification.permission",
+                                "path": "/apiChanges/MediaDevices.prototype.addEventListener",
+                                "value": {
+                                    "type": "descriptor",
+                                    "value": {
+                                        "type": "function",
+                                        "functionName": "noop"
+                                    }
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/apiChanges/MediaDevices.prototype.removeEventListener",
+                                "value": {
+                                    "type": "descriptor",
+                                    "value": {
+                                        "type": "function",
+                                        "functionName": "noop"
+                                    }
+                                }
+                            },
+                            {
+                                "op": "add",
+                                "path": "/apiChanges/MediaDevices.prototype.ondevicechange",
                                 "value": {
                                     "type": "descriptor",
                                     "getterValue": {
-                                        "type": "string",
-                                        "value": "denied"
+                                        "type": "undefined"
+                                    },
+                                    "setterValue": {
+                                        "type": "function",
+                                        "functionName": "noop"
                                     }
                                 }
                             }
@@ -1154,6 +1205,7 @@
                                 "domain": "zxx.edu.cn"
                             }
                         ],
+                        // emulate Chrome UA in both JS
                         "patchSettings": [
                             {
                                 "op": "add",
@@ -1314,16 +1366,16 @@
                     "minSupportedVersion": "0.152.0"
                 },
                 "suggestions": {
-                    "state": "internal",
-                    "minSupportedVersion": "0.155.0"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.157.0"
                 },
                 "suggestionsDeletion": {
-                    "state": "enabled",
+                    "state": "internal",
                     "minSupportedVersion": "0.155.0"
                 },
                 "ntpRecentChats": {
-                    "state": "internal",
-                    "minSupportedVersion": "0.155.0"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.157.0"
                 },
                 "imageGeneration": {
                     "state": "enabled",
@@ -1356,6 +1408,9 @@
                         "steps": [
                             {
                                 "percent": 25.0
+                            },
+                            {
+                                "percent": 100.0
                             }
                         ]
                     }
@@ -1380,8 +1435,15 @@
                     "state": "enabled",
                     "minSupportedVersion": "0.158.0"
                 },
-                "attachMoreTabs": {
+                "sidebarAttachMoreTabs": {
                     "state": "disabled"
+                },
+                "omnibarAttachMoreTabs": {
+                    "state": "disabled"
+                },
+                "onboardingToggleAffectsNtpAndDdg": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.162.0"
                 }
             },
             "minSupportedVersion": "0.100.0",
@@ -1997,7 +2059,8 @@
             }
         },
         "autofillPasskeys": {
-            "state": "internal",
+            "state": "enabled",
+            "minSupportedVersion": "0.161.0",
             "exceptions": []
         },
         "bookmarks": {
@@ -2022,7 +2085,7 @@
                     "state": "disabled"
                 },
                 "heuristicAction": {
-                    "state": "enabled"
+                    "state": "disabled"
                 }
             },
             "exceptions": [
@@ -2054,7 +2117,17 @@
             ]
         },
         "navigatorInterface": {
-            "state": "enabled"
+            "state": "enabled",
+            "exceptions": [
+                {
+                    "domain": "facebook.com",
+                    "reason": "reCAPTCHA failing on Facebook login"
+                },
+                {
+                    "domain": "instagram.com",
+                    "reason": "reCAPTCHA failing on Instagram login"
+                }
+            ]
         },
         "newTabPageSessionMonitoring": {
             "state": "enabled",
@@ -3870,6 +3943,15 @@
                 "aiChatSync": {
                     "state": "enabled",
                     "minSupportedVersion": "0.147.5"
+                },
+                "scopedAccessCredentials": {
+                    "state": "internal"
+                },
+                "canUseV2ConnectFlow": {
+                    "state": "internal"
+                },
+                "canShowV2ConnectCode": {
+                    "state": "internal"
                 }
             }
         },
@@ -4101,7 +4183,31 @@
             "state": "disabled"
         },
         "clientBrandHint": {
-            "state": "enabled"
+            "state": "enabled",
+            "settings": {
+                "domains": [
+                    {
+                        "domain": "facebook.com",
+                        "brand": "Google Chrome"
+                    },
+                    {
+                        "domain": "www.facebook.com",
+                        "brand": "Google Chrome"
+                    },
+                    {
+                        "domain": "m.facebook.com",
+                        "brand": "Google Chrome"
+                    },
+                    {
+                        "domain": "instagram.com",
+                        "brand": "Google Chrome"
+                    },
+                    {
+                        "domain": "www.instagram.com",
+                        "brand": "Google Chrome"
+                    }
+                ]
+            }
         },
         "uaChBrands": {
             "state": "enabled",
@@ -4109,6 +4215,14 @@
                 {
                     "domain": "smythstoys.com",
                     "reason": "Bot check"
+                },
+                {
+                    "domain": "facebook.com",
+                    "reason": "reCAPTCHA failing on Facebook login"
+                },
+                {
+                    "domain": "instagram.com",
+                    "reason": "reCAPTCHA failing on Instagram login"
                 }
             ]
         },
@@ -4216,6 +4330,9 @@
                 "allowProTierPurchase": {
                     "state": "enabled",
                     "minSupportedVersion": "0.147.5"
+                },
+                "vpnToolbarUpsell": {
+                    "state": "disabled"
                 }
             },
             "settings": {
@@ -4243,7 +4360,10 @@
                     "state": "enabled",
                     "changes": []
                 },
-                "enumerateDevices": "enabled",
+                "enumerateDevices": {
+                    "state": "enabled",
+                    "timeoutMs": 300000
+                },
                 "domains": [
                     {
                         "domain": "asana.com",
@@ -4338,23 +4458,22 @@
                     }
                 },
                 "nativeCrashDialog": {
-                    "state": "internal"
+                    "state": "preview"
                 },
                 "ignoreInvalidCastExceptionOnDisposal": {
                     "state": "enabled"
                 },
                 "nativeCrashDialogOneShot": {
                     "state": "disabled",
-                    "rollout": {
-                        "steps": [
-                            {
-                                "percent": 5.0
-                            }
-                        ]
-                    },
                     "settings": {
-                        "generation": 1
+                        "probability": 10,
+                        "generation": 4,
+                        "showInSuspendedState": true
                     }
+                },
+                "attachRenderingDiagnosticsToFeedback": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.161.0"
                 }
             }
         },
@@ -4631,7 +4750,7 @@
             "minSupportedVersion": "0.148.0",
             "exceptions": [],
             "settings": {
-                "extensionUrl": "https://staticcdn.duckduckgo.com/extensions/content-blocker/content-blocker-extension-2026.5.12.crx"
+                "extensionUrl": "https://staticcdn.duckduckgo.com/extensions/content-blocker/content-blocker-extension-2026.6.14.crx"
             },
             "features": {
                 "onboardingEnabled": {
@@ -4653,7 +4772,15 @@
                     "state": "enabled"
                 },
                 "partialLaunch": {
-                    "state": "disabled"
+                    "state": "disabled",
+                    "minSupportedVersion": "0.161.0",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            }
+                        ]
+                    }
                 }
             }
         },
@@ -4712,6 +4839,10 @@
                 "scheduledPinToTaskbarPrompts": {
                     "state": "enabled",
                     "minSupportedVersion": "0.127.0"
+                },
+                "repromptOnUnset": {
+                    "state": "internal",
+                    "minSupportedVersion": "0.163.0"
                 },
                 "popoverVsBannerExperiment": {
                     "state": "disabled"
@@ -4795,7 +4926,56 @@
                             }
                         ]
                     }
-                ]
+                ],
+                "aiPageContextBlocklist": {
+                    "pdf": {
+                        "urlExtensions": [
+                            ".pdf"
+                        ],
+                        "contentTypes": [
+                            "application/pdf"
+                        ]
+                    },
+                    "image": {
+                        "urlExtensions": [
+                            ".png",
+                            ".jpg",
+                            ".jpeg",
+                            ".gif",
+                            ".webp",
+                            ".svg",
+                            ".bmp"
+                        ],
+                        "contentTypePrefixes": [
+                            "image/"
+                        ]
+                    },
+                    "video": {
+                        "urlExtensions": [
+                            ".mp4",
+                            ".webm",
+                            ".avi",
+                            ".mov",
+                            ".mkv"
+                        ],
+                        "contentTypePrefixes": [
+                            "video/"
+                        ]
+                    },
+                    "audio": {
+                        "urlExtensions": [
+                            ".mp3",
+                            ".wav",
+                            ".ogg",
+                            ".flac",
+                            ".aac",
+                            ".m4a"
+                        ],
+                        "contentTypePrefixes": [
+                            "audio/"
+                        ]
+                    }
+                }
             }
         },
         "openFireWindowByDefault": {
@@ -4833,6 +5013,15 @@
                 },
                 "reportStackTrace": {
                     "state": "disabled"
+                },
+                "detectInstalledAv": {
+                    "state": "enabled"
+                },
+                "sendIncidentCrashReports": {
+                    "state": "disabled",
+                    "settings": {
+                        "ExceptionTypes": []
+                    }
                 }
             }
         },
@@ -4841,7 +5030,14 @@
             "exceptions": [],
             "features": {
                 "canShowNativeCrashReportingDialog": {
-                    "state": "disabled"
+                    "state": "disabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            }
+                        ]
+                    }
                 }
             }
         },
@@ -5066,7 +5262,44 @@
             }
         },
         "requestBlocklist": {
-            "state": "enabled"
+            "state": "enabled",
+            "settings": {
+                "blockedRequests": {
+                    "privacy-test-pages.site": {
+                        "rules": [
+                            {
+                                "rule": "privacy-test-pages.site/privacy-protections/request-blocklist/*?block=true",
+                                "domains": [
+                                    "privacy-test-pages.site"
+                                ],
+                                "reason": "Testing rule for the privacy test page, see https://privacy-test-pages.site/privacy-protections/request-blocklist/"
+                            }
+                        ]
+                    },
+                    "third-party.site": {
+                        "rules": [
+                            {
+                                "rule": "third-party.site/privacy-protections/request-blocklist/*?block=true",
+                                "domains": [
+                                    "privacy-test-pages.site"
+                                ],
+                                "reason": "Testing rule for the privacy test page, see https://privacy-test-pages.site/privacy-protections/request-blocklist/"
+                            }
+                        ]
+                    },
+                    "protechts.net": {
+                        "rules": [
+                            {
+                                "rule": "protechts.net",
+                                "domains": [
+                                    "linkedin.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5218"
+                            }
+                        ]
+                    }
+                }
+            }
         },
         "passwordManagerExtensions": {
             "state": "internal",
@@ -5116,6 +5349,10 @@
                     }
                 }
             }
+        },
+        "eventHub": {
+            "state": "internal",
+            "minSupportedVersion": "0.162.0"
         },
         "webDetection": {
             "state": "enabled",
@@ -5290,7 +5527,7 @@
                     "youtubeAds": {
                         "state": "enabled",
                         "sweepIntervalMs": 2000,
-                        "slowLoadThresholdMs": 2000,
+                        "slowLoadThresholdMs": 15000,
                         "playerSelectors": [
                             "#movie_player",
                             ".html5-video-player",
@@ -5393,15 +5630,15 @@
         },
         "nativeRequestInterception": {
             "state": "enabled",
-            "minSupportedVersion": "0.155.5",
+            "minSupportedVersion": "0.158.2",
             "exceptions": [],
             "features": {
                 "disableFirstAboutBlankNavigation": {
-                    "state": "disabled"
+                    "state": "enabled"
                 },
                 "enableNativeRequestInterception": {
-                    "state": "disabled",
-                    "minSupportedVersion": "0.155.5",
+                    "state": "enabled",
+                    "minSupportedVersion": "0.158.2",
                     "rollout": {
                         "steps": [
                             {
@@ -5463,6 +5700,15 @@
             "state": "enabled",
             "minSupportedVersion": "0.158.0",
             "exceptions": []
+        },
+        "websitePermissions": {
+            "state": "disabled",
+            "exceptions": [],
+            "features": {
+                "websitePermissionsV2": {
+                    "state": "disabled"
+                }
+            }
         }
     },
     "unprotectedTemporary": []

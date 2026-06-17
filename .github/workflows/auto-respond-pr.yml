@@ -58,7 +58,7 @@ jobs:
               run: sleep 5
 
             - name: Check repository permissions
-              uses: actions/github-script@v8
+              uses: actions/github-script@v9
               with:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
                   script: |
@@ -173,7 +173,7 @@ jobs:
                   direction: last
 
             - name: Create Diff Comment Body
-              uses: actions/github-script@v8
+              uses: actions/github-script@v9
               id: create_diff_body
               with:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -200,7 +200,7 @@ jobs:
                   timeoutSeconds: 600
 
             - name: Check for existing approved reviews
-              uses: actions/github-script@v8
+              uses: actions/github-script@v9
               id: check_reviews
               with:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -243,7 +243,7 @@ jobs:
 
             - name: Create comment
               if: github.event.action == 'opened' && (steps.wait-for-build.outputs.conclusion == 'success' && steps.approval.outputs.approved == 'true' && steps.check_files.outputs.files_valid == 'true') != true
-              uses: peter-evans/create-or-update-comment@v4
+              uses: peter-evans/create-or-update-comment@v5
               with:
                   issue-number: ${{ github.event.pull_request.number }}
                   body: |
@@ -264,7 +264,7 @@ jobs:
                        - [Feature Implementer Documentation](https://github.com/duckduckgo/privacy-configuration/blob/main/docs/feature-implementer-documentation.md)
 
             - name: Create Approval Comment Body
-              uses: actions/github-script@v8
+              uses: actions/github-script@v9
               id: create_approval_body
               with:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -282,7 +282,7 @@ jobs:
                       core.setOutput('comment_body', commentBody);
 
             - name: Create, or Update the Diff Comment
-              uses: peter-evans/create-or-update-comment@v4
+              uses: peter-evans/create-or-update-comment@v5
               with:
                   issue-number: ${{ github.event.pull_request.number }}
                   comment-id: ${{ steps.find_diff_comment.outputs.comment-id }}
@@ -293,7 +293,7 @@ jobs:
             # events for downstream workflows (e.g., auto-notify-mattermost.yml).
             # See: https://docs.github.com/en/actions/using-workflows/triggering-a-workflow#triggering-a-workflow-from-a-workflow
             - name: Create, or Update the Approval Comment
-              uses: peter-evans/create-or-update-comment@v4
+              uses: peter-evans/create-or-update-comment@v5
               with:
                   token: ${{ secrets.PRIVACY_CONFIG_PAT }}
                   issue-number: ${{ github.event.pull_request.number }}

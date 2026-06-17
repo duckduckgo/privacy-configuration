@@ -96,7 +96,9 @@ export type CSSConfigSetting = CSSConfigSettingSingle | CSSConfigSettingSingle[]
 type CSSConfigSettingSingle = {
     type: 'undefined' | 'number' | 'string' | 'function' | 'boolean' | 'null' | 'array' | 'object';
     functionName?: string;
+    functionValue?: CSSConfigSetting;
     value?: JSONValidValueType;
+    async?: boolean;
     criteria?: {
         arch: string;
     };
