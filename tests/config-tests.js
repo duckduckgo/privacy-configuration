@@ -255,6 +255,35 @@ describe('EventHub validation tests', () => {
                 }
             });
 
+            it('trigger must be a valid period or immediate trigger', () => {
+                for (const [
+                    name,
+                    entry,
+                ] of Object.entries(telemetry)) {
+                    const trigger = entry.trigger;
+                    expect(trigger).to.be.an('object', `Telemetry '${name}' is missing trigger`);
+                    // `type` is optional and defaults to 'period'.
+                    const type = trigger.type ?? 'period';
+                    expect(type).to.be.oneOf(
+                        [
+                            'period',
+                            'immediate',
+                        ],
+                        `Telemetry '${name}' has invalid trigger.type '${trigger.type}'`,
+                    );
+                    if (type === 'immediate') {
+                        // Immediate triggers fire per event: no period, and a `source` naming the event.
+                        expect(trigger.period, `Immediate telemetry '${name}' must not specify a period`).to.equal(undefined);
+                        expect(trigger.source, `Immediate telemetry '${name}' source must be a string`).to.be.a('string');
+                        expect(trigger.source.length, `Immediate telemetry '${name}' source must not be empty`).to.be.greaterThan(0);
+                    } else {
+                        // Period triggers carry a period and no trigger-level source.
+                        expect(trigger.period, `Period telemetry '${name}' is missing trigger.period`).to.be.an('object');
+                        expect(trigger.source, `Period telemetry '${name}' must not specify a trigger-level source`).to.equal(undefined);
+                    }
+                }
+            });
+
             it('trigger period must specify at least one non-negative time unit', () => {
                 const timeUnits = [
                     'seconds',
@@ -266,6 +295,7 @@ describe('EventHub validation tests', () => {
                     name,
                     entry,
                 ] of Object.entries(telemetry)) {
+                    if (entry.trigger.type === 'immediate') continue;
                     const period = entry.trigger.period;
                     expect(period).to.be.an('object', `Telemetry '${name}' is missing trigger.period`);
                     const hasTimeUnit = timeUnits.some((unit) => unit in period);
@@ -283,6 +313,7 @@ describe('EventHub validation tests', () => {
                     name,
                     entry,
                 ] of Object.entries(telemetry)) {
+                    if (entry.trigger.type === 'immediate') continue;
                     const period = entry.trigger.period;
                     const totalSeconds =
                         (period.seconds || 0) + (period.minutes || 0) * 60 + (period.hours || 0) * 3600 + (period.days || 0) * 86400;
@@ -311,6 +342,7 @@ describe('EventHub validation tests', () => {
                     name,
                     entry,
                 ] of Object.entries(telemetry)) {
+                    if (entry.trigger.type === 'immediate') continue;
                     const period = entry.trigger.period;
                     expect(Object.keys(period)).to.deep.equal(
                         [
@@ -335,10 +367,20 @@ describe('EventHub validation tests', () => {
                     param,
                 ] of Object.entries(entry.parameters || {})) {
                     describe(`${entryName}.${paramName}`, () => {
-                        // `source` is required for counter params and for aggregate-period data
-                        // params. Immediate-trigger data params read the value straight off the
-                        // triggering event, so they may omit `source`; only validate it when present.
-                        if (param.template !== 'data' || param.source !== undefined) {
+                        const isImmediateTrigger = entry.trigger?.type === 'immediate';
+
+                        if (param.template === 'data' && isImmediateTrigger) {
+                            // Immediate-trigger data params forward the triggering event's payload; the
+                            // event stream is named by the trigger's `source`, so a param-level `source`
+                            // is disallowed.
+                            it('source must be omitted on immediate-trigger data params', () => {
+                                expect(
+                                    param.source,
+                                    `Parameter '${entryName}.${paramName}' must not specify source on an immediate trigger`,
+                                ).to.equal(undefined);
+                            });
+                        } else {
+                            // Counter params and period data params identify their event stream via `source`.
                             it('source should be a non-empty string', () => {
                                 expect(param.source).to.be.a('string', `Parameter '${entryName}.${paramName}' source must be a string`);
                                 expect(param.source.length).to.be.greaterThan(

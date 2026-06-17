@@ -16,7 +16,8 @@ type TelemetryParameterCounter = TelemetryParameterBase & {
 };
 
 // Forwards a value from the event payload (under `dataKey`) as the parameter, rather than counting.
-// Aggregate-period data params carry a `source`; immediate-trigger ones may omit it.
+// Period data params carry a `source` identifying the event stream; immediate-trigger data params
+// omit it (the value comes from the triggering event, whose name is the trigger's `source`).
 type TelemetryParameterData = TelemetryParameterBase & {
     template: 'data';
     source?: string;
@@ -25,16 +26,31 @@ type TelemetryParameterData = TelemetryParameterBase & {
 
 type TelemetryParameter = TelemetryParameterCounter | TelemetryParameterData;
 
+// Aggregates events over a recurring window. `type` is optional and defaults to
+// 'period' for backward compatibility with entries authored before the discriminator.
+type PeriodTrigger = {
+    type?: 'period';
+    period: {
+        seconds?: number;
+        minutes?: number;
+        hours?: number;
+        days?: number;
+    };
+};
+
+// Fires once per triggering event rather than aggregating, so it carries no `period`.
+// `source` names the event that fires the pixel; data params on an immediate trigger forward
+// that event's payload and so omit their own `source`.
+type ImmediateTrigger = {
+    type: 'immediate';
+    source: string;
+};
+
+type TelemetryTrigger = PeriodTrigger | ImmediateTrigger;
+
 type TelemetryEntry = {
     state: FeatureState;
-    trigger: {
-        period: {
-            seconds?: number;
-            minutes?: number;
-            hours?: number;
-            days?: number;
-        };
-    };
+    trigger: TelemetryTrigger;
     parameters: Record<string, TelemetryParameter>;
 };
 
