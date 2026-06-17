@@ -121,6 +121,22 @@ export function mergeAllowlistedTrackers(t1, t2) {
 }
 
 /**
+ * Merge a platform's eventHub telemetry overrides onto the base telemetry.
+ *
+ * Telemetry entries are merged per key: a platform override only needs to declare the
+ * entries it changes or adds, and inherits every other entry from the base event-hub
+ * config. This keeps platforms from drifting out of date as base entries change, and
+ * ensures they pick up newly-added entries automatically. An entry present in both is
+ * replaced wholesale by the override (no deep merge within an entry).
+ *
+ * @param {object} base - base telemetry record (entry name -> entry)
+ * @param {object} override - platform override telemetry record
+ */
+export function mergeEventHubTelemetry(base, override) {
+    return { ...base, ...override };
+}
+
+/**
  * Traverse the input (JSON data) and ensure any "reason" fields are strings in the output.
  *
  * This allows specifying reasons as an array of strings, and converts these to

@@ -284,46 +284,6 @@ describe('EventHub validation tests', () => {
                 }
             });
 
-            it('trigger period must specify at least one non-negative time unit', () => {
-                const timeUnits = [
-                    'seconds',
-                    'minutes',
-                    'hours',
-                    'days',
-                ];
-                for (const [
-                    name,
-                    entry,
-                ] of Object.entries(telemetry)) {
-                    if (entry.trigger.type === 'immediate') continue;
-                    const period = entry.trigger.period;
-                    expect(period).to.be.an('object', `Telemetry '${name}' is missing trigger.period`);
-                    const hasTimeUnit = timeUnits.some((unit) => unit in period);
-                    expect(hasTimeUnit).to.equal(true, `Telemetry '${name}' period must specify at least one of: ${timeUnits.join(', ')}`);
-                    for (const unit of timeUnits) {
-                        if (unit in period) {
-                            expect(period[unit]).to.be.at.least(0, `Telemetry '${name}' period.${unit} must not be negative`);
-                        }
-                    }
-                }
-            });
-
-            it('total trigger period must be greater than zero', () => {
-                for (const [
-                    name,
-                    entry,
-                ] of Object.entries(telemetry)) {
-                    if (entry.trigger.type === 'immediate') continue;
-                    const period = entry.trigger.period;
-                    const totalSeconds =
-                        (period.seconds || 0) + (period.minutes || 0) * 60 + (period.hours || 0) * 3600 + (period.days || 0) * 86400;
-                    expect(totalSeconds).to.be.greaterThan(
-                        0,
-                        `Telemetry '${name}' total period is ${totalSeconds}s — must be greater than zero`,
-                    );
-                }
-            });
-
             it('each telemetry entry must have at least one parameter', () => {
                 for (const [
                     name,
@@ -335,27 +295,104 @@ describe('EventHub validation tests', () => {
                 }
             });
 
-            // Clients read an integer `trigger.period.seconds` and ignore days/hours/minutes, so
-            // config generation must collapse any authored unit object to a single integer `seconds`.
-            it('trigger period must be collapsed to a single integer seconds value', () => {
-                for (const [
-                    name,
+            // Partition entries by trigger type once, defaulting a missing type to 'period' (the
+            // back-compat default). Grouping the type-specific checks under these buckets means each
+            // check only iterates the entries it applies to, and a future trigger type cannot slip
+            // through a period-only check (as it would with an `=== 'immediate'` skip guard).
+            const periodEntries = Object.entries(telemetry).filter(
+                ([
+                    ,
                     entry,
-                ] of Object.entries(telemetry)) {
-                    if (entry.trigger.type === 'immediate') continue;
-                    const period = entry.trigger.period;
-                    expect(Object.keys(period)).to.deep.equal(
-                        [
-                            'seconds',
-                        ],
-                        `Telemetry '${name}' period must be collapsed to only { seconds }, got: ${JSON.stringify(period)}`,
-                    );
-                    expect(Number.isInteger(period.seconds)).to.equal(
-                        true,
-                        `Telemetry '${name}' period.seconds must be an integer, got: ${period.seconds}`,
-                    );
-                    expect(period.seconds).to.be.greaterThan(0, `Telemetry '${name}' period.seconds must be greater than zero`);
-                }
+                ]) => (entry.trigger.type ?? 'period') === 'period',
+            );
+            const immediateEntries = Object.entries(telemetry).filter(
+                ([
+                    ,
+                    entry,
+                ]) => entry.trigger.type === 'immediate',
+            );
+
+            describe('period telemetry entries', () => {
+                it('trigger period must specify at least one non-negative time unit', () => {
+                    const timeUnits = [
+                        'seconds',
+                        'minutes',
+                        'hours',
+                        'days',
+                    ];
+                    for (const [
+                        name,
+                        entry,
+                    ] of periodEntries) {
+                        const period = entry.trigger.period;
+                        expect(period).to.be.an('object', `Telemetry '${name}' is missing trigger.period`);
+                        const hasTimeUnit = timeUnits.some((unit) => unit in period);
+                    expect(hasTimeUnit).to.equal(true, `Telemetry '${name}' period must specify at least one of: ${timeUnits.join(', ')}`);
+                        for (const unit of timeUnits) {
+                            if (unit in period) {
+                                expect(period[unit]).to.be.at.least(0, `Telemetry '${name}' period.${unit} must not be negative`);
+                            }
+                        }
+                    }
+                });
+
+                it('total trigger period must be greater than zero', () => {
+                    for (const [
+                        name,
+                        entry,
+                    ] of periodEntries) {
+                        const period = entry.trigger.period;
+                        const totalSeconds =
+                            (period.seconds || 0) + (period.minutes || 0) * 60 + (period.hours || 0) * 3600 + (period.days || 0) * 86400;
+                        expect(totalSeconds).to.be.greaterThan(
+                            0,
+                            `Telemetry '${name}' total period is ${totalSeconds}s — must be greater than zero`,
+                        );
+                    }
+                });
+
+                // Clients read an integer `trigger.period.seconds` and ignore days/hours/minutes, so
+                // config generation must collapse any authored unit object to a single integer `seconds`.
+                it('trigger period must be collapsed to a single integer seconds value', () => {
+                    for (const [
+                        name,
+                        entry,
+                    ] of periodEntries) {
+                        const period = entry.trigger.period;
+                        expect(Object.keys(period)).to.deep.equal(
+                            [
+                                'seconds',
+                            ],
+                            `Telemetry '${name}' period must be collapsed to only { seconds }, got: ${JSON.stringify(period)}`,
+                        );
+                        expect(Number.isInteger(period.seconds)).to.equal(
+                            true,
+                            `Telemetry '${name}' period.seconds must be an integer, got: ${period.seconds}`,
+                        );
+                        expect(period.seconds).to.be.greaterThan(0, `Telemetry '${name}' period.seconds must be greater than zero`);
+                    }
+                });
+            });
+
+            describe('immediate telemetry entries', () => {
+                // The counter template aggregates a count across a window, which is meaningless for a
+                // pixel that fires once per event. Disallow it on immediate triggers for now.
+                it('must not use counter parameters', () => {
+                    for (const [
+                        name,
+                        entry,
+                    ] of immediateEntries) {
+                        for (const [
+                            paramName,
+                            param,
+                        ] of Object.entries(entry.parameters || {})) {
+                            expect(param.template).to.not.equal(
+                                'counter',
+                                `Immediate telemetry '${name}' parameter '${paramName}' must not use the 'counter' template`,
+                            );
+                        }
+                    }
+                });
             });
 
             for (const [
@@ -494,6 +531,63 @@ describe('EventHub validation tests', () => {
             }
         });
     }
+});
+
+describe('EventHub telemetry override merge', () => {
+    // Windows declares only its platform-specific telemetry entries in its override; the build
+    // must merge in the base event-hub entries so the platform does not drift as base entries change.
+    const windowsConfig = latestConfigs.find((c) => c.name === 'v5/windows-config.json');
+    const telemetry = windowsConfig?.body?.features?.eventHub?.settings?.telemetry || {};
+    const baseTelemetry = readJsoncFile('./features/event-hub.json').settings.telemetry;
+
+    it('inherits base telemetry entries not declared in the windows override', () => {
+        for (const baseName of Object.keys(baseTelemetry)) {
+            expect(telemetry, `Windows eventHub telemetry is missing inherited base entry '${baseName}'`).to.have.property(baseName);
+        }
+    });
+
+    it('keeps windows-specific telemetry entries', () => {
+        expect(telemetry).to.have.property('webTelemetry_youtube_videoAd_day');
+    });
+});
+
+describe('EventHub schema source rules', () => {
+    const validate = createValidator('EventHubSettings');
+
+    const periodEntry = (param) => ({
+        telemetry: {
+            test_pixel_day: {
+                state: 'enabled',
+                trigger: { period: { seconds: 86400 } },
+                parameters: { value: param },
+            },
+        },
+    });
+
+    const immediateEntry = (param) => ({
+        telemetry: {
+            test_pixel_immediate: {
+                state: 'enabled',
+                trigger: { type: 'immediate', source: 'someEvent' },
+                parameters: { value: param },
+            },
+        },
+    });
+
+    it('accepts a period data param that specifies a source', () => {
+        const settings = periodEntry({ template: 'data', source: 'someStream', dataKey: 'loginState' });
+        expect(validate(settings), formatErrors(validate.errors)).to.equal(true);
+    });
+
+    it('rejects a period data param that omits its source', () => {
+        const settings = periodEntry({ template: 'data', dataKey: 'loginState' });
+        expect(validate(settings)).to.equal(false);
+    });
+
+    it('accepts an immediate data param that omits its source', () => {
+        const settings = immediateEntry({ template: 'data', dataKey: 'loginState' });
+        expect(validate(settings), formatErrors(validate.errors)).to.equal(true);
+    });
 });
 
 describe('WebDetection validation tests', () => {
