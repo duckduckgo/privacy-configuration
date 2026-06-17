@@ -335,13 +335,18 @@ describe('EventHub validation tests', () => {
                     param,
                 ] of Object.entries(entry.parameters || {})) {
                     describe(`${entryName}.${paramName}`, () => {
-                        it('source should be a non-empty string', () => {
-                            expect(param.source).to.be.a('string', `Parameter '${entryName}.${paramName}' source must be a string`);
-                            expect(param.source.length).to.be.greaterThan(
-                                0,
-                                `Parameter '${entryName}.${paramName}' source must not be empty`,
-                            );
-                        });
+                        // `source` is required for counter params and for aggregate-period data
+                        // params. Immediate-trigger data params read the value straight off the
+                        // triggering event, so they may omit `source`; only validate it when present.
+                        if (param.template !== 'data' || param.source !== undefined) {
+                            it('source should be a non-empty string', () => {
+                                expect(param.source).to.be.a('string', `Parameter '${entryName}.${paramName}' source must be a string`);
+                                expect(param.source.length).to.be.greaterThan(
+                                    0,
+                                    `Parameter '${entryName}.${paramName}' source must not be empty`,
+                                );
+                            });
+                        }
 
                         // Only the "counter" template defines buckets; other templates (e.g. "data",
                         // which forwards a value from the event payload) carry none, so skip the
