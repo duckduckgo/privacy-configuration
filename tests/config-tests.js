@@ -327,7 +327,10 @@ describe('EventHub validation tests', () => {
                         const period = entry.trigger.period;
                         expect(period).to.be.an('object', `Telemetry '${name}' is missing trigger.period`);
                         const hasTimeUnit = timeUnits.some((unit) => unit in period);
-                    expect(hasTimeUnit).to.equal(true, `Telemetry '${name}' period must specify at least one of: ${timeUnits.join(', ')}`);
+                        expect(hasTimeUnit).to.equal(
+                            true,
+                            `Telemetry '${name}' period must specify at least one of: ${timeUnits.join(', ')}`,
+                        );
                         for (const unit of timeUnits) {
                             if (unit in period) {
                                 expect(period[unit]).to.be.at.least(0, `Telemetry '${name}' period.${unit} must not be negative`);
