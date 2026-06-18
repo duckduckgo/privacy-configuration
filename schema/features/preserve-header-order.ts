@@ -1,9 +1,9 @@
 import { Feature } from '../feature';
 
 // A placement rule for one header. The shape enforces the fields each position
-// needs: 'index' requires `index`; 'before'/'after' require `anchor` (a regex
-// matched against header NAMES — the native layer splits position/anchor on the
-// first ':', so a ':' inside the regex, e.g. a non-capturing group, is preserved).
+// needs: 'index' requires `index`; 'before'/'after' require `anchor`, matched
+// against header NAMES (case-insensitive): `^name$` = exact, `^name` = prefix,
+// otherwise substring. This is NOT a regex engine.
 type HeaderPlacement =
     | { header: string; position: 'first' | 'last' }
     | { header: string; position: 'index'; index: number }
