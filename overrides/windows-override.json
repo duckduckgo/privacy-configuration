@@ -5358,8 +5358,127 @@
             }
         },
         "eventHub": {
-            "state": "internal",
-            "minSupportedVersion": "0.162.0"
+            "state": "enabled",
+            "minSupportedVersion": "0.163.0",
+            "settings": {
+                "telemetry": {
+                    "webTelemetry_youtube_adBlocker_day": {
+                        "state": "enabled",
+                        "trigger": {
+                            "period": {
+                                "days": 1
+                            }
+                        },
+                        "parameters": {
+                            "count": {
+                                "template": "counter",
+                                "source": "youtube_adBlocker",
+                                "buckets": {
+                                    "0": { "gte": 0, "lt": 1 },
+                                    "1+": { "gte": 1 }
+                                }
+                            },
+                            "loginState": {
+                                "template": "data",
+                                "source": "youtube_adBlocker",
+                                "dataKey": "loginState"
+                            }
+                        }
+                    },
+                    "webTelemetry_youtube_playabilityError_day": {
+                        "state": "enabled",
+                        "trigger": {
+                            "period": {
+                                "days": 1
+                            }
+                        },
+                        "parameters": {
+                            "count": {
+                                "template": "counter",
+                                "source": "youtube_playabilityError",
+                                "buckets": {
+                                    "0": { "gte": 0, "lt": 1 },
+                                    "1+": { "gte": 1 }
+                                }
+                            },
+                            "loginState": {
+                                "template": "data",
+                                "source": "youtube_playabilityError",
+                                "dataKey": "loginState"
+                            }
+                        }
+                    },
+                    "webTelemetry_youtube_videoAd_day": {
+                        "state": "enabled",
+                        "trigger": {
+                            "period": {
+                                "days": 1
+                            }
+                        },
+                        "parameters": {
+                            "count": {
+                                "template": "counter",
+                                "source": "youtube_videoAd",
+                                "buckets": {
+                                    "0": { "gte": 0, "lt": 1 },
+                                    "1+": { "gte": 1 }
+                                }
+                            },
+                            "loginState": {
+                                "template": "data",
+                                "source": "youtube_videoAd",
+                                "dataKey": "loginState"
+                            }
+                        }
+                    },
+                    "webTelemetry_youtube_staticAd_day": {
+                        "state": "enabled",
+                        "trigger": {
+                            "period": {
+                                "days": 1
+                            }
+                        },
+                        "parameters": {
+                            "count": {
+                                "template": "counter",
+                                "source": "youtube_staticAd",
+                                "buckets": {
+                                    "0": { "gte": 0, "lt": 1 },
+                                    "1+": { "gte": 1 }
+                                }
+                            },
+                            "loginState": {
+                                "template": "data",
+                                "source": "youtube_staticAd",
+                                "dataKey": "loginState"
+                            }
+                        }
+                    },
+                    "webTelemetry_youtube_buffering_day": {
+                        "state": "enabled",
+                        "trigger": {
+                            "period": {
+                                "days": 1
+                            }
+                        },
+                        "parameters": {
+                            "count": {
+                                "template": "counter",
+                                "source": "youtube_buffering",
+                                "buckets": {
+                                    "0": { "gte": 0, "lt": 1 },
+                                    "1+": { "gte": 1 }
+                                }
+                            },
+                            "loginState": {
+                                "template": "data",
+                                "source": "youtube_buffering",
+                                "dataKey": "loginState"
+                            }
+                        }
+                    }
+                }
+            }
         },
         "webDetection": {
             "state": "enabled",
