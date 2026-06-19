@@ -2502,7 +2502,22 @@
         },
         "requestBlocklist": {
             "state": "enabled",
-            "minSupportedVersion": 52730000
+            "minSupportedVersion": 52730000,
+            "settings": {
+                "blockedRequests": {
+                    "youtube.com": {
+                        "rules": [
+                            {
+                                "rule": "youtube.com/youtubei/v1/player/ad_break",
+                                "domains": [
+                                    "youtube.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5389"
+                            }
+                        ]
+                    }
+                }
+            }
         },
         "requestFilterer": {
             "state": "enabled",
