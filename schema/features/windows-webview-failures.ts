@@ -7,6 +7,7 @@ type SubFeatures<VersionType> = {
             autoRecoveryBrowserEngine: boolean;
             autoRecoveryTab: boolean;
             autoRecoveryTabOutOfMemory: boolean;
+            crashLoopThresholdSeconds: number;
         }
     >;
     nativeCrashDialogOneShot?: SubFeature<

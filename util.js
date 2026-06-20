@@ -121,6 +121,22 @@ export function mergeAllowlistedTrackers(t1, t2) {
 }
 
 /**
+ * Merge a platform's eventHub telemetry overrides onto the base telemetry.
+ *
+ * Telemetry entries are merged per key: a platform override only needs to declare the
+ * entries it changes or adds, and inherits every other entry from the base event-hub
+ * config. This keeps platforms from drifting out of date as base entries change, and
+ * ensures they pick up newly-added entries automatically. An entry present in both is
+ * replaced wholesale by the override (no deep merge within an entry).
+ *
+ * @param {object} base - base telemetry record (entry name -> entry)
+ * @param {object} override - platform override telemetry record
+ */
+export function mergeEventHubTelemetry(base, override) {
+    return { ...base, ...override };
+}
+
+/**
  * Traverse the input (JSON data) and ensure any "reason" fields are strings in the output.
  *
  * This allows specifying reasons as an array of strings, and converts these to
@@ -145,6 +161,51 @@ export function inlineReasonArrays(data) {
         return res;
     } else {
         return data;
+    }
+}
+
+const PERIOD_UNIT_SECONDS = {
+    seconds: 1,
+    minutes: 60,
+    hours: 3600,
+    days: 86400,
+};
+
+/**
+ * Collapse each eventHub telemetry entry's `trigger.period` into a single integer `{ seconds }`.
+ *
+ * Authors may express a period in any unit (`days` / `hours` / `minutes` / `seconds`, per the
+ * schema). Clients only read `trigger.period.seconds` and ignore the other units, so a period
+ * authored as e.g. `{ "days": 1 }` would parse as 0 seconds and the pixel would be silently
+ * dropped. Summing the units to seconds here is what fulfils that delivery contract.
+ *
+ * Mutates the config in place; no-ops when the feature, telemetry, or a period is absent.
+ *
+ * @param {object} config - a fully-merged platform config
+ */
+export function collapseEventHubTelemetryPeriods(config) {
+    const telemetry = config?.features?.eventHub?.settings?.telemetry;
+    if (!telemetry) {
+        return;
+    }
+
+    for (const entry of Object.values(telemetry)) {
+        const period = entry?.trigger?.period;
+        if (!period || typeof period !== 'object') {
+            continue;
+        }
+
+        let totalSeconds = 0;
+        for (const [
+            unit,
+            multiplier,
+        ] of Object.entries(PERIOD_UNIT_SECONDS)) {
+            if (typeof period[unit] === 'number') {
+                totalSeconds += period[unit] * multiplier;
+            }
+        }
+
+        entry.trigger.period = { seconds: Math.round(totalSeconds) };
     }
 }
 

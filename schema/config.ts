@@ -41,6 +41,7 @@ import { TabSuspension } from './features/tab-suspension';
 
 export { WebCompatSettings } from './features/webcompat';
 export { DuckPlayerSettings } from './features/duckplayer';
+export { EventHubSettings } from './features/event-hub';
 
 export type ExportedSchemas =
     | 'CurrentGenericConfig'
@@ -50,6 +51,7 @@ export type ExportedSchemas =
     | 'WebCompatSettings'
     | 'DuckPlayerSettings'
     | 'DuckPlayerNativeSettings'
+    | 'EventHubSettings'
     | 'AttributedMetricsFeature';
 
 /**
