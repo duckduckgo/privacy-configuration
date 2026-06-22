@@ -88,6 +88,43 @@
                     }
                 }
             },
+            "captcha": {
+                "recaptcha": {
+                    "match": {
+                        "element": {
+                            "selector": [
+                                ".g-recaptcha",
+                                "iframe[src*='recaptcha']",
+                                "iframe[title*='recaptcha' i]"
+                            ],
+                            "visibility": "visible"
+                        }
+                    }
+                },
+                "hcaptcha": {
+                    "match": {
+                        "element": {
+                            "selector": [
+                                ".h-captcha",
+                                "iframe[src*='hcaptcha.com']",
+                                "iframe[title*='hcaptcha' i]"
+                            ],
+                            "visibility": "visible"
+                        }
+                    }
+                },
+                "turnstile": {
+                    "match": {
+                        "element": {
+                            "selector": [
+                                ".cf-turnstile",
+                                "iframe[src*='challenges.cloudflare.com']"
+                            ],
+                            "visibility": "visible"
+                        }
+                    }
+                }
+            },
             "commentsDisabled": {
                 "generic": {
                     "match": {
@@ -221,6 +258,61 @@
                         "op": "add",
                         "path": "/detectors/adwalls/admiral/actions",
                         "value": { "fireEvent": { "state": "enabled", "type": "admiralAdwall" } }
+                    }
+                ]
+            },
+            {
+                "condition": [
+                    {
+                        "injectName": "windows",
+                        "minSupportedVersion": "0.164.0"
+                    }
+                ],
+                "patchSettings": [
+                    {
+                        "op": "add",
+                        "path": "/detectors/captcha/recaptcha/triggers",
+                        "value": { "auto": { "state": "enabled", "when": { "intervalMs": [
+                                        500,
+                                        1000,
+                                        3000,
+                                        5000
+                                    ] } } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/captcha/recaptcha/actions",
+                        "value": { "fireEvent": { "state": "enabled", "type": "captcha_recaptcha" } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/captcha/hcaptcha/triggers",
+                        "value": { "auto": { "state": "enabled", "when": { "intervalMs": [
+                                        500,
+                                        1000,
+                                        3000,
+                                        5000
+                                    ] } } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/captcha/hcaptcha/actions",
+                        "value": { "fireEvent": { "state": "enabled", "type": "captcha_hcaptcha" } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/captcha/turnstile/triggers",
+                        "value": { "auto": { "state": "enabled", "when": { "intervalMs": [
+                                        500,
+                                        1000,
+                                        3000,
+                                        5000
+                                    ] } } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/captcha/turnstile/actions",
+                        "value": { "fireEvent": { "state": "enabled", "type": "captcha_turnstile" } }
                     }
                 ]
             }
