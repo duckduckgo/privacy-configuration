@@ -4,9 +4,7 @@ import { Feature } from '../feature';
 // needs: 'before'/'after' require `anchor`, matched against header NAMES
 // (case-insensitive): `^name$` = exact, `^name` = prefix, otherwise substring.
 // This is NOT a regex engine.
-type HeaderPlacement =
-    | { header: string; position: 'first' | 'last' }
-    | { header: string; position: 'before' | 'after'; anchor: string };
+type HeaderPlacement = { header: string; position: 'first' | 'last' } | { header: string; position: 'before' | 'after'; anchor: string };
 
 // Placements are applied in declaration order (each repositions one header).
 type PreserveHeaderOrderSettings = {
