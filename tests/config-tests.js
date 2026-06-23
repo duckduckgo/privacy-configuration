@@ -568,7 +568,7 @@ describe('Windows captcha telemetry', () => {
             .flatMap((block) => block.patchSettings.map((patch) => ({ condition: block.condition, patch })))
             .filter(({ patch }) => patch.path.startsWith('/detectors/captcha/') && patch.path.endsWith('/actions'));
 
-    const providers = ['recaptcha', 'hcaptcha', 'turnstile'];
+    const providers = ['recaptcha', 'hcaptcha', 'turnstile', 'cloudflare', 'other'];
 
     it('declares a separate immediate telemetry entry per captcha provider', () => {
         const telemetry = windowsConfig?.body?.features?.eventHub?.settings?.telemetry ?? {};
@@ -592,7 +592,13 @@ describe('Windows captcha telemetry', () => {
             ).to.equal(true);
             firedTypes.add(fireEvent.type);
         }
-        expect([...firedTypes].sort()).to.deep.equal(['captcha_hcaptcha', 'captcha_recaptcha', 'captcha_turnstile']);
+        expect([...firedTypes].sort()).to.deep.equal([
+            'captcha_cloudflare',
+            'captcha_hcaptcha',
+            'captcha_other',
+            'captcha_recaptcha',
+            'captcha_turnstile',
+        ]);
     });
 
     it('does not declare captcha telemetry consumers on other platforms', () => {

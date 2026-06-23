@@ -117,10 +117,36 @@
                     "match": {
                         "element": {
                             "selector": [
-                                ".cf-turnstile",
-                                "iframe[src*='challenges.cloudflare.com']"
+                                ".cf-turnstile:not(#turnstile-wrapper)",
+                                ".cf-turnstile:not(#turnstile-wrapper) iframe"
                             ],
                             "visibility": "visible"
+                        }
+                    }
+                },
+                "cloudflare": {
+                    "match": {
+                        "element": {
+                            "selector": [
+                                "#challenge-form",
+                                "#cf-wrapper",
+                                ".cf-browser-verification",
+                                "#challenge-running",
+                                "#cf-challenge-running",
+                                "#challenge-stage"
+                            ],
+                            "visibility": "visible"
+                        }
+                    }
+                },
+                "other": {
+                    "match": {
+                        "text": {
+                            "pattern": [
+                                "press (and|&) hold to (confirm|verify)",
+                                "slide( right)? to (verify|complete)",
+                                "complete the security check to (access|continue)"
+                            ]
                         }
                     }
                 }
@@ -313,6 +339,36 @@
                         "op": "add",
                         "path": "/detectors/captcha/turnstile/actions",
                         "value": { "fireEvent": { "state": "enabled", "type": "captcha_turnstile" } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/captcha/cloudflare/triggers",
+                        "value": { "auto": { "state": "enabled", "when": { "intervalMs": [
+                                        500,
+                                        1000,
+                                        3000,
+                                        5000
+                                    ] } } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/captcha/cloudflare/actions",
+                        "value": { "fireEvent": { "state": "enabled", "type": "captcha_cloudflare" } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/captcha/other/triggers",
+                        "value": { "auto": { "state": "enabled", "when": { "intervalMs": [
+                                        500,
+                                        1000,
+                                        3000,
+                                        5000
+                                    ] } } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/captcha/other/actions",
+                        "value": { "fireEvent": { "state": "enabled", "type": "captcha_other" } }
                     }
                 ]
             }
