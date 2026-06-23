@@ -4438,12 +4438,11 @@
         },
         "webInterferenceDetection": {
             "state": "enabled",
-            "minSupportedVersion": 52840000,
             "settings": {
                 "autoRunDelayMs": 100,
                 "interferenceTypes": {
                     "youtubeAds": {
-                        "state": "enabled",
+                        "state": "disabled",
                         "sweepIntervalMs": 2000,
                         "slowLoadThresholdMs": 15000,
                         "playerSelectors": [
@@ -4526,7 +4525,21 @@
                             "buffering": true
                         }
                     }
-                }
+                },
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "minSupportedVersion": 52840000
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/interferenceTypes/youtubeAds/state",
+                                "value": "enabled"
+                            }
+                        ]
+                    }
+                ]
             }
         },
         "progressBarUpgrade": {
