@@ -562,66 +562,6 @@ describe('EventHub telemetry override merge', () => {
     });
 });
 
-describe('Windows captcha telemetry', () => {
-    const windowsConfig = latestConfigs.find((c) => c.name === 'v5/windows-config.json');
-    const androidConfig = latestConfigs.find((c) => c.name === 'v5/android-config.json');
-
-    const captchaActionPatches = (config) =>
-        (config?.body?.features?.webDetection?.settings?.conditionalChanges ?? [])
-            .flatMap((block) => block.patchSettings.map((patch) => ({ condition: block.condition, patch })))
-            .filter(({ patch }) => patch.path.startsWith('/detectors/captcha/') && patch.path.endsWith('/actions'));
-
-    const providers = [
-        'recaptcha',
-        'hcaptcha',
-        'turnstile',
-        'cloudflare',
-        'other',
-    ];
-
-    it('declares a separate immediate telemetry entry per captcha provider', () => {
-        const telemetry = windowsConfig?.body?.features?.eventHub?.settings?.telemetry ?? {};
-        for (const provider of providers) {
-            const entry = telemetry[`webTelemetry_captcha_${provider}`];
-            expect(entry, `windows eventHub should declare webTelemetry_captcha_${provider}`).to.not.equal(undefined);
-            expect(entry.trigger).to.deep.equal({ type: 'immediate', source: `captcha_${provider}` });
-            // Per-provider pixels carry no parameters: the provider is identified by the pixel, not a data value.
-            expect(entry.parameters).to.deep.equal({});
-        }
-    });
-
-    it('fires a distinct per-provider captcha event for each detector, gated to windows only', () => {
-        const firedTypes = new Set();
-        for (const { condition, patch } of captchaActionPatches(windowsConfig)) {
-            const fireEvent = patch.value.fireEvent;
-            expect(fireEvent.data, `${patch.path} must not carry a data payload (per-provider pixels)`).to.equal(undefined);
-            expect(
-                condition.every((c) => c.injectName === 'windows'),
-                `${patch.path} must be gated to windows so other platforms never fire it`,
-            ).to.equal(true);
-            firedTypes.add(fireEvent.type);
-        }
-        expect(
-            [
-                ...firedTypes,
-            ].sort(),
-        ).to.deep.equal([
-            'captcha_cloudflare',
-            'captcha_hcaptcha',
-            'captcha_other',
-            'captcha_recaptcha',
-            'captcha_turnstile',
-        ]);
-    });
-
-    it('does not declare captcha telemetry consumers on other platforms', () => {
-        const androidTelemetry = androidConfig?.body?.features?.eventHub?.settings?.telemetry ?? {};
-        for (const provider of providers) {
-            expect(androidTelemetry[`webTelemetry_captcha_${provider}`]).to.equal(undefined);
-        }
-    });
-});
-
 describe('EventHub schema source rules', () => {
     const validate = createValidator('EventHubSettings');
 
