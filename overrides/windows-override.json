@@ -2431,14 +2431,7 @@
                         "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
                     }
                 ],
-                "omitClientHintMutations": [
-                    {
-                        "domain": "smythstoys.com"
-                    },
-                    {
-                        "domain": "www.smythstoys.com"
-                    }
-                ]
+                "omitClientHintMutations": []
             },
             "features": {
                 "userAgentStrategies": {
@@ -4210,26 +4203,81 @@
                     {
                         "domain": "www.instagram.com",
                         "brand": "Google Chrome"
+                    },
+                    {
+                        "domain": "www.spectrum.net",
+                        "brand": "Google Chrome"
+                    },
+                    {
+                        "domain": "id.spectrum.net",
+                        "brand": "Google Chrome"
+                    },
+                    {
+                        "domain": "watch.spectrum.net",
+                        "brand": "Google Chrome"
+                    },
+                    {
+                        "domain": "www.smythstoys.com",
+                        "brand": "Google Chrome"
                     }
                 ]
             }
         },
         "uaChBrands": {
             "state": "enabled",
-            "exceptions": [
-                {
-                    "domain": "smythstoys.com",
-                    "reason": "Bot check"
-                },
-                {
-                    "domain": "facebook.com",
-                    "reason": "reCAPTCHA failing on Facebook login"
-                },
-                {
-                    "domain": "instagram.com",
-                    "reason": "reCAPTCHA failing on Instagram login"
-                }
-            ]
+            "settings": {
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "domain": "spectrum.net"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/brandName",
+                                "value": "Google Chrome"
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "domain": "facebook.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/brandName",
+                                "value": "Google Chrome"
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "domain": "instagram.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/brandName",
+                                "value": "Google Chrome"
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "domain": "smythstoys.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/brandName",
+                                "value": "Google Chrome"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "exceptions": []
         },
         "privacyPro": {
             "state": "enabled",
