@@ -45,6 +45,14 @@ When a rollout percentage changes, the diff must **append** a new entry to `roll
 - **Tests**: `tests/tracker-allowlist-tests.js` - Unit tests enforcing ordering, propagation, and duplicate detection
 - **Matching algorithm**: [tracker_allowlist_matching_tests.json](https://github.com/duckduckgo/privacy-reference-tests/blob/main/tracker-radar-tests/TR-domain-matching/tracker_allowlist_matching_tests.json) - Client matching is subdomain-aware, not pure string prefix. A subdomain rule does not match the parent domain.
 
+## Custom User Agent / Client Hints Validation
+
+### References
+
+- **Rule File**: `.cursor/rules/user-agent-client-hints.mdc` - Cross-platform UA/client-hint mitigation guidance
+- **Schemas**: `schema/features/custom-user-agent.ts`, `schema/features/client-brand-hint.ts`, `schema/features/ua-ch-brands.ts`
+- **Configurations**: `overrides/windows-override.json`, `overrides/android-override.json`, `overrides/ios-override.json`, `overrides/macos-override.json`
+
 ## Adding New Features to Bugbot
 
 ### Template for New Feature Validation
