@@ -44,8 +44,7 @@ Android does not use a custom UA by default; the default UA should match Chrome.
 Windows does not use a custom UA by default; the default UA should match Chrome. Windows customizes client-hint branding instead.
 
 - `customUserAgent.settings.userAgentOverrides` supports `{ "domain": "example.com", "pathRegex": ".*", "userAgent": "..." }`.
-- Flag UA or client-hint changes without checking related JS-visible values (`navigator.userAgent`, `navigator.userAgentData.brands`, `fullVersionList`).
-- If mitigating Sec-CH-UA, require matching JS UA-CH mitigation unless the PR description says JS UA-CH is irrelevant.
+- For Sec-CH-UA mitigations, require matching JS UA-CH behavior (`navigator.userAgentData.brands`, `fullVersionList`) unless the PR description says JS UA-CH is irrelevant; for UA string changes, require checking `navigator.userAgent`.
 - Flag domains added to both `customUserAgent.settings.omitClientHintMutations` and `clientBrandHint.settings.domains`; omission sends generic Chromium/GREASE and conflicts with brand override intent.
 - Flag Windows client-hint domain disparities. `uaChBrands` conditions use eTLD+1, while `clientBrandHint` and `omitClientHintMutations` entries are more granular; `example.com` alone only covers the naked domain there, so the PR should state which subdomains (`www`, `m`, auth hosts, eTLD+1 only) need coverage.
 - If `omitClientHintMutations` disables header branding for a domain, require matching `uaChBrands` behavior for that domain, usually by disabling the feature for the condition.
