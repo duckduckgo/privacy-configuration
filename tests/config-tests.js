@@ -295,7 +295,10 @@ describe('EventHub validation tests', () => {
                     // per-provider captcha pixel, where the provider is the pixel itself). Only period
                     // (aggregating) pixels are meaningless without at least one parameter to report.
                     if ((entry.trigger.type ?? 'period') === 'period') {
-                        expect(Object.keys(params).length).to.be.greaterThan(0, `Period telemetry '${name}' must have at least one parameter`);
+                        expect(Object.keys(params).length).to.be.greaterThan(
+                            0,
+                            `Period telemetry '${name}' must have at least one parameter`,
+                        );
                     }
                 }
             });
@@ -568,7 +571,13 @@ describe('Windows captcha telemetry', () => {
             .flatMap((block) => block.patchSettings.map((patch) => ({ condition: block.condition, patch })))
             .filter(({ patch }) => patch.path.startsWith('/detectors/captcha/') && patch.path.endsWith('/actions'));
 
-    const providers = ['recaptcha', 'hcaptcha', 'turnstile', 'cloudflare', 'other'];
+    const providers = [
+        'recaptcha',
+        'hcaptcha',
+        'turnstile',
+        'cloudflare',
+        'other',
+    ];
 
     it('declares a separate immediate telemetry entry per captcha provider', () => {
         const telemetry = windowsConfig?.body?.features?.eventHub?.settings?.telemetry ?? {};
@@ -592,7 +601,11 @@ describe('Windows captcha telemetry', () => {
             ).to.equal(true);
             firedTypes.add(fireEvent.type);
         }
-        expect([...firedTypes].sort()).to.deep.equal([
+        expect(
+            [
+                ...firedTypes,
+            ].sort(),
+        ).to.deep.equal([
             'captcha_cloudflare',
             'captcha_hcaptcha',
             'captcha_other',
