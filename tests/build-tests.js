@@ -5,6 +5,7 @@ import {
     inlineReasonArrays,
     mergeAllowlistedTrackers,
     mergeEventHubTelemetry,
+    mergeInterferenceTypes,
     addHashToFeatures,
 } from '../util.js';
 
@@ -267,6 +268,62 @@ describe('mergeEventHubTelemetry', () => {
     it('returns base entries unchanged when the override is empty', () => {
         const base = { base_pixel_day: baseEntry('base') };
         expect(mergeEventHubTelemetry(base, {})).to.deep.equal(base);
+    });
+});
+
+describe('mergeInterferenceTypes', () => {
+    const baseType = (interval) => ({
+        state: 'enabled',
+        sweepIntervalMs: interval,
+        playerSelectors: [
+            '#player',
+        ],
+    });
+
+    it('inherits base types not present in the override', () => {
+        const base = { adwallDetection: baseType(1000) };
+        const override = { youtubeAds: baseType(2000) };
+        expect(mergeInterferenceTypes(base, override)).to.deep.equal({
+            adwallDetection: baseType(1000),
+            youtubeAds: baseType(2000),
+        });
+    });
+
+    it('lets the override replace a base type with the same key', () => {
+        const base = { adwallDetection: baseType(1000) };
+        const override = { adwallDetection: baseType(2000) };
+        expect(mergeInterferenceTypes(base, override)).to.deep.equal({
+            adwallDetection: baseType(2000),
+        });
+    });
+
+    it('replaces matching keys wholesale rather than deep-merging them', () => {
+        const base = {
+            adwallDetection: {
+                state: 'enabled',
+                sweepIntervalMs: 1000,
+                playerSelectors: [
+                    '#player',
+                    '#movie_player',
+                ],
+            },
+        };
+        const override = {
+            adwallDetection: {
+                state: 'enabled',
+                sweepIntervalMs: 2000,
+                playerSelectors: [
+                    '#player',
+                ],
+            },
+        };
+        // The override type wins entirely — the extra base selector is not carried over.
+        expect(mergeInterferenceTypes(base, override)).to.deep.equal(override);
+    });
+
+    it('returns base types unchanged when the override is empty', () => {
+        const base = { adwallDetection: baseType(1000) };
+        expect(mergeInterferenceTypes(base, {})).to.deep.equal(base);
     });
 });
 
