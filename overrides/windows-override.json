@@ -6077,11 +6077,17 @@
                 }
             }
         },
-        "defaultRestoreSettingExperiment": {
+        "sessionRestorePrompt": {
             "state": "enabled",
             "exceptions": [],
             "features": {
-                "defaultRestoreSettingExperimentOne": {
+                "promptAfterRestore": {
+                    "state": "disabled"
+                },
+                "promptBeforeRestore": {
+                    "state": "disabled"
+                },
+                "sessionRestorePromptExperiment": {
                     "state": "enabled",
                     "cohorts": [
                         {
@@ -6089,11 +6095,11 @@
                             "weight": 1
                         },
                         {
-                            "name": "excludeFromOnboarding",
+                            "name": "promptBeforeRestore",
                             "weight": 1
                         },
                         {
-                            "name": "updateOnboardingText",
+                            "name": "promptAfterRestore",
                             "weight": 1
                         }
                     ]
