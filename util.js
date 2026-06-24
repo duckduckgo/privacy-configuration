@@ -137,6 +137,22 @@ export function mergeEventHubTelemetry(base, override) {
 }
 
 /**
+ * Merge a platform's webInterferenceDetection interferenceTypes overrides onto the base.
+ *
+ * Interference types are merged per key: a platform override only needs to declare the
+ * types it changes or adds, and inherits every other type from the base config. This keeps
+ * platforms from drifting out of date as base types change, and ensures they pick up
+ * newly-added types automatically. A type present in both is replaced wholesale by the
+ * override (no deep merge within a type).
+ *
+ * @param {object} base - base interferenceTypes record (type name -> type)
+ * @param {object} override - platform override interferenceTypes record
+ */
+export function mergeInterferenceTypes(base, override) {
+    return { ...base, ...override };
+}
+
+/**
  * Traverse the input (JSON data) and ensure any "reason" fields are strings in the output.
  *
  * This allows specifying reasons as an array of strings, and converts these to

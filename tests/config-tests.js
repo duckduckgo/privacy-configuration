@@ -554,6 +554,26 @@ describe('EventHub telemetry override merge', () => {
     });
 });
 
+describe('webInterferenceDetection interferenceTypes override merge', () => {
+    // Android declares only its platform-specific interference types in its override; the build
+    // must merge in the base types so the platform does not drift as base types change.
+    const androidConfig = latestConfigs.find((c) => c.name === 'v5/android-config.json');
+    const interferenceTypes = androidConfig?.body?.features?.webInterferenceDetection?.settings?.interferenceTypes || {};
+    const baseInterferenceTypes = readJsoncFile('./features/web-interference-detection.json').settings.interferenceTypes;
+
+    it('inherits base interference types not declared in the android override', () => {
+        for (const baseName of Object.keys(baseInterferenceTypes)) {
+            expect(interferenceTypes, `Android webInterferenceDetection is missing inherited base type '${baseName}'`).to.have.property(
+                baseName,
+            );
+        }
+    });
+
+    it('keeps android-specific interference types', () => {
+        expect(interferenceTypes).to.have.property('youtubeAds');
+    });
+});
+
 describe('EventHub schema source rules', () => {
     const validate = createValidator('EventHubSettings');
 

@@ -7,6 +7,7 @@ import {
     inlineReasonArrays,
     mergeAllowlistedTrackers,
     mergeEventHubTelemetry,
+    mergeInterferenceTypes,
     addHashToFeatures,
     stripReasons,
     getBaseFeatureConfigs,
@@ -291,6 +292,22 @@ async function buildPlatforms() {
                             ...baseSettings,
                             ...overrideSettings,
                             telemetry: mergeEventHubTelemetry(baseSettings.telemetry || {}, overrideSettings.telemetry || {}),
+                        };
+                    } else if (key === 'webInterferenceDetection' && platformKey === 'settings') {
+                        // Merge interferenceTypes per key so platforms inherit base types and
+                        // only declare the ones they override or add. This keeps platform configs
+                        // from drifting as base types change, and picks up new types
+                        // automatically. Other webInterferenceDetection settings keys still
+                        // override wholesale.
+                        const baseSettings = platformConfig.features[key].settings || {};
+                        const overrideSettings = platformOverride.features[key][platformKey];
+                        platformConfig.features[key][platformKey] = {
+                            ...baseSettings,
+                            ...overrideSettings,
+                            interferenceTypes: mergeInterferenceTypes(
+                                baseSettings.interferenceTypes || {},
+                                overrideSettings.interferenceTypes || {},
+                            ),
                         };
                     } else if ((key === 'clickToLoad' || key === 'clickToPlay') && platformKey === 'settings') {
                         // Handle Click to Load settings override later, so that individual entities
