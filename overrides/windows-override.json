@@ -5524,6 +5524,52 @@
                                 "dataKey": "loginState"
                             }
                         }
+                    },
+                    "bookmarks_action_day": {
+                        "state": "enabled",
+                        "trigger": {
+                            "period": {
+                                "days": 1
+                            }
+                        },
+                        "parameters": {
+                            "create": {
+                                "template": "counter",
+                                "source": "bookmarkCreate",
+                                "buckets": {
+                                    "0": { "gte": 0, "lt": 1 },
+                                    "1-2": { "gte": 1, "lt": 3 },
+                                    "3+": { "gte": 3 }
+                                }
+                            },
+                            "edit": {
+                                "template": "counter",
+                                "source": "bookmarkEdit",
+                                "buckets": {
+                                    "0": { "gte": 0, "lt": 1 },
+                                    "1-2": { "gte": 1, "lt": 3 },
+                                    "3+": { "gte": 3 }
+                                }
+                            },
+                            "delete": {
+                                "template": "counter",
+                                "source": "bookmarkDelete",
+                                "buckets": {
+                                    "0": { "gte": 0, "lt": 1 },
+                                    "1-2": { "gte": 1, "lt": 3 },
+                                    "3+": { "gte": 3 }
+                                }
+                            },
+                            "manageOpen": {
+                                "template": "counter",
+                                "source": "bookmarkManageOpen",
+                                "buckets": {
+                                    "0": { "gte": 0, "lt": 1 },
+                                    "1-2": { "gte": 1, "lt": 3 },
+                                    "3+": { "gte": 3 }
+                                }
+                            }
+                        }
                     }
                 }
             }
