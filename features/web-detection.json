@@ -88,6 +88,69 @@
                     }
                 }
             },
+            "captcha": {
+                "recaptcha": {
+                    "match": {
+                        "element": {
+                            "selector": [
+                                ".g-recaptcha",
+                                "iframe[src*='recaptcha']",
+                                "iframe[title*='recaptcha' i]"
+                            ],
+                            "visibility": "visible"
+                        }
+                    }
+                },
+                "hcaptcha": {
+                    "match": {
+                        "element": {
+                            "selector": [
+                                ".h-captcha",
+                                "iframe[src*='hcaptcha.com']",
+                                "iframe[title*='hcaptcha' i]"
+                            ],
+                            "visibility": "visible"
+                        }
+                    }
+                },
+                "turnstile": {
+                    "match": {
+                        "element": {
+                            "selector": [
+                                ".cf-turnstile:not(#turnstile-wrapper)",
+                                ".cf-turnstile:not(#turnstile-wrapper) iframe"
+                            ],
+                            "visibility": "visible"
+                        }
+                    }
+                },
+                "cloudflare": {
+                    "match": {
+                        "element": {
+                            "selector": [
+                                "#challenge-form",
+                                "#cf-wrapper",
+                                ".cf-browser-verification",
+                                "#challenge-running",
+                                "#cf-challenge-running",
+                                "#challenge-stage"
+                            ],
+                            "visibility": "visible"
+                        }
+                    }
+                },
+                "other": {
+                    "match": {
+                        "text": {
+                            "pattern": [
+                                "press (and|&) hold to (confirm|verify)",
+                                "slide( right)? to (verify|complete)",
+                                "complete the security check to (access|continue)"
+                            ]
+                        }
+                    }
+                }
+            },
             "commentsDisabled": {
                 "generic": {
                     "match": {
@@ -221,6 +284,91 @@
                         "op": "add",
                         "path": "/detectors/adwalls/admiral/actions",
                         "value": { "fireEvent": { "state": "enabled", "type": "admiralAdwall" } }
+                    }
+                ]
+            },
+            {
+                "condition": [
+                    {
+                        "injectName": "windows",
+                        "minSupportedVersion": "0.164.0"
+                    }
+                ],
+                "patchSettings": [
+                    {
+                        "op": "add",
+                        "path": "/detectors/captcha/recaptcha/triggers",
+                        "value": { "auto": { "state": "enabled", "when": { "intervalMs": [
+                                        500,
+                                        1000,
+                                        3000,
+                                        5000
+                                    ] } } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/captcha/recaptcha/actions",
+                        "value": { "fireEvent": { "state": "enabled", "type": "captcha_recaptcha" } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/captcha/hcaptcha/triggers",
+                        "value": { "auto": { "state": "enabled", "when": { "intervalMs": [
+                                        500,
+                                        1000,
+                                        3000,
+                                        5000
+                                    ] } } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/captcha/hcaptcha/actions",
+                        "value": { "fireEvent": { "state": "enabled", "type": "captcha_hcaptcha" } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/captcha/turnstile/triggers",
+                        "value": { "auto": { "state": "enabled", "when": { "intervalMs": [
+                                        500,
+                                        1000,
+                                        3000,
+                                        5000
+                                    ] } } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/captcha/turnstile/actions",
+                        "value": { "fireEvent": { "state": "enabled", "type": "captcha_turnstile" } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/captcha/cloudflare/triggers",
+                        "value": { "auto": { "state": "enabled", "when": { "intervalMs": [
+                                        500,
+                                        1000,
+                                        3000,
+                                        5000
+                                    ] } } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/captcha/cloudflare/actions",
+                        "value": { "fireEvent": { "state": "enabled", "type": "captcha_cloudflare" } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/captcha/other/triggers",
+                        "value": { "auto": { "state": "enabled", "when": { "intervalMs": [
+                                        500,
+                                        1000,
+                                        3000,
+                                        5000
+                                    ] } } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/captcha/other/actions",
+                        "value": { "fireEvent": { "state": "enabled", "type": "captcha_other" } }
                     }
                 ]
             }
