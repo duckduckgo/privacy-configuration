@@ -429,9 +429,15 @@ describe('EventHub validation tests', () => {
                         if (!name.startsWith(BASELINE_NAME_PREFIX)) continue;
                         const param = (entry.parameters || {}).baseline;
                         expect(param, `Baseline pixel '${name}' must declare a 'baseline' parameter`).to.be.an('object');
-                        expect(param.template).to.equal('counter', `Baseline pixel '${name}' baseline parameter must use the 'counter' template`);
+                        expect(param.template).to.equal(
+                            'counter',
+                            `Baseline pixel '${name}' baseline parameter must use the 'counter' template`,
+                        );
                         expect(param.source).to.equal('baseline', `Baseline pixel '${name}' baseline parameter source must be 'baseline'`);
-                        expect(param.buckets).to.deep.equal({ '0+': { gte: 0 } }, `Baseline pixel '${name}' baseline parameter buckets must be exactly 0+`);
+                        expect(param.buckets).to.deep.equal(
+                            { '0+': { gte: 0 } },
+                            `Baseline pixel '${name}' baseline parameter buckets must be exactly 0+`,
+                        );
                     }
                 });
             });
