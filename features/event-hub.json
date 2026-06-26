@@ -6,6 +6,40 @@
     "exceptions": [],
     "settings": {
         "telemetry": {
+            "eventHub_baseline_day": {
+                "state": "enabled",
+                "trigger": {
+                    "period": {
+                        "days": 1
+                    }
+                },
+                "parameters": {
+                    "baseline": {
+                        "template": "counter",
+                        "source": "baseline",
+                        "buckets": {
+                            "0+": { "gte": 0 }
+                        }
+                    }
+                }
+            },
+            "eventHub_baseline_week": {
+                "state": "enabled",
+                "trigger": {
+                    "period": {
+                        "days": 7
+                    }
+                },
+                "parameters": {
+                    "baseline": {
+                        "template": "counter",
+                        "source": "baseline",
+                        "buckets": {
+                            "0+": { "gte": 0 }
+                        }
+                    }
+                }
+            },
             "webTelemetry_adwalls_day": {
                 "state": "enabled",
                 "trigger": {

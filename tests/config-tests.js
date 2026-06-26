@@ -398,6 +398,44 @@ describe('EventHub validation tests', () => {
                 });
             });
 
+            // `eventHub_baseline_*` pixels fire purely on their period to
+            // provide a baseline / denominator: the `baseline` parameter is a
+            // counter sourced from an empty "baseline" stream, so its count
+            // stays at 0 and the single unbounded `0+` bucket always matches.
+            // For now these pixels may carry no other parameters.
+            const BASELINE_NAME_PREFIX = 'eventHub_baseline_';
+            describe('baseline telemetry entries', () => {
+                it('eventHub_baseline_* pixels may only declare the baseline parameter', () => {
+                    for (const [
+                        name,
+                        entry,
+                    ] of Object.entries(telemetry)) {
+                        if (!name.startsWith(BASELINE_NAME_PREFIX)) continue;
+                        const paramNames = Object.keys(entry.parameters || {});
+                        expect(paramNames).to.deep.equal(
+                            [
+                                'baseline',
+                            ],
+                            `Baseline pixel '${name}' may only declare the 'baseline' parameter (no other parameters allowed for now), got: ${paramNames.join(', ')}`,
+                        );
+                    }
+                });
+
+                it('the baseline parameter is a counter sourced from "baseline" (fired even if no detector emits it)', () => {
+                    for (const [
+                        name,
+                        entry,
+                    ] of Object.entries(telemetry)) {
+                        if (!name.startsWith(BASELINE_NAME_PREFIX)) continue;
+                        const param = (entry.parameters || {}).baseline;
+                        expect(param, `Baseline pixel '${name}' must declare a 'baseline' parameter`).to.be.an('object');
+                        expect(param.template).to.equal('counter', `Baseline pixel '${name}' baseline parameter must use the 'counter' template`);
+                        expect(param.source).to.equal('baseline', `Baseline pixel '${name}' baseline parameter source must be 'baseline'`);
+                        expect(param.buckets).to.deep.equal({ '0+': { gte: 0 } }, `Baseline pixel '${name}' baseline parameter buckets must be exactly 0+`);
+                    }
+                });
+            });
+
             for (const [
                 entryName,
                 entry,
@@ -597,6 +635,16 @@ describe('EventHub schema source rules', () => {
         },
     });
 
+    const baselineEntry = (name) => ({
+        telemetry: {
+            [name]: {
+                state: 'enabled',
+                trigger: { period: { seconds: 86400 } },
+                parameters: { baseline: { template: 'counter', source: 'baseline', buckets: { '0+': { gte: 0 } } } },
+            },
+        },
+    });
+
     it('accepts a period data param that specifies a source', () => {
         const settings = periodEntry({ template: 'data', source: 'someStream', dataKey: 'loginState' });
         expect(validate(settings), formatErrors(validate.errors)).to.equal(true);
@@ -609,6 +657,11 @@ describe('EventHub schema source rules', () => {
 
     it('accepts an immediate data param that omits its source', () => {
         const settings = immediateEntry({ template: 'data', dataKey: 'loginState' });
+        expect(validate(settings), formatErrors(validate.errors)).to.equal(true);
+    });
+
+    it('accepts an eventHub_baseline_* pixel whose baseline counter has no matching detector source', () => {
+        const settings = baselineEntry('eventHub_baseline_day');
         expect(validate(settings), formatErrors(validate.errors)).to.equal(true);
     });
 });
