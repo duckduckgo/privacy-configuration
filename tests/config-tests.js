@@ -284,7 +284,7 @@ describe('EventHub validation tests', () => {
                 }
             });
 
-            it('each telemetry entry declares a parameters object, and period entries have at least one', () => {
+            it('each telemetry entry declares a parameters object, and non-immediate entries have at least one', () => {
                 for (const [
                     name,
                     entry,
@@ -292,12 +292,13 @@ describe('EventHub validation tests', () => {
                     const params = entry.parameters;
                     expect(params).to.be.an('object', `Telemetry '${name}' is missing parameters`);
                     // Immediate pixels fire once per event and may legitimately carry no parameters (e.g. a
-                    // per-provider captcha pixel, where the provider is the pixel itself). Only period
-                    // (aggregating) pixels are meaningless without at least one parameter to report.
-                    if ((entry.trigger.type ?? 'period') === 'period') {
+                    // per-provider captcha pixel, where the provider is the pixel itself). Skip the check only
+                    // for immediate triggers rather than matching on 'period', so any future trigger type is
+                    // still required to carry at least one parameter until it's explicitly exempted here.
+                    if ((entry.trigger.type ?? 'period') !== 'immediate') {
                         expect(Object.keys(params).length).to.be.greaterThan(
                             0,
-                            `Period telemetry '${name}' must have at least one parameter`,
+                            `Non-immediate telemetry '${name}' must have at least one parameter`,
                         );
                     }
                 }
