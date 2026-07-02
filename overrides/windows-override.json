@@ -6003,6 +6003,35 @@
                     "state": "internal"
                 }
             }
+        },
+        "sessionRestorePrompt": {
+            "state": "enabled",
+            "exceptions": [],
+            "features": {
+                "promptAfterRestore": {
+                    "state": "disabled"
+                },
+                "promptBeforeRestore": {
+                    "state": "disabled"
+                },
+                "sessionRestorePromptExperiment": {
+                    "state": "enabled",
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "promptBeforeRestore",
+                            "weight": 1
+                        },
+                        {
+                            "name": "promptAfterRestore",
+                            "weight": 1
+                        }
+                    ]
+                }
+            }
         }
     },
     "unprotectedTemporary": []
