@@ -117,9 +117,7 @@ describe('Build output validation', () => {
             const config = loadJSON('generated/v5/windows-config.json');
             const strategies = config.features.customUserAgent.features.userAgentStrategies.settings.strategies;
             const clientHintDomains = config.features.clientBrandHint.settings.domains;
-            const uaChBrandDomains = config.features.uaChBrands.settings.conditionalChanges.map(
-                (change) => change.condition.domain,
-            );
+            const uaChBrandDomains = config.features.uaChBrands.settings.conditionalChanges.map((change) => change.condition.domain);
             const uaChBrandExceptions = config.features.uaChBrands.exceptions.map(extractDomains);
 
             globalUnprotected.forEach((domain) => {
