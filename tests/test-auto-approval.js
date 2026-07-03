@@ -1,5 +1,10 @@
 import { expect } from 'chai';
-import { analyzePatchesForApproval, generateChangeSummary } from '../automation-utils.js';
+import {
+    analyzePatchesForApproval,
+    generateChangeSummary,
+    applyConditionalChangesToConfig,
+    findAutoApprovableFeature,
+} from '../automation-utils.js';
 
 describe('Auto-approval logic tests', () => {
     const testCases = [
@@ -58,6 +63,67 @@ describe('Auto-approval logic tests', () => {
             name: 'Other feature changes - should NOT approve',
             patches: [
                 { op: 'add', path: '/features/trackingProtection/settings/domains/0', value: { domain: 'test.com' } },
+            ],
+            expected: false,
+        },
+        {
+            name: 'Autofill site-specific fix effective settings - should approve',
+            patches: [
+                {
+                    op: 'add',
+                    path: '/features/autofill/features/siteSpecificFixes/settings/formTypeSettings/25',
+                    value: { selector: 'form.signup', type: 'signup' },
+                },
+                {
+                    op: 'add',
+                    path: '/features/autofill/features/siteSpecificFixes/settings/inputTypeSettings/25',
+                    value: { selector: 'input#email', type: 'emailAddress' },
+                },
+                {
+                    op: 'replace',
+                    path: '/features/autofill/features/siteSpecificFixes/settings/formBoundarySelector',
+                    value: 'main > form',
+                },
+                { op: 'add', path: '/features/autofill/features/siteSpecificFixes/settings/failsafeSettings/maxInputsPerPage', value: 120 },
+            ],
+            expected: true,
+        },
+        {
+            name: 'Autofill siteSpecificFixes subfeature state - should NOT approve',
+            patches: [
+                { op: 'replace', path: '/features/autofill/features/siteSpecificFixes/state', value: 'internal' },
+            ],
+            expected: false,
+        },
+        {
+            name: 'Autofill top-level state - should NOT approve',
+            patches: [
+                { op: 'replace', path: '/features/autofill/state', value: 'disabled' },
+            ],
+            expected: false,
+        },
+        {
+            name: 'Autofill other subfeature (autofillOSPasskeys) - should NOT approve',
+            patches: [
+                {
+                    op: 'add',
+                    path: '/features/autofill/features/autofillOSPasskeys/settings/excludedDomains/0',
+                    value: { domain: 'test.com' },
+                },
+            ],
+            expected: false,
+        },
+        {
+            name: 'Sibling autofillSurveys feature - should NOT approve (prefix guard)',
+            patches: [
+                { op: 'replace', path: '/features/autofillSurveys/state', value: 'disabled' },
+            ],
+            expected: false,
+        },
+        {
+            name: 'Sibling autofillService nested feature - should NOT approve (prefix guard)',
+            patches: [
+                { op: 'replace', path: '/features/autofillService/features/canMapAppToDomain/state', value: 'disabled' },
             ],
             expected: false,
         },
@@ -283,5 +349,77 @@ describe('generateChangeSummary specific tests', () => {
         expect(summary.otherChanges).to.equal(0);
         expect(Object.keys(summary.byOperation)).to.have.length(0);
         expect(Object.keys(summary.byPath)).to.have.length(0);
+    });
+});
+
+describe('Subfeature conditionalChanges application', () => {
+    function buildConfigWithSiteFix() {
+        return {
+            features: {
+                autofill: {
+                    state: 'enabled',
+                    features: {
+                        siteSpecificFixes: {
+                            state: 'enabled',
+                            settings: {
+                                formTypeSettings: [],
+                                inputTypeSettings: [],
+                                formBoundarySelector: '',
+                                failsafeSettings: {},
+                                conditionalChanges: [
+                                    {
+                                        condition: [
+                                            { domain: 'example.com' },
+                                        ],
+                                        patchSettings: [
+                                            { op: 'add', path: '/formTypeSettings/-', value: { selector: 'form.signup', type: 'signup' } },
+                                            { op: 'replace', path: '/formBoundarySelector', value: 'main' },
+                                        ],
+                                    },
+                                ],
+                            },
+                        },
+                    },
+                },
+            },
+        };
+    }
+
+    it('applies siteSpecificFixes conditionalChanges and strips the rules from the diff view', () => {
+        const config = buildConfigWithSiteFix();
+
+        const result = applyConditionalChangesToConfig(config);
+        const settings = result.features.autofill.features.siteSpecificFixes.settings;
+
+        // Rules themselves are removed so the approval diff only reflects their effect.
+        expect(settings.conditionalChanges).to.equal(undefined);
+        expect(settings.formTypeSettings).to.deep.equal([
+            { selector: 'form.signup', type: 'signup' },
+        ]);
+        expect(settings.formBoundarySelector).to.equal('main');
+    });
+
+    it('does not mutate the input config', () => {
+        const config = buildConfigWithSiteFix();
+
+        applyConditionalChangesToConfig(config);
+
+        expect(config.features.autofill.features.siteSpecificFixes.settings.conditionalChanges).to.have.length(1);
+        expect(config.features.autofill.features.siteSpecificFixes.settings.formTypeSettings).to.deep.equal([]);
+    });
+});
+
+describe('findAutoApprovableFeature prefix boundaries', () => {
+    it('matches an auto-approvable feature for exact and nested paths', () => {
+        expect(findAutoApprovableFeature('/features/autofill/features/siteSpecificFixes/settings/formTypeSettings/0')).to.equal(
+            '/features/autofill',
+        );
+        expect(findAutoApprovableFeature('/features/elementHiding/settings/domains/0')).to.equal('/features/elementHiding');
+    });
+
+    it('does not match sibling features that merely share a name prefix', () => {
+        expect(findAutoApprovableFeature('/features/autofillSurveys/state')).to.equal(undefined);
+        expect(findAutoApprovableFeature('/features/autofillService/features/canMapAppToDomain/state')).to.equal(undefined);
+        expect(findAutoApprovableFeature('/features/autofillBreakageReporter/state')).to.equal(undefined);
     });
 });

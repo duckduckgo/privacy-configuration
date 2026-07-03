@@ -57,12 +57,38 @@ export const AUTO_APPROVABLE_FEATURES = {
     '/features/mediaPlaybackRequiresUserGesture': [
         '/exceptions',
     ],
+    // Autofill site-specific fixes. Site fixes are authored as
+    // `conditionalChanges` rules inside the `siteSpecificFixes` subfeature.
+    // Those rules are applied by `applyConditionalChangesToConfig` before the
+    // approval diff runs, so we allow only their effective settings fields.
+    // Any other autofill key (state, rollout, other subfeatures) still requires
+    // manual review.
+    '/features/autofill': [
+        '/features/siteSpecificFixes/settings/formBoundarySelector',
+        '/features/siteSpecificFixes/settings/formTypeSettings',
+        '/features/siteSpecificFixes/settings/inputTypeSettings',
+        '/features/siteSpecificFixes/settings/failsafeSettings',
+    ],
 };
 
 /**
  * List of auto-approvable feature paths for summary generation
  */
 export const AUTO_APPROVABLE_FEATURE_PATHS = Object.keys(AUTO_APPROVABLE_FEATURES);
+
+/**
+ * Finds the auto-approvable feature that a patch path belongs to.
+ *
+ * Matching is anchored on path segment boundaries so that a feature key which
+ * is a prefix of another (e.g. `autofill` vs `autofillService`) is not matched
+ * for the sibling feature's paths.
+ *
+ * @param {string} patchPath - The patch path to resolve.
+ * @returns {string|undefined} The matching feature path, or undefined.
+ */
+export function findAutoApprovableFeature(patchPath) {
+    return AUTO_APPROVABLE_FEATURE_PATHS.find((feature) => patchPath === feature || patchPath.startsWith(feature + '/'));
+}
 
 /**
  * Checks if a patch path is allowed for auto-approval
@@ -146,7 +172,7 @@ export function isAllowedChangesOnly(patches) {
     // Check if all patches are for auto-approvable features and allowed paths
     return patches.every((patch) => {
         // Find which auto-approvable feature this patch belongs to
-        const featurePath = AUTO_APPROVABLE_FEATURE_PATHS.find((feature) => patch.path.startsWith(feature));
+        const featurePath = findAutoApprovableFeature(patch.path);
 
         if (!featurePath) {
             return false; // Not an auto-approvable feature
@@ -181,7 +207,7 @@ export function analyzePatchesForApproval(patches) {
     // Check if any changes are outside allowed paths
     const disallowedPatches = [];
     for (const patch of patches) {
-        const featurePath = AUTO_APPROVABLE_FEATURE_PATHS.find((feature) => patch.path.startsWith(feature));
+        const featurePath = findAutoApprovableFeature(patch.path);
         const isDisallowed = featurePath ? !isPathAllowedForFeature(patch.path, featurePath) : true;
         if (isDisallowed) {
             disallowedPatches.push(patch);
@@ -219,7 +245,7 @@ export function generateChangeSummary(patches) {
         summary.byPath[pathKey] = (summary.byPath[pathKey] || 0) + 1;
 
         // Count auto-approvable vs other changes
-        const featurePath = AUTO_APPROVABLE_FEATURE_PATHS.find((feature) => patch.path.startsWith(feature));
+        const featurePath = findAutoApprovableFeature(patch.path);
         if (featurePath && isPathAllowedForFeature(patch.path, featurePath)) {
             summary.autoApprovableChanges++;
         } else {
@@ -290,6 +316,31 @@ export function applyConditionalChangesToConfig(config) {
                 ...feature,
                 settings: patchedSettings,
             };
+        }
+
+        // Apply conditionalChanges declared inside subfeatures (e.g.
+        // autofill -> siteSpecificFixes). The rules are removed after applying
+        // so the approval diff reflects only their effective settings result,
+        // not the raw rule definitions.
+        if (patchedConfig.features[featureName].features) {
+            const subFeatures = patchedConfig.features[featureName].features;
+            for (const [
+                subFeatureName,
+                subFeature,
+            ] of Object.entries(subFeatures)) {
+                if (hasConditionalChanges(subFeature)) {
+                    const patchedSubSettings = applyConditionalChanges(subFeature);
+                    if (patchedSubSettings === false) {
+                        return false;
+                    }
+                    const effectiveSettings = { ...patchedSubSettings };
+                    delete effectiveSettings.conditionalChanges;
+                    subFeatures[subFeatureName] = {
+                        ...subFeature,
+                        settings: effectiveSettings,
+                    };
+                }
+            }
         }
     }
 
