@@ -25,7 +25,7 @@ type ImportBookmarksFromGoogleTakeoutSettings = {
 
 export type FormTypeSetting = {
     selector: string;
-    type: 'login' | 'signup';
+    type: 'login' | 'signup' | 'cc';
 };
 
 export type InputTypeSetting = {
