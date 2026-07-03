@@ -7,6 +7,7 @@ import {
     mergeEventHubTelemetry,
     mergeInterferenceTypes,
     addHashToFeatures,
+    addUnprotectedTemporaryUserAgentMitigations,
 } from '../util.js';
 
 const ta1 = {
@@ -324,6 +325,169 @@ describe('mergeInterferenceTypes', () => {
     it('returns base types unchanged when the override is empty', () => {
         const base = { adwallDetection: baseType(1000) };
         expect(mergeInterferenceTypes(base, {})).to.deep.equal(base);
+    });
+});
+
+describe('addUnprotectedTemporaryUserAgentMitigations', () => {
+    const exceptions = [
+        {
+            domain: 'global.example',
+            reason: 'Global temporary mitigation',
+        },
+        {
+            domain: 'platform.example',
+            reason: 'Platform temporary mitigation',
+        },
+    ];
+
+    it('adds Safari-like custom user-agent entries on iOS', () => {
+        const config = {
+            features: {
+                customUserAgent: {
+                    settings: {
+                        ddgFixedSites: [
+                            {
+                                domain: 'global.example',
+                                reason: 'Manual override',
+                            },
+                        ],
+                        omitApplicationSites: [],
+                    },
+                },
+            },
+        };
+
+        addUnprotectedTemporaryUserAgentMitigations('ios', config, exceptions);
+
+        expect(config.features.customUserAgent.settings.ddgFixedSites).to.deep.equal([
+            {
+                domain: 'global.example',
+                reason: 'Manual override',
+            },
+            {
+                domain: 'platform.example',
+                reason: 'Platform temporary mitigation',
+            },
+        ]);
+        expect(config.features.customUserAgent.settings.omitApplicationSites).to.deep.equal(exceptions);
+    });
+
+    it('adds Safari-like custom user-agent entries on macOS', () => {
+        const config = {
+            features: {
+                customUserAgent: {
+                    settings: {
+                        defaultSites: [],
+                    },
+                },
+            },
+        };
+
+        addUnprotectedTemporaryUserAgentMitigations('macos', config, exceptions);
+
+        expect(config.features.customUserAgent.settings.defaultSites).to.deep.equal(exceptions);
+    });
+
+    it('adds Chrome client-brand hints on Android', () => {
+        const config = {
+            features: {
+                clientBrandHint: {
+                    settings: {
+                        domains: [
+                            {
+                                domain: 'global.example',
+                                brand: 'DDG',
+                            },
+                        ],
+                    },
+                },
+            },
+        };
+
+        addUnprotectedTemporaryUserAgentMitigations('android', config, exceptions);
+
+        expect(config.features.clientBrandHint.settings.domains).to.deep.equal([
+            {
+                domain: 'global.example',
+                brand: 'DDG',
+            },
+            {
+                domain: 'platform.example',
+                brand: 'CHROME',
+            },
+        ]);
+    });
+
+    it('adds Chrome UA and client-hint entries on Windows', () => {
+        const config = {
+            features: {
+                customUserAgent: {
+                    features: {
+                        userAgentStrategies: {
+                            settings: {
+                                strategies: [],
+                            },
+                        },
+                    },
+                },
+                clientBrandHint: {
+                    settings: {
+                        domains: [],
+                    },
+                },
+                uaChBrands: {
+                    exceptions: [
+                        {
+                            domain: 'global.example',
+                        },
+                        {
+                            domain: 'platform.example',
+                        },
+                    ],
+                    settings: {
+                        conditionalChanges: [
+                            {
+                                condition: {
+                                    domain: 'global.example',
+                                },
+                                patchSettings: [
+                                    {
+                                        op: 'add',
+                                        path: '/brandName',
+                                        value: 'Google Chrome',
+                                    },
+                                ],
+                            },
+                        ],
+                    },
+                },
+            },
+        };
+
+        addUnprotectedTemporaryUserAgentMitigations('windows', config, exceptions);
+
+        expect(config.features.customUserAgent.features.userAgentStrategies.settings.strategies).to.deep.equal([
+            {
+                strategy: 'ChromeUA',
+                domain: 'global.example',
+            },
+            {
+                strategy: 'ChromeUA',
+                domain: 'platform.example',
+            },
+        ]);
+        expect(config.features.clientBrandHint.settings.domains).to.deep.equal([
+            {
+                domain: 'global.example',
+                brand: 'Google Chrome',
+            },
+            {
+                domain: 'platform.example',
+                brand: 'Google Chrome',
+            },
+        ]);
+        expect(config.features.uaChBrands.exceptions).to.deep.equal([]);
+        expect(config.features.uaChBrands.settings.conditionalChanges).to.have.length(2);
     });
 });
 

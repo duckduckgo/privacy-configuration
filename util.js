@@ -152,6 +152,102 @@ export function mergeInterferenceTypes(base, override) {
     return { ...base, ...override };
 }
 
+function getEntryDomain(entry) {
+    return typeof entry === 'string' ? entry : entry.domain;
+}
+
+function appendMissingDomainEntries(items, exceptions, createEntry) {
+    if (!Array.isArray(items)) {
+        return;
+    }
+
+    const domains = new Set(items.map(getEntryDomain));
+    for (const exception of exceptions) {
+        if (domains.has(exception.domain)) {
+            continue;
+        }
+        items.push(createEntry(exception));
+        domains.add(exception.domain);
+    }
+}
+
+function removeDomainEntries(items, exceptions) {
+    if (!Array.isArray(items)) {
+        return;
+    }
+
+    const domains = new Set(exceptions.map(({ domain }) => domain));
+    for (let i = items.length - 1; i >= 0; i--) {
+        if (domains.has(getEntryDomain(items[i]))) {
+            items.splice(i, 1);
+        }
+    }
+}
+
+function conditionMatchesDomain(condition, domain) {
+    if (Array.isArray(condition)) {
+        return condition.some((entry) => conditionMatchesDomain(entry, domain));
+    }
+    return condition?.domain === domain;
+}
+
+function addClientBrandHintDomains(config, exceptions, brand) {
+    const domains = config.features.clientBrandHint?.settings?.domains;
+    appendMissingDomainEntries(domains, exceptions, ({ domain }) => ({ domain, brand }));
+}
+
+function addWindowsChromeUserAgentStrategies(config, exceptions) {
+    const strategies = config.features.customUserAgent?.features?.userAgentStrategies?.settings?.strategies;
+    appendMissingDomainEntries(strategies, exceptions, ({ domain }) => ({ strategy: 'ChromeUA', domain }));
+}
+
+function addWindowsUaChBrands(config, exceptions) {
+    const feature = config.features.uaChBrands;
+    const conditionalChanges = feature?.settings?.conditionalChanges;
+    if (!Array.isArray(conditionalChanges)) {
+        return;
+    }
+
+    removeDomainEntries(feature.exceptions, exceptions);
+    for (const exception of exceptions) {
+        if (conditionalChanges.some((change) => conditionMatchesDomain(change.condition, exception.domain))) {
+            continue;
+        }
+        conditionalChanges.push({
+            condition: {
+                domain: exception.domain,
+            },
+            patchSettings: [
+                {
+                    op: 'add',
+                    path: '/brandName',
+                    value: 'Google Chrome',
+                },
+            ],
+        });
+    }
+}
+
+export function addUnprotectedTemporaryUserAgentMitigations(platform, config, exceptions) {
+    if (!exceptions.length) {
+        return;
+    }
+
+    const customUserAgentSettings = config.features.customUserAgent?.settings;
+    if (platform === 'ios') {
+        appendMissingDomainEntries(customUserAgentSettings?.ddgFixedSites, exceptions, (entry) => ({ ...entry }));
+        appendMissingDomainEntries(customUserAgentSettings?.omitApplicationSites, exceptions, (entry) => ({ ...entry }));
+    } else if (platform === 'macos') {
+        appendMissingDomainEntries(customUserAgentSettings?.defaultSites, exceptions, (entry) => ({ ...entry }));
+    } else if (platform === 'android') {
+        addClientBrandHintDomains(config, exceptions, 'CHROME');
+    } else if (platform === 'windows') {
+        addWindowsChromeUserAgentStrategies(config, exceptions);
+        addClientBrandHintDomains(config, exceptions, 'Google Chrome');
+        addWindowsUaChBrands(config, exceptions);
+    }
+}
+
 /**
  * Traverse the input (JSON data) and ensure any "reason" fields are strings in the output.
  *
