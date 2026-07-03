@@ -418,18 +418,9 @@ describe('addUnprotectedTemporaryUserAgentMitigations', () => {
         ]);
     });
 
-    it('adds Chrome UA and client-hint entries on Windows', () => {
+    it('adds Chrome client-hint entries on Windows', () => {
         const config = {
             features: {
-                customUserAgent: {
-                    features: {
-                        userAgentStrategies: {
-                            settings: {
-                                strategies: [],
-                            },
-                        },
-                    },
-                },
                 clientBrandHint: {
                     settings: {
                         domains: [],
@@ -466,16 +457,6 @@ describe('addUnprotectedTemporaryUserAgentMitigations', () => {
 
         addUnprotectedTemporaryUserAgentMitigations('windows', config, exceptions);
 
-        expect(config.features.customUserAgent.features.userAgentStrategies.settings.strategies).to.deep.equal([
-            {
-                strategy: 'ChromeUA',
-                domain: 'global.example',
-            },
-            {
-                strategy: 'ChromeUA',
-                domain: 'platform.example',
-            },
-        ]);
         expect(config.features.clientBrandHint.settings.domains).to.deep.equal([
             {
                 domain: 'global.example',

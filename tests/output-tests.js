@@ -113,15 +113,13 @@ describe('Build output validation', () => {
             });
         });
 
-        it('adds Windows Chrome UA and client-hint mitigations', () => {
+        it('adds Windows Chrome client-hint mitigations', () => {
             const config = loadJSON('generated/v5/windows-config.json');
-            const strategies = config.features.customUserAgent.features.userAgentStrategies.settings.strategies;
             const clientHintDomains = config.features.clientBrandHint.settings.domains;
             const uaChBrandDomains = config.features.uaChBrands.settings.conditionalChanges.map((change) => change.condition.domain);
             const uaChBrandExceptions = config.features.uaChBrands.exceptions.map(extractDomains);
 
             globalUnprotected.forEach((domain) => {
-                expect(strategies).to.deep.include({ strategy: 'ChromeUA', domain });
                 expect(clientHintDomains).to.deep.include({ domain, brand: 'Google Chrome' });
                 expect(uaChBrandDomains).to.contain(domain);
                 expect(uaChBrandExceptions).to.not.contain(domain);

@@ -196,11 +196,6 @@ function addClientBrandHintDomains(config, exceptions, brand) {
     appendMissingDomainEntries(domains, exceptions, ({ domain }) => ({ domain, brand }));
 }
 
-function addWindowsChromeUserAgentStrategies(config, exceptions) {
-    const strategies = config.features.customUserAgent?.features?.userAgentStrategies?.settings?.strategies;
-    appendMissingDomainEntries(strategies, exceptions, ({ domain }) => ({ strategy: 'ChromeUA', domain }));
-}
-
 function addWindowsUaChBrands(config, exceptions) {
     const feature = config.features.uaChBrands;
     const conditionalChanges = feature?.settings?.conditionalChanges;
@@ -242,7 +237,6 @@ export function addUnprotectedTemporaryUserAgentMitigations(platform, config, ex
     } else if (platform === 'android') {
         addClientBrandHintDomains(config, exceptions, 'CHROME');
     } else if (platform === 'windows') {
-        addWindowsChromeUserAgentStrategies(config, exceptions);
         addClientBrandHintDomains(config, exceptions, 'Google Chrome');
         addWindowsUaChBrands(config, exceptions);
     }
