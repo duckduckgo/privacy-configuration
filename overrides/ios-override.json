@@ -670,7 +670,7 @@
                     ]
                 },
                 "tdsNextExperiment010": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "rollout": {
                         "steps": [
                             {
@@ -705,6 +705,30 @@
                     "settings": {
                         "controlUrl": "v5/experiments/202606ctl01-ios-tds-control.json",
                         "treatmentUrl": "v5/experiments/202606ctl01-ios-tds-treatment.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "tdsNextExperiment012": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "v5/experiments/202606v2-ios-tds-control.json",
+                        "treatmentUrl": "v5/experiments/202606v2-ios-tds-treatment.json"
                     },
                     "cohorts": [
                         {
