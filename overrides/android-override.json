@@ -221,7 +221,7 @@
                     ]
                 },
                 "tdsNextExperiment010": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": 52361000,
                     "rollout": {
                         "steps": [
@@ -258,6 +258,31 @@
                     "settings": {
                         "controlUrl": "v5/experiments/202606ctl01-android-tds-control.json",
                         "treatmentUrl": "v5/experiments/202606ctl01-android-tds-treatment.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "tdsNextExperiment012": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52361000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "v5/experiments/202606v2-android-tds-control.json",
+                        "treatmentUrl": "v5/experiments/202606v2-android-tds-treatment.json"
                     },
                     "cohorts": [
                         {
