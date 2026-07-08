@@ -25,3 +25,15 @@ See `README.md` for full documentation including:
 - Feature implementer guides
 - Schema writing guides
 - Incremental rollout implementation
+
+## Cursor Cloud specific instructions
+
+This is a Node.js build-tooling repo (no long-running services). Standard commands live in `README.md` and `package.json` scripts:
+- Build: `npm run build` (compact JSON) / `npm run build:debug` (pretty-printed)
+- Test: `npm test` (runs build + `unit-tests` + `lint` + `tsc`)
+- Lint: `npm run lint` / autofix `npm run lint-fix`
+
+Non-obvious notes:
+- `npm run build` (`node index.js`) fetches remote TDS over the network at build time, so builds require outbound network access.
+- Build output goes to `generated/` (v3/v4/v5 per-platform config JSON), which is git-ignored — don't commit it.
+- `.nvmrc` pins Node 20, but the environment's default `node` (from `/exec-daemon`, currently v22) takes PATH precedence over nvm; the full `npm test` suite passes on Node 22, so overriding the version is not required.
