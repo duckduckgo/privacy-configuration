@@ -2258,7 +2258,7 @@
                 "body > div[class][tabindex] > div > div > div:nth-child(2) > div:nth-child(2) > button:nth-child(2)",
                 "body > div[class][id][tabindex][role][aria-labelledby][aria-modal][style] > div > div > div:nth-child(3) > div > div > p > button:nth-child(3)",
                 "body > div[id] > div:nth-child(2) > div:nth-child(4) > div > div:nth-child(2) > button:nth-child(2)",
-                "#gdpr-new-container .btn-more",
+                "#gdpr-new-container button:nth-of-type(3)",
                 "body > div#cassie-widget > div:nth-child(4)#cassie_cookie_module > div:nth-child(2)#cassie_pre_banner > div:nth-child(3)#cassie_pre_banner__footer > button:nth-child(2)#cassie_reject_all_pre_banner",
                 "body > div:not([id]) > div:nth-child(17):not([id]) > div:not([id]) > a:nth-child(3):not([id])",
                 "body:not([id]) > div#__next > div:not([id]) > main:nth-child(3):not([id]) > div:not([id]) > div:nth-child(1):not([id]) > div:not([id]) > div:nth-child(27):not([id]) > div:not([id]) > div:not([id]) > div:nth-child(2):not([id]) > div:not([id]) > div:nth-child(2):not([id]) > button:nth-child(2):not([id])",
@@ -2380,9 +2380,9 @@
                 "#voyager-gdpr > div > div > button:nth-child(2)",
                 ".ind-cbar[data-testid=\"ind-cbar\"]",
                 ".ind-cbar[data-testid=\"ind-cbar\"] button[save-cookie][data-value=\"0\"]",
-                "#gdpr-new-container .gdpr-dialog-switcher",
-                "#gdpr-new-container .switcher-on",
-                "#gdpr-new-container .btn-save",
+                "#gdpr-new-container button:nth-of-type(2)",
+                "#gdpr-new-container button:first-of-type",
+                "#voyager-gdpr-2025",
                 "dialog.cookieconsent__dialog",
                 ".cookieconsent__base[data-component=\"cookieconsent\"]",
                 ".cookieconsent__buttonAcceptNecessary",
@@ -2418,7 +2418,8 @@
                 "body > div#termsfeed-pc1-notice-banner > div:nth-child(2):not([id]) > div:not([id]) > div:nth-child(3):not([id]) > div:not([id]) > button:nth-child(2)#termsfeed_privacy_consent_banner_button_reject_all",
                 "body > div#accn-cookie-consent-wrapper > div#accn-cookie-consent > div:nth-child(2)#accn-statement-scroller > div:nth-child(2):not([id]) > div:nth-child(3):not([id]) > button:not([id])",
                 "#cookie-notification",
-                "#cookie-notification .cookie_pref_wrapper .pref-opt.refuse"
+                "#cookie-notification .cookie_pref_wrapper .pref-opt.refuse",
+                "#voyager-gdpr-2025 button:last-of-type"
             ],
             "r": [
                 [
@@ -11057,6 +11058,7 @@
                     ],
                     [
                         {
+                            "check": "any",
                             "v": 1473
                         }
                     ],
@@ -11072,18 +11074,26 @@
                             ],
                             "else": [
                                 {
-                                    "c": 1356
-                                },
-                                {
-                                    "w": 1478
-                                },
-                                {
-                                    "all": true,
-                                    "optional": true,
-                                    "k": 1479
-                                },
-                                {
-                                    "k": 1480
+                                    "if": {
+                                        "e": 1356
+                                    },
+                                    "then": [
+                                        {
+                                            "c": 1478
+                                        }
+                                    ],
+                                    "else": [
+                                        {
+                                            "c": 1479
+                                        },
+                                        {
+                                            "timeout": 5000,
+                                            "wv": 1480
+                                        },
+                                        {
+                                            "c": 1517
+                                        }
+                                    ]
                                 }
                             ]
                         }
