@@ -286,6 +286,58 @@
                         "value": { "fireEvent": { "state": "enabled", "type": "admiralAdwall" } }
                     }
                 ]
+            },
+            {
+                "condition": [
+                    {
+                        "injectName": "windows",
+                        "minSupportedVersion": "0.164.0"
+                    }
+                ],
+                "patchSettings": [
+                    {
+                        "op": "add",
+                        "path": "/detectors/captcha/recaptcha/triggers",
+                        "value": { "auto": { "state": "enabled", "when": { "intervalMs": [
+                                        500,
+                                        1000,
+                                        5000
+                                    ] } } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/captcha/recaptcha/actions",
+                        "value": { "fireEvent": { "state": "enabled", "type": "captcha_recaptcha" } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/captcha/hcaptcha/triggers",
+                        "value": { "auto": { "state": "enabled", "when": { "intervalMs": [
+                                        500,
+                                        1000,
+                                        5000
+                                    ] } } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/captcha/hcaptcha/actions",
+                        "value": { "fireEvent": { "state": "enabled", "type": "captcha_hcaptcha" } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/captcha/other/triggers",
+                        "value": { "auto": { "state": "enabled", "when": { "intervalMs": [
+                                        500,
+                                        1000,
+                                        5000
+                                    ] } } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/captcha/other/actions",
+                        "value": { "fireEvent": { "state": "enabled", "type": "captcha_other" } }
+                    }
+                ]
             }
         ]
     }
