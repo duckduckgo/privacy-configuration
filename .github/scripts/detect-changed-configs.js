@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { pathToFileURL } from 'url';
 import { CURRENT_CONFIG_VERSION } from '../../constants.js';
 import { mungeFileContents } from '../../automation-utils.js';
 
@@ -12,7 +13,7 @@ import { mungeFileContents } from '../../automation-utils.js';
  * (which strips the per-build `version` and feature `hash` fields) before comparison, so routine
  * build noise is not reported as a change - the same equality check json-diff-directories.js uses.
  *
- * Usage: node detect-changed-configs.js <baseGeneratedDir> <headGeneratedDir>
+ * Usage: node detect-changed-configs.js <baseGeneratedDir> <headGeneratedDir> [configFilename...]
  * Prints a JSON array of changed compiled config filenames, e.g. ["ios-config.json"].
  */
 
@@ -26,19 +27,36 @@ function mungedConfig(generatedDir, filename) {
     return mungeFileContents(fs.readFileSync(filePath, 'utf-8'), filePath);
 }
 
-if (process.argv.length !== 4) {
-    console.error('Usage: node detect-changed-configs.js <baseGeneratedDir> <headGeneratedDir>');
-    process.exit(1);
+function compiledConfigFilenames(generatedDir) {
+    const directory = path.join(generatedDir, versionDir);
+    return fs.existsSync(directory) ? fs.readdirSync(directory).filter((filename) => filename.endsWith('-config.json')) : [];
 }
 
-const baseDir = process.argv[2];
-const headDir = process.argv[3];
+export function detectChangedConfigs(baseDir, headDir, configFilenames = undefined) {
+    const compiledConfigs =
+        configFilenames ??
+        [
+            ...new Set([
+                ...compiledConfigFilenames(baseDir),
+                ...compiledConfigFilenames(headDir),
+            ]),
+        ].sort();
 
-const headVersionDir = path.join(headDir, versionDir);
-const compiledConfigs = fs.existsSync(headVersionDir)
-    ? fs.readdirSync(headVersionDir).filter((filename) => filename.endsWith('-config.json'))
-    : [];
+    return compiledConfigs.filter((filename) => mungedConfig(baseDir, filename) !== mungedConfig(headDir, filename));
+}
 
-const changed = compiledConfigs.filter((filename) => mungedConfig(baseDir, filename) !== mungedConfig(headDir, filename));
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+    const [
+        baseDir,
+        headDir,
+        ...configFilenames
+    ] = process.argv.slice(2);
 
-process.stdout.write(JSON.stringify(changed));
+    if (!baseDir || !headDir) {
+        console.error('Usage: node detect-changed-configs.js <baseGeneratedDir> <headGeneratedDir> [configFilename...]');
+        process.exit(1);
+    }
+
+    const changed = detectChangedConfigs(baseDir, headDir, configFilenames.length > 0 ? configFilenames : undefined);
+    process.stdout.write(JSON.stringify(changed));
+}
