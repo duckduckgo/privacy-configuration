@@ -29,6 +29,12 @@ type Actions = Partial<{
     };
 }>;
 
+export type ConditionBranch<Final> = ConditionNode<Final> | ConditionNode<Final>[];
+
+type ConditionOperator = 'any' | 'all' | 'none';
+
+type ConditionNode<Final> = Final | { [K in ConditionOperator]?: ConditionBranch<Final> };
+
 export type ConditionTypes = {
     text: {
         pattern: MaybeArray<string>;
@@ -40,13 +46,13 @@ export type ConditionTypes = {
     };
 };
 
-type MatchCondition = MaybeArray<{
-    [K in keyof ConditionTypes]?: MaybeArray<ConditionTypes[K]>;
-}>;
+export type MatchConditionSingle = {
+    [K in keyof ConditionTypes]?: ConditionBranch<ConditionTypes[K]>;
+};
 
 export type DetectorConfig = {
     state?: FeatureState;
-    match: MatchCondition;
+    match: ConditionBranch<MatchConditionSingle>;
     triggers?: Triggers;
     actions?: Actions;
 };

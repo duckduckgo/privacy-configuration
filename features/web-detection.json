@@ -88,6 +88,69 @@
                     }
                 }
             },
+            "captcha": {
+                "recaptcha": {
+                    "match": {
+                        "element": {
+                            "selector": [
+                                ".g-recaptcha",
+                                "iframe[src*='recaptcha']",
+                                "iframe[title*='recaptcha' i]"
+                            ],
+                            "visibility": "visible"
+                        }
+                    }
+                },
+                "hcaptcha": {
+                    "match": {
+                        "element": {
+                            "selector": [
+                                ".h-captcha",
+                                "iframe[src*='hcaptcha.com']",
+                                "iframe[title*='hcaptcha' i]"
+                            ],
+                            "visibility": "visible"
+                        }
+                    }
+                },
+                "turnstile": {
+                    "match": {
+                        "element": {
+                            "selector": [
+                                ".cf-turnstile:not(#turnstile-wrapper)",
+                                ".cf-turnstile:not(#turnstile-wrapper) iframe"
+                            ],
+                            "visibility": "visible"
+                        }
+                    }
+                },
+                "cloudflare": {
+                    "match": {
+                        "element": {
+                            "selector": [
+                                "#challenge-form",
+                                "#cf-wrapper",
+                                ".cf-browser-verification",
+                                "#challenge-running",
+                                "#cf-challenge-running",
+                                "#challenge-stage"
+                            ],
+                            "visibility": "visible"
+                        }
+                    }
+                },
+                "other": {
+                    "match": {
+                        "text": {
+                            "pattern": [
+                                "press (and|&) hold to (confirm|verify)",
+                                "slide( right)? to (verify|complete)",
+                                "complete the security check to (access|continue)"
+                            ]
+                        }
+                    }
+                }
+            },
             "commentsDisabled": {
                 "generic": {
                     "match": {

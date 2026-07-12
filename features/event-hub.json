@@ -6,6 +6,40 @@
     "exceptions": [],
     "settings": {
         "telemetry": {
+            "eventHub_baseline_day": {
+                "state": "enabled",
+                "trigger": {
+                    "period": {
+                        "days": 1
+                    }
+                },
+                "parameters": {
+                    "baseline": {
+                        "template": "counter",
+                        "source": "baseline",
+                        "buckets": {
+                            "0+": { "gte": 0 }
+                        }
+                    }
+                }
+            },
+            "eventHub_baseline_week": {
+                "state": "enabled",
+                "trigger": {
+                    "period": {
+                        "days": 7
+                    }
+                },
+                "parameters": {
+                    "baseline": {
+                        "template": "counter",
+                        "source": "baseline",
+                        "buckets": {
+                            "0+": { "gte": 0 }
+                        }
+                    }
+                }
+            },
             "webTelemetry_adwalls_day": {
                 "state": "enabled",
                 "trigger": {
@@ -89,6 +123,246 @@
                     "admiralAdwallCount": {
                         "template": "counter",
                         "source": "admiralAdwall",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-3": { "gte": 2, "lt": 4 },
+                            "4-7": { "gte": 4, "lt": 8 },
+                            "8-14": { "gte": 8, "lt": 15 },
+                            "15-20": { "gte": 15, "lt": 21 },
+                            "21-39": { "gte": 21, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    }
+                }
+            },
+            "webTelemetry_captcha_recaptcha_day": {
+                "state": "enabled",
+                "trigger": {
+                    "period": {
+                        "days": 1
+                    }
+                },
+                "parameters": {
+                    "count": {
+                        "template": "counter",
+                        "source": "captcha_recaptcha",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-3": { "gte": 2, "lt": 4 },
+                            "4-7": { "gte": 4, "lt": 8 },
+                            "8-14": { "gte": 8, "lt": 15 },
+                            "15-20": { "gte": 15, "lt": 21 },
+                            "21-39": { "gte": 21, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    }
+                }
+            },
+            "webTelemetry_captcha_recaptcha_week": {
+                "state": "enabled",
+                "trigger": {
+                    "period": {
+                        "days": 7
+                    }
+                },
+                "parameters": {
+                    "count": {
+                        "template": "counter",
+                        "source": "captcha_recaptcha",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-3": { "gte": 2, "lt": 4 },
+                            "4-7": { "gte": 4, "lt": 8 },
+                            "8-14": { "gte": 8, "lt": 15 },
+                            "15-20": { "gte": 15, "lt": 21 },
+                            "21-39": { "gte": 21, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    }
+                }
+            },
+            "webTelemetry_captcha_hcaptcha_day": {
+                "state": "enabled",
+                "trigger": {
+                    "period": {
+                        "days": 1
+                    }
+                },
+                "parameters": {
+                    "count": {
+                        "template": "counter",
+                        "source": "captcha_hcaptcha",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-3": { "gte": 2, "lt": 4 },
+                            "4-7": { "gte": 4, "lt": 8 },
+                            "8-14": { "gte": 8, "lt": 15 },
+                            "15-20": { "gte": 15, "lt": 21 },
+                            "21-39": { "gte": 21, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    }
+                }
+            },
+            "webTelemetry_captcha_hcaptcha_week": {
+                "state": "enabled",
+                "trigger": {
+                    "period": {
+                        "days": 7
+                    }
+                },
+                "parameters": {
+                    "count": {
+                        "template": "counter",
+                        "source": "captcha_hcaptcha",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-3": { "gte": 2, "lt": 4 },
+                            "4-7": { "gte": 4, "lt": 8 },
+                            "8-14": { "gte": 8, "lt": 15 },
+                            "15-20": { "gte": 15, "lt": 21 },
+                            "21-39": { "gte": 21, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    }
+                }
+            },
+            "webTelemetry_captcha_turnstile_day": {
+                "state": "enabled",
+                "trigger": {
+                    "period": {
+                        "days": 1
+                    }
+                },
+                "parameters": {
+                    "count": {
+                        "template": "counter",
+                        "source": "captcha_turnstile",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-3": { "gte": 2, "lt": 4 },
+                            "4-7": { "gte": 4, "lt": 8 },
+                            "8-14": { "gte": 8, "lt": 15 },
+                            "15-20": { "gte": 15, "lt": 21 },
+                            "21-39": { "gte": 21, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    }
+                }
+            },
+            "webTelemetry_captcha_turnstile_week": {
+                "state": "enabled",
+                "trigger": {
+                    "period": {
+                        "days": 7
+                    }
+                },
+                "parameters": {
+                    "count": {
+                        "template": "counter",
+                        "source": "captcha_turnstile",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-3": { "gte": 2, "lt": 4 },
+                            "4-7": { "gte": 4, "lt": 8 },
+                            "8-14": { "gte": 8, "lt": 15 },
+                            "15-20": { "gte": 15, "lt": 21 },
+                            "21-39": { "gte": 21, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    }
+                }
+            },
+            "webTelemetry_captcha_cloudflare_day": {
+                "state": "enabled",
+                "trigger": {
+                    "period": {
+                        "days": 1
+                    }
+                },
+                "parameters": {
+                    "count": {
+                        "template": "counter",
+                        "source": "captcha_cloudflare",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-3": { "gte": 2, "lt": 4 },
+                            "4-7": { "gte": 4, "lt": 8 },
+                            "8-14": { "gte": 8, "lt": 15 },
+                            "15-20": { "gte": 15, "lt": 21 },
+                            "21-39": { "gte": 21, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    }
+                }
+            },
+            "webTelemetry_captcha_cloudflare_week": {
+                "state": "enabled",
+                "trigger": {
+                    "period": {
+                        "days": 7
+                    }
+                },
+                "parameters": {
+                    "count": {
+                        "template": "counter",
+                        "source": "captcha_cloudflare",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-3": { "gte": 2, "lt": 4 },
+                            "4-7": { "gte": 4, "lt": 8 },
+                            "8-14": { "gte": 8, "lt": 15 },
+                            "15-20": { "gte": 15, "lt": 21 },
+                            "21-39": { "gte": 21, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    }
+                }
+            },
+            "webTelemetry_captcha_other_day": {
+                "state": "enabled",
+                "trigger": {
+                    "period": {
+                        "days": 1
+                    }
+                },
+                "parameters": {
+                    "count": {
+                        "template": "counter",
+                        "source": "captcha_other",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-3": { "gte": 2, "lt": 4 },
+                            "4-7": { "gte": 4, "lt": 8 },
+                            "8-14": { "gte": 8, "lt": 15 },
+                            "15-20": { "gte": 15, "lt": 21 },
+                            "21-39": { "gte": 21, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    }
+                }
+            },
+            "webTelemetry_captcha_other_week": {
+                "state": "enabled",
+                "trigger": {
+                    "period": {
+                        "days": 7
+                    }
+                },
+                "parameters": {
+                    "count": {
+                        "template": "counter",
+                        "source": "captcha_other",
                         "buckets": {
                             "0": { "gte": 0, "lt": 1 },
                             "1": { "gte": 1, "lt": 2 },

@@ -3,11 +3,15 @@ import fetch from 'node-fetch';
 
 import {
     addCnameEntriesToAllowlist,
+    collapseEventHubTelemetryPeriods,
     inlineReasonArrays,
     mergeAllowlistedTrackers,
+    mergeEventHubTelemetry,
+    mergeInterferenceTypes,
     addHashToFeatures,
     stripReasons,
     getBaseFeatureConfigs,
+    readJsoncFile,
 } from './util.js';
 
 import { OVERRIDE_DIR, GENERATED_DIR, LISTS_DIR, BROWSERS_SUBDIR, CURRENT_CONFIG_VERSION, UNPROTECTED_LIST_NAME } from './constants.js';
@@ -108,7 +112,7 @@ function addExceptionsToUnprotected(exceptions) {
     return exceptions.map((obj) => obj.domain);
 }
 
-const listData = JSON.parse(fs.readFileSync(`${LISTS_DIR}/${UNPROTECTED_LIST_NAME}`));
+const listData = readJsoncFile(`${LISTS_DIR}/${UNPROTECTED_LIST_NAME}`);
 addExceptionsToUnprotected(listData.exceptions);
 addExceptionsToUnprotected(defaultConfig.features.contentBlocking.exceptions);
 
@@ -241,7 +245,7 @@ async function buildPlatforms() {
         }
 
         // Handle feature overrides
-        const platformOverride = JSON.parse(fs.readFileSync(overridePath)); // throws error on missing platform file
+        const platformOverride = readJsoncFile(overridePath); // throws error on missing platform file
         for (const key of Object.keys(platformConfig.features)) {
             if (platformOverride.features[key]) {
                 // Override existing keys
@@ -277,6 +281,34 @@ async function buildPlatforms() {
                             settings[settingsKey] = overrideSettings[settingsKey];
                         }
                         platformConfig.features[key][platformKey] = settings;
+                    } else if (key === 'eventHub' && platformKey === 'settings') {
+                        // Merge telemetry entries per key so platforms inherit base entries and
+                        // only declare the ones they override or add. This keeps platform configs
+                        // from drifting as base entries change, and picks up new entries
+                        // automatically. Other eventHub settings keys still override wholesale.
+                        const baseSettings = platformConfig.features[key].settings || {};
+                        const overrideSettings = platformOverride.features[key][platformKey];
+                        platformConfig.features[key][platformKey] = {
+                            ...baseSettings,
+                            ...overrideSettings,
+                            telemetry: mergeEventHubTelemetry(baseSettings.telemetry || {}, overrideSettings.telemetry || {}),
+                        };
+                    } else if (key === 'webInterferenceDetection' && platformKey === 'settings') {
+                        // Merge interferenceTypes per key so platforms inherit base types and
+                        // only declare the ones they override or add. This keeps platform configs
+                        // from drifting as base types change, and picks up new types
+                        // automatically. Other webInterferenceDetection settings keys still
+                        // override wholesale.
+                        const baseSettings = platformConfig.features[key].settings || {};
+                        const overrideSettings = platformOverride.features[key][platformKey];
+                        platformConfig.features[key][platformKey] = {
+                            ...baseSettings,
+                            ...overrideSettings,
+                            interferenceTypes: mergeInterferenceTypes(
+                                baseSettings.interferenceTypes || {},
+                                overrideSettings.interferenceTypes || {},
+                            ),
+                        };
                     } else if ((key === 'clickToLoad' || key === 'clickToPlay') && platformKey === 'settings') {
                         // Handle Click to Load settings override later, so that individual entities
                         // are disabled/enabled correctly (and disabled by default).
@@ -345,6 +377,11 @@ async function buildPlatforms() {
 
         addCnameEntriesToAllowlist(tds, platformConfig.features.trackerAllowlist.settings.allowlistedTrackers);
         platformConfig = inlineReasonArrays(platformConfig);
+
+        // Clients read eventHub periods as integer seconds; collapse any authored unit object
+        // (days/hours/minutes) to seconds so period pixels are not silently dropped.
+        collapseEventHubTelemetryPeriods(platformConfig);
+
         platformConfigs[platform] = platformConfig;
 
         // Write config to disk

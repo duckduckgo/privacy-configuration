@@ -1,5 +1,13 @@
 import { expect } from 'chai';
-import { addAllowlistRule, addCnameEntriesToAllowlist, inlineReasonArrays, mergeAllowlistedTrackers, addHashToFeatures } from '../util.js';
+import {
+    addAllowlistRule,
+    addCnameEntriesToAllowlist,
+    inlineReasonArrays,
+    mergeAllowlistedTrackers,
+    mergeEventHubTelemetry,
+    mergeInterferenceTypes,
+    addHashToFeatures,
+} from '../util.js';
 
 const ta1 = {
     'f1.com': {
@@ -208,6 +216,114 @@ describe('mergeAllowlistedTrackers', () => {
             },
         });
         expect(mergeAllowlistedTrackers(gen(), gen())).to.deep.equal(gen());
+    });
+});
+
+describe('mergeEventHubTelemetry', () => {
+    const baseEntry = (source) => ({
+        state: 'enabled',
+        trigger: { period: { days: 1 } },
+        parameters: { count: { template: 'counter', source, buckets: { 0: { gte: 0 } } } },
+    });
+
+    it('inherits base entries not present in the override', () => {
+        const base = { base_pixel_day: baseEntry('base') };
+        const override = { override_pixel_day: baseEntry('override') };
+        expect(mergeEventHubTelemetry(base, override)).to.deep.equal({
+            base_pixel_day: baseEntry('base'),
+            override_pixel_day: baseEntry('override'),
+        });
+    });
+
+    it('lets the override replace a base entry with the same key', () => {
+        const base = { shared_pixel_day: baseEntry('base') };
+        const override = { shared_pixel_day: baseEntry('override') };
+        expect(mergeEventHubTelemetry(base, override)).to.deep.equal({
+            shared_pixel_day: baseEntry('override'),
+        });
+    });
+
+    it('replaces matching keys wholesale rather than deep-merging them', () => {
+        const base = {
+            shared_pixel_day: {
+                state: 'enabled',
+                trigger: { period: { days: 1 } },
+                parameters: {
+                    a: { template: 'counter', source: 'a', buckets: { 0: { gte: 0 } } },
+                    b: { template: 'counter', source: 'b', buckets: { 0: { gte: 0 } } },
+                },
+            },
+        };
+        const override = {
+            shared_pixel_day: {
+                state: 'enabled',
+                trigger: { period: { days: 7 } },
+                parameters: { a: { template: 'counter', source: 'a', buckets: { 0: { gte: 0 } } } },
+            },
+        };
+        // The override entry wins entirely — parameter `b` from the base is not carried over.
+        expect(mergeEventHubTelemetry(base, override)).to.deep.equal(override);
+    });
+
+    it('returns base entries unchanged when the override is empty', () => {
+        const base = { base_pixel_day: baseEntry('base') };
+        expect(mergeEventHubTelemetry(base, {})).to.deep.equal(base);
+    });
+});
+
+describe('mergeInterferenceTypes', () => {
+    const baseType = (interval) => ({
+        state: 'enabled',
+        sweepIntervalMs: interval,
+        playerSelectors: [
+            '#player',
+        ],
+    });
+
+    it('inherits base types not present in the override', () => {
+        const base = { adwallDetection: baseType(1000) };
+        const override = { youtubeAds: baseType(2000) };
+        expect(mergeInterferenceTypes(base, override)).to.deep.equal({
+            adwallDetection: baseType(1000),
+            youtubeAds: baseType(2000),
+        });
+    });
+
+    it('lets the override replace a base type with the same key', () => {
+        const base = { adwallDetection: baseType(1000) };
+        const override = { adwallDetection: baseType(2000) };
+        expect(mergeInterferenceTypes(base, override)).to.deep.equal({
+            adwallDetection: baseType(2000),
+        });
+    });
+
+    it('replaces matching keys wholesale rather than deep-merging them', () => {
+        const base = {
+            adwallDetection: {
+                state: 'enabled',
+                sweepIntervalMs: 1000,
+                playerSelectors: [
+                    '#player',
+                    '#movie_player',
+                ],
+            },
+        };
+        const override = {
+            adwallDetection: {
+                state: 'enabled',
+                sweepIntervalMs: 2000,
+                playerSelectors: [
+                    '#player',
+                ],
+            },
+        };
+        // The override type wins entirely — the extra base selector is not carried over.
+        expect(mergeInterferenceTypes(base, override)).to.deep.equal(override);
+    });
+
+    it('returns base types unchanged when the override is empty', () => {
+        const base = { adwallDetection: baseType(1000) };
+        expect(mergeInterferenceTypes(base, {})).to.deep.equal(base);
     });
 });
 

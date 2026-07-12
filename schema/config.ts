@@ -21,6 +21,7 @@ import { WindowsWebViewFailures } from './features/windows-webview-failures';
 import { CustomUserAgentFeature } from './features/custom-user-agent';
 import { BurnFeature } from './features/burn';
 import { ClientBrandHintFeature } from './features/client-brand-hint';
+import { PreserveHeaderOrderFeature } from './features/preserve-header-order';
 import { Taskbar } from './features/taskbar';
 import { AppHealth } from './features/appHealth';
 import { ElementHidingFeature } from './features/element-hiding';
@@ -41,6 +42,7 @@ import { TabSuspension } from './features/tab-suspension';
 
 export { WebCompatSettings } from './features/webcompat';
 export { DuckPlayerSettings } from './features/duckplayer';
+export { EventHubSettings } from './features/event-hub';
 
 export type ExportedSchemas =
     | 'CurrentGenericConfig'
@@ -50,6 +52,7 @@ export type ExportedSchemas =
     | 'WebCompatSettings'
     | 'DuckPlayerSettings'
     | 'DuckPlayerNativeSettings'
+    | 'EventHubSettings'
     | 'AttributedMetricsFeature';
 
 /**
@@ -69,6 +72,7 @@ export type ConfigV5<VersionType> = {
         autofill?: AutofillFeature<VersionType>;
         burn?: BurnFeature<VersionType>;
         clientBrandHint?: ClientBrandHintFeature<VersionType>;
+        preserveHeaderOrder?: PreserveHeaderOrderFeature<VersionType>;
         taskbar?: Taskbar<VersionType>;
         import?: ImportFeature<VersionType>;
         cookie?: CookieFeature<VersionType>;

@@ -1205,6 +1205,7 @@
                                 "domain": "zxx.edu.cn"
                             }
                         ],
+                        // emulate Chrome UA in both JS
                         "patchSettings": [
                             {
                                 "op": "add",
@@ -1368,6 +1369,9 @@
                     "state": "enabled",
                     "minSupportedVersion": "0.157.0"
                 },
+                "sidebarSuggestedPrompts": {
+                    "state": "enabled"
+                },
                 "suggestionsDeletion": {
                     "state": "internal",
                     "minSupportedVersion": "0.155.0"
@@ -1443,6 +1447,9 @@
                 "onboardingToggleAffectsNtpAndDdg": {
                     "state": "enabled",
                     "minSupportedVersion": "0.162.0"
+                },
+                "ntpSuggestionsDeletion": {
+                    "state": "internal"
                 }
             },
             "minSupportedVersion": "0.100.0",
@@ -1535,6 +1542,12 @@
                             }
                         ]
                     }
+                },
+                "trackerBlocking": {
+                    "state": "enabled"
+                },
+                "surrogates": {
+                    "state": "enabled"
                 }
             },
             "settings": {
@@ -1560,6 +1573,9 @@
             "state": "enabled",
             "features": {
                 "startInForeground": {
+                    "state": "enabled"
+                },
+                "silentUpdateRelaunch": {
                     "state": "enabled"
                 }
             }
@@ -1621,6 +1637,20 @@
                         "formBoundarySelector": "",
                         "failsafeSettings": {},
                         "conditionalChanges": [
+                            {
+                                "condition": [
+                                    {
+                                        "domain": "wealthr.co.uk"
+                                    }
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/failsafeSettings/maxInputsPerPage",
+                                        "op": "add",
+                                        "value": 160
+                                    }
+                                ]
+                            },
                             {
                                 "condition": [
                                     {
@@ -2051,6 +2081,33 @@
                                         }
                                     }
                                 ]
+                            },
+                            {
+                                "condition": [
+                                    { "domain": "antarestech.com" }
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formBoundarySelector",
+                                        "op": "replace",
+                                        "value": ".auth_dialog"
+                                    }
+                                ]
+                            },
+                            {
+                                "condition": [
+                                    { "domain": "auth.ibx.com" }
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input#floatingLabelInput109",
+                                            "type": "unknown"
+                                        }
+                                    }
+                                ]
                             }
                         ]
                     }
@@ -2084,7 +2141,8 @@
                     "state": "disabled"
                 },
                 "heuristicAction": {
-                    "state": "disabled"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.163.0"
                 }
             },
             "exceptions": [
@@ -2254,6 +2312,7 @@
                 "subscriptions": "disabled",
                 "subscriptionPages": "disabled",
                 "serpSettings": "disabled",
+                "serp": "disabled",
                 "duckAiNativeStorage": "disabled",
                 "domains": [
                     {
@@ -2281,6 +2340,11 @@
                             {
                                 "op": "replace",
                                 "path": "/serpSettings",
+                                "value": "enabled"
+                            },
+                            {
+                                "op": "replace",
+                                "path": "/serp",
                                 "value": "enabled"
                             },
                             {
@@ -2427,34 +2491,7 @@
                         "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
                     }
                 ],
-                "omitClientHintMutations": [
-                    {
-                        "domain": "smythstoys.com"
-                    },
-                    {
-                        "domain": "www.smythstoys.com"
-                    },
-                    {
-                        "domain": "facebook.com",
-                        "includeGoogleChrome": true
-                    },
-                    {
-                        "domain": "www.facebook.com",
-                        "includeGoogleChrome": true
-                    },
-                    {
-                        "domain": "m.facebook.com",
-                        "includeGoogleChrome": true
-                    },
-                    {
-                        "domain": "instagram.com",
-                        "includeGoogleChrome": true
-                    },
-                    {
-                        "domain": "www.instagram.com",
-                        "includeGoogleChrome": true
-                    }
-                ]
+                "omitClientHintMutations": []
             },
             "features": {
                 "userAgentStrategies": {
@@ -3964,13 +4001,16 @@
                     "minSupportedVersion": "0.147.5"
                 },
                 "scopedAccessCredentials": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.162.0"
                 },
                 "canUseV2ConnectFlow": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.162.0"
                 },
                 "canShowV2ConnectCode": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.162.0"
                 }
             }
         },
@@ -4155,6 +4195,15 @@
                                     "<all>"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1534"
+                            },
+                            {
+                                "rule": "adobedc.demdex.net/ee",
+                                "domains": [
+                                    "homedepot.com"
+                                ],
+                                "reason": [
+                                    "https://github.com/duckduckgo/privacy-configuration/pull/5538"
+                                ]
                             }
                         ]
                     },
@@ -4202,24 +4251,121 @@
             "state": "disabled"
         },
         "clientBrandHint": {
-            "state": "enabled"
+            "state": "enabled",
+            "settings": {
+                "domains": [
+                    {
+                        "domain": "facebook.com",
+                        "brand": "Google Chrome"
+                    },
+                    {
+                        "domain": "www.facebook.com",
+                        "brand": "Google Chrome"
+                    },
+                    {
+                        "domain": "m.facebook.com",
+                        "brand": "Google Chrome"
+                    },
+                    {
+                        "domain": "instagram.com",
+                        "brand": "Google Chrome"
+                    },
+                    {
+                        "domain": "www.instagram.com",
+                        "brand": "Google Chrome"
+                    },
+                    {
+                        "domain": "www.spectrum.net",
+                        "brand": "Google Chrome"
+                    },
+                    {
+                        "domain": "id.spectrum.net",
+                        "brand": "Google Chrome"
+                    },
+                    {
+                        "domain": "watch.spectrum.net",
+                        "brand": "Google Chrome"
+                    },
+                    {
+                        "domain": "www.smythstoys.com",
+                        "brand": "Google Chrome"
+                    }
+                ]
+            }
+        },
+        "preserveHeaderOrder": {
+            "state": "enabled",
+            "minSupportedVersion": "0.166.0",
+            "exceptions": [],
+            "settings": {
+                "placements": [
+                    {
+                        "header": "Sec-GPC",
+                        "position": "before",
+                        "anchor": "^sec-fetch-site$"
+                    },
+                    {
+                        "header": "Cookie",
+                        "position": "last"
+                    }
+                ]
+            }
         },
         "uaChBrands": {
             "state": "enabled",
-            "exceptions": [
-                {
-                    "domain": "smythstoys.com",
-                    "reason": "Bot check"
-                },
-                {
-                    "domain": "facebook.com",
-                    "reason": "reCAPTCHA failing on Facebook login"
-                },
-                {
-                    "domain": "instagram.com",
-                    "reason": "reCAPTCHA failing on Instagram login"
-                }
-            ]
+            "settings": {
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "domain": "spectrum.net"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/brandName",
+                                "value": "Google Chrome"
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "domain": "facebook.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/brandName",
+                                "value": "Google Chrome"
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "domain": "instagram.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/brandName",
+                                "value": "Google Chrome"
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "domain": "smythstoys.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/brandName",
+                                "value": "Google Chrome"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "exceptions": []
         },
         "privacyPro": {
             "state": "enabled",
@@ -4327,7 +4473,7 @@
                     "minSupportedVersion": "0.147.5"
                 },
                 "vpnToolbarUpsell": {
-                    "state": "disabled"
+                    "state": "enabled"
                 }
             },
             "settings": {
@@ -4449,7 +4595,8 @@
                     "settings": {
                         "autoRecoveryBrowserEngine": true,
                         "autoRecoveryTab": true,
-                        "autoRecoveryTabOutOfMemory": false
+                        "autoRecoveryTabOutOfMemory": false,
+                        "crashLoopThresholdSeconds": 20
                     }
                 },
                 "nativeCrashDialog": {
@@ -4460,11 +4607,11 @@
                 },
                 "nativeCrashDialogOneShot": {
                     "state": "enabled",
-                    "minSupportedVersion": "0.160.6",
+                    "minSupportedVersion": "0.162.1",
                     "settings": {
-                        "probability": 100,
-                        "generation": 3,
-                        "showInSuspendedState": true
+                        "probability": 10,
+                        "generation": 5,
+                        "showInSuspendedState": false
                     }
                 },
                 "attachRenderingDiagnosticsToFeedback": {
@@ -4557,9 +4704,17 @@
                         "useStartupTimeoutInstead": "disabled"
                     }
                 },
+                "pixelReporting": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.165.1"
+                },
                 "useSingleWebViewEnvironment": {
                     "state": "enabled",
                     "minSupportedVersion": "0.155.0"
+                },
+                "removeRedirectionBitmapAllWinVersions": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.165.1"
                 }
             },
             "exceptions": []
@@ -4746,7 +4901,7 @@
             "minSupportedVersion": "0.148.0",
             "exceptions": [],
             "settings": {
-                "extensionUrl": "https://staticcdn.duckduckgo.com/extensions/content-blocker/content-blocker-extension-2026.6.7.crx"
+                "extensionUrl": "https://staticcdn.duckduckgo.com/extensions/content-blocker/content-blocker-extension-2026.7.6.crx"
             },
             "features": {
                 "onboardingEnabled": {
@@ -4768,7 +4923,18 @@
                     "state": "enabled"
                 },
                 "partialLaunch": {
-                    "state": "disabled"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.162.2",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
                 }
             }
         },
@@ -4827,6 +4993,10 @@
                 "scheduledPinToTaskbarPrompts": {
                     "state": "enabled",
                     "minSupportedVersion": "0.127.0"
+                },
+                "repromptOnUnset": {
+                    "state": "internal",
+                    "minSupportedVersion": "0.163.0"
                 },
                 "popoverVsBannerExperiment": {
                     "state": "disabled"
@@ -4887,6 +5057,7 @@
             "exceptions": [],
             "settings": {
                 "includeIframes": "disabled",
+                "includePageTypeSignals": "enabled",
                 "maxContentLength": 9500,
                 "excludeSelectors": [
                     ".ad",
@@ -5004,8 +5175,13 @@
                 "sendIncidentCrashReports": {
                     "state": "disabled",
                     "settings": {
-                        "ExceptionTypes": []
+                        "ExceptionTypes": [
+                            "System.OutOfMemoryException"
+                        ]
                     }
+                },
+                "sendCrcidWithSentry": {
+                    "state": "enabled"
                 }
             }
         },
@@ -5014,7 +5190,7 @@
             "exceptions": [],
             "features": {
                 "canShowNativeCrashReportingDialog": {
-                    "state": "enabled",
+                    "state": "internal",
                     "rollout": {
                         "steps": [
                             {
@@ -5335,8 +5511,167 @@
             }
         },
         "eventHub": {
-            "state": "internal",
-            "minSupportedVersion": "0.162.0"
+            "state": "enabled",
+            "minSupportedVersion": "0.163.0",
+            "settings": {
+                "telemetry": {
+                    "webTelemetry_youtube_adBlocker_day": {
+                        "state": "enabled",
+                        "trigger": {
+                            "period": {
+                                "days": 1
+                            }
+                        },
+                        "parameters": {
+                            "count": {
+                                "template": "counter",
+                                "source": "youtube_adBlocker",
+                                "buckets": {
+                                    "0": { "gte": 0, "lt": 1 },
+                                    "1+": { "gte": 1 }
+                                }
+                            },
+                            "loginState": {
+                                "template": "data",
+                                "source": "youtube_adBlocker",
+                                "dataKey": "loginState"
+                            }
+                        }
+                    },
+                    "webTelemetry_youtube_playabilityError_day": {
+                        "state": "enabled",
+                        "trigger": {
+                            "period": {
+                                "days": 1
+                            }
+                        },
+                        "parameters": {
+                            "count": {
+                                "template": "counter",
+                                "source": "youtube_playabilityError",
+                                "buckets": {
+                                    "0": { "gte": 0, "lt": 1 },
+                                    "1+": { "gte": 1 }
+                                }
+                            },
+                            "loginState": {
+                                "template": "data",
+                                "source": "youtube_playabilityError",
+                                "dataKey": "loginState"
+                            }
+                        }
+                    },
+                    "webTelemetry_youtube_videoAd_day": {
+                        "state": "enabled",
+                        "trigger": {
+                            "period": {
+                                "days": 1
+                            }
+                        },
+                        "parameters": {
+                            "count": {
+                                "template": "counter",
+                                "source": "youtube_videoAd",
+                                "buckets": {
+                                    "0": { "gte": 0, "lt": 1 },
+                                    "1+": { "gte": 1 }
+                                }
+                            },
+                            "loginState": {
+                                "template": "data",
+                                "source": "youtube_videoAd",
+                                "dataKey": "loginState"
+                            }
+                        }
+                    },
+                    "webTelemetry_youtube_staticAd_day": {
+                        "state": "enabled",
+                        "trigger": {
+                            "period": {
+                                "days": 1
+                            }
+                        },
+                        "parameters": {
+                            "count": {
+                                "template": "counter",
+                                "source": "youtube_staticAd",
+                                "buckets": {
+                                    "0": { "gte": 0, "lt": 1 },
+                                    "1+": { "gte": 1 }
+                                }
+                            },
+                            "loginState": {
+                                "template": "data",
+                                "source": "youtube_staticAd",
+                                "dataKey": "loginState"
+                            }
+                        }
+                    },
+                    "webTelemetry_youtube_buffering_day": {
+                        "state": "enabled",
+                        "trigger": {
+                            "period": {
+                                "days": 1
+                            }
+                        },
+                        "parameters": {
+                            "count": {
+                                "template": "counter",
+                                "source": "youtube_buffering",
+                                "buckets": {
+                                    "0": { "gte": 0, "lt": 1 },
+                                    "1+": { "gte": 1 }
+                                }
+                            },
+                            "loginState": {
+                                "template": "data",
+                                "source": "youtube_buffering",
+                                "dataKey": "loginState"
+                            }
+                        }
+                    },
+                    "webTelemetry_captcha_recaptcha": {
+                        "state": "enabled",
+                        "trigger": {
+                            "type": "immediate",
+                            "source": "captcha_recaptcha"
+                        },
+                        "parameters": {}
+                    },
+                    "webTelemetry_captcha_hcaptcha": {
+                        "state": "enabled",
+                        "trigger": {
+                            "type": "immediate",
+                            "source": "captcha_hcaptcha"
+                        },
+                        "parameters": {}
+                    },
+                    "webTelemetry_captcha_turnstile": {
+                        "state": "enabled",
+                        "trigger": {
+                            "type": "immediate",
+                            "source": "captcha_turnstile"
+                        },
+                        "parameters": {}
+                    },
+                    "webTelemetry_captcha_cloudflare": {
+                        "state": "enabled",
+                        "trigger": {
+                            "type": "immediate",
+                            "source": "captcha_cloudflare"
+                        },
+                        "parameters": {}
+                    },
+                    "webTelemetry_captcha_other": {
+                        "state": "enabled",
+                        "trigger": {
+                            "type": "immediate",
+                            "source": "captcha_other"
+                        },
+                        "parameters": {}
+                    }
+                }
+            }
         },
         "webDetection": {
             "state": "enabled",
@@ -5601,6 +5936,20 @@
             "features": {
                 "instantSuggestions": {
                     "state": "disabled"
+                },
+                "addressBarOverlay": {
+                    "minSupportedVersion": "0.164.0",
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 20
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
                 }
             }
         },
@@ -5686,13 +6035,17 @@
             "exceptions": []
         },
         "websitePermissions": {
-            "state": "disabled",
+            "state": "internal",
             "exceptions": [],
             "features": {
                 "websitePermissionsV2": {
-                    "state": "disabled"
+                    "state": "internal"
                 }
             }
+        },
+        "ntpSearchSuggestionsDeletion": {
+            "state": "internal",
+            "exceptions": []
         }
     },
     "unprotectedTemporary": []
