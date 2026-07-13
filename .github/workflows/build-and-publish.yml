@@ -90,6 +90,7 @@ jobs:
     notify-apple:
         needs: publish
         if: needs.publish.outputs.changed-configs != '[]'
+        continue-on-error: true
         runs-on: ubuntu-latest
         strategy:
             fail-fast: false
