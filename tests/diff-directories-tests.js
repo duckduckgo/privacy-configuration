@@ -3,7 +3,7 @@ import os from 'os';
 import path from 'path';
 import { expect } from 'chai';
 import { CURRENT_CONFIG_VERSION } from '../constants.js';
-import { detectChangedConfigs } from '../.github/scripts/detect-changed-configs.js';
+import { detectChangedConfigs } from '../.github/scripts/diff-directories.js';
 
 const versionDir = `v${CURRENT_CONFIG_VERSION}`;
 
@@ -56,29 +56,13 @@ describe('detect-changed-configs', () => {
         ]);
     });
 
-    it('limits detection to requested platform configs', () => {
-        writeConfig(baseDir, 'ios-config.json', { version: 1, features: {} });
-        writeConfig(headDir, 'ios-config.json', { version: 2, features: {} });
-        writeConfig(headDir, 'windows-config.json', { version: 2, features: { example: { state: 'enabled' } } });
-
-        expect(
-            detectChangedConfigs(baseDir, headDir, [
-                'ios-config.json',
-            ]),
-        ).to.deep.equal([]);
-    });
-
     it('reports a newly deployed config', () => {
         writeConfig(headDir, 'macos-config.json', {
             version: 2,
             features: { example: { state: 'enabled', hash: 'head-hash' } },
         });
 
-        expect(
-            detectChangedConfigs(baseDir, headDir, [
-                'macos-config.json',
-            ]),
-        ).to.deep.equal([
+        expect(detectChangedConfigs(baseDir, headDir)).to.deep.equal([
             'macos-config.json',
         ]);
     });

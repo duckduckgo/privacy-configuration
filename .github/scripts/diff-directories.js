@@ -1,7 +1,35 @@
 import fs from 'fs';
+import path from 'path';
 import * as diff from 'diff';
+import { pathToFileURL } from 'url';
 import { CURRENT_CONFIG_VERSION } from '../../constants.js';
 import { readFilesRecursively, mungeFileContents } from '../../automation-utils.js';
+
+const versionDir = `v${CURRENT_CONFIG_VERSION}`;
+
+function mungedConfig(generatedDir, filename) {
+    const filePath = path.join(generatedDir, versionDir, filename);
+    if (!fs.existsSync(filePath)) {
+        return null;
+    }
+    return mungeFileContents(fs.readFileSync(filePath, 'utf-8'), filePath);
+}
+
+function compiledConfigFilenames(generatedDir) {
+    const directory = path.join(generatedDir, versionDir);
+    return fs.existsSync(directory) ? fs.readdirSync(directory).filter((filename) => filename.endsWith('-config.json')) : [];
+}
+
+export function detectChangedConfigs(baseDir, headDir) {
+    const compiledConfigs = [
+        ...new Set([
+            ...compiledConfigFilenames(baseDir),
+            ...compiledConfigFilenames(headDir),
+        ]),
+    ].sort();
+
+    return compiledConfigs.filter((filename) => mungedConfig(baseDir, filename) !== mungedConfig(headDir, filename));
+}
 
 function displayDiffs(dir1Files, dir2Files, isOpen) {
     const rollupGrouping = {};
@@ -122,46 +150,60 @@ ${text}
 </details>`;
 }
 
-if (process.argv.length !== 4) {
-    console.error('Usage: node diff_directories.js <directory1> <directory2>');
-    process.exit(1);
-}
+function displayDirectoryDiffs(dir1, dir2) {
+    const sections = {
+        legacy: {},
+        latest: {},
+    };
 
-const dir1 = process.argv[2];
-const dir2 = process.argv[3];
-
-const sections = {
-    legacy: {},
-    latest: {},
-};
-function sortFiles(dirFiles, dirName) {
-    for (const [
-        filePath,
-        fileContent,
-    ] of Object.entries(dirFiles)) {
-        if (filePath.startsWith(`v${CURRENT_CONFIG_VERSION}`)) {
-            sections.latest[dirName] = sections.latest[dirName] || {};
-            sections.latest[dirName][filePath] = fileContent;
-        } else {
-            sections.legacy[dirName] = sections.legacy[dirName] || {};
-            sections.legacy[dirName][filePath] = fileContent;
+    function sortFiles(dirFiles, dirName) {
+        for (const [
+            filePath,
+            fileContent,
+        ] of Object.entries(dirFiles)) {
+            if (filePath.startsWith(`v${CURRENT_CONFIG_VERSION}`)) {
+                sections.latest[dirName] = sections.latest[dirName] || {};
+                sections.latest[dirName][filePath] = fileContent;
+            } else {
+                sections.legacy[dirName] = sections.legacy[dirName] || {};
+                sections.legacy[dirName][filePath] = fileContent;
+            }
         }
+    }
+
+    if (!fs.existsSync(`${dir1}/v${CURRENT_CONFIG_VERSION}`)) {
+        console.log(`New config version: v${CURRENT_CONFIG_VERSION}`);
+        return;
+    }
+
+    sortFiles(readFilesRecursively(dir1), 'dir1');
+    sortFiles(readFilesRecursively(dir2), 'dir2');
+
+    for (const [
+        section,
+        files,
+    ] of Object.entries(sections)) {
+        const isOpen = section === 'latest';
+        const fileOut = displayDiffs(files.dir1 || {}, files.dir2 || {}, isOpen);
+        console.log(renderDetails(section, fileOut, isOpen));
     }
 }
 
-if (!fs.existsSync(`${dir1}/v${CURRENT_CONFIG_VERSION}`)) {
-    console.log(`New config version: v${CURRENT_CONFIG_VERSION}`);
-    process.exit(0);
-}
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+    const [
+        dir1,
+        dir2,
+        outputMode,
+    ] = process.argv.slice(2);
 
-sortFiles(readFilesRecursively(dir1), 'dir1');
-sortFiles(readFilesRecursively(dir2), 'dir2');
+    if (!dir1 || !dir2 || (outputMode && outputMode !== '--changed-configs')) {
+        console.error('Usage: node diff-directories.js <directory1> <directory2> [--changed-configs]');
+        process.exit(1);
+    }
 
-for (const [
-    section,
-    files,
-] of Object.entries(sections)) {
-    const isOpen = section === 'latest';
-    const fileOut = displayDiffs(files.dir1 || {}, files.dir2 || {}, isOpen);
-    console.log(renderDetails(section, fileOut, isOpen));
+    if (outputMode === '--changed-configs') {
+        process.stdout.write(JSON.stringify(detectChangedConfigs(dir1, dir2)));
+    } else {
+        displayDirectoryDiffs(dir1, dir2);
+    }
 }
