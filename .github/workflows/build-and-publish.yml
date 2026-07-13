@@ -23,12 +23,16 @@ jobs:
             - uses: actions/checkout@main
             - name: Install dependencies
               run: npm ci
-            - name: Snapshot currently deployed Apple configs
+            - uses: ./
+            - name: Run tests
+              run: npm run test
+            - name: Snapshot currently deployed configs
               run: |
                   CONFIG_VERSION=$(node --input-type=module -e "const { CURRENT_CONFIG_VERSION } = await import('./constants.js'); console.log(CURRENT_CONFIG_VERSION);")
                   mkdir -p "previous-generated/v${CONFIG_VERSION}"
 
-                  for CONFIG in ios-config.json macos-config.json; do
+                  while IFS= read -r GENERATED_CONFIG; do
+                    CONFIG=$(basename "$GENERATED_CONFIG")
                     URL="https://staticcdn.duckduckgo.com/trackerblocking/config/v${CONFIG_VERSION}/${CONFIG}"
                     OUTPUT="previous-generated/v${CONFIG_VERSION}/${CONFIG}"
                     HTTP_STATUS=$(curl --silent --show-error --location --retry 3 --output "$OUTPUT" --write-out '%{http_code}' "$URL")
@@ -45,15 +49,12 @@ jobs:
                         exit 1
                         ;;
                     esac
-                  done
-            - uses: ./
-            - name: Run tests
-              run: npm run test
-            - name: Detect changed deployed Apple configs
+                  done < <(find "generated/v${CONFIG_VERSION}" -maxdepth 1 -type f -name '*-config.json' -print | sort)
+            - name: Detect changed deployed configs
               id: detect-changed-configs
               run: |
-                  CHANGED=$(node .github/scripts/detect-changed-configs.js previous-generated generated ios-config.json macos-config.json)
-                  echo "Changed Apple configs: $CHANGED"
+                  CHANGED=$(node .github/scripts/detect-changed-configs.js previous-generated generated)
+                  echo "Changed configs: $CHANGED"
                   echo "changed=$CHANGED" >> "$GITHUB_OUTPUT"
             - uses: jakejarvis/s3-sync-action@7ed8b112447abb09f1da74f3466e4194fc7a6311
               with:
@@ -89,7 +90,7 @@ jobs:
 
     notify-apple:
         needs: publish
-        if: needs.publish.outputs.changed-configs != '[]'
+        if: contains(fromJSON(needs.publish.outputs.changed-configs), 'ios-config.json') || contains(fromJSON(needs.publish.outputs.changed-configs), 'macos-config.json')
         continue-on-error: true
         runs-on: ubuntu-latest
         strategy:
