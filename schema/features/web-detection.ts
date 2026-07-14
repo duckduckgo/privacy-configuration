@@ -42,7 +42,9 @@ export type ConditionTypes = {
     };
     element: {
         selector: MaybeArray<string>;
-        visibility?: 'visible' | 'hidden' | 'any';
+        // 'content' is a layout-free content-presence proxy (no getComputedStyle/
+        // getBoundingClientRect); avoids the forced layout that 'visible'/'hidden' incur.
+        visibility?: 'visible' | 'hidden' | 'any' | 'content';
     };
 };
 
