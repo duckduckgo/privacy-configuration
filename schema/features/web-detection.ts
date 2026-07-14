@@ -42,7 +42,7 @@ export type ConditionTypes = {
     };
     element: {
         selector: MaybeArray<string>;
-        visibility?: 'visible' | 'hidden' | 'any';
+        visibility?: 'visible' | 'hidden' | 'any' | 'content';
     };
 };
 
