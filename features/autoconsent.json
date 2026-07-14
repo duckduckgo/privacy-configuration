@@ -2422,7 +2422,9 @@
                 "#voyager-gdpr-2025 button:last-of-type",
                 "body > div#wrapper > div:nth-child(4):not([id]) > button:nth-child(3):not([id])",
                 "body > div#frame-modals > div:not([id]) > div:nth-child(2):not([id]) > div:not([id]) > div:not([id]) > div:nth-child(2):not([id]) > div:nth-child(2):not([id]) > button:nth-child(1):not([id])",
-                "[data-testid=\"cookies_reject\"]"
+                "[data-testid=\"cookies_reject\"]",
+                "adc-cookie-banner",
+                "cookie_banner=closed"
             ],
             "r": [
                 [
@@ -11020,6 +11022,46 @@
                         }
                     ],
                     [],
+                    {}
+                ],
+                [
+                    1,
+                    "aa-cookie-banner",
+                    2,
+                    "^https://(www\\.)?(aa|envoyair|psaairlines)\\.com/",
+                    22,
+                    [
+                        1521
+                    ],
+                    [
+                        {
+                            "exists": [
+                                "adc-cookie-banner",
+                                "#cookie-banner"
+                            ]
+                        }
+                    ],
+                    [
+                        {
+                            "visible": [
+                                "adc-cookie-banner",
+                                "#cookie-banner"
+                            ]
+                        }
+                    ],
+                    [
+                        {
+                            "waitForThenClick": [
+                                "adc-cookie-banner",
+                                "#toast-dismiss-button"
+                            ]
+                        }
+                    ],
+                    [
+                        {
+                            "cc": 1522
+                        }
+                    ],
                     {}
                 ],
                 [
@@ -29359,7 +29401,7 @@
                 ],
                 "specificRuleRange": [
                     194,
-                    777
+                    778
                 ],
                 "genericStringEnd": 771,
                 "frameStringEnd": 806
