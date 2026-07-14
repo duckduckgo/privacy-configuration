@@ -42,12 +42,6 @@ export type ConditionTypes = {
     };
     element: {
         selector: MaybeArray<string>;
-        // How a matched element must present to count as a match:
-        // - 'visible': rendered and visible (uses getComputedStyle/getBoundingClientRect).
-        // - 'hidden':  present but not visible (also layout-reading).
-        // - 'any':     exists in the DOM, visibility ignored (default).
-        // - 'content': layout-free content-presence proxy - avoids the forced layout that
-        //   'visible'/'hidden' incur (which can perturb anti-bot challenge pages).
         visibility?: 'visible' | 'hidden' | 'any' | 'content';
     };
 };
