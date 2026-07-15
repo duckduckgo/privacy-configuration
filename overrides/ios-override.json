@@ -1010,6 +1010,26 @@
                         "conditionalChanges": [
                             {
                                 "condition": [
+                                    { "domain": "blindbarber.com" }
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formBoundarySelector",
+                                        "op": "replace",
+                                        "value": "app-createcardtoken form"
+                                    },
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "app-createcardtoken form",
+                                            "type": "cc"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "condition": [
                                     { "domain": "wealthr.co.uk" }
                                 ],
                                 "patchSettings": [
