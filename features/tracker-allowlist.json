@@ -5,6 +5,36 @@
     "state": "enabled",
     "settings": {
         "allowlistedTrackers": {
+            "ay.delivery": {
+                "rules": [
+                    {
+                        "rule": "ay.delivery",
+                        "domains": [
+                            "keviniscooking.com",
+                            "maesmenu.com"
+                        ],
+                        "reason": [
+                            "keviniscooking.com - Raptive/AdThrive video player renders a permanent blank frame when its preroll ad pipeline is blocked (no ad = no timeout fallback). (Raptive Prebid Server pbs-raptive-us.ay.delivery)",
+                            "maesmenu.com - Raptive/AdThrive video player renders a permanent blank frame when its preroll ad pipeline is blocked (no ad = no timeout fallback). (Raptive Prebid Server pbs-raptive-us.ay.delivery)"
+                        ]
+                    }
+                ]
+            },
+            "raptivecdn.com": {
+                "rules": [
+                    {
+                        "rule": "raptivecdn.com",
+                        "domains": [
+                            "keviniscooking.com",
+                            "maesmenu.com"
+                        ],
+                        "reason": [
+                            "keviniscooking.com - Raptive/AdThrive video player renders a permanent blank frame when its preroll ad pipeline is blocked (no ad = no timeout fallback). (Raptive CDN bd.raptivecdn.com bidding/config)",
+                            "maesmenu.com - Raptive/AdThrive video player renders a permanent blank frame when its preroll ad pipeline is blocked (no ad = no timeout fallback). (Raptive CDN bd.raptivecdn.com bidding/config)"
+                        ]
+                    }
+                ]
+            },
             "third-party.site": {
                 "rules": [
                     {
@@ -21,16 +51,39 @@
                     {
                         "rule": "gcdn.2mdn.net/videoplayback/id/",
                         "domains": [
-                            "crunchyroll.com"
+                            "crunchyroll.com",
+                            "keviniscooking.com",
+                            "maesmenu.com"
                         ],
-                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3334"
+                        "reason": [
+                            "https://github.com/duckduckgo/privacy-configuration/pull/3334",
+                            "keviniscooking.com - Raptive/AdThrive video player renders a permanent blank frame when its preroll ad pipeline is blocked (no ad = no timeout fallback).",
+                            "maesmenu.com - Raptive/AdThrive video player renders a permanent blank frame when its preroll ad pipeline is blocked (no ad = no timeout fallback)."
+                        ]
                     },
                     {
                         "rule": "s0.2mdn.net/instream/video/client.js",
                         "domains": [
-                            "crunchyroll.com"
+                            "crunchyroll.com",
+                            "keviniscooking.com",
+                            "maesmenu.com"
                         ],
-                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3334"
+                        "reason": [
+                            "https://github.com/duckduckgo/privacy-configuration/pull/3334",
+                            "keviniscooking.com - Raptive/AdThrive video player renders a permanent blank frame when its preroll ad pipeline is blocked (no ad = no timeout fallback).",
+                            "maesmenu.com - Raptive/AdThrive video player renders a permanent blank frame when its preroll ad pipeline is blocked (no ad = no timeout fallback)."
+                        ]
+                    },
+                    {
+                        "rule": "2mdn.net",
+                        "domains": [
+                            "keviniscooking.com",
+                            "maesmenu.com"
+                        ],
+                        "reason": [
+                            "keviniscooking.com - Raptive/AdThrive video player renders a permanent blank frame when its preroll ad pipeline is blocked (no ad = no timeout fallback).",
+                            "maesmenu.com - Raptive/AdThrive video player renders a permanent blank frame when its preroll ad pipeline is blocked (no ad = no timeout fallback)."
+                        ]
                     }
                 ]
             },
@@ -212,11 +265,15 @@
                             "adamtheautomator.com",
                             "packhacker.com",
                             "cookingclassy.com",
-                            "modernhoney.com"
+                            "modernhoney.com",
+                            "keviniscooking.com",
+                            "maesmenu.com"
                         ],
                         "reason": [
                             "biancazapatka.com - https://github.com/duckduckgo/privacy-configuration/pull/4995",
-                            "gardeningknowhow.com, adamtheautomator.com, packhacker.com, cookingclassy.com, modernhoney.com - domain propagation from adthrive.com rule"
+                            "gardeningknowhow.com, adamtheautomator.com, packhacker.com, cookingclassy.com, modernhoney.com - domain propagation from adthrive.com rule",
+                            "keviniscooking.com - Raptive/AdThrive video player renders a permanent blank frame when its preroll ad pipeline is blocked (no ad = no timeout fallback).",
+                            "maesmenu.com - Raptive/AdThrive video player renders a permanent blank frame when its preroll ad pipeline is blocked (no ad = no timeout fallback)."
                         ]
                     },
                     {
@@ -226,12 +283,16 @@
                             "adamtheautomator.com",
                             "packhacker.com",
                             "cookingclassy.com",
-                            "modernhoney.com"
+                            "modernhoney.com",
+                            "keviniscooking.com",
+                            "maesmenu.com"
                         ],
                         "reason": [
                             "gardeningknowhow.com, adamtheautomator.com, packhacker.com - https://github.com/duckduckgo/privacy-configuration/issues/1122",
                             "cookingclassy.com - https://github.com/duckduckgo/privacy-configuration/pull/3325",
-                            "modernhoney.com - https://github.com/duckduckgo/privacy-configuration/pull/4111"
+                            "modernhoney.com - https://github.com/duckduckgo/privacy-configuration/pull/4111",
+                            "keviniscooking.com - Raptive/AdThrive video player renders a permanent blank frame when its preroll ad pipeline is blocked (no ad = no timeout fallback).",
+                            "maesmenu.com - Raptive/AdThrive video player renders a permanent blank frame when its preroll ad pipeline is blocked (no ad = no timeout fallback)."
                         ]
                     }
                 ]
@@ -1074,13 +1135,17 @@
                             "10play.com.au",
                             "rocketnews24.com",
                             "wunderground.com",
-                            "vidbox.dev"
+                            "vidbox.dev",
+                            "keviniscooking.com",
+                            "maesmenu.com"
                         ],
                         "reason": [
                             "history.com, 10play.com.au - https://github.com/duckduckgo/privacy-configuration/issues/1185",
                             "rocketnews24.com - https://github.com/duckduckgo/privacy-configuration/issues/846",
                             "wunderground.com - https://github.com/duckduckgo/privacy-configuration/pull/3096",
-                            "vidbox.dev - domain propagation from doubleclick.net catch-all"
+                            "vidbox.dev - domain propagation from doubleclick.net catch-all",
+                            "keviniscooking.com - Raptive/AdThrive video player renders a permanent blank frame when its preroll ad pipeline is blocked (no ad = no timeout fallback).",
+                            "maesmenu.com - Raptive/AdThrive video player renders a permanent blank frame when its preroll ad pipeline is blocked (no ad = no timeout fallback)."
                         ]
                     },
                     {
@@ -1090,13 +1155,17 @@
                             "paramountplus.com",
                             "rocketnews24.com",
                             "wunderground.com",
-                            "vidbox.dev"
+                            "vidbox.dev",
+                            "keviniscooking.com",
+                            "maesmenu.com"
                         ],
                         "reason": [
                             "cbs.com, paramountplus.com - https://github.com/duckduckgo/privacy-configuration/pull/2410",
                             "rocketnews24.com - https://github.com/duckduckgo/privacy-configuration/issues/846",
                             "wunderground.com - https://github.com/duckduckgo/privacy-configuration/pull/3096",
-                            "vidbox.dev - domain propagation from doubleclick.net catch-all"
+                            "vidbox.dev - domain propagation from doubleclick.net catch-all",
+                            "keviniscooking.com - Raptive/AdThrive video player renders a permanent blank frame when its preroll ad pipeline is blocked (no ad = no timeout fallback).",
+                            "maesmenu.com - Raptive/AdThrive video player renders a permanent blank frame when its preroll ad pipeline is blocked (no ad = no timeout fallback)."
                         ]
                     },
                     {
@@ -1109,7 +1178,9 @@
                             "wunderground.com",
                             "modernhoney.com",
                             "vidbox.dev",
-                            "nypost.com"
+                            "nypost.com",
+                            "keviniscooking.com",
+                            "maesmenu.com"
                         ],
                         "reason": [
                             "ah.nl - 'Bonus offer' elements do not render and are not clickable.",
@@ -1119,7 +1190,9 @@
                             "wunderground.com - https://github.com/duckduckgo/privacy-configuration/issues/2885",
                             "modernhoney.com - https://github.com/duckduckgo/privacy-configuration/pull/4111",
                             "vidbox.dev - domain propagation from doubleclick.net catch-all",
-                            "nypost.com - Anti-adblock wall blocks the article and prevents page interaction. https://github.com/duckduckgo/privacy-configuration/pull/5575"
+                            "nypost.com - Anti-adblock wall blocks the article and prevents page interaction. https://github.com/duckduckgo/privacy-configuration/pull/5575",
+                            "keviniscooking.com - Raptive/AdThrive video player renders a permanent blank frame when its preroll ad pipeline is blocked (no ad = no timeout fallback).",
+                            "maesmenu.com - Raptive/AdThrive video player renders a permanent blank frame when its preroll ad pipeline is blocked (no ad = no timeout fallback)."
                         ]
                     },
                     {
@@ -1132,7 +1205,9 @@
                             "pch.com",
                             "iheart.com",
                             "wunderground.com",
-                            "vidbox.dev"
+                            "vidbox.dev",
+                            "keviniscooking.com",
+                            "maesmenu.com"
                         ],
                         "reason": [
                             "https://github.com/duckduckgo/privacy-configuration/issues/1185",
@@ -1141,7 +1216,9 @@
                             "pch.com - https://github.com/duckduckgo/privacy-configuration/pull/2793",
                             "iheart.com - https://github.com/duckduckgo/privacy-configuration/pull/3040",
                             "wunderground.com - https://github.com/duckduckgo/privacy-configuration/pull/3096",
-                            "vidbox.dev - domain propagation from doubleclick.net catch-all"
+                            "vidbox.dev - domain propagation from doubleclick.net catch-all",
+                            "keviniscooking.com - Raptive/AdThrive video player renders a permanent blank frame when its preroll ad pipeline is blocked (no ad = no timeout fallback).",
+                            "maesmenu.com - Raptive/AdThrive video player renders a permanent blank frame when its preroll ad pipeline is blocked (no ad = no timeout fallback)."
                         ]
                     },
                     {
@@ -1151,14 +1228,18 @@
                             "paramountplus.com",
                             "rocketnews24.com",
                             "wunderground.com",
-                            "vidbox.dev"
+                            "vidbox.dev",
+                            "keviniscooking.com",
+                            "maesmenu.com"
                         ],
                         "reason": [
                             "cc.com - https://github.com/duckduckgo/privacy-configuration/pull/3508",
                             "paramount - https://github.com/duckduckgo/privacy-configuration/pull/3534",
                             "rocketnews24.com - https://github.com/duckduckgo/privacy-configuration/issues/846",
                             "wunderground.com - https://github.com/duckduckgo/privacy-configuration/pull/3096",
-                            "vidbox.dev - domain propagation from doubleclick.net catch-all"
+                            "vidbox.dev - domain propagation from doubleclick.net catch-all",
+                            "keviniscooking.com - Raptive/AdThrive video player renders a permanent blank frame when its preroll ad pipeline is blocked (no ad = no timeout fallback).",
+                            "maesmenu.com - Raptive/AdThrive video player renders a permanent blank frame when its preroll ad pipeline is blocked (no ad = no timeout fallback)."
                         ]
                     },
                     {
@@ -1168,14 +1249,18 @@
                             "rocketnews24.com",
                             "wbay.com",
                             "wunderground.com",
-                            "vidbox.dev"
+                            "vidbox.dev",
+                            "keviniscooking.com",
+                            "maesmenu.com"
                         ],
                         "reason": [
                             "cbssports.com - Live videos do not load or render.",
                             "rocketnews24.com - https://github.com/duckduckgo/privacy-configuration/issues/846",
                             "wbay.com - Live video stream fails to load.",
                             "wunderground.com - https://github.com/duckduckgo/privacy-configuration/pull/3096",
-                            "vidbox.dev - domain propagation from doubleclick.net catch-all"
+                            "vidbox.dev - domain propagation from doubleclick.net catch-all",
+                            "keviniscooking.com - Raptive/AdThrive video player renders a permanent blank frame when its preroll ad pipeline is blocked (no ad = no timeout fallback).",
+                            "maesmenu.com - Raptive/AdThrive video player renders a permanent blank frame when its preroll ad pipeline is blocked (no ad = no timeout fallback)."
                         ]
                     },
                     {
@@ -1184,13 +1269,17 @@
                             "foxweather.com",
                             "rocketnews24.com",
                             "wunderground.com",
-                            "vidbox.dev"
+                            "vidbox.dev",
+                            "keviniscooking.com",
+                            "maesmenu.com"
                         ],
                         "reason": [
                             "foxweather.com - https://github.com/duckduckgo/privacy-configuration/issues/1541",
                             "rocketnews24.com - https://github.com/duckduckgo/privacy-configuration/issues/846",
                             "wunderground.com - https://github.com/duckduckgo/privacy-configuration/pull/3096",
-                            "vidbox.dev - domain propagation from doubleclick.net catch-all"
+                            "vidbox.dev - domain propagation from doubleclick.net catch-all",
+                            "keviniscooking.com - Raptive/AdThrive video player renders a permanent blank frame when its preroll ad pipeline is blocked (no ad = no timeout fallback).",
+                            "maesmenu.com - Raptive/AdThrive video player renders a permanent blank frame when its preroll ad pipeline is blocked (no ad = no timeout fallback)."
                         ]
                     },
                     {
@@ -1364,7 +1453,9 @@
                             "vidbox.dev",
                             "olx.ba",
                             "ign.com",
-                            "nypost.com"
+                            "nypost.com",
+                            "keviniscooking.com",
+                            "maesmenu.com"
                         ],
                         "reason": [
                             "ah.nl - 'Bonus offer' elements do not render and are not clickable.",
@@ -1395,7 +1486,9 @@
                             "parade.com - https://github.com/duckduckgo/privacy-configuration/pull/5117",
                             "olx.ba - https://github.com/duckduckgo/privacy-configuration/pull/5185",
                             "ign.com - https://github.com/duckduckgo/privacy-configuration/pull/5330",
-                            "nypost.com - Anti-adblock wall blocks the article and prevents page interaction. https://github.com/duckduckgo/privacy-configuration/pull/5575"
+                            "nypost.com - Anti-adblock wall blocks the article and prevents page interaction. https://github.com/duckduckgo/privacy-configuration/pull/5575",
+                            "keviniscooking.com - Raptive/AdThrive video player renders a permanent blank frame when its preroll ad pipeline is blocked (no ad = no timeout fallback).",
+                            "maesmenu.com - Raptive/AdThrive video player renders a permanent blank frame when its preroll ad pipeline is blocked (no ad = no timeout fallback)."
                         ]
                     },
                     {
@@ -1406,7 +1499,9 @@
                             "rocketnews24.com",
                             "vidbox.dev",
                             "ign.com",
-                            "nypost.com"
+                            "nypost.com",
+                            "keviniscooking.com",
+                            "maesmenu.com"
                         ],
                         "reason": [
                             "ah.nl - 'Bonus offer' elements do not render and are not clickable.",
@@ -1414,7 +1509,9 @@
                             "rocketnews24.com - https://github.com/duckduckgo/privacy-configuration/issues/846",
                             "vidbox.dev - domain propagation from doubleclick.net catch-all",
                             "ign.com - https://github.com/duckduckgo/privacy-configuration/pull/5330",
-                            "nypost.com - Anti-adblock wall blocks the article and prevents page interaction. https://github.com/duckduckgo/privacy-configuration/pull/5575"
+                            "nypost.com - Anti-adblock wall blocks the article and prevents page interaction. https://github.com/duckduckgo/privacy-configuration/pull/5575",
+                            "keviniscooking.com - Raptive/AdThrive video player renders a permanent blank frame when its preroll ad pipeline is blocked (no ad = no timeout fallback).",
+                            "maesmenu.com - Raptive/AdThrive video player renders a permanent blank frame when its preroll ad pipeline is blocked (no ad = no timeout fallback)."
                         ]
                     },
                     {
@@ -1425,7 +1522,9 @@
                             "wunderground.com",
                             "repretel.com",
                             "vidbox.dev",
-                            "nypost.com"
+                            "nypost.com",
+                            "keviniscooking.com",
+                            "maesmenu.com"
                         ],
                         "reason": [
                             "https://github.com/duckduckgo/privacy-configuration/issues/415",
@@ -1433,7 +1532,9 @@
                             "wunderground.com - https://github.com/duckduckgo/privacy-configuration/issues/956",
                             "repretel.com - broken videos",
                             "vidbox.dev - domain propagation from doubleclick.net catch-all",
-                            "nypost.com - Anti-adblock wall blocks the article and prevents page interaction. https://github.com/duckduckgo/privacy-configuration/pull/5575"
+                            "nypost.com - Anti-adblock wall blocks the article and prevents page interaction. https://github.com/duckduckgo/privacy-configuration/pull/5575",
+                            "keviniscooking.com - Raptive/AdThrive video player renders a permanent blank frame when its preroll ad pipeline is blocked (no ad = no timeout fallback).",
+                            "maesmenu.com - Raptive/AdThrive video player renders a permanent blank frame when its preroll ad pipeline is blocked (no ad = no timeout fallback)."
                         ]
                     },
                     {
@@ -1443,14 +1544,18 @@
                             "rocketnews24.com",
                             "wunderground.com",
                             "vidbox.dev",
-                            "nypost.com"
+                            "nypost.com",
+                            "keviniscooking.com",
+                            "maesmenu.com"
                         ],
                         "reason": [
                             "sbs.com.au - https://github.com/duckduckgo/privacy-configuration/pull/2436",
                             "rocketnews24.com - https://github.com/duckduckgo/privacy-configuration/issues/846",
                             "wunderground.com - https://github.com/duckduckgo/privacy-configuration/pull/3096",
                             "vidbox.dev - domain propagation from doubleclick.net catch-all",
-                            "nypost.com - Anti-adblock wall blocks the article and prevents page interaction. https://github.com/duckduckgo/privacy-configuration/pull/5575"
+                            "nypost.com - Anti-adblock wall blocks the article and prevents page interaction. https://github.com/duckduckgo/privacy-configuration/pull/5575",
+                            "keviniscooking.com - Raptive/AdThrive video player renders a permanent blank frame when its preroll ad pipeline is blocked (no ad = no timeout fallback).",
+                            "maesmenu.com - Raptive/AdThrive video player renders a permanent blank frame when its preroll ad pipeline is blocked (no ad = no timeout fallback)."
                         ]
                     },
                     {
@@ -1468,7 +1573,9 @@
                             "rocketnews24.com",
                             "nytimes.com",
                             "vidbox.dev",
-                            "nypost.com"
+                            "nypost.com",
+                            "keviniscooking.com",
+                            "maesmenu.com"
                         ],
                         "reason": [
                             "applesfera.com - https://github.com/duckduckgo/privacy-configuration/issues/1723",
@@ -1483,7 +1590,9 @@
                             "rocketnews24.com - https://github.com/duckduckgo/privacy-configuration/issues/846",
                             "nytimes.com - https://github.com/duckduckgo/privacy-configuration/pull/4549",
                             "vidbox.dev - domain propagation from doubleclick.net catch-all",
-                            "nypost.com - Anti-adblock wall blocks the article and prevents page interaction. https://github.com/duckduckgo/privacy-configuration/pull/5575"
+                            "nypost.com - Anti-adblock wall blocks the article and prevents page interaction. https://github.com/duckduckgo/privacy-configuration/pull/5575",
+                            "keviniscooking.com - Raptive/AdThrive video player renders a permanent blank frame when its preroll ad pipeline is blocked (no ad = no timeout fallback).",
+                            "maesmenu.com - Raptive/AdThrive video player renders a permanent blank frame when its preroll ad pipeline is blocked (no ad = no timeout fallback)."
                         ]
                     },
                     {
@@ -1492,13 +1601,17 @@
                             "nypost.com",
                             "rocketnews24.com",
                             "wunderground.com",
-                            "vidbox.dev"
+                            "vidbox.dev",
+                            "keviniscooking.com",
+                            "maesmenu.com"
                         ],
                         "reason": [
                             "nypost.com - Anti-adblock wall blocks the article and prevents page interaction. Requires full securepubads.g.doubleclick.net (GPT ad requests + viewability beacons) for the wall render check to pass. https://github.com/duckduckgo/privacy-configuration/pull/5575",
                             "rocketnews24.com - domain propagation from doubleclick.net catch-all",
                             "wunderground.com - domain propagation from doubleclick.net catch-all",
-                            "vidbox.dev - domain propagation from doubleclick.net catch-all"
+                            "vidbox.dev - domain propagation from doubleclick.net catch-all",
+                            "keviniscooking.com - Raptive/AdThrive video player renders a permanent blank frame when its preroll ad pipeline is blocked (no ad = no timeout fallback).",
+                            "maesmenu.com - Raptive/AdThrive video player renders a permanent blank frame when its preroll ad pipeline is blocked (no ad = no timeout fallback)."
                         ]
                     },
                     {
@@ -1508,14 +1621,18 @@
                             "wunderground.com",
                             "comexlive.org",
                             "3dzip.info",
-                            "vidbox.dev"
+                            "vidbox.dev",
+                            "keviniscooking.com",
+                            "maesmenu.com"
                         ],
                         "reason": [
                             "rocketnews24.com - domain propagation from doubleclick.net catch-all",
                             "wunderground.com - domain propagation from doubleclick.net catch-all",
                             "comexlive.org - https://github.com/duckduckgo/privacy-configuration/pull/4690",
                             "3dzip.info - https://github.com/duckduckgo/privacy-configuration/pull/4733",
-                            "vidbox.dev - domain propagation from doubleclick.net catch-all"
+                            "vidbox.dev - domain propagation from doubleclick.net catch-all",
+                            "keviniscooking.com - Raptive/AdThrive video player renders a permanent blank frame when its preroll ad pipeline is blocked (no ad = no timeout fallback).",
+                            "maesmenu.com - Raptive/AdThrive video player renders a permanent blank frame when its preroll ad pipeline is blocked (no ad = no timeout fallback)."
                         ]
                     },
                     {
@@ -1525,14 +1642,18 @@
                             "rocketnews24.com",
                             "wunderground.com",
                             "business-standard.com",
-                            "vidbox.dev"
+                            "vidbox.dev",
+                            "keviniscooking.com",
+                            "maesmenu.com"
                         ],
                         "reason": [
                             "www.sbs.com.au - https://github.com/duckduckgo/privacy-configuration/issues/1761",
                             "rocketnews24.com - https://github.com/duckduckgo/privacy-configuration/issues/846",
                             "wunderground.com - https://github.com/duckduckgo/privacy-configuration/pull/3096",
                             "business-standard.com - domain propagation from www3.doubleclick.net rule",
-                            "vidbox.dev - domain propagation from doubleclick.net catch-all"
+                            "vidbox.dev - domain propagation from doubleclick.net catch-all",
+                            "keviniscooking.com - Raptive/AdThrive video player renders a permanent blank frame when its preroll ad pipeline is blocked (no ad = no timeout fallback).",
+                            "maesmenu.com - Raptive/AdThrive video player renders a permanent blank frame when its preroll ad pipeline is blocked (no ad = no timeout fallback)."
                         ]
                     },
                     {
@@ -1544,7 +1665,9 @@
                             "community.screwfix.com",
                             "consent-pref.trustarc.com",
                             "adssettings.google.com",
-                            "vidbox.dev"
+                            "vidbox.dev",
+                            "keviniscooking.com",
+                            "maesmenu.com"
                         ],
                         "reason": [
                             "zojirushi.com - https://github.com/duckduckgo/privacy-configuration/issues/2021",
@@ -1553,7 +1676,9 @@
                             "community.screwfix.com - https://github.com/duckduckgo/privacy-configuration/pull/4340",
                             "consent-pref.trustarc.com - https://github.com/duckduckgo/privacy-configuration/pull/4340",
                             "adssettings.google.com - domain propagation from doubleclick.net/ads/preferences/ rule",
-                            "vidbox.dev - domain propagation from doubleclick.net catch-all"
+                            "vidbox.dev - domain propagation from doubleclick.net catch-all",
+                            "keviniscooking.com - Raptive/AdThrive video player renders a permanent blank frame when its preroll ad pipeline is blocked (no ad = no timeout fallback).",
+                            "maesmenu.com - Raptive/AdThrive video player renders a permanent blank frame when its preroll ad pipeline is blocked (no ad = no timeout fallback)."
                         ]
                     },
                     {
@@ -1562,13 +1687,17 @@
                             "rocketnews24.com",
                             "wunderground.com",
                             "business-standard.com",
-                            "vidbox.dev"
+                            "vidbox.dev",
+                            "keviniscooking.com",
+                            "maesmenu.com"
                         ],
                         "reason": [
                             "rocketnews24.com - https://github.com/duckduckgo/privacy-configuration/issues/846",
                             "wunderground.com - https://github.com/duckduckgo/privacy-configuration/pull/3096",
                             "business-standard.com - https://github.com/duckduckgo/privacy-configuration/pull/4740",
-                            "vidbox.dev - domain propagation from doubleclick.net catch-all"
+                            "vidbox.dev - domain propagation from doubleclick.net catch-all",
+                            "keviniscooking.com - Raptive/AdThrive video player renders a permanent blank frame when its preroll ad pipeline is blocked (no ad = no timeout fallback).",
+                            "maesmenu.com - Raptive/AdThrive video player renders a permanent blank frame when its preroll ad pipeline is blocked (no ad = no timeout fallback)."
                         ]
                     },
                     {
@@ -1613,14 +1742,18 @@
                             "kayak.sg",
                             "rocketnews24.com",
                             "wunderground.com",
-                            "vidbox.dev"
+                            "vidbox.dev",
+                            "keviniscooking.com",
+                            "maesmenu.com"
                         ],
                         "reason": [
                             "kayak.com - https://github.com/duckduckgo/privacy-configuration/pull/5525",
                             "kayak national entities - https://github.com/duckduckgo/privacy-configuration/pull/5548",
                             "rocketnews24.com - https://github.com/duckduckgo/privacy-configuration/issues/846",
                             "wunderground.com - https://github.com/duckduckgo/privacy-configuration/pull/3096",
-                            "vidbox.dev - https://github.com/duckduckgo/privacy-configuration/pull/5098"
+                            "vidbox.dev - https://github.com/duckduckgo/privacy-configuration/pull/5098",
+                            "keviniscooking.com - Raptive/AdThrive video player renders a permanent blank frame when its preroll ad pipeline is blocked (no ad = no timeout fallback).",
+                            "maesmenu.com - Raptive/AdThrive video player renders a permanent blank frame when its preroll ad pipeline is blocked (no ad = no timeout fallback)."
                         ]
                     },
                     {
@@ -1637,13 +1770,17 @@
                             "tennis365.com",
                             "cricket365.com",
                             "golf365.com",
-                            "vidbox.dev"
+                            "vidbox.dev",
+                            "keviniscooking.com",
+                            "maesmenu.com"
                         ],
                         "reason": [
                             "rocketnews24.com - domain propagation from doubleclick.net catch-all",
                             "wunderground.com - domain propagation from doubleclick.net catch-all",
                             "teamtalk.com to golf365.com - https://github.com/duckduckgo/privacy-configuration/pull/4971",
-                            "vidbox.dev - domain propagation from doubleclick.net catch-all"
+                            "vidbox.dev - domain propagation from doubleclick.net catch-all",
+                            "keviniscooking.com - Raptive/AdThrive video player renders a permanent blank frame when its preroll ad pipeline is blocked (no ad = no timeout fallback).",
+                            "maesmenu.com - Raptive/AdThrive video player renders a permanent blank frame when its preroll ad pipeline is blocked (no ad = no timeout fallback)."
                         ]
                     },
                     {
@@ -1652,13 +1789,17 @@
                             "adssettings.google.com",
                             "rocketnews24.com",
                             "wunderground.com",
-                            "vidbox.dev"
+                            "vidbox.dev",
+                            "keviniscooking.com",
+                            "maesmenu.com"
                         ],
                         "reason": [
                             "adssettings.google.com - https://github.com/duckduckgo/privacy-configuration/pull/5067",
                             "rocketnews24.com - domain propagation from doubleclick.net catch-all",
                             "wunderground.com - domain propagation from doubleclick.net catch-all",
-                            "vidbox.dev - domain propagation from doubleclick.net catch-all"
+                            "vidbox.dev - domain propagation from doubleclick.net catch-all",
+                            "keviniscooking.com - Raptive/AdThrive video player renders a permanent blank frame when its preroll ad pipeline is blocked (no ad = no timeout fallback).",
+                            "maesmenu.com - Raptive/AdThrive video player renders a permanent blank frame when its preroll ad pipeline is blocked (no ad = no timeout fallback)."
                         ]
                     },
                     {
@@ -1666,12 +1807,16 @@
                         "domains": [
                             "rocketnews24.com",
                             "wunderground.com",
-                            "vidbox.dev"
+                            "vidbox.dev",
+                            "keviniscooking.com",
+                            "maesmenu.com"
                         ],
                         "reason": [
                             "rocketnews24.com - https://github.com/duckduckgo/privacy-configuration/issues/846",
                             "wunderground.com - https://github.com/duckduckgo/privacy-configuration/pull/3096",
-                            "vidbox.dev - https://github.com/duckduckgo/privacy-configuration/pull/5098"
+                            "vidbox.dev - https://github.com/duckduckgo/privacy-configuration/pull/5098",
+                            "keviniscooking.com - Raptive/AdThrive video player renders a permanent blank frame when its preroll ad pipeline is blocked (no ad = no timeout fallback).",
+                            "maesmenu.com - Raptive/AdThrive video player renders a permanent blank frame when its preroll ad pipeline is blocked (no ad = no timeout fallback)."
                         ]
                     }
                 ]
