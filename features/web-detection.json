@@ -118,7 +118,8 @@
                         "element": {
                             "selector": [
                                 ".cf-turnstile:not(#turnstile-wrapper)",
-                                ".cf-turnstile:not(#turnstile-wrapper) iframe"
+                                ".cf-turnstile:not(#turnstile-wrapper) iframe",
+                                "iframe[src*='challenges.cloudflare.com/turnstile']"
                             ],
                             "visibility": "content"
                         }
@@ -175,6 +176,43 @@
                                 }
                             }
                         ]
+                    }
+                },
+                "arkose": {
+                    "match": {
+                        "element": {
+                            "selector": [
+                                "iframe[src*='arkoselabs.com']",
+                                "iframe[src*='funcaptcha.com']",
+                                "#FunCaptcha-Token",
+                                "[data-pkey]"
+                            ],
+                            "visibility": "content"
+                        }
+                    }
+                },
+                "geetest": {
+                    "match": {
+                        "element": {
+                            "selector": [
+                                "iframe[src*='geetest.com']",
+                                ".geetest_box",
+                                ".geetest_captcha",
+                                "[class*='geetest_']"
+                            ],
+                            "visibility": "content"
+                        }
+                    }
+                },
+                "awswaf": {
+                    "match": {
+                        "element": {
+                            "selector": [
+                                "iframe[src*='captcha.awswaf.com']",
+                                "iframe[src*='token.awswaf.com']"
+                            ],
+                            "visibility": "content"
+                        }
                     }
                 },
                 "other": {
@@ -420,6 +458,48 @@
                         "op": "add",
                         "path": "/detectors/captcha/imperva/actions",
                         "value": { "fireEvent": { "state": "enabled", "type": "captcha_imperva" } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/captcha/arkose/triggers",
+                        "value": { "auto": { "state": "enabled", "when": { "intervalMs": [
+                                        2000,
+                                        5000,
+                                        10000
+                                    ] } } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/captcha/arkose/actions",
+                        "value": { "fireEvent": { "state": "enabled", "type": "captcha_arkose" } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/captcha/geetest/triggers",
+                        "value": { "auto": { "state": "enabled", "when": { "intervalMs": [
+                                        2000,
+                                        5000,
+                                        10000
+                                    ] } } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/captcha/geetest/actions",
+                        "value": { "fireEvent": { "state": "enabled", "type": "captcha_geetest" } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/captcha/awswaf/triggers",
+                        "value": { "auto": { "state": "enabled", "when": { "intervalMs": [
+                                        2000,
+                                        5000,
+                                        10000
+                                    ] } } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/captcha/awswaf/actions",
+                        "value": { "fireEvent": { "state": "enabled", "type": "captcha_awswaf" } }
                     },
                     {
                         "op": "add",
