@@ -215,6 +215,34 @@
                         }
                     }
                 },
+                "perimeterx": {
+                    "match": {
+                        "any": [
+                            {
+                                "element": {
+                                    "selector": [
+                                        "#px-captcha",
+                                        "iframe[src*='px-cdn.net']",
+                                        "iframe[src*='px-cloud.net']"
+                                    ],
+                                    "visibility": "content"
+                                }
+                            },
+                            {
+                                "text": {
+                                    "selector": [
+                                        "title",
+                                        "body"
+                                    ],
+                                    "pattern": [
+                                        "Access to this page has been denied",
+                                        "we believe you are using automation tools"
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                },
                 "other": {
                     "match": {
                         "text": {
@@ -500,6 +528,20 @@
                         "op": "add",
                         "path": "/detectors/captcha/awswaf/actions",
                         "value": { "fireEvent": { "state": "enabled", "type": "captcha_awswaf" } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/captcha/perimeterx/triggers",
+                        "value": { "auto": { "state": "enabled", "when": { "intervalMs": [
+                                        2000,
+                                        5000,
+                                        10000
+                                    ] } } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/captcha/perimeterx/actions",
+                        "value": { "fireEvent": { "state": "enabled", "type": "captcha_perimeterx" } }
                     },
                     {
                         "op": "add",
