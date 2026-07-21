@@ -236,6 +236,10 @@
                 "type": "hide"
             },
             {
+                "selector": "#onetap_google_intermediate_iframe",
+                "type": "hide"
+            },
+            {
                 "selector": "[id*='google-one-tap-iframe']",
                 "type": "hide"
             },
@@ -432,7 +436,7 @@
                 "type": "hide-empty"
             },
             {
-                "selector": ".adthrive",
+                "selector": ".adthrive:not([id^=\"cls-video-container\"])",
                 "type": "hide-empty"
             },
             {
@@ -442,6 +446,14 @@
             {
                 "selector": ".adthrive-content",
                 "type": "hide-empty"
+            },
+            {
+                "selector": ".adthrive-auto-injected-player-container",
+                "type": "hide"
+            },
+            {
+                "selector": ".adthrive[id^=\"cls-video-container\"]:has(.adthrive-auto-injected-player-container)",
+                "type": "hide"
             },
             {
                 "selector": ".arc-ad-wrapper",
@@ -3424,15 +3436,6 @@
                     {
                         "selector": ".SetPageTerms-embeddedDesktopAdWrapper",
                         "type": "hide-empty"
-                    }
-                ]
-            },
-            {
-                "domain": "quora.com",
-                "rules": [
-                    {
-                        "selector": "#onetap_google_intermediate_iframe",
-                        "type": "hide"
                     }
                 ]
             },
