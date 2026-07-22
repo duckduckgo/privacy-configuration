@@ -872,6 +872,21 @@
                         "conditionalChanges": [
                             {
                                 "condition": [
+                                    { "domain": "fedex.com" }
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input#password[autocomplete=\"current-password\"]",
+                                            "type": "credentials.password.current"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "condition": [
                                     { "domain": "blindbarber.com" }
                                 ],
                                 "patchSettings": [
