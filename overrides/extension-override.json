@@ -83,6 +83,29 @@
         },
         "fingerprintingHardware": {
             "state": "enabled",
+            "settings": {
+                "hardwareConcurrency": {
+                    "type": "number",
+                    "value": 2
+                },
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "experiment": { "experimentName": "hardwareConcurrencyIncrease", "cohort": "treatment" }
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/hardwareConcurrency",
+                                "value": {
+                                    "type": "number",
+                                    "value": 4
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
             "exceptions": [
                 {
                     "domain": "flysas.com",
@@ -181,6 +204,29 @@
                 "fingerprintingCanvasAdditionalEnabledCheck": {
                     "state": "enabled",
                     "minSupportedVersion": "2025.7.23",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        { "name": "control", "weight": 1 },
+                        { "name": "treatment", "weight": 1 }
+                    ]
+                },
+                "hardwareConcurrencyIncrease": {
+                    "state": "enabled",
                     "rollout": {
                         "steps": [
                             {
