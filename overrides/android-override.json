@@ -2018,6 +2018,18 @@
                                 "value": "disabled"
                             }
                         ]
+                    },
+                    {
+                        "condition": {
+                            "injectName": "android"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/additionalCheck",
+                                "value": "enabled"
+                            }
+                        ]
                     }
                 ]
             }
@@ -3148,7 +3160,8 @@
             "state": "enabled",
             "features": {
                 "useNewWebCompatApis": {
-                    "state": "disabled"
+                    "state": "enabled",
+                    "minSupportedVersion": 52511000
                 }
             },
             "exceptions": []
