@@ -3208,6 +3208,25 @@
                 },
                 "webScrollFreezeObservability": {
                     "state": "disabled"
+                },
+                "searchTokenExperiment": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.230.0",
+                    "settings": {
+                        "tokenTTLSeconds": 300,
+                        "refreshWindowSeconds": 120
+                    },
+                    "description": "NA experiment: search token to speed up SERP by combining Index/Deep responses.",
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
                 }
             }
         },
