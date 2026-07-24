@@ -838,6 +838,50 @@
         "ampLinks": {
             "state": "enabled"
         },
+        "apiManipulation": {
+            "state": "enabled",
+            "exceptions": [],
+            "settings": {
+                "conditionalChanges": [
+                    {
+                        "condition": [
+                            {
+                                "experiment": {
+                                    "experimentName": "appleNullifyMessageHandlersExperiment",
+                                    "cohort": "treatment"
+                                },
+                                "urlPattern": "https://*/*"
+                            },
+                            {
+                                "experiment": {
+                                    "experimentName": "appleNullifyMessageHandlersExperiment",
+                                    "cohort": "treatment"
+                                },
+                                "urlPattern": "http://*/*"
+                            }
+                        ],
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/apiChanges",
+                                "value": {}
+                            },
+                            {
+                                "op": "add",
+                                "path": "/apiChanges/webkit.constructor.prototype.messageHandlers",
+                                "value": {
+                                    "type": "descriptor",
+                                    "getterValue": {
+                                        "type": "undefined"
+                                    },
+                                    "configurable": false
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
         "contentScopeExperiments": {
             "exceptions": [],
             "state": "enabled",
@@ -884,6 +928,27 @@
                             },
                             {
                                 "percent": 100
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "appleNullifyMessageHandlersExperiment": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.224.0",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 1
                             }
                         ]
                     },
