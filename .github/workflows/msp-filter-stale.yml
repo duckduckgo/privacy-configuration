@@ -14,35 +14,56 @@ jobs:
                   repository: duckduckgo/privacy-configuration
                   path: privacy-configuration/
             - name: Execute Update Script
+              id: prep
               run: |
+                  set -euo pipefail
                   cd ./privacy-configuration/
-                  npm i 
+                  npm i
                   npm run build
                   DATE="$(date -u +'%Y-%m-%d')"
-                  echo "DATE=$DATE" >> $GITHUB_ENV
+                  echo "DATE=$DATE" >> "$GITHUB_ENV"
                   TEMPLATE="$(node ./scripts/filter-malicious.js)"
-                  # If TEMPLATE contains 'No updates' then exit with success
-                  if [[ $TEMPLATE == *"No updates"* ]]; then
+                  # No stale exceptions to remove: nothing to do, skip PR creation.
+                  if [[ "$TEMPLATE" == *"No updates"* ]]; then
                     echo "No updates found. Exiting with success."
+                    echo "should_create=false" >> "$GITHUB_OUTPUT"
                     exit 0
-                  fi 
-                  echo "TEMPLATE=$TEMPLATE" >> $GITHUB_ENV
+                  fi
                   PR_BODY="${TEMPLATE//\{\{date\}\}/$DATE}"
                   PR_BODY="${PR_BODY//\\n/$'\n'}" # Replace escaped newlines with actual newlines
                   PR_ID="$(echo "$PR_BODY" | grep 'PR ID: ' | cut -d' ' -f3)"
-                  echo "PR_ID=$PR_ID" >> $GITHUB_ENV
-                  echo "PR_BODY<<EOF" >> $GITHUB_ENV
-                  echo "$PR_BODY" >> $GITHUB_ENV
-                  echo "EOF" >> $GITHUB_ENV
+                  # filter-malicious.js catches its own errors and still exits 0, so a crash
+                  # surfaces as empty/invalid output rather than a non-zero status. A valid run
+                  # always emits a "PR ID:" line; a missing ID means the script failed to produce
+                  # real changes. Fail loudly instead of opening a PR with an unrelated diff.
+                  if [[ -z "$PR_ID" ]]; then
+                    echo "::error::filter-malicious.js produced no PR ID; refusing to open a PR." >&2
+                    exit 1
+                  fi
+                  echo "PR_ID=$PR_ID" >> "$GITHUB_ENV"
+                  {
+                    echo "PR_BODY<<EOF"
+                    echo "$PR_BODY"
+                    echo "EOF"
+                  } >> "$GITHUB_ENV"
                   npm run lint-fix
+                  echo "should_create=true" >> "$GITHUB_OUTPUT"
             - name: Create PR with updated configs
+              if: steps.prep.outputs.should_create == 'true'
               uses: peter-evans/create-pull-request@d8c15c739ffb916295c3e41a2e70c38504c0f6dc
               id: create-pr
               with:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
                   path: privacy-configuration/
+                  # Only commit the files this workflow is meant to change. A broad path such as
+                  # "./" sweeps in unrelated working-tree churn (e.g. package-lock.json metadata
+                  # rewritten by "npm i") under a misleading title.
                   add-paths: |
-                      ./
+                      features/malicious-site-protection.json
+                      overrides/ios-override.json
+                      overrides/macos-override.json
+                      overrides/windows-override.json
+                      overrides/android-override.json
                   commit-message: Remove stale exemptions from malicious site protection
                   assignees: not-a-rootkit
                   branch: remove-stale-exemptions-${{ env.PR_ID }}
