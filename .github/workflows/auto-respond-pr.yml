@@ -15,7 +15,7 @@ name: Auto Respond to PR
 
 on:
     pull_request_review:
-    pull_request_target:
+    pull_request:
         types:
             - opened
             - edited
@@ -29,7 +29,7 @@ jobs:
     # Closes tasks for both merged PRs and abandoned PRs to clean up dead tasks
     # Runs independently of the main workflow
     sync_asana_on_close:
-        if: github.event.action == 'closed' && !github.event.pull_request.head.repo.fork
+        if: github.event.action == 'closed'
         runs-on: ubuntu-latest
         steps:
             - uses: duckduckgo/action-asana-sync@v11
@@ -42,7 +42,7 @@ jobs:
                   ASSIGN_PR_AUTHOR: 'true'
 
     auto_respond:
-        if: github.event.action != 'closed' && !github.event.pull_request.head.repo.fork && github.event.pull_request.user.login != 'dependabot[bot]'
+        if: github.event.action != 'closed' && github.event.pull_request.user.login != 'dependabot[bot]'
         runs-on: ubuntu-latest
         concurrency: auto-respond-${{ github.event.pull_request.number }}
 
