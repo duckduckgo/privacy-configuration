@@ -18,6 +18,7 @@ import { NetworkProtection } from './features/network-protection';
 import { AiChatConfig } from './features/ai-chat';
 import { ScriptletsFeature } from './features/scriptlets';
 import { WindowsWebViewFailures } from './features/windows-webview-failures';
+import { WebViewConfig } from './features/webview';
 import { CustomUserAgentFeature } from './features/custom-user-agent';
 import { BurnFeature } from './features/burn';
 import { ClientBrandHintFeature } from './features/client-brand-hint';
@@ -90,6 +91,7 @@ export type ConfigV5<VersionType> = {
         webDetection?: WebDetectionFeature<VersionType>;
         webEvents?: WebEventsFeature<VersionType>;
         windowsWebviewFailures?: WindowsWebViewFailures<VersionType>;
+        webview?: WebViewConfig<VersionType>;
         customUserAgent?: CustomUserAgentFeature<VersionType>;
         downloadManager?: DownloadManager<VersionType>;
         elementHiding?: ElementHidingFeature<VersionType>;

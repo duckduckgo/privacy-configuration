@@ -38,6 +38,29 @@
         "adBlockingExtension": {
             "exceptions": [],
             "state": "enabled",
+            "features": {
+                "enabledByDefault": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52890000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
+                },
+                "adBlockingUXImprovements": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52890000
+                }
+            },
             "minSupportedVersion": 52840000
         },
         "additionalCampaignPixelParams": {
@@ -271,7 +294,7 @@
                     ]
                 },
                 "tdsNextExperiment012": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": 52361000,
                     "rollout": {
                         "steps": [
@@ -283,6 +306,31 @@
                     "settings": {
                         "controlUrl": "v5/experiments/202606v2-android-tds-control.json",
                         "treatmentUrl": "v5/experiments/202606v2-android-tds-treatment.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "tdsNextExperiment014": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52361000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 50
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "v5/experiments/202607fbctl02-android-tds-control.json",
+                        "treatmentUrl": "v5/experiments/202607fbctl02-android-tds-treatment.json"
                     },
                     "cohorts": [
                         {
@@ -656,6 +704,14 @@
                 "duckAiSettings": {
                     "state": "enabled",
                     "minSupportedVersion": 52870000
+                },
+                "removeChatHistory": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52880000
+                },
+                "nativeInputNavBar": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52890000
                 }
             }
         },
@@ -852,6 +908,41 @@
                         "formBoundarySelector": "",
                         "failsafeSettings": {},
                         "conditionalChanges": [
+                            {
+                                "condition": [
+                                    { "domain": "fedex.com" }
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input#password[autocomplete=\"current-password\"]",
+                                            "type": "credentials.password.current"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "condition": [
+                                    { "domain": "blindbarber.com" }
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formBoundarySelector",
+                                        "op": "replace",
+                                        "value": "app-createcardtoken form"
+                                    },
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "app-createcardtoken form",
+                                            "type": "cc"
+                                        }
+                                    }
+                                ]
+                            },
                             {
                                 "condition": [
                                     { "domain": "wealthr.co.uk" }
@@ -1901,25 +1992,13 @@
                         "defaultIdleThresholdSeconds": "1800"
                     }
                 },
-                "singleTabFireDialog": {
+                "ntpAsDefaultAfterIdleReturn": {
                     "state": "enabled",
-                    "minSupportedVersion": 52742000,
+                    "minSupportedVersion": 52890000,
                     "rollout": {
                         "steps": [
                             {
-                                "percent": 5
-                            },
-                            {
                                 "percent": 10
-                            },
-                            {
-                                "percent": 25
-                            },
-                            {
-                                "percent": 50
-                            },
-                            {
-                                "percent": 100
                             }
                         ]
                     }
@@ -1953,6 +2032,9 @@
                             },
                             {
                                 "percent": 50
+                            },
+                            {
+                                "percent": 100
                             }
                         ]
                     }
@@ -2404,6 +2486,183 @@
                 }
             }
         },
+        "edgeToEdge": {
+            "state": "enabled",
+            "exceptions": [],
+            "features": {
+                "browser": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 50
+                            }
+                        ]
+                    }
+                },
+                "settings": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 50
+                            }
+                        ]
+                    }
+                },
+                "autofill": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 50
+                            }
+                        ]
+                    }
+                },
+                "sync": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 50
+                            }
+                        ]
+                    }
+                },
+                "vpn": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 50
+                            }
+                        ]
+                    }
+                },
+                "webview": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 50
+                            }
+                        ]
+                    }
+                },
+                "onboarding": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 50
+                            }
+                        ]
+                    }
+                },
+                "misc": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 50
+                            }
+                        ]
+                    }
+                },
+                "bottomSheets": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 50
+                            }
+                        ]
+                    }
+                }
+            }
+        },
         "incontextSignup": {
             "exceptions": [],
             "state": "enabled",
@@ -2656,6 +2915,9 @@
                             },
                             {
                                 "percent": 40
+                            },
+                            {
+                                "percent": 75
                             }
                         ]
                     }
@@ -2703,6 +2965,39 @@
                                     "youtube.com"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5389"
+                            }
+                        ]
+                    },
+                    "config-factory.com": {
+                        "rules": [
+                            {
+                                "rule": "config-factory.com",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5644"
+                            }
+                        ]
+                    },
+                    "content-settings.com": {
+                        "rules": [
+                            {
+                                "rule": "content-settings.com",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5644"
+                            }
+                        ]
+                    },
+                    "site-config.com": {
+                        "rules": [
+                            {
+                                "rule": "site-config.com",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5644"
                             }
                         ]
                     }
@@ -4421,10 +4716,6 @@
                 }
             }
         },
-        "webViewClipboardImage": {
-            "state": "enabled",
-            "exceptions": []
-        },
         "webViewCompat": {
             "state": "disabled",
             "exceptions": [],
@@ -4767,14 +5058,28 @@
                     "minSupportedVersion": 52830000,
                     "cohorts": [
                         {
-                            "name": "control",
-                            "weight": 1
-                        },
-                        {
                             "name": "treatment",
                             "weight": 1
                         }
                     ]
+                }
+            }
+        },
+        "fireMode": {
+            "state": "enabled",
+            "minSupportedVersion": 52890000,
+            "exceptions": [],
+            "features": {
+                "fireTabs": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52890000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            }
+                        ]
+                    }
                 }
             }
         }

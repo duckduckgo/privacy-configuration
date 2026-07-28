@@ -229,6 +229,22 @@
                 "riskyDomainsProtection": {
                     "state": "enabled"
                 },
+                "excludeCGNAT": {
+                    "state": "enabled",
+                    "minSupportedVersion": "1.200.0"
+                },
+                "strictRoutingToggle": {
+                    "state": "enabled",
+                    "minSupportedVersion": "1.200.0"
+                },
+                "showCopyDiagnosticsButton": {
+                    "state": "enabled",
+                    "minSupportedVersion": "1.200.0"
+                },
+                "strictRoutingReminder": {
+                    "state": "enabled",
+                    "minSupportedVersion": "1.200.0"
+                },
                 "appStoreSystemExtension": {
                     "state": "enabled"
                 },
@@ -654,7 +670,7 @@
                     ]
                 },
                 "tdsNextExperiment012": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "rollout": {
                         "steps": [
                             {
@@ -665,6 +681,30 @@
                     "settings": {
                         "controlUrl": "v6/experiments/202606v2-macos-tds-control.json",
                         "treatmentUrl": "v6/experiments/202606v2-macos-tds-treatment.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "tdsNextExperiment014": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 50
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "v6/experiments/202607fbctl02-macos-tds-control.json",
+                        "treatmentUrl": "v6/experiments/202607fbctl02-macos-tds-treatment.json"
                     },
                     "cohorts": [
                         {
@@ -818,16 +858,6 @@
                 },
                 "domains": [
                     {
-                        "domain": "docs.google.com",
-                        "patchSettings": [
-                            {
-                                "op": "replace",
-                                "path": "/windowSizing",
-                                "value": "disabled"
-                            }
-                        ]
-                    },
-                    {
                         "domain": [
                             "www.cbsnews.com",
                             "myhome.experian.co.uk",
@@ -870,44 +900,29 @@
                     ]
                 },
                 "cookiePopupPreferenceSetting": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": "1.198.0"
                 },
                 "cookiePopupOptInDialog": {
-                    "state": "internal",
-                    "minSupportedVersion": "1.198.0"
+                    "state": "enabled",
+                    "minSupportedVersion": "1.198.0",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 2
+                            },
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 50
+                            }
+                        ]
+                    }
                 }
             }
         },
         "navigatorInterface": {
-            "state": "enabled"
-        },
-        "clickToLoad": {
-            "state": "enabled",
-            "minSupportedVersion": "1.93.0",
-            "settings": {
-                "Facebook, Inc.": {
-                    "state": "enabled"
-                },
-                "Youtube": {
-                    "state": "disabled"
-                }
-            },
-            "exceptions": [
-                {
-                    "domain": "tinder.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2207"
-                },
-                {
-                    "domain": "zoosk.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2646"
-                },
-                {
-                    "domain": "bandsintown.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5149"
-                }
-            ]
-        },
-        "clickToPlay": {
             "state": "enabled"
         },
         "autofill": {
@@ -943,6 +958,41 @@
                         "formBoundarySelector": "",
                         "failsafeSettings": {},
                         "conditionalChanges": [
+                            {
+                                "condition": [
+                                    { "domain": "fedex.com" }
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input#password[autocomplete=\"current-password\"]",
+                                            "type": "credentials.password.current"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "condition": [
+                                    { "domain": "blindbarber.com" }
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formBoundarySelector",
+                                        "op": "replace",
+                                        "value": "app-createcardtoken form"
+                                    },
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "app-createcardtoken form",
+                                            "type": "cc"
+                                        }
+                                    }
+                                ]
+                            },
                             {
                                 "condition": [
                                     { "domain": "wealthr.co.uk" }
@@ -1867,87 +1917,207 @@
                                     "https://github.com/duckduckgo/privacy-configuration/issues/1968",
                                     "rocketnews24.com, wunderground.com - https://github.com/duckduckgo/privacy-configuration/pull/4645"
                                 ]
-                            }
-                        ]
-                    },
-                    "facebook.com": {
-                        "rules": [
-                            {
-                                "rule": "facebook.com/plugins/customer_chat/",
-                                "domains": [
-                                    "nextdoor.com"
-                                ],
-                                "reason": "nextdoor.com - https://github.com/duckduckgo/privacy-configuration/pull/4645"
                             },
                             {
-                                "rule": "facebook.com/v6.0/plugins/customer_chat/",
+                                "rule": "ad.doubleclick.net/ddm/",
                                 "domains": [
-                                    "nextdoor.com"
+                                    "agd-plugin.com",
+                                    "agoda.ae",
+                                    "agoda.be",
+                                    "agoda.bg",
+                                    "agoda.ca",
+                                    "agoda.cat",
+                                    "agoda.cn",
+                                    "agoda.co",
+                                    "agoda.co.cr",
+                                    "agoda.co.ee",
+                                    "agoda.co.il",
+                                    "agoda.co.in",
+                                    "agoda.co.kr",
+                                    "agoda.co.ma",
+                                    "agoda.co.nz",
+                                    "agoda.co.th",
+                                    "agoda.co.uk",
+                                    "agoda.co.za",
+                                    "agoda.com",
+                                    "agoda.com.ar",
+                                    "agoda.com.au",
+                                    "agoda.com.bh",
+                                    "agoda.com.br",
+                                    "agoda.com.cn",
+                                    "agoda.com.hk",
+                                    "agoda.com.kw",
+                                    "agoda.com.mx",
+                                    "agoda.com.my",
+                                    "agoda.com.om",
+                                    "agoda.com.pt",
+                                    "agoda.com.qa",
+                                    "agoda.com.sa",
+                                    "agoda.com.sg",
+                                    "agoda.com.tr",
+                                    "agoda.com.tw",
+                                    "agoda.cz",
+                                    "agoda.de",
+                                    "agoda.dk",
+                                    "agoda.eg",
+                                    "agoda.es",
+                                    "agoda.fi",
+                                    "agoda.fr",
+                                    "agoda.gr",
+                                    "agoda.hu",
+                                    "agoda.ie",
+                                    "agoda.in",
+                                    "agoda.it",
+                                    "agoda.jo",
+                                    "agoda.jp",
+                                    "agoda.lt",
+                                    "agoda.lv",
+                                    "agoda.net",
+                                    "agoda.nl",
+                                    "agoda.no",
+                                    "agoda.pl",
+                                    "agoda.ro",
+                                    "agoda.ru",
+                                    "agoda.se",
+                                    "agoda.si",
+                                    "agoda.th",
+                                    "agoda.ua",
+                                    "agoda.vn",
+                                    "agoda.web.id",
+                                    "ankeda.com",
+                                    "booking.com",
+                                    "bookingholdings.com",
+                                    "bstatic.com",
+                                    "cheapflights.ca",
+                                    "cheapflights.co.id",
+                                    "cheapflights.co.nz",
+                                    "cheapflights.co.uk",
+                                    "cheapflights.co.za",
+                                    "cheapflights.com",
+                                    "cheapflights.com.au",
+                                    "cheapflights.com.hk",
+                                    "cheapflights.com.my",
+                                    "cheapflights.com.ph",
+                                    "cheapflights.com.sg",
+                                    "cheapflights.qa",
+                                    "checkfelix.co.uk",
+                                    "checkfelix.com",
+                                    "checkfelix.es",
+                                    "checkfelix.fr",
+                                    "checkfelix.it",
+                                    "datahc.com",
+                                    "hotelscombined.ae",
+                                    "hotelscombined.ca",
+                                    "hotelscombined.co.uk",
+                                    "hotelscombined.com",
+                                    "hotelscombined.com.au",
+                                    "hotelscombined.dk",
+                                    "hotelscombined.hk",
+                                    "hotelscombined.it",
+                                    "hotelscombined.pl",
+                                    "kayak.ae",
+                                    "kayak.cat",
+                                    "kayak.ch",
+                                    "kayak.cl",
+                                    "kayak.co.id",
+                                    "kayak.co.in",
+                                    "kayak.co.jp",
+                                    "kayak.co.kr",
+                                    "kayak.co.th",
+                                    "kayak.co.uk",
+                                    "kayak.com",
+                                    "kayak.com.ar",
+                                    "kayak.com.au",
+                                    "kayak.com.br",
+                                    "kayak.com.co",
+                                    "kayak.com.hk",
+                                    "kayak.com.mx",
+                                    "kayak.com.my",
+                                    "kayak.com.pe",
+                                    "kayak.com.ph",
+                                    "kayak.com.tr",
+                                    "kayak.de",
+                                    "kayak.dk",
+                                    "kayak.es",
+                                    "kayak.eu",
+                                    "kayak.fr",
+                                    "kayak.ie",
+                                    "kayak.it",
+                                    "kayak.nl",
+                                    "kayak.no",
+                                    "kayak.ph",
+                                    "kayak.pl",
+                                    "kayak.pt",
+                                    "kayak.qa",
+                                    "kayak.ru",
+                                    "kayak.se",
+                                    "kayak.sg",
+                                    "kayakaffiliates.com",
+                                    "momondo.at",
+                                    "momondo.be",
+                                    "momondo.by",
+                                    "momondo.ca",
+                                    "momondo.ch",
+                                    "momondo.cl",
+                                    "momondo.co.nz",
+                                    "momondo.co.uk",
+                                    "momondo.co.za",
+                                    "momondo.com",
+                                    "momondo.com.ar",
+                                    "momondo.com.au",
+                                    "momondo.com.br",
+                                    "momondo.com.co",
+                                    "momondo.com.pe",
+                                    "momondo.com.tr",
+                                    "momondo.cz",
+                                    "momondo.de",
+                                    "momondo.dk",
+                                    "momondo.ee",
+                                    "momondo.es",
+                                    "momondo.fi",
+                                    "momondo.fr",
+                                    "momondo.hk",
+                                    "momondo.ie",
+                                    "momondo.in",
+                                    "momondo.it",
+                                    "momondo.kz",
+                                    "momondo.lt",
+                                    "momondo.mx",
+                                    "momondo.net",
+                                    "momondo.nl",
+                                    "momondo.no",
+                                    "momondo.pl",
+                                    "momondo.pro",
+                                    "momondo.pt",
+                                    "momondo.ro",
+                                    "momondo.ru",
+                                    "momondo.se",
+                                    "momondo.tw",
+                                    "momondo.ua",
+                                    "momondogroup.com",
+                                    "opentable.ca",
+                                    "opentable.co.uk",
+                                    "opentable.com",
+                                    "opentable.de",
+                                    "opentable.jp",
+                                    "otstatic.com",
+                                    "pointsmax.com",
+                                    "portalhc.com",
+                                    "priceline.com",
+                                    "priceline.com.au",
+                                    "pricelineagoda.com",
+                                    "r9cdn.net",
+                                    "rcstatic.com",
+                                    "rentalcars.com",
+                                    "rezserver.com",
+                                    "speedfares.com",
+                                    "swoodoo.at",
+                                    "swoodoo.ch",
+                                    "swoodoo.com",
+                                    "traveljigsaw.com",
+                                    "xn--jprt0pvr1c.com"
                                 ],
-                                "reason": "nextdoor.com - https://github.com/duckduckgo/privacy-configuration/pull/4645"
-                            },
-                            {
-                                "rule": "facebook.com/v6.0/plugins/customerchat.php",
-                                "domains": [
-                                    "nextdoor.com"
-                                ],
-                                "reason": "nextdoor.com - https://github.com/duckduckgo/privacy-configuration/pull/4645"
-                            },
-                            {
-                                "rule": "facebook.com",
-                                "domains": [
-                                    "nextdoor.com"
-                                ],
-                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1190"
-                            }
-                        ]
-                    },
-                    "facebook.net": {
-                        "rules": [
-                            {
-                                "rule": "connect.facebook.net/en_UK/sdk.js",
-                                "domains": [
-                                    "globalcyclingnetwork.com",
-                                    "nextdoor.com"
-                                ],
-                                "reason": [
-                                    "https://github.com/duckduckgo/privacy-configuration/issues/1568",
-                                    "nextdoor.com - https://github.com/duckduckgo/privacy-configuration/pull/4645"
-                                ]
-                            },
-                            {
-                                "rule": "connect.facebook.net/en_US/all.js",
-                                "domains": [
-                                    "nextdoor.com"
-                                ],
-                                "reason": "nextdoor.com - https://github.com/duckduckgo/privacy-configuration/pull/4645"
-                            },
-                            {
-                                "rule": "connect.facebook.net/en_US/sdk/xfbml.customerchat.js",
-                                "domains": [
-                                    "nextdoor.com"
-                                ],
-                                "reason": "nextdoor.com - https://github.com/duckduckgo/privacy-configuration/pull/4645"
-                            },
-                            {
-                                "rule": "connect.facebook.net/en_US/sdk.js",
-                                "domains": [
-                                    "mytrackman.com",
-                                    "nextdoor.com",
-                                    "solitaired.com"
-                                ],
-                                "reason": [
-                                    "mytrackman.com - https://github.com/duckduckgo/privacy-configuration/issues/1426",
-                                    "nextdoor.com - https://github.com/duckduckgo/privacy-configuration/issues/1190",
-                                    "solitaired.com - https://github.com/duckduckgo/privacy-configuration/pull/2329"
-                                ]
-                            },
-                            {
-                                "rule": "facebook.net",
-                                "domains": [
-                                    "nextdoor.com"
-                                ],
-                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1190"
+                                "reason": "Booking Holdings entities - https://github.com/duckduckgo/privacy-configuration/pull/5592"
                             }
                         ]
                     },
@@ -1988,6 +2158,25 @@
                                     "scrolller.com"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1968"
+                            },
+                            {
+                                "rule": "www.google.com/measurement/1p-conversion",
+                                "domains": [
+                                    "architecturaldesigns.com",
+                                    "furniturerow.com",
+                                    "printerval.com",
+                                    "iseehair.com",
+                                    "generation.org",
+                                    "poshmark.com",
+                                    "partselect.com",
+                                    "golfavenue.ca",
+                                    "petsuppliesplus.com",
+                                    "myenneagramtest.org",
+                                    "arcteryx.com",
+                                    "topsecretrecipes.com",
+                                    "homedepot.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5637"
                             }
                         ]
                     },
@@ -2425,6 +2614,10 @@
                 "onboardingRebranding": {
                     "state": "enabled",
                     "minSupportedVersion": "1.192.0"
+                },
+                "appRebranding": {
+                    "state": "internal",
+                    "minSupportedVersion": "1.201.0"
                 }
             }
         },
@@ -2433,6 +2626,7 @@
             "minSupportedVersion": "1.179.0",
             "exceptions": [],
             "settings": {
+                "includePageTypeSignals": "enabled",
                 "maxContentLength": 9500,
                 "mainContentSelector": "main, article, .content, .main, #content, #main",
                 "excludeSelectors": [
@@ -2469,7 +2663,56 @@
                             }
                         ]
                     }
-                ]
+                ],
+                "aiPageContextBlocklist": {
+                    "pdf": {
+                        "urlExtensions": [
+                            ".pdf"
+                        ],
+                        "contentTypes": [
+                            "application/pdf"
+                        ]
+                    },
+                    "image": {
+                        "urlExtensions": [
+                            ".png",
+                            ".jpg",
+                            ".jpeg",
+                            ".gif",
+                            ".webp",
+                            ".svg",
+                            ".bmp"
+                        ],
+                        "contentTypePrefixes": [
+                            "image/"
+                        ]
+                    },
+                    "video": {
+                        "urlExtensions": [
+                            ".mp4",
+                            ".webm",
+                            ".avi",
+                            ".mov",
+                            ".mkv"
+                        ],
+                        "contentTypePrefixes": [
+                            "video/"
+                        ]
+                    },
+                    "audio": {
+                        "urlExtensions": [
+                            ".mp3",
+                            ".wav",
+                            ".ogg",
+                            ".flac",
+                            ".aac",
+                            ".m4a"
+                        ],
+                        "contentTypePrefixes": [
+                            "audio/"
+                        ]
+                    }
+                }
             }
         },
         "popupBlocking": {
