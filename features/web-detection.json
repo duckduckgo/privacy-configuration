@@ -86,6 +86,98 @@
                             ]
                         }
                     }
+                },
+                "generic_en_noscript": {
+                    "match": {
+                        "all": [
+                            {
+                                "text": {
+                                    "pattern": [
+                                        "ad ?block(er)? detected",
+                                        "adjust(ing)?( your)? ad blocking settings",
+                                        "(turn(ing)? off|disable|disabling|deactivate)( your| my)? ad ?block(er)?",
+                                        "your ad ?blocker is on",
+                                        "you('re| are| may be) using an ad blocker"
+                                    ]
+                                }
+                            },
+                            {
+                                "text": {
+                                    "none": {
+                                        "pattern": [
+                                            "ad ?block(er)? detected",
+                                            "adjust(ing)?( your)? ad blocking settings",
+                                            "(turn(ing)? off|disable|disabling|deactivate)( your| my)? ad ?block(er)?",
+                                            "your ad ?blocker is on",
+                                            "you('re| are| may be) using an ad blocker"
+                                        ],
+                                        "selector": "script"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                },
+                "generic_en_css": {
+                    "match": {
+                        "text": {
+                            "pattern": [
+                                "ad ?block(er)? detected",
+                                "adjust(ing)?( your)? ad blocking settings",
+                                "(turn(ing)? off|disable|disabling|deactivate)( your| my)? ad ?block(er)?",
+                                "your ad ?blocker is on",
+                                "you('re| are| may be) using an ad blocker"
+                            ],
+                            "selector": ":not(script):not(:has(script))"
+                        }
+                    }
+                },
+                "generic_en_combined": {
+                    "match": {
+                        "any": [
+                            {
+                                "all": [
+                                    {
+                                        "text": {
+                                            "pattern": [
+                                                "ad ?block(er)? detected",
+                                                "adjust(ing)?( your)? ad blocking settings",
+                                                "(turn(ing)? off|disable|disabling|deactivate)( your| my)? ad ?block(er)?",
+                                                "your ad ?blocker is on",
+                                                "you('re| are| may be) using an ad blocker"
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "text": {
+                                            "none": {
+                                                "pattern": [
+                                                    "ad ?block(er)? detected",
+                                                    "adjust(ing)?( your)? ad blocking settings",
+                                                    "(turn(ing)? off|disable|disabling|deactivate)( your| my)? ad ?block(er)?",
+                                                    "your ad ?blocker is on",
+                                                    "you('re| are| may be) using an ad blocker"
+                                                ],
+                                                "selector": "script"
+                                            }
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "text": {
+                                    "pattern": [
+                                        "ad ?block(er)? detected",
+                                        "adjust(ing)?( your)? ad blocking settings",
+                                        "(turn(ing)? off|disable|disabling|deactivate)( your| my)? ad ?block(er)?",
+                                        "your ad ?blocker is on",
+                                        "you('re| are| may be) using an ad blocker"
+                                    ],
+                                    "selector": ":not(script):not(:has(script))"
+                                }
+                            }
+                        ]
+                    }
                 }
             },
             "captcha": {
