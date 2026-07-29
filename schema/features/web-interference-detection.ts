@@ -20,6 +20,11 @@ type FraudDetector = {
     textPatterns?: string[];
     textSources?: string[];
 };
+type AdwallDetector = {
+    state: FeatureState;
+    textPatterns?: string[];
+    textSources?: string[];
+};
 
 type YoutubeAdsDetector = {
     state: FeatureState;
@@ -56,6 +61,7 @@ type WebInterferenceDetectionSettings = CSSInjectFeatureSettings<{
     interferenceTypes?: {
         botDetection?: Record<string, BotDetector>;
         fraudDetection?: Record<string, FraudDetector>;
+        adwallDetection?: Record<string, AdwallDetector>;
         youtubeAds?: YoutubeAdsDetector;
     };
 }>;
