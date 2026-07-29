@@ -40,6 +40,7 @@ import { DownloadManager } from './features/downloadManager';
 import { WebExtensionsConfig } from './features/web-extensions';
 import { AdBlockingExtensionConfig } from './features/ad-blocking-extension';
 import { TabSuspension } from './features/tab-suspension';
+import { ExtensionManagementFeature } from './features/extension-management';
 
 export { WebCompatSettings } from './features/webcompat';
 export { DuckPlayerSettings } from './features/duckplayer';
@@ -105,6 +106,7 @@ export type ConfigV5<VersionType> = {
         iOSBrowserConfig?: IOSBrowserConfig<VersionType>;
         tabSuspension?: TabSuspension<VersionType>;
         webExtensions?: WebExtensionsConfig<VersionType>;
+        extensionManagement?: ExtensionManagementFeature<VersionType>;
     };
     unprotectedTemporary: SiteException[];
 };
