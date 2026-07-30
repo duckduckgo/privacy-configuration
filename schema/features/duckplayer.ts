@@ -3,6 +3,10 @@ import { Feature, CSSInjectFeatureSettings, FeatureState } from '../feature';
 type StateObject = {
     state: FeatureState;
 };
+type BufferingFeedbackObject = StateObject & {
+    giveUpMs?: number;
+    spinnerDelayMs?: number;
+};
 export type DuckPlayerSettings = CSSInjectFeatureSettings<{
     tryDuckPlayerLink: string;
     duckPlayerDisabledHelpPageLink: string | null;
@@ -29,6 +33,7 @@ export type DuckPlayerSettings = CSSInjectFeatureSettings<{
             clickInterception: StateObject;
             videoOverlays: StateObject;
             videoDrawer?: StateObject;
+            bufferingFeedback?: BufferingFeedbackObject;
         };
         serpProxy: StateObject;
     };
