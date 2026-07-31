@@ -288,27 +288,10 @@
                 ]
             },
             {
-                "condition": [
-                    {
-                        "injectName": "android",
-                        "minSupportedVersion": 52720000,
-                        "domain": "homedepot.com"
-                    },
-                    {
-                        "injectName": "windows",
-                        "minSupportedVersion": "0.162.0",
-                        "domain": "homedepot.com"
-                    }
-                ],
-                "patchSettings": [
-                    { "op": "remove", "path": "/detectors/adwalls/generic_en/triggers/auto" },
-                    { "op": "remove", "path": "/detectors/adwalls/generic_de/triggers/auto" },
-                    { "op": "remove", "path": "/detectors/adwalls/generic_es/triggers/auto" },
-                    { "op": "remove", "path": "/detectors/adwalls/generic_it/triggers/auto" },
-                    { "op": "remove", "path": "/detectors/adwalls/generic_nl/triggers/auto" },
-                    { "op": "remove", "path": "/detectors/adwalls/generic_se/triggers/auto" },
-                    { "op": "remove", "path": "/detectors/adwalls/admiral/triggers/auto" }
-                ]
+                "condition": {
+                    "domain": "homedepot.com"
+                },
+                "patchSettings": [{ "op": "remove", "path": "/detectors/adwalls" }]
             }
         ]
     }
