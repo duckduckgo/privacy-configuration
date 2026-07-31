@@ -34,6 +34,7 @@ export type DuckPlayerSettings = CSSInjectFeatureSettings<{
             videoOverlays: StateObject;
             videoDrawer?: StateObject;
             bufferingFeedback?: BufferingFeedbackObject;
+            fullscreenGuard?: StateObject;
         };
         serpProxy: StateObject;
     };
