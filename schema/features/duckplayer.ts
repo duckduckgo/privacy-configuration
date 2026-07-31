@@ -4,7 +4,7 @@ type StateObject = {
     state: FeatureState;
 };
 type BufferingFeedbackObject = StateObject & {
-    giveUpMs?: number;
+    spinnerTimeoutMs?: number;
     spinnerDelayMs?: number;
 };
 export type DuckPlayerSettings = CSSInjectFeatureSettings<{
