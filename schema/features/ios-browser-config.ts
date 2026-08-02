@@ -12,6 +12,15 @@ type SubFeatures<VersionType> = {
             idleThresholdSeconds: number;
         }
     >;
+    searchTokenExperiment?: SubFeature<
+        VersionType,
+        {
+            // Lifetime of the search token in seconds
+            tokenTTLSeconds: number;
+            // Time before expiry within which the token is proactively refreshed, in seconds
+            refreshWindowSeconds: number;
+        }
+    >;
 };
 
 export type IOSBrowserConfig<VersionType> = Feature<

@@ -48,14 +48,6 @@
             "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3924"
         },
         {
-            "domain": "eurostar.com",
-            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/2229"
-        },
-        {
-            "domain": "events.com",
-            "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3172"
-        },
-        {
             "domain": "geo.fr",
             "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2476"
         },
@@ -620,10 +612,6 @@
             "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3776"
         },
         {
-            "domain": "paypal.com",
-            "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3826"
-        },
-        {
             "domain": "snyk.io",
             "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3830"
         },
@@ -816,10 +804,6 @@
             "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4943"
         },
         {
-            "domain": "unive.nl",
-            "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4993"
-        },
-        {
             "domain": "tk-aerztefuehrer.de",
             "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5032"
         },
@@ -834,10 +818,6 @@
         {
             "domain": "milesplit.live",
             "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5079"
-        },
-        {
-            "domain": "doublelist.com",
-            "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5137"
         },
         {
             "domain": "hillsdale.edu",
@@ -890,13 +870,18 @@
         {
             "domain": "michaels.com",
             "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5542"
+        },
+        {
+            "domain": "doublelist.com",
+            "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5685"
         }
     ],
     "settings": {
         "disabledCMPs": [
             "healthline-media",
             "cookie-notice",
-            "notice-cookie"
+            "notice-cookie",
+            "pornhub-compact-cookie-banner"
         ],
         "filterlistExceptions": [],
         "compactRuleList": {
@@ -987,13 +972,13 @@
                 "axeptio_authorized_vendors=%2C%2C",
                 ".b-cookie.is-open",
                 ".cookie-alert.t-dark",
-                ".cookies-message",
-                ".cookies-message [name='allow-all']",
-                ".cookies-message button.bds-button-unstyled",
-                ".cookies-policy-dialog[open]",
-                ".cookies-policy-dialog fieldset input[type=radio][value=false]:not(:checked)",
-                ".cookies-policy-dialog button.bds-button",
-                ".cookies-message button.bds-button:not([name])",
+                "iabbb-cookies-message > section",
+                "iabbb-cookies-message",
+                "iabbb-cookies-message > section [name='allow-all']",
+                "iabbb-cookies-message > section button.bds-button-unstyled",
+                "iabbb-cookies-message dialog[open]",
+                "iabbb-cookies-message dialog fieldset input[type=radio][value=false]:not(:checked)",
+                "iabbb-cookies-message dialog button.bds-button",
                 "#rejectAllMain",
                 "#sd-cmp",
                 ".snigel-cmp-framework",
@@ -1106,7 +1091,7 @@
                 ".cc-type-info[aria-describedby=\"cookieconsent:desc\"] .cc-compliance .cc-btn",
                 ".cc-deny",
                 "[aria-describedby=\"cookieconsent:desc\"]",
-                "[aria-describedby=\"cookieconsent:desc\"] .cc-type-opt-both",
+                ".brlbs-btn-save,#CookieBoxSaveButton",
                 "[aria-describedby=\"cookieconsent:desc\"].cc-type-opt-out",
                 ".cmp-pref-link",
                 ".cmp-body [id*=rejectAll]",
@@ -1208,9 +1193,9 @@
                 "div[class^=\"cookies-banner-module_\"]",
                 ".cookie-banner.show .cookie-banner__content-all-btn",
                 ".cookie-banner__content-essential-btn",
-                "*[data-testid='dl-cookieBanner']",
-                "[data-testid='dl-cookieBanner']",
-                "button[data-testid='cookie-banner-strict-accept-selected']",
+                ".brlbs-cmpnt-close-button[data-borlabs-cookie-actions=\"close-button\"]",
+                ".cookieinfo",
+                ".cookieinfo-close",
                 "div[class^=\"cookies-banner-module_cookie-banner_\"]",
                 "div[class^=\"cookies-banner-module_small-cookie-banner_\"]",
                 "#tarteaucitronRoot",
@@ -1673,6 +1658,9 @@
                 "#piano-cookie_banner [data-close-button]",
                 ".dg-consent-banner",
                 "datagrail_consent",
+                ".disclaimer-opened #disclaimer-cookies",
+                "#disclaimer-reject_cookies",
+                "iabbb-cookies-message > section button.bds-button:not([name])",
                 "body > div#root > div#ccpa-iframe-theme-provider[data-testid=\"ccpa-iframe-theme-provider\"] > div#ccpa-iframe[data-testid=\"ccpa-iframe\"] > div#ccpa_consent_banner[data-testid=\"ccpa_consent_banner\"] > div:not([id]) > div:nth-child(3):not([id]) > span:not([id]) > span:not([id]) > div:nth-child(2):not([id]) > span:nth-child(1):not([id]) > button#decline_cookies_button[data-testid=\"decline_cookies_button\"]",
                 "body:not([id]) > div#banner-0 > div:nth-child(1)#grouped-pageload-Banner > div:not([id]) > div:not([id]) > div:not([id]) > div:nth-child(3):not([id]) > button:nth-child(2):not([id])",
                 "body > div#iubenda-cs-banner > div:not([id]) > div:not([id]) > div:not([id]) > div:nth-child(5):not([id]) > div:nth-child(2):not([id]) > button:nth-child(1):not([id])",
@@ -1697,6 +1685,12 @@
                 "button[class^=CookieBannerContent__Settings]",
                 "div[class^=CookiePreferencesModal__CategoryContainer] input:checked",
                 "div[class^=CookiePreferencesModal__ButtonContainer] > button",
+                "#overlay.cmp",
+                "#overlay[role=dialog]",
+                "#deny",
+                "#edit-purpose-settings",
+                "#save-purpose-settings",
+                "ui_cid=OPTOUT",
                 "#gdpr-consent-tool-wrapper",
                 "iframe[src^=\"https://cmp-consent-tool.privacymanager.io\"]",
                 "button#save",
@@ -1708,15 +1702,6 @@
                 "span[role=checkbox][aria-checked=true]",
                 "#save-all-pur",
                 "#reminder",
-                "body > div#message-banner > div:not([id]) > div:nth-child(2):not([id]) > button:not([id])",
-                "body > div#cookiemodal > div:not([id]) > div:not([id]) > div:nth-child(2):not([id]) > div:nth-child(2):not([id]) > div:nth-child(5)#footer-cookie-buttons > a:nth-child(2)#footer-cookie-close",
-                "body > aside:not([id]) > div:nth-child(2)#cookie-consent-modal > div:not([id]) > div:not([id]) > div:not([id]) > div:not([id]) > div:not([id]) > div:not([id]) > div:nth-child(2):not([id]) > button:nth-child(2):not([id])",
-                "body > div:not([id]) > div#csm-wrapper > div:not([id]) > div:not([id]) > div:nth-child(2):not([id]) > button:nth-child(2):not([id])",
-                "body > div#app > div:nth-child(1)#__nuxt > div#__layout > div:not([id]) > div:nth-child(4):not([id]) > div:not([id]) > div:nth-child(4):not([id]) > a:nth-child(2):not([id])",
-                "body > div:not([id]) > div:nth-child(1):not([id]) > div:nth-child(1):not([id]) > button:not([id])",
-                "body > div#wrapwrap > div:nth-child(5)#website_cookies_bar > div:not([id]) > div:not([id]) > div:not([id]) > section:not([id]) > div:not([id]) > div:not([id]) > div:nth-child(2):not([id]) > a:nth-child(1)#cookie-banner-essential",
-                "body > aside:not([id]) > div:nth-child(1):not([id]) > div:not([id]) > div:nth-child(3):not([id]) > div:nth-child(2):not([id]) > button:nth-child(3):not([id])",
-                "body > div:not([id]) > div:not([id]) > div#ch2-settings-dialog > div:nth-child(3):not([id]) > div:nth-child(1)#ch2-settings > button:nth-child(4):not([id])",
                 "div > div > div > div > span[href*=\"/cookie-and-similar-technologies-policy.html\"]",
                 "xpath///span[contains(., 'Alle afwijzen') or contains(., 'Reject all') or contains(., 'Tümünü reddet') or contains(., 'Odrzuć wszystko')]",
                 "div > div > div:has(> div > span[href*=\"/cookie-and-similar-technologies-policy.html\"]) > [role=button]:nth-child(2)",
@@ -1813,10 +1798,10 @@
                 "xpath///div[contains(., \"Vill du tillåta användningen av cookies från Instagram i den här webbläsaren?\") or contains(., \"Allow the use of cookies from Instagram on this browser?\") or contains(., \"Povolit v prohlížeči použití souborů cookie z Instagramu?\") or contains(., \"Dopustiti upotrebu kolačića s Instagrama na ovom pregledniku?\") or contains(., \"Разрешить использование файлов cookie от Instagram в этом браузере?\") or contains(., \"Vuoi consentire l'uso dei cookie di Instagram su questo browser?\") or contains(., \"Povoliť používanie cookies zo služby Instagram v tomto prehliadači?\") or contains(., \"Die Verwendung von Cookies durch Instagram in diesem Browser erlauben?\") or contains(., \"Sallitaanko Instagramin evästeiden käyttö tällä selaimella?\") or contains(., \"Engedélyezed az Instagram cookie-jainak használatát ebben a böngészőben?\") or contains(., \"Het gebruik van cookies van Instagram toestaan in deze browser?\") or contains(., \"Bu tarayıcıda Instagram'dan çerez kullanımına izin verilsin mi?\") or contains(., \"Permitir o uso de cookies do Instagram neste navegador?\") or contains(., \"Permiţi folosirea modulelor cookie de la Instagram în acest browser?\") or contains(., \"Autoriser l’utilisation des cookies d’Instagram sur ce navigateur ?\") or contains(., \"¿Permitir el uso de cookies de Instagram en este navegador?\") or contains(., \"Zezwolić na użycie plików cookie z Instagramu w tej przeglądarce?\") or contains(., \"Να επιτρέπεται η χρήση cookies από τo Instagram σε αυτό το πρόγραμμα περιήγησης;\") or contains(., \"Разрешавате ли използването на бисквитки от Instagram на този браузър?\") or contains(., \"Vil du tillade brugen af cookies fra Instagram i denne browser?\") or contains(., \"Vil du tillate bruk av informasjonskapsler fra Instagram i denne nettleseren?\")]",
                 "xpath///button[contains(., 'Отклонить необязательные файлы cookie') or contains(., 'Decline optional cookies') or contains(., 'Refuser les cookies optionnels') or contains(., 'Hylkää valinnaiset evästeet') or contains(., 'Afvis valgfrie cookies') or contains(., 'Odmietnuť nepovinné cookies') or contains(., 'Απόρριψη προαιρετικών cookies') or contains(., 'Neka valfria cookies') or contains(., 'Optionale Cookies ablehnen') or contains(., 'Rifiuta cookie facoltativi') or contains(., 'Odbij neobavezne kolačiće') or contains(., 'Avvis valgfrie informasjonskapsler') or contains(., 'İsteğe bağlı çerezleri reddet') or contains(., 'Recusar cookies opcionais') or contains(., 'Optionele cookies afwijzen') or contains(., 'Rechazar cookies opcionales') or contains(., 'Odrzuć opcjonalne pliki cookie') or contains(., 'Отхвърляне на бисквитките по избор') or contains(., 'Odmítnout volitelné soubory cookie') or contains(., 'Refuză modulele cookie opţionale') or contains(., 'A nem kötelező cookie-k elutasítása')]",
                 ".pop-cookie",
-                ".miniConsent,#PrivacyPolicyBanner",
-                "#PrivacyPolicyBanner",
-                "#cookie-settings",
-                "#reject-all-cookies",
+                "body > aside:not([id]) > div:nth-child(2)#cookie-consent-modal > div:not([id]) > div:not([id]) > div:not([id]) > div:not([id]) > div:not([id]) > div:not([id]) > div:nth-child(2):not([id]) > button:nth-child(2):not([id])",
+                "#cookieBanner.cbShort .cbCloseButton",
+                "#cookieBanner #cookieBannerContent, #globalCookieBanner",
+                "[data-role=\"cookies-modal\"] [class*=container]",
                 "#gdpr-banner-container",
                 "body > div:not([id])[data-popup=\"\"][data-popup-cookies=\"\"][data-terms-cookies-popup-common=\"\"][data-popup-need-overlay=\"true\"] > div:not([id])[data-terms-cookies-popup=\"\"][data-terms-cookies-popup-common=\"\"] > div:not([id]) > div:nth-child(2):not([id]) > button:nth-child(2):not([id])[data-cookies=\"disallow_all_cookies\"]",
                 "#gdpr-banner-container #gdpr-banner [data-testid=gdpr-banner-decline-button]",
@@ -1869,9 +1854,9 @@
                 "xeConsentState={%22performance%22:false%2C%22marketing%22:false%2C%22compliance%22:false}",
                 "#cookie-consent[style*=\"max-height\"] #cookie-status-reject",
                 "#cookie-consent .cookie-selection__btn",
-                "[class*=modal]",
-                "[class*=modal] a[href*='/cookie-policy']",
-                "[class*=modal]:has(a[href*='/cookie-policy']) button:nth-child(2)",
+                "body > div#message-banner > div:not([id]) > div:nth-child(2):not([id]) > button:not([id])",
+                "body > div#cookiemodal > div:not([id]) > div:not([id]) > div:nth-child(2):not([id]) > div:nth-child(2):not([id]) > div:nth-child(5)#footer-cookie-buttons > a:nth-child(2)#footer-cookie-close",
+                "form.rodo-popup",
                 "[class*=cookiesAnnounce]",
                 "[class*=cookiesAnnounce] [class*=announceText]",
                 "cookie_consent_essential=true",
@@ -1879,13 +1864,13 @@
                 "[data-testid='cookie-banner-reject-button']",
                 "CMCCP=AD%3D0",
                 "body > div:not([id]) > div:nth-child(1):not([id]) > div:not([id]) > div:nth-child(2):not([id]) > div:not([id]) > div:not([id]) > div:not([id]) > div:not([id]) > div:nth-child(2):not([id]) > div:not([id]) > div:nth-child(1):not([id]) > div:nth-child(2):not([id])",
-                ".disclaimer-opened #disclaimer-cookies",
-                "#disclaimer-reject_cookies",
+                "form.rodo-popup button.rodo-popup-main-settings",
+                "form.rodo-popup button.rodo-popup-reject",
                 "#consent-page",
                 "#consent-page button[value=reject]",
                 ".cookie-manager",
                 ".cookie-manager .cookie-notice.open",
-                ".cookie-notice [data-test=reject]",
+                ".cookie-notice button.owid-btn--outline-dark-blue.cookie-notice__button",
                 "footer .ccpabanner",
                 ".BusinessCookieConsent",
                 ".BusinessCookieConsent [data-id=cookie-consent-banner-buttons]",
@@ -2275,7 +2260,7 @@
                 "#cookie-consent-banner button[aria-label=\"Reject non-essential cookies and continue.\"]",
                 "body > div:not([id]) > div:nth-child(2):not([id]) > div:nth-child(2):not([id]) > button:nth-child(2):not([id])",
                 "body > div:not([id]) > div:nth-child(2):not([id]) > div:not([id]) > div:nth-child(2):not([id]) > div:nth-child(2):not([id]) > button:nth-child(2):not([id])",
-                "#cookieBanner #cookieBannerContent, #globalCookieBanner",
+                "div[id='sp_message_container_1482251'],div[id='sp_message_container_1482252']",
                 "#globalCookieBanner .js-customizeGlobalCookies",
                 "#cookieBanner button.cbSecondaryCTA",
                 "#__rptl-cookiebanner #__rptl-cookiebanner-reject",
@@ -2421,7 +2406,26 @@
                 "#cookie-notification .cookie_pref_wrapper .pref-opt.refuse",
                 "#voyager-gdpr-2025 button:last-of-type",
                 "body > div#wrapper > div:nth-child(4):not([id]) > button:nth-child(3):not([id])",
-                "body > div#frame-modals > div:not([id]) > div:nth-child(2):not([id]) > div:not([id]) > div:not([id]) > div:nth-child(2):not([id]) > div:nth-child(2):not([id]) > button:nth-child(1):not([id])"
+                "body > div#frame-modals > div:not([id]) > div:nth-child(2):not([id]) > div:not([id]) > div:not([id]) > div:nth-child(2):not([id]) > div:nth-child(2):not([id]) > button:nth-child(1):not([id])",
+                "[data-testid=\"cookies_reject\"]",
+                "adc-cookie-banner",
+                "cookie_banner=closed",
+                "#__tealiumGDPRcpPrefs #consent-container",
+                "#__tealiumGDPRcpPrefs #consent-container #consent-modal-settings",
+                "#no-consent-popup-close-modal",
+                "[data-role=\"cookies-modal\"]",
+                "[data-role=\"cookies-modal\"] [data-opt-hydration=\"cookies-dialog-eu\"]",
+                "[data-role=\"cookies-modal\"] [class*=experimentalButtons] button:nth-of-type(2)",
+                "body > div:not([id]) > div#csm-wrapper > div:not([id]) > div:not([id]) > div:nth-child(2):not([id]) > button:nth-child(2):not([id])",
+                "body > div:not([id]) > div:nth-child(1):not([id]) > div:nth-child(1):not([id]) > button:not([id])",
+                "body > div#wrapwrap > div:nth-child(5)#website_cookies_bar > div:not([id]) > div:not([id]) > div:not([id]) > section:not([id]) > div:not([id]) > div:not([id]) > div:nth-child(2):not([id]) > a:nth-child(1)#cookie-banner-essential",
+                "body > aside:not([id]) > div:nth-child(1):not([id]) > div:not([id]) > div:nth-child(3):not([id]) > div:nth-child(2):not([id]) > button:nth-child(3):not([id])",
+                "body > div:not([id]) > div:not([id]) > div#ch2-settings-dialog > div:nth-child(3):not([id]) > div:nth-child(1)#ch2-settings > button:nth-child(4):not([id])",
+                "body > div#app > div:nth-child(1)#__nuxt > div#__layout > div:not([id]) > div:nth-child(4):not([id]) > div:not([id]) > div:nth-child(4):not([id]) > a:nth-child(2):not([id])",
+                "#cookieBanner.cbShort",
+                "[data-testid=\"cookie-wall\"]",
+                "[data-testid=\"cookie-wall\"] .cookie-bar__footer button[data-id=\"0\"]",
+                "acceptCookies=0"
             ],
             "r": [
                 [
@@ -3092,37 +3096,37 @@
                     ],
                     [
                         {
-                            "e": 85
+                            "e": 86
                         }
                     ],
                     [
                         {
-                            "v": 86
+                            "v": 87
                         }
                     ],
                     [
                         {
-                            "wv": 87
+                            "wv": 88
                         },
                         {
                             "wait": 500
                         },
                         {
-                            "k": 87
+                            "k": 88
                         },
                         {
-                            "w": 88
+                            "w": 89
                         },
                         {
                             "all": true,
                             "optional": true,
-                            "k": 89
-                        },
-                        {
                             "k": 90
                         },
                         {
-                            "c": 91
+                            "k": 91
+                        },
+                        {
+                            "c": 773
                         }
                     ],
                     [],
@@ -3263,21 +3267,52 @@
                             ],
                             "else": [
                                 {
-                                    "k": 113
-                                },
-                                {
-                                    "wv": 114
-                                },
-                                {
-                                    "all": true,
-                                    "optional": true,
-                                    "k": 115
-                                },
-                                {
-                                    "k": 116
-                                },
-                                {
-                                    "wait": 500
+                                    "if": {
+                                        "e": 204
+                                    },
+                                    "then": [
+                                        {
+                                            "k": 204
+                                        }
+                                    ],
+                                    "else": [
+                                        {
+                                            "if": {
+                                                "e": 306
+                                            },
+                                            "then": [
+                                                {
+                                                    "k": 306
+                                                }
+                                            ],
+                                            "else": [
+                                                {
+                                                    "if": {
+                                                        "e": 113
+                                                    },
+                                                    "then": [
+                                                        {
+                                                            "k": 113
+                                                        },
+                                                        {
+                                                            "wv": 114
+                                                        },
+                                                        {
+                                                            "all": true,
+                                                            "optional": true,
+                                                            "k": 115
+                                                        },
+                                                        {
+                                                            "k": 116
+                                                        },
+                                                        {
+                                                            "wait": 500
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
                                 }
                             ]
                         }
@@ -3948,33 +3983,6 @@
                                     "h": 203
                                 }
                             ]
-                        }
-                    ],
-                    [],
-                    {}
-                ],
-                [
-                    1,
-                    "Complianz opt-both",
-                    2,
-                    "",
-                    22,
-                    [
-                        204
-                    ],
-                    [
-                        {
-                            "e": 204
-                        }
-                    ],
-                    [
-                        {
-                            "v": 204
-                        }
-                    ],
-                    [
-                        {
-                            "c": 202
                         }
                     ],
                     [],
@@ -4665,6 +4673,33 @@
                 ],
                 [
                     1,
+                    "cookieinfo",
+                    1,
+                    "",
+                    22,
+                    [
+                        307
+                    ],
+                    [
+                        {
+                            "e": 307
+                        }
+                    ],
+                    [
+                        {
+                            "v": 307
+                        }
+                    ],
+                    [
+                        {
+                            "c": 308
+                        }
+                    ],
+                    [],
+                    {}
+                ],
+                [
+                    1,
                     "cookiejs-banner",
                     2,
                     "",
@@ -5079,45 +5114,6 @@
                             ]
                         }
                     ],
-                    {}
-                ],
-                [
-                    1,
-                    "deepl.com",
-                    2,
-                    "",
-                    22,
-                    [
-                        306
-                    ],
-                    [
-                        {
-                            "e": 307
-                        }
-                    ],
-                    [
-                        {
-                            "v": 307
-                        }
-                    ],
-                    [
-                        {
-                            "if": {
-                                "e": 308
-                            },
-                            "then": [
-                                {
-                                    "k": 308
-                                }
-                            ],
-                            "else": [
-                                {
-                                    "h": 307
-                                }
-                            ]
-                        }
-                    ],
-                    [],
                     {}
                 ],
                 [
@@ -7449,15 +7445,21 @@
                             },
                             "then": [
                                 {
-                                    "k": 644
+                                    "c": 644
                                 }
                             ],
                             "else": [
                                 {
-                                    "k": 645
+                                    "c": 645
                                 },
                                 {
-                                    "c": 646
+                                    "wv": 646
+                                },
+                                {
+                                    "k": 646
+                                },
+                                {
+                                    "wv": 647
                                 },
                                 {
                                     "k": 647
@@ -9996,17 +9998,43 @@
                     ],
                     [
                         {
-                            "e": 678
+                            "any": [
+                                {
+                                    "e": 678
+                                },
+                                {
+                                    "e": 771
+                                }
+                            ]
                         }
                     ],
                     [
                         {
-                            "v": 678
+                            "any": [
+                                {
+                                    "v": 678
+                                },
+                                {
+                                    "v": 771
+                                }
+                            ]
                         }
                     ],
                     [
                         {
-                            "h": 678
+                            "if": {
+                                "v": 771
+                            },
+                            "then": [
+                                {
+                                    "c": 772
+                                }
+                            ],
+                            "else": [
+                                {
+                                    "h": 678
+                                }
+                            ]
                         }
                     ],
                     [],
@@ -10073,6 +10101,9 @@
                         }
                     ],
                     [
+                        {
+                            "wait": 500
+                        },
                         {
                             "c": 694
                         },
@@ -10193,99 +10224,6 @@
                     [],
                     [
                         {
-                            "e": 771
-                        }
-                    ],
-                    [
-                        {
-                            "v": 771
-                        }
-                    ],
-                    [
-                        {
-                            "wait": 500
-                        },
-                        {
-                            "c": 771
-                        }
-                    ],
-                    [
-                        {
-                            "timeout": 1000,
-                            "check": "none",
-                            "wv": 771
-                        }
-                    ],
-                    {}
-                ],
-                [
-                    1,
-                    "auto_CA_coasthotels.com_f8m",
-                    0,
-                    "^https?://(www\\.)?coasthotels\\.com/",
-                    1,
-                    [],
-                    [
-                        {
-                            "e": 772
-                        }
-                    ],
-                    [
-                        {
-                            "v": 772
-                        }
-                    ],
-                    [
-                        {
-                            "c": 772
-                        }
-                    ],
-                    [],
-                    {}
-                ],
-                [
-                    1,
-                    "auto_CA_epihunter.eu_hd4",
-                    0,
-                    "^https?://(www\\.)?combell\\.com/",
-                    1,
-                    [],
-                    [
-                        {
-                            "e": 773
-                        }
-                    ],
-                    [
-                        {
-                            "v": 773
-                        }
-                    ],
-                    [
-                        {
-                            "wait": 500
-                        },
-                        {
-                            "c": 773
-                        }
-                    ],
-                    [
-                        {
-                            "timeout": 1000,
-                            "check": "none",
-                            "wv": 773
-                        }
-                    ],
-                    {}
-                ],
-                [
-                    1,
-                    "auto_CA_nationalarchives.gov.uk_rx0",
-                    0,
-                    "^https?://(www\\.)?webarchive\\.nationalarchives\\.gov\\.uk/",
-                    1,
-                    [],
-                    [
-                        {
                             "e": 774
                         }
                     ],
@@ -10313,9 +10251,9 @@
                 ],
                 [
                     1,
-                    "auto_CA_natureconservancy.ca_3pp",
+                    "auto_CA_coasthotels.com_f8m",
                     0,
-                    "^https?://(www\\.)?natureconservancy\\.ca/",
+                    "^https?://(www\\.)?coasthotels\\.com/",
                     1,
                     [],
                     [
@@ -10330,26 +10268,17 @@
                     ],
                     [
                         {
-                            "wait": 500
-                        },
-                        {
                             "c": 775
                         }
                     ],
-                    [
-                        {
-                            "timeout": 1000,
-                            "check": "none",
-                            "wv": 775
-                        }
-                    ],
+                    [],
                     {}
                 ],
                 [
                     1,
-                    "auto_CA_ontariospca.ca_k32",
+                    "auto_CA_epihunter.eu_hd4",
                     0,
-                    "^https?://(www\\.)?widget-next\\.clym-sdk\\.net/",
+                    "^https?://(www\\.)?combell\\.com/",
                     1,
                     [],
                     [
@@ -10381,9 +10310,9 @@
                 ],
                 [
                     1,
-                    "auto_CA_phoenixnap.com_hrb",
+                    "auto_CA_nationalarchives.gov.uk_rx0",
                     0,
-                    "^https?://(www\\.)?widget-next\\.clym-sdk\\.net/",
+                    "^https?://(www\\.)?webarchive\\.nationalarchives\\.gov\\.uk/",
                     1,
                     [],
                     [
@@ -10415,9 +10344,9 @@
                 ],
                 [
                     1,
-                    "auto_CH_phoenixnap.com_lx5",
+                    "auto_CA_natureconservancy.ca_3pp",
                     0,
-                    "^https?://(www\\.)?widget-next\\.clym-sdk\\.net/",
+                    "^https?://(www\\.)?natureconservancy\\.ca/",
                     1,
                     [],
                     [
@@ -10449,9 +10378,9 @@
                 ],
                 [
                     1,
-                    "auto_CH_swisscare.com_arx",
+                    "auto_CA_ontariospca.ca_k32",
                     0,
-                    "^https?://(www\\.)?swisscare\\.com/",
+                    "^https?://(www\\.)?widget-next\\.clym-sdk\\.net/",
                     1,
                     [],
                     [
@@ -10483,9 +10412,9 @@
                 ],
                 [
                     1,
-                    "auto_DE_alfaromeo.de_gvg_+2",
+                    "auto_CA_phoenixnap.com_hrb",
                     0,
-                    "^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/|^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/|^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/",
+                    "^https?://(www\\.)?widget-next\\.clym-sdk\\.net/",
                     1,
                     [],
                     [
@@ -10517,9 +10446,9 @@
                 ],
                 [
                     1,
-                    "auto_DE_huss-licht-ton.de_jj0",
+                    "auto_CH_phoenixnap.com_lx5",
                     0,
-                    "^https?://(www\\.)?huss-licht-ton\\.de/",
+                    "^https?://(www\\.)?widget-next\\.clym-sdk\\.net/",
                     1,
                     [],
                     [
@@ -10551,9 +10480,9 @@
                 ],
                 [
                     1,
-                    "auto_DE_modellbau-berlinski.de_8vm",
+                    "auto_CH_swisscare.com_arx",
                     0,
-                    "^https?://(www\\.)?modellbau-berlinski\\.de/",
+                    "^https?://(www\\.)?swisscare\\.com/",
                     1,
                     [],
                     [
@@ -10585,9 +10514,9 @@
                 ],
                 [
                     1,
-                    "auto_DE_phoenixnap.com_xq7",
+                    "auto_DE_alfaromeo.de_gvg_+2",
                     0,
-                    "^https?://(www\\.)?widget-next\\.clym-sdk\\.net/",
+                    "^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/|^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/|^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/",
                     1,
                     [],
                     [
@@ -10619,9 +10548,9 @@
                 ],
                 [
                     1,
-                    "auto_FR_fiat.fr_3fh",
+                    "auto_DE_huss-licht-ton.de_jj0",
                     0,
-                    "^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/",
+                    "^https?://(www\\.)?huss-licht-ton\\.de/",
                     1,
                     [],
                     [
@@ -10653,43 +10582,9 @@
                 ],
                 [
                     1,
-                    "auto_FR_stellantis.com_67q",
+                    "auto_DE_modellbau-berlinski.de_8vm",
                     0,
-                    "^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/",
-                    1,
-                    [],
-                    [
-                        {
-                            "e": 784
-                        }
-                    ],
-                    [
-                        {
-                            "v": 784
-                        }
-                    ],
-                    [
-                        {
-                            "wait": 500
-                        },
-                        {
-                            "c": 784
-                        }
-                    ],
-                    [
-                        {
-                            "timeout": 1000,
-                            "check": "none",
-                            "wv": 784
-                        }
-                    ],
-                    {}
-                ],
-                [
-                    1,
-                    "auto_GB_dropbox.com_0_+1",
-                    0,
-                    "^https?://(www\\.)?dropbox\\.com/|^https?://(www\\.)?dropbox\\.com/",
+                    "^https?://(www\\.)?modellbau-berlinski\\.de/",
                     1,
                     [],
                     [
@@ -10704,17 +10599,26 @@
                     ],
                     [
                         {
+                            "wait": 500
+                        },
+                        {
                             "c": 785
                         }
                     ],
-                    [],
+                    [
+                        {
+                            "timeout": 1000,
+                            "check": "none",
+                            "wv": 785
+                        }
+                    ],
                     {}
                 ],
                 [
                     1,
-                    "auto_GB_investing.thisismoney.co.uk_0",
+                    "auto_DE_phoenixnap.com_xq7",
                     0,
-                    "^https?://(www\\.)?thisismoney\\.co\\.uk/",
+                    "^https?://(www\\.)?widget-next\\.clym-sdk\\.net/",
                     1,
                     [],
                     [
@@ -10729,17 +10633,26 @@
                     ],
                     [
                         {
+                            "wait": 500
+                        },
+                        {
                             "c": 786
                         }
                     ],
-                    [],
+                    [
+                        {
+                            "timeout": 1000,
+                            "check": "none",
+                            "wv": 786
+                        }
+                    ],
                     {}
                 ],
                 [
                     1,
-                    "auto_GB_village-hotels.co.uk_hsa",
+                    "auto_FR_fiat.fr_3fh",
                     0,
-                    "^https?://(www\\.)?village-hotels\\.co\\.uk/",
+                    "^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/",
                     1,
                     [],
                     [
@@ -10771,19 +10684,19 @@
                 ],
                 [
                     1,
-                    "auto_NL_fiat.nl_trv_+1",
+                    "auto_FR_stellantis.com_67q",
                     0,
-                    "^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/|^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/",
+                    "^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/",
                     1,
                     [],
                     [
                         {
-                            "e": 784
+                            "e": 787
                         }
                     ],
                     [
                         {
-                            "v": 784
+                            "v": 787
                         }
                     ],
                     [
@@ -10791,23 +10704,23 @@
                             "wait": 500
                         },
                         {
-                            "c": 784
+                            "c": 787
                         }
                     ],
                     [
                         {
                             "timeout": 1000,
                             "check": "none",
-                            "wv": 784
+                            "wv": 787
                         }
                     ],
                     {}
                 ],
                 [
                     1,
-                    "auto_NL_flitsmeister.nl_ws8",
+                    "auto_GB_dropbox.com_0_+1",
                     0,
-                    "^https?://(www\\.)?cookies\\.flitsmeister\\.com/",
+                    "^https?://(www\\.)?dropbox\\.com/|^https?://(www\\.)?dropbox\\.com/",
                     1,
                     [],
                     [
@@ -10822,26 +10735,17 @@
                     ],
                     [
                         {
-                            "wait": 500
-                        },
-                        {
                             "c": 788
                         }
                     ],
-                    [
-                        {
-                            "timeout": 1000,
-                            "check": "none",
-                            "wv": 788
-                        }
-                    ],
+                    [],
                     {}
                 ],
                 [
                     1,
-                    "auto_NL_interpolis.nl_jk9",
+                    "auto_GB_investing.thisismoney.co.uk_0",
                     0,
-                    "^https?://(www\\.)?interpolis\\.nl/",
+                    "^https?://(www\\.)?thisismoney\\.co\\.uk/",
                     1,
                     [],
                     [
@@ -10856,26 +10760,17 @@
                     ],
                     [
                         {
-                            "wait": 500
-                        },
-                        {
                             "c": 789
                         }
                     ],
-                    [
-                        {
-                            "timeout": 1000,
-                            "check": "none",
-                            "wv": 789
-                        }
-                    ],
+                    [],
                     {}
                 ],
                 [
                     1,
-                    "auto_US_dropbox.com_0_+1",
+                    "auto_GB_village-hotels.co.uk_hsa",
                     0,
-                    "^https?://(www\\.)?dropbox\\.com/|^https?://(www\\.)?dropbox\\.com/",
+                    "^https?://(www\\.)?village-hotels\\.co\\.uk/",
                     1,
                     [],
                     [
@@ -10890,8 +10785,144 @@
                     ],
                     [
                         {
-                            "text": "Decline",
+                            "wait": 500
+                        },
+                        {
                             "c": 790
+                        }
+                    ],
+                    [
+                        {
+                            "timeout": 1000,
+                            "check": "none",
+                            "wv": 790
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
+                    "auto_NL_fiat.nl_trv_+1",
+                    0,
+                    "^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/|^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/",
+                    1,
+                    [],
+                    [
+                        {
+                            "e": 787
+                        }
+                    ],
+                    [
+                        {
+                            "v": 787
+                        }
+                    ],
+                    [
+                        {
+                            "wait": 500
+                        },
+                        {
+                            "c": 787
+                        }
+                    ],
+                    [
+                        {
+                            "timeout": 1000,
+                            "check": "none",
+                            "wv": 787
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
+                    "auto_NL_flitsmeister.nl_ws8",
+                    0,
+                    "^https?://(www\\.)?cookies\\.flitsmeister\\.com/",
+                    1,
+                    [],
+                    [
+                        {
+                            "e": 791
+                        }
+                    ],
+                    [
+                        {
+                            "v": 791
+                        }
+                    ],
+                    [
+                        {
+                            "wait": 500
+                        },
+                        {
+                            "c": 791
+                        }
+                    ],
+                    [
+                        {
+                            "timeout": 1000,
+                            "check": "none",
+                            "wv": 791
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
+                    "auto_NL_interpolis.nl_jk9",
+                    0,
+                    "^https?://(www\\.)?interpolis\\.nl/",
+                    1,
+                    [],
+                    [
+                        {
+                            "e": 792
+                        }
+                    ],
+                    [
+                        {
+                            "v": 792
+                        }
+                    ],
+                    [
+                        {
+                            "wait": 500
+                        },
+                        {
+                            "c": 792
+                        }
+                    ],
+                    [
+                        {
+                            "timeout": 1000,
+                            "check": "none",
+                            "wv": 792
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
+                    "auto_US_dropbox.com_0_+1",
+                    0,
+                    "^https?://(www\\.)?dropbox\\.com/|^https?://(www\\.)?dropbox\\.com/",
+                    1,
+                    [],
+                    [
+                        {
+                            "e": 793
+                        }
+                    ],
+                    [
+                        {
+                            "v": 793
+                        }
+                    ],
+                    [
+                        {
+                            "text": "Decline",
+                            "c": 793
                         }
                     ],
                     [],
@@ -10906,25 +10937,25 @@
                     [],
                     [
                         {
-                            "e": 791
+                            "e": 794
                         }
                     ],
                     [
                         {
-                            "v": 791
+                            "v": 794
                         }
                     ],
                     [
                         {
-                            "k": 792
+                            "k": 795
                         },
                         {
                             "all": true,
                             "optional": true,
-                            "k": 793
+                            "k": 796
                         },
                         {
-                            "k": 794
+                            "k": 797
                         }
                     ],
                     [
@@ -10938,54 +10969,115 @@
                 ],
                 [
                     1,
-                    "privacymanager.io",
+                    "gmx-permission",
                     2,
-                    "^https://cmp-consent-tool\\.privacymanager\\.io/",
+                    "^https://plus\\.gmx\\.com/lt(?:[?#]|$)",
                     1,
                     [
-                        795,
-                        796
+                        798
                     ],
                     [
                         {
-                            "e": 797
+                            "e": 798
                         }
                     ],
                     [
                         {
-                            "v": 797
+                            "v": 799
                         }
                     ],
                     [
                         {
                             "if": {
-                                "e": 798
+                                "e": 800
                             },
                             "then": [
                                 {
-                                    "k": 798
-                                },
-                                {
-                                    "c": 799
+                                    "c": 800
                                 }
                             ],
                             "else": [
                                 {
-                                    "c": 800
+                                    "if": {
+                                        "e": 801
+                                    },
+                                    "then": [
+                                        {
+                                            "c": 801
+                                        },
+                                        {
+                                            "wv": 802
+                                        },
+                                        {
+                                            "c": 802
+                                        }
+                                    ],
+                                    "else": [
+                                        {
+                                            "c": 802
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    [
+                        {
+                            "cc": 803
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
+                    "privacymanager.io",
+                    2,
+                    "^https://cmp-consent-tool\\.privacymanager\\.io/",
+                    1,
+                    [
+                        804,
+                        805
+                    ],
+                    [
+                        {
+                            "e": 806
+                        }
+                    ],
+                    [
+                        {
+                            "v": 806
+                        }
+                    ],
+                    [
+                        {
+                            "if": {
+                                "e": 807
+                            },
+                            "then": [
+                                {
+                                    "k": 807
                                 },
                                 {
-                                    "w": 801
+                                    "c": 808
+                                }
+                            ],
+                            "else": [
+                                {
+                                    "c": 809
                                 },
                                 {
-                                    "w": 802
+                                    "w": 810
+                                },
+                                {
+                                    "w": 811
                                 },
                                 {
                                     "all": true,
                                     "optional": true,
-                                    "k": 803
+                                    "k": 812
                                 },
                                 {
-                                    "k": 802
+                                    "k": 811
                                 }
                             ]
                         }
@@ -11002,23 +11094,63 @@
                     [],
                     [
                         {
-                            "e": 804
+                            "e": 813
                         },
                         {
-                            "e": 805
+                            "e": 814
                         }
                     ],
                     [
                         {
-                            "v": 805
+                            "v": 814
                         }
                     ],
                     [
                         {
-                            "c": 805
+                            "c": 814
                         }
                     ],
                     [],
+                    {}
+                ],
+                [
+                    1,
+                    "aa-cookie-banner",
+                    2,
+                    "^https://(www\\.)?(aa|envoyair|psaairlines)\\.com/",
+                    22,
+                    [
+                        1521
+                    ],
+                    [
+                        {
+                            "exists": [
+                                "adc-cookie-banner",
+                                "#cookie-banner"
+                            ]
+                        }
+                    ],
+                    [
+                        {
+                            "visible": [
+                                "adc-cookie-banner",
+                                "#cookie-banner"
+                            ]
+                        }
+                    ],
+                    [
+                        {
+                            "waitForThenClick": [
+                                "adc-cookie-banner",
+                                "#toast-dismiss-button"
+                            ]
+                        }
+                    ],
+                    [
+                        {
+                            "cc": 1522
+                        }
+                    ],
                     {}
                 ],
                 [
@@ -11046,6 +11178,36 @@
                     [
                         {
                             "cc": 1429
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
+                    "abetterrouteplanner",
+                    2,
+                    "^https?://(www\\.)?abetterrouteplanner\\.com/",
+                    22,
+                    [],
+                    [
+                        {
+                            "e": 1520
+                        }
+                    ],
+                    [
+                        {
+                            "v": 1520
+                        }
+                    ],
+                    [
+                        {
+                            "c": 1520
+                        }
+                    ],
+                    [
+                        {
+                            "negated": true,
+                            "e": 1520
                         }
                     ],
                     {}
@@ -12218,12 +12380,12 @@
                     [],
                     [
                         {
-                            "e": 806
+                            "e": 967
                         }
                     ],
                     [
                         {
-                            "v": 806
+                            "v": 967
                         }
                     ],
                     [
@@ -12231,14 +12393,14 @@
                             "wait": 500
                         },
                         {
-                            "c": 806
+                            "c": 967
                         }
                     ],
                     [
                         {
                             "timeout": 1000,
                             "check": "none",
-                            "wv": 806
+                            "wv": 967
                         }
                     ],
                     {}
@@ -12252,12 +12414,12 @@
                     [],
                     [
                         {
-                            "e": 807
+                            "e": 968
                         }
                     ],
                     [
                         {
-                            "v": 807
+                            "v": 968
                         }
                     ],
                     [
@@ -12265,14 +12427,14 @@
                             "wait": 500
                         },
                         {
-                            "c": 807
+                            "c": 968
                         }
                     ],
                     [
                         {
                             "timeout": 1000,
                             "check": "none",
-                            "wv": 807
+                            "wv": 968
                         }
                     ],
                     {}
@@ -12549,12 +12711,12 @@
                     [],
                     [
                         {
-                            "e": 809
+                            "e": 1529
                         }
                     ],
                     [
                         {
-                            "v": 809
+                            "v": 1529
                         }
                     ],
                     [
@@ -12562,14 +12724,14 @@
                             "wait": 500
                         },
                         {
-                            "c": 809
+                            "c": 1529
                         }
                     ],
                     [
                         {
                             "timeout": 1000,
                             "check": "none",
-                            "wv": 809
+                            "wv": 1529
                         }
                     ],
                     {}
@@ -12617,12 +12779,12 @@
                     [],
                     [
                         {
-                            "e": 811
+                            "e": 1530
                         }
                     ],
                     [
                         {
-                            "v": 811
+                            "v": 1530
                         }
                     ],
                     [
@@ -12630,14 +12792,14 @@
                             "wait": 500
                         },
                         {
-                            "c": 811
+                            "c": 1530
                         }
                     ],
                     [
                         {
                             "timeout": 1000,
                             "check": "none",
-                            "wv": 811
+                            "wv": 1530
                         }
                     ],
                     {}
@@ -12685,12 +12847,12 @@
                     [],
                     [
                         {
-                            "e": 812
+                            "e": 1531
                         }
                     ],
                     [
                         {
-                            "v": 812
+                            "v": 1531
                         }
                     ],
                     [
@@ -12698,14 +12860,14 @@
                             "wait": 500
                         },
                         {
-                            "c": 812
+                            "c": 1531
                         }
                     ],
                     [
                         {
                             "timeout": 1000,
                             "check": "none",
-                            "wv": 812
+                            "wv": 1531
                         }
                     ],
                     {}
@@ -12719,12 +12881,12 @@
                     [],
                     [
                         {
-                            "e": 808
+                            "e": 911
                         }
                     ],
                     [
                         {
-                            "v": 808
+                            "v": 911
                         }
                     ],
                     [
@@ -12732,14 +12894,14 @@
                             "wait": 500
                         },
                         {
-                            "c": 808
+                            "c": 911
                         }
                     ],
                     [
                         {
                             "timeout": 1000,
                             "check": "none",
-                            "wv": 808
+                            "wv": 911
                         }
                     ],
                     {}
@@ -12812,12 +12974,12 @@
                     [],
                     [
                         {
-                            "e": 813
+                            "e": 1532
                         }
                     ],
                     [
                         {
-                            "v": 813
+                            "v": 1532
                         }
                     ],
                     [
@@ -12825,14 +12987,14 @@
                             "wait": 500
                         },
                         {
-                            "c": 813
+                            "c": 1532
                         }
                     ],
                     [
                         {
                             "timeout": 1000,
                             "check": "none",
-                            "wv": 813
+                            "wv": 1532
                         }
                     ],
                     {}
@@ -12880,12 +13042,12 @@
                     [],
                     [
                         {
-                            "e": 814
+                            "e": 1533
                         }
                     ],
                     [
                         {
-                            "v": 814
+                            "v": 1533
                         }
                     ],
                     [
@@ -12893,14 +13055,14 @@
                             "wait": 500
                         },
                         {
-                            "c": 814
+                            "c": 1533
                         }
                     ],
                     [
                         {
                             "timeout": 1000,
                             "check": "none",
-                            "wv": 814
+                            "wv": 1533
                         }
                     ],
                     {}
@@ -14979,12 +15141,12 @@
                     [],
                     [
                         {
-                            "e": 810
+                            "e": 1534
                         }
                     ],
                     [
                         {
-                            "v": 810
+                            "v": 1534
                         }
                     ],
                     [
@@ -14992,14 +15154,14 @@
                             "wait": 500
                         },
                         {
-                            "c": 810
+                            "c": 1534
                         }
                     ],
                     [
                         {
                             "timeout": 1000,
                             "check": "none",
-                            "wv": 810
+                            "wv": 1534
                         }
                     ],
                     {}
@@ -19126,12 +19288,12 @@
                     [],
                     [
                         {
-                            "e": 809
+                            "e": 1529
                         }
                     ],
                     [
                         {
-                            "v": 809
+                            "v": 1529
                         }
                     ],
                     [
@@ -19139,14 +19301,14 @@
                             "wait": 500
                         },
                         {
-                            "c": 809
+                            "c": 1529
                         }
                     ],
                     [
                         {
                             "timeout": 1000,
                             "check": "none",
-                            "wv": 809
+                            "wv": 1529
                         }
                     ],
                     {}
@@ -20282,12 +20444,12 @@
                     [],
                     [
                         {
-                            "e": 809
+                            "e": 1529
                         }
                     ],
                     [
                         {
-                            "v": 809
+                            "v": 1529
                         }
                     ],
                     [
@@ -20295,14 +20457,14 @@
                             "wait": 500
                         },
                         {
-                            "c": 809
+                            "c": 1529
                         }
                     ],
                     [
                         {
                             "timeout": 1000,
                             "check": "none",
-                            "wv": 809
+                            "wv": 1529
                         }
                     ],
                     {}
@@ -22342,12 +22504,12 @@
                     [],
                     [
                         {
-                            "e": 809
+                            "e": 1529
                         }
                     ],
                     [
                         {
-                            "v": 809
+                            "v": 1529
                         }
                     ],
                     [
@@ -22355,14 +22517,14 @@
                             "wait": 500
                         },
                         {
-                            "c": 809
+                            "c": 1529
                         }
                     ],
                     [
                         {
                             "timeout": 1000,
                             "check": "none",
-                            "wv": 809
+                            "wv": 1529
                         }
                     ],
                     {}
@@ -24075,12 +24237,12 @@
                     [],
                     [
                         {
-                            "e": 809
+                            "e": 1529
                         }
                     ],
                     [
                         {
-                            "v": 809
+                            "v": 1529
                         }
                     ],
                     [
@@ -24088,14 +24250,14 @@
                             "wait": 500
                         },
                         {
-                            "c": 809
+                            "c": 1529
                         }
                     ],
                     [
                         {
                             "timeout": 1000,
                             "check": "none",
-                            "wv": 809
+                            "wv": 1529
                         }
                     ],
                     {}
@@ -25632,12 +25794,12 @@
                     [],
                     [
                         {
-                            "e": 809
+                            "e": 1529
                         }
                     ],
                     [
                         {
-                            "v": 809
+                            "v": 1529
                         }
                     ],
                     [
@@ -25645,14 +25807,14 @@
                             "wait": 500
                         },
                         {
-                            "c": 809
+                            "c": 1529
                         }
                     ],
                     [
                         {
                             "timeout": 1000,
                             "check": "none",
-                            "wv": 809
+                            "wv": 1529
                         }
                     ],
                     {}
@@ -27115,6 +27277,42 @@
                 ],
                 [
                     1,
+                    "interia",
+                    2,
+                    "^https://(www\\.)?interia\\.pl/",
+                    22,
+                    [
+                        969
+                    ],
+                    [
+                        {
+                            "e": 969
+                        }
+                    ],
+                    [
+                        {
+                            "v": 969
+                        }
+                    ],
+                    [
+                        {
+                            "c": 977
+                        },
+                        {
+                            "c": 978
+                        }
+                    ],
+                    [
+                        {
+                            "check": "none",
+                            "timeout": 3000,
+                            "wv": 969
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
                     "itopvpn.com",
                     1,
                     "^https://(www\\.)?itopvpn.com/",
@@ -27133,48 +27331,6 @@
                     [
                         {
                             "h": 910
-                        }
-                    ],
-                    [],
-                    {}
-                ],
-                [
-                    1,
-                    "jdsports",
-                    2,
-                    "^https://(www|m)\\.jdsports\\.",
-                    22,
-                    [
-                        911
-                    ],
-                    [
-                        {
-                            "e": 911
-                        }
-                    ],
-                    [
-                        {
-                            "v": 911
-                        }
-                    ],
-                    [
-                        {
-                            "if": {
-                                "e": 912
-                            },
-                            "then": [
-                                {
-                                    "h": 912
-                                }
-                            ],
-                            "else": [
-                                {
-                                    "c": 913
-                                },
-                                {
-                                    "c": 914
-                                }
-                            ]
                         }
                     ],
                     [],
@@ -27923,6 +28079,33 @@
                 ],
                 [
                     1,
+                    "pornhub-compact-cookie-banner",
+                    0,
+                    "^https://(www\\.)?pornhub\\.com/",
+                    22,
+                    [
+                        1535
+                    ],
+                    [
+                        {
+                            "e": 912
+                        }
+                    ],
+                    [
+                        {
+                            "v": 912
+                        }
+                    ],
+                    [
+                        {
+                            "k": 912
+                        }
+                    ],
+                    [],
+                    {}
+                ],
+                [
+                    1,
                     "pornhub.com",
                     0,
                     "^https://(www\\.)?pornhub\\.com/",
@@ -27932,12 +28115,12 @@
                     ],
                     [
                         {
-                            "e": 1373
+                            "e": 913
                         }
                     ],
                     [
                         {
-                            "v": 1373
+                            "v": 913
                         }
                     ],
                     [
@@ -28156,7 +28339,7 @@
                     1,
                     "reddit.com",
                     2,
-                    "^https://www\\.reddit\\.com/",
+                    "^https://(www|old)\\.reddit\\.com/",
                     22,
                     [
                         1380
@@ -28446,6 +28629,37 @@
                 ],
                 [
                     1,
+                    "simyo-nl",
+                    2,
+                    "^https?://(www\\.)?simyo\\.nl/",
+                    10,
+                    [
+                        1536
+                    ],
+                    [
+                        {
+                            "v": 1536
+                        }
+                    ],
+                    [
+                        {
+                            "v": 1536
+                        }
+                    ],
+                    [
+                        {
+                            "c": 1537
+                        }
+                    ],
+                    [
+                        {
+                            "cc": 1538
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
                     "skyscanner",
                     0,
                     "^https://(www\\.)?skyscanner[\\.a-z]+/",
@@ -28674,6 +28888,43 @@
                     [
                         {
                             "cc": 840
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    2,
+                    "theguardian.com",
+                    1,
+                    "^https?://(\\w+\\.)?theguardian\\.com/",
+                    10,
+                    [
+                        1373
+                    ],
+                    [
+                        {
+                            "e": 1373
+                        }
+                    ],
+                    [
+                        {
+                            "v": 1373
+                        }
+                    ],
+                    [
+                        {
+                            "h": 1373
+                        },
+                        {
+                            "removeClass": "sp-message-open",
+                            "selector": "html",
+                            "optional": true
+                        }
+                    ],
+                    [
+                        {
+                            "check": "none",
+                            "v": 1373
                         }
                     ],
                     {}
@@ -28951,6 +29202,39 @@
                 ],
                 [
                     1,
+                    "unive-nl",
+                    0,
+                    "^https?://(?:[^/]+\\.)?unive\\.nl/",
+                    10,
+                    [
+                        1523
+                    ],
+                    [
+                        {
+                            "e": 1524
+                        }
+                    ],
+                    [
+                        {
+                            "v": 1523
+                        }
+                    ],
+                    [
+                        {
+                            "c": 1525
+                        }
+                    ],
+                    [
+                        {
+                            "check": "none",
+                            "timeout": 2000,
+                            "wv": 1523
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
                     "uswitch.com",
                     2,
                     "^https://(www\\.)?uswitch\\.com/",
@@ -29125,21 +29409,25 @@
                     "^https://(\\w+\\.)?xhamster\\d?\\.com",
                     22,
                     [
-                        967
+                        1526
                     ],
                     [
                         {
-                            "e": 968
+                            "e": 1527
                         }
                     ],
                     [
                         {
-                            "v": 968
+                            "v": 1527
                         }
                     ],
                     [
                         {
-                            "c": 969
+                            "c": 1528
+                        },
+                        {
+                            "optional": true,
+                            "h": 914
                         }
                     ],
                     [],
@@ -29181,17 +29469,17 @@
                     [],
                     [
                         {
-                            "e": 977
+                            "e": 771
                         }
                     ],
                     [
                         {
-                            "v": 977
+                            "v": 771
                         }
                     ],
                     [
                         {
-                            "c": 978
+                            "c": 772
                         }
                     ],
                     [],
@@ -29320,18 +29608,18 @@
             "index": {
                 "genericRuleRange": [
                     0,
-                    194
+                    193
                 ],
                 "frameRuleRange": [
-                    192,
+                    191,
                     219
                 ],
                 "specificRuleRange": [
-                    194,
-                    776
+                    193,
+                    782
                 ],
-                "genericStringEnd": 771,
-                "frameStringEnd": 806
+                "genericStringEnd": 774,
+                "frameStringEnd": 815
             }
         }
     }
