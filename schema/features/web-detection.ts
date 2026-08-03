@@ -39,6 +39,7 @@ export type ConditionTypes = {
     text: {
         pattern: MaybeArray<string>;
         selector?: MaybeArray<string>;
+        xpath?: MaybeArray<string>;
     };
     element: {
         selector: MaybeArray<string>;
