@@ -12,7 +12,7 @@ type SubFeatures<VersionType> = {
             idleThresholdSeconds: number;
         }
     >;
-    searchTokenExperiment?: SubFeature<
+    searchTokenExperimentV2?: SubFeature<
         VersionType,
         {
             // Lifetime of the search token in seconds
