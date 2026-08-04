@@ -16,7 +16,6 @@ type ExtensionManagementSettings = {
 type CuratedExtension = {
     id: string;
     name: string;
-    description: string;
     publisher: string;
     publisherUri: string;
     iconUri: string;
