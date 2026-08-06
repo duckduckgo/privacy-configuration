@@ -1,5 +1,6 @@
 import { expect } from 'chai';
 import fs from 'fs';
+import xpath from 'xpath';
 import platforms from '../platforms.js';
 
 const OPERATOR_KEYS = [
