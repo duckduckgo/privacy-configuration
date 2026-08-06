@@ -2425,7 +2425,10 @@
                 "#cookieBanner.cbShort",
                 "[data-testid=\"cookie-wall\"]",
                 "[data-testid=\"cookie-wall\"] .cookie-bar__footer button[data-id=\"0\"]",
-                "acceptCookies=0"
+                "acceptCookies=0",
+                "[data-qa=\"GDPRBanner-Container\"]",
+                "[data-qa=\"GDPRBanner-Container\"] [data-qa=\"GDPRBanner-Button\"]",
+                ".fc-consent-root .fc-dialog-container"
             ],
             "r": [
                 [
@@ -28596,6 +28599,57 @@
                 ],
                 [
                     1,
+                    "scmp",
+                    2,
+                    "^https://(www\\.)?scmp\\.com/",
+                    22,
+                    [
+                        1539
+                    ],
+                    [
+                        {
+                            "e": 1540
+                        }
+                    ],
+                    [
+                        {
+                            "v": 1540
+                        }
+                    ],
+                    [
+                        {
+                            "timeout": 4000,
+                            "optional": true,
+                            "wv": 1541
+                        },
+                        {
+                            "if": {
+                                "v": 1541
+                            },
+                            "then": [
+                                {
+                                    "k": 406
+                                },
+                                {
+                                    "all": true,
+                                    "optional": true,
+                                    "k": 407
+                                },
+                                {
+                                    "optional": true,
+                                    "k": 408
+                                }
+                            ]
+                        },
+                        {
+                            "h": 1539
+                        }
+                    ],
+                    [],
+                    {}
+                ],
+                [
+                    1,
                     "shein.com",
                     2,
                     "^https?://([a-z]+\\.)?shein\\.com/",
@@ -29616,7 +29670,7 @@
                 ],
                 "specificRuleRange": [
                     193,
-                    782
+                    783
                 ],
                 "genericStringEnd": 774,
                 "frameStringEnd": 815
