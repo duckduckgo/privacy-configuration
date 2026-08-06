@@ -108,6 +108,85 @@ function assertXPathConfig(xpathConfig, path) {
 }
 
 /**
+ * Assert an XPath expression parses under the XPath 1.0 grammar.
+ *
+ * Only the grammar is checked. An expression that parses may still select nothing on
+ * a real page, and browser engines may disagree at the edges of the spec.
+ *
+ * @param {unknown} expression
+ * @param {string} path - used in error messages
+ */
+function assertValidXPath(expression, path) {
+    expect(typeof expression, `${path}: expected a string, got ${JSON.stringify(expression)}`).to.equal('string');
+    try {
+        xpath.parse(/** @type {string} */ (expression));
+    } catch (error) {
+        expect.fail(`${path}: ${JSON.stringify(expression)} is not a valid XPath expression - ${error.message}`);
+    }
+}
+
+/**
+ * Compile a pattern source, throwing on a syntax error.
+ *
+ * @param {string} source
+ * @returns {RegExp}
+ */
+function compilePattern(source) {
+    return new RegExp(source, 'i');
+}
+
+/**
+ * Assert every entry of a `pattern` value is a regular expression in its own right.
+ *
+ * Syntax is all that is checked, and only against this Node version.
+ *
+ * @param {unknown} pattern - a single pattern or an array of them
+ * @param {string} path - used in error messages
+ */
+function assertValidPattern(pattern, path) {
+    const patterns = Array.isArray(pattern)
+        ? pattern
+        : [
+              pattern,
+          ];
+    for (const [
+        index,
+        entry,
+    ] of patterns.entries()) {
+        expect(typeof entry, `${path}[${index}]: expected a string, got ${JSON.stringify(entry)}`).to.equal('string');
+        try {
+            compilePattern(entry);
+        } catch (error) {
+            expect.fail(`${path}[${index}]: ${JSON.stringify(entry)} is not a valid regular expression - ${error.message}`);
+        }
+    }
+}
+
+/**
+ * Assert the expressions of a single `text` leaf condition.
+ *
+ * @param {Record<string, any>} condition
+ * @param {string} path - used in error messages
+ */
+function assertTextConditionExpressions(condition, path) {
+    if (condition.pattern !== undefined) {
+        assertValidPattern(condition.pattern, `${path}/pattern`);
+    }
+    const expressions = Array.isArray(condition.xpath)
+        ? condition.xpath
+        : [
+              condition.xpath,
+          ];
+    for (const [
+        index,
+        expression,
+    ] of expressions.entries()) {
+        if (expression === undefined) continue;
+        assertValidXPath(expression, `${path}/xpath[${index}]`);
+    }
+}
+
+/**
  * Invoke `cb` for every leaf of a `text` condition branch, descending through
  * operator blocks and arrays.
  *
@@ -182,6 +261,44 @@ function assertXPathConfigPatch(operation, path) {
     assertXPathConfig({ [key]: operation.value }, `${path} ${operation.path}`);
 }
 
+/** Patch paths that land on an `xpath` value, or on one entry of an `xpath` array. */
+const XPATH_PATCH_PATH = /\/xpath(?:\/\d+)?$/;
+
+/** Patch paths that land on a `pattern` value, or on one entry of a `pattern` array. */
+const PATTERN_PATCH_PATH = /\/pattern(?:\/\d+)?$/;
+
+/**
+ * Validate a patch operation targeting an `xpath` or `pattern` value.
+ *
+ * Patches are applied client-side, so a value set only by a patch never appears as a
+ * literal in the generated config and would otherwise go unchecked.
+ *
+ * @param {Record<string, any>} operation
+ * @param {string} path - used in error messages
+ */
+function assertExpressionPatch(operation, path) {
+    const operationPath = operation.path ?? '';
+    if (operation.op === 'remove') return;
+
+    if (XPATH_PATCH_PATH.test(operationPath)) {
+        const values = Array.isArray(operation.value)
+            ? operation.value
+            : [
+                  operation.value,
+              ];
+        for (const [
+            index,
+            expression,
+        ] of values.entries()) {
+            assertValidXPath(expression, `${path} ${operationPath}[${index}]`);
+        }
+    }
+
+    if (PATTERN_PATCH_PATH.test(operationPath)) {
+        assertValidPattern(operation.value, `${path} ${operationPath}`);
+    }
+}
+
 const platformOutput = platforms.map((item) => item.replace('browsers/', 'extension-'));
 
 const latestConfigs = platformOutput.map((plat) => {
@@ -190,6 +307,33 @@ const latestConfigs = platformOutput.map((plat) => {
         body: JSON.parse(fs.readFileSync(`./generated/v5/${plat}-config.json`)),
     };
 });
+
+/**
+ * Invoke `cb` for every patch operation the feature can apply, from either the
+ * per-domain or the conditional lists.
+ *
+ * @param {import('../schema/features/web-detection').WebDetectionFeature<number>} webDetection
+ * @param {(operation: Record<string, any>, path: string) => void} cb
+ */
+function forEachPatchOperation(webDetection, cb) {
+    const settings = /** @type {Record<string, any>} */ (webDetection.settings);
+    for (const [
+        index,
+        entry,
+    ] of (settings.domains ?? []).entries()) {
+        for (const operation of entry.patchSettings ?? []) {
+            cb(operation, `domains[${index}] (${entry.domain})`);
+        }
+    }
+    for (const [
+        index,
+        entry,
+    ] of (settings.conditionalChanges ?? []).entries()) {
+        for (const operation of entry.patchSettings ?? []) {
+            cb(operation, `conditionalChanges[${index}]`);
+        }
+    }
+}
 
 /**
  * Iterate every generated config that has a webDetection feature with detectors.
@@ -314,23 +458,35 @@ describe('webDetection config tests', () => {
                 }
 
                 it('xpathConfig patch operations are within sensible bounds', () => {
-                    const settings = /** @type {Record<string, any>} */ (webDetection.settings);
+                    forEachPatchOperation(webDetection, assertXPathConfigPatch);
+                });
+            });
+        });
+    });
+
+    describe('expression validation', () => {
+        forEachWebDetectionConfig(({ configName, webDetection, detectors }) => {
+            describe(configName, () => {
+                for (const [
+                    groupName,
+                    group,
+                ] of Object.entries(detectors)) {
                     for (const [
-                        index,
-                        entry,
-                    ] of (settings.domains ?? []).entries()) {
-                        for (const operation of entry.patchSettings ?? []) {
-                            assertXPathConfigPatch(operation, `domains[${index}] (${entry.domain})`);
-                        }
+                        detectorId,
+                        detector,
+                    ] of Object.entries(group)) {
+                        it(`${groupName}.${detectorId} xpath and pattern values are well formed`, () => {
+                            forEachTextCondition(
+                                detector.match,
+                                `detectors.${groupName}.${detectorId}.match`,
+                                assertTextConditionExpressions,
+                            );
+                        });
                     }
-                    for (const [
-                        index,
-                        entry,
-                    ] of (settings.conditionalChanges ?? []).entries()) {
-                        for (const operation of entry.patchSettings ?? []) {
-                            assertXPathConfigPatch(operation, `conditionalChanges[${index}]`);
-                        }
-                    }
+                }
+
+                it('xpath and pattern patch operations are well formed', () => {
+                    forEachPatchOperation(webDetection, assertExpressionPatch);
                 });
             });
         });
@@ -453,6 +609,127 @@ describe('webDetection config tests', () => {
         it('checks a lone chunkTail in isolation, since the ratio needs a chunkSize', () => {
             expect(check({ chunkTail: 99999 })).to.not.throw();
             expect(check({ chunkTail: -1 })).to.throw();
+        });
+    });
+
+    describe('expression validation (self-test)', () => {
+        /** @param {unknown} expression */
+        const checkXPath = (expression) => () => assertValidXPath(expression, '$');
+
+        /** @param {unknown} pattern */
+        const checkPattern = (pattern) => () => assertValidPattern(pattern, '$');
+
+        it('accepts XPath expressions of the shape detectors use', () => {
+            expect(checkXPath('//div//text()')).to.not.throw();
+            expect(checkXPath('//*[@class="banner"]//text()')).to.not.throw();
+            expect(checkXPath('//div[contains(@id, "consent")]')).to.not.throw();
+        });
+
+        it('rejects malformed XPath expressions', () => {
+            expect(checkXPath('//div[')).to.throw();
+            expect(checkXPath('//div[@class="a"')).to.throw();
+            expect(checkXPath('')).to.throw();
+        });
+
+        it('rejects a non-string XPath expression', () => {
+            expect(checkXPath(42)).to.throw();
+            expect(checkXPath(null)).to.throw();
+        });
+
+        it('accepts a single pattern and an array of them', () => {
+            expect(checkPattern('foo')).to.not.throw();
+            expect(
+                checkPattern([
+                    'foo',
+                    'bar(baz)?',
+                ]),
+            ).to.not.throw();
+        });
+
+        it('rejects a malformed pattern', () => {
+            expect(checkPattern('foo(')).to.throw();
+            expect(checkPattern('[a-')).to.throw();
+        });
+
+        it('rejects entries that are only valid as a pair', () => {
+            expect(
+                checkPattern([
+                    'a(',
+                    'b)',
+                ]),
+            ).to.throw();
+        });
+
+        it('rejects a non-string pattern entry', () => {
+            expect(
+                checkPattern([
+                    'foo',
+                    7,
+                ]),
+            ).to.throw();
+        });
+
+        it('checks both keys of a text leaf', () => {
+            expect(() => assertTextConditionExpressions({ pattern: 'foo', xpath: '//div//text()' }, '$')).to.not.throw();
+            expect(() => assertTextConditionExpressions({ pattern: 'foo(', xpath: '//div//text()' }, '$')).to.throw();
+            expect(() => assertTextConditionExpressions({ pattern: 'foo', xpath: '//div[' }, '$')).to.throw();
+            expect(() => assertTextConditionExpressions({ pattern: 'foo' }, '$')).to.not.throw();
+        });
+
+        it('checks every entry of an xpath array', () => {
+            expect(() =>
+                assertTextConditionExpressions(
+                    {
+                        pattern: 'foo',
+                        xpath: [
+                            '//div//text()',
+                            '//span[',
+                        ],
+                    },
+                    '$',
+                ),
+            ).to.throw();
+        });
+    });
+
+    describe('expression patch validation (self-test)', () => {
+        /** @param {Record<string, any>} operation */
+        const check = (operation) => () => assertExpressionPatch(operation, '$');
+
+        it('checks a patched xpath value', () => {
+            expect(check({ op: 'replace', path: '/detectors/g/d/match/text/xpath', value: '//div//text()' })).to.not.throw();
+            expect(check({ op: 'replace', path: '/detectors/g/d/match/text/xpath', value: '//div[' })).to.throw();
+        });
+
+        it('checks every entry of a patched xpath array', () => {
+            expect(
+                check({
+                    op: 'replace',
+                    path: '/detectors/g/d/match/text/xpath',
+                    value: [
+                        '//div//text()',
+                        '//span[',
+                    ],
+                }),
+            ).to.throw();
+        });
+
+        it('checks a patched single xpath array entry', () => {
+            expect(check({ op: 'replace', path: '/detectors/g/d/match/text/xpath/1', value: '//div[' })).to.throw();
+        });
+
+        it('checks a patched pattern value', () => {
+            expect(check({ op: 'add', path: '/detectors/g/d/match/text/pattern', value: 'foo' })).to.not.throw();
+            expect(check({ op: 'add', path: '/detectors/g/d/match/text/pattern', value: 'foo(' })).to.throw();
+        });
+
+        it('ignores removals and unrelated paths', () => {
+            expect(check({ op: 'remove', path: '/detectors/g/d/match/text/xpath' })).to.not.throw();
+            expect(check({ op: 'replace', path: '/detectors/g/d/state', value: 'disabled' })).to.not.throw();
+        });
+
+        it('does not mistake xpathConfig for an xpath value', () => {
+            expect(check({ op: 'replace', path: '/detectors/g/d/match/text/xpathConfig', value: { chunkSize: 8192 } })).to.not.throw();
         });
     });
 
