@@ -262,14 +262,42 @@ function assertXPathConfigPatch(operation, path) {
     assertXPathConfig({ [key]: operation.value }, `${path} ${operation.path}`);
 }
 
-/** Patch paths that land on an `xpath` value, or on one entry of an `xpath` array. */
-const XPATH_PATCH_PATH = /\/xpath(?:\/\d+)?$/;
+/** Patch paths that land on an `xpath` value, or on one entry of an `xpath` array. `-` appends. */
+const XPATH_PATCH_PATH = /\/xpath(?:\/(?:\d+|-))?$/;
 
-/** Patch paths that land on a `pattern` value, or on one entry of a `pattern` array. */
-const PATTERN_PATCH_PATH = /\/pattern(?:\/\d+)?$/;
+/** Patch paths that land on a `pattern` value, or on one entry of a `pattern` array. `-` appends. */
+const PATTERN_PATCH_PATH = /\/pattern(?:\/(?:\d+|-))?$/;
 
 /**
- * Validate a patch operation targeting an `xpath` or `pattern` value.
+ * Invoke `cb` for every object carrying an `xpath` or `pattern` key anywhere within `node`.
+ *
+ * Unlike `forEachTextCondition` this makes no assumptions about where in the tree it
+ * started, so it can be pointed at the value of a patch that lands above a text leaf.
+ *
+ * @param {unknown} node
+ * @param {string} path
+ * @param {(condition: Record<string, any>, path: string) => void} cb
+ */
+function forEachExpressionHolder(node, path, cb) {
+    if (Array.isArray(node)) {
+        node.forEach((entry, index) => forEachExpressionHolder(entry, `${path}/${index}`, cb));
+        return;
+    }
+    if (node === null || typeof node !== 'object') return;
+
+    const holder = /** @type {Record<string, any>} */ (node);
+    if (holder.xpath !== undefined || holder.pattern !== undefined) cb(holder, path);
+    for (const [
+        key,
+        value,
+    ] of Object.entries(holder)) {
+        forEachExpressionHolder(value, `${path}/${key}`, cb);
+    }
+}
+
+/**
+ * Validate a patch operation that sets an `xpath` or `pattern`, whether the path lands
+ * on the value itself or on an object containing it.
  *
  * Patches are applied client-side, so a value set only by a patch never appears as a
  * literal in the generated config and would otherwise go unchecked.
@@ -293,11 +321,16 @@ function assertExpressionPatch(operation, path) {
         ] of values.entries()) {
             assertValidXPath(expression, `${path} ${operationPath}[${index}]`);
         }
+        return;
     }
 
     if (PATTERN_PATCH_PATH.test(operationPath)) {
         assertValidPattern(operation.value, `${path} ${operationPath}`);
+        return;
     }
+
+    // The path lands above a text leaf, so any expressions are nested in the value
+    forEachExpressionHolder(operation.value, `${path} ${operationPath}`, assertTextConditionExpressions);
 }
 
 const platformOutput = platforms.map((item) => item.replace('browsers/', 'extension-'));
@@ -722,6 +755,40 @@ describe('webDetection config tests', () => {
         it('checks a patched pattern value', () => {
             expect(check({ op: 'add', path: '/detectors/g/d/match/text/pattern', value: 'foo' })).to.not.throw();
             expect(check({ op: 'add', path: '/detectors/g/d/match/text/pattern', value: 'foo(' })).to.throw();
+        });
+
+        it('checks values appended to an xpath or pattern array', () => {
+            expect(check({ op: 'add', path: '/detectors/g/d/match/text/xpath/-', value: '//div//text()' })).to.not.throw();
+            expect(check({ op: 'add', path: '/detectors/g/d/match/text/xpath/-', value: '//div[' })).to.throw();
+            expect(check({ op: 'add', path: '/detectors/g/d/match/text/pattern/-', value: 'foo(' })).to.throw();
+        });
+
+        it('checks expressions nested inside a patch that lands above the leaf', () => {
+            expect(check({ op: 'add', path: '/detectors/g/d/match/text/-', value: { pattern: 'foo(' } })).to.throw();
+            expect(check({ op: 'replace', path: '/detectors/g/d/match', value: { text: { pattern: 'foo', xpath: '//div[' } } })).to.throw();
+            expect(
+                check({
+                    op: 'add',
+                    path: '/detectors/g/d',
+                    value: {
+                        match: {
+                            all: [
+                                { text: { pattern: 'ok' } },
+                                {
+                                    text: {
+                                        any: [
+                                            { pattern: 'b)' },
+                                        ],
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                }),
+            ).to.throw();
+            expect(
+                check({ op: 'replace', path: '/detectors/g/d/match', value: { text: { pattern: 'foo', xpath: '//div//text()' } } }),
+            ).to.not.throw();
         });
 
         it('ignores removals and unrelated paths', () => {
