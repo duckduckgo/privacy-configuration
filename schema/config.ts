@@ -18,6 +18,7 @@ import { NetworkProtection } from './features/network-protection';
 import { AiChatConfig } from './features/ai-chat';
 import { ScriptletsFeature } from './features/scriptlets';
 import { WindowsWebViewFailures } from './features/windows-webview-failures';
+import { WebViewConfig } from './features/webview';
 import { CustomUserAgentFeature } from './features/custom-user-agent';
 import { BurnFeature } from './features/burn';
 import { ClientBrandHintFeature } from './features/client-brand-hint';
@@ -39,6 +40,7 @@ import { DownloadManager } from './features/downloadManager';
 import { WebExtensionsConfig } from './features/web-extensions';
 import { AdBlockingExtensionConfig } from './features/ad-blocking-extension';
 import { TabSuspension } from './features/tab-suspension';
+import { ExtensionManagementFeature } from './features/extension-management';
 
 export { WebCompatSettings } from './features/webcompat';
 export { DuckPlayerSettings } from './features/duckplayer';
@@ -90,6 +92,7 @@ export type ConfigV5<VersionType> = {
         webDetection?: WebDetectionFeature<VersionType>;
         webEvents?: WebEventsFeature<VersionType>;
         windowsWebviewFailures?: WindowsWebViewFailures<VersionType>;
+        webview?: WebViewConfig<VersionType>;
         customUserAgent?: CustomUserAgentFeature<VersionType>;
         downloadManager?: DownloadManager<VersionType>;
         elementHiding?: ElementHidingFeature<VersionType>;
@@ -103,6 +106,7 @@ export type ConfigV5<VersionType> = {
         iOSBrowserConfig?: IOSBrowserConfig<VersionType>;
         tabSuspension?: TabSuspension<VersionType>;
         webExtensions?: WebExtensionsConfig<VersionType>;
+        extensionManagement?: ExtensionManagementFeature<VersionType>;
     };
     unprotectedTemporary: SiteException[];
 };

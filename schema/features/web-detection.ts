@@ -35,14 +35,38 @@ type ConditionOperator = 'any' | 'all' | 'none';
 
 type ConditionNode<Final> = Final | { [K in ConditionOperator]?: ConditionBranch<Final> };
 
+/**
+ * Tuning for `xpath` text matching, which scans selected text in chunks rather than
+ * concatenating it in full so that a large page is not held in memory at once.
+ *
+ * Both values are counted in characters. Omit them unless a detector needs tuning.
+ *
+ * Has no effect on `selector`, which always reads text in one go.
+ */
+type XPathConfig = {
+    /**
+     * Characters matched at a time. 0 turns chunking off, matching the whole
+     * selected text in one go.
+     */
+    chunkSize?: number;
+    /**
+     * Characters carried over between chunks, which sets the longest match that can
+     * span a chunk boundary and still be found. Raise this if a detector's phrases
+     * are long enough to be split.
+     */
+    chunkTail?: number;
+};
+
 export type ConditionTypes = {
     text: {
         pattern: MaybeArray<string>;
         selector?: MaybeArray<string>;
+        xpath?: MaybeArray<string>;
+        xpathConfig?: XPathConfig;
     };
     element: {
         selector: MaybeArray<string>;
-        visibility?: 'visible' | 'hidden' | 'any';
+        visibility?: 'visible' | 'hidden' | 'any' | 'content';
     };
 };
 

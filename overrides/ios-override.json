@@ -126,6 +126,22 @@
                 },
                 "riskyDomainsProtection": {
                     "state": "enabled"
+                },
+                "excludeCGNAT": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.230.0"
+                },
+                "strictRoutingToggle": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.230.0"
+                },
+                "showCopyDiagnosticsButton": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.230.0"
+                },
+                "strictRoutingReminder": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.230.0"
                 }
             }
         },
@@ -384,9 +400,17 @@
                             },
                             {
                                 "percent": 25
+                            },
+                            {
+                                "percent": 100
                             }
                         ]
                     }
+                },
+                "contextualUnifiedToggleInput": {
+                    "state": "enabled",
+                    "description": "Contextual Unified Toggle Input (UTI) for Duck.ai",
+                    "minSupportedVersion": "7.230.0"
                 },
                 "aiChatAtb": {
                     "state": "enabled",
@@ -400,6 +424,10 @@
                 "iPadPageContext": {
                     "state": "enabled",
                     "minSupportedVersion": "7.213.0"
+                },
+                "iPadDuckAIBarControls": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.229.0"
                 },
                 "supportsSyncChatsDeletion": {
                     "state": "enabled",
@@ -416,6 +444,10 @@
                 "voiceShortcut": {
                     "state": "enabled",
                     "minSupportedVersion": "7.216.0"
+                },
+                "contextualSuggestedPrompts": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.232.0"
                 }
             },
             "settings": {
@@ -718,7 +750,7 @@
                     ]
                 },
                 "tdsNextExperiment012": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "rollout": {
                         "steps": [
                             {
@@ -729,6 +761,33 @@
                     "settings": {
                         "controlUrl": "v5/experiments/202606v2-ios-tds-control.json",
                         "treatmentUrl": "v5/experiments/202606v2-ios-tds-treatment.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "tdsNextExperiment014": {
+                    "state": "disabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "v5/experiments/202607fbctl02-ios-tds-control.json",
+                        "treatmentUrl": "v5/experiments/202607fbctl02-ios-tds-treatment.json"
                     },
                     "cohorts": [
                         {
@@ -925,7 +984,28 @@
                     "state": "enabled"
                 },
                 "cookiePopupPreferenceSetting": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": "7.228.0"
+                },
+                "cookiePopupOptInDialog": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.228.0",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 2
+                            },
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
                 }
             }
         },
@@ -989,6 +1069,41 @@
                         "formBoundarySelector": "",
                         "failsafeSettings": {},
                         "conditionalChanges": [
+                            {
+                                "condition": [
+                                    { "domain": "fedex.com" }
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input#password[autocomplete=\"current-password\"]",
+                                            "type": "credentials.password.current"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "condition": [
+                                    { "domain": "blindbarber.com" }
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formBoundarySelector",
+                                        "op": "replace",
+                                        "value": "app-createcardtoken form"
+                                    },
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "app-createcardtoken form",
+                                            "type": "cc"
+                                        }
+                                    }
+                                ]
+                            },
                             {
                                 "condition": [
                                     { "domain": "wealthr.co.uk" }
@@ -2013,7 +2128,8 @@
                     "minSupportedVersion": "7.208.2"
                 },
                 "aiChatSyncPromo": {
-                    "state": "disabled"
+                    "state": "enabled",
+                    "minSupportedVersion": "7.228.0"
                 },
                 "simplifiedSyncSetupExperiment": {
                     "state": "enabled",
@@ -2113,6 +2229,207 @@
                                     "https://github.com/duckduckgo/privacy-configuration/issues/1968",
                                     "rocketnews24.com, wunderground.com - https://github.com/duckduckgo/privacy-configuration/pull/4645"
                                 ]
+                            },
+                            {
+                                "rule": "ad.doubleclick.net/ddm/",
+                                "domains": [
+                                    "agd-plugin.com",
+                                    "agoda.ae",
+                                    "agoda.be",
+                                    "agoda.bg",
+                                    "agoda.ca",
+                                    "agoda.cat",
+                                    "agoda.cn",
+                                    "agoda.co",
+                                    "agoda.co.cr",
+                                    "agoda.co.ee",
+                                    "agoda.co.il",
+                                    "agoda.co.in",
+                                    "agoda.co.kr",
+                                    "agoda.co.ma",
+                                    "agoda.co.nz",
+                                    "agoda.co.th",
+                                    "agoda.co.uk",
+                                    "agoda.co.za",
+                                    "agoda.com",
+                                    "agoda.com.ar",
+                                    "agoda.com.au",
+                                    "agoda.com.bh",
+                                    "agoda.com.br",
+                                    "agoda.com.cn",
+                                    "agoda.com.hk",
+                                    "agoda.com.kw",
+                                    "agoda.com.mx",
+                                    "agoda.com.my",
+                                    "agoda.com.om",
+                                    "agoda.com.pt",
+                                    "agoda.com.qa",
+                                    "agoda.com.sa",
+                                    "agoda.com.sg",
+                                    "agoda.com.tr",
+                                    "agoda.com.tw",
+                                    "agoda.cz",
+                                    "agoda.de",
+                                    "agoda.dk",
+                                    "agoda.eg",
+                                    "agoda.es",
+                                    "agoda.fi",
+                                    "agoda.fr",
+                                    "agoda.gr",
+                                    "agoda.hu",
+                                    "agoda.ie",
+                                    "agoda.in",
+                                    "agoda.it",
+                                    "agoda.jo",
+                                    "agoda.jp",
+                                    "agoda.lt",
+                                    "agoda.lv",
+                                    "agoda.net",
+                                    "agoda.nl",
+                                    "agoda.no",
+                                    "agoda.pl",
+                                    "agoda.ro",
+                                    "agoda.ru",
+                                    "agoda.se",
+                                    "agoda.si",
+                                    "agoda.th",
+                                    "agoda.ua",
+                                    "agoda.vn",
+                                    "agoda.web.id",
+                                    "ankeda.com",
+                                    "booking.com",
+                                    "bookingholdings.com",
+                                    "bstatic.com",
+                                    "cheapflights.ca",
+                                    "cheapflights.co.id",
+                                    "cheapflights.co.nz",
+                                    "cheapflights.co.uk",
+                                    "cheapflights.co.za",
+                                    "cheapflights.com",
+                                    "cheapflights.com.au",
+                                    "cheapflights.com.hk",
+                                    "cheapflights.com.my",
+                                    "cheapflights.com.ph",
+                                    "cheapflights.com.sg",
+                                    "cheapflights.qa",
+                                    "checkfelix.co.uk",
+                                    "checkfelix.com",
+                                    "checkfelix.es",
+                                    "checkfelix.fr",
+                                    "checkfelix.it",
+                                    "datahc.com",
+                                    "hotelscombined.ae",
+                                    "hotelscombined.ca",
+                                    "hotelscombined.co.uk",
+                                    "hotelscombined.com",
+                                    "hotelscombined.com.au",
+                                    "hotelscombined.dk",
+                                    "hotelscombined.hk",
+                                    "hotelscombined.it",
+                                    "hotelscombined.pl",
+                                    "kayak.ae",
+                                    "kayak.cat",
+                                    "kayak.ch",
+                                    "kayak.cl",
+                                    "kayak.co.id",
+                                    "kayak.co.in",
+                                    "kayak.co.jp",
+                                    "kayak.co.kr",
+                                    "kayak.co.th",
+                                    "kayak.co.uk",
+                                    "kayak.com",
+                                    "kayak.com.ar",
+                                    "kayak.com.au",
+                                    "kayak.com.br",
+                                    "kayak.com.co",
+                                    "kayak.com.hk",
+                                    "kayak.com.mx",
+                                    "kayak.com.my",
+                                    "kayak.com.pe",
+                                    "kayak.com.ph",
+                                    "kayak.com.tr",
+                                    "kayak.de",
+                                    "kayak.dk",
+                                    "kayak.es",
+                                    "kayak.eu",
+                                    "kayak.fr",
+                                    "kayak.ie",
+                                    "kayak.it",
+                                    "kayak.nl",
+                                    "kayak.no",
+                                    "kayak.ph",
+                                    "kayak.pl",
+                                    "kayak.pt",
+                                    "kayak.qa",
+                                    "kayak.ru",
+                                    "kayak.se",
+                                    "kayak.sg",
+                                    "kayakaffiliates.com",
+                                    "momondo.at",
+                                    "momondo.be",
+                                    "momondo.by",
+                                    "momondo.ca",
+                                    "momondo.ch",
+                                    "momondo.cl",
+                                    "momondo.co.nz",
+                                    "momondo.co.uk",
+                                    "momondo.co.za",
+                                    "momondo.com",
+                                    "momondo.com.ar",
+                                    "momondo.com.au",
+                                    "momondo.com.br",
+                                    "momondo.com.co",
+                                    "momondo.com.pe",
+                                    "momondo.com.tr",
+                                    "momondo.cz",
+                                    "momondo.de",
+                                    "momondo.dk",
+                                    "momondo.ee",
+                                    "momondo.es",
+                                    "momondo.fi",
+                                    "momondo.fr",
+                                    "momondo.hk",
+                                    "momondo.ie",
+                                    "momondo.in",
+                                    "momondo.it",
+                                    "momondo.kz",
+                                    "momondo.lt",
+                                    "momondo.mx",
+                                    "momondo.net",
+                                    "momondo.nl",
+                                    "momondo.no",
+                                    "momondo.pl",
+                                    "momondo.pro",
+                                    "momondo.pt",
+                                    "momondo.ro",
+                                    "momondo.ru",
+                                    "momondo.se",
+                                    "momondo.tw",
+                                    "momondo.ua",
+                                    "momondogroup.com",
+                                    "opentable.ca",
+                                    "opentable.co.uk",
+                                    "opentable.com",
+                                    "opentable.de",
+                                    "opentable.jp",
+                                    "otstatic.com",
+                                    "pointsmax.com",
+                                    "portalhc.com",
+                                    "priceline.com",
+                                    "priceline.com.au",
+                                    "pricelineagoda.com",
+                                    "r9cdn.net",
+                                    "rcstatic.com",
+                                    "rentalcars.com",
+                                    "rezserver.com",
+                                    "speedfares.com",
+                                    "swoodoo.at",
+                                    "swoodoo.ch",
+                                    "swoodoo.com",
+                                    "traveljigsaw.com",
+                                    "xn--jprt0pvr1c.com"
+                                ],
+                                "reason": "Booking Holdings entities - https://github.com/duckduckgo/privacy-configuration/pull/5592"
                             }
                         ]
                     },
@@ -2155,6 +2472,25 @@
                                     "scrolller.com"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1968"
+                            },
+                            {
+                                "rule": "www.google.com/measurement/1p-conversion",
+                                "domains": [
+                                    "architecturaldesigns.com",
+                                    "furniturerow.com",
+                                    "printerval.com",
+                                    "iseehair.com",
+                                    "generation.org",
+                                    "poshmark.com",
+                                    "partselect.com",
+                                    "golfavenue.ca",
+                                    "petsuppliesplus.com",
+                                    "myenneagramtest.org",
+                                    "arcteryx.com",
+                                    "topsecretrecipes.com",
+                                    "homedepot.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5632"
                             }
                         ]
                     },
@@ -2501,6 +2837,25 @@
                     ],
                     "minSupportedVersion": "7.157.0"
                 },
+                "monthlyFreeTrialExperiment": {
+                    "state": "enabled",
+                    "targets": [
+                        {
+                            "localeCountry": "US"
+                        }
+                    ],
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ],
+                    "minSupportedVersion": "7.231.0"
+                },
                 "privacyProOnboardingCTAMarch25": {
                     "state": "enabled",
                     "targets": [
@@ -2845,6 +3200,15 @@
                         "steps": [
                             {
                                 "percent": 2
+                            },
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 100
                             }
                         ]
                     }
@@ -2905,6 +3269,25 @@
                 },
                 "webScrollFreezeObservability": {
                     "state": "disabled"
+                },
+                "searchTokenExperimentV2": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.232.0",
+                    "settings": {
+                        "tokenTTLSeconds": 300,
+                        "refreshWindowSeconds": 120
+                    },
+                    "description": "NA experiment: search token to speed up SERP by combining Index/Deep responses.",
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
                 }
             }
         },
@@ -2957,10 +3340,32 @@
                     "minSupportedVersion": "7.201.1"
                 },
                 "goToMarket": {
-                    "state": "disabled"
+                    "state": "enabled",
+                    "minSupportedVersion": "7.227.0",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
                 },
                 "freemiumPIR": {
-                    "state": "disabled"
+                    "state": "enabled",
+                    "minSupportedVersion": "7.230.0",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
                 },
                 "contentBlocking": {
                     "state": "enabled"
@@ -2971,6 +3376,10 @@
                 "optOutRetryError96Hours": {
                     "state": "enabled",
                     "minSupportedVersion": "7.226.0"
+                },
+                "deferredSecureVaultInit": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.231.0"
                 }
             },
             "minSupportedVersion": "7.201.1"
@@ -2981,6 +3390,7 @@
             "exceptions": [],
             "settings": {
                 "additionalCheck": "enabled",
+                "includePageTypeSignals": "enabled",
                 "activeCaptureOnFirstMessage": "enabled",
                 "maxContentLength": 9500,
                 "mainContentSelector": "main, article, .content, .main, #content, #main",
@@ -3018,7 +3428,56 @@
                             }
                         ]
                     }
-                ]
+                ],
+                "aiPageContextBlocklist": {
+                    "pdf": {
+                        "urlExtensions": [
+                            ".pdf"
+                        ],
+                        "contentTypes": [
+                            "application/pdf"
+                        ]
+                    },
+                    "image": {
+                        "urlExtensions": [
+                            ".png",
+                            ".jpg",
+                            ".jpeg",
+                            ".gif",
+                            ".webp",
+                            ".svg",
+                            ".bmp"
+                        ],
+                        "contentTypePrefixes": [
+                            "image/"
+                        ]
+                    },
+                    "video": {
+                        "urlExtensions": [
+                            ".mp4",
+                            ".webm",
+                            ".avi",
+                            ".mov",
+                            ".mkv"
+                        ],
+                        "contentTypePrefixes": [
+                            "video/"
+                        ]
+                    },
+                    "audio": {
+                        "urlExtensions": [
+                            ".mp3",
+                            ".wav",
+                            ".ogg",
+                            ".flac",
+                            ".aac",
+                            ".m4a"
+                        ],
+                        "contentTypePrefixes": [
+                            "audio/"
+                        ]
+                    }
+                }
             }
         },
         "webInterferenceDetection": {
@@ -3027,73 +3486,6 @@
             "settings": {
                 "autoRunDelayMs": 100,
                 "interferenceTypes": {
-                    "adwallDetection": {
-                        "generic": {
-                            "state": "enabled",
-                            "textPatterns": [
-                                "ad ?block(er)? detected",
-                                "adjust(ing)?( your)? ad blocking settings",
-                                "(turn off|disable|disabling|deactivate)( your| my)? ad ?block(er)?",
-                                "your ad ?blocker is on",
-                                "you('re| are| may be) using an ad blocker"
-                            ],
-                            "textSources": [
-                                "innerText"
-                            ]
-                        },
-                        "generic_de": {
-                            "state": "enabled",
-                            "textPatterns": [
-                                "deaktivieren sie ihren adblocker",
-                                "deaktivieren sie ihre blocker",
-                                "adblocker zu deaktivieren",
-                                "adblocker deaktivieren",
-                                "sie einen adblocker verwenden"
-                            ],
-                            "textSources": [
-                                "innerText"
-                            ]
-                        },
-                        "generic_es": {
-                            "state": "enabled",
-                            "textPatterns": [
-                                "en esta web no aceptamos el uso de adblock"
-                            ],
-                            "textSources": [
-                                "innerText"
-                            ]
-                        },
-                        "generic_it": {
-                            "state": "enabled",
-                            "textPatterns": [
-                                "disattiva l'ad block",
-                                "stai usando un ad block"
-                            ],
-                            "textSources": [
-                                "innerText"
-                            ]
-                        },
-                        "generic_nl": {
-                            "state": "enabled",
-                            "textPatterns": [
-                                "adblock gedetecteerd",
-                                "schakel je adblocker uit om de video te bekijken"
-                            ],
-                            "textSources": [
-                                "innerText"
-                            ]
-                        },
-                        "generic_se": {
-                            "state": "enabled",
-                            "textPatterns": [
-                                "har du en annonsblockerare igång",
-                                "avaktivera din annonsblockerare"
-                            ],
-                            "textSources": [
-                                "innerText"
-                            ]
-                        }
-                    },
                     "botDetection": {
                         "cloudflareTurnstile": {
                             "state": "enabled",
@@ -3338,6 +3730,169 @@
         "webDetection": {
             "state": "enabled",
             "minSupportedVersion": "7.214.0"
+        },
+        "eventHub": {
+            "state": "enabled",
+            "minSupportedVersion": "7.234.0",
+            "settings": {
+                "telemetry": {
+                    "webTelemetry_youtube_adBlocker_day": {
+                        "state": "enabled",
+                        "trigger": {
+                            "period": {
+                                "days": 1
+                            }
+                        },
+                        "parameters": {
+                            "count": {
+                                "template": "counter",
+                                "source": "youtube_adBlocker",
+                                "buckets": {
+                                    "0": { "gte": 0, "lt": 1 },
+                                    "1+": { "gte": 1 }
+                                }
+                            },
+                            "loginState": {
+                                "template": "data",
+                                "source": "youtube_adBlocker",
+                                "dataKey": "loginState"
+                            }
+                        }
+                    },
+                    "webTelemetry_youtube_playabilityError_day": {
+                        "state": "enabled",
+                        "trigger": {
+                            "period": {
+                                "days": 1
+                            }
+                        },
+                        "parameters": {
+                            "count": {
+                                "template": "counter",
+                                "source": "youtube_playabilityError",
+                                "buckets": {
+                                    "0": { "gte": 0, "lt": 1 },
+                                    "1+": { "gte": 1 }
+                                }
+                            },
+                            "loginState": {
+                                "template": "data",
+                                "source": "youtube_playabilityError",
+                                "dataKey": "loginState"
+                            }
+                        }
+                    },
+                    "webTelemetry_youtube_videoAd_day": {
+                        "state": "enabled",
+                        "trigger": {
+                            "period": {
+                                "days": 1
+                            }
+                        },
+                        "parameters": {
+                            "count": {
+                                "template": "counter",
+                                "source": "youtube_videoAd",
+                                "buckets": {
+                                    "0": { "gte": 0, "lt": 1 },
+                                    "1+": { "gte": 1 }
+                                }
+                            },
+                            "loginState": {
+                                "template": "data",
+                                "source": "youtube_videoAd",
+                                "dataKey": "loginState"
+                            }
+                        }
+                    },
+                    "webTelemetry_youtube_staticAd_day": {
+                        "state": "enabled",
+                        "trigger": {
+                            "period": {
+                                "days": 1
+                            }
+                        },
+                        "parameters": {
+                            "count": {
+                                "template": "counter",
+                                "source": "youtube_staticAd",
+                                "buckets": {
+                                    "0": { "gte": 0, "lt": 1 },
+                                    "1+": { "gte": 1 }
+                                }
+                            },
+                            "loginState": {
+                                "template": "data",
+                                "source": "youtube_staticAd",
+                                "dataKey": "loginState"
+                            }
+                        }
+                    },
+                    "webTelemetry_youtube_buffering_day": {
+                        "state": "enabled",
+                        "trigger": {
+                            "period": {
+                                "days": 1
+                            }
+                        },
+                        "parameters": {
+                            "count": {
+                                "template": "counter",
+                                "source": "youtube_buffering",
+                                "buckets": {
+                                    "0": { "gte": 0, "lt": 1 },
+                                    "1+": { "gte": 1 }
+                                }
+                            },
+                            "loginState": {
+                                "template": "data",
+                                "source": "youtube_buffering",
+                                "dataKey": "loginState"
+                            }
+                        }
+                    },
+                    "webTelemetry_captcha_recaptcha": {
+                        "state": "enabled",
+                        "trigger": {
+                            "type": "immediate",
+                            "source": "captcha_recaptcha"
+                        },
+                        "parameters": {}
+                    },
+                    "webTelemetry_captcha_hcaptcha": {
+                        "state": "enabled",
+                        "trigger": {
+                            "type": "immediate",
+                            "source": "captcha_hcaptcha"
+                        },
+                        "parameters": {}
+                    },
+                    "webTelemetry_captcha_turnstile": {
+                        "state": "enabled",
+                        "trigger": {
+                            "type": "immediate",
+                            "source": "captcha_turnstile"
+                        },
+                        "parameters": {}
+                    },
+                    "webTelemetry_captcha_cloudflare": {
+                        "state": "enabled",
+                        "trigger": {
+                            "type": "immediate",
+                            "source": "captcha_cloudflare"
+                        },
+                        "parameters": {}
+                    },
+                    "webTelemetry_captcha_other": {
+                        "state": "enabled",
+                        "trigger": {
+                            "type": "immediate",
+                            "source": "captcha_other"
+                        },
+                        "parameters": {}
+                    }
+                }
+            }
         }
     },
     "unprotectedTemporary": []
