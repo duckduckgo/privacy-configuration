@@ -21,6 +21,15 @@ type SubFeatures<VersionType> = {
             refreshWindowSeconds: number;
         }
     >;
+    inactivityNotification?: SubFeature<
+        VersionType,
+        {
+            // Number of days of inactivity before a notification is delivered
+            daysInactive: number;
+            // Maximum number of notification interactions before delivery stops
+            maxInteractions: number;
+        }
+    >;
 };
 
 export type IOSBrowserConfig<VersionType> = Feature<
