@@ -94,9 +94,9 @@
                     "match": {
                         "element": {
                             "selector": [
-                                ".g-recaptcha",
-                                "iframe[src*='recaptcha']",
-                                "iframe[title*='recaptcha' i]"
+                                ".g-rec\\61 ptcha",
+                                "iframe[src*='rec\\61 ptcha']",
+                                "iframe[title*='rec\\61 ptcha' i]"
                             ],
                             "visibility": "content"
                         }
@@ -107,9 +107,9 @@
                     "match": {
                         "element": {
                             "selector": [
-                                ".h-captcha",
-                                "iframe[src*='hcaptcha.com']",
-                                "iframe[title*='hcaptcha' i]"
+                                ".h-c\\61 ptcha",
+                                "iframe[src*='hc\\61 ptcha.com']",
+                                "iframe[title*='hc\\61 ptcha' i]"
                             ],
                             "visibility": "content"
                         }
@@ -120,9 +120,9 @@
                     "match": {
                         "element": {
                             "selector": [
-                                ".cf-turnstile:not(#turnstile-wrapper)",
-                                ".cf-turnstile:not(#turnstile-wrapper) iframe",
-                                "iframe[src*='challenges.cloudflare.com/turnstile']"
+                                ".cf-t\\75 rnstile:not(#t\\75 rnstile-wrapper)",
+                                ".cf-t\\75 rnstile:not(#t\\75 rnstile-wrapper) iframe",
+                                "iframe[src*='challenges.clo\\75 dfl\\61 re.com/t\\75 rnstile']"
                             ],
                             "visibility": "content"
                         }
@@ -133,12 +133,12 @@
                     "match": {
                         "element": {
                             "selector": [
-                                "#challenge-form",
-                                "#cf-wrapper",
-                                ".cf-browser-verification",
-                                "#challenge-running",
-                                "#cf-challenge-running",
-                                "#challenge-stage"
+                                "#ch\\61 llenge-form",
+                                "#cf-wr\\61 pper",
+                                ".cf-browser-verific\\61 tion",
+                                "#ch\\61 llenge-running",
+                                "#cf-ch\\61 llenge-running",
+                                "#ch\\61 llenge-stage"
                             ],
                             "visibility": "content"
                         }
@@ -149,8 +149,8 @@
                     "match": {
                         "element": {
                             "selector": [
-                                "iframe[src*='captcha-delivery.com']",
-                                "iframe[title*='datadome' i]"
+                                "iframe[src*='c\\61 ptcha-delivery.com']",
+                                "iframe[title*='d\\61 tadome' i]"
                             ],
                             "visibility": "content"
                         }
@@ -176,7 +176,7 @@
                             {
                                 "element": {
                                     "selector": [
-                                        "iframe[src*='_Incapsula_Resource']"
+                                        "iframe[src*='_Inc\\61 psul\\61 _Resource']"
                                     ],
                                     "visibility": "content"
                                 }
@@ -189,10 +189,10 @@
                     "match": {
                         "element": {
                             "selector": [
-                                "iframe[src*='arkoselabs.com']",
-                                "iframe[src*='funcaptcha.com']",
-                                "#FunCaptcha-Token",
-                                "[data-pkey]"
+                                "iframe[src*='\\61 rkosel\\61 bs.com']",
+                                "iframe[src*='func\\61 ptcha.com']",
+                                "#FunC\\61 ptcha-Token",
+                                "[d\\61 ta-pkey]"
                             ],
                             "visibility": "content"
                         }
@@ -203,10 +203,10 @@
                     "match": {
                         "element": {
                             "selector": [
-                                "iframe[src*='geetest.com']",
-                                ".geetest_box",
-                                ".geetest_captcha",
-                                "[class*='geetest_']"
+                                "iframe[src*='geet\\65 st.com']",
+                                ".geet\\65 st_box",
+                                ".geet\\65 st_c\\61 ptcha",
+                                "[class*='geet\\65 st_']"
                             ],
                             "visibility": "content"
                         }
@@ -217,8 +217,8 @@
                     "match": {
                         "element": {
                             "selector": [
-                                "iframe[src*='captcha.awswaf.com']",
-                                "iframe[src*='token.awswaf.com']"
+                                "iframe[src*='c\\61 ptcha.awsw\\61 f.com']",
+                                "iframe[src*='token.awsw\\61 f.com']"
                             ],
                             "visibility": "content"
                         }
@@ -231,9 +231,9 @@
                             {
                                 "element": {
                                     "selector": [
-                                        "#px-captcha",
-                                        "iframe[src*='px-cdn.net']",
-                                        "iframe[src*='px-cloud.net']"
+                                        "#px-c\\61 ptcha",
+                                        "iframe[src*='px-c\\64 n.net']",
+                                        "iframe[src*='px-clo\\75 d.net']"
                                     ],
                                     "visibility": "content"
                                 }
@@ -405,15 +405,29 @@
                 "condition": [
                     {
                         "experiment": {
-                            "experimentName": "contentScopeExperiment5",
-                            "cohort": "treatment"
+                            "experimentName": "contentScopeExperiment6",
+                            "cohort": "treatmentCon"
                         },
                         "injectName": "android"
                     },
                     {
                         "experiment": {
-                            "experimentName": "contentScopeExperiment5",
-                            "cohort": "treatment"
+                            "experimentName": "contentScopeExperiment6",
+                            "cohort": "treatmentCon"
+                        },
+                        "injectName": "apple-isolated"
+                    },
+                    {
+                        "experiment": {
+                            "experimentName": "contentScopeExperiment6",
+                            "cohort": "treatmentVis"
+                        },
+                        "injectName": "android"
+                    },
+                    {
+                        "experiment": {
+                            "experimentName": "contentScopeExperiment6",
+                            "cohort": "treatmentVis"
                         },
                         "injectName": "apple-isolated"
                     }
@@ -488,16 +502,6 @@
                     },
                     {
                         "op": "add",
-                        "path": "/detectors/captcha/recaptcha/actions",
-                        "value": {
-                            "fireEvent": {
-                                "state": "enabled",
-                                "type": "captcha_recaptcha"
-                            }
-                        }
-                    },
-                    {
-                        "op": "add",
                         "path": "/detectors/captcha/hcaptcha/triggers",
                         "value": {
                             "auto": {
@@ -510,16 +514,6 @@
                                         20000
                                     ]
                                 }
-                            }
-                        }
-                    },
-                    {
-                        "op": "add",
-                        "path": "/detectors/captcha/hcaptcha/actions",
-                        "value": {
-                            "fireEvent": {
-                                "state": "enabled",
-                                "type": "captcha_hcaptcha"
                             }
                         }
                     },
@@ -542,16 +536,6 @@
                     },
                     {
                         "op": "add",
-                        "path": "/detectors/captcha/turnstile/actions",
-                        "value": {
-                            "fireEvent": {
-                                "state": "enabled",
-                                "type": "captcha_turnstile"
-                            }
-                        }
-                    },
-                    {
-                        "op": "add",
                         "path": "/detectors/captcha/cloudflare/triggers",
                         "value": {
                             "auto": {
@@ -564,16 +548,6 @@
                                         20000
                                     ]
                                 }
-                            }
-                        }
-                    },
-                    {
-                        "op": "add",
-                        "path": "/detectors/captcha/cloudflare/actions",
-                        "value": {
-                            "fireEvent": {
-                                "state": "enabled",
-                                "type": "captcha_cloudflare"
                             }
                         }
                     },
@@ -596,16 +570,6 @@
                     },
                     {
                         "op": "add",
-                        "path": "/detectors/captcha/datadome/actions",
-                        "value": {
-                            "fireEvent": {
-                                "state": "enabled",
-                                "type": "captcha_datadome"
-                            }
-                        }
-                    },
-                    {
-                        "op": "add",
                         "path": "/detectors/captcha/imperva/triggers",
                         "value": {
                             "auto": {
@@ -618,16 +582,6 @@
                                         20000
                                     ]
                                 }
-                            }
-                        }
-                    },
-                    {
-                        "op": "add",
-                        "path": "/detectors/captcha/imperva/actions",
-                        "value": {
-                            "fireEvent": {
-                                "state": "enabled",
-                                "type": "captcha_imperva"
                             }
                         }
                     },
@@ -650,16 +604,6 @@
                     },
                     {
                         "op": "add",
-                        "path": "/detectors/captcha/arkose/actions",
-                        "value": {
-                            "fireEvent": {
-                                "state": "enabled",
-                                "type": "captcha_arkose"
-                            }
-                        }
-                    },
-                    {
-                        "op": "add",
                         "path": "/detectors/captcha/geetest/triggers",
                         "value": {
                             "auto": {
@@ -672,16 +616,6 @@
                                         20000
                                     ]
                                 }
-                            }
-                        }
-                    },
-                    {
-                        "op": "add",
-                        "path": "/detectors/captcha/geetest/actions",
-                        "value": {
-                            "fireEvent": {
-                                "state": "enabled",
-                                "type": "captcha_geetest"
                             }
                         }
                     },
@@ -704,16 +638,6 @@
                     },
                     {
                         "op": "add",
-                        "path": "/detectors/captcha/awswaf/actions",
-                        "value": {
-                            "fireEvent": {
-                                "state": "enabled",
-                                "type": "captcha_awswaf"
-                            }
-                        }
-                    },
-                    {
-                        "op": "add",
                         "path": "/detectors/captcha/perimeterx/triggers",
                         "value": {
                             "auto": {
@@ -726,16 +650,6 @@
                                         20000
                                     ]
                                 }
-                            }
-                        }
-                    },
-                    {
-                        "op": "add",
-                        "path": "/detectors/captcha/perimeterx/actions",
-                        "value": {
-                            "fireEvent": {
-                                "state": "enabled",
-                                "type": "captcha_perimeterx"
                             }
                         }
                     },
@@ -755,16 +669,206 @@
                                 }
                             }
                         }
+                    }
+                ]
+            },
+            {
+                "condition": [
+                    {
+                        "experiment": {
+                            "experimentName": "contentScopeExperiment6",
+                            "cohort": "treatmentCon"
+                        },
+                        "injectName": "android"
+                    },
+                    {
+                        "experiment": {
+                            "experimentName": "contentScopeExperiment6",
+                            "cohort": "treatmentCon"
+                        },
+                        "injectName": "apple-isolated"
+                    }
+                ],
+                "patchSettings": [
+                    {
+                        "op": "add",
+                        "path": "/detectors/captcha/recaptcha/actions",
+                        "value": { "fireEvent": { "state": "enabled", "type": "captcha_recaptcha_t_con" } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/captcha/hcaptcha/actions",
+                        "value": { "fireEvent": { "state": "enabled", "type": "captcha_hcaptcha_t_con" } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/captcha/turnstile/actions",
+                        "value": { "fireEvent": { "state": "enabled", "type": "captcha_turnstile_t_con" } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/captcha/cloudflare/actions",
+                        "value": { "fireEvent": { "state": "enabled", "type": "captcha_cloudflare_t_con" } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/captcha/datadome/actions",
+                        "value": { "fireEvent": { "state": "enabled", "type": "captcha_datadome_t_con" } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/captcha/imperva/actions",
+                        "value": { "fireEvent": { "state": "enabled", "type": "captcha_imperva_t_con" } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/captcha/arkose/actions",
+                        "value": { "fireEvent": { "state": "enabled", "type": "captcha_arkose_t_con" } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/captcha/geetest/actions",
+                        "value": { "fireEvent": { "state": "enabled", "type": "captcha_geetest_t_con" } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/captcha/awswaf/actions",
+                        "value": { "fireEvent": { "state": "enabled", "type": "captcha_awswaf_t_con" } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/captcha/perimeterx/actions",
+                        "value": { "fireEvent": { "state": "enabled", "type": "captcha_perimeterx_t_con" } }
                     },
                     {
                         "op": "add",
                         "path": "/detectors/captcha/other/actions",
-                        "value": {
-                            "fireEvent": {
-                                "state": "enabled",
-                                "type": "captcha_other"
-                            }
-                        }
+                        "value": { "fireEvent": { "state": "enabled", "type": "captcha_other_t_con" } }
+                    }
+                ]
+            },
+            {
+                "condition": [
+                    {
+                        "experiment": {
+                            "experimentName": "contentScopeExperiment6",
+                            "cohort": "treatmentVis"
+                        },
+                        "injectName": "android"
+                    },
+                    {
+                        "experiment": {
+                            "experimentName": "contentScopeExperiment6",
+                            "cohort": "treatmentVis"
+                        },
+                        "injectName": "apple-isolated"
+                    }
+                ],
+                "patchSettings": [
+                    {
+                        "op": "replace",
+                        "path": "/detectors/captcha/recaptcha/match/element/visibility",
+                        "value": "visible"
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/captcha/hcaptcha/match/element/visibility",
+                        "value": "visible"
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/captcha/turnstile/match/element/visibility",
+                        "value": "visible"
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/captcha/cloudflare/match/element/visibility",
+                        "value": "visible"
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/captcha/datadome/match/element/visibility",
+                        "value": "visible"
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/captcha/imperva/match/any/1/element/visibility",
+                        "value": "visible"
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/captcha/arkose/match/element/visibility",
+                        "value": "visible"
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/captcha/geetest/match/element/visibility",
+                        "value": "visible"
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/captcha/awswaf/match/element/visibility",
+                        "value": "visible"
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/captcha/perimeterx/match/any/0/element/visibility",
+                        "value": "visible"
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/captcha/recaptcha/actions",
+                        "value": { "fireEvent": { "state": "enabled", "type": "captcha_recaptcha_t_vis" } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/captcha/hcaptcha/actions",
+                        "value": { "fireEvent": { "state": "enabled", "type": "captcha_hcaptcha_t_vis" } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/captcha/turnstile/actions",
+                        "value": { "fireEvent": { "state": "enabled", "type": "captcha_turnstile_t_vis" } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/captcha/cloudflare/actions",
+                        "value": { "fireEvent": { "state": "enabled", "type": "captcha_cloudflare_t_vis" } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/captcha/datadome/actions",
+                        "value": { "fireEvent": { "state": "enabled", "type": "captcha_datadome_t_vis" } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/captcha/imperva/actions",
+                        "value": { "fireEvent": { "state": "enabled", "type": "captcha_imperva_t_vis" } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/captcha/arkose/actions",
+                        "value": { "fireEvent": { "state": "enabled", "type": "captcha_arkose_t_vis" } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/captcha/geetest/actions",
+                        "value": { "fireEvent": { "state": "enabled", "type": "captcha_geetest_t_vis" } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/captcha/awswaf/actions",
+                        "value": { "fireEvent": { "state": "enabled", "type": "captcha_awswaf_t_vis" } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/captcha/perimeterx/actions",
+                        "value": { "fireEvent": { "state": "enabled", "type": "captcha_perimeterx_t_vis" } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/captcha/other/actions",
+                        "value": { "fireEvent": { "state": "enabled", "type": "captcha_other_t_vis" } }
                     }
                 ]
             },
