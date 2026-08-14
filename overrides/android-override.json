@@ -4716,6 +4716,32 @@
                             "weight": 1
                         }
                     ]
+                },
+                "contentScopeExperiment6": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52900000,
+                    "description": "Captcha detection: auto-run + fireEvent for the captcha detectors, comparing 'content' vs 'visible' element visibility",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatmentCon",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatmentVis",
+                            "weight": 1
+                        }
+                    ]
                 }
             }
         },
