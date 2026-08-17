@@ -171,6 +171,54 @@
                             "weight": 1
                         }
                     ]
+                },
+                "contentScopeExperiment5": {
+                    "state": "disabled",
+                    "minSupportedVersion": "1.201.0",
+                    "description": "Captcha detection: auto-run + fireEvent for the captcha detectors",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 50
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "contentScopeExperiment6": {
+                    "state": "enabled",
+                    "minSupportedVersion": "1.201.0",
+                    "description": "Captcha detection: auto-run + fireEvent for the captcha detectors, comparing 'content' vs 'visible' element visibility",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatmentCon",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatmentVis",
+                            "weight": 1
+                        }
+                    ]
                 }
             }
         },
@@ -179,6 +227,7 @@
             "exceptions": [],
             "settings": {
                 "videoPlayback": "enabled",
+                "videoAutoplay": "enabled",
                 "urlChanged": "enabled"
             }
         },
@@ -1746,6 +1795,10 @@
                     {
                         "domain": "hulu.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5327"
+                    },
+                    {
+                        "domain": "deezer.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5749"
                     }
                 ],
                 "webViewDefault": [

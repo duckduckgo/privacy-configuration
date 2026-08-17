@@ -719,6 +719,14 @@
                 "nativeInputNavBar": {
                     "state": "enabled",
                     "minSupportedVersion": 52890000
+                },
+                "contextualNativeInput": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52920000
+                },
+                "contextualSuggestedPrompts": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52920000
                 }
             }
         },
@@ -2983,6 +2991,9 @@
                             },
                             {
                                 "percent": 75
+                            },
+                            {
+                                "percent": 100
                             }
                         ]
                     }
@@ -3123,6 +3134,20 @@
                 },
                 "canShowV2ConnectCode": {
                     "state": "enabled"
+                },
+                "useSimplifiedSync": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52920000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 25
+                            }
+                        ]
+                    }
                 }
             }
         },
@@ -3169,24 +3194,6 @@
                                     "linkedin.com"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/675"
-                            }
-                        ]
-                    },
-                    "datadoghq-browser-agent.com": {
-                        "rules": [
-                            {
-                                "rule": "www.datadoghq-browser-agent.com/datadog-logs-v4.js",
-                                "domains": [
-                                    "resy.com"
-                                ],
-                                "reason": "resy.com - https://github.com/duckduckgo/privacy-configuration/pull/4645"
-                            },
-                            {
-                                "rule": "datadoghq-browser-agent.com",
-                                "domains": [
-                                    "resy.com"
-                                ],
-                                "reason": "resy.com - https://github.com/duckduckgo/privacy-configuration/pull/3370"
                             }
                         ]
                     },
@@ -3465,6 +3472,18 @@
             "features": {
                 "useNewWebCompatApis": {
                     "state": "disabled"
+                },
+                "optimizeContentScopeInjection": {
+                    "minSupportedVersion": 52920000,
+                    "state": "enabled"
+                },
+                "optimizeContentScopeMessaging": {
+                    "minSupportedVersion": 52920000,
+                    "state": "enabled"
+                },
+                "cacheContentScopeExperiments": {
+                    "minSupportedVersion": 52920000,
+                    "state": "enabled"
                 }
             },
             "exceptions": []
@@ -4654,6 +4673,54 @@
                         },
                         {
                             "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "contentScopeExperiment5": {
+                    "state": "disabled",
+                    "minSupportedVersion": 52900000,
+                    "description": "Captcha detection: auto-run + fireEvent for the captcha detectors",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 50
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "contentScopeExperiment6": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52900000,
+                    "description": "Captcha detection: auto-run + fireEvent for the captcha detectors, comparing 'content' vs 'visible' element visibility",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatmentCon",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatmentVis",
                             "weight": 1
                         }
                     ]

@@ -5009,7 +5009,7 @@
             "minSupportedVersion": "0.148.0",
             "exceptions": [],
             "settings": {
-                "extensionUrl": "https://staticcdn.duckduckgo.com/extensions/content-blocker/content-blocker-extension-2026.8.5.crx"
+                "extensionUrl": "https://staticcdn.duckduckgo.com/extensions/content-blocker/content-blocker-extension-2026.8.13.crx"
             },
             "features": {
                 "onboardingEnabled": {
@@ -5383,13 +5383,13 @@
             "exceptions": []
         },
         "tabLabelTransition": {
-            "minSupportedVersion": "0.155.0",
-            "state": "preview",
+            "minSupportedVersion": "0.172.0",
+            "state": "enabled",
             "exceptions": []
         },
         "faviconTransitions": {
-            "minSupportedVersion": "0.155.0",
-            "state": "preview",
+            "minSupportedVersion": "0.173.0",
+            "state": "enabled",
             "exceptions": []
         },
         "tabNavigationHistoryRestore": {
@@ -5742,7 +5742,10 @@
                                 "template": "counter",
                                 "source": "youtube_adBlocker",
                                 "buckets": {
-                                    "0": { "gte": 0, "lt": 1 },
+                                    "0": {
+                                        "gte": 0,
+                                        "lt": 1
+                                    },
                                     "1+": { "gte": 1 }
                                 }
                             },
@@ -5765,7 +5768,10 @@
                                 "template": "counter",
                                 "source": "youtube_playabilityError",
                                 "buckets": {
-                                    "0": { "gte": 0, "lt": 1 },
+                                    "0": {
+                                        "gte": 0,
+                                        "lt": 1
+                                    },
                                     "1+": { "gte": 1 }
                                 }
                             },
@@ -5788,7 +5794,10 @@
                                 "template": "counter",
                                 "source": "youtube_videoAd",
                                 "buckets": {
-                                    "0": { "gte": 0, "lt": 1 },
+                                    "0": {
+                                        "gte": 0,
+                                        "lt": 1
+                                    },
                                     "1+": { "gte": 1 }
                                 }
                             },
@@ -5811,7 +5820,10 @@
                                 "template": "counter",
                                 "source": "youtube_staticAd",
                                 "buckets": {
-                                    "0": { "gte": 0, "lt": 1 },
+                                    "0": {
+                                        "gte": 0,
+                                        "lt": 1
+                                    },
                                     "1+": { "gte": 1 }
                                 }
                             },
@@ -5834,7 +5846,10 @@
                                 "template": "counter",
                                 "source": "youtube_buffering",
                                 "buckets": {
-                                    "0": { "gte": 0, "lt": 1 },
+                                    "0": {
+                                        "gte": 0,
+                                        "lt": 1
+                                    },
                                     "1+": { "gte": 1 }
                                 }
                             },
@@ -6231,6 +6246,18 @@
                     "state": "preview"
                 }
             }
+        },
+        "duplicateTabNavigationHistory": {
+            "state": "internal",
+            "exceptions": []
+        },
+        "forkTabNavigationHistory": {
+            "state": "internal",
+            "exceptions": []
+        },
+        "sessionRestoreNavigationHistory": {
+            "state": "internal",
+            "exceptions": []
         }
     },
     "unprotectedTemporary": []

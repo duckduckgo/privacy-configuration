@@ -824,11 +824,37 @@
             }
         },
         "fingerprintingTemporaryStorage": {
-            "state": "enabled"
+            "state": "enabled",
+            "exceptions": [
+                {
+                    "domain": "yahoo.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5774"
+                },
+                {
+                    "domain": "att.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5774"
+                },
+                {
+                    "domain": "att.net",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5774"
+                }
+            ]
         },
         "fingerprintingScreenSize": {
             "state": "enabled",
             "exceptions": [
+                {
+                    "domain": "yahoo.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5774"
+                },
+                {
+                    "domain": "att.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5774"
+                },
+                {
+                    "domain": "att.net",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5774"
+                },
                 {
                     "domain": "yelp.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4668"
@@ -836,7 +862,21 @@
             ]
         },
         "fingerprintingBattery": {
-            "state": "enabled"
+            "state": "enabled",
+            "exceptions": [
+                {
+                    "domain": "yahoo.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5774"
+                },
+                {
+                    "domain": "att.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5774"
+                },
+                {
+                    "domain": "att.net",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5774"
+                }
+            ]
         },
         "fingerprintingCanvas": {
             "state": "disabled"
@@ -863,6 +903,18 @@
                 {
                     "domain": "yelp.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4668"
+                },
+                {
+                    "domain": "yahoo.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5774"
+                },
+                {
+                    "domain": "att.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5774"
+                },
+                {
+                    "domain": "att.net",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5774"
                 }
             ]
         },
@@ -925,6 +977,54 @@
                         },
                         {
                             "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "contentScopeExperiment5": {
+                    "state": "disabled",
+                    "minSupportedVersion": "7.231.0",
+                    "description": "Captcha detection: auto-run + fireEvent for the captcha detectors",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 50
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "contentScopeExperiment6": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.231.0",
+                    "description": "Captcha detection: auto-run + fireEvent for the captcha detectors, comparing 'content' vs 'visible' element visibility",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatmentCon",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatmentVis",
                             "weight": 1
                         }
                     ]
@@ -1673,7 +1773,15 @@
                     },
                     {
                         "domain": "yahoo.com",
-                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4258"
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5774"
+                    },
+                    {
+                        "domain": "att.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5774"
+                    },
+                    {
+                        "domain": "att.net",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5774"
                     },
                     {
                         "domain": "pinterest.com",
@@ -1909,6 +2017,14 @@
                     {
                         "domain": "yahoo.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4258"
+                    },
+                    {
+                        "domain": "att.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5774"
+                    },
+                    {
+                        "domain": "att.net",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5774"
                     },
                     {
                         "domain": "pinterest.com",
@@ -2562,24 +2678,6 @@
                             }
                         ]
                     },
-                    "datadoghq-browser-agent.com": {
-                        "rules": [
-                            {
-                                "rule": "www.datadoghq-browser-agent.com/datadog-logs-v4.js",
-                                "domains": [
-                                    "resy.com"
-                                ],
-                                "reason": "resy.com - https://github.com/duckduckgo/privacy-configuration/pull/4645"
-                            },
-                            {
-                                "rule": "datadoghq-browser-agent.com",
-                                "domains": [
-                                    "resy.com"
-                                ],
-                                "reason": "resy.com - https://github.com/duckduckgo/privacy-configuration/pull/3370"
-                            }
-                        ]
-                    },
                     "skimresources.com": {
                         "rules": [
                             {
@@ -2838,7 +2936,7 @@
                     "minSupportedVersion": "7.157.0"
                 },
                 "monthlyFreeTrialExperiment": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "targets": [
                         {
                             "localeCountry": "US"
@@ -3092,14 +3190,12 @@
                     "state": "disabled"
                 },
                 "inactivityNotification": {
-                    "state": "disabled",
-                    "minSupportedVersion": "7.187.0",
+                    "state": "enabled",
+                    "minSupportedVersion": "7.234.0",
                     "description": "Local inactivity provisional notifications delivered to Notification Center.",
-                    "targets": [
-                        { "localeLanguage": "en", "localeCountry": "US" }
-                    ],
                     "settings": {
-                        "daysInactive": "7"
+                        "daysInactive": 7,
+                        "maxInteractions": 4
                     }
                 },
                 "customization": {
@@ -3288,6 +3384,11 @@
                             "weight": 1
                         }
                     ]
+                },
+                "newTabPageSessionInstrumentation": {
+                    "state": "internal",
+                    "minSupportedVersion": "7.233.0",
+                    "description": "Wide event measuring Starting Experience Success Rate."
                 }
             }
         },
