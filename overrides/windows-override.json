@@ -2686,16 +2686,21 @@
             }
         },
         "storagePartitioning": {
-            "state": "preview",
-            "minSupportedVersion": "0.169.0",
-            "rollout": {
-                "steps": [
-                    {
-                        "percent": 5.0
+            "state": "enabled",
+            "exceptions": [],
+            "features": {
+                "cacheAndCookies": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.171.2",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5.0
+                            }
+                        ]
                     }
-                ]
-            },
-            "exceptions": []
+                }
+            }
         },
         "customUserAgent": {
             "settings": {
