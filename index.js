@@ -4,6 +4,7 @@ import fetch from 'node-fetch';
 import {
     addCnameEntriesToAllowlist,
     collapseEventHubTelemetryPeriods,
+    expandEventHubMetrics,
     inlineReasonArrays,
     mergeAllowlistedTrackers,
     mergeEventHubTelemetry,
@@ -381,6 +382,11 @@ async function buildPlatforms() {
         // Clients read eventHub periods as integer seconds; collapse any authored unit object
         // (days/hours/minutes) to seconds so period pixels are not silently dropped.
         collapseEventHubTelemetryPeriods(platformConfig);
+
+        // Expand metric experiment patterns to exact names, so the experiments a metric applies
+        // to are visible in the generated config and no client evaluates a regular expression.
+        // Runs after the merge so it sees this platform's experiments.
+        expandEventHubMetrics(platformConfig);
 
         platformConfigs[platform] = platformConfig;
 

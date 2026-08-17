@@ -226,6 +226,117 @@ export function collapseEventHubTelemetryPeriods(config) {
 }
 
 /**
+ * Every subfeature name in the config that declares cohorts, i.e. every experiment a user can
+ * actually be enrolled in on this platform. Enrollment always originates from a cohorts array,
+ * so this is the complete set an eventHub metric could target.
+ *
+ * @param {object} config - a fully-merged platform config
+ * @returns {string[]} sorted subfeature names
+ */
+export function collectExperimentNames(config) {
+    const names = new Set();
+    for (const feature of Object.values(config?.features || {})) {
+        for (const [
+            subFeatureName,
+            subFeature,
+        ] of Object.entries(feature?.features || {})) {
+            if (Array.isArray(subFeature?.cohorts) && subFeature.cohorts.length > 0) {
+                names.add(subFeatureName);
+            }
+        }
+    }
+    return [
+        ...names,
+    ].sort();
+}
+
+/**
+ * Every event type a webDetection detector fires. Detector triggers may be introduced by
+ * conditional patches, so this walks the feature rather than reading a fixed path.
+ *
+ * @param {object} config - a fully-merged platform config
+ * @returns {Set<string>} event type names
+ */
+export function collectWebDetectionEventTypes(config) {
+    const types = new Set();
+    const visit = (node) => {
+        if (Array.isArray(node)) {
+            node.forEach(visit);
+            return;
+        }
+        if (!node || typeof node !== 'object') {
+            return;
+        }
+        if (typeof node.fireEvent?.type === 'string') {
+            types.add(node.fireEvent.type);
+        }
+        Object.values(node).forEach(visit);
+    };
+    visit(config?.features?.webDetection);
+    return types;
+}
+
+/**
+ * Compiles authored eventHub metrics into the shape clients consume.
+ *
+ * Three normalisations, all of which exist so no client has to infer anything:
+ *   - a single metric definition becomes a one-element list
+ *   - `source` becomes `{ name, dedup }`, defaulting to 'page' for events a webDetection
+ *     detector fires (these arrive per frame, so counting each would inflate conversions)
+ *     and 'none' for anything else
+ *   - `experiments` regular expressions are expanded to the exact experiment names they
+ *     full-match on this platform, so clients never evaluate a pattern
+ *   - `thresholds` defaults to [1], i.e. convert on first occurrence
+ *
+ * Mutates the config in place; no-ops when the feature or metrics are absent.
+ *
+ * @param {object} config - a fully-merged platform config
+ */
+export function expandEventHubMetrics(config) {
+    const metrics = config?.features?.eventHub?.settings?.metrics;
+    if (!metrics) {
+        return;
+    }
+
+    const experimentNames = collectExperimentNames(config);
+    const webDetectionEventTypes = collectWebDetectionEventTypes(config);
+
+    for (const [
+        metricName,
+        definition,
+    ] of Object.entries(metrics)) {
+        const entries = Array.isArray(definition)
+            ? definition
+            : [
+                  definition,
+              ];
+        metrics[metricName] = entries.map((entry) => {
+            const sourceName = typeof entry.source === 'string' ? entry.source : entry.source.name;
+            const dedup =
+                typeof entry.source === 'string' ? (webDetectionEventTypes.has(sourceName) ? 'page' : 'none') : entry.source.dedup;
+
+            const patterns = Array.isArray(entry.experiments)
+                ? entry.experiments
+                : [
+                      entry.experiments,
+                  ];
+            const matched = experimentNames.filter((name) => patterns.some((pattern) => new RegExp(`^(?:${pattern})$`).test(name)));
+
+            return {
+                source: { name: sourceName, dedup },
+                experiments: matched,
+                conversions: entry.conversions.map((conversion) => ({
+                    windows: conversion.windows,
+                    thresholds: conversion.thresholds ?? [
+                        1,
+                    ],
+                })),
+            };
+        });
+    }
+}
+
+/**
  * All domains that may map to the given cnameTarget.
  */
 function getCnameSources(tds, cnameTarget) {
