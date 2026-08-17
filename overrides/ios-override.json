@@ -3389,6 +3389,47 @@
                     "state": "internal",
                     "minSupportedVersion": "7.233.0",
                     "description": "Wide event measuring Starting Experience Success Rate."
+                },
+                "onboardingFlowByDownloadReasonExperiment": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.234.0",
+                    "description": "NA Experiment: tailor the onboarding flow based on the user's download reason. `settings` provides the fallback AI model list for the model-picker step when the /models API is unavailable.",
+                    "settings": {
+                        "defaultModelId": "gpt-5.4-nano",
+                        "models": [
+                            {
+                                "id": "gpt-5.4-nano",
+                                "provider": "openai",
+                                "modelShortName": "5.4-nano"
+                            },
+                            {
+                                "id": "claude-haiku-4-5",
+                                "provider": "anthropic",
+                                "modelShortName": "Haiku 4.5"
+                            },
+                            {
+                                "id": "mistral-small-2603",
+                                "provider": "mistral",
+                                "modelShortName": "Mistral"
+                            }
+                        ]
+                    },
+                    "targets": [
+                        {
+                            "localeLanguage": "en",
+                            "localeCountry": "US"
+                        }
+                    ],
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
                 }
             }
         },
