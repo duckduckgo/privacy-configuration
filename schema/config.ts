@@ -27,6 +27,7 @@ import { Taskbar } from './features/taskbar';
 import { AppHealth } from './features/appHealth';
 import { ElementHidingFeature } from './features/element-hiding';
 import { EventHubFeature } from './features/event-hub';
+import { ContentScopeExperimentsFeature, TdsExperimentsFeature } from './features/experiment-metrics';
 import { RequestBlocklistFeature } from './features/request-blocklist';
 import { UaChBrandsFeature } from './features/ua-ch-brands';
 import { UrlPredictorFeature } from './features/url-predictor';
@@ -95,6 +96,9 @@ export type ConfigV5<VersionType> = {
         webview?: WebViewConfig<VersionType>;
         customUserAgent?: CustomUserAgentFeature<VersionType>;
         downloadManager?: DownloadManager<VersionType>;
+        blockList?: TdsExperimentsFeature<VersionType>;
+        contentBlocking?: TdsExperimentsFeature<VersionType>;
+        contentScopeExperiments?: ContentScopeExperimentsFeature<VersionType>;
         elementHiding?: ElementHidingFeature<VersionType>;
         eventHub?: EventHubFeature<VersionType>;
         requestBlocklist?: RequestBlocklistFeature<VersionType>;

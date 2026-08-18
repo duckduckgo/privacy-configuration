@@ -67,40 +67,13 @@ type ImmediateTelemetryEntry = {
 
 type TelemetryEntry = PeriodTelemetryEntry | ImmediateTelemetryEntry;
 
-// How repeated occurrences of a metric's source event are treated. 'page' reuses the
-// aggregate counter semantics (one conversion per metric, per event type, per tab, reset on
-// navigation); 'none' reports every occurrence.
-type MetricDedup = 'none' | 'page';
-
-// Authored as a bare event name, in which case the build resolves the default dedup. The
-// compiled config always carries the object form so clients never infer it.
-type MetricSource = string | { name: string; dedup: MetricDedup };
-
-// Windows are inclusive [low, high] day bounds from the enrollment day and may overlap.
-// windows x thresholds form a product; several conversions express a partial product.
-type MetricConversion = {
-    windows: [
-        number,
-        number,
-    ][];
-    thresholds?: number[];
-};
-
-// `experiments` holds full-match regular expressions as authored, and the exact experiment
-// names they matched once compiled.
-type MetricEntry = {
-    source: MetricSource;
-    experiments: string | string[];
-    conversions: MetricConversion[];
-};
+// Experiment metrics converted by hub events are declared on the experiment subfeatures
+// themselves rather than here — see ./experiment-metrics.ts.
 
 // intentionally not using CSSInjectFeatureSettings here as this does not
 // support conditional changes
 export type EventHubSettings = {
     telemetry?: Record<string, TelemetryEntry>;
-    // Permissive across the authored and compiled shapes, as with telemetry periods, because
-    // the generated config is validated against this type too.
-    metrics?: Record<string, MetricEntry | MetricEntry[]>;
 };
 
 export type EventHubFeature<VersionType> = Feature<EventHubSettings, VersionType>;
