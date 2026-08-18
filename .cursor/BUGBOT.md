@@ -45,6 +45,22 @@ When a rollout percentage changes, the diff must **append** a new entry to `roll
 - **Tests**: `tests/tracker-allowlist-tests.js` - Unit tests enforcing ordering, propagation, and duplicate detection
 - **Matching algorithm**: [tracker_allowlist_matching_tests.json](https://github.com/duckduckgo/privacy-reference-tests/blob/main/tracker-radar-tests/TR-domain-matching/tracker_allowlist_matching_tests.json) - Client matching is subdomain-aware, not pure string prefix. A subdomain rule does not match the parent domain.
 
+## Experiment Metrics Validation
+
+### References
+
+- **Schema**: `schema/features/experiment-metrics.ts` - Metric shape shared by experiment subfeatures
+- **Tests**: `tests/experiment-metrics-tests.js` - Placement, shape, naming, and event-production checks
+- Metrics live in `settings.metrics` of experiment subfeatures under `contentScopeExperiments`, `blockList`, and `contentBlocking` only.
+
+### No Metric Additions to Already-Enabled Experiments
+
+Clients snapshot or anchor metric state at enrollment, and users enroll as soon as an experiment is enabled. A metric **added** to an experiment subfeature that already has `state: enabled` and `cohorts` in the base branch will silently not fire for already-enrolled users on some platforms. Flag any PR that adds new keys to an existing experiment's `settings.metrics` (or adds a whole `metrics` object to it) unless the same PR is what enables the experiment. **Removing** a metric is always fine — deletion is the kill switch and must not be flagged.
+
+### Detector Changes Affecting Live Experiment Metrics
+
+If a PR modifies a `webDetection` detector (its `match`, `triggers`, or `actions.fireEvent`) whose `fireEvent.type` is referenced as the `event` of a metric in an experiment that is currently `enabled` with cohorts, warn on the PR: the change applies to both cohorts equally so the A/B comparison survives, but the metric's meaning steps mid-experiment and analysis needs to know the date. This is a **warning**, not a block — ask the author to confirm the experiment owner is aware.
+
 ## Custom User Agent / Client Hints Validation
 
 ### References
