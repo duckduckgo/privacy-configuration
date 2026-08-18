@@ -67,9 +67,6 @@ type ImmediateTelemetryEntry = {
 
 type TelemetryEntry = PeriodTelemetryEntry | ImmediateTelemetryEntry;
 
-// Experiment metrics converted by hub events are declared on the experiment subfeatures
-// themselves rather than here — see ./experiment-metrics.ts.
-
 // intentionally not using CSSInjectFeatureSettings here as this does not
 // support conditional changes
 export type EventHubSettings = {
