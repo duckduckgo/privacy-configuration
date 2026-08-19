@@ -764,8 +764,7 @@ describe('tracker-allowlist-validator', () => {
 
     describe('validate real tracker-allowlist.json', () => {
         it('has no violations in features/tracker-allowlist.json', () => {
-            const raw = fs.readFileSync('./features/tracker-allowlist.json', 'utf-8');
-            const config = JSON.parse(raw);
+            const config = readJsoncFile('./features/tracker-allowlist.json');
             const allowlistedTrackers = config.settings.allowlistedTrackers;
             const errors = validateAllowlist(allowlistedTrackers);
             if (errors.length > 0) {
@@ -777,7 +776,7 @@ describe('tracker-allowlist-validator', () => {
 
     describe('validate generated platform configs', () => {
         const platformOutput = platforms.map((item) => item.replace('browsers/', 'extension-'));
-        const baseConfig = JSON.parse(fs.readFileSync('./features/tracker-allowlist.json', 'utf-8'));
+        const baseConfig = readJsoncFile('./features/tracker-allowlist.json');
         const baseTrackers = baseConfig.settings.allowlistedTrackers;
         const baseErrors = validateAllowlist(baseTrackers);
         const baseErrorKeys = new Set(baseErrors.map((e) => `${e.type}|${e.tracker}|${e.message}`));
