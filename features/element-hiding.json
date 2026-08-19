@@ -984,25 +984,6 @@
                 ]
             },
             {
-                "domain": "birminghammail.co.uk",
-                "rules": [
-                    {
-                        "selector": "[data-tmdatatrack='non-content-unit']",
-                        "type": "hide"
-                    },
-                    {
-                        "selector": ".iSMTT.sticky ~ header",
-                        "type": "modify-style",
-                        "values": [
-                            {
-                                "property": "top",
-                                "value": "0"
-                            }
-                        ]
-                    }
-                ]
-            },
-            {
                 "domain": "bizjournals.com",
                 "rules": [
                     {
@@ -2736,25 +2717,6 @@
                 ]
             },
             {
-                "domain": "manchestereveningnews.co.uk",
-                "rules": [
-                    {
-                        "selector": "[data-tmdatatrack='non-content-unit']",
-                        "type": "hide"
-                    },
-                    {
-                        "selector": ".qQnbZ.sticky ~ header",
-                        "type": "modify-style",
-                        "values": [
-                            {
-                                "property": "top",
-                                "value": "0"
-                            }
-                        ]
-                    }
-                ]
-            },
-            {
                 "domain": "mantan-web.jp",
                 "rules": [
                     {
@@ -3131,29 +3093,6 @@
                     {
                         "selector": "[data-uses-js='dfp-top-ad-fixed']",
                         "type": "hide-empty"
-                    }
-                ]
-            },
-            {
-                "domain": "nottinghampost.com",
-                "rules": [
-                    {
-                        "selector": "div[data-tmdatatrack=\"non-content-unit\"]",
-                        "type": "hide"
-                    },
-                    {
-                        "selector": "div.vf-promo-gtag",
-                        "type": "closest-empty"
-                    },
-                    {
-                        "selector": ".kwUlOm.sticky ~ header",
-                        "type": "modify-style",
-                        "values": [
-                            {
-                                "property": "top",
-                                "value": "0"
-                            }
-                        ]
                     }
                 ]
             },
@@ -4339,29 +4278,6 @@
                 ]
             },
             {
-                "domain": "walesonline.co.uk",
-                "rules": [
-                    {
-                        "selector": "[data-testid='commercial-label-gpt'], [data-testid='commercial-1'], [data-testid='commercial-2'], [data-testid='commercial-3'], [data-testid='commercial-4']",
-                        "type": "hide"
-                    },
-                    {
-                        "selector": ".vf3-conversations-list__promo",
-                        "type": "hide"
-                    },
-                    {
-                        "selector": ".Rbaif.sticky ~ header",
-                        "type": "modify-style",
-                        "values": [
-                            {
-                                "property": "top",
-                                "value": "0px"
-                            }
-                        ]
-                    }
-                ]
-            },
-            {
                 "domain": "washingtonpost.com",
                 "rules": [
                     {
@@ -5076,6 +4992,57 @@
                     {
                         "selector": "#cookieBanner.cbShort",
                         "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": [
+                    "belfastlive.co.uk",
+                    "birminghammail.co.uk",
+                    "cheshire-live.co.uk",
+                    "corkbeo.ie",
+                    "cornwalllive.com",
+                    "coventrytelegraph.net",
+                    "dailypost.co.uk",
+                    "dailyrecord.co.uk",
+                    "dailystar.co.uk",
+                    "derbytelegraph.co.uk",
+                    "devonlive.com",
+                    "dublinlive.ie",
+                    "edinburghlive.co.uk",
+                    "essexlive.news",
+                    "examinerlive.co.uk",
+                    "gazettelive.co.uk",
+                    "getsurrey.co.uk",
+                    "grimsbytelegraph.co.uk",
+                    "hulldailymail.co.uk",
+                    "insider.co.uk",
+                    "irishmirror.ie",
+                    "kentlive.news",
+                    "lancs.live",
+                    "lincolnshirelive.co.uk",
+                    "liverpoolecho.co.uk",
+                    "manchestereveningnews.co.uk",
+                    "mylondon.news",
+                    "nottinghampost.com",
+                    "somersetlive.co.uk",
+                    "stokesentinel.co.uk",
+                    "walesonline.co.uk"
+                ],
+                "rules": [
+                    {
+                        "selector": "[data-tmdatatrack='non-content-unit'], .vf3-conversations-list__promo",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".sticky ~ header",
+                        "type": "modify-style",
+                        "values": [
+                            {
+                                "property": "top",
+                                "value": "0"
+                            }
+                        ]
                     }
                 ]
             }
