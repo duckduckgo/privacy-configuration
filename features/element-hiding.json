@@ -24,24 +24,8 @@
         "useStrictHideStyleTag": true,
         "rules": [
             {
-                "selector": "[id*='gpt-']",
+                "selector": "[id*='gpt-'], [class*='gpt-'], [class*='dfp-'], [id*='dfp-'], [id*='dfp_']",
                 "type": "hide-empty"
-            },
-            {
-                "selector": "[class*='gpt-']",
-                "type": "closest-empty"
-            },
-            {
-                "selector": "[class*='dfp-']",
-                "type": "hide-empty"
-            },
-            {
-                "selector": "[id*='dfp-']",
-                "type": "hide-empty"
-            },
-            {
-                "selector": "[id*='dfp_']",
-                "type": "closest-empty"
             },
             {
                 "selector": "[id*='google_ads_iframe']",
@@ -80,11 +64,7 @@
                 "type": "hide-empty"
             },
             {
-                "selector": "[class*='ad_unit']",
-                "type": "closest-empty"
-            },
-            {
-                "selector": "[class^='adunit']",
+                "selector": "[class*='ad_unit'], [class^='adunit'], [class^='ad-content'], [class*='ad-slot_'], [class*='_ad-slot'], [class*='bannerAd']",
                 "type": "hide-empty"
             },
             {
@@ -113,22 +93,6 @@
             },
             {
                 "selector": ".ad-adhesion",
-                "type": "hide-empty"
-            },
-            {
-                "selector": ".Ad--empty",
-                "type": "hide-empty"
-            },
-            {
-                "selector": "[class^='ad-content']",
-                "type": "hide-empty"
-            },
-            {
-                "selector": "[class*='ad-slot_']",
-                "type": "hide-empty"
-            },
-            {
-                "selector": "[class*='_ad-slot']",
                 "type": "hide-empty"
             },
             {
@@ -208,10 +172,6 @@
                 "type": "hide-empty"
             },
             {
-                "selector": "[class*='bannerAd']",
-                "type": "hide-empty"
-            },
-            {
                 "selector": ".banner-placeholder",
                 "type": "hide-empty"
             },
@@ -276,14 +236,6 @@
                 "type": "closest-empty"
             },
             {
-                "selector": "[class^='ad-container']",
-                "type": "hide-empty"
-            },
-            {
-                "selector": "[class*='-ad-container']",
-                "type": "hide-empty"
-            },
-            {
                 "selector": ".adcontainer",
                 "type": "closest-empty"
             },
@@ -304,15 +256,7 @@
                 "type": "closest-empty"
             },
             {
-                "selector": "[class*='advert-']",
-                "type": "hide-empty"
-            },
-            {
-                "selector": "[id*='advert-']",
-                "type": "hide-empty"
-            },
-            {
-                "selector": "[aria-label='advertisement']",
+                "selector": "[aria-label='advertisement'], [data-ad]",
                 "type": "hide-empty"
             },
             {
@@ -356,39 +300,11 @@
                 "type": "closest-empty"
             },
             {
-                "selector": "[class^='adWrapper']",
-                "type": "closest-empty"
-            },
-            {
-                "selector": "[class*='container--ads']",
+                "selector": "[class^='ad-container']",
                 "type": "hide-empty"
             },
             {
-                "selector": "[class*='page-ad']",
-                "type": "hide-empty"
-            },
-            {
-                "selector": "[class*='module__ad']",
-                "type": "hide-empty"
-            },
-            {
-                "selector": "[class*='advertising']",
-                "type": "hide-empty"
-            },
-            {
-                "selector": "[class*='AdvertisingSlot']",
-                "type": "hide-empty"
-            },
-            {
-                "selector": "[class*='AdSlot']",
-                "type": "hide-empty"
-            },
-            {
-                "selector": "[class*='werbung']",
-                "type": "hide-empty"
-            },
-            {
-                "selector": "[class*='am-bazaar-ad']",
+                "selector": "[class*='container--ads'], [class*='page-ad'], [class*='module__ad'], [class*='advertising'], [class*='AdvertisingSlot'], [class*='AdSlot'], [class^='Display_displayAd'], [class*='advert-'], [id*='advert-'], [class^='DisplayAdvert']",
                 "type": "hide-empty"
             },
             {
@@ -400,59 +316,23 @@
                 "type": "hide-empty"
             },
             {
-                "selector": "[class^='Display_displayAd']",
-                "type": "hide-empty"
-            },
-            {
-                "selector": "[class^='Display_displayAd']",
-                "type": "hide-empty"
-            },
-            {
                 "selector": "#premium_ddb_0",
                 "type": "hide-empty"
             },
             {
-                "selector": "[class*='ad-zone']",
-                "type": "hide-empty"
-            },
-            {
-                "selector": "[data-adunitpath]",
+                "selector": "[data-adunitpath], [data-ad-placeholder], [class^='adWrapper']",
                 "type": "closest-empty"
-            },
-            {
-                "selector": "[data-targeting]",
-                "type": "closest-empty"
-            },
-            {
-                "selector": "[data-ad-placeholder]",
-                "type": "closest-empty"
-            },
-            {
-                "selector": "[data-ad]",
-                "type": "hide-empty"
             },
             {
                 "selector": ".instream_ad",
                 "type": "hide-empty"
             },
             {
-                "selector": ".adthrive:not([id^=\"cls-video-container\"])",
+                "selector": ".adthrive:not([id^=\"cls-video-container\"]), .adthrive-ad, .adthrive-content",
                 "type": "hide-empty"
             },
             {
-                "selector": ".adthrive-ad",
-                "type": "hide-empty"
-            },
-            {
-                "selector": ".adthrive-content",
-                "type": "hide-empty"
-            },
-            {
-                "selector": ".adthrive-auto-injected-player-container",
-                "type": "hide"
-            },
-            {
-                "selector": ".adthrive[id^=\"cls-video-container\"]:has(.adthrive-auto-injected-player-container)",
+                "selector": ".adthrive-auto-injected-player-container, .adthrive[id^=\"cls-video-container\"]:has(.adthrive-auto-injected-player-container)",
                 "type": "hide"
             },
             {
@@ -468,15 +348,7 @@
                 "type": "hide-empty"
             },
             {
-                "selector": ".ezoic-ad",
-                "type": "hide-empty"
-            },
-            {
-                "selector": ".ezo_ad",
-                "type": "hide-empty"
-            },
-            {
-                "selector": "[data-ez-ph-id]",
+                "selector": ".ezoic-ad, .ezo_ad, [data-ez-ph-id]",
                 "type": "hide-empty"
             },
             {
@@ -510,14 +382,6 @@
             {
                 "selector": ".m-in-content-ad-row",
                 "type": "hide-empty"
-            },
-            {
-                "selector": ".clsy-c-advsection",
-                "type": "hide-empty"
-            },
-            {
-                "selector": "[class^='DisplayAdvert']",
-                "type": "closest-empty"
             }
         ],
         "styleTagExceptions": [
@@ -537,19 +401,13 @@
         "hideTimeouts": [
             0,
             100,
-            300,
             500,
             1000,
-            1500,
-            2000,
-            3000,
-            5000
+            2000
         ],
         "unhideTimeouts": [
             1250,
-            2250,
-            3250,
-            5250
+            3250
         ],
         "mediaAndFormSelectors": "video,canvas,embed,object,audio,map,form,input,textarea,select,option",
         "adLabelStrings": [
@@ -1110,6 +968,10 @@
                     {
                         "selector": ".subnav-ad-layout",
                         "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".masthead-ad, .ad-holder, .ad-callout-wrapper",
+                        "type": "hide-empty"
                     }
                 ]
             },
@@ -1295,15 +1157,6 @@
                 ]
             },
             {
-                "domain": "cookingclassy.com",
-                "rules": [
-                    {
-                        "selector": ".adthrive",
-                        "type": "override"
-                    }
-                ]
-            },
-            {
                 "domain": "corriere.it",
                 "rules": [
                     {
@@ -1454,15 +1307,6 @@
                     {
                         "selector": ".bg-neutral-grey-4.items-center",
                         "type": "hide-empty"
-                    }
-                ]
-            },
-            {
-                "domain": "deseret.com",
-                "rules": [
-                    {
-                        "selector": "[data-targeting]",
-                        "type": "override"
                     }
                 ]
             },
@@ -1762,6 +1606,14 @@
                     {
                         "selector": ".top-ads-container",
                         "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".sticky-placement-top",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".featured-video__player-container",
+                        "type": "hide-empty"
                     }
                 ]
             },
@@ -1863,15 +1715,15 @@
                 "domain": "fortune.com",
                 "rules": [
                     {
-                        "selector": "[id*='Leaderboard']",
+                        "selector": "[id*='Leaderboard'], [id*='RightRailFlex'], [id*='InStream']",
                         "type": "closest-empty"
                     },
                     {
-                        "selector": "[id*='RightRailFlex']",
+                        "selector": ".impression-element",
                         "type": "closest-empty"
                     },
                     {
-                        "selector": "[id*='InStream']",
+                        "selector": "[name='fortunecom_leaderboard_top']",
                         "type": "closest-empty"
                     }
                 ]
@@ -2683,14 +2535,6 @@
                 "rules": [
                     {
                         "type": "disable-default"
-                    },
-                    {
-                        "selector": "[class*='__GAMWrapper-']",
-                        "type": "override"
-                    },
-                    {
-                        "selector": ".gam-wrapper",
-                        "type": "override"
                     }
                 ]
             },
@@ -2835,10 +2679,6 @@
             {
                 "domain": "modernhoney.com",
                 "rules": [
-                    {
-                        "selector": ".adthrive",
-                        "type": "override"
-                    },
                     {
                         "selector": ".adthrive-footer",
                         "type": "hide-empty"
@@ -4039,6 +3879,15 @@
                 "rules": [
                     {
                         "selector": "[class*='AdCard__']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "time.com",
+                "rules": [
+                    {
+                        "selector": "[data-ad-wrapper='true']",
                         "type": "hide-empty"
                     }
                 ]
