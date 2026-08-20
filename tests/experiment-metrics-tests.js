@@ -119,6 +119,22 @@ function findMisplacedMetrics(config) {
 }
 
 /**
+ * Fail with `message` and nothing else.
+ *
+ * `expect(condition, message).to.equal(true)` attaches an actual/expected pair, and mocha
+ * then reduces the reported message to whatever precedes its first colon and prints a
+ * `false`/`true` diff in place of the rest.
+ *
+ * @param {boolean} condition
+ * @param {string} message
+ */
+function check(condition, message) {
+    if (!condition) {
+        expect.fail(message);
+    }
+}
+
+/**
  * Assert a single metric declaration is well-formed.
  *
  * @param {string} metricName
@@ -126,55 +142,64 @@ function findMisplacedMetrics(config) {
  * @param {string} path - used in error messages
  */
 function assertMetricShape(metricName, metric, path) {
-    expect(metricName, `${path}: metric name must match ${METRIC_NAME_FORMAT}`).to.match(METRIC_NAME_FORMAT);
-    expect(RESERVED_METRIC_NAMES.has(metricName), `${path}: '${metricName}' collides with a framework built-in metric`).to.equal(false);
+    check(METRIC_NAME_FORMAT.test(metricName), `${path} metric name '${metricName}' must match ${METRIC_NAME_FORMAT}`);
+    check(!RESERVED_METRIC_NAMES.has(metricName), `${path} metric name '${metricName}' collides with a framework built-in metric`);
 
-    expect(typeof metric?.event === 'string' && metric.event.length > 0, `${path}: 'event' must be a non-empty string`).to.equal(true);
+    check(
+        typeof metric?.event === 'string' && metric.event.length > 0,
+        `${path}.event must be a non-empty string, got ${JSON.stringify(metric?.event)}`,
+    );
 
-    expect(
+    check(
         Array.isArray(metric?.conversions) && metric.conversions.length > 0,
-        `${path}: 'conversions' must be a non-empty array`,
-    ).to.equal(true);
+        `${path}.conversions must be a non-empty array, got ${JSON.stringify(metric?.conversions)}`,
+    );
 
     for (const [
         index,
         conversion,
     ] of (metric?.conversions ?? []).entries()) {
         const conversionPath = `${path}.conversions[${index}]`;
+        const windows = conversion?.windows;
 
-        expect(
-            Array.isArray(conversion?.windows) && conversion.windows.length > 0,
-            `${conversionPath}: 'windows' must be a non-empty array`,
-        ).to.equal(true);
+        check(
+            Array.isArray(windows) && windows.length > 0,
+            `${conversionPath}.windows must be a non-empty array, got ${JSON.stringify(windows)}`,
+        );
+        check(
+            !windows.every((entry) => typeof entry === 'number'),
+            `${conversionPath}.windows is a list of [low, high] pairs, so a single window nests: ` +
+                `write [${JSON.stringify(windows)}] rather than ${JSON.stringify(windows)}`,
+        );
+
         for (const [
             windowIndex,
             window,
-        ] of (conversion?.windows ?? []).entries()) {
-            const ok =
-                Array.isArray(window) &&
-                window.length === 2 &&
-                Number.isInteger(window[0]) &&
-                Number.isInteger(window[1]) &&
-                window[0] >= 0 &&
-                window[0] <= window[1];
-            expect(
-                ok,
-                `${conversionPath}.windows[${windowIndex}]: expected [low, high] integers with 0 <= low <= high, got ${JSON.stringify(window)}`,
-            ).to.equal(true);
+        ] of windows.entries()) {
+            const windowPath = `${conversionPath}.windows[${windowIndex}]`;
+            check(Array.isArray(window) && window.length === 2, `${windowPath} must be a [low, high] pair, got ${JSON.stringify(window)}`);
+            const [
+                low,
+                high,
+            ] = window;
+            check(Number.isInteger(low) && Number.isInteger(high), `${windowPath} bounds must be integers, got ${JSON.stringify(window)}`);
+            check(low >= 0, `${windowPath} low bound counts days from enrollment and must be >= 0, got ${low}`);
+            check(low <= high, `${windowPath} must run low to high, got ${JSON.stringify(window)}`);
         }
 
-        expect(
-            Array.isArray(conversion?.thresholds) && conversion.thresholds.length > 0,
-            `${conversionPath}: 'thresholds' must be a non-empty array`,
-        ).to.equal(true);
+        const thresholds = conversion?.thresholds;
+        check(
+            Array.isArray(thresholds) && thresholds.length > 0,
+            `${conversionPath}.thresholds must be a non-empty array, got ${JSON.stringify(thresholds)}`,
+        );
         for (const [
             thresholdIndex,
             threshold,
-        ] of (conversion?.thresholds ?? []).entries()) {
-            expect(
+        ] of thresholds.entries()) {
+            check(
                 Number.isInteger(threshold) && threshold >= 1,
-                `${conversionPath}.thresholds[${thresholdIndex}]: expected an integer >= 1, got ${JSON.stringify(threshold)}`,
-            ).to.equal(true);
+                `${conversionPath}.thresholds[${thresholdIndex}] must be an integer >= 1, got ${JSON.stringify(threshold)}`,
+            );
         }
     }
 }
@@ -285,6 +310,79 @@ describe('experiment metrics config tests', () => {
 
         it('rejects empty conversions', () => {
             expect(() => assertMetricShape('adwallSeen', { event: 'adwallDetected', conversions: [] }, '$')).to.throw();
+        });
+
+        it('names the nesting when a single window is written un-nested', () => {
+            expect(() =>
+                assertMetricShape(
+                    'adwallSeen',
+                    {
+                        event: 'adwallDetected',
+                        conversions: [
+                            {
+                                windows: [
+                                    1,
+                                    2,
+                                ],
+                                thresholds: [
+                                    1,
+                                ],
+                            },
+                        ],
+                    },
+                    '$',
+                ),
+            ).to.throw('write [[1,2]] rather than [1,2]');
+        });
+
+        it('rejects a non-integer window bound', () => {
+            expect(() =>
+                assertMetricShape(
+                    'adwallSeen',
+                    {
+                        event: 'adwallDetected',
+                        conversions: [
+                            {
+                                windows: [
+                                    [
+                                        0,
+                                        '7',
+                                    ],
+                                ],
+                                thresholds: [
+                                    1,
+                                ],
+                            },
+                        ],
+                    },
+                    '$',
+                ),
+            ).to.throw('bounds must be integers');
+        });
+
+        it('rejects a negative window bound', () => {
+            expect(() =>
+                assertMetricShape(
+                    'adwallSeen',
+                    {
+                        event: 'adwallDetected',
+                        conversions: [
+                            {
+                                windows: [
+                                    [
+                                        -1,
+                                        4,
+                                    ],
+                                ],
+                                thresholds: [
+                                    1,
+                                ],
+                            },
+                        ],
+                    },
+                    '$',
+                ),
+            ).to.throw('must be >= 0');
         });
 
         it('rejects an inverted window', () => {
