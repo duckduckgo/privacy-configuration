@@ -202,6 +202,46 @@ function assertMetricShape(metricName, metric, path) {
             );
         }
     }
+
+    assertNoDuplicateRequests(metric, path);
+}
+
+/**
+ * Assert no `(window, threshold)` pair is reached twice across a metric's conversion groups.
+ *
+ * A metric's request set is the union of each group's `windows x thresholds` product. Windows
+ * may overlap, but a pair reached twice is one conversion request authored twice, and the
+ * framework converts it once, so the second is inert.
+ *
+ * @param {any} metric - a metric whose conversion groups are already known well-formed
+ * @param {string} path - used in error messages
+ */
+function assertNoDuplicateRequests(metric, path) {
+    /** @type {Map<string, string>} */
+    const origins = new Map();
+
+    for (const [
+        index,
+        conversion,
+    ] of metric.conversions.entries()) {
+        const origin = `conversions[${index}]`;
+        for (const [
+            low,
+            high,
+        ] of conversion.windows) {
+            for (const threshold of conversion.thresholds) {
+                const request = `window [${low}, ${high}] at threshold ${threshold}`;
+                const previous = origins.get(`${low}-${high}@${threshold}`);
+                check(
+                    previous === undefined,
+                    previous === origin
+                        ? `${path}.${origin} requests ${request} more than once`
+                        : `${path} requests ${request} in both ${previous} and ${origin}`,
+                );
+                origins.set(`${low}-${high}@${threshold}`, origin);
+            }
+        }
+    }
 }
 
 const platformOutput = platforms.map((item) => item.replace('browsers/', 'extension-'));
@@ -405,6 +445,131 @@ describe('experiment metrics config tests', () => {
                     '$',
                 ),
             ).to.throw();
+        });
+
+        it('rejects a threshold repeated within one group', () => {
+            expect(() =>
+                assertMetricShape(
+                    'adwallSeen',
+                    {
+                        event: 'adwallDetected',
+                        conversions: [
+                            {
+                                windows: [
+                                    [
+                                        0,
+                                        7,
+                                    ],
+                                ],
+                                thresholds: [
+                                    1,
+                                    1,
+                                ],
+                            },
+                        ],
+                    },
+                    '$',
+                ),
+            ).to.throw('$.conversions[0] requests window [0, 7] at threshold 1 more than once');
+        });
+
+        it('rejects a window repeated within one group', () => {
+            expect(() =>
+                assertMetricShape(
+                    'adwallSeen',
+                    {
+                        event: 'adwallDetected',
+                        conversions: [
+                            {
+                                windows: [
+                                    [
+                                        0,
+                                        7,
+                                    ],
+                                    [
+                                        0,
+                                        7,
+                                    ],
+                                ],
+                                thresholds: [
+                                    2,
+                                ],
+                            },
+                        ],
+                    },
+                    '$',
+                ),
+            ).to.throw('$.conversions[0] requests window [0, 7] at threshold 2 more than once');
+        });
+
+        it('rejects the same window and threshold reached by two groups', () => {
+            expect(() =>
+                assertMetricShape(
+                    'adwallSeen',
+                    {
+                        event: 'adwallDetected',
+                        conversions: [
+                            {
+                                windows: [
+                                    [
+                                        0,
+                                        7,
+                                    ],
+                                ],
+                                thresholds: [
+                                    1,
+                                    3,
+                                ],
+                            },
+                            {
+                                windows: [
+                                    [
+                                        0,
+                                        7,
+                                    ],
+                                ],
+                                thresholds: [
+                                    3,
+                                ],
+                            },
+                        ],
+                    },
+                    '$',
+                ),
+            ).to.throw('$ requests window [0, 7] at threshold 3 in both conversions[0] and conversions[1]');
+        });
+
+        it('accepts overlapping windows that differ in bounds', () => {
+            expect(() =>
+                assertMetricShape(
+                    'adwallSeen',
+                    {
+                        event: 'adwallDetected',
+                        conversions: [
+                            {
+                                windows: [
+                                    [
+                                        0,
+                                        0,
+                                    ],
+                                    [
+                                        0,
+                                        7,
+                                    ],
+                                ],
+                                thresholds: [
+                                    1,
+                                ],
+                            },
+                        ],
+                    },
+                    '$',
+                ),
+            ).to.not.throw();
+        });
+
+        it('accepts the same window at different thresholds', () => {
+            expect(() => assertMetricShape('adwallSeen', validMetric, '$')).to.not.throw();
         });
 
         it('rejects a zero threshold', () => {
