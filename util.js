@@ -226,59 +226,6 @@ export function collapseEventHubTelemetryPeriods(config) {
 }
 
 /**
- * Feature names whose subfeatures may declare experiment metrics in `settings.metrics`.
- *
- * The TDS experiment parent is `blockList` on Android and `contentBlocking` on every other
- * platform; content scope experiments use one name everywhere.
- */
-export const EXPERIMENT_METRIC_PARENT_FEATURES = [
-    'contentScopeExperiments',
-    'blockList',
-    'contentBlocking',
-];
-
-/**
- * Convert on the first in-window occurrence, when a conversion group omits `thresholds`.
- */
-const DEFAULT_METRIC_THRESHOLDS = [
-    1,
-];
-
-/**
- * Give every experiment metric conversion group an explicit `thresholds` list.
- *
- * Authored config may omit `thresholds`; the built config always carries it, and the schema
- * requires it.
- *
- * Mutates the config in place; no-ops when no subfeature declares metrics.
- *
- * @param {object} config - a fully-merged platform config
- */
-export function defaultExperimentMetricThresholds(config) {
-    for (const parent of EXPERIMENT_METRIC_PARENT_FEATURES) {
-        const subFeatures = config?.features?.[parent]?.features;
-        if (!subFeatures) {
-            continue;
-        }
-
-        for (const subFeature of Object.values(subFeatures)) {
-            for (const metric of Object.values(subFeature?.settings?.metrics || {})) {
-                if (!Array.isArray(metric?.conversions)) {
-                    continue;
-                }
-                for (const conversion of metric.conversions) {
-                    if (conversion && !Array.isArray(conversion.thresholds)) {
-                        conversion.thresholds = [
-                            ...DEFAULT_METRIC_THRESHOLDS,
-                        ];
-                    }
-                }
-            }
-        }
-    }
-}
-
-/**
  * All domains that may map to the given cnameTarget.
  */
 function getCnameSources(tds, cnameTarget) {

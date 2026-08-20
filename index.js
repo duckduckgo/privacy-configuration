@@ -4,7 +4,6 @@ import fetch from 'node-fetch';
 import {
     addCnameEntriesToAllowlist,
     collapseEventHubTelemetryPeriods,
-    defaultExperimentMetricThresholds,
     inlineReasonArrays,
     mergeAllowlistedTrackers,
     mergeEventHubTelemetry,
@@ -382,9 +381,6 @@ async function buildPlatforms() {
         // Clients read eventHub periods as integer seconds; collapse any authored unit object
         // (days/hours/minutes) to seconds so period pixels are not silently dropped.
         collapseEventHubTelemetryPeriods(platformConfig);
-
-        // Runs after the override merge, so it reaches metrics introduced by an override.
-        defaultExperimentMetricThresholds(platformConfig);
 
         platformConfigs[platform] = platformConfig;
 

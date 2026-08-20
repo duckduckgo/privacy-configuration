@@ -1,7 +1,6 @@
 import { expect } from 'chai';
 import fs from 'fs';
 import platforms from '../platforms.js';
-import { EXPERIMENT_METRIC_PARENT_FEATURES, defaultExperimentMetricThresholds } from '../util.js';
 import { createValidator, formatErrors } from './schema-validation.js';
 
 /**
@@ -11,11 +10,19 @@ import { createValidator, formatErrors } from './schema-validation.js';
  * Checks are per declaration: the shape, the name, and that the event can be produced.
  * Metric names are scoped to the experiment that declares them, so two experiments may
  * bind the same name to different events.
- *
- * These run against generated configs, so `thresholds` is always present.
  */
 
-const PARTICIPATING_PARENTS = EXPERIMENT_METRIC_PARENT_FEATURES;
+/**
+ * The only features whose subfeatures may carry experiment metrics.
+ *
+ * The TDS experiment parent is `blockList` on Android and `contentBlocking` on every other
+ * platform; content scope experiments use one name everywhere.
+ */
+const PARTICIPATING_PARENTS = [
+    'contentScopeExperiments',
+    'blockList',
+    'contentBlocking',
+];
 
 // Names the NA experiment framework already fires as built-in retention metrics; a
 // config-declared metric with one of these names would be indistinguishable in the data.
@@ -631,131 +638,6 @@ describe('experiment metrics config tests', () => {
 
         it('rejects a conversion group without thresholds', () => {
             expect(validate(settingsWithConversion({ windows: window }))).to.equal(false);
-        });
-
-        it('accepts the output of the build step for an authored group without thresholds', () => {
-            const config = {
-                features: {
-                    contentScopeExperiments: {
-                        features: {
-                            experiment1: { settings: settingsWithConversion({ windows: window }) },
-                        },
-                    },
-                },
-            };
-            defaultExperimentMetricThresholds(config);
-            const settings = config.features.contentScopeExperiments.features.experiment1.settings;
-            expect(validate(settings)).to.equal(true, formatErrors(validate.errors));
-        });
-    });
-
-    describe('defaultExperimentMetricThresholds', () => {
-        /**
-         * @param {object} conversion
-         * @returns {object} a config whose one metric has `conversion` as its only group
-         */
-        const configWithConversion = (conversion) => ({
-            features: {
-                contentScopeExperiments: {
-                    features: {
-                        experiment1: {
-                            settings: {
-                                metrics: {
-                                    adwallSeen: {
-                                        event: 'adwallDetected',
-                                        conversions: [
-                                            conversion,
-                                        ],
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-            },
-        });
-
-        /**
-         * @param {object} config
-         * @returns {object} the single conversion group written back by the build step
-         */
-        const onlyConversion = (config) =>
-            config.features.contentScopeExperiments.features.experiment1.settings.metrics.adwallSeen.conversions[0];
-
-        it('applies [1] when thresholds are omitted', () => {
-            const config = configWithConversion({
-                windows: [
-                    [
-                        0,
-                        7,
-                    ],
-                ],
-            });
-            defaultExperimentMetricThresholds(config);
-            expect(onlyConversion(config).thresholds).to.deep.equal([
-                1,
-            ]);
-        });
-
-        it('leaves authored thresholds alone', () => {
-            const config = configWithConversion({
-                windows: [
-                    [
-                        0,
-                        7,
-                    ],
-                ],
-                thresholds: [
-                    2,
-                    3,
-                ],
-            });
-            defaultExperimentMetricThresholds(config);
-            expect(onlyConversion(config).thresholds).to.deep.equal([
-                2,
-                3,
-            ]);
-        });
-
-        it('covers TDS experiment parents as well as content scope experiments', () => {
-            const config = {
-                features: {
-                    blockList: {
-                        features: {
-                            tdsNextExperiment007: {
-                                settings: {
-                                    metrics: {
-                                        blocklistFailure: {
-                                            event: 'tdsDownloadFailed',
-                                            conversions: [
-                                                {
-                                                    windows: [
-                                                        [
-                                                            0,
-                                                            7,
-                                                        ],
-                                                    ],
-                                                },
-                                            ],
-                                        },
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-            };
-            defaultExperimentMetricThresholds(config);
-            expect(
-                config.features.blockList.features.tdsNextExperiment007.settings.metrics.blocklistFailure.conversions[0].thresholds,
-            ).to.deep.equal([
-                1,
-            ]);
-        });
-
-        it('no-ops on a config with no metrics', () => {
-            const config = { features: { contentScopeExperiments: { features: { experiment1: { settings: {} } } } } };
-            expect(() => defaultExperimentMetricThresholds(config)).to.not.throw();
         });
     });
 
