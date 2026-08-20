@@ -18,13 +18,15 @@ type MetricConversion = {
         number,
     ][];
     // Convert on the Nth in-window occurrence. Sent as the pixel's `value` param.
-    thresholds?: number[]; // defaults to [1]
+    // Required here because this type describes the built config: authors may omit
+    // `thresholds` and the build applies the default [1], so no client infers it.
+    thresholds: number[];
 };
 
 type ExperimentMetric = {
     // The hub event type that converts this metric. Keying by metric name means one event
-    // per metric name within an experiment; validation enforces the same across experiments,
-    // since the pixel carries only the metric name.
+    // per metric name within an experiment. Names are scoped to their experiment, so two
+    // experiments may bind the same metric name to different events.
     event: string;
     conversions: MetricConversion[];
 };

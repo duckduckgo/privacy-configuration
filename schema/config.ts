@@ -46,6 +46,7 @@ import { ExtensionManagementFeature } from './features/extension-management';
 export { WebCompatSettings } from './features/webcompat';
 export { DuckPlayerSettings } from './features/duckplayer';
 export { EventHubSettings } from './features/event-hub';
+export { ExperimentMetricsSettings } from './features/experiment-metrics';
 
 export type ExportedSchemas =
     | 'CurrentGenericConfig'
@@ -56,6 +57,7 @@ export type ExportedSchemas =
     | 'DuckPlayerSettings'
     | 'DuckPlayerNativeSettings'
     | 'EventHubSettings'
+    | 'ExperimentMetricsSettings'
     | 'AttributedMetricsFeature';
 
 /**

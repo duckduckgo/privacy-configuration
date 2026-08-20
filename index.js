@@ -4,6 +4,7 @@ import fetch from 'node-fetch';
 import {
     addCnameEntriesToAllowlist,
     collapseEventHubTelemetryPeriods,
+    defaultExperimentMetricThresholds,
     inlineReasonArrays,
     mergeAllowlistedTrackers,
     mergeEventHubTelemetry,
@@ -381,6 +382,10 @@ async function buildPlatforms() {
         // Clients read eventHub periods as integer seconds; collapse any authored unit object
         // (days/hours/minutes) to seconds so period pixels are not silently dropped.
         collapseEventHubTelemetryPeriods(platformConfig);
+
+        // Experiment metric conversions fan out as `windows x thresholds`; apply the default
+        // threshold here so no client has to know what an omitted list means.
+        defaultExperimentMetricThresholds(platformConfig);
 
         platformConfigs[platform] = platformConfig;
 

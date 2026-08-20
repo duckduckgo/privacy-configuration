@@ -1,6 +1,8 @@
 import { expect } from 'chai';
 import fs from 'fs';
 import platforms from '../platforms.js';
+import { EXPERIMENT_METRIC_PARENT_FEATURES, defaultExperimentMetricThresholds } from '../util.js';
+import { createValidator, formatErrors } from './schema-validation.js';
 
 /**
  * Validation for experiment metrics declared in the `settings.metrics` of experiment
@@ -10,16 +12,15 @@ import platforms from '../platforms.js';
  * one experiment's declarations against another's — the same metric name may bind
  * different events in different experiments. The checks below are per declaration:
  * the shape, the name, and that the event can actually be produced.
+ *
+ * These run against generated configs, i.e. the client-level format, so they assert the
+ * post-build shape: `thresholds` is optional when authoring but always present here.
  */
 
 // The only features whose subfeatures may carry experiment metrics. Scoping the
 // capability to the experiment types with a use case is deliberate; extending it is a
 // design decision, not a config edit.
-const PARTICIPATING_PARENTS = [
-    'contentScopeExperiments',
-    'blockList',
-    'contentBlocking',
-];
+const PARTICIPATING_PARENTS = EXPERIMENT_METRIC_PARENT_FEATURES;
 
 // Names the NA experiment framework already fires as built-in retention metrics; a
 // config-declared metric with one of these names would be indistinguishable in the data.
@@ -167,10 +168,10 @@ function assertMetricShape(metricName, metric, path) {
             ).to.equal(true);
         }
 
-        if (conversion?.thresholds === undefined) continue;
         expect(
-            Array.isArray(conversion.thresholds) && conversion.thresholds.length > 0,
-            `${conversionPath}: 'thresholds' must be a non-empty array when present`,
+            Array.isArray(conversion?.thresholds) && conversion.thresholds.length > 0,
+            `${conversionPath}: 'thresholds' must be a non-empty array — the build applies the default, so a ` +
+                `generated config always carries it explicitly`,
         ).to.equal(true);
         for (const [
             thresholdIndex,
@@ -254,7 +255,7 @@ describe('experiment metrics config tests', () => {
             expect(() => assertMetricShape('adwallSeen', validMetric, '$')).to.not.throw();
         });
 
-        it('passes when thresholds are omitted', () => {
+        it('rejects omitted thresholds, which the build should already have defaulted', () => {
             expect(() =>
                 assertMetricShape(
                     'adwallSeen',
@@ -273,7 +274,7 @@ describe('experiment metrics config tests', () => {
                     },
                     '$',
                 ),
-            ).to.not.throw();
+            ).to.throw();
         });
 
         it('rejects a reserved name', () => {
@@ -337,6 +338,169 @@ describe('experiment metrics config tests', () => {
                     '$',
                 ),
             ).to.throw();
+        });
+    });
+
+    describe('schema', () => {
+        // The schema describes the built config, so it holds the build to its own output
+        // contract: an unfilled `thresholds` is a build bug, not a valid config.
+        const validate = createValidator('ExperimentMetricsSettings');
+
+        const settingsWithConversion = (conversion) => ({
+            metrics: {
+                adwallSeen: {
+                    event: 'adwallDetected',
+                    conversions: [
+                        conversion,
+                    ],
+                },
+            },
+        });
+
+        const window = [
+            [
+                0,
+                7,
+            ],
+        ];
+
+        it('accepts explicit thresholds', () => {
+            const settings = settingsWithConversion({
+                windows: window,
+                thresholds: [
+                    1,
+                ],
+            });
+            expect(validate(settings)).to.equal(true, formatErrors(validate.errors));
+        });
+
+        it('rejects a conversion group without thresholds', () => {
+            expect(validate(settingsWithConversion({ windows: window }))).to.equal(false);
+        });
+
+        it('accepts the output of the build step for an authored group without thresholds', () => {
+            const config = {
+                features: {
+                    contentScopeExperiments: {
+                        features: {
+                            experiment1: { settings: settingsWithConversion({ windows: window }) },
+                        },
+                    },
+                },
+            };
+            defaultExperimentMetricThresholds(config);
+            const settings = config.features.contentScopeExperiments.features.experiment1.settings;
+            expect(validate(settings)).to.equal(true, formatErrors(validate.errors));
+        });
+    });
+
+    describe('defaultExperimentMetricThresholds', () => {
+        /**
+         * @param {object} conversion
+         * @returns {object} a config whose one metric has `conversion` as its only group
+         */
+        const configWithConversion = (conversion) => ({
+            features: {
+                contentScopeExperiments: {
+                    features: {
+                        experiment1: {
+                            settings: {
+                                metrics: {
+                                    adwallSeen: {
+                                        event: 'adwallDetected',
+                                        conversions: [
+                                            conversion,
+                                        ],
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        });
+
+        /**
+         * @param {object} config
+         * @returns {object} the single conversion group written back by the build step
+         */
+        const onlyConversion = (config) =>
+            config.features.contentScopeExperiments.features.experiment1.settings.metrics.adwallSeen.conversions[0];
+
+        it('applies [1] when thresholds are omitted', () => {
+            const config = configWithConversion({
+                windows: [
+                    [
+                        0,
+                        7,
+                    ],
+                ],
+            });
+            defaultExperimentMetricThresholds(config);
+            expect(onlyConversion(config).thresholds).to.deep.equal([
+                1,
+            ]);
+        });
+
+        it('leaves authored thresholds alone', () => {
+            const config = configWithConversion({
+                windows: [
+                    [
+                        0,
+                        7,
+                    ],
+                ],
+                thresholds: [
+                    2,
+                    3,
+                ],
+            });
+            defaultExperimentMetricThresholds(config);
+            expect(onlyConversion(config).thresholds).to.deep.equal([
+                2,
+                3,
+            ]);
+        });
+
+        it('covers TDS experiment parents as well as content scope experiments', () => {
+            const config = {
+                features: {
+                    blockList: {
+                        features: {
+                            tdsNextExperiment007: {
+                                settings: {
+                                    metrics: {
+                                        blocklistFailure: {
+                                            event: 'tdsDownloadFailed',
+                                            conversions: [
+                                                {
+                                                    windows: [
+                                                        [
+                                                            0,
+                                                            7,
+                                                        ],
+                                                    ],
+                                                },
+                                            ],
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            };
+            defaultExperimentMetricThresholds(config);
+            expect(
+                config.features.blockList.features.tdsNextExperiment007.settings.metrics.blocklistFailure.conversions[0].thresholds,
+            ).to.deep.equal([
+                1,
+            ]);
+        });
+
+        it('no-ops on a config with no metrics', () => {
+            const config = { features: { contentScopeExperiments: { features: { experiment1: { settings: {} } } } } };
+            expect(() => defaultExperimentMetricThresholds(config)).to.not.throw();
         });
     });
 
