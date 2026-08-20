@@ -383,8 +383,7 @@ async function buildPlatforms() {
         // (days/hours/minutes) to seconds so period pixels are not silently dropped.
         collapseEventHubTelemetryPeriods(platformConfig);
 
-        // Experiment metric conversions fan out as `windows x thresholds`; apply the default
-        // threshold here so no client has to know what an omitted list means.
+        // Runs after the override merge, so it reaches metrics introduced by an override.
         defaultExperimentMetricThresholds(platformConfig);
 
         platformConfigs[platform] = platformConfig;

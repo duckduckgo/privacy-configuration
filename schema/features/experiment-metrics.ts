@@ -18,8 +18,7 @@ type MetricConversion = {
         number,
     ][];
     // Convert on the Nth in-window occurrence. Sent as the pixel's `value` param.
-    // Required here because this type describes the built config: authors may omit
-    // `thresholds` and the build applies the default [1], so no client infers it.
+    // Authored config may omit this; the build applies the default [1].
     thresholds: number[];
 };
 

@@ -247,10 +247,8 @@ const DEFAULT_METRIC_THRESHOLDS = [
 /**
  * Give every experiment metric conversion group an explicit `thresholds` list.
  *
- * `thresholds` is optional when authoring, but the client-level format always carries it: the
- * fan-out into conversion requests is `windows × thresholds`, and four clients agreeing on an
- * implicit default is four chances to disagree. Applying it here means a client reads what it
- * converts on rather than inferring it.
+ * Authored config may omit `thresholds`; the built config always carries it, and the schema
+ * requires it.
  *
  * Mutates the config in place; no-ops when no subfeature declares metrics.
  *

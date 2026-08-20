@@ -8,18 +8,13 @@ import { createValidator, formatErrors } from './schema-validation.js';
  * Validation for experiment metrics declared in the `settings.metrics` of experiment
  * subfeatures (see schema/features/experiment-metrics.ts).
  *
- * Metrics are scoped to the experiment that declares them, so nothing here constrains
- * one experiment's declarations against another's — the same metric name may bind
- * different events in different experiments. The checks below are per declaration:
- * the shape, the name, and that the event can actually be produced.
+ * Checks are per declaration: the shape, the name, and that the event can be produced.
+ * Metric names are scoped to the experiment that declares them, so two experiments may
+ * bind the same name to different events.
  *
- * These run against generated configs, i.e. the client-level format, so they assert the
- * post-build shape: `thresholds` is optional when authoring but always present here.
+ * These run against generated configs, so `thresholds` is always present.
  */
 
-// The only features whose subfeatures may carry experiment metrics. Scoping the
-// capability to the experiment types with a use case is deliberate; extending it is a
-// design decision, not a config edit.
 const PARTICIPATING_PARENTS = EXPERIMENT_METRIC_PARENT_FEATURES;
 
 // Names the NA experiment framework already fires as built-in retention metrics; a
@@ -170,8 +165,7 @@ function assertMetricShape(metricName, metric, path) {
 
         expect(
             Array.isArray(conversion?.thresholds) && conversion.thresholds.length > 0,
-            `${conversionPath}: 'thresholds' must be a non-empty array — the build applies the default, so a ` +
-                `generated config always carries it explicitly`,
+            `${conversionPath}: 'thresholds' must be a non-empty array`,
         ).to.equal(true);
         for (const [
             thresholdIndex,
@@ -255,7 +249,7 @@ describe('experiment metrics config tests', () => {
             expect(() => assertMetricShape('adwallSeen', validMetric, '$')).to.not.throw();
         });
 
-        it('rejects omitted thresholds, which the build should already have defaulted', () => {
+        it('rejects omitted thresholds', () => {
             expect(() =>
                 assertMetricShape(
                     'adwallSeen',
@@ -342,8 +336,6 @@ describe('experiment metrics config tests', () => {
     });
 
     describe('schema', () => {
-        // The schema describes the built config, so it holds the build to its own output
-        // contract: an unfilled `thresholds` is a build bug, not a valid config.
         const validate = createValidator('ExperimentMetricsSettings');
 
         const settingsWithConversion = (conversion) => ({
