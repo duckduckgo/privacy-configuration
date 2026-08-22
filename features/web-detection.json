@@ -413,29 +413,15 @@
                 "condition": [
                     {
                         "experiment": {
-                            "experimentName": "contentScopeExperiment6",
-                            "cohort": "treatmentCon"
+                            "experimentName": "contentScopeExperiment7",
+                            "cohort": "treatment"
                         },
                         "injectName": "android"
                     },
                     {
                         "experiment": {
-                            "experimentName": "contentScopeExperiment6",
-                            "cohort": "treatmentCon"
-                        },
-                        "injectName": "apple-isolated"
-                    },
-                    {
-                        "experiment": {
-                            "experimentName": "contentScopeExperiment6",
-                            "cohort": "treatmentVis"
-                        },
-                        "injectName": "android"
-                    },
-                    {
-                        "experiment": {
-                            "experimentName": "contentScopeExperiment6",
-                            "cohort": "treatmentVis"
+                            "experimentName": "contentScopeExperiment7",
+                            "cohort": "treatment"
                         },
                         "injectName": "apple-isolated"
                     }
@@ -666,27 +652,7 @@
                                 }
                             }
                         }
-                    }
-                ]
-            },
-            {
-                "condition": [
-                    {
-                        "experiment": {
-                            "experimentName": "contentScopeExperiment6",
-                            "cohort": "treatmentCon"
-                        },
-                        "injectName": "android"
                     },
-                    {
-                        "experiment": {
-                            "experimentName": "contentScopeExperiment6",
-                            "cohort": "treatmentCon"
-                        },
-                        "injectName": "apple-isolated"
-                    }
-                ],
-                "patchSettings": [
                     {
                         "op": "add",
                         "path": "/detectors/captcha/recaptcha/actions",
@@ -741,131 +707,6 @@
                         "op": "add",
                         "path": "/detectors/captcha/other/actions",
                         "value": { "fireEvent": { "state": "enabled", "type": "captcha_other_t_con" } }
-                    }
-                ]
-            },
-            {
-                "condition": [
-                    {
-                        "experiment": {
-                            "experimentName": "contentScopeExperiment6",
-                            "cohort": "treatmentVis"
-                        },
-                        "injectName": "android"
-                    },
-                    {
-                        "experiment": {
-                            "experimentName": "contentScopeExperiment6",
-                            "cohort": "treatmentVis"
-                        },
-                        "injectName": "apple-isolated"
-                    }
-                ],
-                "patchSettings": [
-                    {
-                        "op": "replace",
-                        "path": "/detectors/captcha/recaptcha/match/element/visibility",
-                        "value": "visible"
-                    },
-                    {
-                        "op": "replace",
-                        "path": "/detectors/captcha/hcaptcha/match/element/visibility",
-                        "value": "visible"
-                    },
-                    {
-                        "op": "replace",
-                        "path": "/detectors/captcha/turnstile/match/element/visibility",
-                        "value": "visible"
-                    },
-                    {
-                        "op": "replace",
-                        "path": "/detectors/captcha/cloudflare/match/element/visibility",
-                        "value": "visible"
-                    },
-                    {
-                        "op": "replace",
-                        "path": "/detectors/captcha/datadome/match/element/visibility",
-                        "value": "visible"
-                    },
-                    {
-                        "op": "replace",
-                        "path": "/detectors/captcha/imperva/match/any/1/element/visibility",
-                        "value": "visible"
-                    },
-                    {
-                        "op": "replace",
-                        "path": "/detectors/captcha/arkose/match/element/visibility",
-                        "value": "visible"
-                    },
-                    {
-                        "op": "replace",
-                        "path": "/detectors/captcha/geetest/match/element/visibility",
-                        "value": "visible"
-                    },
-                    {
-                        "op": "replace",
-                        "path": "/detectors/captcha/awswaf/match/element/visibility",
-                        "value": "visible"
-                    },
-                    {
-                        "op": "replace",
-                        "path": "/detectors/captcha/perimeterx/match/any/0/element/visibility",
-                        "value": "visible"
-                    },
-                    {
-                        "op": "add",
-                        "path": "/detectors/captcha/recaptcha/actions",
-                        "value": { "fireEvent": { "state": "enabled", "type": "captcha_recaptcha_t_vis" } }
-                    },
-                    {
-                        "op": "add",
-                        "path": "/detectors/captcha/hcaptcha/actions",
-                        "value": { "fireEvent": { "state": "enabled", "type": "captcha_hcaptcha_t_vis" } }
-                    },
-                    {
-                        "op": "add",
-                        "path": "/detectors/captcha/turnstile/actions",
-                        "value": { "fireEvent": { "state": "enabled", "type": "captcha_turnstile_t_vis" } }
-                    },
-                    {
-                        "op": "add",
-                        "path": "/detectors/captcha/cloudflare/actions",
-                        "value": { "fireEvent": { "state": "enabled", "type": "captcha_cloudflare_t_vis" } }
-                    },
-                    {
-                        "op": "add",
-                        "path": "/detectors/captcha/datadome/actions",
-                        "value": { "fireEvent": { "state": "enabled", "type": "captcha_datadome_t_vis" } }
-                    },
-                    {
-                        "op": "add",
-                        "path": "/detectors/captcha/imperva/actions",
-                        "value": { "fireEvent": { "state": "enabled", "type": "captcha_imperva_t_vis" } }
-                    },
-                    {
-                        "op": "add",
-                        "path": "/detectors/captcha/arkose/actions",
-                        "value": { "fireEvent": { "state": "enabled", "type": "captcha_arkose_t_vis" } }
-                    },
-                    {
-                        "op": "add",
-                        "path": "/detectors/captcha/geetest/actions",
-                        "value": { "fireEvent": { "state": "enabled", "type": "captcha_geetest_t_vis" } }
-                    },
-                    {
-                        "op": "add",
-                        "path": "/detectors/captcha/awswaf/actions",
-                        "value": { "fireEvent": { "state": "enabled", "type": "captcha_awswaf_t_vis" } }
-                    },
-                    {
-                        "op": "add",
-                        "path": "/detectors/captcha/perimeterx/actions",
-                        "value": { "fireEvent": { "state": "enabled", "type": "captcha_perimeterx_t_vis" } }
-                    },
-                    {
-                        "op": "add",
-                        "path": "/detectors/captcha/other/actions",
-                        "value": { "fireEvent": { "state": "enabled", "type": "captcha_other_t_vis" } }
                     }
                 ]
             },

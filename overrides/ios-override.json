@@ -1012,7 +1012,7 @@
                     ]
                 },
                 "contentScopeExperiment6": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": "7.231.0",
                     "description": "Captcha detection: auto-run + fireEvent for the captcha detectors, comparing 'content' vs 'visible' element visibility",
                     "rollout": {
@@ -1033,6 +1033,28 @@
                         },
                         {
                             "name": "treatmentVis",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "contentScopeExperiment7": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.231.0",
+                    "description": "Captcha detection: auto-run + fireEvent for the captcha detectors, using 'content' element visibility",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 50
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
                             "weight": 1
                         }
                     ]
