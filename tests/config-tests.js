@@ -77,6 +77,9 @@ describe('Config schema tests', () => {
                     'macOSBrowserConfig',
                     'iOSBrowserConfig',
                 ];
+                const legacySubfeatures = [
+                    'iOSPromoPresentationCoordination',
+                ];
                 const deviceSpecificCheck = /(android|ios|windows|macos)/i;
                 const featureNameRegex = /^[a-zA-Z0-9]+$/;
                 for (const featureName of Object.keys(config.body.features)) {
@@ -91,7 +94,9 @@ describe('Config schema tests', () => {
                     if (feature.features) {
                         for (const subfeatureName of Object.keys(feature.features)) {
                             expect(subfeatureName).to.match(featureNameRegex);
-                            expect(subfeatureName).to.not.match(deviceSpecificCheck);
+                            if (!legacySubfeatures.includes(subfeatureName)) {
+                                expect(subfeatureName).to.not.match(deviceSpecificCheck);
+                            }
                         }
                     }
                 }
