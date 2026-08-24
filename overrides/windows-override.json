@@ -5713,6 +5713,45 @@
                 }
             }
         },
+        "chromeWebstorePatching": {
+            "state": "internal",
+            "exceptions": [],
+            "settings": {
+                "patchWebstore": {
+                    "state": "disabled"
+                },
+                "installButtonSelectors": [
+                    {
+                        "type": "css",
+                        "value": "button[jsname=\"wQO0od\"]"
+                    },
+                    {
+                        "type": "xpath",
+                        "value": "//button[.//span[contains(text(),'Add to Chrome')] or .//span[contains(text(),'Remove from Chrome')]]"
+                    }
+                ],
+                "installButtonTextSelectors": [
+                    "span.UywwFc-vQzf8d"
+                ],
+                "promoSelectors": [],
+                "buttonCopy": {
+                    "install": "Add to DuckDuckGo",
+                    "remove": "Remove from DuckDuckGo"
+                },
+                "domains": [
+                    {
+                        "domain": "chromewebstore.google.com",
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/patchWebstore/state",
+                                "value": "enabled"
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
         "tabPanelDeferChanges": {
             "state": "disabled",
             "exceptions": [],
