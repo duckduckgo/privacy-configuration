@@ -41,6 +41,7 @@ import { WebExtensionsConfig } from './features/web-extensions';
 import { AdBlockingExtensionConfig } from './features/ad-blocking-extension';
 import { TabSuspension } from './features/tab-suspension';
 import { ExtensionManagementFeature } from './features/extension-management';
+import { ChromeWebstorePatchingFeature } from './features/chrome-webstore-patching';
 
 export { WebCompatSettings } from './features/webcompat';
 export { DuckPlayerSettings } from './features/duckplayer';
@@ -107,6 +108,7 @@ export type ConfigV5<VersionType> = {
         tabSuspension?: TabSuspension<VersionType>;
         webExtensions?: WebExtensionsConfig<VersionType>;
         extensionManagement?: ExtensionManagementFeature<VersionType>;
+        chromeWebstorePatching?: ChromeWebstorePatchingFeature<VersionType>;
     };
     unprotectedTemporary: SiteException[];
 };
