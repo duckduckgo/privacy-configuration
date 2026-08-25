@@ -57,6 +57,13 @@ export const AUTO_APPROVABLE_FEATURES = {
     '/features/mediaPlaybackRequiresUserGesture': [
         '/exceptions',
     ],
+    // Nested CSS-inject subfeature. Only site-scoped patches are auto-approved;
+    // global defaults (formBoundarySelector, formTypeSettings, etc.) and
+    // subfeature state/rollout still require review.
+    '/features/autofill/features/siteSpecificFixes': [
+        '/settings/conditionalChanges',
+        '/settings/domains',
+    ],
 };
 
 /**

@@ -86,6 +86,96 @@ describe('Auto-approval logic tests', () => {
             ],
             expected: false,
         },
+        {
+            name: 'Autofill siteSpecificFixes conditionalChanges - should approve',
+            patches: [
+                {
+                    op: 'add',
+                    path: '/features/autofill/features/siteSpecificFixes/settings/conditionalChanges/28/condition',
+                    value: [
+                        { domain: 'icloud.com' },
+                    ],
+                },
+                {
+                    op: 'add',
+                    path: '/features/autofill/features/siteSpecificFixes/settings/conditionalChanges/28/patchSettings',
+                    value: [
+                        { path: '/formBoundarySelector', op: 'replace', value: '#sign_in_form' },
+                        {
+                            path: '/formTypeSettings/-',
+                            op: 'add',
+                            value: { selector: '#sign_in_form', type: 'login' },
+                        },
+                    ],
+                },
+            ],
+            expected: true,
+        },
+        {
+            name: 'Autofill siteSpecificFixes domains - should approve',
+            patches: [
+                {
+                    op: 'add',
+                    path: '/features/autofill/features/siteSpecificFixes/settings/domains/0',
+                    value: { domain: 'example.com', patchSettings: [] },
+                },
+            ],
+            expected: true,
+        },
+        {
+            name: 'Autofill siteSpecificFixes global settings - should NOT approve',
+            patches: [
+                {
+                    op: 'replace',
+                    path: '/features/autofill/features/siteSpecificFixes/settings/formBoundarySelector',
+                    value: '#sign_in_form',
+                },
+            ],
+            expected: false,
+        },
+        {
+            name: 'Autofill siteSpecificFixes mixed with global settings - should NOT approve',
+            patches: [
+                {
+                    op: 'add',
+                    path: '/features/autofill/features/siteSpecificFixes/settings/conditionalChanges/0',
+                    value: {
+                        condition: [
+                            { domain: 'icloud.com' },
+                        ],
+                        patchSettings: [],
+                    },
+                },
+                {
+                    op: 'replace',
+                    path: '/features/autofill/features/siteSpecificFixes/settings/failsafeSettings/maxFormsPerPage',
+                    value: 1,
+                },
+            ],
+            expected: false,
+        },
+        {
+            name: 'Autofill parent feature exceptions - should NOT approve',
+            patches: [
+                {
+                    op: 'add',
+                    path: '/features/autofill/exceptions/0',
+                    value: { domain: 'example.com', reason: 'testing' },
+                },
+            ],
+            expected: false,
+        },
+        {
+            name: 'Autofill other subfeature changes - should NOT approve',
+            patches: [
+                {
+                    op: 'replace',
+                    path: '/features/autofill/features/autofillOSPasskeys/state',
+                    value: 'enabled',
+                },
+            ],
+            expected: false,
+        },
     ];
 
     testCases.forEach((testCase) => {
@@ -135,6 +225,49 @@ describe('Auto-approvable features structure tests', () => {
         expect(result.reason).to.include('Auto-approved');
         expect(summary.autoApprovableChanges).to.equal(1);
         expect(summary.otherChanges).to.equal(0);
+    });
+
+    it('should approve autofill siteSpecificFixes conditionalChanges like icloud.com form-boundary PRs', () => {
+        const siteSpecificFixesPatches = [
+            {
+                op: 'add',
+                path: '/features/autofill/features/siteSpecificFixes/settings/conditionalChanges/28/condition',
+                value: [
+                    { domain: 'icloud.com' },
+                ],
+            },
+            {
+                op: 'add',
+                path: '/features/autofill/features/siteSpecificFixes/settings/conditionalChanges/28/patchSettings',
+                value: [
+                    { path: '/formBoundarySelector', op: 'replace', value: '#sign_in_form' },
+                ],
+            },
+        ];
+
+        const result = analyzePatchesForApproval(siteSpecificFixesPatches);
+        const summary = generateChangeSummary(siteSpecificFixesPatches);
+
+        expect(result.shouldApprove).to.equal(true);
+        expect(result.reason).to.include('Auto-approved');
+        expect(summary.autoApprovableChanges).to.equal(2);
+        expect(summary.otherChanges).to.equal(0);
+    });
+
+    it('should not approve autofill siteSpecificFixes global default setting changes', () => {
+        const globalSettingsPatches = [
+            {
+                op: 'replace',
+                path: '/features/autofill/features/siteSpecificFixes/settings/formTypeSettings/0',
+                value: { selector: 'form', type: 'login' },
+            },
+        ];
+
+        const result = analyzePatchesForApproval(globalSettingsPatches);
+
+        expect(result.shouldApprove).to.equal(false);
+        expect(result.reason).to.include('Manual review required');
+        expect(result.disallowedPatches).to.have.length(1);
     });
 
     it('should not approve element hiding rules changes', () => {
