@@ -29,11 +29,15 @@ export type ChromeWebstorePatchingSettings = CSSInjectFeatureSettings<{
      */
     promoSelectors?: string[];
     /**
-     * Replacement button copy for curated extensions.
+     * Replacement button copy. install/remove label the curated pill;
+     * unavailable labels the disabled pill on non-curated detail pages, with
+     * unavailableDescription as its explanatory tooltip.
      */
     buttonCopy?: {
         install: string;
         remove: string;
+        unavailable?: string;
+        unavailableDescription?: string;
     };
     /**
      * Max time in ms to wait for the chrome.webstorePrivate API to appear
