@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { analyzePatchesForApproval, generateChangeSummary } from '../automation-utils.js';
+import { analyzePatchesForApproval, evaluateSiteSpecificFixesChange, generateChangeSummary } from '../automation-utils.js';
 
 describe('Auto-approval logic tests', () => {
     const testCases = [
@@ -87,74 +87,6 @@ describe('Auto-approval logic tests', () => {
             expected: false,
         },
         {
-            name: 'Autofill siteSpecificFixes conditionalChanges - should approve',
-            patches: [
-                {
-                    op: 'add',
-                    path: '/features/autofill/features/siteSpecificFixes/settings/conditionalChanges/28/condition',
-                    value: [
-                        { domain: 'icloud.com' },
-                    ],
-                },
-                {
-                    op: 'add',
-                    path: '/features/autofill/features/siteSpecificFixes/settings/conditionalChanges/28/patchSettings',
-                    value: [
-                        { path: '/formBoundarySelector', op: 'replace', value: '#sign_in_form' },
-                        {
-                            path: '/formTypeSettings/-',
-                            op: 'add',
-                            value: { selector: '#sign_in_form', type: 'login' },
-                        },
-                    ],
-                },
-            ],
-            expected: true,
-        },
-        {
-            name: 'Autofill siteSpecificFixes domains - should approve',
-            patches: [
-                {
-                    op: 'add',
-                    path: '/features/autofill/features/siteSpecificFixes/settings/domains/0',
-                    value: { domain: 'example.com', patchSettings: [] },
-                },
-            ],
-            expected: true,
-        },
-        {
-            name: 'Autofill siteSpecificFixes global settings - should NOT approve',
-            patches: [
-                {
-                    op: 'replace',
-                    path: '/features/autofill/features/siteSpecificFixes/settings/formBoundarySelector',
-                    value: '#sign_in_form',
-                },
-            ],
-            expected: false,
-        },
-        {
-            name: 'Autofill siteSpecificFixes mixed with global settings - should NOT approve',
-            patches: [
-                {
-                    op: 'add',
-                    path: '/features/autofill/features/siteSpecificFixes/settings/conditionalChanges/0',
-                    value: {
-                        condition: [
-                            { domain: 'icloud.com' },
-                        ],
-                        patchSettings: [],
-                    },
-                },
-                {
-                    op: 'replace',
-                    path: '/features/autofill/features/siteSpecificFixes/settings/failsafeSettings/maxFormsPerPage',
-                    value: 1,
-                },
-            ],
-            expected: false,
-        },
-        {
             name: 'Autofill parent feature exceptions - should NOT approve',
             patches: [
                 {
@@ -172,6 +104,19 @@ describe('Auto-approval logic tests', () => {
                     op: 'replace',
                     path: '/features/autofill/features/autofillOSPasskeys/state',
                     value: 'enabled',
+                },
+            ],
+            expected: false,
+        },
+        {
+            name: 'Autofill siteSpecificFixes without config context - should NOT approve',
+            patches: [
+                {
+                    op: 'add',
+                    path: '/features/autofill/features/siteSpecificFixes/settings/conditionalChanges/1/condition',
+                    value: [
+                        { domain: 'icloud.com' },
+                    ],
                 },
             ],
             expected: false,
@@ -227,18 +172,11 @@ describe('Auto-approvable features structure tests', () => {
         expect(summary.otherChanges).to.equal(0);
     });
 
-    it('should approve autofill siteSpecificFixes conditionalChanges like icloud.com form-boundary PRs', () => {
+    it('should not approve autofill siteSpecificFixes changes without the configs to evaluate', () => {
         const siteSpecificFixesPatches = [
             {
                 op: 'add',
-                path: '/features/autofill/features/siteSpecificFixes/settings/conditionalChanges/28/condition',
-                value: [
-                    { domain: 'icloud.com' },
-                ],
-            },
-            {
-                op: 'add',
-                path: '/features/autofill/features/siteSpecificFixes/settings/conditionalChanges/28/patchSettings',
+                path: '/features/autofill/features/siteSpecificFixes/settings/conditionalChanges/1/patchSettings',
                 value: [
                     { path: '/formBoundarySelector', op: 'replace', value: '#sign_in_form' },
                 ],
@@ -246,28 +184,10 @@ describe('Auto-approvable features structure tests', () => {
         ];
 
         const result = analyzePatchesForApproval(siteSpecificFixesPatches);
-        const summary = generateChangeSummary(siteSpecificFixesPatches);
-
-        expect(result.shouldApprove).to.equal(true);
-        expect(result.reason).to.include('Auto-approved');
-        expect(summary.autoApprovableChanges).to.equal(2);
-        expect(summary.otherChanges).to.equal(0);
-    });
-
-    it('should not approve autofill siteSpecificFixes global default setting changes', () => {
-        const globalSettingsPatches = [
-            {
-                op: 'replace',
-                path: '/features/autofill/features/siteSpecificFixes/settings/formTypeSettings/0',
-                value: { selector: 'form', type: 'login' },
-            },
-        ];
-
-        const result = analyzePatchesForApproval(globalSettingsPatches);
 
         expect(result.shouldApprove).to.equal(false);
-        expect(result.reason).to.include('Manual review required');
-        expect(result.disallowedPatches).to.have.length(1);
+        expect(result.siteSpecificFixesReasons).to.have.length(1);
+        expect(result.siteSpecificFixesReasons[0]).to.include('without both configs');
     });
 
     it('should not approve element hiding rules changes', () => {
@@ -416,5 +336,326 @@ describe('generateChangeSummary specific tests', () => {
         expect(summary.otherChanges).to.equal(0);
         expect(Object.keys(summary.byOperation)).to.have.length(0);
         expect(Object.keys(summary.byPath)).to.have.length(0);
+    });
+});
+
+describe('Autofill siteSpecificFixes approval tests', () => {
+    /**
+     * Builds a generated config containing only the autofill siteSpecificFixes
+     * subfeature, which is all evaluateSiteSpecificFixesChange reads.
+     */
+    function configWithEntries(conditionalChanges, overrides = {}) {
+        return {
+            features: {
+                autofill: {
+                    state: 'enabled',
+                    features: {
+                        siteSpecificFixes: {
+                            state: 'enabled',
+                            settings: {
+                                formBoundarySelector: '',
+                                formTypeSettings: [
+                                    { selector: '#existing-form', type: 'login' },
+                                ],
+                                inputTypeSettings: [],
+                                failsafeSettings: { maxInputsPerPage: 100 },
+                                conditionalChanges,
+                                ...overrides,
+                            },
+                        },
+                    },
+                },
+            },
+        };
+    }
+
+    const existingEntry = {
+        condition: [
+            { domain: 'fedex.com' },
+        ],
+        patchSettings: [
+            {
+                path: '/inputTypeSettings/-',
+                op: 'add',
+                value: { selector: 'input#password', type: 'credentials.password.current' },
+            },
+        ],
+    };
+
+    const base = configWithEntries([
+        existingEntry,
+    ]);
+
+    it('approves a domain-scoped fix like the icloud.com form-boundary change', () => {
+        const updated = configWithEntries([
+            existingEntry,
+            {
+                condition: [
+                    { domain: 'icloud.com' },
+                ],
+                patchSettings: [
+                    { path: '/formBoundarySelector', op: 'replace', value: '#sign_in_form' },
+                    {
+                        path: '/formTypeSettings/-',
+                        op: 'add',
+                        value: { selector: '#sign_in_form', type: 'login' },
+                    },
+                ],
+            },
+        ]);
+
+        const result = evaluateSiteSpecificFixesChange(base, updated);
+
+        expect(result.reasons).to.deep.equal([]);
+        expect(result.approved).to.equal(true);
+    });
+
+    it('approves editing an existing site fix in place', () => {
+        const updated = configWithEntries([
+            {
+                ...existingEntry,
+                patchSettings: [
+                    {
+                        path: '/inputTypeSettings/-',
+                        op: 'add',
+                        value: { selector: 'input#pass', type: 'credentials.password.current' },
+                    },
+                ],
+            },
+        ]);
+
+        const result = evaluateSiteSpecificFixesChange(base, updated);
+
+        expect(result.approved).to.equal(true);
+    });
+
+    it('approves removing a site fix', () => {
+        const result = evaluateSiteSpecificFixesChange(base, configWithEntries([]));
+
+        expect(result.approved).to.equal(true);
+    });
+
+    it('rejects a wildcard urlPattern condition that escapes domain scoping', () => {
+        const updated = configWithEntries([
+            existingEntry,
+            {
+                condition: [
+                    { urlPattern: '*' },
+                ],
+                patchSettings: [
+                    { path: '/formBoundarySelector', op: 'replace', value: 'body' },
+                ],
+            },
+        ]);
+
+        const result = evaluateSiteSpecificFixesChange(base, updated);
+
+        expect(result.approved).to.equal(false);
+        expect(result.reasons.join(' ')).to.include('not scoped to specific domains');
+    });
+
+    it('rejects a root replace that rewrites the whole settings object', () => {
+        const updated = configWithEntries([
+            existingEntry,
+            {
+                condition: [
+                    { domain: 'example.com' },
+                ],
+                patchSettings: [
+                    {
+                        path: '',
+                        op: 'replace',
+                        value: { formBoundarySelector: 'body', formTypeSettings: [], inputTypeSettings: [] },
+                    },
+                ],
+            },
+        ]);
+
+        const result = evaluateSiteSpecificFixesChange(base, updated);
+
+        expect(result.approved).to.equal(false);
+        expect(result.reasons.join(' ')).to.include('entire settings object');
+    });
+
+    it('rejects an experiment-gated condition', () => {
+        const updated = configWithEntries([
+            existingEntry,
+            {
+                condition: [
+                    { experiment: { experimentName: 'autofillTest', cohort: 'treatment' } },
+                ],
+                patchSettings: [
+                    { path: '/formBoundarySelector', op: 'replace', value: 'form' },
+                ],
+            },
+        ]);
+
+        const result = evaluateSiteSpecificFixesChange(base, updated);
+
+        expect(result.approved).to.equal(false);
+        expect(result.reasons.join(' ')).to.include('not scoped to specific domains');
+    });
+
+    it('rejects a condition that mixes a domain with a broader matcher', () => {
+        const updated = configWithEntries([
+            existingEntry,
+            {
+                condition: [
+                    { domain: 'example.com', urlPattern: '/login' },
+                ],
+                patchSettings: [
+                    { path: '/formBoundarySelector', op: 'replace', value: 'form' },
+                ],
+            },
+        ]);
+
+        const result = evaluateSiteSpecificFixesChange(base, updated);
+
+        expect(result.approved).to.equal(false);
+        expect(result.reasons.join(' ')).to.include('not scoped to specific domains');
+    });
+
+    it('rejects a patch that silently does nothing instead of failing', () => {
+        const updated = configWithEntries([
+            existingEntry,
+            {
+                condition: [
+                    { domain: 'example.com' },
+                ],
+                // immutable-json-patch no-ops rather than throwing on this path.
+                patchSettings: [
+                    { path: '/failsafeSettings/missing/nested', op: 'replace', value: 5 },
+                ],
+            },
+        ]);
+
+        const result = evaluateSiteSpecificFixesChange(base, updated);
+
+        expect(result.approved).to.equal(false);
+        expect(result.reasons.join(' ')).to.include('inert');
+    });
+
+    it('rejects an entry with no patchSettings', () => {
+        const updated = configWithEntries([
+            existingEntry,
+            {
+                condition: [
+                    { domain: 'example.com' },
+                ],
+            },
+        ]);
+
+        const result = evaluateSiteSpecificFixesChange(base, updated);
+
+        expect(result.approved).to.equal(false);
+        expect(result.reasons.join(' ')).to.include('no patchSettings operations');
+    });
+
+    it('rejects move and copy operations', () => {
+        const updated = configWithEntries([
+            existingEntry,
+            {
+                condition: [
+                    { domain: 'example.com' },
+                ],
+                patchSettings: [
+                    { path: '/inputTypeSettings/0', op: 'move', from: '/formTypeSettings/0' },
+                ],
+            },
+        ]);
+
+        const result = evaluateSiteSpecificFixesChange(base, updated);
+
+        expect(result.approved).to.equal(false);
+        expect(result.reasons.join(' ')).to.include('unsupported op');
+    });
+
+    it('rejects a patch that writes a key outside the site-fix settings', () => {
+        const updated = configWithEntries([
+            existingEntry,
+            {
+                condition: [
+                    { domain: 'example.com' },
+                ],
+                patchSettings: [
+                    { path: '/someOtherSetting', op: 'add', value: true },
+                ],
+            },
+        ]);
+
+        const result = evaluateSiteSpecificFixesChange(base, updated);
+
+        expect(result.approved).to.equal(false);
+        expect(result.reasons.join(' ')).to.include('outside the site-fix settings');
+    });
+
+    it('rejects a change to the subfeature defaults that applies to every site', () => {
+        const updated = configWithEntries(
+            [
+                existingEntry,
+            ],
+            { formBoundarySelector: 'body' },
+        );
+
+        const result = evaluateSiteSpecificFixesChange(base, updated);
+
+        expect(result.approved).to.equal(false);
+        expect(result.reasons.join(' ')).to.include('defaults changed');
+    });
+
+    it('rejects an empty condition array that matches everything', () => {
+        const updated = configWithEntries([
+            existingEntry,
+            {
+                condition: [],
+                patchSettings: [
+                    { path: '/formBoundarySelector', op: 'replace', value: 'body' },
+                ],
+            },
+        ]);
+
+        const result = evaluateSiteSpecificFixesChange(base, updated);
+
+        expect(result.approved).to.equal(false);
+        expect(result.reasons.join(' ')).to.include('not scoped to specific domains');
+    });
+
+    it('is reachable through analyzePatchesForApproval when configs are supplied', () => {
+        const updated = configWithEntries([
+            existingEntry,
+            {
+                condition: [
+                    { domain: 'icloud.com' },
+                ],
+                patchSettings: [
+                    { path: '/formBoundarySelector', op: 'replace', value: '#sign_in_form' },
+                ],
+            },
+        ]);
+        const patches = [
+            {
+                op: 'add',
+                path: '/features/autofill/features/siteSpecificFixes/settings/conditionalChanges/1',
+                value: updated.features.autofill.features.siteSpecificFixes.settings.conditionalChanges[1],
+            },
+        ];
+
+        const approved = analyzePatchesForApproval(patches, { baseConfig: base, updatedConfig: updated });
+        expect(approved.shouldApprove).to.equal(true);
+
+        const hostile = configWithEntries([
+            existingEntry,
+            {
+                condition: [
+                    { urlPattern: '*' },
+                ],
+                patchSettings: [
+                    { path: '/formBoundarySelector', op: 'replace', value: 'body' },
+                ],
+            },
+        ]);
+        const rejected = analyzePatchesForApproval(patches, { baseConfig: base, updatedConfig: hostile });
+        expect(rejected.shouldApprove).to.equal(false);
+        expect(rejected.disallowedPatches).to.have.length(1);
     });
 });
