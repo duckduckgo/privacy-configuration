@@ -1633,6 +1633,26 @@
                                         }
                                     }
                                 ]
+                            },
+                            {
+                                "condition": [
+                                    { "domain": "icloud.com" }
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formBoundarySelector",
+                                        "op": "replace",
+                                        "value": "#sign_in_form"
+                                    },
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "#sign_in_form",
+                                            "type": "login"
+                                        }
+                                    }
+                                ]
                             }
                         ]
                     }
