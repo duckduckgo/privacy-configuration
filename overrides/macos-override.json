@@ -1064,6 +1064,36 @@
                             },
                             {
                                 "condition": [
+                                    { "domain": "www.theinformation.com" }
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "#login-email",
+                                            "type": "credentials.username"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "condition": [
+                                    { "domain": "payments.municipay.com" }
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "#ind_user_password2_confirmation",
+                                            "type": "unknown"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "condition": [
                                     { "domain": "fedex.com" }
                                 ],
                                 "patchSettings": [
