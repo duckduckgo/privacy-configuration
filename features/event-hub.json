@@ -375,6 +375,710 @@
                         }
                     }
                 }
+            },
+            "webTelemetry_detectorPerf_day": {
+                "state": "enabled",
+                "trigger": {
+                    "period": {
+                        "days": 1
+                    }
+                },
+                "parameters": {
+                    "pagesMeasured": {
+                        "template": "counter",
+                        "source": "detectorPerf_measured",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1-9": { "gte": 1, "lt": 10 },
+                            "10-39": { "gte": 10, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "botRan": {
+                        "template": "counter",
+                        "source": "detectorPerf_bot_ran",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1-9": { "gte": 1, "lt": 10 },
+                            "10-39": { "gte": 10, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "botOver8": {
+                        "template": "counter",
+                        "source": "detectorPerf_bot_over8ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1-9": { "gte": 1, "lt": 10 },
+                            "10-39": { "gte": 10, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "botOver16": {
+                        "template": "counter",
+                        "source": "detectorPerf_bot_over16ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1-9": { "gte": 1, "lt": 10 },
+                            "10-39": { "gte": 10, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "botOver50": {
+                        "template": "counter",
+                        "source": "detectorPerf_bot_over50ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1": { "gte": 1, "lt": 2 },
+                            "2+": { "gte": 2 }
+                        }
+                    },
+                    "botOver150": {
+                        "template": "counter",
+                        "source": "detectorPerf_bot_over150ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1": { "gte": 1, "lt": 2 },
+                            "2+": { "gte": 2 }
+                        }
+                    },
+                    "botTotalOver50": {
+                        "template": "counter",
+                        "source": "detectorPerf_bot_total_over50ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1-9": { "gte": 1, "lt": 10 },
+                            "10-39": { "gte": 10, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "botTotalOver100": {
+                        "template": "counter",
+                        "source": "detectorPerf_bot_total_over100ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1": { "gte": 1, "lt": 2 },
+                            "2+": { "gte": 2 }
+                        }
+                    },
+                    "botTotalOver250": {
+                        "template": "counter",
+                        "source": "detectorPerf_bot_total_over250ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1": { "gte": 1, "lt": 2 },
+                            "2+": { "gte": 2 }
+                        }
+                    },
+                    "fraudRan": {
+                        "template": "counter",
+                        "source": "detectorPerf_fraud_ran",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1-9": { "gte": 1, "lt": 10 },
+                            "10-39": { "gte": 10, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "fraudOver8": {
+                        "template": "counter",
+                        "source": "detectorPerf_fraud_over8ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1-9": { "gte": 1, "lt": 10 },
+                            "10-39": { "gte": 10, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "fraudOver16": {
+                        "template": "counter",
+                        "source": "detectorPerf_fraud_over16ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1-9": { "gte": 1, "lt": 10 },
+                            "10-39": { "gte": 10, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "fraudOver50": {
+                        "template": "counter",
+                        "source": "detectorPerf_fraud_over50ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1": { "gte": 1, "lt": 2 },
+                            "2+": { "gte": 2 }
+                        }
+                    },
+                    "fraudOver150": {
+                        "template": "counter",
+                        "source": "detectorPerf_fraud_over150ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1": { "gte": 1, "lt": 2 },
+                            "2+": { "gte": 2 }
+                        }
+                    },
+                    "fraudTotalOver50": {
+                        "template": "counter",
+                        "source": "detectorPerf_fraud_total_over50ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1-9": { "gte": 1, "lt": 10 },
+                            "10-39": { "gte": 10, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "fraudTotalOver100": {
+                        "template": "counter",
+                        "source": "detectorPerf_fraud_total_over100ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1": { "gte": 1, "lt": 2 },
+                            "2+": { "gte": 2 }
+                        }
+                    },
+                    "fraudTotalOver250": {
+                        "template": "counter",
+                        "source": "detectorPerf_fraud_total_over250ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1": { "gte": 1, "lt": 2 },
+                            "2+": { "gte": 2 }
+                        }
+                    },
+                    "adwallRan": {
+                        "template": "counter",
+                        "source": "detectorPerf_adwall_ran",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1-9": { "gte": 1, "lt": 10 },
+                            "10-39": { "gte": 10, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "adwallOver8": {
+                        "template": "counter",
+                        "source": "detectorPerf_adwall_over8ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1-9": { "gte": 1, "lt": 10 },
+                            "10-39": { "gte": 10, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "adwallOver16": {
+                        "template": "counter",
+                        "source": "detectorPerf_adwall_over16ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1-9": { "gte": 1, "lt": 10 },
+                            "10-39": { "gte": 10, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "adwallOver50": {
+                        "template": "counter",
+                        "source": "detectorPerf_adwall_over50ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1": { "gte": 1, "lt": 2 },
+                            "2+": { "gte": 2 }
+                        }
+                    },
+                    "adwallOver150": {
+                        "template": "counter",
+                        "source": "detectorPerf_adwall_over150ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1": { "gte": 1, "lt": 2 },
+                            "2+": { "gte": 2 }
+                        }
+                    },
+                    "adwallTotalOver50": {
+                        "template": "counter",
+                        "source": "detectorPerf_adwall_total_over50ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1-9": { "gte": 1, "lt": 10 },
+                            "10-39": { "gte": 10, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "adwallTotalOver100": {
+                        "template": "counter",
+                        "source": "detectorPerf_adwall_total_over100ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1": { "gte": 1, "lt": 2 },
+                            "2+": { "gte": 2 }
+                        }
+                    },
+                    "adwallTotalOver250": {
+                        "template": "counter",
+                        "source": "detectorPerf_adwall_total_over250ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1": { "gte": 1, "lt": 2 },
+                            "2+": { "gte": 2 }
+                        }
+                    },
+                    "webDetectionRan": {
+                        "template": "counter",
+                        "source": "detectorPerf_webDetection_ran",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1-9": { "gte": 1, "lt": 10 },
+                            "10-39": { "gte": 10, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "webDetectionOver8": {
+                        "template": "counter",
+                        "source": "detectorPerf_webDetection_over8ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1-9": { "gte": 1, "lt": 10 },
+                            "10-39": { "gte": 10, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "webDetectionOver16": {
+                        "template": "counter",
+                        "source": "detectorPerf_webDetection_over16ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1-9": { "gte": 1, "lt": 10 },
+                            "10-39": { "gte": 10, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "webDetectionOver50": {
+                        "template": "counter",
+                        "source": "detectorPerf_webDetection_over50ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1": { "gte": 1, "lt": 2 },
+                            "2+": { "gte": 2 }
+                        }
+                    },
+                    "webDetectionOver150": {
+                        "template": "counter",
+                        "source": "detectorPerf_webDetection_over150ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1": { "gte": 1, "lt": 2 },
+                            "2+": { "gte": 2 }
+                        }
+                    },
+                    "webDetectionTotalOver50": {
+                        "template": "counter",
+                        "source": "detectorPerf_webDetection_total_over50ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1-9": { "gte": 1, "lt": 10 },
+                            "10-39": { "gte": 10, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "webDetectionTotalOver100": {
+                        "template": "counter",
+                        "source": "detectorPerf_webDetection_total_over100ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1": { "gte": 1, "lt": 2 },
+                            "2+": { "gte": 2 }
+                        }
+                    },
+                    "webDetectionTotalOver250": {
+                        "template": "counter",
+                        "source": "detectorPerf_webDetection_total_over250ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1": { "gte": 1, "lt": 2 },
+                            "2+": { "gte": 2 }
+                        }
+                    },
+                    "combinedOver100": {
+                        "template": "counter",
+                        "source": "detectorPerf_combined_over100ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1-9": { "gte": 1, "lt": 10 },
+                            "10-39": { "gte": 10, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "combinedOver250": {
+                        "template": "counter",
+                        "source": "detectorPerf_combined_over250ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1": { "gte": 1, "lt": 2 },
+                            "2+": { "gte": 2 }
+                        }
+                    },
+                    "combinedOver500": {
+                        "template": "counter",
+                        "source": "detectorPerf_combined_over500ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1": { "gte": 1, "lt": 2 },
+                            "2+": { "gte": 2 }
+                        }
+                    }
+                }
+            },
+            "webTelemetry_detectorPerf_week": {
+                "state": "enabled",
+                "trigger": {
+                    "period": {
+                        "days": 7
+                    }
+                },
+                "parameters": {
+                    "pagesMeasured": {
+                        "template": "counter",
+                        "source": "detectorPerf_measured",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1-9": { "gte": 1, "lt": 10 },
+                            "10-39": { "gte": 10, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "botRan": {
+                        "template": "counter",
+                        "source": "detectorPerf_bot_ran",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1-9": { "gte": 1, "lt": 10 },
+                            "10-39": { "gte": 10, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "botOver8": {
+                        "template": "counter",
+                        "source": "detectorPerf_bot_over8ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1-9": { "gte": 1, "lt": 10 },
+                            "10-39": { "gte": 10, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "botOver16": {
+                        "template": "counter",
+                        "source": "detectorPerf_bot_over16ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1-9": { "gte": 1, "lt": 10 },
+                            "10-39": { "gte": 10, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "botOver50": {
+                        "template": "counter",
+                        "source": "detectorPerf_bot_over50ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1": { "gte": 1, "lt": 2 },
+                            "2+": { "gte": 2 }
+                        }
+                    },
+                    "botOver150": {
+                        "template": "counter",
+                        "source": "detectorPerf_bot_over150ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1": { "gte": 1, "lt": 2 },
+                            "2+": { "gte": 2 }
+                        }
+                    },
+                    "botTotalOver50": {
+                        "template": "counter",
+                        "source": "detectorPerf_bot_total_over50ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1-9": { "gte": 1, "lt": 10 },
+                            "10-39": { "gte": 10, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "botTotalOver100": {
+                        "template": "counter",
+                        "source": "detectorPerf_bot_total_over100ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1": { "gte": 1, "lt": 2 },
+                            "2+": { "gte": 2 }
+                        }
+                    },
+                    "botTotalOver250": {
+                        "template": "counter",
+                        "source": "detectorPerf_bot_total_over250ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1": { "gte": 1, "lt": 2 },
+                            "2+": { "gte": 2 }
+                        }
+                    },
+                    "fraudRan": {
+                        "template": "counter",
+                        "source": "detectorPerf_fraud_ran",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1-9": { "gte": 1, "lt": 10 },
+                            "10-39": { "gte": 10, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "fraudOver8": {
+                        "template": "counter",
+                        "source": "detectorPerf_fraud_over8ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1-9": { "gte": 1, "lt": 10 },
+                            "10-39": { "gte": 10, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "fraudOver16": {
+                        "template": "counter",
+                        "source": "detectorPerf_fraud_over16ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1-9": { "gte": 1, "lt": 10 },
+                            "10-39": { "gte": 10, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "fraudOver50": {
+                        "template": "counter",
+                        "source": "detectorPerf_fraud_over50ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1": { "gte": 1, "lt": 2 },
+                            "2+": { "gte": 2 }
+                        }
+                    },
+                    "fraudOver150": {
+                        "template": "counter",
+                        "source": "detectorPerf_fraud_over150ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1": { "gte": 1, "lt": 2 },
+                            "2+": { "gte": 2 }
+                        }
+                    },
+                    "fraudTotalOver50": {
+                        "template": "counter",
+                        "source": "detectorPerf_fraud_total_over50ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1-9": { "gte": 1, "lt": 10 },
+                            "10-39": { "gte": 10, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "fraudTotalOver100": {
+                        "template": "counter",
+                        "source": "detectorPerf_fraud_total_over100ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1": { "gte": 1, "lt": 2 },
+                            "2+": { "gte": 2 }
+                        }
+                    },
+                    "fraudTotalOver250": {
+                        "template": "counter",
+                        "source": "detectorPerf_fraud_total_over250ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1": { "gte": 1, "lt": 2 },
+                            "2+": { "gte": 2 }
+                        }
+                    },
+                    "adwallRan": {
+                        "template": "counter",
+                        "source": "detectorPerf_adwall_ran",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1-9": { "gte": 1, "lt": 10 },
+                            "10-39": { "gte": 10, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "adwallOver8": {
+                        "template": "counter",
+                        "source": "detectorPerf_adwall_over8ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1-9": { "gte": 1, "lt": 10 },
+                            "10-39": { "gte": 10, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "adwallOver16": {
+                        "template": "counter",
+                        "source": "detectorPerf_adwall_over16ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1-9": { "gte": 1, "lt": 10 },
+                            "10-39": { "gte": 10, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "adwallOver50": {
+                        "template": "counter",
+                        "source": "detectorPerf_adwall_over50ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1": { "gte": 1, "lt": 2 },
+                            "2+": { "gte": 2 }
+                        }
+                    },
+                    "adwallOver150": {
+                        "template": "counter",
+                        "source": "detectorPerf_adwall_over150ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1": { "gte": 1, "lt": 2 },
+                            "2+": { "gte": 2 }
+                        }
+                    },
+                    "adwallTotalOver50": {
+                        "template": "counter",
+                        "source": "detectorPerf_adwall_total_over50ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1-9": { "gte": 1, "lt": 10 },
+                            "10-39": { "gte": 10, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "adwallTotalOver100": {
+                        "template": "counter",
+                        "source": "detectorPerf_adwall_total_over100ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1": { "gte": 1, "lt": 2 },
+                            "2+": { "gte": 2 }
+                        }
+                    },
+                    "adwallTotalOver250": {
+                        "template": "counter",
+                        "source": "detectorPerf_adwall_total_over250ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1": { "gte": 1, "lt": 2 },
+                            "2+": { "gte": 2 }
+                        }
+                    },
+                    "webDetectionRan": {
+                        "template": "counter",
+                        "source": "detectorPerf_webDetection_ran",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1-9": { "gte": 1, "lt": 10 },
+                            "10-39": { "gte": 10, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "webDetectionOver8": {
+                        "template": "counter",
+                        "source": "detectorPerf_webDetection_over8ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1-9": { "gte": 1, "lt": 10 },
+                            "10-39": { "gte": 10, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "webDetectionOver16": {
+                        "template": "counter",
+                        "source": "detectorPerf_webDetection_over16ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1-9": { "gte": 1, "lt": 10 },
+                            "10-39": { "gte": 10, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "webDetectionOver50": {
+                        "template": "counter",
+                        "source": "detectorPerf_webDetection_over50ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1": { "gte": 1, "lt": 2 },
+                            "2+": { "gte": 2 }
+                        }
+                    },
+                    "webDetectionOver150": {
+                        "template": "counter",
+                        "source": "detectorPerf_webDetection_over150ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1": { "gte": 1, "lt": 2 },
+                            "2+": { "gte": 2 }
+                        }
+                    },
+                    "webDetectionTotalOver50": {
+                        "template": "counter",
+                        "source": "detectorPerf_webDetection_total_over50ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1-9": { "gte": 1, "lt": 10 },
+                            "10-39": { "gte": 10, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "webDetectionTotalOver100": {
+                        "template": "counter",
+                        "source": "detectorPerf_webDetection_total_over100ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1": { "gte": 1, "lt": 2 },
+                            "2+": { "gte": 2 }
+                        }
+                    },
+                    "webDetectionTotalOver250": {
+                        "template": "counter",
+                        "source": "detectorPerf_webDetection_total_over250ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1": { "gte": 1, "lt": 2 },
+                            "2+": { "gte": 2 }
+                        }
+                    },
+                    "combinedOver100": {
+                        "template": "counter",
+                        "source": "detectorPerf_combined_over100ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1-9": { "gte": 1, "lt": 10 },
+                            "10-39": { "gte": 10, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "combinedOver250": {
+                        "template": "counter",
+                        "source": "detectorPerf_combined_over250ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1": { "gte": 1, "lt": 2 },
+                            "2+": { "gte": 2 }
+                        }
+                    },
+                    "combinedOver500": {
+                        "template": "counter",
+                        "source": "detectorPerf_combined_over500ms",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1": { "gte": 1, "lt": 2 },
+                            "2+": { "gte": 2 }
+                        }
+                    }
+                }
             }
         }
     }
