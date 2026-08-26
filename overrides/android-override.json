@@ -961,6 +961,36 @@
                             },
                             {
                                 "condition": [
+                                    { "domain": "login.app.carta.com" }
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "form",
+                                            "type": "login"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "condition": [
+                                    { "domain": "www.kathykuohome.com" }
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input[autocomplete=\"new-password\"]",
+                                            "type": "unknown"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "condition": [
                                     { "domain": "fedex.com" }
                                 ],
                                 "patchSettings": [
