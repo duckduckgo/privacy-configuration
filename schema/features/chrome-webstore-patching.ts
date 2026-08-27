@@ -20,11 +20,6 @@ export type ChromeWebstorePatchingSettings = CSSInjectFeatureSettings<{
      */
     installButtonSelectors?: SelectorEntry[];
     /**
-     * Ordered CSS selectors, resolved relative to the matched button,
-     * targeting the inner span that holds the button's text label.
-     */
-    installButtonTextSelectors?: string[];
-    /**
      * CSS selectors for Chrome promo banners (e.g. "Switch to Chrome") to hide.
      */
     promoSelectors?: string[];
