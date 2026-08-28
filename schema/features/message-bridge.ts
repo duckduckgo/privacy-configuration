@@ -7,6 +7,7 @@ export type MessageBridgeSettings = CSSInjectFeatureSettings<{
     serpSettings?: FeatureState;
     serp?: FeatureState;
     duckAiNativeStorage?: FeatureState;
+    internalFeedback?: FeatureState;
 }>;
 
 export type MessageBridgeFeature<VersionType> = Feature<MessageBridgeSettings, VersionType>;
