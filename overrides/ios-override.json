@@ -807,6 +807,30 @@
                             "weight": 1
                         }
                     ]
+                },
+                "tdsNextExperiment015": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "v5/experiments/202609v1-ios-tds-control.json",
+                        "treatmentUrl": "v5/experiments/202609v1-ios-tds-treatment.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
                 }
             }
         },
@@ -3486,9 +3510,9 @@
                 "webScrollFreezeObservability": {
                     "state": "disabled"
                 },
-                "searchTokenExperimentV2": {
+                "searchTokenExperimentV4": {
                     "state": "enabled",
-                    "minSupportedVersion": "7.233.0",
+                    "minSupportedVersion": "7.236.0",
                     "settings": {
                         "tokenTTLSeconds": 300,
                         "refreshWindowSeconds": 120

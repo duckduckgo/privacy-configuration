@@ -349,6 +349,31 @@
                             "weight": 1
                         }
                     ]
+                },
+                "tdsNextExperiment015": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52361000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "v5/experiments/202609v1-android-tds-control.json",
+                        "treatmentUrl": "v5/experiments/202609v1-android-tds-treatment.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
                 }
             }
         },
@@ -4288,6 +4313,11 @@
                     }
                 }
             }
+        },
+        "nativeInputUrlClearingFeature": {
+            "state": "enabled",
+            "minSupportedVersion": 52940000,
+            "exceptions": []
         },
         "swipingTabs": {
             "state": "enabled",
