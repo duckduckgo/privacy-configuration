@@ -67,6 +67,10 @@ function expectedEventTypes(settings) {
     const overrides = settings.detectorOverrides ?? {};
     const types = new Set([
         'detectorPerf_measured',
+        // Immediate severe event: fired when the highest edge of a threshold
+        // family is crossed, consumed by an immediate-trigger pixel that
+        // forwards the data payload (detector, kind, thresholdMs).
+        'detectorPerf_severe',
     ]);
     for (const name of DETECTORS) {
         types.add(`detectorPerf_${name}_ran`);
@@ -86,8 +90,8 @@ function expectedEventTypes(settings) {
 }
 
 /**
- * Collect every eventHub parameter source, in every telemetry entry it
- * appears in.
+ * Collect every eventHub source that consumes an event: parameter sources
+ * (period counters/data) and immediate trigger sources.
  *
  * @param {Record<string, any> | undefined} telemetry
  * @returns {Map<string, string[]>} source → telemetry entry names
@@ -98,6 +102,11 @@ function collectSources(telemetry) {
         entryName,
         entry,
     ] of Object.entries(telemetry ?? {})) {
+        if (entry.trigger?.type === 'immediate' && entry.trigger.source) {
+            const entries = sources.get(entry.trigger.source) ?? [];
+            entries.push(entryName);
+            sources.set(entry.trigger.source, entries);
+        }
         for (const param of Object.values(entry.parameters ?? {})) {
             if (!param.source) continue;
             const entries = sources.get(param.source) ?? [];
@@ -166,5 +175,48 @@ describe('detectorPerf config tests', () => {
 
     it('exercises at least one config with detectorPerf (sanity)', () => {
         expect(sawDetectorPerf).to.equal(true);
+    });
+
+    // Period counters live in the base feature file and are inherited by all
+    // platforms (harmless where the feature is absent — the sources just never
+    // fire; same as the captcha week counters). The immediate severe entry is
+    // different: it belongs only in overrides for platforms that run the
+    // feature, and must never reach Android (see the test below).
+    it('configs without detectorPerf have no immediate detectorPerf entries', () => {
+        for (const config of latestConfigs) {
+            if (config.body.features?.detectorPerf) continue;
+            const telemetry = config.body.features?.eventHub?.settings?.telemetry ?? {};
+            for (const [
+                entryName,
+                entry,
+            ] of Object.entries(telemetry)) {
+                const isDetectorPerfImmediate =
+                    entry.trigger?.type === 'immediate' && String(entry.trigger.source).startsWith('detectorPerf_');
+                expect(isDetectorPerfImmediate).to.equal(
+                    false,
+                    `${config.name}: telemetry entry '${entryName}' is an immediate detectorPerf pixel but the config has no detectorPerf feature`,
+                );
+            }
+        }
+    });
+
+    // Android's EventHub config parser is period + counter only and fails hard
+    // on an immediate-trigger entry, rejecting the *entire* telemetry set
+    // (including the shipped adwalls/captcha pixels). Keep immediate entries
+    // out of Android configs until the parser is entry-tolerant.
+    it('android configs contain no immediate-trigger telemetry entries', () => {
+        for (const config of latestConfigs) {
+            if (!config.name.includes('android')) continue;
+            const telemetry = config.body.features?.eventHub?.settings?.telemetry ?? {};
+            for (const [
+                entryName,
+                entry,
+            ] of Object.entries(telemetry)) {
+                expect(entry.trigger?.type).to.not.equal(
+                    'immediate',
+                    `${config.name}: telemetry entry '${entryName}' uses an immediate trigger, which Android's EventHub parser rejects wholesale`,
+                );
+            }
+        }
     });
 });

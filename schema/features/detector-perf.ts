@@ -18,6 +18,12 @@ type DetectorPerfSettings = CSSInjectFeatureSettings<{
     combinedThresholdsMs?: number[];
     /** Per-detector threshold overrides, keyed by detector label (e.g. `bot`). */
     detectorOverrides?: Record<string, DetectorThresholds>;
+    /**
+     * Cap on severe (immediate) emissions per page. Each (detector, kind) pair
+     * still fires at most once; the cap bounds fleet-wide pixel volume if a
+     * bad config push makes every detector cross. Client default: 10.
+     */
+    maxSeverePerPage?: number;
 }>;
 
 export type DetectorPerfFeature<VersionType> = Feature<DetectorPerfSettings, VersionType>;

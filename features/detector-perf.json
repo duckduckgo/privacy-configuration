@@ -1,8 +1,7 @@
 {
     "_meta": {
-        "description": "Measures on-device detector execution time (worst single run, total per page, combined across detectors) and reports threshold-crossing counts through EventHub telemetry. Thresholds are discovery bin edges, not performance budgets; edges are encoded into event-type names and must match the eventHub telemetry sources (enforced by tests/detector-perf-tests.js)."
+        "description": "Measures on-device detector execution time (worst single run, total per page, combined across detectors) and reports threshold-crossing counts through EventHub telemetry. Thresholds are discovery bin edges, not performance budgets; edges are encoded into event-type names and must match the eventHub telemetry sources (enforced by tests/detector-perf-tests.js). No base state on purpose: platforms opt in via overrides/. Android must stay excluded — its C-S-S config needs a native ContentScopeConfigPlugin and its EventHub parser fails hard on the immediate-trigger severe pixel."
     },
-    "state": "disabled",
     "exceptions": [],
     "settings": {
         "defaults": {
@@ -23,6 +22,7 @@
             250,
             500
         ],
-        "detectorOverrides": {}
+        "detectorOverrides": {},
+        "maxSeverePerPage": 10
     }
 }
