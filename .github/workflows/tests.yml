@@ -14,10 +14,10 @@ jobs:
             statuses: write
         steps:
             - uses: actions/checkout@v6
-            - name: Use Node.js 20
+            - name: Use Node.js
               uses: actions/setup-node@v6
               with:
-                  node-version: 24.x
+                  node-version-file: .nvmrc
             - name: Install dependencies
               run: npm ci
             - uses: ./
@@ -48,10 +48,10 @@ jobs:
               with:
                   repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
                   ref: ${{ github.event.pull_request.head.ref || github.ref }}
-            - name: Use Node.js 20
+            - name: Use Node.js
               uses: actions/setup-node@v6
               with:
-                  node-version: 24.x
+                  node-version-file: .nvmrc
             - name: Install dependencies
               run: npm ci
             - name: Check or Fix lint
