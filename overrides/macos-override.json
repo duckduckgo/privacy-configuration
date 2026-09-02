@@ -972,14 +972,7 @@
                 "apiChanges": {},
                 "domains": [
                     {
-                        // Luna's bootstrap only calls tempo.initialize() when the native-wrapper
-                        // signals are absent or contradictory: `isMac = window.webkit && !isIOS`,
-                        // `isWindows = typeof CefSharp !== 'undefined'`, run only if
-                        // `!(isMac ? !isWindows : isWindows)`. Every WKWebView browser looks like
-                        // Luna's own macOS app, so the page never boots. Defining CefSharp takes the
-                        // contradictory branch. It is referenced nowhere else on the site, and
-                        // lunaState.isMac/isWindows come from the injected platform ("web"), not
-                        // from this, so no native code paths are enabled by it.
+                        // https://github.com/duckduckgo/privacy-configuration/pull/5863
                         "domain": "luna.amazon.com",
                         "patchSettings": [
                             {
