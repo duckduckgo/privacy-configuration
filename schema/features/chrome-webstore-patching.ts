@@ -15,12 +15,22 @@ export type ChromeWebstorePatchingSettings = CSSInjectFeatureSettings<{
         state: 'enabled' | 'disabled';
     };
     /**
-     * Ordered fallback list targeting the install/uninstall <button>.
-     * The first entry matching at least one element wins.
+     * Selectors targeting the install/uninstall <button>. Every entry applies
+     * together: each gets its own hide rule and the matches are unioned, so a
+     * too-broad selector hides extra buttons wherever it sits in the list.
+     *
+     * Only `css` entries are consumed today. `xpath` is accepted by the schema
+     * so it can be added without a schema change, but it is not implemented:
+     * xpath entries are dropped at runtime. The hide has to be a stylesheet
+     * rule to cover buttons the store has not rendered yet, and xpath cannot
+     * appear in a stylesheet, so it needs a separate JS-driven hide path first.
      */
     installButtonSelectors?: SelectorEntry[];
     /**
      * CSS selectors for Chrome promo banners (e.g. "Switch to Chrome") to hide.
+     * Plain strings, not SelectorEntry: promo hiding is CSS-only (the selectors
+     * go straight into the injected stylesheet, which is what hides the banner
+     * before it paints), so xpath is not representable here by design.
      */
     promoSelectors?: string[];
     /**
