@@ -807,7 +807,7 @@
                     ]
                 },
                 "tdsNextExperiment015": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "rollout": {
                         "steps": [
                             {
@@ -818,6 +818,30 @@
                     "settings": {
                         "controlUrl": "v6/experiments/202609v1-macos-tds-control.json",
                         "treatmentUrl": "v6/experiments/202609v1-macos-tds-treatment.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "tdsNextExperiment016": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "v6/experiments/202609v2-macos-tds-control.json",
+                        "treatmentUrl": "v6/experiments/202609v2-macos-tds-treatment.json"
                     },
                     "cohorts": [
                         {
