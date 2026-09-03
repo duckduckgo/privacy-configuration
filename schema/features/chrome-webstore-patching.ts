@@ -5,6 +5,15 @@ type SelectorEntry = {
     value: string;
 };
 
+/**
+ * Same shape as SelectorEntry, narrowed to css. Used where an xpath entry could
+ * never be consumed, so the schema does not advertise support that is absent.
+ */
+type CssSelectorEntry = {
+    type: 'css';
+    value: string;
+};
+
 export type ChromeWebstorePatchingSettings = CSSInjectFeatureSettings<{
     /**
      * Execution gate: disabled by default everywhere, flipped to enabled on
@@ -27,12 +36,13 @@ export type ChromeWebstorePatchingSettings = CSSInjectFeatureSettings<{
      */
     installButtonSelectors?: SelectorEntry[];
     /**
-     * CSS selectors for Chrome promo banners (e.g. "Switch to Chrome") to hide.
-     * Plain strings, not SelectorEntry: promo hiding is CSS-only (the selectors
-     * go straight into the injected stylesheet, which is what hides the banner
-     * before it paints), so xpath is not representable here by design.
+     * Selectors for Chrome promo banners (e.g. "Switch to Chrome") to hide.
+     * Same entry shape as installButtonSelectors, but css only: promo hiding is
+     * pure CSS (the selectors go straight into the injected stylesheet, which is
+     * what hides the banner before it paints) and there is no JS pass here for an
+     * xpath entry to feed.
      */
-    promoSelectors?: string[];
+    promoSelectors?: CssSelectorEntry[];
     /**
      * Replacement button copy. install/remove label the curated pill;
      * unavailable labels the disabled pill on non-curated detail pages, with
