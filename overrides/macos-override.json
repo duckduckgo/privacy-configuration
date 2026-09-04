@@ -3340,6 +3340,9 @@
                 }
             }
         },
+        "detectorPerf": {
+            "state": "disabled"
+        },
         "webDetection": {
             "state": "enabled",
             "minSupportedVersion": "1.184.0"
@@ -3503,6 +3506,27 @@
                             "source": "captcha_other"
                         },
                         "parameters": {}
+                    },
+                    "detectorPerf_severe": {
+                        "state": "enabled",
+                        "trigger": {
+                            "type": "immediate",
+                            "source": "detectorPerf_severe"
+                        },
+                        "parameters": {
+                            "kind": {
+                                "template": "data",
+                                "dataKey": "kind"
+                            },
+                            "detector": {
+                                "template": "data",
+                                "dataKey": "detector"
+                            },
+                            "thresholdMs": {
+                                "template": "data",
+                                "dataKey": "thresholdMs"
+                            }
+                        }
                     }
                 }
             }

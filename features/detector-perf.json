@@ -1,0 +1,29 @@
+{
+    "_meta": {
+        "description": "Measures on-device detector execution time (worst single run, total per page, combined across detectors) and reports threshold-crossing counts through EventHub telemetry. Thresholds are discovery bin edges, not performance budgets; edges are encoded into event-type names and must match the eventHub telemetry sources (enforced by tests/detector-perf-tests.js). No base state on purpose: platforms opt in via overrides/."
+    },
+    "exceptions": [],
+    "settings": {
+        "defaults": {
+            "singleRunThresholdsMs": [
+                8,
+                16,
+                50,
+                150
+            ],
+            "totalPerPageThresholdsMs": [
+                50,
+                100,
+                250,
+                500
+            ]
+        },
+        "combinedThresholdsMs": [
+            100,
+            250,
+            500
+        ],
+        "detectorOverrides": {},
+        "maxSeverePerPage": 10
+    }
+}
