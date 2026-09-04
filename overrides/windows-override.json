@@ -5847,6 +5847,55 @@
                 }
             }
         },
+        "chromeWebstorePatching": {
+            "state": "internal",
+            "exceptions": [],
+            "settings": {
+                "patchWebstore": {
+                    "state": "disabled"
+                },
+                "installButtonSelectors": [
+                    {
+                        "type": "css",
+                        "value": "button[jsname=\"wQO0od\"]"
+                    },
+                    {
+                        "type": "css",
+                        "value": "button[jsname=\"ajZLRd\"]"
+                    },
+                    {
+                        "type": "css",
+                        "value": "button[jscontroller=\"O626Fe\"][disabled]"
+                    }
+                ],
+                "promoSelectors": [
+                    {
+                        "type": "css",
+                        "value": "[jsname=\"v621tc\"]"
+                    },
+                    {
+                        "type": "css",
+                        "value": "div[jscontroller=\"o2G9me\"]"
+                    },
+                    {
+                        "type": "css",
+                        "value": "header[role=\"banner\"] aside"
+                    }
+                ],
+                "domains": [
+                    {
+                        "domain": "chromewebstore.google.com",
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/patchWebstore/state",
+                                "value": "enabled"
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
         "tabPanelDeferChanges": {
             "state": "disabled",
             "exceptions": [],

@@ -42,6 +42,7 @@ import { WebExtensionsConfig } from './features/web-extensions';
 import { AdBlockingExtensionConfig } from './features/ad-blocking-extension';
 import { TabSuspension } from './features/tab-suspension';
 import { ExtensionManagementFeature } from './features/extension-management';
+import { ChromeWebstorePatchingFeature } from './features/chrome-webstore-patching';
 import { PrivacyProFeature } from './features/privacy-pro';
 
 export { WebCompatSettings } from './features/webcompat';
@@ -114,6 +115,7 @@ export type ConfigV5<VersionType> = {
         tabSuspension?: TabSuspension<VersionType>;
         webExtensions?: WebExtensionsConfig<VersionType>;
         extensionManagement?: ExtensionManagementFeature<VersionType>;
+        chromeWebstorePatching?: ChromeWebstorePatchingFeature<VersionType>;
         privacyPro?: PrivacyProFeature<VersionType>;
     };
     unprotectedTemporary: SiteException[];
