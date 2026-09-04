@@ -153,7 +153,18 @@
                 "serpSettings": "disabled",
                 "serp": "disabled",
                 "duckAiNativeStorage": "disabled",
+                "internalFeedback": "disabled",
                 "domains": [
+                    {
+                        "domain": "internalapps.duckduckgo.com",
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/internalFeedback",
+                                "value": "enabled"
+                            }
+                        ]
+                    },
                     {
                         "domain": [
                             "duckduckgo.com",
@@ -406,6 +417,10 @@
                             }
                         ]
                     }
+                },
+                "updatedModelPicker": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.235.0"
                 },
                 "contextualUnifiedToggleInput": {
                     "state": "enabled",
@@ -803,6 +818,54 @@
                             "weight": 1
                         }
                     ]
+                },
+                "tdsNextExperiment015": {
+                    "state": "disabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "v5/experiments/202609v1-ios-tds-control.json",
+                        "treatmentUrl": "v5/experiments/202609v1-ios-tds-treatment.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "tdsNextExperiment016": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "v5/experiments/202609v2-ios-tds-control.json",
+                        "treatmentUrl": "v5/experiments/202609v2-ios-tds-treatment.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
                 }
             }
         },
@@ -1008,7 +1071,7 @@
                     ]
                 },
                 "contentScopeExperiment6": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": "7.231.0",
                     "description": "Captcha detection: auto-run + fireEvent for the captcha detectors, comparing 'content' vs 'visible' element visibility",
                     "rollout": {
@@ -1029,6 +1092,28 @@
                         },
                         {
                             "name": "treatmentVis",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "contentScopeExperiment7": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.234.0",
+                    "description": "Adwall detection: rendered-text xpath matching for the generic adwall detectors",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
                             "weight": 1
                         }
                     ]
@@ -1056,10 +1141,6 @@
                 {
                     "domain": "postnl.nl",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4648"
-                },
-                {
-                    "domain": "theguardian.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4985"
                 },
                 {
                     "domain": "mumsnet.com",
@@ -1173,6 +1254,51 @@
                         "formBoundarySelector": "",
                         "failsafeSettings": {},
                         "conditionalChanges": [
+                            {
+                                "condition": [
+                                    { "domain": "www.aestheticcity.academy" }
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input[name=\"confirm-email\"]",
+                                            "type": "unknown"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "condition": [
+                                    { "urlPattern": "https://login.app.carta.com/registration*" }
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "form",
+                                            "type": "login"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "condition": [
+                                    { "domain": "www.theinformation.com" }
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "#login-email",
+                                            "type": "credentials.username"
+                                        }
+                                    }
+                                ]
+                            },
                             {
                                 "condition": [
                                     { "domain": "fedex.com" }
@@ -1343,6 +1469,30 @@
                                         "value": {
                                             "selector": "profile-lookup[app-name='account-login'] input[type='text']",
                                             "type": "credentials.username"
+                                        }
+                                    },
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "#ps_month",
+                                            "type": "identities.birthdayMonth"
+                                        }
+                                    },
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "#ps_day",
+                                            "type": "identities.birthdayDay"
+                                        }
+                                    },
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "#ps_year",
+                                            "type": "identities.birthdayYear"
                                         }
                                     }
                                 ]
@@ -1626,6 +1776,26 @@
                                         "value": {
                                             "selector": "input#floatingLabelInput109",
                                             "type": "unknown"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "condition": [
+                                    { "domain": "icloud.com" }
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formBoundarySelector",
+                                        "op": "replace",
+                                        "value": "#sign_in_form"
+                                    },
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "#sign_in_form",
+                                            "type": "login"
                                         }
                                     }
                                 ]
@@ -3050,6 +3220,22 @@
                 "allowProTierPurchase": {
                     "state": "enabled",
                     "minSupportedVersion": "7.210.0"
+                },
+                "performanceOptimizedPaywalls": {
+                    "state": "disabled",
+                    "settings": {
+                        "entryPoints": {
+                            "vpn": {
+                                "path": "/subscriptions/new/mobile/vpn"
+                            },
+                            "duckai": {
+                                "path": "/subscriptions/new/mobile/duckai"
+                            },
+                            "pir": {
+                                "path": "/subscriptions/new/mobile/pir"
+                            }
+                        }
+                    }
                 }
             }
         },
@@ -3389,9 +3575,9 @@
                 "webScrollFreezeObservability": {
                     "state": "disabled"
                 },
-                "searchTokenExperimentV2": {
+                "searchTokenExperimentV4": {
                     "state": "enabled",
-                    "minSupportedVersion": "7.232.0",
+                    "minSupportedVersion": "7.236.0",
                     "settings": {
                         "tokenTTLSeconds": 300,
                         "refreshWindowSeconds": 120
@@ -3409,9 +3595,38 @@
                     ]
                 },
                 "newTabPageSessionInstrumentation": {
-                    "state": "internal",
+                    "state": "enabled",
                     "minSupportedVersion": "7.233.0",
                     "description": "Wide event measuring Starting Experience Success Rate."
+                },
+                "onboardingFlowByDownloadReasonExperiment": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.235.0",
+                    "description": "NA Experiment: tailor the onboarding flow based on the user's download reason. `settings` provides the fallback AI model list for the model-picker step when the /models API is unavailable.",
+                    "settings": {
+                        "defaultModelId": "gpt-5.4-nano",
+                        "models": "[{\"id\":\"gpt-5.4-nano\",\"provider\":\"openai\",\"modelShortName\":\"5.4-nano\"},{\"id\":\"claude-haiku-4-5\",\"provider\":\"anthropic\",\"modelShortName\":\"Haiku 4.5\"},{\"id\":\"mistral-small-2603\",\"provider\":\"mistral\",\"modelShortName\":\"Mistral\"}]"
+                    },
+                    "targets": [
+                        {
+                            "localeLanguage": "en",
+                            "localeCountry": "US"
+                        }
+                    ],
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "promoPresentationCoordination": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.235.0"
                 }
             }
         },

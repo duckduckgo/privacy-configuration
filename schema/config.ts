@@ -27,6 +27,7 @@ import { Taskbar } from './features/taskbar';
 import { AppHealth } from './features/appHealth';
 import { ElementHidingFeature } from './features/element-hiding';
 import { EventHubFeature } from './features/event-hub';
+import { ContentScopeExperimentsFeature, TdsExperimentsFeature } from './features/experiment-metrics';
 import { RequestBlocklistFeature } from './features/request-blocklist';
 import { UaChBrandsFeature } from './features/ua-ch-brands';
 import { UrlPredictorFeature } from './features/url-predictor';
@@ -42,10 +43,12 @@ import { AdBlockingExtensionConfig } from './features/ad-blocking-extension';
 import { TabSuspension } from './features/tab-suspension';
 import { ExtensionManagementFeature } from './features/extension-management';
 import { ChromeWebstorePatchingFeature } from './features/chrome-webstore-patching';
+import { PrivacyProFeature } from './features/privacy-pro';
 
 export { WebCompatSettings } from './features/webcompat';
 export { DuckPlayerSettings } from './features/duckplayer';
 export { EventHubSettings } from './features/event-hub';
+export { ExperimentMetricsSettings } from './features/experiment-metrics';
 
 export type ExportedSchemas =
     | 'CurrentGenericConfig'
@@ -56,6 +59,7 @@ export type ExportedSchemas =
     | 'DuckPlayerSettings'
     | 'DuckPlayerNativeSettings'
     | 'EventHubSettings'
+    | 'ExperimentMetricsSettings'
     | 'AttributedMetricsFeature';
 
 /**
@@ -96,6 +100,9 @@ export type ConfigV5<VersionType> = {
         webview?: WebViewConfig<VersionType>;
         customUserAgent?: CustomUserAgentFeature<VersionType>;
         downloadManager?: DownloadManager<VersionType>;
+        blockList?: TdsExperimentsFeature<VersionType>;
+        contentBlocking?: TdsExperimentsFeature<VersionType>;
+        contentScopeExperiments?: ContentScopeExperimentsFeature<VersionType>;
         elementHiding?: ElementHidingFeature<VersionType>;
         eventHub?: EventHubFeature<VersionType>;
         requestBlocklist?: RequestBlocklistFeature<VersionType>;
@@ -109,6 +116,7 @@ export type ConfigV5<VersionType> = {
         webExtensions?: WebExtensionsConfig<VersionType>;
         extensionManagement?: ExtensionManagementFeature<VersionType>;
         chromeWebstorePatching?: ChromeWebstorePatchingFeature<VersionType>;
+        privacyPro?: PrivacyProFeature<VersionType>;
     };
     unprotectedTemporary: SiteException[];
 };

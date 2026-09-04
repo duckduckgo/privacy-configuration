@@ -10,6 +10,10 @@ type ExtensionManagementSettings = {
     hiddenExtensionIds: string[];
     disabledExtensionIds: string[];
     specialBehavior: Record<string, ExtensionSpecialBehavior>;
+    // Help-page URL for the page-header "Learn more" link on the extensions settings screen.
+    learnMoreUrl?: string;
+    // Help-page URL for the "Learn more" link on a remotely-disabled extension's notice.
+    learnMoreUrlRemoteDisable?: string;
 };
 
 // One entry in the curated extensions catalog

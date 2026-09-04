@@ -768,10 +768,6 @@
             "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4503"
         },
         {
-            "domain": "dillards.com",
-            "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4606"
-        },
-        {
             "domain": "depop.com",
             "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4653"
         },
@@ -998,6 +994,10 @@
         {
             "domain": "traxxas.com",
             "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5776"
+        },
+        {
+            "domain": "thewhisky.pl",
+            "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5806"
         }
     ],
     "settings": {
@@ -1470,7 +1470,7 @@
                 "#TPCookieToggle",
                 "#TPCookieToggle[aria-pressed=true]",
                 "#updateCookieButton",
-                "dialog[data-cookie-consent]",
+                "#cookiefirst-root button[data-cookiefirst-action],.cookiefirst-root button[data-cookiefirst-action],#btnAcceptAllCookies,#btnRejectAllCookies,#btnAdjustSettings,[aria-labelledby=cookie-preference-panel-title] button",
                 "a[data-cookie-accept=\"functional\"]",
                 "#hu.hu-wrapper",
                 "#hu.hu-visible",
@@ -1515,7 +1515,7 @@
                 ".consent-banner .consent-banner__actions",
                 ".consent-banner__actions button.basic-button.secondary",
                 ".consent-modal__footer button.basic-button.secondary",
-                ".consent-modal ion-content > div > a:nth-child(9)",
+                "[aria-describedby=\"cookieconsent:desc\"].cc-type-opt-out:not(.cc-invisible)",
                 "label.consent-switch input[type=checkbox]:checked",
                 ".consent-modal__footer button.basic-button.primary",
                 ".kc-overlay",
@@ -1660,13 +1660,13 @@
                 ".pd-cp-ui-rejectAll",
                 ".pd-cp-ui-save",
                 "[data-hook=ccsu-banner-decline-all]",
-                "#ccpaCookieContent_wrapper, article.ppvx_modal--overpanel",
-                "#ccpaCookieBanner, .privacy-sheet-content",
+                "iframe[title='Consent window']",
+                "script[src*='cdn.appconsent.io/tcf2-clear/'][src*='core.bundle.js']",
                 "#bannerDeclineButton",
                 "a#manageCookiesLink",
-                ".privacy-sheet-content #formContent",
-                "#formContent .cookiepref-11m2iee-checkbox_base input:checked",
-                ".cookieAction.saveCookie,.confirmCookie #submitCookiesBtn",
+                "[data-testid=\"cookie-banner\"][class*=\"cookie-banner-styles__StyledCookieBanner\"]",
+                "[data-test-id=\"cookie-banner-body\"]",
+                "cookie-banner [data-test-id=\"cookie-banner-body\"] [data-test-id=\"reject-button\"]",
                 "#gdprCookieBanner",
                 "#gdprCookieContent_wrapper",
                 "hideCookieBanner=",
@@ -1751,7 +1751,7 @@
                 "#consent-banner-modal a[href=\"#settings\"]",
                 "#consent-banner-settings a[href=\"#reject\"]",
                 "#cookie_consent_wrapper #consent_accept_essential, #manage_cookie_consent_modal #modal_consent_accept_essential",
-                "#age_disclaimer_window,#ageDisclaimerWrapper",
+                "#btnRejectAllCookies",
                 "#cookie_consent_min_wrapper #close_minimized_banner",
                 "cookieConsent=1",
                 "#js-consent-banner",
@@ -1785,6 +1785,69 @@
                 ".disclaimer-opened #disclaimer-cookies",
                 "#disclaimer-reject_cookies",
                 "iabbb-cookies-message > section button.bds-button:not([name])",
+                "iframe[srcdoc*='frame-root']",
+                "script[src*='cdn.appconsent.io/tcf2/'][src*='core.bundle.js']",
+                "#cookie_consent_wrapper.non_cookie_consent_wrapper #js_cookieBannerCloseBtn",
+                "#cookie_consent_wrapper #consent_accept_essential",
+                "#cookie_consent_wrapper #js_cookieBannerCloseBtn",
+                "#manage_cookie_consent_modal #modal_consent_accept_essential",
+                "cookieConsent=5",
+                ".c24-cookie-consent-wrapper",
+                ".c24-cookie-consent-wrapper .c24-cookie-consent-functional",
+                ".c24-cookie-consent-notice",
+                "#ncmp__tool .ncmp__banner",
+                "#ncmp__tool .ncmp__banner.ncmp__active",
+                "ncmp=",
+                "cookie-banner-element#ckb",
+                "astro-island[component-url*=\"CookiesBanner\"] .cookies",
+                "astro-island[component-url*=\"CookiesBanner\"] .cookies button.cookies__buttons--settings",
+                "astro-island[component-url*=\"CookiesBanner\"] .cookies input[name=\"targeting\"]:checked",
+                "astro-island[component-url*=\"CookiesBanner\"] .cookies input[name=\"targeting\"]",
+                "astro-island[component-url*=\"CookiesBanner\"] .cookies button.cookies__buttons--accept",
+                "cookiesPreferences=[%22necessary%22]",
+                "modal-box[data-options*=\"cookies\"] .modal-object--cookie",
+                ".modal-object--cookie [data-js-cookies-decline]",
+                "[data-testid=\"cookie-banner\"] button[kind=\"BUTTON/FLAT_SECONDARY\"]",
+                "cookie_tracking_enabled",
+                "#ccpaCookieContent_wrapper",
+                "#ccpaCookieBanner",
+                "#r42CookieBar .cw-deny",
+                "dialog[data-cookie-consent]:has([data-cookie-accept])",
+                "dialog[data-cookie-consent] [data-cookie-accept]",
+                "[data-test-id=\"cookie-banner-body\"] [data-test-id=\"reject-button\"]",
+                ".consent-modal .base-modal__body a",
+                "#r42CookieBar[open] .cw-deny",
+                ".disclaimer-opened #disclaimer-reject_cookies",
+                "type%3Dexplicit",
+                ".cookiesgdpr__base:has(.cookiesgdpr__rejectbtn)",
+                ".cookiesgdpr__base .cookiesgdpr__rejectbtn",
+                ".cookiesgdpr__base .cookiesgdpr__wrapper",
+                "\"analitica\":false",
+                "#cookieBox .block-cookie-consent",
+                "#cookieBox #consentButton.block-cookie-consent--btn",
+                "#cookieBox",
+                "#controlled_banner-cookie_consent-consent_banner",
+                "#controlled_banner-cookie_consent-privacy_setting_banner",
+                "#controlled_banner-cookie_consent-consent_banner [data-search-key-button=reject_all_text]",
+                "#controlled_submit-cookie_consent-consent_banner-privacy_setting_banner_link",
+                "#controlled_banner-cookie_consent-privacy_setting_banner [data-search-key-button=reject_all_text]",
+                "#wpconsent-root",
+                "#wpconsent-container",
+                "wpconsent_preferences=",
+                "#r42CookieBar",
+                "epaas-consent-drawer-shell",
+                "%22advertising%22%3A0",
+                "dialog:has(#cookie-banner-2025-form)",
+                "#cookie-banner-2025-form",
+                "button[form=\"cookie-banner-2025-form\"][name=\"accept_cookie\"]",
+                "button[form=\"cookie-banner-2025-form\"][name=\"accept_cookie\"][value=\"selection\"]",
+                "#mensajeCookies",
+                "#divConfigCookies",
+                "#mensajeCookies .cajaCookies #btnAcceptAll",
+                "#mensajeCookies #btnAcceptNoAllCookies",
+                "#divConfigCookies #btnAcceptNoCookies",
+                "#mensajeCookies .cajaCookies",
+                "#mensajeCookies #btnConfigCookies",
                 "body > div#root > div#ccpa-iframe-theme-provider[data-testid=\"ccpa-iframe-theme-provider\"] > div#ccpa-iframe[data-testid=\"ccpa-iframe\"] > div#ccpa_consent_banner[data-testid=\"ccpa_consent_banner\"] > div:not([id]) > div:nth-child(3):not([id]) > span:not([id]) > span:not([id]) > div:nth-child(2):not([id]) > span:nth-child(1):not([id]) > button#decline_cookies_button[data-testid=\"decline_cookies_button\"]",
                 "body:not([id]) > div#banner-0 > div:nth-child(1)#grouped-pageload-Banner > div:not([id]) > div:not([id]) > div:not([id]) > div:nth-child(3):not([id]) > button:nth-child(2):not([id])",
                 "body > div#iubenda-cs-banner > div:not([id]) > div:not([id]) > div:not([id]) > div:nth-child(5):not([id]) > div:nth-child(2):not([id]) > button:nth-child(1):not([id])",
@@ -1826,69 +1889,6 @@
                 "span[role=checkbox][aria-checked=true]",
                 "#save-all-pur",
                 "#reminder",
-                "div > div > div > div > span[href*=\"/cookie-and-similar-technologies-policy.html\"]",
-                "xpath///span[contains(., 'Alle afwijzen') or contains(., 'Reject all') or contains(., 'Tümünü reddet') or contains(., 'Odrzuć wszystko')]",
-                "div > div > div:has(> div > span[href*=\"/cookie-and-similar-technologies-policy.html\"]) > [role=button]:nth-child(2)",
-                "body > div:not([id]) > a:nth-child(3):not([id])",
-                "body > div#root > div:nth-child(2):not([id]) > div:nth-child(5):not([id]) > div:not([id]) > div:not([id]) > div:not([id]) > div:nth-child(2):not([id]) > div:nth-child(3):not([id]) > button:nth-child(2):not([id])",
-                "*[aria-labelledby=\"consent-banner-title\"]",
-                "#consent-banner-title",
-                "button[data-testid=\"reject-button\"]",
-                "ckns_explicit=1",
-                "div.modal.cookiesModal.is-open",
-                "div.cookiesModal__buttonWrapper > button[data-closecause=\"close-by-manage-cookies\"]",
-                "button#js-manage-data-privacy-save-button",
-                "#gdpr-cookie-message",
-                "#cookie-disclaimer",
-                "#cookiesel",
-                "div[class*=\"Overlay__container\"]:has(div[class*=\"TCF2Popup\"])",
-                "div[class*=\"TCF2Popup\"]",
-                "[class*=\"TCF2Popup\"] a[href^=\"https://www.dailymotion.com/legal/cookiemanagement\"]",
-                "button[class*=\"TCF2ContinueWithoutAcceptingButton\"]",
-                "dm-euconsent-v2",
-                "#cookies .cookies-btn",
-                "[aria-label=consent-banner]",
-                "xpath///button[contains(., 'Reject all')]",
-                "#cookie_banner",
-                "#tsla-reject-cookie",
-                "tsla-cookie-consent=rejected",
-                "ngc-cookie-banner",
-                "div.cookie-footer-container",
-                "[data-testid=cookieBanner]",
-                "[data-testid=cookieBanner] button",
-                "[data-testid=cookieBanner__manageCookiesButton]",
-                "[data-testid=cookieModal] input[type=radio][value=false]:not(:checked):not(:disabled)",
-                "[data-testid=cookieModal__acceptButton]",
-                "gdpr__",
-                "[class*=CookieConsent__root___]",
-                "[class*=CookieConsent__modal___]",
-                "[class*=CookieConsent__modal___] > div > button[class*=secondary]:nth-child(2)",
-                "[data-test-id=cookies_section]",
-                ".cc-window.cc-visible",
-                ".cc-window .cc-dialog",
-                ".cc-window.cc-visible .cc-consent-require-only",
-                "dji_consentmanager",
-                "[id^=cookie-consent-banner]",
-                "#cookie-consent-denied",
-                "cookie-consent=denied",
-                "#gdpr-banner",
-                "#gdpr-banner-decline",
-                "body > div#tna-cookie-prompt-banner > div:not([id]) > div:nth-child(2):not([id]) > button:nth-child(2)#reject-cookie",
-                ".cookie-wrapper",
-                ".cookie-wrapper > .cookie-notice",
-                "#consent-modal",
-                "#privacy-settings-content",
-                "button[type=\"submit\"]",
-                "div.one-modal__action-footer-column--secondary > a",
-                "[data-test-id=cookie-notice-reject]",
-                "#ef-ccpa",
-                "#ef-button-ccpa-decline",
-                ".cdk-overlay-container",
-                ".cdk-overlay-container app-esaa-cookie-component",
-                ".btn-cookie-refuser",
-                "body > div#ecom2-spa-root > div:nth-child(4)#layout-grid > div:nth-child(4)#main-content-v2 > div:nth-child(2):not([id]) > div:not([id]) > div:not([id]) > div:nth-child(2):not([id]) > button:nth-child(2):not([id])[data-testid=\"cookie-btn-deny\"]",
-                ".fixed.bottom-0:has([data-test=cookieBannerButton])",
-                ".fixed.bottom-0 [data-test=cookieBannerButton]",
                 "body > div:not([id]) > div:not([id]) > div:nth-child(3):not([id]) > button:nth-child(2)#cookieadmin_reject_button",
                 "body > aside:not([id]) > div:nth-child(1):not([id]) > div:nth-child(2):not([id]) > div:nth-child(2):not([id]) > button:nth-child(2):not([id])",
                 ".cck-container",
@@ -1900,12 +1900,12 @@
                 ".show-cookies-modal .cookies-modal #cookies-accept",
                 "body > div:not([id]) > div:nth-child(2):not([id]) > div:nth-child(2):not([id]) > div:nth-child(2):not([id]) > div:not([id]) > button:not([id])",
                 "body > div:not([id]) > div:not([id]) > div#ch2-dialog > div:nth-child(2):not([id]) > button:nth-child(1):not([id])",
-                "div:has(> .consent-banner .consent-banner__content--gdpr-v2),.ReactModalPortal:has([data-a-target=consent-modal-save])",
-                ".consent-banner .consent-banner__content--gdpr-v2",
-                "div:has(> .consent-banner .consent-banner__content--gdpr-v2)",
+                "[data-testid=cookieBanner] button",
+                "[data-testid=cookieBanner__manageCookiesButton]",
+                "[data-testid=cookieModal] input[type=radio][value=false]:not(:checked):not(:disabled)",
                 "button[data-a-target=\"consent-banner-manage-preferences\"]",
-                "input[type=checkbox][data-a-target=tw-checkbox]",
-                "input[type=checkbox][data-a-target=tw-checkbox][checked]:not([disabled])",
+                "#cookiePrefsModal #formContent, .privacy-sheet-content #formContent",
+                "[data-testid=cookieModal__acceptButton]",
                 "[data-a-target=consent-modal-save]",
                 ".ReactModalPortal:has([data-a-target=consent-modal-save])",
                 "[data-testid=\"BottomBar\"]",
@@ -2012,7 +2012,7 @@
                 "#consent-update #consent-configuration-save",
                 "zinio-cookie-consent",
                 "body > dialog:not([id]) > div:nth-child(1):not([id]) > div:nth-child(3):not([id]) > div:nth-child(2):not([id]) > button:not([id])",
-                "body > dialog:not([id]) > div:not([id]) > div:nth-child(2):not([id]) > div:not([id]) > div:nth-child(1):not([id]) > form:not([id]) > div:nth-child(3):not([id]) > div:nth-child(2):not([id]) > button:not([id])",
+                "#formContent input[type='checkbox']:checked",
                 "body > div#consent-manager > div:nth-child(1)#consent-banner > div:nth-child(2):not([id]) > div:nth-child(2):not([id]) > div:not([id]) > div:nth-child(3):not([id]) > button#consent-banner-btn-close",
                 "body > section#cookie-policy > div:not([id]) > div:nth-child(2):not([id]) > button:nth-child(1):not([id])",
                 "body > div:not([id]) > div:not([id]) > div:not([id]) > div:nth-child(2):not([id]) > button:nth-child(2):not([id])",
@@ -2243,7 +2243,7 @@
                 "body > div#app > div:nth-child(3):not([id]) > div:nth-child(2):not([id]) > div:nth-child(2):not([id]) > button:nth-child(2):not([id])",
                 "body > div:not([id]) > div#cookieconsent > div:nth-child(2):not([id]) > div:nth-child(3):not([id]) > div:not([id]) > button:nth-child(1)#cookie-deny",
                 "body > div#body-wrapper > section:nth-child(5):not([id]) > div:not([id]) > div:not([id]) > div:nth-child(2):not([id]) > div:not([id]) > button:nth-child(2):not([id])",
-                "body > dialog#r42CookieBar > section:nth-child(2):not([id]) > div:nth-child(3):not([id]) > button:nth-child(1):not([id])",
+                "#cookie_modal_placeholder dialog.bm-modal--cookie",
                 "body > div#modal-cookiesettings > div:not([id]) > div:not([id]) > div:nth-child(3):not([id]) > button:nth-child(2):not([id])",
                 "body > div:not([id]) > div:nth-child(3):not([id]) > div:not([id]) > button:nth-child(3):not([id])",
                 "body > div:not([id]) > div:nth-child(1)#react-content > div:nth-child(1):not([id]) > div:not([id]) > div:nth-child(3):not([id]) > div:nth-child(1):not([id]) > button:nth-child(2):not([id]) > span:not([id])",
@@ -2383,7 +2383,7 @@
                 "#cookie-consent-banner .all4-cc-primary-button",
                 "#cookie-consent-banner button[aria-label=\"Reject non-essential cookies and continue.\"]",
                 "body > div:not([id]) > div:nth-child(2):not([id]) > div:nth-child(2):not([id]) > button:nth-child(2):not([id])",
-                "body > div:not([id]) > div:nth-child(2):not([id]) > div:not([id]) > div:nth-child(2):not([id]) > div:nth-child(2):not([id]) > button:nth-child(2):not([id])",
+                "dialog[data-cookie-consent]:has(form[data-privacy-consent-form])",
                 "div[id='sp_message_container_1482251'],div[id='sp_message_container_1482252']",
                 "#globalCookieBanner .js-customizeGlobalCookies",
                 "#cookieBanner button.cbSecondaryCTA",
@@ -2525,7 +2525,7 @@
                 "body > div#BannerRegion > div:nth-child(1)#Banner_cookie_0 > div:nth-child(2):not([id]) > div:not([id]) > div:nth-child(2):not([id]) > div:not([id]) > button:nth-child(2)#rejectAllBtn",
                 "body > div:not([id]) > div:nth-child(3):not([id]) > div:not([id]) > div:nth-child(2):not([id]) > button:nth-child(2):not([id])",
                 "body > div#termsfeed-pc1-notice-banner > div:nth-child(2):not([id]) > div:not([id]) > div:nth-child(3):not([id]) > div:not([id]) > button:nth-child(2)#termsfeed_privacy_consent_banner_button_reject_all",
-                "body > div#accn-cookie-consent-wrapper > div#accn-cookie-consent > div:nth-child(2)#accn-statement-scroller > div:nth-child(2):not([id]) > div:nth-child(3):not([id]) > button:not([id])",
+                "button[type=\"submit\"]",
                 "#cookie-notification",
                 "#cookie-notification .cookie_pref_wrapper .pref-opt.refuse",
                 "#voyager-gdpr-2025 button:last-of-type",
@@ -2549,7 +2549,138 @@
                 "#cookieBanner.cbShort",
                 "[data-testid=\"cookie-wall\"]",
                 "[data-testid=\"cookie-wall\"] .cookie-bar__footer button[data-id=\"0\"]",
-                "acceptCookies=0"
+                "acceptCookies=0",
+                "#cookies .cookies-btn",
+                "body > div:not([id]) > a:nth-child(3):not([id])",
+                "body > div#root > div:nth-child(2):not([id]) > div:nth-child(5):not([id]) > div:not([id]) > div:not([id]) > div:not([id]) > div:nth-child(2):not([id]) > div:nth-child(3):not([id]) > button:nth-child(2):not([id])",
+                "*[aria-labelledby=\"consent-banner-title\"]",
+                "#consent-banner-title",
+                "button[data-testid=\"reject-button\"]",
+                "ckns_explicit=1",
+                "div.modal.cookiesModal.is-open",
+                "div.cookiesModal__buttonWrapper > button[data-closecause=\"close-by-manage-cookies\"]",
+                "button#js-manage-data-privacy-save-button",
+                "#gdpr-cookie-message",
+                "#cookie-disclaimer",
+                "#cookiesel",
+                ".box-cookie",
+                ".box-cookie .box-cookie__inner",
+                ".box-cookie .btn-normal.is-small",
+                "disney_cc=ok",
+                "div[class*=\"Overlay__container\"]:has(div[class*=\"TCF2Popup\"])",
+                "div[class*=\"TCF2Popup\"]",
+                "[class*=\"TCF2Popup\"] a[href^=\"https://www.dailymotion.com/legal/cookiemanagement\"]",
+                "button[class*=\"TCF2ContinueWithoutAcceptingButton\"]",
+                "dm-euconsent-v2",
+                "ngc-cookie-banner",
+                "#header-gdpr",
+                "#header-gdpr #header-gdpr-in-btn button",
+                "#header-gdpr.is-active",
+                "gdprCookieData=ok",
+                "#cookie-form",
+                "#cookie-form .reject",
+                "_cookieNoticeSettings=%7B%22performance%22%3Afalse%2C%22targeting%22%3Afalse%2C%22analytic%22%3Afalse%7D",
+                "[data-qa=\"GDPRBanner-Container\"]",
+                "[data-qa=\"GDPRBanner-Container\"] [data-qa=\"GDPRBanner-Button\"]",
+                ".fc-consent-root .fc-dialog-container",
+                "custom-cookie-consent#cookieBubble.banner-show",
+                "custom-cookie-consent#cookieBubble #configureBtn",
+                "custom-cookie-consent#cookieBubble.banner-show #configureBtn",
+                ".custom-cookie-modal #acceptNecessaryBtn",
+                "div > div > div > div > span[href*=\"/cookie-and-similar-technologies-policy.html\"]",
+                "xpath///span[contains(., 'Alle afwijzen') or contains(., 'Reject all') or contains(., 'Tümünü reddet') or contains(., 'Odrzuć wszystko')]",
+                "div > div > div:has(> div > span[href*=\"/cookie-and-similar-technologies-policy.html\"]) > [role=button]:nth-child(2)",
+                "[aria-label=consent-banner]",
+                "xpath///button[contains(., 'Reject all')]",
+                "#cookie_banner",
+                "#tsla-reject-cookie",
+                "tsla-cookie-consent=rejected",
+                "xpath///div[contains(@class, 'fixed') and contains(., 'Cookieをブロック') and .//button[normalize-space()='Cookieの設定']]",
+                "xpath///div[contains(@class, 'fixed') and contains(., 'Cookieをブロック')]//button[normalize-space()='Cookieの設定']",
+                "xpath///button[normalize-space()='設定を保存する']",
+                ".optIn",
+                ".optIn .js-optin-cookie-settings",
+                "label[for=\"TAB-02\"]",
+                "label[for=\"TAB-02\"] + .tab-content .toggleSwitch__circle",
+                "label[for=\"TAB-03\"]",
+                "label[for=\"TAB-03\"] + .tab-content .toggleSwitch__circle",
+                ".js-modal-save-settings",
+                "__performanceCookieFlag__=0",
+                "__targetingCookieFlag__=0",
+                "#js-pw-consent-wrapper bgl-modal[test-id='cookie-modal']",
+                "#js-pw-consent-wrapper [data-ta-id='pw-consent-rejectAllButton']",
+                "dialog[data-cookie-consent] form[data-privacy-consent-form] input[name=\"action\"][value=\"reject\"]",
+                "dialog[data-cookie-consent] form[data-privacy-consent-form]:has(input[name=\"action\"][value=\"reject\"]) button[type=\"submit\"]",
+                "dialog[data-cookie-consent]",
+                "div.cookie-footer-container",
+                "[data-testid=cookieBanner]",
+                "gdpr__",
+                ".cookie:has(.cookie__inner .cookie__button)",
+                ".cookie > .cookie__inner > .cookie__button > a",
+                "#loader.is--show",
+                ".cookie",
+                "cookiesubmit=1",
+                "#gdprconsent.gdprcontainer",
+                "#gdprconsent .gdprbutton a",
+                "gdpr-consent=0",
+                "[class*=\"cookie-consent-required\"]",
+                "html[data-cookie-consent-required] [data-testid=\"accept-all-cookie-button\"]",
+                "[data-testid=\"accept-all-cookie-button\"]",
+                "body[data-scroll-locked]",
+                "[data-testid=\"customize-cookie-button\"]",
+                "[data-testid=\"confirm-settings-cookie-button\"]",
+                "%22analytics%22%3Afalse",
+                "[data-a-target=\"consent-banner\"],.ReactModalPortal:has([data-a-target=consent-modal-save])",
+                "[data-a-target=\"consent-banner\"]",
+                "[data-a-target=\"consent-banner-accept\"]",
+                "[data-a-target=\"consent-banner\"] button:not([data-a-target])",
+                "input[type=checkbox][data-a-target=tw-checkbox]:not(:checked):not([disabled])",
+                ".cookie-menu.js-cookie-banner",
+                ".cookie-menu.js-cookie-banner .js-cookie-banner-close",
+                "apaycnst-mktg=true",
+                "body > div#tna-cookie-prompt-banner > div:not([id]) > div:nth-child(2):not([id]) > button:nth-child(2)#reject-cookie",
+                "div[role=\"dialog\"][class*=\"CustomCookieBanner\"]",
+                "#onetrust-consent-sdk .ot-pc-refuse-all-handler",
+                ".cc-window.cc-visible",
+                ".cc-window .cc-dialog",
+                ".cc-window.cc-visible .cc-consent-require-only",
+                "dji_consentmanager",
+                "[id^=cookie-consent-banner]",
+                "#cookie-consent-denied",
+                "cookie-consent=denied",
+                "#gdpr-banner",
+                "#gdpr-banner-decline",
+                ".cookie-wrapper",
+                "[class*=CookieConsent__root___]",
+                "[class*=CookieConsent__modal___]",
+                "[class*=CookieConsent__modal___] > div > button[class*=secondary]:nth-child(2)",
+                "html.sp-message-open",
+                "[data-test-id=cookies_section]",
+                "Analytics_consent=2",
+                "Marketing_consent=2",
+                ".modalwindow-container.bar .modalwindow",
+                "#bibliotheek-nl-page",
+                ".modalwindow-container.bar .modalwindow button.button.primary.notok",
+                ".cookie-wrapper > .cookie-notice",
+                "#consent-modal",
+                "#privacy-settings-content",
+                "a[href=\"https://www.walmartcanada.ca/cookie-notice\"]",
+                "button[data-dca-intent=\"open\"][role=\"link\"]",
+                "xpath///button[contains(., 'Save settings') or contains(., 'Enregistrer les paramètres')]",
+                "[data-test-id=cookie-notice-reject]",
+                ".incentive-banner",
+                "#ef-ccpa",
+                "#cookiePrefsModal, .privacy-sheet-content",
+                ".cookieAction #submitCookiesBtn",
+                "div.one-modal__action-footer-column--secondary > a",
+                "input[type=checkbox][data-a-target=tw-checkbox]:not([disabled])",
+                "body > div#ecom2-spa-root > div:nth-child(4)#layout-grid > div:nth-child(4)#main-content-v2 > div:nth-child(2):not([id]) > div:not([id]) > div:not([id]) > div:nth-child(2):not([id]) > button:nth-child(2):not([id])[data-testid=\"cookie-btn-deny\"]",
+                "#ef-button-ccpa-decline",
+                ".cdk-overlay-container",
+                ".cdk-overlay-container app-esaa-cookie-component",
+                ".btn-cookie-refuser",
+                ".fixed.bottom-0:has([data-test=cookieBannerButton])",
+                ".fixed.bottom-0 [data-test=cookieBannerButton]"
             ],
             "r": [
                 [
@@ -2815,6 +2946,78 @@
                     [
                         {
                             "cc": 52
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
+                    "AppConsent",
+                    2,
+                    "",
+                    22,
+                    [
+                        649
+                    ],
+                    [
+                        {
+                            "e": 650
+                        }
+                    ],
+                    [
+                        {
+                            "v": 649
+                        }
+                    ],
+                    [
+                        {
+                            "waitForThenClick": [
+                                "iframe[title='Consent window']",
+                                ".button__refuseAll"
+                            ]
+                        }
+                    ],
+                    [
+                        {
+                            "timeout": 1000,
+                            "check": "none",
+                            "wv": 649
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
+                    "AppConsent legacy",
+                    2,
+                    "",
+                    22,
+                    [
+                        774
+                    ],
+                    [
+                        {
+                            "e": 775
+                        }
+                    ],
+                    [
+                        {
+                            "v": 774
+                        }
+                    ],
+                    [
+                        {
+                            "waitForThenClick": [
+                                "iframe[srcdoc*='frame-root']",
+                                ".button__skip"
+                            ]
+                        }
+                    ],
+                    [
+                        {
+                            "timeout": 1000,
+                            "check": "none",
+                            "wv": 774
                         }
                     ],
                     {}
@@ -3117,14 +3320,46 @@
                             "v": 680
                         },
                         {
-                            "check": "none",
-                            "v": 740
+                            "any": [
+                                {
+                                    "v": 776
+                                },
+                                {
+                                    "eval": "EVAL_AYLO_COOKIE_MANAGER_READY"
+                                }
+                            ]
                         }
                     ],
                     [
                         {
-                            "all": true,
-                            "c": 739
+                            "if": {
+                                "v": 777
+                            },
+                            "then": [
+                                {
+                                    "c": 777
+                                }
+                            ],
+                            "else": [
+                                {
+                                    "if": {
+                                        "v": 778
+                                    },
+                                    "then": [
+                                        {
+                                            "wait": 8000
+                                        },
+                                        {
+                                            "c": 778
+                                        }
+                                    ],
+                                    "else": [
+                                        {
+                                            "c": 779
+                                        }
+                                    ]
+                                }
+                            ]
                         },
                         {
                             "optional": true,
@@ -3133,7 +3368,14 @@
                     ],
                     [
                         {
-                            "cc": 742
+                            "any": [
+                                {
+                                    "cc": 742
+                                },
+                                {
+                                    "cc": 780
+                                }
+                            ]
                         }
                     ],
                     {}
@@ -3254,6 +3496,41 @@
                         }
                     ],
                     [],
+                    {}
+                ],
+                [
+                    1,
+                    "bbva",
+                    2,
+                    "",
+                    22,
+                    [
+                        808
+                    ],
+                    [
+                        {
+                            "e": 809
+                        }
+                    ],
+                    [
+                        {
+                            "v": 809
+                        }
+                    ],
+                    [
+                        {
+                            "c": 809
+                        },
+                        {
+                            "check": "none",
+                            "wv": 810
+                        }
+                    ],
+                    [
+                        {
+                            "cc": 811
+                        }
+                    ],
                     {}
                 ],
                 [
@@ -3687,6 +3964,38 @@
                     [
                         {
                             "eval": "EVAL_CC_BANNER2_0"
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
+                    "check24",
+                    2,
+                    "",
+                    22,
+                    [
+                        781
+                    ],
+                    [
+                        {
+                            "e": 782
+                        }
+                    ],
+                    [
+                        {
+                            "v": 783
+                        }
+                    ],
+                    [
+                        {
+                            "c": 782
+                        }
+                    ],
+                    [
+                        {
+                            "check": "none",
+                            "v": 781
                         }
                     ],
                     {}
@@ -4133,6 +4442,11 @@
                     ],
                     [
                         {
+                            "timeout": 2000,
+                            "optional": true,
+                            "w": 504
+                        },
+                        {
                             "if": {
                                 "e": 202
                             },
@@ -4224,6 +4538,41 @@
                         }
                     ],
                     [],
+                    {}
+                ],
+                [
+                    1,
+                    "consentmanager-ncmp",
+                    2,
+                    "",
+                    22,
+                    [
+                        784
+                    ],
+                    [
+                        {
+                            "e": 785
+                        }
+                    ],
+                    [
+                        {
+                            "check": "any",
+                            "v": 785
+                        }
+                    ],
+                    [
+                        {
+                            "wait": 500
+                        },
+                        {
+                            "eval": "EVAL_CONSENTMANAGER_NCMP_REJECT"
+                        }
+                    ],
+                    [
+                        {
+                            "cc": 786
+                        }
+                    ],
                     {}
                 ],
                 [
@@ -4337,6 +4686,39 @@
                             "cc": 264
                         }
                     ],
+                    {}
+                ],
+                [
+                    1,
+                    "cookie-banner-element",
+                    2,
+                    "",
+                    22,
+                    [
+                        787
+                    ],
+                    [
+                        {
+                            "e": 787
+                        }
+                    ],
+                    [
+                        {
+                            "visible": [
+                                "cookie-banner-element#ckb",
+                                "#ckb[role=\"dialog\"]"
+                            ]
+                        }
+                    ],
+                    [
+                        {
+                            "waitForThenClick": [
+                                "cookie-banner-element#ckb",
+                                "#ckn"
+                            ]
+                        }
+                    ],
+                    [],
                     {}
                 ],
                 [
@@ -4689,35 +5071,67 @@
                     ],
                     [
                         {
-                            "v": 250
+                            "check": "any",
+                            "v": 459
                         }
                     ],
                     [
                         {
                             "if": {
-                                "e": 251
+                                "e": 254
                             },
                             "then": [
                                 {
-                                    "k": 251
-                                },
-                                {
-                                    "timeout": 1000,
-                                    "wv": 252
-                                },
-                                {
-                                    "eval": "EVAL_COOKIEFIRST_1"
-                                },
-                                {
-                                    "wait": 1000
-                                },
-                                {
-                                    "k": 253
+                                    "k": 254
                                 }
                             ],
                             "else": [
                                 {
-                                    "k": 254
+                                    "if": {
+                                        "e": 740
+                                    },
+                                    "then": [
+                                        {
+                                            "timeout": 5000,
+                                            "wv": 740
+                                        },
+                                        {
+                                            "k": 740
+                                        },
+                                        {
+                                            "wait": 1500
+                                        }
+                                    ],
+                                    "else": [
+                                        {
+                                            "if": {
+                                                "e": 251
+                                            },
+                                            "then": [
+                                                {
+                                                    "k": 251
+                                                },
+                                                {
+                                                    "timeout": 1000,
+                                                    "wv": 252
+                                                },
+                                                {
+                                                    "eval": "EVAL_COOKIEFIRST_1"
+                                                },
+                                                {
+                                                    "wait": 1000
+                                                },
+                                                {
+                                                    "k": 253
+                                                }
+                                            ],
+                                            "else": [
+                                                {
+                                                    "k": 254
+                                                }
+                                            ]
+                                        }
+                                    ]
                                 }
                             ]
                         }
@@ -4948,6 +5362,33 @@
                             "cc": 282
                         }
                     ],
+                    {}
+                ],
+                [
+                    1,
+                    "coolblue",
+                    0,
+                    "",
+                    10,
+                    [
+                        826
+                    ],
+                    [
+                        {
+                            "e": 827
+                        }
+                    ],
+                    [
+                        {
+                            "v": 828
+                        }
+                    ],
+                    [
+                        {
+                            "c": 829
+                        }
+                    ],
+                    [],
                     {}
                 ],
                 [
@@ -5362,6 +5803,39 @@
                 ],
                 [
                     1,
+                    "doordash-storefront",
+                    2,
+                    "",
+                    22,
+                    [
+                        653
+                    ],
+                    [
+                        {
+                            "e": 653
+                        }
+                    ],
+                    [
+                        {
+                            "v": 653
+                        }
+                    ],
+                    [
+                        {
+                            "retry": 15,
+                            "retryInterval": 300,
+                            "c": 796
+                        }
+                    ],
+                    [
+                        {
+                            "cc": 797
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
                     "dpgmedia-nl",
                     2,
                     "",
@@ -5497,6 +5971,33 @@
                 ],
                 [
                     1,
+                    "ecbeing",
+                    1,
+                    "",
+                    22,
+                    [
+                        812
+                    ],
+                    [
+                        {
+                            "e": 813
+                        }
+                    ],
+                    [
+                        {
+                            "v": 814
+                        }
+                    ],
+                    [
+                        {
+                            "h": 814
+                        }
+                    ],
+                    [],
+                    {}
+                ],
+                [
+                    1,
                     "elsevier-pure",
                     2,
                     "",
@@ -5626,6 +6127,73 @@
                         }
                     ],
                     [],
+                    {}
+                ],
+                [
+                    1,
+                    "epaas",
+                    2,
+                    "",
+                    22,
+                    [
+                        824
+                    ],
+                    [
+                        {
+                            "e": 824
+                        }
+                    ],
+                    [
+                        {
+                            "visible": [
+                                "epaas-consent-drawer-shell",
+                                "section.consentDrawer"
+                            ]
+                        }
+                    ],
+                    [
+                        {
+                            "if": {
+                                "exists": [
+                                    "epaas-consent-drawer-shell",
+                                    "button.reject-button"
+                                ]
+                            },
+                            "then": [
+                                {
+                                    "waitForThenClick": [
+                                        "epaas-consent-drawer-shell",
+                                        "button.reject-button"
+                                    ]
+                                }
+                            ],
+                            "else": [
+                                {
+                                    "waitForThenClick": [
+                                        "epaas-consent-drawer-shell",
+                                        "button.personalize-button"
+                                    ]
+                                },
+                                {
+                                    "waitFor": [
+                                        "epaas-consent-drawer-shell",
+                                        "epaas-policy-page-shell"
+                                    ]
+                                },
+                                {
+                                    "waitForThenClick": [
+                                        "epaas-consent-drawer-shell",
+                                        "button.save-button"
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    [
+                        {
+                            "cc": 825
+                        }
+                    ],
                     {}
                 ],
                 [
@@ -5839,6 +6407,50 @@
                     [
                         {
                             "cc": 392
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
+                    "fever",
+                    2,
+                    "",
+                    22,
+                    [
+                        788
+                    ],
+                    [
+                        {
+                            "e": 789
+                        }
+                    ],
+                    [
+                        {
+                            "v": 788
+                        }
+                    ],
+                    [
+                        {
+                            "c": 789
+                        },
+                        {
+                            "if": {
+                                "e": 790
+                            },
+                            "then": [
+                                {
+                                    "k": 791
+                                }
+                            ]
+                        },
+                        {
+                            "c": 792
+                        }
+                    ],
+                    [
+                        {
+                            "cc": 793
                         }
                     ],
                     {}
@@ -6080,6 +6692,33 @@
                             "eval": "EVAL_GDPR_LEGAL_COOKIE_TEST"
                         }
                     ],
+                    {}
+                ],
+                [
+                    1,
+                    "gemini.google.com",
+                    2,
+                    "",
+                    22,
+                    [
+                        654
+                    ],
+                    [
+                        {
+                            "e": 655
+                        }
+                    ],
+                    [
+                        {
+                            "v": 654
+                        }
+                    ],
+                    [
+                        {
+                            "c": 803
+                        }
+                    ],
+                    [],
                     {}
                 ],
                 [
@@ -6409,16 +7048,16 @@
                     "",
                     22,
                     [
-                        459
+                        801
                     ],
                     [
                         {
-                            "e": 459
+                            "e": 802
                         }
                     ],
                     [
                         {
-                            "v": 459
+                            "v": 801
                         }
                     ],
                     [
@@ -6753,7 +7392,8 @@
                             "c": 503
                         },
                         {
-                            "c": 504
+                            "all": true,
+                            "c": 804
                         },
                         {
                             "all": true,
@@ -6946,6 +7586,40 @@
                     {
                         "intermediate": false
                     }
+                ],
+                [
+                    1,
+                    "krown-cookie-banner",
+                    0,
+                    "",
+                    22,
+                    [
+                        794
+                    ],
+                    [
+                        {
+                            "e": 795
+                        }
+                    ],
+                    [
+                        {
+                            "v": 795
+                        }
+                    ],
+                    [
+                        {
+                            "c": 795
+                        }
+                    ],
+                    [
+                        {
+                            "wait": 500
+                        },
+                        {
+                            "eval": "EVAL_KROWN_COOKIE_BANNER_TEST"
+                        }
+                    ],
+                    {}
                 ],
                 [
                     1,
@@ -7152,6 +7826,69 @@
                         }
                     ],
                     [],
+                    {}
+                ],
+                [
+                    1,
+                    "mensaje-cookies",
+                    2,
+                    "",
+                    22,
+                    [
+                        830,
+                        831
+                    ],
+                    [
+                        {
+                            "e": 832
+                        },
+                        {
+                            "any": [
+                                {
+                                    "e": 833
+                                },
+                                {
+                                    "e": 834
+                                }
+                            ]
+                        }
+                    ],
+                    [
+                        {
+                            "v": 835
+                        }
+                    ],
+                    [
+                        {
+                            "if": {
+                                "e": 833
+                            },
+                            "then": [
+                                {
+                                    "c": 833
+                                }
+                            ],
+                            "else": [
+                                {
+                                    "c": 836
+                                },
+                                {
+                                    "c": 834
+                                }
+                            ]
+                        },
+                        {
+                            "check": "none",
+                            "timeout": 3000,
+                            "wv": 835
+                        }
+                    ],
+                    [
+                        {
+                            "check": "none",
+                            "v": 835
+                        }
+                    ],
                     {}
                 ],
                 [
@@ -7608,16 +8345,16 @@
                     "",
                     22,
                     [
-                        649
+                        798
                     ],
                     [
                         {
-                            "e": 650
+                            "e": 799
                         }
                     ],
                     [
                         {
-                            "v": 650
+                            "v": 799
                         }
                     ],
                     [
@@ -7632,32 +8369,19 @@
                             ],
                             "else": [
                                 {
-                                    "if": {
-                                        "e": 652
-                                    },
-                                    "then": [
-                                        {
-                                            "k": 652
-                                        }
-                                    ],
-                                    "else": [
-                                        {
-                                            "wv": 653
-                                        },
-                                        {
-                                            "all": true,
-                                            "optional": true,
-                                            "k": 654
-                                        },
-                                        {
-                                            "k": 655
-                                        }
-                                    ]
+                                    "k": 652
                                 }
                             ]
                         }
                     ],
-                    [],
+                    [
+                        {
+                            "wait": 1000
+                        },
+                        {
+                            "cc": 807
+                        }
+                    ],
                     {}
                 ],
                 [
@@ -8071,6 +8795,39 @@
                 ],
                 [
                     1,
+                    "r42-cookiebar",
+                    0,
+                    "",
+                    10,
+                    [
+                        823
+                    ],
+                    [
+                        {
+                            "e": 800
+                        }
+                    ],
+                    [
+                        {
+                            "v": 805
+                        }
+                    ],
+                    [
+                        {
+                            "c": 800
+                        }
+                    ],
+                    [
+                        {
+                            "timeout": 1000,
+                            "check": "none",
+                            "wv": 800
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
                     "real-cookie-banner",
                     0,
                     "",
@@ -8456,6 +9213,58 @@
                         },
                         {
                             "eval": "EVAL_STEAMPOWERED_0"
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
+                    "stright",
+                    2,
+                    "",
+                    22,
+                    [
+                        815,
+                        816
+                    ],
+                    [
+                        {
+                            "e": 815
+                        }
+                    ],
+                    [
+                        {
+                            "v": 815
+                        }
+                    ],
+                    [
+                        {
+                            "if": {
+                                "v": 817
+                            },
+                            "then": [
+                                {
+                                    "c": 817
+                                }
+                            ],
+                            "else": [
+                                {
+                                    "c": 818
+                                },
+                                {
+                                    "c": 819
+                                }
+                            ]
+                        },
+                        {
+                            "check": "none",
+                            "wv": 815
+                        }
+                    ],
+                    [
+                        {
+                            "check": "none",
+                            "v": 815
                         }
                     ],
                     {}
@@ -10054,6 +10863,43 @@
                 ],
                 [
                     1,
+                    "WPConsent",
+                    2,
+                    "",
+                    22,
+                    [
+                        820
+                    ],
+                    [
+                        {
+                            "e": 821
+                        }
+                    ],
+                    [
+                        {
+                            "visible": [
+                                "#wpconsent-container",
+                                "#wpconsent-banner-holder.wpconsent-banner-visible"
+                            ]
+                        }
+                    ],
+                    [
+                        {
+                            "waitForThenClick": [
+                                "#wpconsent-container",
+                                "#wpconsent-cancel-all"
+                            ]
+                        }
+                    ],
+                    [
+                        {
+                            "cc": 822
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
                     "xgroovy",
                     1,
                     "",
@@ -10127,7 +10973,7 @@
                                     "e": 678
                                 },
                                 {
-                                    "e": 771
+                                    "e": 806
                                 }
                             ]
                         }
@@ -10348,12 +11194,12 @@
                     [],
                     [
                         {
-                            "e": 774
+                            "e": 837
                         }
                     ],
                     [
                         {
-                            "v": 774
+                            "v": 837
                         }
                     ],
                     [
@@ -10361,14 +11207,14 @@
                             "wait": 500
                         },
                         {
-                            "c": 774
+                            "c": 837
                         }
                     ],
                     [
                         {
                             "timeout": 1000,
                             "check": "none",
-                            "wv": 774
+                            "wv": 837
                         }
                     ],
                     {}
@@ -10382,17 +11228,17 @@
                     [],
                     [
                         {
-                            "e": 775
+                            "e": 838
                         }
                     ],
                     [
                         {
-                            "v": 775
+                            "v": 838
                         }
                     ],
                     [
                         {
-                            "c": 775
+                            "c": 838
                         }
                     ],
                     [],
@@ -10407,12 +11253,12 @@
                     [],
                     [
                         {
-                            "e": 776
+                            "e": 839
                         }
                     ],
                     [
                         {
-                            "v": 776
+                            "v": 839
                         }
                     ],
                     [
@@ -10420,14 +11266,14 @@
                             "wait": 500
                         },
                         {
-                            "c": 776
+                            "c": 839
                         }
                     ],
                     [
                         {
                             "timeout": 1000,
                             "check": "none",
-                            "wv": 776
+                            "wv": 839
                         }
                     ],
                     {}
@@ -10441,12 +11287,12 @@
                     [],
                     [
                         {
-                            "e": 777
+                            "e": 840
                         }
                     ],
                     [
                         {
-                            "v": 777
+                            "v": 840
                         }
                     ],
                     [
@@ -10454,14 +11300,14 @@
                             "wait": 500
                         },
                         {
-                            "c": 777
+                            "c": 840
                         }
                     ],
                     [
                         {
                             "timeout": 1000,
                             "check": "none",
-                            "wv": 777
+                            "wv": 840
                         }
                     ],
                     {}
@@ -10475,12 +11321,12 @@
                     [],
                     [
                         {
-                            "e": 778
+                            "e": 841
                         }
                     ],
                     [
                         {
-                            "v": 778
+                            "v": 841
                         }
                     ],
                     [
@@ -10488,14 +11334,14 @@
                             "wait": 500
                         },
                         {
-                            "c": 778
+                            "c": 841
                         }
                     ],
                     [
                         {
                             "timeout": 1000,
                             "check": "none",
-                            "wv": 778
+                            "wv": 841
                         }
                     ],
                     {}
@@ -10509,12 +11355,12 @@
                     [],
                     [
                         {
-                            "e": 779
+                            "e": 842
                         }
                     ],
                     [
                         {
-                            "v": 779
+                            "v": 842
                         }
                     ],
                     [
@@ -10522,14 +11368,14 @@
                             "wait": 500
                         },
                         {
-                            "c": 779
+                            "c": 842
                         }
                     ],
                     [
                         {
                             "timeout": 1000,
                             "check": "none",
-                            "wv": 779
+                            "wv": 842
                         }
                     ],
                     {}
@@ -10543,12 +11389,12 @@
                     [],
                     [
                         {
-                            "e": 780
+                            "e": 843
                         }
                     ],
                     [
                         {
-                            "v": 780
+                            "v": 843
                         }
                     ],
                     [
@@ -10556,14 +11402,14 @@
                             "wait": 500
                         },
                         {
-                            "c": 780
+                            "c": 843
                         }
                     ],
                     [
                         {
                             "timeout": 1000,
                             "check": "none",
-                            "wv": 780
+                            "wv": 843
                         }
                     ],
                     {}
@@ -10577,12 +11423,12 @@
                     [],
                     [
                         {
-                            "e": 781
+                            "e": 844
                         }
                     ],
                     [
                         {
-                            "v": 781
+                            "v": 844
                         }
                     ],
                     [
@@ -10590,14 +11436,14 @@
                             "wait": 500
                         },
                         {
-                            "c": 781
+                            "c": 844
                         }
                     ],
                     [
                         {
                             "timeout": 1000,
                             "check": "none",
-                            "wv": 781
+                            "wv": 844
                         }
                     ],
                     {}
@@ -10611,12 +11457,12 @@
                     [],
                     [
                         {
-                            "e": 782
+                            "e": 845
                         }
                     ],
                     [
                         {
-                            "v": 782
+                            "v": 845
                         }
                     ],
                     [
@@ -10624,14 +11470,14 @@
                             "wait": 500
                         },
                         {
-                            "c": 782
+                            "c": 845
                         }
                     ],
                     [
                         {
                             "timeout": 1000,
                             "check": "none",
-                            "wv": 782
+                            "wv": 845
                         }
                     ],
                     {}
@@ -10645,12 +11491,12 @@
                     [],
                     [
                         {
-                            "e": 783
+                            "e": 846
                         }
                     ],
                     [
                         {
-                            "v": 783
+                            "v": 846
                         }
                     ],
                     [
@@ -10658,14 +11504,14 @@
                             "wait": 500
                         },
                         {
-                            "c": 783
+                            "c": 846
                         }
                     ],
                     [
                         {
                             "timeout": 1000,
                             "check": "none",
-                            "wv": 783
+                            "wv": 846
                         }
                     ],
                     {}
@@ -10679,12 +11525,12 @@
                     [],
                     [
                         {
-                            "e": 784
+                            "e": 847
                         }
                     ],
                     [
                         {
-                            "v": 784
+                            "v": 847
                         }
                     ],
                     [
@@ -10692,14 +11538,14 @@
                             "wait": 500
                         },
                         {
-                            "c": 784
+                            "c": 847
                         }
                     ],
                     [
                         {
                             "timeout": 1000,
                             "check": "none",
-                            "wv": 784
+                            "wv": 847
                         }
                     ],
                     {}
@@ -10713,12 +11559,12 @@
                     [],
                     [
                         {
-                            "e": 785
+                            "e": 848
                         }
                     ],
                     [
                         {
-                            "v": 785
+                            "v": 848
                         }
                     ],
                     [
@@ -10726,14 +11572,14 @@
                             "wait": 500
                         },
                         {
-                            "c": 785
+                            "c": 848
                         }
                     ],
                     [
                         {
                             "timeout": 1000,
                             "check": "none",
-                            "wv": 785
+                            "wv": 848
                         }
                     ],
                     {}
@@ -10747,12 +11593,12 @@
                     [],
                     [
                         {
-                            "e": 786
+                            "e": 849
                         }
                     ],
                     [
                         {
-                            "v": 786
+                            "v": 849
                         }
                     ],
                     [
@@ -10760,14 +11606,14 @@
                             "wait": 500
                         },
                         {
-                            "c": 786
+                            "c": 849
                         }
                     ],
                     [
                         {
                             "timeout": 1000,
                             "check": "none",
-                            "wv": 786
+                            "wv": 849
                         }
                     ],
                     {}
@@ -10781,12 +11627,12 @@
                     [],
                     [
                         {
-                            "e": 787
+                            "e": 850
                         }
                     ],
                     [
                         {
-                            "v": 787
+                            "v": 850
                         }
                     ],
                     [
@@ -10794,14 +11640,14 @@
                             "wait": 500
                         },
                         {
-                            "c": 787
+                            "c": 850
                         }
                     ],
                     [
                         {
                             "timeout": 1000,
                             "check": "none",
-                            "wv": 787
+                            "wv": 850
                         }
                     ],
                     {}
@@ -10815,12 +11661,12 @@
                     [],
                     [
                         {
-                            "e": 787
+                            "e": 850
                         }
                     ],
                     [
                         {
-                            "v": 787
+                            "v": 850
                         }
                     ],
                     [
@@ -10828,14 +11674,14 @@
                             "wait": 500
                         },
                         {
-                            "c": 787
+                            "c": 850
                         }
                     ],
                     [
                         {
                             "timeout": 1000,
                             "check": "none",
-                            "wv": 787
+                            "wv": 850
                         }
                     ],
                     {}
@@ -10849,17 +11695,17 @@
                     [],
                     [
                         {
-                            "e": 788
+                            "e": 851
                         }
                     ],
                     [
                         {
-                            "v": 788
+                            "v": 851
                         }
                     ],
                     [
                         {
-                            "c": 788
+                            "c": 851
                         }
                     ],
                     [],
@@ -10874,17 +11720,17 @@
                     [],
                     [
                         {
-                            "e": 789
+                            "e": 852
                         }
                     ],
                     [
                         {
-                            "v": 789
+                            "v": 852
                         }
                     ],
                     [
                         {
-                            "c": 789
+                            "c": 852
                         }
                     ],
                     [],
@@ -10899,12 +11745,12 @@
                     [],
                     [
                         {
-                            "e": 790
+                            "e": 853
                         }
                     ],
                     [
                         {
-                            "v": 790
+                            "v": 853
                         }
                     ],
                     [
@@ -10912,14 +11758,14 @@
                             "wait": 500
                         },
                         {
-                            "c": 790
+                            "c": 853
                         }
                     ],
                     [
                         {
                             "timeout": 1000,
                             "check": "none",
-                            "wv": 790
+                            "wv": 853
                         }
                     ],
                     {}
@@ -10933,12 +11779,12 @@
                     [],
                     [
                         {
-                            "e": 787
+                            "e": 850
                         }
                     ],
                     [
                         {
-                            "v": 787
+                            "v": 850
                         }
                     ],
                     [
@@ -10946,14 +11792,14 @@
                             "wait": 500
                         },
                         {
-                            "c": 787
+                            "c": 850
                         }
                     ],
                     [
                         {
                             "timeout": 1000,
                             "check": "none",
-                            "wv": 787
+                            "wv": 850
                         }
                     ],
                     {}
@@ -10967,12 +11813,12 @@
                     [],
                     [
                         {
-                            "e": 791
+                            "e": 854
                         }
                     ],
                     [
                         {
-                            "v": 791
+                            "v": 854
                         }
                     ],
                     [
@@ -10980,14 +11826,14 @@
                             "wait": 500
                         },
                         {
-                            "c": 791
+                            "c": 854
                         }
                     ],
                     [
                         {
                             "timeout": 1000,
                             "check": "none",
-                            "wv": 791
+                            "wv": 854
                         }
                     ],
                     {}
@@ -11001,12 +11847,12 @@
                     [],
                     [
                         {
-                            "e": 792
+                            "e": 855
                         }
                     ],
                     [
                         {
-                            "v": 792
+                            "v": 855
                         }
                     ],
                     [
@@ -11014,14 +11860,14 @@
                             "wait": 500
                         },
                         {
-                            "c": 792
+                            "c": 855
                         }
                     ],
                     [
                         {
                             "timeout": 1000,
                             "check": "none",
-                            "wv": 792
+                            "wv": 855
                         }
                     ],
                     {}
@@ -11035,18 +11881,18 @@
                     [],
                     [
                         {
-                            "e": 793
+                            "e": 856
                         }
                     ],
                     [
                         {
-                            "v": 793
+                            "v": 856
                         }
                     ],
                     [
                         {
                             "text": "Decline",
-                            "c": 793
+                            "c": 856
                         }
                     ],
                     [],
@@ -11061,25 +11907,25 @@
                     [],
                     [
                         {
-                            "e": 794
+                            "e": 857
                         }
                     ],
                     [
                         {
-                            "v": 794
+                            "v": 857
                         }
                     ],
                     [
                         {
-                            "k": 795
+                            "k": 858
                         },
                         {
                             "all": true,
                             "optional": true,
-                            "k": 796
+                            "k": 859
                         },
                         {
-                            "k": 797
+                            "k": 860
                         }
                     ],
                     [
@@ -11098,47 +11944,47 @@
                     "^https://plus\\.gmx\\.com/lt(?:[?#]|$)",
                     1,
                     [
-                        798
+                        861
                     ],
                     [
                         {
-                            "e": 798
+                            "e": 861
                         }
                     ],
                     [
                         {
-                            "v": 799
+                            "v": 862
                         }
                     ],
                     [
                         {
                             "if": {
-                                "e": 800
+                                "e": 863
                             },
                             "then": [
                                 {
-                                    "c": 800
+                                    "c": 863
                                 }
                             ],
                             "else": [
                                 {
                                     "if": {
-                                        "e": 801
+                                        "e": 864
                                     },
                                     "then": [
                                         {
-                                            "c": 801
+                                            "c": 864
                                         },
                                         {
-                                            "wv": 802
+                                            "wv": 865
                                         },
                                         {
-                                            "c": 802
+                                            "c": 865
                                         }
                                     ],
                                     "else": [
                                         {
-                                            "c": 802
+                                            "c": 865
                                         }
                                     ]
                                 }
@@ -11147,7 +11993,7 @@
                     ],
                     [
                         {
-                            "cc": 803
+                            "cc": 866
                         }
                     ],
                     {}
@@ -11159,49 +12005,49 @@
                     "^https://cmp-consent-tool\\.privacymanager\\.io/",
                     1,
                     [
-                        804,
-                        805
+                        867,
+                        868
                     ],
                     [
                         {
-                            "e": 806
+                            "e": 869
                         }
                     ],
                     [
                         {
-                            "v": 806
+                            "v": 869
                         }
                     ],
                     [
                         {
                             "if": {
-                                "e": 807
+                                "e": 870
                             },
                             "then": [
                                 {
-                                    "k": 807
+                                    "k": 870
                                 },
                                 {
-                                    "c": 808
+                                    "c": 871
                                 }
                             ],
                             "else": [
                                 {
-                                    "c": 809
+                                    "c": 872
                                 },
                                 {
-                                    "w": 810
+                                    "w": 873
                                 },
                                 {
-                                    "w": 811
+                                    "w": 874
                                 },
                                 {
                                     "all": true,
                                     "optional": true,
-                                    "k": 812
+                                    "k": 875
                                 },
                                 {
-                                    "k": 811
+                                    "k": 874
                                 }
                             ]
                         }
@@ -11218,20 +12064,20 @@
                     [],
                     [
                         {
-                            "e": 813
+                            "e": 876
                         },
                         {
-                            "e": 814
+                            "e": 877
                         }
                     ],
                     [
                         {
-                            "v": 814
+                            "v": 877
                         }
                     ],
                     [
                         {
-                            "c": 814
+                            "c": 877
                         }
                     ],
                     [],
@@ -11347,7 +12193,7 @@
                     ],
                     [
                         {
-                            "e": 835
+                            "e": 1539
                         }
                     ],
                     [
@@ -11530,6 +12376,37 @@
                         }
                     ],
                     [],
+                    {}
+                ],
+                [
+                    1,
+                    "amazon-pay",
+                    2,
+                    "^https?://pay\\.amazon\\.",
+                    22,
+                    [
+                        1624
+                    ],
+                    [
+                        {
+                            "e": 1625
+                        }
+                    ],
+                    [
+                        {
+                            "v": 1624
+                        }
+                    ],
+                    [
+                        {
+                            "k": 1625
+                        }
+                    ],
+                    [
+                        {
+                            "cc": 1626
+                        }
+                    ],
                     {}
                 ],
                 [
@@ -12667,40 +13544,6 @@
                 ],
                 [
                     1,
-                    "auto_CA_algonquincollege.com_o8v",
-                    0,
-                    "^https?://(www\\.)?algonquincollege\\.com/",
-                    10,
-                    [],
-                    [
-                        {
-                            "e": 1514
-                        }
-                    ],
-                    [
-                        {
-                            "v": 1514
-                        }
-                    ],
-                    [
-                        {
-                            "wait": 500
-                        },
-                        {
-                            "c": 1514
-                        }
-                    ],
-                    [
-                        {
-                            "timeout": 1000,
-                            "check": "none",
-                            "wv": 1514
-                        }
-                    ],
-                    {}
-                ],
-                [
-                    1,
                     "auto_CA_arte.tv_7nv",
                     0,
                     "^https?://(www\\.)?arte\\.tv/",
@@ -13302,12 +14145,12 @@
                     [],
                     [
                         {
-                            "e": 818
+                            "e": 1540
                         }
                     ],
                     [
                         {
-                            "v": 818
+                            "v": 1540
                         }
                     ],
                     [
@@ -13315,14 +14158,14 @@
                             "wait": 500
                         },
                         {
-                            "c": 818
+                            "c": 1540
                         }
                     ],
                     [
                         {
                             "timeout": 1000,
                             "check": "none",
-                            "wv": 818
+                            "wv": 1540
                         }
                     ],
                     {}
@@ -13336,12 +14179,12 @@
                     [],
                     [
                         {
-                            "e": 819
+                            "e": 1541
                         }
                     ],
                     [
                         {
-                            "v": 819
+                            "v": 1541
                         }
                     ],
                     [
@@ -13349,14 +14192,14 @@
                             "wait": 500
                         },
                         {
-                            "c": 819
+                            "c": 1541
                         }
                     ],
                     [
                         {
                             "timeout": 1000,
                             "check": "none",
-                            "wv": 819
+                            "wv": 1541
                         }
                     ],
                     {}
@@ -13370,12 +14213,12 @@
                     [],
                     [
                         {
-                            "e": 862
+                            "e": 1627
                         }
                     ],
                     [
                         {
-                            "v": 862
+                            "v": 1627
                         }
                     ],
                     [
@@ -13383,14 +14226,14 @@
                             "wait": 500
                         },
                         {
-                            "c": 862
+                            "c": 1627
                         }
                     ],
                     [
                         {
                             "timeout": 1000,
                             "check": "none",
-                            "wv": 862
+                            "wv": 1627
                         }
                     ],
                     {}
@@ -13404,12 +14247,12 @@
                     [],
                     [
                         {
-                            "e": 875
+                            "e": 1663
                         }
                     ],
                     [
                         {
-                            "v": 875
+                            "v": 1663
                         }
                     ],
                     [
@@ -13417,14 +14260,14 @@
                             "wait": 500
                         },
                         {
-                            "c": 875
+                            "c": 1663
                         }
                     ],
                     [
                         {
                             "timeout": 1000,
                             "check": "none",
-                            "wv": 875
+                            "wv": 1663
                         }
                     ],
                     {}
@@ -14538,40 +15381,6 @@
                             "timeout": 1000,
                             "check": "none",
                             "wv": 1000
-                        }
-                    ],
-                    {}
-                ],
-                [
-                    1,
-                    "auto_CH_coolblue.de_egw",
-                    0,
-                    "^https?://(www\\.)?coolblue\\.de/",
-                    10,
-                    [],
-                    [
-                        {
-                            "e": 1001
-                        }
-                    ],
-                    [
-                        {
-                            "v": 1001
-                        }
-                    ],
-                    [
-                        {
-                            "wait": 500
-                        },
-                        {
-                            "c": 1001
-                        }
-                    ],
-                    [
-                        {
-                            "timeout": 1000,
-                            "check": "none",
-                            "wv": 1001
                         }
                     ],
                     {}
@@ -22485,40 +23294,6 @@
                 ],
                 [
                     1,
-                    "auto_NL_averoachmea.nl_fxj_+1",
-                    0,
-                    "^https?://(www\\.)?averoachmea\\.nl/|^https?://(www\\.)?centraalbeheer\\.nl/",
-                    10,
-                    [],
-                    [
-                        {
-                            "e": 1232
-                        }
-                    ],
-                    [
-                        {
-                            "v": 1232
-                        }
-                    ],
-                    [
-                        {
-                            "wait": 500
-                        },
-                        {
-                            "c": 1232
-                        }
-                    ],
-                    [
-                        {
-                            "timeout": 1000,
-                            "check": "none",
-                            "wv": 1232
-                        }
-                    ],
-                    {}
-                ],
-                [
-                    1,
                     "auto_NL_beekman.nl_f9e",
                     0,
                     "^https?://(www\\.)?beekman\\.nl/",
@@ -26417,33 +27192,97 @@
                 ],
                 [
                     1,
+                    "bankmillennium.pl",
+                    2,
+                    "^https?://(www\\.)?bankmillennium\\.pl/",
+                    22,
+                    [
+                        1232
+                    ],
+                    [
+                        {
+                            "e": 1232
+                        }
+                    ],
+                    [
+                        {
+                            "v": 1232
+                        }
+                    ],
+                    [
+                        {
+                            "waitForThenClick": [
+                                "#cookie_modal_placeholder dialog.bm-modal--cookie",
+                                "xpath///button[contains(normalize-space(.), 'Odrzu')]"
+                            ]
+                        }
+                    ],
+                    [
+                        {
+                            "cc": 1645
+                        },
+                        {
+                            "cc": 1646
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
                     "bbc.com",
                     2,
                     "^https://(www\\.)?bbc\\.(com|co\\.uk)",
                     22,
                     [
-                        820
+                        1542
                     ],
                     [
                         {
-                            "e": 821
+                            "e": 1543
                         }
                     ],
                     [
                         {
-                            "v": 821
+                            "v": 1543
                         }
                     ],
                     [
                         {
-                            "c": 822
+                            "c": 1544
                         }
                     ],
                     [
                         {
-                            "cc": 823
+                            "cc": 1545
                         }
                     ],
+                    {}
+                ],
+                [
+                    1,
+                    "bibliotheek-nl",
+                    0,
+                    "^https?://(?:www\\.)?(?:onlinebibliotheek|bibliotheek)\\.nl/",
+                    10,
+                    [
+                        1647
+                    ],
+                    [
+                        {
+                            "e": 1648
+                        }
+                    ],
+                    [
+                        {
+                            "v": 1647
+                        }
+                    ],
+                    [
+                        {
+                            "c": 1649
+                        }
+                    ],
+                    [],
                     {}
                 ],
                 [
@@ -26453,24 +27292,24 @@
                     "^https://www\\.canyon\\.com/",
                     22,
                     [
-                        824
+                        1546
                     ],
                     [
                         {
-                            "e": 824
+                            "e": 1546
                         }
                     ],
                     [
                         {
-                            "v": 824
+                            "v": 1546
                         }
                     ],
                     [
                         {
-                            "k": 825
+                            "k": 1547
                         },
                         {
-                            "c": 826
+                            "c": 1548
                         }
                     ],
                     [],
@@ -26498,6 +27337,61 @@
                     [
                         {
                             "c": 1516
+                        }
+                    ],
+                    [],
+                    {}
+                ],
+                [
+                    1,
+                    "ccm-net",
+                    1,
+                    "^https?://([\\w-]+\\.)?ccm\\.net/",
+                    22,
+                    [
+                        774,
+                        1657
+                    ],
+                    [
+                        {
+                            "any": [
+                                {
+                                    "e": 775
+                                },
+                                {
+                                    "e": 1657
+                                }
+                            ]
+                        }
+                    ],
+                    [
+                        {
+                            "any": [
+                                {
+                                    "v": 774
+                                },
+                                {
+                                    "v": 1657
+                                }
+                            ]
+                        }
+                    ],
+                    [
+                        {
+                            "h": 1657
+                        },
+                        {
+                            "if": {
+                                "v": 774
+                            },
+                            "then": [
+                                {
+                                    "waitForThenClick": [
+                                        "iframe[srcdoc*='frame-root']",
+                                        ".button__skip"
+                                    ]
+                                }
+                            ]
                         }
                     ],
                     [],
@@ -26538,12 +27432,14 @@
                     1,
                     "chatgpt",
                     0,
-                    "^https://(www\\.)?chatgpt\\.com/",
+                    "^https?://(\\w+\\.)?chatgpt\\.com/",
                     10,
-                    [],
+                    [
+                        1372
+                    ],
                     [
                         {
-                            "e": 1372
+                            "e": 1598
                         }
                     ],
                     [
@@ -26553,17 +27449,14 @@
                     ],
                     [
                         {
-                            "wait": 500
-                        },
-                        {
-                            "c": 1372
+                            "c": 1599
                         }
                     ],
                     [
                         {
                             "timeout": 1000,
                             "check": "none",
-                            "wv": 1372
+                            "wv": 1600
                         }
                     ],
                     {}
@@ -26575,21 +27468,21 @@
                     "^https://(www\\.)?clustrmaps\\.com/",
                     22,
                     [
-                        827
+                        1549
                     ],
                     [
                         {
-                            "e": 827
+                            "e": 1549
                         }
                     ],
                     [
                         {
-                            "v": 827
+                            "v": 1549
                         }
                     ],
                     [
                         {
-                            "h": 827
+                            "h": 1549
                         }
                     ],
                     [],
@@ -26633,24 +27526,55 @@
                     "^https://(www\\.|)?csu-landtag\\.de",
                     22,
                     [
-                        828
+                        1550
                     ],
                     [
                         {
-                            "e": 828
+                            "e": 1550
                         }
                     ],
                     [
                         {
-                            "v": 828
+                            "v": 1550
                         }
                     ],
                     [
                         {
-                            "k": 829
+                            "k": 1551
                         }
                     ],
                     [],
+                    {}
+                ],
+                [
+                    1,
+                    "ctv-disneyonice",
+                    2,
+                    "^https://www\\.ctv\\.co\\.jp/disneyonice(?:/|[?#]|$)",
+                    22,
+                    [
+                        1552
+                    ],
+                    [
+                        {
+                            "e": 1553
+                        }
+                    ],
+                    [
+                        {
+                            "v": 1553
+                        }
+                    ],
+                    [
+                        {
+                            "c": 1554
+                        }
+                    ],
+                    [
+                        {
+                            "cc": 1555
+                        }
+                    ],
                     {}
                 ],
                 [
@@ -26660,26 +27584,61 @@
                     "^https://(www\\.)?dailymotion\\.com/",
                     22,
                     [
-                        830
+                        1556
                     ],
                     [
                         {
-                            "e": 831
+                            "e": 1557
                         }
                     ],
                     [
                         {
-                            "v": 832
+                            "v": 1558
                         }
                     ],
                     [
                         {
-                            "c": 833
+                            "c": 1559
                         }
                     ],
                     [
                         {
-                            "cc": 834
+                            "cc": 1560
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
+                    "deliveroo",
+                    2,
+                    "^https?://(\\w+\\.)?deliveroo\\.(co\\.uk|\\w+)/",
+                    22,
+                    [
+                        1628
+                    ],
+                    [
+                        {
+                            "e": 1628
+                        }
+                    ],
+                    [
+                        {
+                            "v": 1628
+                        }
+                    ],
+                    [
+                        {
+                            "c": 1629
+                        },
+                        {
+                            "check": "none",
+                            "wv": 1628
+                        }
+                    ],
+                    [
+                        {
+                            "cc": 1502
                         }
                     ],
                     {}
@@ -26691,21 +27650,21 @@
                     "^https://www\\.delta\\.com/",
                     22,
                     [
-                        841
+                        1561
                     ],
                     [
                         {
-                            "e": 842
+                            "e": 1601
                         }
                     ],
                     [
                         {
-                            "v": 842
+                            "v": 1601
                         }
                     ],
                     [
                         {
-                            "h": 842
+                            "h": 1601
                         }
                     ],
                     [],
@@ -26718,34 +27677,34 @@
                     "^https://(www\\.)?depop\\.com/",
                     22,
                     [
-                        843
+                        1602
                     ],
                     [
                         {
-                            "e": 844
+                            "e": 889
                         }
                     ],
                     [
                         {
-                            "v": 844
+                            "v": 889
                         }
                     ],
                     [
                         {
-                            "c": 845
+                            "c": 890
                         },
                         {
                             "all": true,
                             "optional": true,
-                            "k": 846
+                            "k": 891
                         },
                         {
-                            "c": 847
+                            "c": 894
                         }
                     ],
                     [
                         {
-                            "cc": 848
+                            "cc": 1603
                         }
                     ],
                     {}
@@ -26757,26 +27716,26 @@
                     "^https://(\\w+\\.)+dji\\.com/",
                     22,
                     [
-                        853
+                        1630
                     ],
                     [
                         {
-                            "e": 854
+                            "e": 1631
                         }
                     ],
                     [
                         {
-                            "e": 853
+                            "e": 1630
                         }
                     ],
                     [
                         {
-                            "c": 855
+                            "c": 1632
                         }
                     ],
                     [
                         {
-                            "cc": 856
+                            "cc": 1633
                         }
                     ],
                     {}
@@ -26788,26 +27747,26 @@
                     "^https://(www\\.)?dndbeyond\\.com/",
                     22,
                     [
-                        857
+                        1634
                     ],
                     [
                         {
-                            "e": 857
+                            "e": 1634
                         }
                     ],
                     [
                         {
-                            "v": 857
+                            "v": 1634
                         }
                     ],
                     [
                         {
-                            "c": 858
+                            "c": 1635
                         }
                     ],
                     [
                         {
-                            "cc": 859
+                            "cc": 1636
                         }
                     ],
                     {}
@@ -26819,21 +27778,38 @@
                     "^https://(www\\.)?ebay\\.([.a-z]+)/",
                     10,
                     [
-                        860
+                        1637
                     ],
                     [
                         {
-                            "e": 860
+                            "e": 1637
                         }
                     ],
                     [
                         {
-                            "v": 860
+                            "v": 1637
                         }
                     ],
                     [
                         {
-                            "c": 861
+                            "c": 1638
+                        },
+                        {
+                            "check": "none",
+                            "timeout": 2000,
+                            "optional": true,
+                            "wv": 1637
+                        },
+                        {
+                            "if": {
+                                "v": 1637
+                            },
+                            "then": [
+                                {
+                                    "timeout": 2000,
+                                    "c": 1638
+                                }
+                            ]
                         }
                     ],
                     [],
@@ -26846,21 +27822,21 @@
                     "^https://www\\.ecosia\\.org/",
                     22,
                     [
-                        863
+                        1639
                     ],
                     [
                         {
-                            "e": 864
+                            "e": 1650
                         }
                     ],
                     [
                         {
-                            "v": 864
+                            "v": 1650
                         }
                     ],
                     [
                         {
-                            "c": 869
+                            "c": 1656
                         }
                     ],
                     [],
@@ -26904,21 +27880,21 @@
                     "^https://(www\\.)?eforms\\.com",
                     22,
                     [
-                        870
+                        1658
                     ],
                     [
                         {
-                            "e": 870
+                            "e": 1658
                         }
                     ],
                     [
                         {
-                            "v": 870
+                            "v": 1658
                         }
                     ],
                     [
                         {
-                            "c": 871
+                            "c": 1664
                         }
                     ],
                     [],
@@ -26990,21 +27966,21 @@
                     "^https://espace-personnel\\.agirc-arrco\\.fr/",
                     22,
                     [
-                        872
+                        1665
                     ],
                     [
                         {
-                            "e": 873
+                            "e": 1666
                         }
                     ],
                     [
                         {
-                            "v": 873
+                            "v": 1666
                         }
                     ],
                     [
                         {
-                            "c": 874
+                            "c": 1667
                         }
                     ],
                     [],
@@ -27346,6 +28322,37 @@
                 ],
                 [
                     1,
+                    "ibanez",
+                    2,
+                    "^https?://www\\.ibanez\\.com/",
+                    22,
+                    [
+                        1562
+                    ],
+                    [
+                        {
+                            "e": 1563
+                        }
+                    ],
+                    [
+                        {
+                            "v": 1564
+                        }
+                    ],
+                    [
+                        {
+                            "c": 1563
+                        }
+                    ],
+                    [
+                        {
+                            "cc": 1565
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
                     "imdb",
                     0,
                     "^https://(www\\.)?(m\\.)?imdb.com/",
@@ -27532,6 +28539,60 @@
                         {
                             "check": "none",
                             "v": 1424
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
+                    "kingrecords-co-jp",
+                    2,
+                    "^https?://(?:[^/]+\\.)?kingrecords\\.co\\.jp/",
+                    22,
+                    [
+                        1604
+                    ],
+                    [
+                        {
+                            "e": 1605
+                        }
+                    ],
+                    [
+                        {
+                            "v": 1605
+                        }
+                    ],
+                    [
+                        {
+                            "timeout": 10000,
+                            "optional": true,
+                            "w": 1606
+                        },
+                        {
+                            "c": 1605
+                        },
+                        {
+                            "if": {
+                                "v": 1607
+                            },
+                            "then": [
+                                {
+                                    "wait": 1000
+                                },
+                                {
+                                    "k": 1605
+                                }
+                            ]
+                        },
+                        {
+                            "check": "none",
+                            "timeout": 5000,
+                            "wv": 1607
+                        }
+                    ],
+                    [
+                        {
+                            "cc": 1608
                         }
                     ],
                     {}
@@ -28137,6 +29198,46 @@
                 ],
                 [
                     1,
+                    "paypal-cookieprefs",
+                    2,
+                    "^https://www\\.paypal\\.com/myaccount/privacy/cookiePrefs\\?",
+                    22,
+                    [
+                        1659
+                    ],
+                    [
+                        {
+                            "e": 893
+                        }
+                    ],
+                    [
+                        {
+                            "v": 893
+                        }
+                    ],
+                    [
+                        {
+                            "all": true,
+                            "optional": true,
+                            "k": 1001
+                        },
+                        {
+                            "timeout": 15000,
+                            "c": 1660
+                        }
+                    ],
+                    [
+                        {
+                            "wait": 1000
+                        },
+                        {
+                            "cc": 807
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
                     "pinterest-business",
                     2,
                     "^https://[a-z]*\\.pinterest\\.com/",
@@ -28279,6 +29380,35 @@
                 ],
                 [
                     1,
+                    "pornpics.de",
+                    2,
+                    "^https?://(www\\.)?pornpics\\.(com|de)/",
+                    22,
+                    [],
+                    [
+                        {
+                            "e": 1566
+                        }
+                    ],
+                    [
+                        {
+                            "v": 1566
+                        }
+                    ],
+                    [
+                        {
+                            "c": 1567
+                        }
+                    ],
+                    [
+                        {
+                            "cc": 1568
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    2,
                     "postnl",
                     0,
                     "^https://([a-z]*\\.)?postnl\\.nl/",
@@ -28293,15 +29423,32 @@
                     ],
                     [
                         {
-                            "v": 993
+                            "visible": [
+                                "pnl-cookie-wall-widget",
+                                ".pnl-cookie-wall"
+                            ]
                         }
                     ],
                     [
                         {
                             "waitForThenClick": [
                                 "pnl-cookie-wall-widget",
-                                "button.pci-button--secondary"
+                                ".cookie-overview__footer button.stamp-button--variant-secondary:last-child"
                             ]
+                        },
+                        {
+                            "waitForVisible": [
+                                "pnl-cookie-wall-widget",
+                                ".pnl-cookie-wall"
+                            ],
+                            "check": "none",
+                            "timeout": 3000,
+                            "optional": true
+                        },
+                        {
+                            "setStyle": "",
+                            "selector": "body",
+                            "optional": true
                         }
                     ],
                     [
@@ -28635,6 +29782,37 @@
                 ],
                 [
                     1,
+                    "rule34-xxx",
+                    2,
+                    "^https?://(www\\.)?rule34\\.xxx/",
+                    22,
+                    [
+                        1609
+                    ],
+                    [
+                        {
+                            "e": 1609
+                        }
+                    ],
+                    [
+                        {
+                            "v": 1609
+                        }
+                    ],
+                    [
+                        {
+                            "c": 1610
+                        }
+                    ],
+                    [
+                        {
+                            "cc": 1611
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
                     "ryanair",
                     0,
                     "^https://(www\\.)?ryanair\\.com/",
@@ -28720,6 +29898,94 @@
                 ],
                 [
                     1,
+                    "scmp",
+                    2,
+                    "^https://(www\\.)?scmp\\.com/",
+                    22,
+                    [
+                        1569
+                    ],
+                    [
+                        {
+                            "e": 1570
+                        }
+                    ],
+                    [
+                        {
+                            "v": 1570
+                        }
+                    ],
+                    [
+                        {
+                            "timeout": 4000,
+                            "optional": true,
+                            "wv": 1571
+                        },
+                        {
+                            "if": {
+                                "v": 1571
+                            },
+                            "then": [
+                                {
+                                    "k": 406
+                                },
+                                {
+                                    "all": true,
+                                    "optional": true,
+                                    "k": 407
+                                },
+                                {
+                                    "optional": true,
+                                    "k": 408
+                                }
+                            ]
+                        },
+                        {
+                            "h": 1569
+                        }
+                    ],
+                    [],
+                    {}
+                ],
+                [
+                    1,
+                    "sex.com",
+                    2,
+                    "^https?://(\\w+\\.)?sex\\.com/",
+                    22,
+                    [
+                        1612
+                    ],
+                    [
+                        {
+                            "e": 1613
+                        }
+                    ],
+                    [
+                        {
+                            "v": 1614
+                        }
+                    ],
+                    [
+                        {
+                            "w": 1615
+                        },
+                        {
+                            "c": 1616
+                        },
+                        {
+                            "c": 1617
+                        }
+                    ],
+                    [
+                        {
+                            "cc": 1618
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
                     "shein.com",
                     2,
                     "^https?://([a-z]+\\.)?shein\\.com/",
@@ -28749,6 +30015,36 @@
                             "wv": 1406
                         }
                     ],
+                    {}
+                ],
+                [
+                    1,
+                    "simplehuman-com",
+                    2,
+                    "^https?://(www\\.)?simplehuman\\.com/",
+                    10,
+                    [
+                        1572
+                    ],
+                    [
+                        {
+                            "e": 1573
+                        }
+                    ],
+                    [
+                        {
+                            "v": 1574
+                        }
+                    ],
+                    [
+                        {
+                            "c": 1573
+                        },
+                        {
+                            "c": 1575
+                        }
+                    ],
+                    [],
                     {}
                 ],
                 [
@@ -28892,21 +30188,21 @@
                     "^https://www\\.svt\\.se/",
                     22,
                     [
-                        849
+                        1640
                     ],
                     [
                         {
-                            "e": 849
+                            "e": 1640
                         }
                     ],
                     [
                         {
-                            "v": 850
+                            "v": 1641
                         }
                     ],
                     [
                         {
-                            "c": 851
+                            "c": 1642
                         }
                     ],
                     [
@@ -28925,27 +30221,27 @@
                     [],
                     [
                         {
-                            "e": 815
+                            "e": 1576
                         }
                     ],
                     [
                         {
-                            "v": 815
+                            "v": 1576
                         }
                     ],
                     [
                         {
                             "if": {
-                                "e": 816
+                                "e": 1577
                             },
                             "then": [
                                 {
-                                    "c": 816
+                                    "c": 1577
                                 }
                             ],
                             "else": [
                                 {
-                                    "c": 817
+                                    "c": 1578
                                 }
                             ]
                         }
@@ -28960,16 +30256,16 @@
                     "^https://(www\\.)?tesco\\.com/",
                     22,
                     [
-                        836
+                        1579
                     ],
                     [
                         {
-                            "e": 836
+                            "e": 1579
                         }
                     ],
                     [
                         {
-                            "v": 836
+                            "v": 1579
                         }
                     ],
                     [
@@ -28977,7 +30273,7 @@
                             "w": 1468
                         },
                         {
-                            "c": 837
+                            "c": 1580
                         }
                     ],
                     [
@@ -28996,28 +30292,28 @@
                     [],
                     [
                         {
-                            "e": 838
+                            "e": 1581
                         }
                     ],
                     [
                         {
-                            "v": 838
+                            "v": 1581
                         }
                     ],
                     [
                         {
-                            "c": 839
+                            "c": 1582
                         }
                     ],
                     [
                         {
-                            "cc": 840
+                            "cc": 1583
                         }
                     ],
                     {}
                 ],
                 [
-                    2,
+                    3,
                     "theguardian.com",
                     1,
                     "^https?://(\\w+\\.)?theguardian\\.com/",
@@ -29032,7 +30328,14 @@
                     ],
                     [
                         {
-                            "v": 1373
+                            "any": [
+                                {
+                                    "v": 1373
+                                },
+                                {
+                                    "e": 1643
+                                }
+                            ]
                         }
                     ],
                     [
@@ -29040,9 +30343,8 @@
                             "h": 1373
                         },
                         {
-                            "removeClass": "sp-message-open",
-                            "selector": "html",
-                            "optional": true
+                            "stylesheet": "html.sp-message-open body { position: static !important; top: auto !important; width: auto !important; overflow: auto !important; }",
+                            "stylesheetId": "theguardian-scroll-unlock"
                         }
                     ],
                     [
@@ -29092,24 +30394,120 @@
                     "^https://tinyurl\\.com/",
                     22,
                     [
-                        852
+                        1644
                     ],
                     [
                         {
-                            "e": 852
+                            "e": 1644
                         }
                     ],
                     [
                         {
-                            "v": 852
+                            "v": 1644
                         }
                     ],
                     [
                         {
-                            "h": 852
+                            "h": 1644
                         }
                     ],
                     [],
+                    {}
+                ],
+                [
+                    1,
+                    "toho-one.com",
+                    2,
+                    "^https?://www\\.toho-one\\.com/",
+                    22,
+                    [],
+                    [
+                        {
+                            "e": 1584
+                        }
+                    ],
+                    [
+                        {
+                            "v": 1584
+                        }
+                    ],
+                    [
+                        {
+                            "c": 1585
+                        },
+                        {
+                            "waitFor": [
+                                "xpath///div[contains(@class, 'fixed') and .//button[normalize-space()='設定を保存する']]",
+                                "input[type=checkbox]:checked:not(:disabled)"
+                            ]
+                        },
+                        {
+                            "click": [
+                                "xpath///div[contains(@class, 'fixed') and .//button[normalize-space()='設定を保存する']]",
+                                "input[type=checkbox]:checked:not(:disabled)"
+                            ],
+                            "all": true
+                        },
+                        {
+                            "c": 1586
+                        }
+                    ],
+                    [
+                        {
+                            "timeout": 1000,
+                            "check": "none",
+                            "wv": 1584
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
+                    "tohotheater-jp",
+                    2,
+                    "^https?://(?:[^/]+\\.)?tohotheater\\.jp/",
+                    22,
+                    [
+                        1587
+                    ],
+                    [
+                        {
+                            "e": 1588
+                        }
+                    ],
+                    [
+                        {
+                            "v": 1587
+                        }
+                    ],
+                    [
+                        {
+                            "c": 1588
+                        },
+                        {
+                            "c": 1589
+                        },
+                        {
+                            "c": 1590
+                        },
+                        {
+                            "c": 1591
+                        },
+                        {
+                            "c": 1592
+                        },
+                        {
+                            "c": 1593
+                        }
+                    ],
+                    [
+                        {
+                            "cc": 1594
+                        },
+                        {
+                            "cc": 1595
+                        }
+                    ],
                     {}
                 ],
                 [
@@ -29146,16 +30544,16 @@
                     "^https://www\\.transip\\.nl/",
                     22,
                     [
-                        865
+                        1651
                     ],
                     [
                         {
                             "any": [
                                 {
-                                    "e": 865
+                                    "e": 1651
                                 },
                                 {
-                                    "e": 866
+                                    "e": 1652
                                 }
                             ]
                         }
@@ -29164,10 +30562,10 @@
                         {
                             "any": [
                                 {
-                                    "v": 865
+                                    "v": 1651
                                 },
                                 {
-                                    "v": 866
+                                    "v": 1652
                                 }
                             ]
                         }
@@ -29175,16 +30573,16 @@
                     [
                         {
                             "if": {
-                                "e": 866
+                                "e": 1652
                             },
                             "then": [
                                 {
-                                    "k": 867
+                                    "k": 1514
                                 }
                             ],
                             "else": [
                                 {
-                                    "k": 868
+                                    "k": 1661
                                 }
                             ]
                         }
@@ -29199,21 +30597,21 @@
                     "^https://(www\\.)?truecar\\.com/",
                     22,
                     [
-                        876
+                        1668
                     ],
                     [
                         {
-                            "e": 877
+                            "e": 1669
                         }
                     ],
                     [
                         {
-                            "v": 877
+                            "v": 1669
                         }
                     ],
                     [
                         {
-                            "h": 876
+                            "h": 1668
                         }
                     ],
                     [],
@@ -29223,42 +30621,57 @@
                     1,
                     "twitch.tv",
                     2,
-                    "^https?://([\\w-]+\\.)?twitch\\.tv",
+                    "^https?://([\\w-]+\\.)?twitch\\.tv/",
                     22,
                     [
-                        889
+                        1619
                     ],
                     [
                         {
-                            "e": 890
+                            "e": 1620
                         }
                     ],
                     [
                         {
-                            "v": 890
+                            "v": 1620
                         }
                     ],
                     [
                         {
-                            "h": 891
-                        },
-                        {
-                            "k": 892
-                        },
-                        {
-                            "w": 893
-                        },
-                        {
-                            "all": true,
-                            "optional": true,
-                            "k": 894
-                        },
-                        {
-                            "c": 895
-                        },
-                        {
-                            "check": "none",
-                            "wv": 896
+                            "if": {
+                                "e": 1621
+                            },
+                            "then": [
+                                {
+                                    "retry": 3,
+                                    "retryInterval": 1000,
+                                    "c": 1622
+                                },
+                                {
+                                    "check": "none",
+                                    "wv": 1620
+                                }
+                            ],
+                            "else": [
+                                {
+                                    "c": 892
+                                },
+                                {
+                                    "w": 1662
+                                },
+                                {
+                                    "all": true,
+                                    "optional": true,
+                                    "k": 1623
+                                },
+                                {
+                                    "c": 895
+                                },
+                                {
+                                    "check": "none",
+                                    "wv": 896
+                                }
+                            ]
                         }
                     ],
                     [],
@@ -29386,6 +30799,39 @@
                 ],
                 [
                     1,
+                    "uwv-nl",
+                    0,
+                    "^https?://(?:www\\.)?uwv\\.nl/",
+                    10,
+                    [
+                        1596
+                    ],
+                    [
+                        {
+                            "e": 1596
+                        }
+                    ],
+                    [
+                        {
+                            "v": 1597
+                        }
+                    ],
+                    [
+                        {
+                            "c": 1597
+                        }
+                    ],
+                    [
+                        {
+                            "check": "none",
+                            "timeout": 2000,
+                            "wv": 1597
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
                     "vodafone.de",
                     2,
                     "^https://www\\.vodafone\\.de/",
@@ -29458,6 +30904,42 @@
                     [
                         {
                             "cc": 1427
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
+                    "walmart-ca",
+                    0,
+                    "^https?://(www\\.)?walmart\\.ca/",
+                    22,
+                    [],
+                    [
+                        {
+                            "e": 1653
+                        }
+                    ],
+                    [
+                        {
+                            "v": 1653
+                        }
+                    ],
+                    [
+                        {
+                            "retry": 5,
+                            "retryInterval": 500,
+                            "c": 1654
+                        },
+                        {
+                            "c": 1655
+                        }
+                    ],
+                    [
+                        {
+                            "check": "none",
+                            "timeout": 5000,
+                            "wv": 1653
                         }
                     ],
                     {}
@@ -29547,7 +31029,13 @@
                     ],
                     [
                         {
-                            "c": 1528
+                            "wv": 1528
+                        },
+                        {
+                            "wait": 500
+                        },
+                        {
+                            "k": 1528
                         },
                         {
                             "optional": true,
@@ -29593,7 +31081,7 @@
                     [],
                     [
                         {
-                            "e": 771
+                            "e": 806
                         }
                     ],
                     [
@@ -29732,18 +31220,18 @@
             "index": {
                 "genericRuleRange": [
                     0,
-                    193
+                    210
                 ],
                 "frameRuleRange": [
-                    191,
-                    219
+                    208,
+                    236
                 ],
                 "specificRuleRange": [
-                    193,
-                    782
+                    210,
+                    814
                 ],
-                "genericStringEnd": 774,
-                "frameStringEnd": 815
+                "genericStringEnd": 837,
+                "frameStringEnd": 878
             }
         }
     }

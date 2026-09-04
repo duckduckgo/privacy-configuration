@@ -19,6 +19,16 @@ Parent features and their subfeatures are **not** co-dependent — a subfeature'
 ### Rollout Step Edits
 When a rollout percentage changes, the diff must **append** a new entry to `rollout.steps[]` rather than mutate an existing entry. Each step is a discrete event clients persist; modifying an existing `percent` is silently ignored for already-enrolled users. Flag any PR that edits or removes an existing step object instead of appending a new one. See [`.cursor/rules/rollout-steps.mdc`](../.cursor/rules/rollout-steps.mdc) and [`docs/incremental-rollout-implementation-guide.md`](../docs/incremental-rollout-implementation-guide.md).
 
+## Build Pipeline
+
+### Feature-Specific Config Transforms
+
+`index.js` and `util.js` transform the merged config before it is written to `generated/`. Warn on a PR that adds a transform which fills in or rewrites data for one feature — supplying a default for an omitted key, expanding a shorthand, normalising a shape the author could have written directly. Ask the author whether the schema can require the value instead, or the client can interpret what is authored.
+
+A transform earns its place when the data cannot be authored: derived from an external source, such as `addCnameEntriesToAllowlist` expanding from TDS, or reconciling a base feature with a platform override, such as `mergeEventHubTelemetry` and `mergeInterferenceTypes`. Defaults and shorthands are authorable, and every transform is a rule that lives outside the schema and that four clients read the output of.
+
+This is a **warning**, not a block.
+
 ## Element Hiding Feature Validation
 
 ### Schema & Implementation References
@@ -44,6 +54,22 @@ When a rollout percentage changes, the diff must **append** a new entry to `roll
 - **Configuration**: `features/tracker-allowlist.json` - Tracker allowlist rule definitions
 - **Tests**: `tests/tracker-allowlist-tests.js` - Unit tests enforcing ordering, propagation, and duplicate detection
 - **Matching algorithm**: [tracker_allowlist_matching_tests.json](https://github.com/duckduckgo/privacy-reference-tests/blob/main/tracker-radar-tests/TR-domain-matching/tracker_allowlist_matching_tests.json) - Client matching is subdomain-aware, not pure string prefix. A subdomain rule does not match the parent domain.
+
+## Experiment Metrics Validation
+
+### References
+
+- **Schema**: `schema/features/experiment-metrics.ts` - Metric shape shared by experiment subfeatures
+- **Tests**: `tests/experiment-metrics-tests.js` - Placement, shape, naming, and event-production checks
+- Metrics live in `settings.metrics` of experiment subfeatures under `contentScopeExperiments`, `blockList`, and `contentBlocking` only.
+
+### No Metric Additions to Already-Enabled Experiments
+
+Clients snapshot or anchor metric state at enrollment, and users enroll as soon as an experiment is enabled. A metric **added** to an experiment subfeature that already has `state: enabled` and `cohorts` in the base branch will silently not fire for already-enrolled users on some platforms. Flag any PR that adds new keys to an existing experiment's `settings.metrics` (or adds a whole `metrics` object to it) unless the same PR is what enables the experiment. **Removing** a metric is always fine — deletion is the kill switch and must not be flagged.
+
+### Detector Changes Affecting Live Experiment Metrics
+
+If a PR modifies a `webDetection` detector (its `match`, `triggers`, or `actions.fireEvent`) whose `fireEvent.type` is referenced as the `event` of a metric in an experiment that is currently `enabled` with cohorts, warn on the PR: the change applies to both cohorts equally so the A/B comparison survives, but the metric's meaning steps mid-experiment and analysis needs to know the date. This is a **warning**, not a block — ask the author to confirm the experiment owner is aware.
 
 ## Custom User Agent / Client Hints Validation
 

@@ -349,6 +349,56 @@
                             "weight": 1
                         }
                     ]
+                },
+                "tdsNextExperiment015": {
+                    "state": "disabled",
+                    "minSupportedVersion": 52361000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "v5/experiments/202609v1-android-tds-control.json",
+                        "treatmentUrl": "v5/experiments/202609v1-android-tds-treatment.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "tdsNextExperiment016": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52361000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "v5/experiments/202609v2-android-tds-control.json",
+                        "treatmentUrl": "v5/experiments/202609v2-android-tds-treatment.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
                 }
             }
         },
@@ -675,6 +725,10 @@
                     "state": "enabled",
                     "minSupportedVersion": 52860000
                 },
+                "nativePromptEditing": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52940000
+                },
                 "nativeInputField": {
                     "state": "enabled",
                     "minSupportedVersion": 52840000,
@@ -942,6 +996,51 @@
                         "conditionalChanges": [
                             {
                                 "condition": [
+                                    { "domain": "www.aestheticcity.academy" }
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input[name=\"confirm-email\"]",
+                                            "type": "unknown"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "condition": [
+                                    { "urlPattern": "https://login.app.carta.com/registration*" }
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "form",
+                                            "type": "login"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "condition": [
+                                    { "domain": "www.theinformation.com" }
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "#login-email",
+                                            "type": "credentials.username"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "condition": [
                                     { "domain": "fedex.com" }
                                 ],
                                 "patchSettings": [
@@ -1130,6 +1229,30 @@
                                         "value": {
                                             "selector": "profile-lookup[app-name='account-login'] input[type='text']",
                                             "type": "credentials.username"
+                                        }
+                                    },
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "#ps_month",
+                                            "type": "identities.birthdayMonth"
+                                        }
+                                    },
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "#ps_day",
+                                            "type": "identities.birthdayDay"
+                                        }
+                                    },
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "#ps_year",
+                                            "type": "identities.birthdayYear"
                                         }
                                     }
                                 ]
@@ -1393,6 +1516,26 @@
                                         "value": {
                                             "selector": "input#floatingLabelInput109",
                                             "type": "unknown"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "condition": [
+                                    { "domain": "icloud.com" }
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formBoundarySelector",
+                                        "op": "replace",
+                                        "value": "#sign_in_form"
+                                    },
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "#sign_in_form",
+                                            "type": "login"
                                         }
                                     }
                                 ]
@@ -2757,7 +2900,18 @@
                 "serpSettings": "disabled",
                 "serp": "disabled",
                 "duckAiNativeStorage": "disabled",
+                "internalFeedback": "disabled",
                 "domains": [
+                    {
+                        "domain": "internalapps.duckduckgo.com",
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/internalFeedback",
+                                "value": "enabled"
+                            }
+                        ]
+                    },
                     {
                         "domain": [
                             "duckduckgo.com",
@@ -3086,6 +3240,11 @@
             "settings": {
                 "windowInMs": 200
             },
+            "exceptions": []
+        },
+        "returnSessionWideEvent": {
+            "state": "enabled",
+            "minSupportedVersion": 52930000,
             "exceptions": []
         },
         "sendFullPackageInstallSource": {
@@ -3482,7 +3641,7 @@
                 },
                 "optimizeContentScopeMessaging": {
                     "minSupportedVersion": 52920000,
-                    "state": "enabled"
+                    "state": "disabled"
                 },
                 "cacheContentScopeExperiments": {
                     "minSupportedVersion": 52920000,
@@ -3915,6 +4074,17 @@
         "privacyPro": {
             "state": "enabled",
             "features": {
+                "partnershipsHub": {
+                    "state": "disabled",
+                    "settings": {
+                        "url": "https://duckduckgo.com/partner-benefits"
+                    },
+                    "targets": [
+                        {
+                            "localeCountry": "us"
+                        }
+                    ]
+                },
                 "refreshSubscriptionPlanFeatures": {
                     "state": "enabled",
                     "minSupportedVersion": 52440000
@@ -4035,6 +4205,32 @@
                 "useQueryPurchases": {
                     "state": "enabled",
                     "minSupportedVersion": 52840000
+                },
+                "serializeTokenRefresh": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            }
+                        ]
+                    }
+                },
+                "performanceOptimizedPaywalls": {
+                    "state": "disabled",
+                    "settings": {
+                        "entryPoints": {
+                            "vpn": {
+                                "path": "/subscriptions/new/mobile/vpn"
+                            },
+                            "duckai": {
+                                "path": "/subscriptions/new/mobile/duckai"
+                            },
+                            "pir": {
+                                "path": "/subscriptions/new/mobile/pir"
+                            }
+                        }
+                    }
                 }
             }
         },
@@ -4190,6 +4386,11 @@
                     }
                 }
             }
+        },
+        "nativeInputUrlClearingFeature": {
+            "state": "enabled",
+            "minSupportedVersion": 52940000,
+            "exceptions": []
         },
         "swipingTabs": {
             "state": "enabled",
@@ -4703,7 +4904,7 @@
                     ]
                 },
                 "contentScopeExperiment6": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": 52900000,
                     "description": "Captcha detection: auto-run + fireEvent for the captcha detectors, comparing 'content' vs 'visible' element visibility",
                     "rollout": {
@@ -4724,6 +4925,28 @@
                         },
                         {
                             "name": "treatmentVis",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "contentScopeExperiment7": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52920000,
+                    "description": "Adwall detection: rendered-text xpath matching for the generic adwall detectors",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
                             "weight": 1
                         }
                     ]
@@ -5242,7 +5465,7 @@
                         },
                         {
                             "name": "treatmentDockOnly",
-                            "weight": 1
+                            "weight": 0
                         },
                         {
                             "name": "treatmentWidgetOnly",
@@ -5268,6 +5491,15 @@
                         "steps": [
                             {
                                 "percent": 10
+                            },
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
                             }
                         ]
                     }

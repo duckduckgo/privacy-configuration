@@ -400,17 +400,32 @@ describe('webDetection config tests', () => {
     });
 
     describe('eventHub cross-reference', () => {
+        // Features whose subfeatures may declare experiment metrics that consume events
+        // (see tests/experiment-metrics-tests.js).
+        const METRIC_PARENTS = [
+            'contentScopeExperiments',
+            'blockList',
+            'contentBlocking',
+        ];
+
         forEachWebDetectionConfig(({ configName, detectors }) => {
             describe(configName, () => {
-                it('fireEvent.type values should have a corresponding eventHub parameter source', () => {
+                it('fireEvent.type values should have a corresponding eventHub parameter source or metric event', () => {
                     const config = latestConfigs.find((c) => c.name === configName);
                     const eventHubTelemetry = /** @type {import('../schema/features/event-hub').EventHubFeature<number> | undefined} */ (
                         config?.body.features?.eventHub
                     )?.settings.telemetry;
-                    const knownSources = new Set();
+                    const knownConsumers = new Set();
                     for (const entry of Object.values(eventHubTelemetry ?? {})) {
                         for (const param of Object.values(entry.parameters)) {
-                            if (param.source) knownSources.add(param.source);
+                            if (param.source) knownConsumers.add(param.source);
+                        }
+                    }
+                    for (const parent of METRIC_PARENTS) {
+                        for (const subFeature of Object.values(config?.body.features?.[parent]?.features ?? {})) {
+                            for (const metric of Object.values(subFeature?.settings?.metrics ?? {})) {
+                                if (typeof metric?.event === 'string') knownConsumers.add(metric.event);
+                            }
                         }
                     }
 
@@ -424,10 +439,10 @@ describe('webDetection config tests', () => {
                         ] of Object.entries(groupDetectors)) {
                             const type = detector.actions?.fireEvent?.type;
                             if (type === undefined) continue;
-                            expect(knownSources.has(type)).to.equal(
+                            expect(knownConsumers.has(type)).to.equal(
                                 true,
-                                `Detector '${groupName}.${detectorName}' fires event type '${type}' but no eventHub parameter has source '${type}' (known sources: ${[
-                                    ...knownSources,
+                                `Detector '${groupName}.${detectorName}' fires event type '${type}' but no eventHub parameter source or experiment metric event consumes '${type}' (known consumers: ${[
+                                    ...knownConsumers,
                                 ].join(', ')})`,
                             );
                         }
