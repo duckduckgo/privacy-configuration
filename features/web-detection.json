@@ -98,7 +98,6 @@
             },
             "captcha": {
                 "recaptcha": {
-                    "state": "disabled",
                     "match": {
                         "element": {
                             "selector": [
@@ -106,12 +105,29 @@
                                 "iframe[src*='rec\\61 ptcha']",
                                 "iframe[title*='rec\\61 ptcha' i]"
                             ],
-                            "visibility": "content"
+                            "visibility": "visible"
+                        }
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    10000,
+                                    15000,
+                                    20000
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        "fireEvent": {
+                            "state": "enabled",
+                            "type": "captcha_recaptcha"
                         }
                     }
                 },
                 "hcaptcha": {
-                    "state": "disabled",
                     "match": {
                         "element": {
                             "selector": [
@@ -119,12 +135,29 @@
                                 "iframe[src*='hc\\61 ptcha.com']",
                                 "iframe[title*='hc\\61 ptcha' i]"
                             ],
-                            "visibility": "content"
+                            "visibility": "visible"
+                        }
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    10000,
+                                    15000,
+                                    20000
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        "fireEvent": {
+                            "state": "enabled",
+                            "type": "captcha_hcaptcha"
                         }
                     }
                 },
                 "turnstile": {
-                    "state": "disabled",
                     "match": {
                         "element": {
                             "selector": [
@@ -132,12 +165,29 @@
                                 ".cf-t\\75 rnstile:not(#t\\75 rnstile-wrapper) iframe",
                                 "iframe[src*='challenges.clo\\75 dfl\\61 re.com/t\\75 rnstile']"
                             ],
-                            "visibility": "content"
+                            "visibility": "visible"
+                        }
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    10000,
+                                    15000,
+                                    20000
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        "fireEvent": {
+                            "state": "enabled",
+                            "type": "captcha_turnstile"
                         }
                     }
                 },
                 "cloudflare": {
-                    "state": "disabled",
                     "match": {
                         "element": {
                             "selector": [
@@ -148,24 +198,58 @@
                                 "#cf-ch\\61 llenge-running",
                                 "#ch\\61 llenge-stage"
                             ],
-                            "visibility": "content"
+                            "visibility": "visible"
+                        }
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    10000,
+                                    15000,
+                                    20000
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        "fireEvent": {
+                            "state": "enabled",
+                            "type": "captcha_cloudflare"
                         }
                     }
                 },
                 "datadome": {
-                    "state": "disabled",
                     "match": {
                         "element": {
                             "selector": [
                                 "iframe[src*='c\\61 ptcha-delivery.com']",
                                 "iframe[title*='d\\61 tadome' i]"
                             ],
-                            "visibility": "content"
+                            "visibility": "visible"
+                        }
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    10000,
+                                    15000,
+                                    20000
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        "fireEvent": {
+                            "state": "enabled",
+                            "type": "captcha_other"
                         }
                     }
                 },
                 "imperva": {
-                    "state": "disabled",
                     "match": {
                         "any": [
                             {
@@ -186,14 +270,31 @@
                                     "selector": [
                                         "iframe[src*='_Inc\\61 psul\\61 _Resource']"
                                     ],
-                                    "visibility": "content"
+                                    "visibility": "visible"
                                 }
                             }
                         ]
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    10000,
+                                    15000,
+                                    20000
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        "fireEvent": {
+                            "state": "enabled",
+                            "type": "captcha_other"
+                        }
                     }
                 },
                 "arkose": {
-                    "state": "disabled",
                     "match": {
                         "element": {
                             "selector": [
@@ -202,12 +303,29 @@
                                 "#FunC\\61 ptcha-Token",
                                 "[d\\61 ta-pkey]"
                             ],
-                            "visibility": "content"
+                            "visibility": "visible"
+                        }
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    10000,
+                                    15000,
+                                    20000
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        "fireEvent": {
+                            "state": "enabled",
+                            "type": "captcha_other"
                         }
                     }
                 },
                 "geetest": {
-                    "state": "disabled",
                     "match": {
                         "element": {
                             "selector": [
@@ -216,24 +334,58 @@
                                 ".geet\\65 st_c\\61 ptcha",
                                 "[class*='geet\\65 st_']"
                             ],
-                            "visibility": "content"
+                            "visibility": "visible"
+                        }
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    10000,
+                                    15000,
+                                    20000
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        "fireEvent": {
+                            "state": "enabled",
+                            "type": "captcha_other"
                         }
                     }
                 },
                 "awswaf": {
-                    "state": "disabled",
                     "match": {
                         "element": {
                             "selector": [
                                 "iframe[src*='c\\61 ptcha.awsw\\61 f.com']",
                                 "iframe[src*='token.awsw\\61 f.com']"
                             ],
-                            "visibility": "content"
+                            "visibility": "visible"
+                        }
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    10000,
+                                    15000,
+                                    20000
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        "fireEvent": {
+                            "state": "enabled",
+                            "type": "captcha_other"
                         }
                     }
                 },
                 "perimeterx": {
-                    "state": "disabled",
                     "match": {
                         "any": [
                             {
@@ -243,7 +395,7 @@
                                         "iframe[src*='px-c\\64 n.net']",
                                         "iframe[src*='px-clo\\75 d.net']"
                                     ],
-                                    "visibility": "content"
+                                    "visibility": "visible"
                                 }
                             },
                             {
@@ -259,6 +411,24 @@
                                 }
                             }
                         ]
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    10000,
+                                    15000,
+                                    20000
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        "fireEvent": {
+                            "state": "enabled",
+                            "type": "captcha_other"
+                        }
                     }
                 },
                 "other": {
@@ -269,6 +439,24 @@
                                 "slide( right)? to (verify|complete)",
                                 "complete the security check to (access|continue)"
                             ]
+                        }
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    10000,
+                                    15000,
+                                    20000
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        "fireEvent": {
+                            "state": "enabled",
+                            "type": "captcha_other"
                         }
                     }
                 }
