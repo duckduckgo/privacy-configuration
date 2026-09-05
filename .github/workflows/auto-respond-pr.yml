@@ -96,6 +96,11 @@ jobs:
                   path: pr
                   fetch-depth: 0
 
+            - name: Use Node.js
+              uses: actions/setup-node@v6
+              with:
+                  node-version-file: pr/.nvmrc
+
             - name: Run build script on base branch
               run: |
                   cd base
