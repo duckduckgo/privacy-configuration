@@ -78,4 +78,52 @@ describe('Build output validation', () => {
             });
         });
     });
+
+    describe('unprotected temporary user-agent mitigations', () => {
+        const extractDomains = (entry) => entry.domain;
+        const globalUnprotected = loadJSON('features/unprotected-temporary.json').exceptions.map(extractDomains);
+
+        it('adds iOS Safari-like custom user-agent settings', () => {
+            const config = loadJSON('generated/v5/ios-config.json');
+            const settings = config.features.customUserAgent.settings;
+            const ddgFixedSites = settings.ddgFixedSites.map(extractDomains);
+            const omitApplicationSites = settings.omitApplicationSites.map(extractDomains);
+
+            globalUnprotected.forEach((domain) => {
+                expect(ddgFixedSites).to.contain(domain);
+                expect(omitApplicationSites).to.contain(domain);
+            });
+        });
+
+        it('adds macOS Safari-like custom user-agent settings', () => {
+            const config = loadJSON('generated/v5/macos-config.json');
+            const defaultSites = config.features.customUserAgent.settings.defaultSites.map(extractDomains);
+
+            globalUnprotected.forEach((domain) => {
+                expect(defaultSites).to.contain(domain);
+            });
+        });
+
+        it('adds Android Chrome client-brand hints', () => {
+            const config = loadJSON('generated/v5/android-config.json');
+            const domains = config.features.clientBrandHint.settings.domains;
+
+            globalUnprotected.forEach((domain) => {
+                expect(domains).to.deep.include({ domain, brand: 'CHROME' });
+            });
+        });
+
+        it('adds Windows Chrome client-hint mitigations', () => {
+            const config = loadJSON('generated/v5/windows-config.json');
+            const clientHintDomains = config.features.clientBrandHint.settings.domains;
+            const uaChBrandDomains = config.features.uaChBrands.settings.conditionalChanges.map((change) => change.condition.domain);
+            const uaChBrandExceptions = config.features.uaChBrands.exceptions.map(extractDomains);
+
+            globalUnprotected.forEach((domain) => {
+                expect(clientHintDomains).to.deep.include({ domain, brand: 'Google Chrome' });
+                expect(uaChBrandDomains).to.contain(domain);
+                expect(uaChBrandExceptions).to.not.contain(domain);
+            });
+        });
+    });
 });
