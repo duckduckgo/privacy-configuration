@@ -18,9 +18,12 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@main
+            - name: Use Node.js
+              uses: actions/setup-node@v6
+              with:
+                  node-version-file: .nvmrc
             - name: Install dependencies
               run: npm ci
-            - uses: ./
             - name: Run tests
               run: npm run test
             - uses: jakejarvis/s3-sync-action@7ed8b112447abb09f1da74f3466e4194fc7a6311
@@ -35,7 +38,7 @@ jobs:
             - name: Set version variable
               run: echo "VERSION=$(jq -r .version ./generated/v5/extension-config.json)" >> $GITHUB_ENV
             - name: Generate release description file
-              uses: ./scripts/
+              run: node scripts/compute-etag.js
             - name: Archive Release
               uses: thedoctor0/zip-release@master
               with:
