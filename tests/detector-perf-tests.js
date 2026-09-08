@@ -4,15 +4,13 @@ import platforms from '../platforms.js';
 
 /**
  * Detector labels as emitted by C-S-S (content-scope-scripts
- * injected/src/features/detector-perf.js call sites): the three on-demand
- * detector utils plus the pooled label for config-driven webDetection scans.
+ * injected/src/features/detector-perf.js
+ * DETECTOR_PERF_DETECTOR_NAMES): the pooled label for config-driven
+ * webDetection scans.
  * A new timed call site in C-S-S must be added here and given eventHub
  * parameters before it ships.
  */
 const DETECTORS = [
-    'bot',
-    'fraud',
-    'adwall',
     'webDetection',
 ];
 
@@ -74,6 +72,7 @@ function expectedEventTypes(settings) {
     ]);
     for (const name of DETECTORS) {
         types.add(`detectorPerf_${name}_ran`);
+        types.add(`detectorPerf_${name}_failed`);
         const single = overrides[name]?.singleRunThresholdsMs ?? defaults.singleRunThresholdsMs ?? [];
         const total = overrides[name]?.totalPerPageThresholdsMs ?? defaults.totalPerPageThresholdsMs ?? [];
         for (const edge of single) {
