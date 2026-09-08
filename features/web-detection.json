@@ -282,6 +282,51 @@
                     }
                 }
             },
+            "video": {
+                "error": {
+                    "match": {
+                        "text": {
+                            "pattern": [
+                                "html5 video not found",
+                                "video (file )?can(not|.?t) be played",
+                                "video playback (error|failed)",
+                                "(error|problem) playing (this |the )?(video|media|clip)",
+                                "couldn.?t play this",
+                                "(error|code)\\s*:?\\s*22400[03]"
+                            ]
+                        }
+                    }
+                },
+                "placeholder": {
+                    "match": {
+                        "text": {
+                            "pattern": "video loading"
+                        }
+                    }
+                },
+                "unavailable": {
+                    "match": {
+                        "text": {
+                            "pattern": [
+                                "not available in your (country|region|location|area)",
+                                "due to (rights|licensing) restrictions",
+                                "n.est pas disponible dans (votre pays|le pays)"
+                            ]
+                        }
+                    }
+                },
+                "blocked": {
+                    "match": {
+                        "text": {
+                            "pattern": [
+                                "(disable|turn off|deactivate|pause) your ad ?block(er)? to (watch|play|view|continue watching)",
+                                "to (watch|view|play) (this|the) video,? (please )?(disable|turn off|deactivate)",
+                                "(video|player) (is )?(unavailable|blocked) (with|while using) an ad ?block(er)?"
+                              ]
+                        }
+                    }
+                }
+            },
             "other": {
                 "dismissible_en": {
                     "match": {
@@ -406,6 +451,109 @@
                         "op": "add",
                         "path": "/detectors/adwalls/admiral/actions",
                         "value": { "fireEvent": { "state": "enabled", "type": "admiralAdwall" } }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/video/error/triggers",
+                        "value": {
+                            "auto": {
+                                "state": "enabled",
+                                "when": {
+                                    "intervalMs": [
+                                        500,
+                                        1000,
+                                        5000,
+                                        10000
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/video/error/actions",
+                        "value": {
+                            "fireEvent": {
+                                "state": "enabled",
+                                "type": "video_error"
+                            }
+                        }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/video/placeholder/triggers",
+                        "value": {
+                            "auto": {
+                                "state": "enabled",
+                                "when": {
+                                    "intervalMs": [
+                                        5000
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/video/placeholder/actions",
+                        "value": {
+                            "fireEvent": {
+                                "state": "enabled",
+                                "type": "video_placeholder"
+                            }
+                        }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/video/unavailable/triggers",
+                        "value": {
+                            "auto": {
+                                "state": "enabled",
+                                "when": {
+                                    "intervalMs": [
+                                        500,
+                                        1000,
+                                        5000
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/video/unavailable/actions",
+                        "value": {
+                            "fireEvent": {
+                                "state": "enabled",
+                                "type": "video_unavailable"
+                            }
+                        }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/video/blocked/triggers",
+                        "value": {
+                            "auto": {
+                                "state": "enabled",
+                                "when": {
+                                    "intervalMs": [
+                                        500,
+                                        1000,
+                                        5000
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/video/blocked/actions",
+                        "value": {
+                            "fireEvent": {
+                                "state": "enabled",
+                                "type": "video_blocked"
+                            }
+                        }
                     }
                 ]
             },
