@@ -384,6 +384,26 @@ describe('EventHub validation tests', () => {
                         expect(period.seconds).to.be.greaterThan(0, `Telemetry '${name}' period.seconds must be greater than zero`);
                     }
                 });
+
+                // A period pixel fires when a counter's total falls in one of its buckets, so an entry
+                // without a counter parameter can never fire.
+                it('must declare at least one counter parameter', () => {
+                    for (const [
+                        name,
+                        entry,
+                    ] of periodEntries) {
+                        const counters = Object.entries(entry.parameters || {}).filter(
+                            ([
+                                ,
+                                param,
+                            ]) => param.template === 'counter',
+                        );
+                        expect(counters.length).to.be.greaterThan(
+                            0,
+                            `Period telemetry '${name}' must declare at least one 'counter' parameter`,
+                        );
+                    }
+                });
             });
 
             describe('immediate telemetry entries', () => {
