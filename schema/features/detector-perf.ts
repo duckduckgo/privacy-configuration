@@ -18,6 +18,10 @@ type DetectorPerfSettings = CSSInjectFeatureSettings<{
     defaults?: DetectorThresholds;
     /** Threshold edges for the combined all-detector total per frame. */
     combinedThresholdsMs?: number[];
+    /** Single-run edges at or above this cutoff also emit immediate severe telemetry. */
+    singleRunSevereThresholdMs?: number;
+    /** Per-group total edges at or above this cutoff also emit immediate severe telemetry. */
+    totalPerPageSevereThresholdMs?: number;
     /** Per-group threshold overrides, keyed by Web Detection group. */
     detectorOverrides?: Partial<Record<DetectorPerfGroup, DetectorThresholds>>;
     /**

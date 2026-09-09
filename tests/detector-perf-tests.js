@@ -41,6 +41,24 @@ function assertThresholdEdges(edges, path) {
 }
 
 /**
+ * Assert a severe cutoff is valid and selects at least one measured edge.
+ *
+ * @param {unknown} cutoff
+ * @param {unknown} edges
+ * @param {string} path
+ */
+function assertSevereCutoff(cutoff, edges, path) {
+    expect(
+        typeof cutoff === 'number' && Number.isFinite(cutoff) && cutoff > 0,
+        `${path}: expected a positive finite number, got ${JSON.stringify(cutoff)}`,
+    ).to.equal(true);
+    expect(
+        /** @type {unknown[]} */ (edges).some((edge) => Number(edge) >= Number(cutoff)),
+        `${path}: expected at least one configured threshold edge at or above ${cutoff}`,
+    ).to.equal(true);
+}
+
+/**
  * Compute every event type the C-S-S detectorPerf feature can emit under the
  * given settings. Mirrors the naming scheme in
  * content-scope-scripts/injected/src/features/detector-perf.js.
@@ -143,6 +161,20 @@ describe('detectorPerf config tests', () => {
                 assertThresholdEdges(settings.defaults?.singleRunThresholdsMs, 'defaults/singleRunThresholdsMs');
                 assertThresholdEdges(settings.defaults?.totalPerPageThresholdsMs, 'defaults/totalPerPageThresholdsMs');
                 assertThresholdEdges(settings.combinedThresholdsMs, 'combinedThresholdsMs');
+                if (settings.singleRunSevereThresholdMs !== undefined) {
+                    assertSevereCutoff(
+                        settings.singleRunSevereThresholdMs,
+                        settings.defaults?.singleRunThresholdsMs,
+                        'singleRunSevereThresholdMs',
+                    );
+                }
+                if (settings.totalPerPageSevereThresholdMs !== undefined) {
+                    assertSevereCutoff(
+                        settings.totalPerPageSevereThresholdMs,
+                        settings.defaults?.totalPerPageThresholdsMs,
+                        'totalPerPageSevereThresholdMs',
+                    );
+                }
                 for (const [
                     name,
                     override,
