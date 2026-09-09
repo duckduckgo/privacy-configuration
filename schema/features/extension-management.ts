@@ -30,10 +30,6 @@ type CuratedExtension = {
 // Type of the `curatedExtensions` subfeature `settings` object
 type CuratedExtensionsSettings = {
     catalog: CuratedExtension[];
-    // Catalog for internal builds, read in place of `catalog` rather than added
-    // to it, so extensions still being trialled can be offered internally while
-    // the public catalog stays narrower. Optional: clients fall back to
-    // `catalog` when it is absent.
     catalogInternal?: CuratedExtension[];
 };
 
