@@ -2,18 +2,6 @@ import { expect } from 'chai';
 import fs from 'fs';
 import platforms from '../platforms.js';
 
-/**
- * Detector labels as emitted by C-S-S (content-scope-scripts
- * injected/src/features/detector-perf.js
- * DETECTOR_PERF_DETECTOR_NAMES): the pooled label for config-driven
- * webDetection scans.
- * A new timed call site in C-S-S must be added here and given eventHub
- * parameters before it ships.
- */
-const DETECTORS = [
-    'webDetection',
-];
-
 const platformOutput = platforms.map((item) => item.replace('browsers/', 'extension-'));
 
 const latestConfigs = platformOutput.map((plat) => {
@@ -58,9 +46,10 @@ function assertThresholdEdges(edges, path) {
  * content-scope-scripts/injected/src/features/detector-perf.js.
  *
  * @param {Record<string, any>} settings
+ * @param {string[]} detectorGroups
  * @returns {Set<string>}
  */
-function expectedEventTypes(settings) {
+function expectedEventTypes(settings, detectorGroups) {
     const defaults = settings.defaults ?? {};
     const overrides = settings.detectorOverrides ?? {};
     const types = new Set([
@@ -70,7 +59,7 @@ function expectedEventTypes(settings) {
         // forwards the data payload (detector, kind, thresholdMs).
         'detectorPerf_severe',
     ]);
-    for (const name of DETECTORS) {
+    for (const name of detectorGroups) {
         types.add(`detectorPerf_${name}_ran`);
         types.add(`detectorPerf_${name}_failed`);
         const single = overrides[name]?.singleRunThresholdsMs ?? defaults.singleRunThresholdsMs ?? [];
@@ -86,6 +75,28 @@ function expectedEventTypes(settings) {
         types.add(`detectorPerf_combined_over${edge}ms`);
     }
     return types;
+}
+
+/**
+ * Return Web Detection groups containing at least one enabled detector.
+ * Detector state defaults to enabled in C-S-S.
+ *
+ * @param {Record<string, Record<string, any>>} detectors
+ * @returns {string[]}
+ */
+function enabledDetectorGroups(detectors) {
+    return Object.entries(detectors)
+        .filter(
+            ([
+                ,
+                groupDetectors,
+            ]) => Object.values(groupDetectors).some((detector) => (detector.state ?? 'enabled') === 'enabled'),
+        )
+        .map(
+            ([
+                groupName,
+            ]) => groupName,
+        );
 }
 
 /**
@@ -124,6 +135,8 @@ describe('detectorPerf config tests', () => {
         if (!detectorPerf?.settings) continue;
         sawDetectorPerf = true;
         const settings = detectorPerf.settings;
+        const webDetectionDetectors = config.body.features?.webDetection?.settings?.detectors ?? {};
+        const detectorGroups = enabledDetectorGroups(webDetectionDetectors);
 
         describe(config.name, () => {
             it('threshold edges are positive and strictly ascending', () => {
@@ -134,6 +147,9 @@ describe('detectorPerf config tests', () => {
                     name,
                     override,
                 ] of Object.entries(settings.detectorOverrides ?? {})) {
+                    expect(Object.hasOwn(webDetectionDetectors, name), `detectorOverrides/${name}: unknown Web Detection group`).to.equal(
+                        true,
+                    );
                     if (override.singleRunThresholdsMs !== undefined) {
                         assertThresholdEdges(override.singleRunThresholdsMs, `detectorOverrides/${name}/singleRunThresholdsMs`);
                     }
@@ -145,7 +161,7 @@ describe('detectorPerf config tests', () => {
 
             it('every emittable event type has an eventHub parameter source', () => {
                 const sources = collectSources(config.body.features?.eventHub?.settings?.telemetry);
-                for (const type of expectedEventTypes(settings)) {
+                for (const type of expectedEventTypes(settings, detectorGroups)) {
                     expect(sources.has(type)).to.equal(
                         true,
                         `detectorPerf can emit '${type}' but no eventHub telemetry parameter consumes it — ` +
@@ -156,7 +172,7 @@ describe('detectorPerf config tests', () => {
 
             it('every detectorPerf eventHub source is an emittable event type (no stale entries)', () => {
                 const sources = collectSources(config.body.features?.eventHub?.settings?.telemetry);
-                const expected = expectedEventTypes(settings);
+                const expected = expectedEventTypes(settings, detectorGroups);
                 for (const [
                     source,
                     entryNames,
