@@ -30,6 +30,13 @@ type ImmediateTelemetryParameterData = TelemetryParameterBase & {
     dataKey: string;
 };
 
+// Carries a fixed value, independent of any event. The value reaches the pixel verbatim,
+// percent-encoded exactly once by the time the request leaves the client.
+type TelemetryParameterConst = TelemetryParameterBase & {
+    template: 'const';
+    value: string;
+};
+
 // Aggregates events over a recurring window. `type` is optional and defaults to
 // 'period' for backward compatibility with entries authored before the discriminator.
 type PeriodTrigger = {
@@ -54,7 +61,7 @@ type ImmediateTrigger = {
 type PeriodTelemetryEntry = {
     state: FeatureState;
     trigger: PeriodTrigger;
-    parameters: Record<string, TelemetryParameterCounter | TelemetryParameterData>;
+    parameters: Record<string, TelemetryParameterCounter | TelemetryParameterData | TelemetryParameterConst>;
 };
 
 // Immediate entries fire per event; their data params omit `source`. (That counter params are
@@ -62,7 +69,7 @@ type PeriodTelemetryEntry = {
 type ImmediateTelemetryEntry = {
     state: FeatureState;
     trigger: ImmediateTrigger;
-    parameters: Record<string, TelemetryParameterCounter | ImmediateTelemetryParameterData>;
+    parameters: Record<string, TelemetryParameterCounter | ImmediateTelemetryParameterData | TelemetryParameterConst>;
 };
 
 type TelemetryEntry = PeriodTelemetryEntry | ImmediateTelemetryEntry;

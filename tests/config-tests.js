@@ -482,7 +482,12 @@ describe('EventHub validation tests', () => {
                     describe(`${entryName}.${paramName}`, () => {
                         const isImmediateTrigger = entry.trigger?.type === 'immediate';
 
-                        if (param.template === 'data' && isImmediateTrigger) {
+                        if (param.template === 'const') {
+                            // Const params carry a fixed value and consume no event stream.
+                            it('source must be omitted on const params', () => {
+                                expect(param.source, `Parameter '${entryName}.${paramName}' must not specify source`).to.equal(undefined);
+                            });
+                        } else if (param.template === 'data' && isImmediateTrigger) {
                             // Immediate-trigger data params forward the triggering event's payload; the
                             // event stream is named by the trigger's `source`, so a param-level `source`
                             // is disallowed.
@@ -507,6 +512,15 @@ describe('EventHub validation tests', () => {
                         // which forwards a value from the event payload) carry none, so skip the
                         // bucket-schema checks below for them.
                         if (param.template !== 'counter') {
+                            if (param.template === 'const') {
+                                it('value should be a non-empty string', () => {
+                                    expect(param.value).to.be.a('string', `Parameter '${entryName}.${paramName}' value must be a string`);
+                                    expect(param.value.length).to.be.greaterThan(
+                                        0,
+                                        `Parameter '${entryName}.${paramName}' value must not be empty`,
+                                    );
+                                });
+                            }
                             if (param.template === 'data') {
                                 it('dataKey should be a non-empty string', () => {
                                     expect(param.dataKey).to.be.a(
@@ -693,6 +707,26 @@ describe('EventHub schema source rules', () => {
     it('accepts an immediate data param that omits its source', () => {
         const settings = immediateEntry({ template: 'data', dataKey: 'loginState' });
         expect(validate(settings), formatErrors(validate.errors)).to.equal(true);
+    });
+
+    it('accepts a const param on a period entry', () => {
+        const settings = periodEntry({ template: 'const', value: 'randomize' });
+        expect(validate(settings), formatErrors(validate.errors)).to.equal(true);
+    });
+
+    it('accepts a const param on an immediate entry', () => {
+        const settings = immediateEntry({ template: 'const', value: 'randomize' });
+        expect(validate(settings), formatErrors(validate.errors)).to.equal(true);
+    });
+
+    it('rejects a const param that omits its value', () => {
+        const settings = immediateEntry({ template: 'const' });
+        expect(validate(settings)).to.equal(false);
+    });
+
+    it('rejects a const param whose value is not a string', () => {
+        const settings = immediateEntry({ template: 'const', value: 3 });
+        expect(validate(settings)).to.equal(false);
     });
 
     it('accepts an eventHub_baseline_* pixel whose baseline counter has no matching detector source', () => {
