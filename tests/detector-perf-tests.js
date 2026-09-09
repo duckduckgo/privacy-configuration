@@ -72,9 +72,9 @@ function expectedEventTypes(settings, detectorGroups) {
     const overrides = settings.detectorOverrides ?? {};
     const types = new Set([
         'detectorPerf_measured',
-        // Immediate severe event: fired when the highest edge of a threshold
-        // family is crossed, consumed by an immediate-trigger pixel that
-        // forwards the data payload (detector, kind, thresholdMs).
+        // Immediate severe event: fired when a configured severe edge is
+        // crossed, consumed by an immediate-trigger pixel that forwards the
+        // data payload (detector, kind, thresholdMs).
         'detectorPerf_severe',
     ]);
     for (const name of detectorGroups) {
@@ -174,6 +174,9 @@ describe('detectorPerf config tests', () => {
                         settings.defaults?.totalPerPageThresholdsMs,
                         'totalPerPageSevereThresholdMs',
                     );
+                }
+                if (settings.combinedSevereThresholdMs !== undefined) {
+                    assertSevereCutoff(settings.combinedSevereThresholdMs, settings.combinedThresholdsMs, 'combinedSevereThresholdMs');
                 }
                 for (const [
                     name,
