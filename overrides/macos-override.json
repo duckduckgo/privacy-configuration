@@ -1003,7 +1003,8 @@
                     {
                         "domain": [
                             "www.cbsnews.com",
-                            "myhome.experian.co.uk"
+                            "myhome.experian.co.uk",
+                            "luna.amazon.com"
                         ],
                         "patchSettings": [
                             {
@@ -1021,7 +1022,26 @@
             "exceptions": [],
             "settings": {
                 "apiChanges": {},
-                "domains": []
+                "domains": [
+                    {
+                        // https://github.com/duckduckgo/privacy-configuration/pull/5863
+                        "domain": "luna.amazon.com",
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/apiChanges/CefSharp",
+                                "value": {
+                                    "type": "descriptor",
+                                    "value": {
+                                        "type": "object",
+                                        "value": {}
+                                    },
+                                    "define": true
+                                }
+                            }
+                        ]
+                    }
+                ]
             }
         },
         "autoconsent": {
@@ -1984,6 +2004,10 @@
                         "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5749"
                     },
                     {
+                        "domain": "chatgpt.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5808"
+                    },
+                    {
                         "domain": "spotify.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5910"
                     }
@@ -2423,7 +2447,8 @@
                                     "petsuppliesplus.com",
                                     "myenneagramtest.org",
                                     "arcteryx.com",
-                                    "topsecretrecipes.com"
+                                    "topsecretrecipes.com",
+                                    "homedepot.com"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5637"
                             }
@@ -3057,6 +3082,7 @@
                 "userInitiatedPopupThreshold": 6.0,
                 "allowlist": [
                     "duckduckgo.com",
+                    "amazon.com",
                     "becu.org",
                     "capitalone.com",
                     "chase.com",
