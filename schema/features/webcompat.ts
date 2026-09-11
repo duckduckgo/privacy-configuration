@@ -6,6 +6,7 @@ type FullWebCompatOptions = CSSInjectFeatureSettings<{
     };
     windowSizing: FeatureState;
     navigatorCredentials: FeatureState;
+    passkeyDetection: FeatureState;
     safariObject: FeatureState;
     messageHandlers: {
         state: FeatureState;
