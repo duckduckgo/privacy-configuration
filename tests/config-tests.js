@@ -232,6 +232,14 @@ describe('Config schema tests', () => {
     });
 });
 
+// `immediate_v2` fires per de-duplicated delivery and `immediate` per raw occurrence, so clients
+// must not treat them as aliases — but every validation rule below applies to both.
+const IMMEDIATE_TRIGGER_TYPES = [
+    'immediate_v2',
+    'immediate',
+];
+const isImmediateTriggerType = (type) => IMMEDIATE_TRIGGER_TYPES.includes(type);
+
 describe('EventHub validation tests', () => {
     for (const config of latestConfigs) {
         const eventHub = /** @type {import('../schema/features/event-hub').EventHubFeature<number> | undefined} */ (
@@ -267,11 +275,11 @@ describe('EventHub validation tests', () => {
                     expect(type).to.be.oneOf(
                         [
                             'period',
-                            'immediate',
+                            ...IMMEDIATE_TRIGGER_TYPES,
                         ],
                         `Telemetry '${name}' has invalid trigger.type '${trigger.type}'`,
                     );
-                    if (type === 'immediate') {
+                    if (isImmediateTriggerType(type)) {
                         // Immediate triggers fire per event: no period, and a `source` naming the event.
                         expect(trigger.period, `Immediate telemetry '${name}' must not specify a period`).to.equal(undefined);
                         expect(trigger.source, `Immediate telemetry '${name}' source must be a string`).to.be.a('string');
@@ -295,7 +303,7 @@ describe('EventHub validation tests', () => {
                     // per-provider captcha pixel, where the provider is the pixel itself). Skip the check only
                     // for immediate triggers rather than matching on 'period', so any future trigger type is
                     // still required to carry at least one parameter until it's explicitly exempted here.
-                    if ((entry.trigger.type ?? 'period') !== 'immediate') {
+                    if (!isImmediateTriggerType(entry.trigger.type ?? 'period')) {
                         expect(Object.keys(params).length).to.be.greaterThan(
                             0,
                             `Non-immediate telemetry '${name}' must have at least one parameter`,
@@ -318,7 +326,7 @@ describe('EventHub validation tests', () => {
                 ([
                     ,
                     entry,
-                ]) => entry.trigger.type === 'immediate',
+                ]) => isImmediateTriggerType(entry.trigger.type),
             );
 
             describe('period telemetry entries', () => {
@@ -460,7 +468,7 @@ describe('EventHub validation tests', () => {
                     param,
                 ] of Object.entries(entry.parameters || {})) {
                     describe(`${entryName}.${paramName}`, () => {
-                        const isImmediateTrigger = entry.trigger?.type === 'immediate';
+                        const isImmediateTrigger = isImmediateTriggerType(entry.trigger?.type);
 
                         if (param.template === 'data' && isImmediateTrigger) {
                             // Immediate-trigger data params forward the triggering event's payload; the
@@ -640,11 +648,11 @@ describe('EventHub schema source rules', () => {
         },
     });
 
-    const immediateEntry = (param) => ({
+    const immediateEntry = (param, type = 'immediate_v2') => ({
         telemetry: {
             test_pixel_immediate: {
                 state: 'enabled',
-                trigger: { type: 'immediate', source: 'someEvent' },
+                trigger: { type, source: 'someEvent' },
                 parameters: { value: param },
             },
         },
@@ -673,6 +681,18 @@ describe('EventHub schema source rules', () => {
     it('accepts an immediate data param that omits its source', () => {
         const settings = immediateEntry({ template: 'data', dataKey: 'loginState' });
         expect(validate(settings), formatErrors(validate.errors)).to.equal(true);
+    });
+
+    it('accepts both immediate trigger spellings', () => {
+        for (const type of IMMEDIATE_TRIGGER_TYPES) {
+            const settings = immediateEntry({ template: 'data', dataKey: 'loginState' }, type);
+            expect(validate(settings), formatErrors(validate.errors)).to.equal(true);
+        }
+    });
+
+    it('rejects an unknown immediate trigger spelling', () => {
+        const settings = immediateEntry({ template: 'data', dataKey: 'loginState' }, 'immediate_v3');
+        expect(validate(settings)).to.equal(false);
     });
 
     it('accepts an eventHub_baseline_* pixel whose baseline counter has no matching detector source', () => {

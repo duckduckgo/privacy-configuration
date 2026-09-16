@@ -42,11 +42,11 @@ type PeriodTrigger = {
     };
 };
 
-// Fires once per triggering event rather than aggregating, so it carries no `period`.
+// Fires once per delivered event rather than aggregating, so it carries no `period`.
 // `source` names the event that fires the pixel; data params on an immediate trigger forward
 // that event's payload and so omit their own `source`.
 type ImmediateTrigger = {
-    type: 'immediate';
+    type: 'immediate_v2' | 'immediate';
     source: string;
 };
 
