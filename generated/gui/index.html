@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Config Status — Sub-feature Inspector</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>Sub-feature Status Inspector</h1>
+    <p class="subtitle">Privacy Remote Configuration — Generated v5 Configs</p>
+  </header>
+
+  <main>
+    <div class="controls">
+      <div class="control-group">
+        <label for="platform-select">Platform</label>
+        <select id="platform-select">
+          <option value="">— Select a platform —</option>
+        </select>
+      </div>
+      <div class="control-group">
+        <label for="search-input">Search</label>
+        <input type="text" id="search-input" placeholder="Filter by feature or subfeature name…" disabled>
+      </div>
+      <div class="control-group stats" id="stats" hidden>
+        <span id="stats-text"></span>
+      </div>
+    </div>
+
+    <fieldset class="filters" id="filters" disabled>
+      <legend>Filters</legend>
+      <div class="filter-row">
+        <div class="filter-group">
+          <span class="filter-label">State</span>
+          <label class="chip-toggle">
+            <input type="checkbox" value="enabled" checked> <span class="chip chip-enabled">enabled</span>
+          </label>
+          <label class="chip-toggle">
+            <input type="checkbox" value="disabled" checked> <span class="chip chip-disabled">disabled</span>
+          </label>
+          <label class="chip-toggle">
+            <input type="checkbox" value="internal" checked> <span class="chip chip-internal">internal</span>
+          </label>
+        </div>
+        <div class="filter-group">
+          <label class="chip-toggle">
+            <input type="checkbox" id="filter-rollout"> <span class="chip">Has rollout</span>
+          </label>
+          <label class="chip-toggle">
+            <input type="checkbox" id="filter-cohorts"> <span class="chip">Has cohorts</span>
+          </label>
+        </div>
+      </div>
+    </fieldset>
+
+    <div id="loading" class="message" hidden>Loading config…</div>
+    <div id="empty" class="message" hidden>No matching subfeatures found.</div>
+
+    <div class="table-wrap" id="table-wrap" hidden>
+      <table id="results-table">
+        <thead>
+          <tr>
+            <th class="sortable" data-key="feature">Feature</th>
+            <th class="sortable" data-key="subfeature">Subfeature</th>
+            <th class="sortable" data-key="state">State</th>
+            <th>Rollout</th>
+            <th>Cohorts</th>
+          </tr>
+        </thead>
+        <tbody id="results-body"></tbody>
+      </table>
+    </div>
+  </main>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
