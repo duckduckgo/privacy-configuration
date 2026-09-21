@@ -349,6 +349,59 @@
                             "weight": 1
                         }
                     ]
+                },
+                "tdsNextExperiment015": {
+                    "state": "disabled",
+                    "minSupportedVersion": 52361000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "v5/experiments/202609v1-android-tds-control.json",
+                        "treatmentUrl": "v5/experiments/202609v1-android-tds-treatment.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "tdsNextExperiment016": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52361000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "v5/experiments/202609v2-android-tds-control.json",
+                        "treatmentUrl": "v5/experiments/202609v2-android-tds-treatment.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
                 }
             }
         },
@@ -376,124 +429,318 @@
         "contentBlocking": {
             "exceptions": []
         },
+        "drmPolicy": {
+            "state": "disabled",
+            "minSupportedVersion": 52950000,
+            "features": {
+                "centralPolicy": {
+                    "state": "disabled"
+                }
+            },
+            "exceptions": []
+        },
         "eme": {
             "state": "enabled",
             "exceptions": [
                 {
-                    "domain": "amazon.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1162"
+                    "domain": "pornhub.com"
                 },
                 {
-                    "domain": "cnn.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1220"
+                    "domain": "xvideos.com"
                 },
                 {
-                    "domain": "foxnews.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/984"
+                    "domain": "youtube.com"
                 },
                 {
-                    "domain": "open.spotify.com",
-                    "reason": "Site displays a 'Playback disabled' notice on some media, preventing listening."
+                    "domain": "xhamster.com"
                 },
                 {
-                    "domain": "plex.tv",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/684"
+                    "domain": "reddit.com"
                 },
                 {
-                    "domain": "primevideo.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1162"
+                    "domain": "facebook.com"
                 },
                 {
-                    "domain": "rte.ie",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1217"
+                    "domain": "xnxx.com"
                 },
                 {
-                    "domain": "showtime.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/867"
+                    "domain": "instagram.com"
                 },
                 {
-                    "domain": "peacocktv.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1356"
+                    "domain": "fandom.com"
                 },
                 {
-                    "domain": "disneyplus.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1363"
+                    "domain": "erome.com"
                 },
                 {
-                    "domain": "hulu.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1363"
+                    "domain": "amazon.com"
                 },
                 {
-                    "domain": "plus.espn.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1363"
+                    "domain": "imdb.com"
                 },
                 {
-                    "domain": "netflix.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1363"
+                    "domain": "viralxxxporn.com"
                 },
                 {
-                    "domain": "paramountplus.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1363"
+                    "domain": "eporner.com"
                 },
                 {
-                    "domain": "tv.apple.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1363"
+                    "domain": "x.com"
                 },
                 {
-                    "domain": "curiositystream.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1363"
+                    "domain": "linkedin.com"
                 },
                 {
-                    "domain": "starz.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1363"
+                    "domain": "rule34.xxx"
                 },
                 {
-                    "domain": "dazn.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1363"
+                    "domain": "yahoo.com"
                 },
                 {
-                    "domain": "crunchyroll.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1363"
+                    "domain": "bbc.com"
                 },
                 {
-                    "domain": "funimation.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1363"
+                    "domain": "tubesafari.com"
                 },
                 {
-                    "domain": "mubi.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1363"
+                    "domain": "t.me"
                 },
                 {
-                    "domain": "crave.ca",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1363"
+                    "domain": "yandex.com"
                 },
                 {
-                    "domain": "britbox.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1363"
+                    "domain": "bbc.co.uk"
                 },
                 {
-                    "domain": "dailywire.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1363"
+                    "domain": "scrolller.com"
                 },
                 {
-                    "domain": "fubo.tv",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1363"
+                    "domain": "rule34video.com"
                 },
                 {
-                    "domain": "acorn.tv",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1363"
+                    "domain": "xhamster.desi"
                 },
                 {
-                    "domain": "shudder.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1363"
+                    "domain": "aznude.com"
                 },
                 {
-                    "domain": "music.amazon.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1363"
+                    "domain": "wikihow.com"
                 },
                 {
-                    "domain": "youtube.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1363"
+                    "domain": "nudevista.com"
+                },
+                {
+                    "domain": "tiktok.com"
+                },
+                {
+                    "domain": "foxnews.com"
+                },
+                {
+                    "domain": "xhamster19.com"
+                },
+                {
+                    "domain": "nytimes.com"
+                },
+                {
+                    "domain": "youporn.com"
+                },
+                {
+                    "domain": "thisvid.com"
+                },
+                {
+                    "domain": "mypikpak.com"
+                },
+                {
+                    "domain": "archive.org"
+                },
+                {
+                    "domain": "chaturbate.com"
+                },
+                {
+                    "domain": "luxuretv.com"
+                },
+                {
+                    "domain": "allrecipes.com"
+                },
+                {
+                    "domain": "accuweather.com"
+                },
+                {
+                    "domain": "webmd.com"
+                },
+                {
+                    "domain": "amazon.de"
+                },
+                {
+                    "domain": "notfans.com"
+                },
+                {
+                    "domain": "pornhub.org"
+                },
+                {
+                    "domain": "spankbang.com"
+                },
+                {
+                    "domain": "msn.com"
+                },
+                {
+                    "domain": "amazon.co.uk"
+                },
+                {
+                    "domain": "erothots.co"
+                },
+                {
+                    "domain": "steamcommunity.com"
+                },
+                {
+                    "domain": "fapello.com"
+                },
+                {
+                    "domain": "alohatube.com"
+                },
+                {
+                    "domain": "leakgallery.com"
+                },
+                {
+                    "domain": "cumguru.com"
+                },
+                {
+                    "domain": "dailymail.com"
+                },
+                {
+                    "domain": "fapopedia.net"
+                },
+                {
+                    "domain": "stripchat.com"
+                },
+                {
+                    "domain": "thothub.to"
+                },
+                {
+                    "domain": "pinterest.com"
+                },
+                {
+                    "domain": "hanime.tv"
+                },
+                {
+                    "domain": "theguardian.com"
+                },
+                {
+                    "domain": "porntrex.com"
+                },
+                {
+                    "domain": "tnaflix.com"
+                },
+                {
+                    "domain": "telegram.im"
+                },
+                {
+                    "domain": "scribd.com"
+                },
+                {
+                    "domain": "people.com"
+                },
+                {
+                    "domain": "tagesschau.de"
+                },
+                {
+                    "domain": "spotify.com"
+                },
+                {
+                    "domain": "play.google.com"
+                },
+                {
+                    "domain": "easyliveauction.com"
+                },
+                {
+                    "domain": "xfinity.com"
+                },
+                {
+                    "domain": "bitchute.com"
+                },
+                {
+                    "domain": "onlyfans.com"
+                },
+                {
+                    "domain": "xhamsterlive.com"
+                },
+                {
+                    "domain": "newsmax.com"
+                },
+                {
+                    "domain": "n-tv.de"
+                },
+                {
+                    "domain": "peacocktv.com"
+                },
+                {
+                    "domain": "sportschau.de"
+                },
+                {
+                    "domain": "cnn.com"
+                },
+                {
+                    "domain": "xgroovy.com"
+                },
+                {
+                    "domain": "espn.com"
+                },
+                {
+                    "domain": "iporntv.net"
+                },
+                {
+                    "domain": "youjizz.com"
+                },
+                {
+                    "domain": "rule34.gg"
+                },
+                {
+                    "domain": "pussyspace.com"
+                },
+                {
+                    "domain": "pornone.com"
+                },
+                {
+                    "domain": "redtube.com"
+                },
+                {
+                    "domain": "trannyclips.com"
+                },
+                {
+                    "domain": "xhamster3.com"
+                },
+                {
+                    "domain": "tubepornstars.com"
+                },
+                {
+                    "domain": "netflix.com"
+                },
+                {
+                    "domain": "tubepleasure.com"
+                },
+                {
+                    "domain": "cums.net"
+                },
+                {
+                    "domain": "vk.com"
+                },
+                {
+                    "domain": "porzo.com"
+                },
+                {
+                    "domain": "dailymotion.com"
+                },
+                {
+                    "domain": "missav.live"
+                },
+                {
+                    "domain": "goldtits.com"
+                },
+                {
+                    "domain": "heavy-r.com"
+                },
+                {
+                    "domain": "gaymaletube.com"
                 }
             ]
         },
@@ -675,6 +922,10 @@
                     "state": "enabled",
                     "minSupportedVersion": 52860000
                 },
+                "nativePromptEditing": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52940000
+                },
                 "nativeInputField": {
                     "state": "enabled",
                     "minSupportedVersion": 52840000,
@@ -727,6 +978,18 @@
                 "contextualSuggestedPrompts": {
                     "state": "enabled",
                     "minSupportedVersion": 52920000
+                },
+                "nativeInputAttachmentChanges": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52950000
+                },
+                "contextualSheetRedesign": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52950000
+                },
+                "sendDuckAiSessionWideEvent": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52950000
                 }
             }
         },
@@ -811,10 +1074,6 @@
                 {
                     "domain": "dresden.de",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5532"
-                },
-                {
-                    "domain": "paypal.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5800"
                 }
             ],
             "features": {
@@ -851,6 +1110,17 @@
                             },
                             {
                                 "percent": 100
+                            }
+                        ]
+                    }
+                },
+                "cookiePopUpOptInPrompt": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52950000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
                             }
                         ]
                     }
@@ -944,6 +1214,51 @@
                         "formBoundarySelector": "",
                         "failsafeSettings": {},
                         "conditionalChanges": [
+                            {
+                                "condition": [
+                                    { "domain": "www.aestheticcity.academy" }
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input[name=\"confirm-email\"]",
+                                            "type": "unknown"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "condition": [
+                                    { "urlPattern": "https://login.app.carta.com/registration*" }
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "form",
+                                            "type": "login"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "condition": [
+                                    { "domain": "www.theinformation.com" }
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "#login-email",
+                                            "type": "credentials.username"
+                                        }
+                                    }
+                                ]
+                            },
                             {
                                 "condition": [
                                     { "domain": "fedex.com" }
@@ -1134,6 +1449,30 @@
                                         "value": {
                                             "selector": "profile-lookup[app-name='account-login'] input[type='text']",
                                             "type": "credentials.username"
+                                        }
+                                    },
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "#ps_month",
+                                            "type": "identities.birthdayMonth"
+                                        }
+                                    },
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "#ps_day",
+                                            "type": "identities.birthdayDay"
+                                        }
+                                    },
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "#ps_year",
+                                            "type": "identities.birthdayYear"
                                         }
                                     }
                                 ]
@@ -1397,6 +1736,26 @@
                                         "value": {
                                             "selector": "input#floatingLabelInput109",
                                             "type": "unknown"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "condition": [
+                                    { "domain": "icloud.com" }
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formBoundarySelector",
+                                        "op": "replace",
+                                        "value": "#sign_in_form"
+                                    },
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "#sign_in_form",
+                                            "type": "login"
                                         }
                                     }
                                 ]
@@ -2761,7 +3120,18 @@
                 "serpSettings": "disabled",
                 "serp": "disabled",
                 "duckAiNativeStorage": "disabled",
+                "internalFeedback": "disabled",
                 "domains": [
+                    {
+                        "domain": "internalapps.duckduckgo.com",
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/internalFeedback",
+                                "value": "enabled"
+                            }
+                        ]
+                    },
                     {
                         "domain": [
                             "duckduckgo.com",
@@ -3004,6 +3374,10 @@
                 },
                 "ensureBrokerDataBeforeScan": {
                     "state": "enabled"
+                },
+                "workQueueScheduling": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52930000
                 }
             }
         },
@@ -3090,6 +3464,11 @@
             "settings": {
                 "windowInMs": 200
             },
+            "exceptions": []
+        },
+        "returnSessionWideEvent": {
+            "state": "enabled",
+            "minSupportedVersion": 52930000,
             "exceptions": []
         },
         "sendFullPackageInstallSource": {
@@ -3462,6 +3841,7 @@
                 "webShare": "enabled",
                 "screenLock": "enabled",
                 "plainTextViewPort": "enabled",
+                "passkeyDetection": "enabled",
                 "modifyLocalStorage": {
                     "state": "enabled",
                     "changes": []
@@ -3919,6 +4299,17 @@
         "privacyPro": {
             "state": "enabled",
             "features": {
+                "partnershipsHub": {
+                    "state": "disabled",
+                    "settings": {
+                        "url": "https://duckduckgo.com/partner-benefits"
+                    },
+                    "targets": [
+                        {
+                            "localeCountry": "us"
+                        }
+                    ]
+                },
                 "refreshSubscriptionPlanFeatures": {
                     "state": "enabled",
                     "minSupportedVersion": 52440000
@@ -4039,6 +4430,41 @@
                 "useQueryPurchases": {
                     "state": "enabled",
                     "minSupportedVersion": 52840000
+                },
+                "serializeTokenRefresh": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 20
+                            },
+                            {
+                                "percent": 50
+                            }
+                        ]
+                    }
+                },
+                "performanceOptimizedPaywalls": {
+                    "state": "disabled",
+                    "settings": {
+                        "entryPoints": {
+                            "vpn": {
+                                "path": "/subscriptions/new/mobile/vpn"
+                            },
+                            "duckai": {
+                                "path": "/subscriptions/new/mobile/duckai"
+                            },
+                            "pir": {
+                                "path": "/subscriptions/new/mobile/pir"
+                            }
+                        }
+                    }
                 }
             }
         },
@@ -4194,6 +4620,11 @@
                     }
                 }
             }
+        },
+        "nativeInputUrlClearingFeature": {
+            "state": "enabled",
+            "minSupportedVersion": 52940000,
+            "exceptions": []
         },
         "swipingTabs": {
             "state": "enabled",
@@ -4707,7 +5138,7 @@
                     ]
                 },
                 "contentScopeExperiment6": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": 52900000,
                     "description": "Captcha detection: auto-run + fireEvent for the captcha detectors, comparing 'content' vs 'visible' element visibility",
                     "rollout": {
@@ -4728,6 +5159,31 @@
                         },
                         {
                             "name": "treatmentVis",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "contentScopeExperiment7": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52920000,
+                    "description": "Adwall detection: rendered-text xpath matching for the generic adwall detectors",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
                             "weight": 1
                         }
                     ]
@@ -5018,35 +5474,103 @@
                                 "template": "counter",
                                 "source": "youtube_videoAd",
                                 "buckets": {
-                                    "true": { "gte": 1 }
+                                    "0": { "gte": 0, "lt": 1 },
+                                    "1": { "gte": 1, "lt": 2 },
+                                    "2-5": { "gte": 2, "lt": 6 },
+                                    "6-9": { "gte": 6, "lt": 10 },
+                                    "10+": { "gte": 10 }
                                 }
                             },
                             "staticAd": {
                                 "template": "counter",
                                 "source": "youtube_staticAd",
                                 "buckets": {
-                                    "true": { "gte": 1 }
+                                    "0": { "gte": 0, "lt": 1 },
+                                    "1": { "gte": 1, "lt": 2 },
+                                    "2-5": { "gte": 2, "lt": 6 },
+                                    "6-9": { "gte": 6, "lt": 10 },
+                                    "10+": { "gte": 10 }
                                 }
                             },
                             "playabilityError": {
                                 "template": "counter",
                                 "source": "youtube_playabilityError",
                                 "buckets": {
-                                    "true": { "gte": 1 }
+                                    "0": { "gte": 0, "lt": 1 },
+                                    "1": { "gte": 1, "lt": 2 },
+                                    "2-5": { "gte": 2, "lt": 6 },
+                                    "6-9": { "gte": 6, "lt": 10 },
+                                    "10+": { "gte": 10 }
                                 }
                             },
                             "adBlocker": {
                                 "template": "counter",
                                 "source": "youtube_adBlocker",
                                 "buckets": {
-                                    "true": { "gte": 1 }
+                                    "0": { "gte": 0, "lt": 1 },
+                                    "1": { "gte": 1, "lt": 2 },
+                                    "2-5": { "gte": 2, "lt": 6 },
+                                    "6-9": { "gte": 6, "lt": 10 },
+                                    "10+": { "gte": 10 }
                                 }
                             },
                             "buffering": {
                                 "template": "counter",
                                 "source": "youtube_buffering",
                                 "buckets": {
-                                    "true": { "gte": 1 }
+                                    "0": { "gte": 0, "lt": 1 },
+                                    "1": { "gte": 1, "lt": 2 },
+                                    "2-5": { "gte": 2, "lt": 6 },
+                                    "6-9": { "gte": 6, "lt": 10 },
+                                    "10+": { "gte": 10 }
+                                }
+                            }
+                        }
+                    },
+                    "webTelemetry_video_unavailable_day": {
+                        "state": "enabled",
+                        "trigger": {
+                            "period": {
+                                "days": 1
+                            }
+                        },
+                        "parameters": {
+                            "count": {
+                                "template": "counter",
+                                "source": "video_unavailable",
+                                "buckets": {
+                                    "0": { "gte": 0, "lt": 1 },
+                                    "1": { "gte": 1, "lt": 2 },
+                                    "2-3": { "gte": 2, "lt": 4 },
+                                    "4-7": { "gte": 4, "lt": 8 },
+                                    "8-14": { "gte": 8, "lt": 15 },
+                                    "15-20": { "gte": 15, "lt": 21 },
+                                    "21-39": { "gte": 21, "lt": 40 },
+                                    "40+": { "gte": 40 }
+                                }
+                            }
+                        }
+                    },
+                    "webTelemetry_video_unavailable_week": {
+                        "state": "enabled",
+                        "trigger": {
+                            "period": {
+                                "days": 7
+                            }
+                        },
+                        "parameters": {
+                            "count": {
+                                "template": "counter",
+                                "source": "video_unavailable",
+                                "buckets": {
+                                    "0": { "gte": 0, "lt": 1 },
+                                    "1": { "gte": 1, "lt": 2 },
+                                    "2-3": { "gte": 2, "lt": 4 },
+                                    "4-7": { "gte": 4, "lt": 8 },
+                                    "8-14": { "gte": 8, "lt": 15 },
+                                    "15-20": { "gte": 15, "lt": 21 },
+                                    "21-39": { "gte": 21, "lt": 40 },
+                                    "40+": { "gte": 40 }
                                 }
                             }
                         }
@@ -5246,7 +5770,7 @@
                         },
                         {
                             "name": "treatmentDockOnly",
-                            "weight": 1
+                            "weight": 0
                         },
                         {
                             "name": "treatmentWidgetOnly",
@@ -5278,6 +5802,67 @@
                             },
                             {
                                 "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        "optimizeCnameDetection": {
+            "state": "enabled",
+            "minSupportedVersion": 52930000,
+            "exceptions": [],
+            "features": {
+                "cacheCnamesInMemory": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52930000
+                }
+            }
+        },
+        "badUrlErrorPageWideEvent": {
+            "state": "enabled",
+            "minSupportedVersion": 52950000,
+            "exceptions": []
+        },
+        "suggestRedirectOnUnresolvedError": {
+            "state": "enabled",
+            "minSupportedVersion": 52950000,
+            "exceptions": [],
+            "features": {
+                "suggestRedirect": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52950000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 20
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        "customErrorPages": {
+            "state": "enabled",
+            "minSupportedVersion": 52950000,
+            "exceptions": [],
+            "features": {
+                "keepErrorPageUntilNextPageStartsLoading": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52950000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 20
                             }
                         ]
                     }

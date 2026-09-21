@@ -30,6 +30,7 @@ type CuratedExtension = {
 // Type of the `curatedExtensions` subfeature `settings` object
 type CuratedExtensionsSettings = {
     catalog: CuratedExtension[];
+    catalogInternal?: CuratedExtension[];
 };
 
 type SubFeatures<VersionType> = {

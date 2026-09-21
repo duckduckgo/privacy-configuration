@@ -40,17 +40,17 @@ jobs:
             - name: Install jq
               run: sudo apt-get update && sudo apt-get install -y jq
 
-            - name: Setup Node.js
-              uses: actions/setup-node@v6
-              with:
-                  node-version: '20'
-
             - name: Checkout merge commit
               uses: actions/checkout@v6
               with:
                   ref: ${{ steps.pr_context.outputs.head_sha }}
                   path: head
                   fetch-depth: 2
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v6
+              with:
+                  node-version-file: head/.nvmrc
 
             - name: Resolve pre-merge base SHA
               id: resolve_base
