@@ -221,7 +221,7 @@
                     ]
                 },
                 "contentScopeExperiment7": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": "1.204.0",
                     "description": "Adwall detection: rendered-text xpath matching for the generic adwall detectors",
                     "rollout": {
@@ -3519,6 +3519,22 @@
                                 "dataKey": "loginState"
                             }
                         }
+                    },
+                    "webTelemetry_adwall": {
+                        "state": "enabled",
+                        "trigger": {
+                            "type": "immediate",
+                            "source": "adwall"
+                        },
+                        "parameters": {}
+                    },
+                    "webTelemetry_admiralAdwall": {
+                        "state": "enabled",
+                        "trigger": {
+                            "type": "immediate",
+                            "source": "admiralAdwall"
+                        },
+                        "parameters": {}
                     },
                     "webTelemetry_captcha_recaptcha": {
                         "state": "enabled",
