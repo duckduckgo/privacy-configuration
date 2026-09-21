@@ -430,11 +430,18 @@
             "exceptions": []
         },
         "drmPolicy": {
-            "state": "disabled",
+            "state": "enabled",
             "minSupportedVersion": 52950000,
             "features": {
                 "centralPolicy": {
-                    "state": "disabled"
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25
+                            }
+                        ]
+                    }
                 }
             },
             "exceptions": []
