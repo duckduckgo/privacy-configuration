@@ -2686,8 +2686,21 @@
             }
         },
         "storagePartitioning": {
-            "state": "preview",
-            "exceptions": []
+            "state": "enabled",
+            "exceptions": [],
+            "features": {
+                "cacheAndCookies": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.171.2",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5.0
+                            }
+                        ]
+                    }
+                }
+            }
         },
         "customUserAgent": {
             "settings": {
