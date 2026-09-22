@@ -1943,6 +1943,7 @@
                 "#concentBanner .rdc-save-preferences, #concentPopup .rdc-save-preferences",
                 "#concentBanner, #concentPopup",
                 "iframe.tmblr-iframe--gdpr-banner",
+                "div[id^='sp_message_container_']",
                 "body > div#root > div#ccpa-iframe-theme-provider[data-testid=\"ccpa-iframe-theme-provider\"] > div#ccpa-iframe[data-testid=\"ccpa-iframe\"] > div#ccpa_consent_banner[data-testid=\"ccpa_consent_banner\"] > div:not([id]) > div:nth-child(3):not([id]) > span:not([id]) > span:not([id]) > div:nth-child(2):not([id]) > span:nth-child(1):not([id]) > button#decline_cookies_button[data-testid=\"decline_cookies_button\"]",
                 "body:not([id]) > div#banner-0 > div:nth-child(1)#grouped-pageload-Banner > div:not([id]) > div:not([id]) > div:not([id]) > div:nth-child(3):not([id]) > button:nth-child(2):not([id])",
                 "body > div#iubenda-cs-banner > div:not([id]) > div:not([id]) > div:not([id]) > div:nth-child(5):not([id]) > div:nth-child(2):not([id]) > button:nth-child(1):not([id])",
@@ -1985,7 +1986,6 @@
                 "#cmp-app-container",
                 "#save-all-pur",
                 "#reminder",
-                "[class*=cookiesAnnounce]",
                 "[class*=cookiesAnnounce] [class*=announceText]",
                 "cookie_consent_essential=true",
                 "cookie_consent_marketing=true",
@@ -2388,7 +2388,7 @@
                 "#cookie-consent-banner button[aria-label=\"Reject non-essential cookies and continue.\"]",
                 "body > div:not([id]) > div:nth-child(2):not([id]) > div:nth-child(2):not([id]) > button:nth-child(2):not([id])",
                 "dialog[data-cookie-consent]:has(form[data-privacy-consent-form])",
-                "div[id='sp_message_container_1482251'],div[id='sp_message_container_1482252']",
+                "%22analytics%22:false",
                 "#globalCookieBanner .js-customizeGlobalCookies",
                 "#cookieBanner button.cbSecondaryCTA",
                 "#__rptl-cookiebanner #__rptl-cookiebanner-reject",
@@ -2658,7 +2658,7 @@
                 "[class*=CookieConsent__root___]",
                 "[class*=CookieConsent__modal___]",
                 "[class*=CookieConsent__modal___] > div > button[class*=secondary]:nth-child(2)",
-                "html.sp-message-open",
+                "[class*=cookiesAnnounce]",
                 "[data-test-id=cookies_section]",
                 "Analytics_consent=2",
                 "Marketing_consent=2",
@@ -2835,8 +2835,7 @@
                 ".cookie-policy-modal",
                 ".manage-cookies-modal",
                 ".cookie-policy-modal .cookie-policy-details button.manage",
-                ".manage-cookies-modal .manage-cookies-footer button.btn-outline-primary",
-                "%22analytics%22:false"
+                ".manage-cookies-modal .manage-cookies-footer button.btn-outline-primary"
             ],
             "r": [
                 [
@@ -9937,6 +9936,43 @@
                     {}
                 ],
                 [
+                    3,
+                    "sourcepoint-top",
+                    2,
+                    "",
+                    10,
+                    [
+                        928
+                    ],
+                    [
+                        {
+                            "e": 928
+                        }
+                    ],
+                    [
+                        {
+                            "v": 928
+                        }
+                    ],
+                    [
+                        {
+                            "stylesheet": "div[id^='sp_message_container_'] { visibility: hidden !important; z-index: -1 !important; pointer-events: none !important; }",
+                            "stylesheetId": "sourcepoint-top-hide"
+                        },
+                        {
+                            "stylesheet": "html.sp-message-open { height: auto !important; width: auto !important; } html.sp-message-open body { position: relative !important; overflow: auto !important; margin-top: 0 !important; top: auto !important; left: auto !important; right: auto !important; }",
+                            "stylesheetId": "sourcepoint-top-scroll-unlock"
+                        },
+                        {
+                            "removeClass": "sp-message-open",
+                            "selector": "html",
+                            "optional": true
+                        }
+                    ],
+                    [],
+                    {}
+                ],
+                [
                     1,
                     "squarespace-cookie-banner",
                     2,
@@ -12078,40 +12114,6 @@
                     [],
                     [
                         {
-                            "e": 928
-                        }
-                    ],
-                    [
-                        {
-                            "v": 928
-                        }
-                    ],
-                    [
-                        {
-                            "wait": 500
-                        },
-                        {
-                            "c": 928
-                        }
-                    ],
-                    [
-                        {
-                            "timeout": 1000,
-                            "check": "none",
-                            "wv": 928
-                        }
-                    ],
-                    {}
-                ],
-                [
-                    1,
-                    "auto_CA_coasthotels.com_f8m",
-                    0,
-                    "^https?://(www\\.)?coasthotels\\.com/",
-                    1,
-                    [],
-                    [
-                        {
                             "e": 929
                         }
                     ],
@@ -12122,17 +12124,26 @@
                     ],
                     [
                         {
+                            "wait": 500
+                        },
+                        {
                             "c": 929
                         }
                     ],
-                    [],
+                    [
+                        {
+                            "timeout": 1000,
+                            "check": "none",
+                            "wv": 929
+                        }
+                    ],
                     {}
                 ],
                 [
                     1,
-                    "auto_CA_epihunter.eu_hd4",
+                    "auto_CA_coasthotels.com_f8m",
                     0,
-                    "^https?://(www\\.)?combell\\.com/",
+                    "^https?://(www\\.)?coasthotels\\.com/",
                     1,
                     [],
                     [
@@ -12147,26 +12158,17 @@
                     ],
                     [
                         {
-                            "wait": 500
-                        },
-                        {
                             "c": 930
                         }
                     ],
-                    [
-                        {
-                            "timeout": 1000,
-                            "check": "none",
-                            "wv": 930
-                        }
-                    ],
+                    [],
                     {}
                 ],
                 [
                     1,
-                    "auto_CA_nationalarchives.gov.uk_rx0",
+                    "auto_CA_epihunter.eu_hd4",
                     0,
-                    "^https?://(www\\.)?webarchive\\.nationalarchives\\.gov\\.uk/",
+                    "^https?://(www\\.)?combell\\.com/",
                     1,
                     [],
                     [
@@ -12198,9 +12200,9 @@
                 ],
                 [
                     1,
-                    "auto_CA_natureconservancy.ca_3pp",
+                    "auto_CA_nationalarchives.gov.uk_rx0",
                     0,
-                    "^https?://(www\\.)?natureconservancy\\.ca/",
+                    "^https?://(www\\.)?webarchive\\.nationalarchives\\.gov\\.uk/",
                     1,
                     [],
                     [
@@ -12232,9 +12234,9 @@
                 ],
                 [
                     1,
-                    "auto_CA_ontariospca.ca_k32",
+                    "auto_CA_natureconservancy.ca_3pp",
                     0,
-                    "^https?://(www\\.)?widget-next\\.clym-sdk\\.net/",
+                    "^https?://(www\\.)?natureconservancy\\.ca/",
                     1,
                     [],
                     [
@@ -12266,7 +12268,7 @@
                 ],
                 [
                     1,
-                    "auto_CA_phoenixnap.com_hrb",
+                    "auto_CA_ontariospca.ca_k32",
                     0,
                     "^https?://(www\\.)?widget-next\\.clym-sdk\\.net/",
                     1,
@@ -12300,7 +12302,7 @@
                 ],
                 [
                     1,
-                    "auto_CH_phoenixnap.com_lx5",
+                    "auto_CA_phoenixnap.com_hrb",
                     0,
                     "^https?://(www\\.)?widget-next\\.clym-sdk\\.net/",
                     1,
@@ -12334,9 +12336,9 @@
                 ],
                 [
                     1,
-                    "auto_CH_swisscare.com_arx",
+                    "auto_CH_phoenixnap.com_lx5",
                     0,
-                    "^https?://(www\\.)?swisscare\\.com/",
+                    "^https?://(www\\.)?widget-next\\.clym-sdk\\.net/",
                     1,
                     [],
                     [
@@ -12368,9 +12370,9 @@
                 ],
                 [
                     1,
-                    "auto_DE_alfaromeo.de_gvg_+2",
+                    "auto_CH_swisscare.com_arx",
                     0,
-                    "^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/|^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/|^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/",
+                    "^https?://(www\\.)?swisscare\\.com/",
                     1,
                     [],
                     [
@@ -12402,9 +12404,9 @@
                 ],
                 [
                     1,
-                    "auto_DE_huss-licht-ton.de_jj0",
+                    "auto_DE_alfaromeo.de_gvg_+2",
                     0,
-                    "^https?://(www\\.)?huss-licht-ton\\.de/",
+                    "^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/|^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/|^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/",
                     1,
                     [],
                     [
@@ -12436,9 +12438,9 @@
                 ],
                 [
                     1,
-                    "auto_DE_modellbau-berlinski.de_8vm",
+                    "auto_DE_huss-licht-ton.de_jj0",
                     0,
-                    "^https?://(www\\.)?modellbau-berlinski\\.de/",
+                    "^https?://(www\\.)?huss-licht-ton\\.de/",
                     1,
                     [],
                     [
@@ -12470,9 +12472,9 @@
                 ],
                 [
                     1,
-                    "auto_DE_phoenixnap.com_xq7",
+                    "auto_DE_modellbau-berlinski.de_8vm",
                     0,
-                    "^https?://(www\\.)?widget-next\\.clym-sdk\\.net/",
+                    "^https?://(www\\.)?modellbau-berlinski\\.de/",
                     1,
                     [],
                     [
@@ -12504,77 +12506,43 @@
                 ],
                 [
                     1,
+                    "auto_DE_phoenixnap.com_xq7",
+                    0,
+                    "^https?://(www\\.)?widget-next\\.clym-sdk\\.net/",
+                    1,
+                    [],
+                    [
+                        {
+                            "e": 941
+                        }
+                    ],
+                    [
+                        {
+                            "v": 941
+                        }
+                    ],
+                    [
+                        {
+                            "wait": 500
+                        },
+                        {
+                            "c": 941
+                        }
+                    ],
+                    [
+                        {
+                            "timeout": 1000,
+                            "check": "none",
+                            "wv": 941
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
                     "auto_FR_fiat.fr_3fh",
                     0,
                     "^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/",
-                    1,
-                    [],
-                    [
-                        {
-                            "e": 941
-                        }
-                    ],
-                    [
-                        {
-                            "v": 941
-                        }
-                    ],
-                    [
-                        {
-                            "wait": 500
-                        },
-                        {
-                            "c": 941
-                        }
-                    ],
-                    [
-                        {
-                            "timeout": 1000,
-                            "check": "none",
-                            "wv": 941
-                        }
-                    ],
-                    {}
-                ],
-                [
-                    1,
-                    "auto_FR_stellantis.com_67q",
-                    0,
-                    "^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/",
-                    1,
-                    [],
-                    [
-                        {
-                            "e": 941
-                        }
-                    ],
-                    [
-                        {
-                            "v": 941
-                        }
-                    ],
-                    [
-                        {
-                            "wait": 500
-                        },
-                        {
-                            "c": 941
-                        }
-                    ],
-                    [
-                        {
-                            "timeout": 1000,
-                            "check": "none",
-                            "wv": 941
-                        }
-                    ],
-                    {}
-                ],
-                [
-                    1,
-                    "auto_GB_dropbox.com_0_+1",
-                    0,
-                    "^https?://(www\\.)?dropbox\\.com/|^https?://(www\\.)?dropbox\\.com/",
                     1,
                     [],
                     [
@@ -12589,17 +12557,60 @@
                     ],
                     [
                         {
+                            "wait": 500
+                        },
+                        {
                             "c": 942
                         }
                     ],
-                    [],
+                    [
+                        {
+                            "timeout": 1000,
+                            "check": "none",
+                            "wv": 942
+                        }
+                    ],
                     {}
                 ],
                 [
                     1,
-                    "auto_GB_investing.thisismoney.co.uk_0",
+                    "auto_FR_stellantis.com_67q",
                     0,
-                    "^https?://(www\\.)?thisismoney\\.co\\.uk/",
+                    "^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/",
+                    1,
+                    [],
+                    [
+                        {
+                            "e": 942
+                        }
+                    ],
+                    [
+                        {
+                            "v": 942
+                        }
+                    ],
+                    [
+                        {
+                            "wait": 500
+                        },
+                        {
+                            "c": 942
+                        }
+                    ],
+                    [
+                        {
+                            "timeout": 1000,
+                            "check": "none",
+                            "wv": 942
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
+                    "auto_GB_dropbox.com_0_+1",
+                    0,
+                    "^https?://(www\\.)?dropbox\\.com/|^https?://(www\\.)?dropbox\\.com/",
                     1,
                     [],
                     [
@@ -12622,9 +12633,9 @@
                 ],
                 [
                     1,
-                    "auto_GB_village-hotels.co.uk_hsa",
+                    "auto_GB_investing.thisismoney.co.uk_0",
                     0,
-                    "^https?://(www\\.)?village-hotels\\.co\\.uk/",
+                    "^https?://(www\\.)?thisismoney\\.co\\.uk/",
                     1,
                     [],
                     [
@@ -12639,60 +12650,17 @@
                     ],
                     [
                         {
-                            "wait": 500
-                        },
-                        {
                             "c": 944
                         }
                     ],
-                    [
-                        {
-                            "timeout": 1000,
-                            "check": "none",
-                            "wv": 944
-                        }
-                    ],
-                    {}
-                ],
-                [
-                    1,
-                    "auto_NL_fiat.nl_trv_+1",
-                    0,
-                    "^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/|^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/",
-                    1,
                     [],
-                    [
-                        {
-                            "e": 941
-                        }
-                    ],
-                    [
-                        {
-                            "v": 941
-                        }
-                    ],
-                    [
-                        {
-                            "wait": 500
-                        },
-                        {
-                            "c": 941
-                        }
-                    ],
-                    [
-                        {
-                            "timeout": 1000,
-                            "check": "none",
-                            "wv": 941
-                        }
-                    ],
                     {}
                 ],
                 [
                     1,
-                    "auto_NL_flitsmeister.nl_ws8",
+                    "auto_GB_village-hotels.co.uk_hsa",
                     0,
-                    "^https?://(www\\.)?cookies\\.flitsmeister\\.com/",
+                    "^https?://(www\\.)?village-hotels\\.co\\.uk/",
                     1,
                     [],
                     [
@@ -12724,9 +12692,43 @@
                 ],
                 [
                     1,
-                    "auto_NL_interpolis.nl_jk9",
+                    "auto_NL_fiat.nl_trv_+1",
                     0,
-                    "^https?://(www\\.)?interpolis\\.nl/",
+                    "^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/|^https?://(www\\.)?cookielaw\\.emea\\.fcagroup\\.com/",
+                    1,
+                    [],
+                    [
+                        {
+                            "e": 942
+                        }
+                    ],
+                    [
+                        {
+                            "v": 942
+                        }
+                    ],
+                    [
+                        {
+                            "wait": 500
+                        },
+                        {
+                            "c": 942
+                        }
+                    ],
+                    [
+                        {
+                            "timeout": 1000,
+                            "check": "none",
+                            "wv": 942
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
+                    "auto_NL_flitsmeister.nl_ws8",
+                    0,
+                    "^https?://(www\\.)?cookies\\.flitsmeister\\.com/",
                     1,
                     [],
                     [
@@ -12758,9 +12760,9 @@
                 ],
                 [
                     1,
-                    "auto_US_dropbox.com_0_+1",
+                    "auto_NL_interpolis.nl_jk9",
                     0,
-                    "^https?://(www\\.)?dropbox\\.com/|^https?://(www\\.)?dropbox\\.com/",
+                    "^https?://(www\\.)?interpolis\\.nl/",
                     1,
                     [],
                     [
@@ -12775,8 +12777,42 @@
                     ],
                     [
                         {
-                            "text": "Decline",
+                            "wait": 500
+                        },
+                        {
                             "c": 947
+                        }
+                    ],
+                    [
+                        {
+                            "timeout": 1000,
+                            "check": "none",
+                            "wv": 947
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
+                    "auto_US_dropbox.com_0_+1",
+                    0,
+                    "^https?://(www\\.)?dropbox\\.com/|^https?://(www\\.)?dropbox\\.com/",
+                    1,
+                    [],
+                    [
+                        {
+                            "e": 948
+                        }
+                    ],
+                    [
+                        {
+                            "v": 948
+                        }
+                    ],
+                    [
+                        {
+                            "text": "Decline",
+                            "c": 948
                         }
                     ],
                     [],
@@ -12791,25 +12827,25 @@
                     [],
                     [
                         {
-                            "e": 948
+                            "e": 949
                         }
                     ],
                     [
                         {
-                            "v": 948
+                            "v": 949
                         }
                     ],
                     [
                         {
-                            "k": 949
+                            "k": 950
                         },
                         {
                             "all": true,
                             "optional": true,
-                            "k": 950
+                            "k": 951
                         },
                         {
-                            "k": 951
+                            "k": 952
                         }
                     ],
                     [
@@ -12828,47 +12864,47 @@
                     "^https://plus\\.gmx\\.com/lt(?:[?#]|$)",
                     1,
                     [
-                        952
+                        953
                     ],
                     [
                         {
-                            "e": 952
+                            "e": 953
                         }
                     ],
                     [
                         {
-                            "v": 953
+                            "v": 954
                         }
                     ],
                     [
                         {
                             "if": {
-                                "e": 954
+                                "e": 955
                             },
                             "then": [
                                 {
-                                    "c": 954
+                                    "c": 955
                                 }
                             ],
                             "else": [
                                 {
                                     "if": {
-                                        "e": 955
+                                        "e": 956
                                     },
                                     "then": [
                                         {
-                                            "c": 955
-                                        },
-                                        {
-                                            "wv": 956
-                                        },
-                                        {
                                             "c": 956
+                                        },
+                                        {
+                                            "wv": 957
+                                        },
+                                        {
+                                            "c": 957
                                         }
                                     ],
                                     "else": [
                                         {
-                                            "c": 956
+                                            "c": 957
                                         }
                                     ]
                                 }
@@ -12877,7 +12913,7 @@
                     ],
                     [
                         {
-                            "cc": 957
+                            "cc": 958
                         }
                     ],
                     {}
@@ -12889,49 +12925,49 @@
                     "^https://cmp-consent-tool\\.privacymanager\\.io/",
                     1,
                     [
-                        958,
-                        959
+                        959,
+                        960
                     ],
                     [
                         {
-                            "e": 960
+                            "e": 961
                         }
                     ],
                     [
                         {
-                            "v": 960
+                            "v": 961
                         }
                     ],
                     [
                         {
                             "if": {
-                                "e": 961
+                                "e": 962
                             },
                             "then": [
                                 {
-                                    "k": 961
+                                    "k": 962
                                 },
                                 {
-                                    "c": 962
+                                    "c": 963
                                 }
                             ],
                             "else": [
                                 {
-                                    "c": 963
-                                },
-                                {
-                                    "w": 964
+                                    "c": 964
                                 },
                                 {
                                     "w": 965
                                 },
                                 {
-                                    "all": true,
-                                    "optional": true,
-                                    "k": 966
+                                    "w": 966
                                 },
                                 {
-                                    "k": 965
+                                    "all": true,
+                                    "optional": true,
+                                    "k": 967
+                                },
+                                {
+                                    "k": 966
                                 }
                             ]
                         }
@@ -12946,17 +12982,17 @@
                     "^https://(www\\.)?tumblr\\.com/",
                     21,
                     [
-                        967
+                        968
                     ],
                     [
                         {
-                            "e": 967
+                            "e": 968
                         }
                     ],
                     [
                         {
                             "check": "any",
-                            "v": 967
+                            "v": 968
                         }
                     ],
                     [
@@ -12980,20 +13016,20 @@
                     [],
                     [
                         {
-                            "e": 968
+                            "e": 969
                         },
                         {
-                            "e": 969
+                            "e": 970
                         }
                     ],
                     [
                         {
-                            "v": 969
+                            "v": 970
                         }
                     ],
                     [
                         {
-                            "c": 969
+                            "c": 970
                         }
                     ],
                     [],
@@ -31573,49 +31609,6 @@
                     {}
                 ],
                 [
-                    3,
-                    "theguardian.com",
-                    1,
-                    "^https?://(\\w+\\.)?theguardian\\.com/",
-                    10,
-                    [
-                        1373
-                    ],
-                    [
-                        {
-                            "e": 1373
-                        }
-                    ],
-                    [
-                        {
-                            "any": [
-                                {
-                                    "v": 1373
-                                },
-                                {
-                                    "e": 1643
-                                }
-                            ]
-                        }
-                    ],
-                    [
-                        {
-                            "h": 1373
-                        },
-                        {
-                            "stylesheet": "html.sp-message-open body { position: static !important; top: auto !important; width: auto !important; overflow: auto !important; }",
-                            "stylesheetId": "theguardian-scroll-unlock"
-                        }
-                    ],
-                    [
-                        {
-                            "check": "none",
-                            "v": 1373
-                        }
-                    ],
-                    {}
-                ],
-                [
                     1,
                     "theinfatuation",
                     2,
@@ -32220,7 +32213,7 @@
                     ],
                     [
                         {
-                            "cc": 1821
+                            "cc": 1373
                         }
                     ],
                     {}
@@ -32450,11 +32443,11 @@
                     "^https://(\\w+\\.)?xhamster\\d?\\.com",
                     22,
                     [
-                        970
+                        1643
                     ],
                     [
                         {
-                            "e": 970
+                            "e": 1643
                         }
                     ],
                     [
@@ -32464,7 +32457,7 @@
                     ],
                     [
                         {
-                            "h": 970
+                            "h": 1643
                         }
                     ],
                     [],
@@ -32618,18 +32611,18 @@
             "index": {
                 "genericRuleRange": [
                     0,
-                    227
+                    228
                 ],
                 "frameRuleRange": [
-                    225,
-                    254
+                    226,
+                    255
                 ],
                 "specificRuleRange": [
-                    227,
+                    228,
                     843
                 ],
-                "genericStringEnd": 928,
-                "frameStringEnd": 970
+                "genericStringEnd": 929,
+                "frameStringEnd": 971
             }
         }
     }
