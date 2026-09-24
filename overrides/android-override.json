@@ -3191,6 +3191,22 @@
                 "overflowTypes": [
                     "hidden",
                     "clip"
+                ],
+                "conditionalChanges": [
+                    {
+                        "condition": [
+                            {
+                                "urlPattern": "https://www.nytimes.com/games/*"
+                            }
+                        ],
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/isLockedPage",
+                                "value": "enabled"
+                            }
+                        ]
+                    }
                 ]
             }
         },
