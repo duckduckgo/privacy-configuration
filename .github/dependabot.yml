@@ -4,6 +4,11 @@ updates:
       directory: '/'
       schedule:
           interval: 'daily'
+      # Wait at least 7 days after a release before opening an update PR,
+      # so we don't pick up freshly-published (potentially compromised)
+      # versions before the ecosystem has had time to react.
+      cooldown:
+          default-days: 7
       open-pull-requests-limit: 20
       target-branch: 'main'
       labels:
