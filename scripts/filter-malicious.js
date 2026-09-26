@@ -3,6 +3,7 @@ import path from 'path';
 import fetch from 'node-fetch';
 import crypto from 'crypto';
 import _ from 'lodash';
+import { parse as parseJsonc, modify, applyEdits } from 'jsonc-parser';
 
 // Rate limit fetch to 30 requests per second using a promise queue
 // https://thoughtspile.github.io/2018/07/07/rate-limit-promises/
@@ -60,9 +61,31 @@ class ConfigProcessor {
         }
     }
 
-    async saveConfig(filePath, config) {
+    // Source files (features/, overrides/) may contain comments (JSONC), so they
+    // must be parsed leniently and edited in place to preserve those comments.
+    async loadSourceConfig(filePath) {
         try {
-            await fs.writeFile(filePath, JSON.stringify(config, null, 4), 'utf8');
+            const text = await fs.readFile(filePath, 'utf8');
+            const errors = [];
+            const data = parseJsonc(text, errors);
+            if (errors.length > 0) {
+                throw new Error(`Failed to parse JSONC: ${JSON.stringify(errors)}`);
+            }
+            return { text, data };
+        } catch (error) {
+            console.error(`Error loading config ${filePath}:`, error.message);
+            return null;
+        }
+    }
+
+    // Replace a single value at jsonPath while preserving surrounding comments
+    // and formatting in the source file.
+    async updateSourceConfig(filePath, text, jsonPath, value) {
+        try {
+            const edits = modify(text, jsonPath, value, {
+                formattingOptions: { tabSize: 4, insertSpaces: true },
+            });
+            await fs.writeFile(filePath, applyEdits(text, edits), 'utf8');
         } catch (error) {
             console.error(`Error saving config ${filePath}:`, error.message);
         }
@@ -172,14 +195,23 @@ class ConfigProcessor {
     */
     async updateOverrideConfig(updatedExceptions, platform) {
         const overridePath = path.join(this.inputPath, platform.overrideFile);
-        const overrideConfig = await this.loadConfig(overridePath);
-        if (overrideConfig?.features?.maliciousSiteProtection?.exceptions) {
-            const updatedOverrideExceptions = overrideConfig.features.maliciousSiteProtection.exceptions.filter((exception) => {
+        const source = await this.loadSourceConfig(overridePath);
+        const existingExceptions = source?.data?.features?.maliciousSiteProtection?.exceptions;
+        if (existingExceptions) {
+            const updatedOverrideExceptions = existingExceptions.filter((exception) => {
                 return updatedExceptions.some((updated) => updated.domain === exception.domain);
             });
-            if (updatedOverrideExceptions.length !== overrideConfig.features.maliciousSiteProtection.exceptions.length) {
-                overrideConfig.features.maliciousSiteProtection.exceptions = updatedOverrideExceptions;
-                await this.saveConfig(overridePath, overrideConfig);
+            if (updatedOverrideExceptions.length !== existingExceptions.length) {
+                await this.updateSourceConfig(
+                    overridePath,
+                    source.text,
+                    [
+                        'features',
+                        'maliciousSiteProtection',
+                        'exceptions',
+                    ],
+                    updatedOverrideExceptions,
+                );
                 return true;
             }
         }
@@ -190,14 +222,20 @@ class ConfigProcessor {
         Update the default config with the removed exceptions.
     */
     async updateDefaultConfig(updatedExceptions) {
-        const defaultConfig = await this.loadConfig(this.defaultConfig);
-        if (defaultConfig?.exceptions) {
-            const updatedDefaultExceptions = defaultConfig.exceptions.filter((exception) => {
+        const source = await this.loadSourceConfig(this.defaultConfig);
+        if (source?.data?.exceptions) {
+            const updatedDefaultExceptions = source.data.exceptions.filter((exception) => {
                 return updatedExceptions.some((updated) => updated.domain === exception.domain);
             });
-            if (updatedDefaultExceptions.length !== defaultConfig.exceptions.length) {
-                defaultConfig.exceptions = updatedDefaultExceptions;
-                await this.saveConfig(this.defaultConfig, defaultConfig);
+            if (updatedDefaultExceptions.length !== source.data.exceptions.length) {
+                await this.updateSourceConfig(
+                    this.defaultConfig,
+                    source.text,
+                    [
+                        'exceptions',
+                    ],
+                    updatedDefaultExceptions,
+                );
                 return true;
             }
         }
