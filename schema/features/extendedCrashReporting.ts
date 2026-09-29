@@ -18,6 +18,12 @@ type SubFeatures<VersionType> = {
             ExceptionTypes?: string[];
         }
     >;
+    verifyDdgBinaryChecksum?: SubFeature<
+        VersionType,
+        {
+            ExceptionTypes?: string[];
+        }
+    >;
 };
 
 export type ExtendedCrashReporting<VersionType> = Feature<
