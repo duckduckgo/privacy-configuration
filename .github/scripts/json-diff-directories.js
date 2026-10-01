@@ -307,7 +307,10 @@ function displayApprovalStatus(dir1Files, dir2Files, isOpen) {
                     continue;
                 }
 
-                const analysis = analyzePatchesForApproval(patches);
+                const analysis = analyzePatchesForApproval(patches, {
+                    baseConfig: patchedJson1,
+                    updatedConfig: patchedJson2,
+                });
                 const summary = generateChangeSummary(patches);
 
                 fileAnalysis[filePath] = {
@@ -315,6 +318,7 @@ function displayApprovalStatus(dir1Files, dir2Files, isOpen) {
                     message: analysis.shouldApprove ? '✅ Auto-approved' : '❌ Manual review required',
                     patches,
                     disallowedPatches: analysis.disallowedPatches || [],
+                    siteSpecificFixesReasons: analysis.siteSpecificFixesReasons || [],
                     summary,
                     approvalAnalysis: analysis,
                 };
@@ -371,8 +375,15 @@ function displayApprovalStatus(dir1Files, dir2Files, isOpen) {
     // Manual review files
     if (groupedFiles.manual_review.length > 0) {
         outString += '\n## ❌ Manual Review Required\n';
-        groupedFiles.manual_review.forEach(({ filePath, disallowedPatches, summary }) => {
+        groupedFiles.manual_review.forEach(({ filePath, disallowedPatches, siteSpecificFixesReasons, summary }) => {
             outString += `- **${filePath}** (${summary.total} total changes)\n`;
+
+            if (siteSpecificFixesReasons?.length > 0) {
+                outString += '  **Autofill site-specific fixes needing review:**\n';
+                siteSpecificFixesReasons.forEach((reason) => {
+                    outString += `  - ${reason}\n`;
+                });
+            }
 
             if (disallowedPatches.length > 0) {
                 outString += '  **Disallowed paths that require review:**\n';
