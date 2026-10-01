@@ -1,10 +1,10 @@
-import { Feature, SubFeature } from '../feature';
+import { Cohort, Feature, SubFeature } from '../feature';
 
 type PaywallEntryPoint = {
     path: string;
 };
 
-type PerformanceOptimizedPaywallsSettings = {
+type PerfPaywall = {
     entryPoints?: {
         vpn?: PaywallEntryPoint;
         duckai?: PaywallEntryPoint;
@@ -12,8 +12,18 @@ type PerformanceOptimizedPaywallsSettings = {
     };
 };
 
+// The apps only read these names; any other cohort would silently enrol nobody.
+interface PerfPaywallCohorts extends Cohort {
+    name: 'control' | 'treatment';
+}
+
+interface PerfPaywallSubFeature<VersionType> extends SubFeature<VersionType, PerfPaywall> {
+    cohorts?: PerfPaywallCohorts[];
+}
+
+// Add more privacy-pro subfeatures here
 type SubFeatures<VersionType> = {
-    performanceOptimizedPaywalls?: SubFeature<VersionType, PerformanceOptimizedPaywallsSettings>;
+    performanceOptimizedPaywalls?: PerfPaywallSubFeature<VersionType>;
 };
 
 export type PrivacyProFeature<VersionType> = Feature<any, VersionType, SubFeatures<VersionType> & Record<string, SubFeature<VersionType>>>;
