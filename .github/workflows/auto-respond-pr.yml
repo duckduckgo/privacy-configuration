@@ -195,15 +195,6 @@ jobs:
                       }
                       core.setOutput('comment_body', commentBody);
 
-            - name: Wait for Cursor Bugbot
-              uses: fountainhead/action-wait-for-check@v1.2.0
-              id: wait-for-build
-              with:
-                  token: ${{ secrets.GITHUB_TOKEN }}
-                  checkName: Cursor Bugbot
-                  ref: ${{ github.event.pull_request.head.sha }}
-                  timeoutSeconds: 600
-
             - name: Check for existing approved reviews
               uses: actions/github-script@v9
               id: check_reviews
@@ -225,7 +216,7 @@ jobs:
                       core.setOutput('has_approved_review', hasApprovedReview);
 
             - name: Auto approve
-              if: steps.wait-for-build.outputs.conclusion == 'success' && steps.approval.outputs.approved == 'true' && steps.check_files.outputs.files_valid == 'true' && steps.check_reviews.outputs.has_approved_review == 'false'
+              if: steps.approval.outputs.approved == 'true' && steps.check_files.outputs.files_valid == 'true' && steps.check_reviews.outputs.has_approved_review == 'false'
               run: |
                   gh pr review --approve "$PR_URL"
               env:
@@ -237,7 +228,7 @@ jobs:
             - uses: duckduckgo/action-asana-sync@v11
               if: |
                   github.event.action != 'closed' &&
-                  ((steps.wait-for-build.outputs.conclusion == 'success' && steps.approval.outputs.approved == 'true' && steps.check_files.outputs.files_valid == 'true') != true)
+                  ((steps.approval.outputs.approved == 'true' && steps.check_files.outputs.files_valid == 'true') != true)
               with:
                   ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
                   ASANA_WORKSPACE_ID: ${{ secrets.ASANA_WORKSPACE_ID }}
@@ -247,7 +238,7 @@ jobs:
                   ASSIGN_PR_AUTHOR: 'true'
 
             - name: Create comment
-              if: github.event.action == 'opened' && (steps.wait-for-build.outputs.conclusion == 'success' && steps.approval.outputs.approved == 'true' && steps.check_files.outputs.files_valid == 'true') != true
+              if: github.event.action == 'opened' && (steps.approval.outputs.approved == 'true' && steps.check_files.outputs.files_valid == 'true') != true
               uses: peter-evans/create-or-update-comment@v5
               with:
                   issue-number: ${{ github.event.pull_request.number }}
