@@ -94,9 +94,13 @@ function effectiveLists(read) {
     );
 }
 
-function fetchRemoteBranch(branch, extraArgs = []) {
+function githubRemote() {
     const repository = process.env.GITHUB_REPOSITORY;
-    const remote = repository ? `${process.env.GITHUB_SERVER_URL || 'https://github.com'}/${repository}.git` : 'origin';
+    return repository ? `${process.env.GITHUB_SERVER_URL || 'https://github.com'}/${repository}.git` : 'origin';
+}
+
+function fetchRemoteBranch(branch, extraArgs = []) {
+    const remote = githubRemote();
     if (tryGit('fetch', '--quiet', '--no-tags', ...extraArgs, remote, `refs/heads/${branch}`) === null) {
         return null;
     }
@@ -110,6 +114,27 @@ function parentOf(rev) {
     }
     tryGit('fetch', '--quiet', '--no-tags', '--deepen=1');
     return tryGit('rev-parse', '--verify', `${rev}^`);
+}
+
+/**
+ * A push can contain several commits, so HEAD^ alone could miss a removal in an earlier one.
+ * @returns {string | null}
+ */
+function pushEventBefore() {
+    if (process.env.GITHUB_EVENT_NAME !== 'push' || !process.env.GITHUB_EVENT_PATH) {
+        return null;
+    }
+    const before = JSON.parse(readFileSync(process.env.GITHUB_EVENT_PATH, 'utf-8')).before;
+    if (!before || /^0+$/.test(before)) {
+        return null;
+    }
+    const remote = githubRemote();
+    return (
+        tryGit('rev-parse', '--verify', `${before}^{commit}`) ||
+        (tryGit('fetch', '--quiet', '--no-tags', '--depth=1', remote, before) !== null
+            ? tryGit('rev-parse', '--verify', `${before}^{commit}`)
+            : null)
+    );
 }
 
 /**
@@ -142,6 +167,11 @@ function resolveBaseRevisions() {
                 { rev, description: `${process.env.GITHUB_BASE_REF} at ${rev}` },
             ]
         );
+    }
+
+    const pushedFrom = pushEventBefore();
+    if (pushedFrom) {
+        revisions.push({ rev: pushedFrom, description: `push before (${pushedFrom})` });
     }
 
     const baseTip =
