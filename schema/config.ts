@@ -2,6 +2,7 @@ import { Feature, SiteException } from './feature';
 import { AttributedMetricsFeature } from './features/attributed-metrics';
 import { AutoconsentFeature } from './features/autoconsent';
 import { CookieFeature } from './features/cookie';
+import { DbpFeature } from './features/dbp';
 import { TrackerAllowlistFeature } from './features/tracker-allowlist';
 import { WebCompatFeature } from './features/webcompat';
 import { DuckPlayerFeature } from './features/duckplayer';
@@ -83,6 +84,7 @@ export type ConfigV5<VersionType> = {
         taskbar?: Taskbar<VersionType>;
         import?: ImportFeature<VersionType>;
         cookie?: CookieFeature<VersionType>;
+        dbp?: DbpFeature<VersionType>;
         duckPlayer?: DuckPlayerFeature<VersionType>;
         duckPlayerNative?: DuckPlayerNativeFeature<VersionType>;
         trackerAllowlist?: TrackerAllowlistFeature<VersionType>;
