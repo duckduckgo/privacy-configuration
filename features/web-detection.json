@@ -33,9 +33,8 @@
                             "state": "enabled",
                             "when": {
                                 "intervalMs": [
-                                    500,
-                                    1000,
-                                    5000
+                                    3100,
+                                    5100
                                 ]
                             }
                         }
@@ -65,9 +64,8 @@
                             "state": "enabled",
                             "when": {
                                 "intervalMs": [
-                                    500,
-                                    1000,
-                                    5000
+                                    3200,
+                                    5200
                                 ]
                             }
                         }
@@ -94,9 +92,8 @@
                             "state": "enabled",
                             "when": {
                                 "intervalMs": [
-                                    500,
-                                    1000,
-                                    5000
+                                    3300,
+                                    5300
                                 ]
                             }
                         }
@@ -123,9 +120,8 @@
                             "state": "enabled",
                             "when": {
                                 "intervalMs": [
-                                    500,
-                                    1000,
-                                    5000
+                                    3400,
+                                    5400
                                 ]
                             }
                         }
@@ -152,9 +148,8 @@
                             "state": "enabled",
                             "when": {
                                 "intervalMs": [
-                                    500,
-                                    1000,
-                                    5000
+                                    3500,
+                                    5500
                                 ]
                             }
                         }
@@ -181,9 +176,8 @@
                             "state": "enabled",
                             "when": {
                                 "intervalMs": [
-                                    500,
-                                    1000,
-                                    5000
+                                    3600,
+                                    5600
                                 ]
                             }
                         }
@@ -224,6 +218,33 @@
                         "fireEvent": {
                             "state": "enabled",
                             "type": "admiralAdwall"
+                        }
+                    }
+                },
+                "keywords_vendor": {
+                    "match": {
+                        "text": {
+                            "pattern": [
+                                "pagefair",
+                                "fuckadblock"
+                            ]
+                        }
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    3000,
+                                    5000
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        "fireEvent": {
+                            "state": "enabled",
+                            "type": "adwall"
                         }
                     }
                 }
@@ -591,6 +612,98 @@
                             "type": "captcha_other"
                         }
                     }
+                },
+                "cloudflare_challenge_extra": {
+                    "match": {
+                        "any": [
+                            {
+                                "element": {
+                                    "selector": [
+                                        "#cf-ch\\61 llenge-running",
+                                        "#cf-please-wait",
+                                        "#ch\\61 llenge-spinner",
+                                        "#trk_jsch\\61 l_js",
+                                        ".ray_id",
+                                        "#ch\\61 llenge-form[action*='__cf_chl_f_tk=']",
+                                        "#ch\\61 llenge-form[action*='__cf_chl_rt_tk=']"
+                                    ],
+                                    "visibility": "content"
+                                }
+                            },
+                            {
+                                "text": {
+                                    "selector": [
+                                        "title"
+                                    ],
+                                    "pattern": [
+                                        "^just a moment",
+                                        "^ddos-guard$"
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    1000,
+                                    5000
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        "fireEvent": {
+                            "state": "enabled",
+                            "type": "temp_wd_challenge"
+                        }
+                    }
+                },
+                "cloudflare_access_denied": {
+                    "match": {
+                        "any": [
+                            {
+                                "element": {
+                                    "selector": [
+                                        "div.cf-error-title span.cf-code-label span",
+                                        "#cf-error-details div.cf-error-overview h1",
+                                        "span.cf-error-code"
+                                    ],
+                                    "visibility": "content"
+                                }
+                            },
+                            {
+                                "text": {
+                                    "selector": [
+                                        "title"
+                                    ],
+                                    "pattern": [
+                                        "^access denied$",
+                                        "^attention required! \\| cloudflare"
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    1000,
+                                    5000
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        "fireEvent": {
+                            "state": "enabled",
+                            "type": "temp_wd_blockPage"
+                        }
+                    }
                 }
             },
             "commentsDisabled": {
@@ -660,6 +773,486 @@
                         }
                     }
                 }
+            },
+            "blockPage": {
+                "waf_generic_en": {
+                    "match": {
+                        "text": {
+                            "selector": [
+                                "title",
+                                "h1"
+                            ],
+                            "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                            "pattern": [
+                                "the requested url was rejected",
+                                "please consult with your administrator",
+                                "your support id is",
+                                "unauthorized request blocked",
+                                "dotdefender blocked your request",
+                                "this error was generated by mod.?security",
+                                "request forbidden by administrative rules",
+                                "incapsula incident id",
+                                "denied because we believe you are using automation tools",
+                                "your request was blocked by cloudbric",
+                                "our system thinks you might be a robot!",
+                                "\\b18\\.[0-9a-f]{8}.1[0-9]{9}\\.[0-9a-f]{7}\\b"
+                            ]
+                        }
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    3700,
+                                    5700
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        "fireEvent": {
+                            "state": "enabled",
+                            "type": "temp_wd_blockPage"
+                        }
+                    }
+                },
+                "waf_vendors": {
+                    "match": {
+                        "any": [
+                            {
+                                "text": {
+                                    "selector": [
+                                        "title"
+                                    ],
+                                    "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                    "pattern": [
+                                        "cloudflare_error_",
+                                        "incapsula incident id",
+                                        "access denied - sucuri website firewall",
+                                        "you don.t have permission to access"
+                                    ]
+                                }
+                            },
+                            {
+                                "element": {
+                                    "selector": [
+                                        "#distilC\\61 ptchaForm"
+                                    ],
+                                    "visibility": "content"
+                                }
+                            },
+                            {
+                                "all": [
+                                    {
+                                        "text": {
+                                            "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                            "pattern": [
+                                                "request blocked"
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "text": {
+                                            "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                            "pattern": [
+                                                "generated by cloudfront"
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    3800,
+                                    5800
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        "fireEvent": {
+                            "state": "enabled",
+                            "type": "temp_wd_blockPage"
+                        }
+                    }
+                },
+                "verification_failed_en": {
+                    "match": {
+                        "text": {
+                            "selector": [
+                                "title"
+                            ],
+                            "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                            "pattern": [
+                                "(failed to|could not|unable to|cannot) verif(y|ication)[^.]{0,20}(browser|device)",
+                                "(browser|device) verification (was )?(blocked|failed)",
+                                "verification could not be completed",
+                                "verification failed\\.?\\s*(please\\s+)?try again"
+                            ]
+                        }
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    3900,
+                                    10900
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        "fireEvent": {
+                            "state": "enabled",
+                            "type": "temp_wd_blockPage"
+                        }
+                    }
+                },
+                "vercel_checkpoint": {
+                    "match": {
+                        "text": {
+                            "selector": [
+                                "title"
+                            ],
+                            "pattern": [
+                                "^vercel security checkpoint$"
+                            ]
+                        }
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    1000,
+                                    5000
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        "fireEvent": {
+                            "state": "enabled",
+                            "type": "temp_wd_blockPage"
+                        }
+                    }
+                },
+                "http_forbidden_en": {
+                    "match": {
+                        "text": {
+                            "selector": [
+                                "title",
+                                "h1"
+                            ],
+                            "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                            "pattern": [
+                                "\\b403\\b[^.]{0,40}forbidden",
+                                "^\\s*forbidden\\b",
+                                "forbidden[^.]{0,30}\\b403\\b",
+                                "access is denied"
+                            ]
+                        }
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    4000,
+                                    6000
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        "fireEvent": {
+                            "state": "enabled",
+                            "type": "temp_wd_blockPage"
+                        }
+                    }
+                },
+                "http_rate_limited_en": {
+                    "match": {
+                        "text": {
+                            "selector": [
+                                "title",
+                                "h1"
+                            ],
+                            "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                            "pattern": [
+                                "\\b429\\b[^.]{0,30}too many requests",
+                                "too many requests"
+                            ]
+                        }
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    4100,
+                                    6100
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        "fireEvent": {
+                            "state": "enabled",
+                            "type": "temp_wd_blockPage"
+                        }
+                    }
+                },
+                "network_security_en": {
+                    "match": {
+                        "text": {
+                            "selector": [
+                                "title"
+                            ],
+                            "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                            "pattern": [
+                                "you(’|')?(ve| have) been blocked by network security"
+                            ]
+                        }
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    4200,
+                                    6200
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        "fireEvent": {
+                            "state": "enabled",
+                            "type": "temp_wd_blockPage"
+                        }
+                    }
+                },
+                "title_blocked_en": {
+                    "match": {
+                        "text": {
+                            "selector": [
+                                "title"
+                            ],
+                            "pattern": [
+                                "the url you requested has been blocked",
+                                "^\\s*(this )?domain has been seized\\s*$|^\\s*seized\\s*$"
+                            ]
+                        }
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    1000,
+                                    5000
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        "fireEvent": {
+                            "state": "enabled",
+                            "type": "temp_wd_blockPage"
+                        }
+                    }
+                }
+            },
+            "errorPage": {
+                "soft404_phrases_en": {
+                    "match": {
+                        "text": {
+                            "selector": [
+                                "title",
+                                "h1"
+                            ],
+                            "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                            "pattern": [
+                                "access denied",
+                                "page not found",
+                                "404 not found"
+                            ]
+                        }
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    4300,
+                                    6300
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        "fireEvent": {
+                            "state": "enabled",
+                            "type": "temp_wd_errorPage"
+                        }
+                    }
+                },
+                "title_unavailable_en": {
+                    "match": {
+                        "text": {
+                            "selector": [
+                                "title"
+                            ],
+                            "pattern": [
+                                "^\\s*website temporarily unavailable\\s*$"
+                            ]
+                        }
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    1000,
+                                    5000
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        "fireEvent": {
+                            "state": "enabled",
+                            "type": "temp_wd_errorPage"
+                        }
+                    }
+                },
+                "ebay_error_page": {
+                    "match": {
+                        "text": {
+                            "selector": [
+                                "title"
+                            ],
+                            "pattern": [
+                                "^\\s*error page \\| ebay\\s*$"
+                            ]
+                        }
+                    },
+                    "actions": {
+                        "breakageReportData": {
+                            "state": "enabled"
+                        }
+                    }
+                }
+            },
+            "geoblocks": {
+                "region_block_en": {
+                    "match": {
+                        "text": {
+                            "selector": [
+                                "title"
+                            ],
+                            "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                            "pattern": [
+                                "streaming is not available in your area",
+                                "this page is currently unavailable in your region",
+                                "this content is unavailable in your country",
+                                "is not available in your region"
+                            ]
+                        }
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    4400,
+                                    6400
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        "fireEvent": {
+                            "state": "enabled",
+                            "type": "temp_wd_geoblock"
+                        }
+                    }
+                }
+            },
+            "verification": {
+                "title_en": {
+                    "match": {
+                        "text": {
+                            "selector": [
+                                "title"
+                            ],
+                            "pattern": [
+                                "^\\s*human verification\\s*$",
+                                "^\\s*verifying device\\s*$",
+                                "^\\s*security verification\\s*$",
+                                "\\bsecurity check\\s*$",
+                                "^\\s*check bot verification\\s*$"
+                            ]
+                        }
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    1000,
+                                    5000
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        "fireEvent": {
+                            "state": "enabled",
+                            "type": "temp_wd_challenge"
+                        }
+                    }
+                }
+            },
+            "blankPage": {
+                "no_text_or_title": {
+                    "match": {
+                        "none": [
+                            {
+                                "text": {
+                                    "xpath": "//title/text() | //body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                    "pattern": [
+                                        "\\S"
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    6500
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        "fireEvent": {
+                            "state": "enabled",
+                            "type": "temp_wd_blankPage"
+                        }
+                    }
+                }
             }
         },
         "conditionalChanges": [
@@ -683,8 +1276,7 @@
                                 "state": "enabled",
                                 "when": {
                                     "intervalMs": [
-                                        500,
-                                        1000,
+                                        3000,
                                         5000,
                                         10000
                                     ]
@@ -735,8 +1327,7 @@
                                 "state": "enabled",
                                 "when": {
                                     "intervalMs": [
-                                        500,
-                                        1000,
+                                        3000,
                                         5000,
                                         10000
                                     ]
@@ -762,8 +1353,7 @@
                                 "state": "enabled",
                                 "when": {
                                     "intervalMs": [
-                                        500,
-                                        1000,
+                                        3000,
                                         5000,
                                         10000
                                     ]
