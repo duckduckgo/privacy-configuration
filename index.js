@@ -309,6 +309,13 @@ async function buildPlatforms() {
                                 overrideSettings.interferenceTypes || {},
                             ),
                         };
+                    } else if (key === 'dbp' && platformKey === 'settings') {
+                        // revokedBundleSigningKeys lives in the base feature so every platform gets the same
+                        // revocation list, even when it overrides other dbp settings.
+                        platformConfig.features[key][platformKey] = {
+                            ...platformConfig.features[key].settings,
+                            ...platformOverride.features[key][platformKey],
+                        };
                     } else if ((key === 'clickToLoad' || key === 'clickToPlay') && platformKey === 'settings') {
                         // Handle Click to Load settings override later, so that individual entities
                         // are disabled/enabled correctly (and disabled by default).

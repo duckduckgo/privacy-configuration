@@ -627,6 +627,21 @@ describe('webInterferenceDetection interferenceTypes override merge', () => {
     });
 });
 
+describe('dbp revokedBundleSigningKeys override merge', () => {
+    const baseRevokedKeys = readJsoncFile('./features/dbp.json').settings.revokedBundleSigningKeys;
+
+    for (const config of latestConfigs) {
+        it(`${config.name} contains every base revoked key`, () => {
+            expect(config.body.features.dbp?.settings?.revokedBundleSigningKeys).to.include.members(baseRevokedKeys);
+        });
+    }
+
+    it('keeps windows-specific dbp settings', () => {
+        const windowsConfig = latestConfigs.find((c) => c.name === 'v5/windows-config.json');
+        expect(windowsConfig.body.features.dbp.settings).to.have.property('betaEnding');
+    });
+});
+
 describe('EventHub schema source rules', () => {
     const validate = createValidator('EventHubSettings');
 
