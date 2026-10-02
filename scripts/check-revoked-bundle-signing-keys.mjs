@@ -204,6 +204,14 @@ function resolveBaseRevisions() {
 const errors = [];
 const headLists = effectiveLists(readWorkingTree);
 
+for (const platform of platforms) {
+    const path = `${OVERRIDE_DIR}/${platform}-override.json`;
+    const overrideSettings = readWorkingTree(path)?.features?.dbp?.settings;
+    if (overrideSettings && SETTING in overrideSettings) {
+        errors.push(`${path}: ${SETTING} must only be defined in ${BASE_FEATURE_PATH} so every platform gets the full list`);
+    }
+}
+
 for (const [
     platform,
     list,

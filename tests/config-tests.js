@@ -631,8 +631,15 @@ describe('dbp revokedBundleSigningKeys override merge', () => {
     const baseRevokedKeys = readJsoncFile('./features/dbp.json').settings.revokedBundleSigningKeys;
 
     for (const config of latestConfigs) {
-        it(`${config.name} contains every base revoked key`, () => {
-            expect(config.body.features.dbp?.settings?.revokedBundleSigningKeys).to.include.members(baseRevokedKeys);
+        it(`${config.name} has exactly the base revoked keys`, () => {
+            expect(config.body.features.dbp?.settings?.revokedBundleSigningKeys).to.have.members(baseRevokedKeys);
+        });
+    }
+
+    for (const platform of platforms) {
+        it(`${platform} override does not define revokedBundleSigningKeys`, () => {
+            const override = readJsoncFile(`./overrides/${platform}-override.json`);
+            expect(override.features?.dbp?.settings || {}).to.not.have.property('revokedBundleSigningKeys');
         });
     }
 
