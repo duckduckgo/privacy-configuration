@@ -55,7 +55,6 @@ const BODY_KEYS = {
         'where',
         'field',
         'root',
-        'allowGetter',
     ],
     text: [
         'pattern',
@@ -69,7 +68,6 @@ const BODY_KEYS = {
         'args',
         'where',
         'field',
-        'allowGetter',
     ],
 };
 
@@ -80,16 +78,10 @@ const VISIBILITY_VALUES = [
     'content',
 ];
 
-/** The keys of a `field` object that read something. */
-const FIELD_READ_KEYS = [
+const FIELD_KEYS = [
     'path',
     'args',
     'feature',
-];
-
-const FIELD_KEYS = [
-    ...FIELD_READ_KEYS,
-    'allowGetter',
 ];
 
 /** Each feature and the input it takes. */
@@ -137,45 +129,38 @@ const PAYLOAD_FIELD_KEYS = [
 ];
 
 /**
- * Every name an `api` may read, with what the name holds where the read finds it. A name is each
- * prefix of the `path`, and the path joined by `.` to each name a `field` path or a predicate
- * reads from its items or values.
+ * Every name an `api` may read: each prefix of the `path`, and the path joined by `.` to each
+ * name a `field` path or a predicate reads from its items or values. A `method` is called
+ * through `args`, as the last name of a path; a `property` is read.
  *
- * | Kind | Read |
- * |---|---|
- * | `getter` | An accessor: an IDL attribute. Its getter runs only under `allowGetter` |
- * | `method` | A function, called through `args` as the last name of a path |
- * | `data` | A data value: `length` on a string or array, an array index |
- *
- * The kind is the one the browser's IDL gives the name on the object the path reaches. C-S-S
- * reads any name config gives, so this list is the review point. A detector reading a name not
- * listed adds it here in the same change. Names reading user data or URLs, such as
+ * C-S-S reads any name config gives, so this list is the review point. A detector reading a name
+ * not listed adds it here in the same change. Names reading user data or URLs, such as
  * `document.cookie` and `.name` on `resource` entries, stay off the list.
  *
- * @type {Record<string, 'getter' | 'method' | 'data'>}
+ * @type {Record<string, 'method' | 'property'>}
  */
 const API_ALLOWLIST = {
-    document: 'getter',
-    'document.fonts': 'getter',
-    'document.fonts.status': 'getter',
-    'document.hidden': 'getter',
-    'document.readyState': 'getter',
-    'document.title': 'getter',
-    'document.title.length': 'data',
+    document: 'property',
+    'document.fonts': 'property',
+    'document.fonts.status': 'property',
+    'document.hidden': 'property',
+    'document.readyState': 'property',
+    'document.title': 'property',
+    'document.title.length': 'property',
     matchMedia: 'method',
-    'matchMedia.matches': 'getter',
-    performance: 'getter',
+    'matchMedia.matches': 'property',
+    performance: 'property',
     'performance.getEntries': 'method',
     'performance.getEntriesByName': 'method',
-    'performance.getEntriesByName.startTime': 'getter',
+    'performance.getEntriesByName.startTime': 'property',
     'performance.getEntriesByType': 'method',
-    'performance.getEntriesByType.decodedBodySize': 'getter',
-    'performance.getEntriesByType.duration': 'getter',
-    'performance.getEntriesByType.initiatorType': 'getter',
-    'performance.getEntriesByType.loadEventEnd': 'getter',
-    'performance.getEntriesByType.responseEnd': 'getter',
-    'performance.getEntriesByType.responseStatus': 'getter',
-    'performance.getEntriesByType.type': 'getter',
+    'performance.getEntriesByType.decodedBodySize': 'property',
+    'performance.getEntriesByType.duration': 'property',
+    'performance.getEntriesByType.initiatorType': 'property',
+    'performance.getEntriesByType.loadEventEnd': 'property',
+    'performance.getEntriesByType.responseEnd': 'property',
+    'performance.getEntriesByType.responseStatus': 'property',
+    'performance.getEntriesByType.type': 'property',
     'performance.now': 'method',
 };
 
@@ -676,16 +661,14 @@ function forEachWebDetectionConfig(cb) {
  *   nan: boolean,
  *   interfaces?: string[],
  *   customElement?: boolean,
- *   platformObject?: boolean,
  *   apiPath?: string,
  * }} StaticType
  *
  * `types` is null when config does not show the type. `nan` is set when the value can be NaN.
  * `interfaces` names the element interfaces an element value can have, and `customElement` is
  * set when it can also be a custom element, whose page-defined values have names outside the
- * tables. `platformObject` is set for an object of an IDL interface outside the tables, whose
- * named properties are accessors. `apiPath` is the `api` name the value was read through, which
- * names read from it extend for the allowlist.
+ * tables. `apiPath` is the `api` name the value was read through, which names read from it
+ * extend for the allowlist.
  */
 
 /** @type {StaticType} */
@@ -716,13 +699,11 @@ function mergeTypes(list) {
     const apiPaths = new Set();
     let nan = false;
     let customElement = false;
-    let platformObject = false;
     for (const entry of list) {
         if (entry.types === null) types = null;
         else if (types) for (const name of entry.types) types.add(name);
         nan ||= entry.nan;
         customElement ||= entry.customElement === true;
-        platformObject ||= entry.platformObject === true;
         for (const name of entry.interfaces ?? []) interfaces.add(name);
         if (entry.apiPath !== undefined) apiPaths.add(entry.apiPath);
     }
@@ -740,7 +721,6 @@ function mergeTypes(list) {
             ...interfaces,
         ];
     if (customElement) merged.customElement = true;
-    if (platformObject) merged.platformObject = true;
     if (apiPaths.size === 1)
         merged.apiPath = [
             ...apiPaths,
@@ -872,8 +852,8 @@ function typeFromIdl(idlType) {
             ],
         };
     } else {
-        // An interface outside the tables: its names are not checked, and are accessors
-        result = { ...typeOf('object'), platformObject: true };
+        // An interface outside the tables: its properties are not checked
+        result = typeOf('object');
     }
     return nullable
         ? mergeTypes([
@@ -999,12 +979,10 @@ function describeInterfaces(interfaces) {
  *   topOperand: number | null,
  *   matchRoot: boolean,
  *   owners: string[],
- *   allowGetter: boolean,
  * }} Scope
  *
  * `branch` lists the `if` branches around the expression. `topOperand` is the index of the
  * operand of match's top-level `all` holding it. `owners` lists the `as` names around it.
- * `allowGetter` is set in a predicate whose reads a source's `allowGetter` covers.
  */
 
 /**
@@ -1027,10 +1005,10 @@ function describeInterfaces(interfaces) {
  */
 
 /** @type {Scope} */
-const MATCH_SCOPE = { inMatch: true, underNone: false, branch: [], topOperand: null, matchRoot: true, owners: [], allowGetter: false };
+const MATCH_SCOPE = { inMatch: true, underNone: false, branch: [], topOperand: null, matchRoot: true, owners: [] };
 
 /** @type {Scope} */
-const PAYLOAD_SCOPE = { inMatch: false, underNone: false, branch: [], topOperand: null, matchRoot: false, owners: [], allowGetter: false };
+const PAYLOAD_SCOPE = { inMatch: false, underNone: false, branch: [], topOperand: null, matchRoot: false, owners: [] };
 
 /**
  * @param {Context} ctx
@@ -1126,24 +1104,6 @@ function providesValues(node, ctx, seen = new Set()) {
         default:
             return false;
     }
-}
-
-/**
- * Whether a source's `allowGetter` covers an `is` beside it: every body of the source sets it.
- *
- * @param {string} key
- * @param {unknown} body
- */
-function sourceAllowsGetter(key, body) {
-    if (key === 'api') return isPlainObject(body) && body.allowGetter === true;
-    if (key !== 'element') return false;
-    let bodies = 0;
-    let allowing = 0;
-    forEachTextLeaf(body, '', (leaf) => {
-        bodies++;
-        if (leaf.allowGetter === true) allowing++;
-    });
-    return bodies > 0 && bodies === allowing;
 }
 
 /**
@@ -1248,8 +1208,7 @@ function checkExpr(node, position, scope, ctx, path) {
     }
     if (hasIs) {
         // `as` names the value, not the test, so a ref to it from the test is no cycle
-        const allowGetter = exprKeys.length === 1 && sourceAllowsGetter(exprKeys[0], node[exprKeys[0]]);
-        checkPredicate(node.is, 'value', type, { ...child(scope), allowGetter }, ctx, `${path}.is`);
+        checkPredicate(node.is, 'value', type, child(scope), ctx, `${path}.is`);
         return typeOf('boolean');
     }
     return type;
@@ -1580,9 +1539,6 @@ function checkConditionSource(key, branch, position, scope, ctx, path, owner) {
     /** @type {StaticType[]} */
     const valueTypes = [];
     for (const { body, path: bodyPath, underNone } of bodies) {
-        const allowGetter = body.allowGetter === true;
-        if ('allowGetter' in body && typeof body.allowGetter !== 'boolean')
-            fail(ctx, `${bodyPath}.allowGetter`, '`allowGetter` is a boolean');
         checkBodyKeys(body, BODY_KEYS[key], ctx, bodyPath);
         if (key === 'text') {
             expectStrings(body.pattern, ctx, `${bodyPath}.pattern`, '`pattern`');
@@ -1615,8 +1571,8 @@ function checkConditionSource(key, branch, position, scope, ctx, path, owner) {
             };
             if (selectorNamesCustomElement(body.selector)) itemType.customElement = true;
             if ('where' in body)
-                checkPredicate(body.where, 'item', itemType, { ...child(scope), underNone: false, allowGetter }, ctx, `${bodyPath}.where`);
-            valueTypes.push('field' in body ? checkFieldRead(body.field, itemType, ctx, `${bodyPath}.field`, allowGetter) : itemType);
+                checkPredicate(body.where, 'item', itemType, { ...child(scope), underNone: false }, ctx, `${bodyPath}.where`);
+            valueTypes.push('field' in body ? checkFieldRead(body.field, itemType, ctx, `${bodyPath}.field`) : itemType);
         }
         if ('root' in body && expectStrings(body.root, ctx, `${bodyPath}.root`, '`root`') && ctx.mode === 'check') {
             ctx.rooted.push({
@@ -1661,12 +1617,10 @@ function checkApi(body, position, scope, ctx, path) {
         fail(ctx, `${path}.path`, '`path` is a non-empty string');
         return UNKNOWN;
     }
-    const allowGetter = body.allowGetter === true;
-    if ('allowGetter' in body && typeof body.allowGetter !== 'boolean') fail(ctx, `${path}.allowGetter`, '`allowGetter` is a boolean');
     const names = body.path.split('.');
     names.forEach((_, index) => {
         const isCall = 'args' in body && index === names.length - 1;
-        checkApiName(names.slice(0, index + 1).join('.'), isCall, allowGetter, ctx, `${path}.path`);
+        checkApiName(names.slice(0, index + 1).join('.'), isCall, ctx, `${path}.path`);
     });
     if ((position === 'value' || position === 'number') && body.path === 'performance.getEntries') {
         fail(
@@ -1678,23 +1632,20 @@ function checkApi(body, position, scope, ctx, path) {
     if ('args' in body) checkArgs(body.args, ctx, `${path}.args`);
     /** @type {StaticType} */
     const itemType = { types: null, nan: false, apiPath: body.path };
-    if ('where' in body)
-        checkPredicate(body.where, 'item', itemType, { ...child(scope), underNone: false, allowGetter }, ctx, `${path}.where`);
-    const valueType = 'field' in body ? checkFieldRead(body.field, itemType, ctx, `${path}.field`, allowGetter) : itemType;
+    if ('where' in body) checkPredicate(body.where, 'item', itemType, { ...child(scope), underNone: false }, ctx, `${path}.where`);
+    const valueType = 'field' in body ? checkFieldRead(body.field, itemType, ctx, `${path}.field`) : itemType;
     return position === 'items' ? itemType : valueType;
 }
 
 /**
- * Check one name an `api` reads: listed, called when it is a method, and read through a getter
- * only under `allowGetter`.
+ * Check one name an `api` reads: listed, and called exactly when it is a method.
  *
  * @param {string} name
  * @param {boolean} isCall
- * @param {boolean} allowGetter
  * @param {Context} ctx
  * @param {string} path
  */
-function checkApiName(name, isCall, allowGetter, ctx, path) {
+function checkApiName(name, isCall, ctx, path) {
     const kind = Object.hasOwn(API_ALLOWLIST, name) ? API_ALLOWLIST[name] : undefined;
     if (!kind) {
         fail(ctx, path, `\`api\` reads "${name}", which is not in API_ALLOWLIST`);
@@ -1702,8 +1653,6 @@ function checkApiName(name, isCall, allowGetter, ctx, path) {
         fail(ctx, path, `calls "${name}", which API_ALLOWLIST records as a ${kind}`);
     } else if (!isCall && kind === 'method') {
         fail(ctx, path, `reads the method "${name}" without calling it; a method is called through \`args\`, as the last name of a path`);
-    } else if (kind === 'getter' && !allowGetter) {
-        fail(ctx, path, `reads "${name}", an accessor, without \`allowGetter\``);
     }
 }
 
@@ -1734,10 +1683,9 @@ function checkArgs(args, ctx, path) {
  * @param {StaticType} subject
  * @param {Context} ctx
  * @param {string} path
- * @param {boolean} [allowGetter] - set when a source's `allowGetter` covers the read
  * @returns {StaticType}
  */
-function checkFieldRead(field, subject, ctx, path, allowGetter = false) {
+function checkFieldRead(field, subject, ctx, path) {
     /** @type {Record<string, any>} */
     let read;
     if (typeof field === 'string') {
@@ -1746,9 +1694,7 @@ function checkFieldRead(field, subject, ctx, path, allowGetter = false) {
         for (const key of Object.keys(field)) {
             if (!FIELD_KEYS.includes(key)) fail(ctx, path, `unknown \`field\` key "${key}"`);
         }
-        if (!FIELD_READ_KEYS.some((key) => key in field)) fail(ctx, path, '`field` needs at least one of `path`, `args` and `feature`');
-        if ('allowGetter' in field && typeof field.allowGetter !== 'boolean')
-            fail(ctx, `${path}.allowGetter`, '`allowGetter` is a boolean');
+        if (!FIELD_KEYS.some((key) => key in field)) fail(ctx, path, '`field` needs at least one of `path`, `args` and `feature`');
         if ('args' in field && !('path' in field)) fail(ctx, path, '`args` calls the last name in `path`, so it needs `path`');
         read = field;
     } else {
@@ -1756,7 +1702,6 @@ function checkFieldRead(field, subject, ctx, path, allowGetter = false) {
         return UNKNOWN;
     }
 
-    const getters = allowGetter || read.allowGetter === true;
     let current = subject;
     if (read.path !== undefined) {
         if (typeof read.path !== 'string' || read.path === '') {
@@ -1766,7 +1711,7 @@ function checkFieldRead(field, subject, ctx, path, allowGetter = false) {
         if (read.args !== undefined) checkArgs(read.args, ctx, `${path}.args`);
         const names = read.path.split('.');
         names.forEach((name, index) => {
-            current = readName(current, name, read.args !== undefined && index === names.length - 1, getters, ctx, path);
+            current = readName(current, name, read.args !== undefined && index === names.length - 1, ctx, path);
         });
     }
     if (read.feature !== undefined) {
@@ -1791,19 +1736,18 @@ function checkFieldRead(field, subject, ctx, path, allowGetter = false) {
  * @param {StaticType} current
  * @param {string} name
  * @param {boolean} isCall
- * @param {boolean} allowGetter
  * @param {Context} ctx
  * @param {string} path
  * @returns {StaticType}
  */
-function readName(current, name, isCall, allowGetter, ctx, path) {
+function readName(current, name, isCall, ctx, path) {
     if (name === '') {
         fail(ctx, path, 'a path has an empty name');
         return UNKNOWN;
     }
     if (current.apiPath !== undefined) {
         const apiPath = `${current.apiPath}.${name}`;
-        checkApiName(apiPath, isCall, allowGetter, ctx, path);
+        checkApiName(apiPath, isCall, ctx, path);
         return { types: null, nan: false, apiPath };
     }
     if (isCall) {
@@ -1823,7 +1767,6 @@ function readName(current, name, isCall, allowGetter, ctx, path) {
     /** @type {StaticType[]} */
     const results = [];
     const wrong = [];
-    let accessor = false;
     for (const type of current.types) {
         if (type === 'null' || type === 'undefined') {
             results.push(typeOf('undefined'));
@@ -1839,11 +1782,9 @@ function readName(current, name, isCall, allowGetter, ctx, path) {
         } else if (type === 'array' && isIndex) {
             results.push(UNKNOWN);
         } else if (type === 'object' && current.interfaces) {
-            // Every attribute in the tables is an accessor
             const found = current.interfaces.map((iface) => interfaceProperties(iface).get(name)).filter((idl) => idl !== undefined);
             if (found.length) {
                 results.push(...found.map(typeFromIdl));
-                accessor = true;
             } else if (current.customElement) {
                 results.push(UNKNOWN);
             } else {
@@ -1851,13 +1792,11 @@ function readName(current, name, isCall, allowGetter, ctx, path) {
             }
         } else if (type === 'object') {
             results.push(UNKNOWN);
-            if (current.platformObject && !isIndex) accessor = true;
         } else {
             wrong.push(type);
         }
     }
     if (wrong.length) fail(ctx, path, `reads "${name}" on a value config types as ${wrong.join(' or ')}`);
-    if (accessor && !allowGetter) fail(ctx, path, `reads "${name}", an accessor, without \`allowGetter\``);
     return results.length ? mergeTypes(results) : UNKNOWN;
 }
 
@@ -1903,12 +1842,12 @@ function checkPredicate(predicate, level, subject, scope, ctx, path) {
             const entryScope = { ...scope, underNone: scope.underNone || key === 'none' };
             for (const entry of asArray(value)) checkPredicate(entry, level, subject, entryScope, ctx, keyPath);
         } else if (key === 'field') {
-            const read = checkFieldRead(value, subject, ctx, keyPath, scope.allowGetter);
+            const read = checkFieldRead(value, subject, ctx, keyPath);
             if ('is' in predicate) checkPredicate(predicate.is, 'value', read, scope, ctx, `${path}.is`);
         } else if (key === 'is' || operators.includes(key)) {
             continue;
         } else {
-            const read = checkFieldRead(key, subject, ctx, keyPath, scope.allowGetter);
+            const read = checkFieldRead(key, subject, ctx, keyPath);
             checkPredicate(value, 'value', read, scope, ctx, keyPath);
         }
     }
@@ -2252,9 +2191,7 @@ function checkRootGuards(detector, path, ctx) {
     const guards = topAll.map((operand) => {
         if (!isPlainObject(operand) || Object.keys(operand).join() !== 'element' || !isPlainObject(operand.element)) return null;
         const body = operand.element;
-        const shaped =
-            Object.keys(body).every((key) => key === 'selector' || key === 'visibility' || key === 'allowGetter') &&
-            (body.visibility ?? 'any') === 'any';
+        const shaped = Object.keys(body).every((key) => key === 'selector' || key === 'visibility') && (body.visibility ?? 'any') === 'any';
         return shaped ? selectorSetKey(body.selector) : null;
     });
     const referenced = new Set(ctx.refs.map((ref) => ref.name));
@@ -2995,12 +2932,11 @@ describe('webDetection config tests', () => {
                 args: [
                     'navigation',
                 ],
-                allowGetter: true,
                 field: 'loadEventEnd',
             },
         };
-        const now = { api: { path: 'performance.now', args: [], allowGetter: true } };
-        const title = { api: { path: 'document.title', allowGetter: true } };
+        const now = { api: { path: 'performance.now', args: [] } };
+        const title = { api: { path: 'document.title' } };
         const guard = {
             element: {
                 selector: [
@@ -3019,7 +2955,6 @@ describe('webDetection config tests', () => {
             },
         };
         const text = { text: { pattern: 'a' } };
-        const accessorError = 'an accessor, without `allowGetter`';
 
         /**
          * A count of the elements matching a selector that pass `where`.
@@ -3027,13 +2962,13 @@ describe('webDetection config tests', () => {
          * @param {string} selector
          * @param {unknown} where
          */
-        const items = (selector, where) => ({ count: { element: { selector, allowGetter: true, where } }, is: 0 });
+        const items = (selector, where) => ({ count: { element: { selector, where } }, is: 0 });
 
         /**
          * @param {string} selector
          * @param {unknown} field
          */
-        const fieldOf = (selector, field) => ({ element: { selector, allowGetter: true, field } });
+        const fieldOf = (selector, field) => ({ element: { selector, field } });
 
         describe('shape', () => {
             it('passes the shipped forms: leaves, legacy blocks, arrays and boolean literals', () => {
@@ -3125,7 +3060,6 @@ describe('webDetection config tests', () => {
                     count: {
                         api: {
                             path: 'document.fonts',
-                            allowGetter: true,
                             root: [
                                 '#a',
                             ],
@@ -3181,7 +3115,7 @@ describe('webDetection config tests', () => {
 
             it('checks `catch` kinds and handler positions', () => {
                 expectValid({
-                    count: { api: { path: 'document.fonts', allowGetter: true, where: { status: 'error' } } },
+                    count: { api: { path: 'document.fonts', where: { status: 'error' } } },
                     catch: { absent: 0 },
                     is: { gt: 0 },
                 });
@@ -3202,7 +3136,7 @@ describe('webDetection config tests', () => {
             });
 
             it('checks `field` has a read key, and `args` only with `path`', () => {
-                expectError('needs at least one', { ...fieldOf('img', { allowGetter: true }), is: {} });
+                expectError('needs at least one', { ...fieldOf('img', {}), is: {} });
                 expectError('needs `path`', { ...fieldOf('img', { args: [] }), is: {} });
             });
         });
@@ -3324,12 +3258,12 @@ describe('webDetection config tests', () => {
                     always: { value: true },
                 });
                 expectValid({ ...text, is: { length: { gt: 0 } } });
-                expectValid({ element: { selector: 'input', allowGetter: true }, is: { hidden: false } });
+                expectValid({ element: { selector: 'input' }, is: { hidden: false } });
             });
 
             it('places `text` and `element` without `field` in list-of-values position', () => {
                 expectValid({ first: text, is: { length: { gt: 0 } } });
-                expectValid({ first: img, is: { field: { path: 'tagName', allowGetter: true }, is: 'IMG' } });
+                expectValid({ first: img, is: { field: { path: 'tagName' }, is: 'IMG' } });
             });
 
             it('rejects `text` and `element` without `field` in number position', () => {
@@ -3383,7 +3317,7 @@ describe('webDetection config tests', () => {
 
             it('checks a feature’s input type', () => {
                 expectValid({
-                    api: { path: 'document', allowGetter: true, field: { path: 'title', feature: 'wordCount' } },
+                    api: { path: 'document', field: { path: 'title', feature: 'wordCount' } },
                     is: { lte: 3 },
                 });
                 expectValid({ element: { selector: 'body', field: { feature: 'renderedTextLength' } }, is: { lt: 1 } });
@@ -3399,73 +3333,42 @@ describe('webDetection config tests', () => {
             });
         });
 
-        describe('`allowGetter`', () => {
-            it('is needed to read an element property in `where`, `field` or the `is` on the source', () => {
-                expectError(accessorError, { count: { element: { selector: 'img', where: { complete: true } } }, is: 0 });
-                expectError(accessorError, { element: { selector: 'img', field: 'naturalWidth' }, is: { gt: 0 } });
-                expectError(accessorError, { element: { selector: 'input' }, is: { hidden: false } });
-                expectValid(items('img', { complete: true }));
-            });
-
-            it('is needed for each `api` name that is a getter, the path’s first name included', () => {
-                expectError(accessorError, { api: { path: 'performance.now', args: [] }, is: { gt: 0 } });
-                expectError(accessorError, { api: { path: 'document.title' }, is: { type: 'string' } });
-                expectError(accessorError, { count: { api: { path: 'document.fonts', where: { status: 'error' } } }, is: 0 });
-                expectValid({ ...title, is: { type: 'string' } });
-            });
-
-            it('covers an `is` on the source expression, and not an `is` on a ref to it', () => {
-                const input = { element: { selector: 'input', allowGetter: true } };
-                expectValid({ ...input, is: { hidden: false } });
-                expectError(accessorError, {
-                    all: [
-                        { ...input, as: 'box' },
-                        { ref: 'box', is: { hidden: false } },
-                    ],
+        describe('`api` names and data reads', () => {
+            it('rejects `allowGetter`, which is no source body or `field` key', () => {
+                expectError('unknown source body key "allowGetter"', {
+                    count: { element: { selector: 'img', allowGetter: true, where: { complete: true } } },
+                    is: 0,
                 });
-            });
-
-            it('on a `field` object, covers that read in a predicate outside a source', () => {
-                expectValid(true, { tag: { value: { first: img }, when: { field: { path: 'tagName', allowGetter: true }, is: 'IMG' } } });
-                expectError(accessorError, true, { tag: { value: { first: img }, when: { field: 'tagName', is: 'IMG' } } });
-            });
-
-            it('treats names on IDL objects outside the tables as accessors', () => {
-                expectError(accessorError, true, {
-                    rules: {
-                        value: { first: { element: { selector: 'link' } } },
-                        when: { field: { path: 'sheet', allowGetter: true }, is: { cssRules: { exists: true } } },
-                    },
+                expectError('unknown source body key "allowGetter"', {
+                    api: { path: 'document.title', allowGetter: true },
+                    is: { type: 'string' },
                 });
-            });
-
-            it('is not needed for data values, and may cover no accessor read', () => {
-                expectValid({ first: text, is: { length: 1 } });
-                expectValid({ first: text, is: { 0: 'a' } });
-                expectValid({ element: { selector: 'img', allowGetter: true } });
+                expectError('unknown `field` key "allowGetter"', {
+                    ...fieldOf('img', { path: 'naturalWidth', allowGetter: true }),
+                    is: { gt: 0 },
+                });
             });
 
             it('checks `api` names are read as the kind API_ALLOWLIST records', () => {
-                expectError('reads the method "performance.now" without calling it', {
-                    api: { path: 'performance.now', allowGetter: true },
-                    is: {},
-                });
-                expectError('calls "document.title", which API_ALLOWLIST records as a getter', {
-                    api: { path: 'document.title', args: [], allowGetter: true },
+                expectError('reads the method "performance.now" without calling it', { api: { path: 'performance.now' }, is: {} });
+                expectError('calls "document.title", which API_ALLOWLIST records as a property', {
+                    api: { path: 'document.title', args: [] },
                     is: {},
                 });
                 expectError('reads the method "performance.getEntriesByType" without calling it', {
-                    api: { path: 'performance', allowGetter: true, field: 'getEntriesByType.length' },
+                    api: { path: 'performance', field: 'getEntriesByType.length' },
                     is: {},
                 });
             });
 
+            it('reads `length` and indexes on strings', () => {
+                expectValid({ first: text, is: { length: 1 } });
+                expectValid({ first: text, is: { 0: 'a' } });
+            });
+
             it('reads page-defined values under names outside the tables on custom elements only', () => {
-                expectValid({ element: { selector: 'x-widget', allowGetter: true }, is: { value: 3 } });
-                expectError('"value" is not a property of HTMLDivElement', {
-                    element: { selector: 'div', allowGetter: true },
-                    is: { value: 3 },
-                });
+                expectValid({ element: { selector: 'x-widget' }, is: { value: 3 } });
+                expectError('"value" is not a property of HTMLDivElement', { element: { selector: 'div' }, is: { value: 3 } });
             });
         });
 
@@ -3697,14 +3600,14 @@ describe('webDetection config tests', () => {
         describe('`api` allowlist', () => {
             it('checks each name of the path, `field` names and the names predicates read', () => {
                 expectError('"document.cookie", which is not in API_ALLOWLIST', {
-                    api: { path: 'document.cookie', allowGetter: true },
+                    api: { path: 'document.cookie' },
                     is: { type: 'string' },
                 });
                 expectError('"navigator", which is not in API_ALLOWLIST', {
-                    api: { path: 'navigator.userAgent', allowGetter: true },
+                    api: { path: 'navigator.userAgent' },
                     is: { type: 'string' },
                 });
-                expectError('"document.title.foo"', { api: { path: 'document', allowGetter: true, field: 'title.foo' }, is: {} });
+                expectError('"document.title.foo"', { api: { path: 'document', field: 'title.foo' }, is: {} });
                 expectError('"performance.getEntriesByType.name"', {
                     count: {
                         api: {
@@ -3712,13 +3615,12 @@ describe('webDetection config tests', () => {
                             args: [
                                 'resource',
                             ],
-                            allowGetter: true,
                             where: { name: 'x' },
                         },
                     },
                     is: 0,
                 });
-                expectError('"document.readyState.length"', { api: { path: 'document.readyState', allowGetter: true }, is: { length: 8 } });
+                expectError('"document.readyState.length"', { api: { path: 'document.readyState' }, is: { length: 8 } });
                 expectValid({ ...title, is: { type: 'string', length: { gte: 7 } } });
                 expectValid({
                     count: {
@@ -3727,7 +3629,6 @@ describe('webDetection config tests', () => {
                             args: [
                                 'resource',
                             ],
-                            allowGetter: true,
                             where: { responseStatus: { exists: true, gte: 400 } },
                         },
                     },
@@ -3737,10 +3638,10 @@ describe('webDetection config tests', () => {
 
             it('rejects performance.getEntries in value position only', () => {
                 expectError('performance.getEntries selects every entry', {
-                    api: { path: 'performance.getEntries', args: [], allowGetter: true, field: 'duration' },
+                    api: { path: 'performance.getEntries', args: [], field: 'duration' },
                     is: { gt: 0 },
                 });
-                expectValid({ count: { api: { path: 'performance.getEntries', args: [], allowGetter: true } }, is: { gt: 0 } });
+                expectValid({ count: { api: { path: 'performance.getEntries', args: [] } }, is: { gt: 0 } });
             });
         });
 
@@ -3761,7 +3662,7 @@ describe('webDetection config tests', () => {
                 expectError('overlap', true, { a: { value: imgCount, buckets: { low: { lte: 3 }, high: { gte: 3 } } } });
                 expectError('overlap', true, {
                     a: {
-                        value: { api: { path: 'document.readyState', allowGetter: true } },
+                        value: { api: { path: 'document.readyState' } },
                         buckets: {
                             early: [
                                 'loading',
