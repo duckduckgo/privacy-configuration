@@ -3828,6 +3828,102 @@
                             "source": "captcha_other"
                         },
                         "parameters": {}
+                    },
+                    "webTelemetry_slowPageLoad_immediate": {
+                        "state": "disabled",
+                        "trigger": {
+                            "type": "immediate_v2",
+                            "source": "slowPageLoad"
+                        },
+                        "parameters": {
+                            "loadEventEnd": { "template": "data", "dataKey": "loadEventEnd" },
+                            "errors": { "template": "data", "dataKey": "_errors" }
+                        }
+                    },
+                    "webTelemetry_pageLoadTime_immediate": {
+                        "state": "disabled",
+                        "trigger": {
+                            "type": "immediate_v2",
+                            "source": "pageLoadTime"
+                        },
+                        "parameters": {
+                            "loadEventEnd": { "template": "data", "dataKey": "loadEventEnd" },
+                            "errors": { "template": "data", "dataKey": "_errors" }
+                        }
+                    },
+                    "webTelemetry_errorPage_immediate": {
+                        "state": "disabled",
+                        "trigger": {
+                            "type": "immediate_v2",
+                            "source": "errorPage"
+                        },
+                        "parameters": {
+                            "keywordCount": { "template": "data", "dataKey": "keywordCount" },
+                            "contentByteRatio": { "template": "data", "dataKey": "contentByteRatio" },
+                            "bodyTextLength": { "template": "data", "dataKey": "bodyTextLength" },
+                            "errors": { "template": "data", "dataKey": "_errors" }
+                        }
+                    },
+                    "webTelemetry_blockPage_immediate": {
+                        "state": "disabled",
+                        "trigger": {
+                            "type": "immediate_v2",
+                            "source": "blockPage"
+                        },
+                        "parameters": {
+                            "status": { "template": "data", "dataKey": "status" },
+                            "bodyTextLength": { "template": "data", "dataKey": "bodyTextLength" },
+                            "errors": { "template": "data", "dataKey": "_errors" }
+                        }
+                    },
+                    "webTelemetry_blankPage_immediate": {
+                        "state": "disabled",
+                        "trigger": {
+                            "type": "immediate_v2",
+                            "source": "blankPage"
+                        },
+                        "parameters": {
+                            "loadEventEnd": { "template": "data", "dataKey": "loadEventEnd" },
+                            "failedScripts": { "template": "data", "dataKey": "failedScripts" },
+                            "bodySize": { "template": "data", "dataKey": "bodySize" },
+                            "media": { "template": "data", "dataKey": "media" },
+                            "errors": { "template": "data", "dataKey": "_errors" }
+                        }
+                    },
+                    "webTelemetry_stylesMissing_immediate": {
+                        "state": "disabled",
+                        "trigger": {
+                            "type": "immediate_v2",
+                            "source": "stylesMissing"
+                        },
+                        "parameters": {
+                            "unloadedStylesheets": { "template": "data", "dataKey": "unloadedStylesheets" },
+                            "failedFontFaces": { "template": "data", "dataKey": "failedFontFaces" },
+                            "errors": { "template": "data", "dataKey": "_errors" }
+                        }
+                    },
+                    "webTelemetry_brokenImages_immediate": {
+                        "state": "disabled",
+                        "trigger": {
+                            "type": "immediate_v2",
+                            "source": "brokenImages"
+                        },
+                        "parameters": {
+                            "brokenImages": { "template": "data", "dataKey": "brokenImages" },
+                            "brokenShare": { "template": "data", "dataKey": "brokenShare" },
+                            "errors": { "template": "data", "dataKey": "_errors" }
+                        }
+                    },
+                    "webTelemetry_regionEmpty_immediate": {
+                        "state": "disabled",
+                        "trigger": {
+                            "type": "immediate_v2",
+                            "source": "regionEmpty"
+                        },
+                        "parameters": {
+                            "brokenImages": { "template": "data", "dataKey": "brokenImages" },
+                            "errors": { "template": "data", "dataKey": "_errors" }
+                        }
                     }
                 }
             }

@@ -1086,6 +1086,275 @@
                             "type": "temp_wd_blockPage"
                         }
                     }
+                },
+                "http_forbidden_en_v2": {
+                    "state": "disabled",
+                    "match": {
+                        "any": [
+                            {
+                                "text": {
+                                    "selector": [
+                                        "title",
+                                        "h1"
+                                    ],
+                                    "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                    "pattern": [
+                                        "\\b403\\b[^.]{0,40}forbidden",
+                                        "forbidden[^.]{0,30}\\b403\\b",
+                                        "access is denied"
+                                    ]
+                                }
+                            },
+                            {
+                                "all": [
+                                    {
+                                        "text": {
+                                            "selector": [
+                                                "title",
+                                                "h1"
+                                            ],
+                                            "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                            "pattern": [
+                                                "^\\s*forbidden\\b"
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "api": {
+                                            "path": "performance.getEntriesByType",
+                                            "args": [
+                                                "navigation"
+                                            ],
+                                            "field": "responseStatus"
+                                        },
+                                        "as": "status",
+                                        "is": {
+                                            "gte": 400
+                                        }
+                                    }
+                                ],
+                                "catch": {
+                                    "absent": true
+                                }
+                            }
+                        ]
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    1000,
+                                    5000
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        "fireEvent": {
+                            "state": "enabled",
+                            "type": "blockPage",
+                            "data": {
+                                "status": {
+                                    "value": {
+                                        "ref": "status"
+                                    },
+                                    "buckets": {
+                                        "2xx": {
+                                            "gte": 200,
+                                            "lt": 300
+                                        },
+                                        "4xx": {
+                                            "gte": 400,
+                                            "lt": 500
+                                        },
+                                        "5xx": {
+                                            "gte": 500,
+                                            "lt": 600
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "http_rate_limited_en_v2": {
+                    "state": "disabled",
+                    "match": {
+                        "any": [
+                            {
+                                "text": {
+                                    "selector": [
+                                        "title",
+                                        "h1"
+                                    ],
+                                    "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                    "pattern": [
+                                        "\\b429\\b[^.]{0,30}too many requests"
+                                    ]
+                                }
+                            },
+                            {
+                                "all": [
+                                    {
+                                        "text": {
+                                            "selector": [
+                                                "title",
+                                                "h1"
+                                            ],
+                                            "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                            "pattern": [
+                                                "too many requests"
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "api": {
+                                            "path": "performance.getEntriesByType",
+                                            "args": [
+                                                "navigation"
+                                            ],
+                                            "field": "responseStatus"
+                                        },
+                                        "as": "status",
+                                        "is": {
+                                            "gte": 400
+                                        }
+                                    }
+                                ],
+                                "catch": {
+                                    "absent": true
+                                }
+                            }
+                        ]
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    1000,
+                                    5000
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        "fireEvent": {
+                            "state": "enabled",
+                            "type": "blockPage",
+                            "data": {
+                                "status": {
+                                    "value": {
+                                        "ref": "status"
+                                    },
+                                    "buckets": {
+                                        "2xx": {
+                                            "gte": 200,
+                                            "lt": 300
+                                        },
+                                        "4xx": {
+                                            "gte": 400,
+                                            "lt": 500
+                                        },
+                                        "5xx": {
+                                            "gte": 500,
+                                            "lt": 600
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "waf_assets_v2": {
+                    "state": "disabled",
+                    "match": {
+                        "all": [
+                            {
+                                "element": {
+                                    "selector": [
+                                        "script[src*='_Inc\\61 psul\\61 _Resource']",
+                                        "img[src*='_Inc\\61 psul\\61 _Resource']",
+                                        "link[href*='cdn.sucuri.net']"
+                                    ],
+                                    "visibility": "any"
+                                }
+                            },
+                            {
+                                "any": [
+                                    {
+                                        "element": {
+                                            "selector": "body",
+                                            "field": {
+                                                "feature": "renderedTextLength"
+                                            }
+                                        },
+                                        "as": "bodyTextLength",
+                                        "is": {
+                                            "lt": 2000
+                                        }
+                                    },
+                                    {
+                                        "api": {
+                                            "path": "performance.getEntriesByType",
+                                            "args": [
+                                                "navigation"
+                                            ],
+                                            "field": "responseStatus"
+                                        },
+                                        "catch": {
+                                            "absent": 0
+                                        },
+                                        "is": {
+                                            "gte": 400
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    1000,
+                                    5000
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        "fireEvent": {
+                            "state": "enabled",
+                            "type": "blockPage",
+                            "data": {
+                                "bodyTextLength": {
+                                    "value": {
+                                        "ref": "bodyTextLength"
+                                    },
+                                    "buckets": {
+                                        "0-499": {
+                                            "gte": 0,
+                                            "lt": 500
+                                        },
+                                        "500-999": {
+                                            "gte": 500,
+                                            "lt": 1000
+                                        },
+                                        "1000-1999": {
+                                            "gte": 1000,
+                                            "lt": 2000
+                                        },
+                                        "2000+": {
+                                            "gte": 2000
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             },
             "errorPage": {
@@ -1168,6 +1437,280 @@
                     "actions": {
                         "breakageReportData": {
                             "state": "enabled"
+                        }
+                    }
+                },
+                "soft404_phrases_count": {
+                    "state": "disabled",
+                    "match": {
+                        "count": {
+                            "text": {
+                                "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                "pattern": [
+                                    "access denied",
+                                    "page not found",
+                                    "404 not found"
+                                ]
+                            }
+                        },
+                        "as": "keywordCount",
+                        "is": {
+                            "gte": 1
+                        }
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    1000,
+                                    5000
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        "fireEvent": {
+                            "state": "enabled",
+                            "type": "errorPage",
+                            "data": {
+                                "keywordCount": {
+                                    "value": {
+                                        "ref": "keywordCount"
+                                    },
+                                    "buckets": {
+                                        "1": 1,
+                                        "2-4": {
+                                            "gte": 2,
+                                            "lt": 5
+                                        },
+                                        "5+": {
+                                            "gte": 5
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "soft404_features": {
+                    "state": "disabled",
+                    "match": {
+                        "all": [
+                            {
+                                "div": [
+                                    {
+                                        "element": {
+                                            "selector": "body",
+                                            "field": {
+                                                "feature": "renderedTextLength"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "api": {
+                                            "path": "performance.getEntriesByType",
+                                            "args": [
+                                                "navigation"
+                                            ],
+                                            "field": "decodedBodySize"
+                                        }
+                                    }
+                                ],
+                                "as": "contentByteRatio",
+                                "is": {
+                                    "lt": 0.15
+                                }
+                            },
+                            {
+                                "any": [
+                                    {
+                                        "count": {
+                                            "element": {
+                                                "selector": "img"
+                                            }
+                                        },
+                                        "is": {
+                                            "lt": 2
+                                        }
+                                    },
+                                    {
+                                        "api": {
+                                            "path": "document",
+                                            "field": {
+                                                "path": "title",
+                                                "feature": "wordCount"
+                                            }
+                                        },
+                                        "is": {
+                                            "lte": 3
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "count": {
+                                    "text": {
+                                        "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                        "pattern": [
+                                            "\\b404\\b",
+                                            "\\berror\\b",
+                                            "\\bfound\\b",
+                                            "\\bpage\\b",
+                                            "\\bfile\\b",
+                                            "\\bresource\\b",
+                                            "\\burl\\b",
+                                            "\\baccess denied\\b",
+                                            "\\bforbidden\\b",
+                                            "\\bunavailable\\b",
+                                            "\\bgone\\b",
+                                            "\\bredirect\\b",
+                                            "\\btemporary\\b",
+                                            "\\bpermanent\\b",
+                                            "\\bserver\\b",
+                                            "\\bclient\\b",
+                                            "\\bbrowser\\b",
+                                            "\\bnetwork\\b",
+                                            "\\bdns\\b",
+                                            "\\btypo\\b",
+                                            "\\bmisspelling\\b",
+                                            "\\bstale\\b",
+                                            "\\bbroken\\b",
+                                            "\\bdead\\b",
+                                            "\\bobsolete\\b",
+                                            "\\bexpired\\b",
+                                            "\\binvalid\\b",
+                                            "\\bmalformed\\b",
+                                            "\\bcorrupt\\b",
+                                            "\\bunreachable\\b",
+                                            "\\bdeleted\\b"
+                                        ]
+                                    }
+                                },
+                                "as": "keywordCount",
+                                "is": {
+                                    "gte": 5
+                                }
+                            }
+                        ]
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    3000,
+                                    10000
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        "fireEvent": {
+                            "state": "enabled",
+                            "type": "errorPage",
+                            "data": {
+                                "contentByteRatio": {
+                                    "value": {
+                                        "ref": "contentByteRatio"
+                                    },
+                                    "buckets": {
+                                        "0-0.05": {
+                                            "gte": 0,
+                                            "lt": 0.05
+                                        },
+                                        "0.05-0.15": {
+                                            "gte": 0.05,
+                                            "lt": 0.15
+                                        }
+                                    }
+                                },
+                                "keywordCount": {
+                                    "value": {
+                                        "ref": "keywordCount"
+                                    },
+                                    "buckets": {
+                                        "5-9": {
+                                            "gte": 5,
+                                            "lt": 10
+                                        },
+                                        "10-24": {
+                                            "gte": 10,
+                                            "lt": 25
+                                        },
+                                        "25+": {
+                                            "gte": 25
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "failure_phrases_small_page": {
+                    "state": "disabled",
+                    "match": {
+                        "all": [
+                            {
+                                "text": {
+                                    "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                    "pattern": [
+                                        "something went wrong",
+                                        "temporary error",
+                                        "this is taking longer than"
+                                    ]
+                                }
+                            },
+                            {
+                                "element": {
+                                    "selector": "body",
+                                    "field": {
+                                        "feature": "renderedTextLength"
+                                    }
+                                },
+                                "as": "bodyTextLength",
+                                "is": {
+                                    "lt": 2000
+                                }
+                            }
+                        ]
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    3000,
+                                    10000
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        "fireEvent": {
+                            "state": "enabled",
+                            "type": "errorPage",
+                            "data": {
+                                "bodyTextLength": {
+                                    "value": {
+                                        "ref": "bodyTextLength"
+                                    },
+                                    "buckets": {
+                                        "0-499": {
+                                            "gte": 0,
+                                            "lt": 500
+                                        },
+                                        "500-999": {
+                                            "gte": 500,
+                                            "lt": 1000
+                                        },
+                                        "1000-1999": {
+                                            "gte": 1000,
+                                            "lt": 2000
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -1273,6 +1816,617 @@
                         "fireEvent": {
                             "state": "enabled",
                             "type": "temp_wd_blankPage"
+                        }
+                    }
+                },
+                "app_root_empty_v2": {
+                    "state": "disabled",
+                    "match": {
+                        "all": [
+                            {
+                                "element": {
+                                    "selector": [
+                                        "#app",
+                                        "#root",
+                                        "#__next"
+                                    ],
+                                    "visibility": "any"
+                                }
+                            },
+                            {
+                                "api": {
+                                    "path": "performance.getEntriesByType",
+                                    "args": [
+                                        "navigation"
+                                    ],
+                                    "field": "loadEventEnd"
+                                },
+                                "as": "loadEventEnd",
+                                "is": {
+                                    "gt": 0
+                                }
+                            },
+                            {
+                                "sub": [
+                                    {
+                                        "api": {
+                                            "path": "performance.now",
+                                            "args": []
+                                        }
+                                    },
+                                    {
+                                        "ref": "loadEventEnd"
+                                    }
+                                ],
+                                "is": {
+                                    "gte": 3000
+                                }
+                            },
+                            {
+                                "none": [
+                                    {
+                                        "element": {
+                                            "selector": [
+                                                "#app",
+                                                "#root",
+                                                "#__next"
+                                            ],
+                                            "visibility": "content"
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    5000,
+                                    10000
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        "fireEvent": {
+                            "state": "enabled",
+                            "type": "blankPage",
+                            "data": {
+                                "loadEventEnd": {
+                                    "value": {
+                                        "ref": "loadEventEnd"
+                                    },
+                                    "buckets": {
+                                        "0-3s": {
+                                            "gt": 0,
+                                            "lt": 3000
+                                        },
+                                        "3-8s": {
+                                            "gte": 3000,
+                                            "lt": 8000
+                                        },
+                                        "8s+": {
+                                            "gte": 8000
+                                        }
+                                    }
+                                },
+                                "failedScripts": {
+                                    "value": {
+                                        "count": {
+                                            "api": {
+                                                "path": "performance.getEntriesByType",
+                                                "args": [
+                                                    "resource"
+                                                ],
+                                                "where": {
+                                                    "initiatorType": "script",
+                                                    "responseStatus": {
+                                                        "gte": 400
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "buckets": {
+                                        "0": 0,
+                                        "1": 1,
+                                        "2+": {
+                                            "gte": 2
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "no_text_or_title_v2": {
+                    "state": "disabled",
+                    "match": {
+                        "none": [
+                            {
+                                "text": {
+                                    "xpath": "//title/text() | //body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                    "pattern": [
+                                        "\\S"
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    5000
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        "fireEvent": {
+                            "state": "enabled",
+                            "type": "blankPage",
+                            "data": {
+                                "bodySize": {
+                                    "value": {
+                                        "api": {
+                                            "path": "performance.getEntriesByType",
+                                            "args": [
+                                                "navigation"
+                                            ],
+                                            "field": "decodedBodySize"
+                                        }
+                                    },
+                                    "buckets": {
+                                        "0": 0,
+                                        "under1KB": {
+                                            "gt": 0,
+                                            "lt": 1024
+                                        },
+                                        "1-100KB": {
+                                            "gte": 1024,
+                                            "lt": 102400
+                                        },
+                                        "100KB+": {
+                                            "gte": 102400
+                                        }
+                                    }
+                                },
+                                "media": {
+                                    "value": {
+                                        "count": {
+                                            "element": {
+                                                "selector": [
+                                                    "img",
+                                                    "video",
+                                                    "canvas",
+                                                    "svg",
+                                                    "iframe"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "buckets": {
+                                        "0": 0,
+                                        "1-4": {
+                                            "gte": 1,
+                                            "lt": 5
+                                        },
+                                        "5+": {
+                                            "gte": 5
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "pageLoad": {
+                "slow_load": {
+                    "state": "disabled",
+                    "match": {
+                        "any": [
+                            {
+                                "api": {
+                                    "path": "performance.getEntriesByType",
+                                    "args": [
+                                        "navigation"
+                                    ],
+                                    "field": "loadEventEnd"
+                                },
+                                "as": "loadEventEnd",
+                                "is": {
+                                    "gte": 8000
+                                }
+                            },
+                            {
+                                "all": [
+                                    {
+                                        "ref": "loadEventEnd",
+                                        "is": 0
+                                    },
+                                    {
+                                        "api": {
+                                            "path": "performance.now",
+                                            "args": []
+                                        },
+                                        "is": {
+                                            "gte": 15000
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    10000,
+                                    16000
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        "fireEvent": {
+                            "state": "enabled",
+                            "type": "slowPageLoad",
+                            "data": {
+                                "loadEventEnd": {
+                                    "value": {
+                                        "ref": "loadEventEnd"
+                                    },
+                                    "buckets": {
+                                        "loading": 0,
+                                        "8-15s": {
+                                            "gte": 8000,
+                                            "lt": 15000
+                                        },
+                                        "15s+": {
+                                            "gte": 15000
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "load_time": {
+                    "state": "disabled",
+                    "match": {
+                        "api": {
+                            "path": "performance.getEntriesByType",
+                            "args": [
+                                "navigation"
+                            ],
+                            "field": "loadEventEnd"
+                        },
+                        "as": "loadEventEnd",
+                        "is": {}
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    10000
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        "fireEvent": {
+                            "state": "enabled",
+                            "type": "pageLoadTime",
+                            "data": {
+                                "loadEventEnd": {
+                                    "value": {
+                                        "ref": "loadEventEnd"
+                                    },
+                                    "buckets": {
+                                        "loading": 0,
+                                        "0-3s": {
+                                            "gt": 0,
+                                            "lt": 3000
+                                        },
+                                        "3-5s": {
+                                            "gte": 3000,
+                                            "lt": 5000
+                                        },
+                                        "5-8s": {
+                                            "gte": 5000,
+                                            "lt": 8000
+                                        },
+                                        "8s+": {
+                                            "gte": 8000
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "styleBreakage": {
+                "missing_styles_or_fonts": {
+                    "state": "disabled",
+                    "match": {
+                        "any": [
+                            {
+                                "count": {
+                                    "element": {
+                                        "selector": "link[rel~='stylesheet']:not([rel~='alternate']):not([disabled])",
+                                        "where": {
+                                            "sheet": null
+                                        }
+                                    }
+                                },
+                                "as": "unloadedStylesheets",
+                                "is": {
+                                    "gt": 0
+                                }
+                            },
+                            {
+                                "count": {
+                                    "api": {
+                                        "path": "document.fonts",
+                                        "where": {
+                                            "status": "error"
+                                        }
+                                    }
+                                },
+                                "catch": {
+                                    "absent": 0
+                                },
+                                "as": "failedFontFaces",
+                                "is": {
+                                    "gt": 0
+                                }
+                            }
+                        ]
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    5000
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        "fireEvent": {
+                            "state": "enabled",
+                            "type": "stylesMissing",
+                            "data": {
+                                "unloadedStylesheets": {
+                                    "value": {
+                                        "ref": "unloadedStylesheets"
+                                    },
+                                    "buckets": {
+                                        "0": 0,
+                                        "1": 1,
+                                        "2-4": {
+                                            "gte": 2,
+                                            "lt": 5
+                                        },
+                                        "5+": {
+                                            "gte": 5
+                                        }
+                                    }
+                                },
+                                "failedFontFaces": {
+                                    "value": {
+                                        "ref": "failedFontFaces"
+                                    },
+                                    "buckets": {
+                                        "0": 0,
+                                        "1": 1,
+                                        "2-4": {
+                                            "gte": 2,
+                                            "lt": 5
+                                        },
+                                        "5+": {
+                                            "gte": 5
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "imageBreakage": {
+                "broken_images": {
+                    "state": "disabled",
+                    "match": {
+                        "count": {
+                            "element": {
+                                "selector": "img",
+                                "where": {
+                                    "complete": true,
+                                    "naturalWidth": 0,
+                                    "currentSrc.length": {
+                                        "gt": 0
+                                    }
+                                }
+                            }
+                        },
+                        "as": "brokenImages",
+                        "is": {
+                            "gte": 1
+                        }
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    5000
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        "fireEvent": {
+                            "state": "enabled",
+                            "type": "brokenImages",
+                            "data": {
+                                "brokenImages": {
+                                    "value": {
+                                        "ref": "brokenImages"
+                                    },
+                                    "buckets": {
+                                        "1": 1,
+                                        "2-4": {
+                                            "gte": 2,
+                                            "lt": 5
+                                        },
+                                        "5-9": {
+                                            "gte": 5,
+                                            "lt": 10
+                                        },
+                                        "10+": {
+                                            "gte": 10
+                                        }
+                                    }
+                                },
+                                "brokenShare": {
+                                    "value": {
+                                        "div": [
+                                            {
+                                                "ref": "brokenImages"
+                                            },
+                                            {
+                                                "count": {
+                                                    "element": {
+                                                        "selector": "img"
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    },
+                                    "buckets": {
+                                        "under10": {
+                                            "gte": 0,
+                                            "lt": 0.1
+                                        },
+                                        "10-50": {
+                                            "gte": 0.1,
+                                            "lt": 0.5
+                                        },
+                                        "50-90": {
+                                            "gte": 0.5,
+                                            "lt": 0.9
+                                        },
+                                        "90+": {
+                                            "gte": 0.9
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "regionBreakage": {
+                "comments_empty": {
+                    "state": "disabled",
+                    "match": {
+                        "all": [
+                            {
+                                "element": {
+                                    "selector": [
+                                        "#comments"
+                                    ]
+                                }
+                            },
+                            {
+                                "element": {
+                                    "selector": "#comments",
+                                    "field": {
+                                        "feature": "renderedTextLength"
+                                    }
+                                },
+                                "is": {
+                                    "lt": 1
+                                }
+                            },
+                            {
+                                "count": {
+                                    "element": {
+                                        "selector": "img",
+                                        "where": {
+                                            "complete": true,
+                                            "naturalWidth": {
+                                                "gt": 0
+                                            }
+                                        },
+                                        "root": [
+                                            "#comments"
+                                        ]
+                                    }
+                                },
+                                "is": {
+                                    "lt": 1
+                                }
+                            }
+                        ]
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "runConditions": {
+                                "context": {
+                                    "top": true
+                                },
+                                "urlPattern": "https://www.example.com/*"
+                            },
+                            "when": {
+                                "intervalMs": [
+                                    5000
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        "fireEvent": {
+                            "state": "enabled",
+                            "type": "regionEmpty",
+                            "data": {
+                                "brokenImages": {
+                                    "value": {
+                                        "count": {
+                                            "element": {
+                                                "selector": "img",
+                                                "where": {
+                                                    "complete": true,
+                                                    "naturalWidth": 0,
+                                                    "currentSrc.length": {
+                                                        "gt": 0
+                                                    }
+                                                },
+                                                "root": [
+                                                    "#comments"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "buckets": {
+                                        "0": 0,
+                                        "1+": {
+                                            "gte": 1
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }

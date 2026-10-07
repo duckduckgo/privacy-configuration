@@ -1,60 +1,200 @@
 import { expect } from 'chai';
 import fs from 'fs';
+import { immutableJSONPatch } from 'immutable-json-patch';
 import xpath from 'xpath';
 import platforms from '../platforms.js';
+import { buildTables } from '../scripts/generate-element-property-tables.mjs';
 
+/** Combinators in match, in predicates, and in the legacy blocks over `text` and `element` bodies. */
 const OPERATOR_KEYS = [
     'any',
     'all',
     'none',
 ];
 
-const MATCH_LEVEL_KEYS = [
-    'text',
+/** `as` names, payload keys, and group and detector names. */
+const NAME_PATTERN = /^[a-zA-Z][a-zA-Z0-9_]*$/;
+
+const SOURCE_KEYS = [
     'element',
+    'text',
+    'api',
+];
+
+const EXPRESSION_KEYS = [
+    ...SOURCE_KEYS,
+    'count',
+    'first',
+    'last',
+    'sum',
+    'mul',
+    'min',
+    'max',
+    'sub',
+    'div',
+    'if',
+    ...OPERATOR_KEYS,
+    'ref',
+];
+
+const MODIFIER_KEYS = [
+    'as',
+    'catch',
+    'is',
+];
+
+const FAILURE_KINDS = [
+    'absent',
+    'denied',
+];
+
+const BODY_KEYS = {
+    element: [
+        'selector',
+        'visibility',
+        'where',
+        'field',
+        'root',
+    ],
+    text: [
+        'pattern',
+        'selector',
+        'xpath',
+        'xpathConfig',
+        'root',
+    ],
+    api: [
+        'path',
+        'args',
+        'where',
+        'field',
+    ],
+};
+
+const VISIBILITY_VALUES = [
+    'visible',
+    'hidden',
+    'any',
+    'content',
+];
+
+const FIELD_KEYS = [
+    'path',
+    'args',
+    'feature',
+];
+
+/** Each feature and the input it takes. */
+const FEATURE_INPUTS = {
+    wordCount: 'string',
+    renderedTextLength: 'element',
+};
+
+const TYPE_NAMES = [
+    'number',
+    'string',
+    'boolean',
+    'null',
+    'undefined',
+    'array',
+    'object',
+];
+
+const COMPARISON_OPERATORS = [
+    'lt',
+    'lte',
+    'gt',
+    'gte',
+];
+
+/** Operator names at value level. At item level they are property paths. */
+const VALUE_OPERATORS = [
+    'eq',
+    ...COMPARISON_OPERATORS,
+    'exists',
+    'type',
+    'finite',
+    'nan',
+];
+
+const PAYLOAD_ACTIONS = [
+    'fireEvent',
+    'breakageReportData',
+];
+
+const PAYLOAD_FIELD_KEYS = [
+    'value',
+    'when',
+    'buckets',
 ];
 
 /**
- * Recursively walk a condition node, asserting it contains either only operator
- * keys or only level-appropriate leaf keys (never both).
+ * Every name an `api` may read: its `path`, and that path joined by `.` to each name a `field`
+ * path or a predicate reads from its items or values.
  *
- * Operator children stay at the same level (operators are level-preserving);
- * descending into a `text`/`element` key transitions the walk into a per-type
- * subtree where leaf fields like `pattern`/`selector` live (and don't need
- * further structural validation here).
- *
- * @param {unknown} node
- * @param {string} path - JSON path used in error messages
+ * C-S-S reads any name config gives, so this list is the review point. A detector reading a name
+ * not listed adds it here in the same change. Names reading user data or URLs, such as
+ * `document.cookie` and `.name` on `resource` entries, stay off the list.
  */
-function assertConditionNode(node, path) {
-    if (Array.isArray(node)) {
-        node.forEach((n, i) => assertConditionNode(n, `${path}[${i}]`));
-        return;
-    }
-    if (node === null || typeof node !== 'object') return;
+const API_ALLOWLIST = [
+    'document',
+    'document.fonts',
+    'document.fonts.status',
+    'document.hidden',
+    'document.readyState',
+    'document.title',
+    'document.title.length',
+    'matchMedia',
+    'matchMedia.matches',
+    'performance.getEntries',
+    'performance.getEntriesByName',
+    'performance.getEntriesByName.startTime',
+    'performance.getEntriesByType',
+    'performance.getEntriesByType.decodedBodySize',
+    'performance.getEntriesByType.duration',
+    'performance.getEntriesByType.initiatorType',
+    'performance.getEntriesByType.loadEventEnd',
+    'performance.getEntriesByType.responseEnd',
+    'performance.getEntriesByType.responseStatus',
+    'performance.getEntriesByType.type',
+    'performance.now',
+];
 
-    const keys = Object.keys(node);
-    const opKeys = keys.filter((k) => OPERATOR_KEYS.includes(k));
-    const otherKeys = keys.filter((k) => !OPERATOR_KEYS.includes(k));
+/**
+ * Methods a `field` may call on `element` items, with the IDL type each returns. Each leaves the
+ * page unchanged: it fires no event and changes no focus, DOM or state. WebIDL does not mark
+ * side effects, so this list is kept by hand.
+ */
+const ELEMENT_METHOD_ALLOWLIST = {
+    checkVisibility: 'boolean',
+    closest: 'Element?',
+    getAttribute: 'DOMString?',
+    getAttributeNS: 'DOMString?',
+    getAttributeNames: 'sequence<DOMString>',
+    getBoundingClientRect: 'DOMRect',
+    getClientRects: 'DOMRectList',
+    hasAttribute: 'boolean',
+    hasAttributeNS: 'boolean',
+    hasAttributes: 'boolean',
+    hasChildNodes: 'boolean',
+    matches: 'boolean',
+    querySelector: 'Element?',
+    querySelectorAll: 'NodeList',
+};
 
-    expect(
-        opKeys.length === 0 || otherKeys.length === 0,
-        `${path}: condition node mixes operator keys [${opKeys.join(', ')}] with non-operator keys [${otherKeys.join(', ')}]`,
-    ).to.equal(true);
+/**
+ * @typedef {{
+ *   _meta: Record<string, unknown>,
+ *   reservedNameProperties: string[],
+ *   tags: Record<string, Record<string, string>>,
+ *   interfaces: Record<string, { inherits: string | null, properties: Record<string, string> }>,
+ * }} PropertyTables
+ */
 
-    if (opKeys.length > 0) {
-        for (const op of opKeys) {
-            assertConditionNode(node[op], `${path}.${op}`);
-        }
-        return;
-    }
-
-    for (const childKey of MATCH_LEVEL_KEYS) {
-        if (childKey in node) {
-            assertConditionNode(node[childKey], `${path}.${childKey}`);
-        }
-    }
-}
+/** Generated by scripts/generate-element-property-tables.mjs. */
+const PROPERTY_TABLES = /** @type {PropertyTables} */ (
+    JSON.parse(fs.readFileSync(new URL('./data/element-property-tables.json', import.meta.url), 'utf8'))
+);
 
 /** Floor for a non-zero chunkSize. Smaller chunks multiply regex tests for little gain. */
 const MIN_CHUNK_SIZE = 1024;
@@ -188,8 +328,29 @@ function assertTextConditionExpressions(condition, path) {
 }
 
 /**
- * Invoke `cb` for every leaf of a `text` condition branch, descending through
- * operator blocks and arrays.
+ * @param {unknown} value
+ * @returns {value is Record<string, any>}
+ */
+function isPlainObject(value) {
+    return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+
+/**
+ * @template T
+ * @param {T | T[]} value
+ * @returns {T[]}
+ */
+function asArray(value) {
+    return Array.isArray(value)
+        ? value
+        : [
+              value,
+          ];
+}
+
+/**
+ * Invoke `cb` for every body of a `text` or `element` source, descending through arrays and
+ * the legacy `{any|all|none}` blocks.
  *
  * @param {unknown} node
  * @param {string} path
@@ -213,23 +374,151 @@ function forEachTextLeaf(node, path, cb) {
 }
 
 /**
- * Invoke `cb` for every `text` leaf condition reachable from a match tree.
+ * Invoke `cb` for every source in an expression, wherever it sits: under operators, in `catch`
+ * handlers and `if` branches, and in the operands of predicates.
+ *
+ * @param {unknown} node
+ * @param {string} path
+ * @param {(key: string, body: unknown, path: string) => void} cb
+ */
+function forEachSource(node, path, cb) {
+    if (Array.isArray(node)) {
+        node.forEach((n, i) => forEachSource(n, `${path}[${i}]`, cb));
+        return;
+    }
+    if (!isPlainObject(node)) return;
+
+    for (const [
+        key,
+        value,
+    ] of Object.entries(node)) {
+        const childPath = `${path}.${key}`;
+        if (SOURCE_KEYS.includes(key)) {
+            cb(key, value, childPath);
+            const bodies =
+                key === 'api'
+                    ? [
+                          { body: value, path: childPath },
+                      ]
+                    : [];
+            if (key !== 'api') forEachTextLeaf(value, childPath, (body, bodyPath) => bodies.push({ body, path: bodyPath }));
+            for (const { body, path: bodyPath } of bodies) {
+                if (isPlainObject(body) && 'where' in body) forEachPredicateSource(body.where, 'item', `${bodyPath}.where`, cb);
+            }
+        } else if (key === 'if') {
+            if (!isPlainObject(value)) continue;
+            for (const branch of [
+                'test',
+                'then',
+                'else',
+            ]) {
+                forEachSource(value[branch], `${childPath}.${branch}`, cb);
+            }
+        } else if (key === 'catch') {
+            if (!isPlainObject(value)) continue;
+            for (const [
+                kind,
+                handler,
+            ] of Object.entries(value)) {
+                forEachSource(handler, `${childPath}.${kind}`, cb);
+            }
+        } else if (key === 'is') {
+            forEachPredicateSource(value, 'value', childPath, cb);
+        } else if (EXPRESSION_KEYS.includes(key) && key !== 'ref') {
+            forEachSource(value, childPath, cb);
+        }
+    }
+}
+
+/**
+ * Invoke `cb` for every source in the operands of a predicate.
+ *
+ * @param {unknown} predicate
+ * @param {'item' | 'value'} level
+ * @param {string} path
+ * @param {(key: string, body: unknown, path: string) => void} cb
+ */
+function forEachPredicateSource(predicate, level, path, cb) {
+    if (Array.isArray(predicate)) {
+        predicate.forEach((p, i) => forEachPredicateSource(p, level, `${path}[${i}]`, cb));
+        return;
+    }
+    if (!isPlainObject(predicate)) return;
+
+    for (const [
+        key,
+        value,
+    ] of Object.entries(predicate)) {
+        const childPath = `${path}.${key}`;
+        if (OPERATOR_KEYS.includes(key)) {
+            forEachPredicateSource(value, level, childPath, cb);
+        } else if (key === 'is') {
+            forEachPredicateSource(value, 'value', childPath, cb);
+        } else if (key === 'field') {
+            continue;
+        } else if (level === 'value' && VALUE_OPERATORS.includes(key)) {
+            if (key === 'eq' || COMPARISON_OPERATORS.includes(key)) forEachSource(value, childPath, cb);
+        } else {
+            forEachPredicateSource(value, 'value', childPath, cb);
+        }
+    }
+}
+
+/**
+ * Invoke `cb` for every source in a detector's match tree and payloads.
+ *
+ * @param {Record<string, any>} detector
+ * @param {string} path
+ * @param {(key: string, body: unknown, path: string) => void} cb
+ */
+function forEachDetectorSource(detector, path, cb) {
+    forEachSource(detector.match, `${path}.match`, cb);
+    for (const action of PAYLOAD_ACTIONS) {
+        const data = detector.actions?.[action]?.data;
+        if (!isPlainObject(data)) continue;
+        for (const [
+            key,
+            field,
+        ] of Object.entries(data)) {
+            if (!isPlainObject(field)) continue;
+            const fieldPath = `${path}.actions.${action}.data.${key}`;
+            forEachSource(field.value, `${fieldPath}.value`, cb);
+            forEachPredicateSource(field.when, 'value', `${fieldPath}.when`, cb);
+            if (!isPlainObject(field.buckets)) continue;
+            for (const [
+                name,
+                bucket,
+            ] of Object.entries(field.buckets)) {
+                forEachPredicateSource(bucket, 'value', `${fieldPath}.buckets.${name}`, cb);
+            }
+        }
+    }
+}
+
+/**
+ * Invoke `cb` for every `text` body reachable from an expression, in any placement.
  *
  * @param {unknown} node
  * @param {string} path
  * @param {(condition: Record<string, any>, path: string) => void} cb
  */
 function forEachTextCondition(node, path, cb) {
-    if (Array.isArray(node)) {
-        node.forEach((n, i) => forEachTextCondition(n, `${path}[${i}]`, cb));
-        return;
-    }
-    if (node === null || typeof node !== 'object') return;
+    forEachSource(node, path, (key, body, sourcePath) => {
+        if (key === 'text') forEachTextLeaf(body, sourcePath, cb);
+    });
+}
 
-    for (const op of OPERATOR_KEYS) {
-        if (op in node) forEachTextCondition(node[op], `${path}.${op}`, cb);
-    }
-    if ('text' in node) forEachTextLeaf(node.text, `${path}.text`, cb);
+/**
+ * Invoke `cb` for every `text` body in a detector's match tree and payloads.
+ *
+ * @param {Record<string, any>} detector
+ * @param {string} path
+ * @param {(condition: Record<string, any>, path: string) => void} cb
+ */
+function forEachDetectorTextCondition(detector, path, cb) {
+    forEachDetectorSource(detector, path, (key, body, sourcePath) => {
+        if (key === 'text') forEachTextLeaf(body, sourcePath, cb);
+    });
 }
 
 /** Patch paths that land on an `xpathConfig` block or one of its values. */
@@ -355,9 +644,1717 @@ function forEachWebDetectionConfig(cb) {
     }
 }
 
+/**
+ * @typedef {'number' | 'string' | 'boolean' | 'null' | 'undefined' | 'array' | 'object'} TypeName
+ * @typedef {'boolean' | 'value' | 'number' | 'items' | 'values'} Position
+ */
+
+/**
+ * What config shows about a value.
+ *
+ * @typedef {{
+ *   types: TypeName[] | null,
+ *   nan: boolean,
+ *   interfaces?: string[],
+ *   apiPath?: string,
+ * }} StaticType
+ *
+ * `types` is null when config does not show the type. `nan` is set when the value can be NaN.
+ * `interfaces` names the element interfaces an element value can have. `apiPath` is the `api`
+ * name the value was read through, which names read from it extend for the allowlist.
+ */
+
+/** @type {StaticType} */
+const UNKNOWN = { types: null, nan: false };
+
+/**
+ * @param {TypeName} name
+ * @returns {StaticType}
+ */
+function typeOf(name) {
+    return {
+        types: [
+            name,
+        ],
+        nan: false,
+    };
+}
+
+/**
+ * @param {StaticType[]} list
+ * @returns {StaticType}
+ */
+function mergeTypes(list) {
+    /** @type {Set<TypeName> | null} */
+    let types = new Set();
+    /** @type {Set<string> | null} */
+    const interfaces = new Set();
+    const apiPaths = new Set();
+    let nan = false;
+    for (const entry of list) {
+        if (entry.types === null) types = null;
+        else if (types) for (const name of entry.types) types.add(name);
+        nan ||= entry.nan;
+        for (const name of entry.interfaces ?? []) interfaces.add(name);
+        if (entry.apiPath !== undefined) apiPaths.add(entry.apiPath);
+    }
+    /** @type {StaticType} */
+    const merged = {
+        types: types
+            ? [
+                  ...types,
+              ]
+            : null,
+        nan,
+    };
+    if (interfaces.size)
+        merged.interfaces = [
+            ...interfaces,
+        ];
+    if (apiPaths.size === 1)
+        merged.apiPath = [
+            ...apiPaths,
+        ][0];
+    return merged;
+}
+
+/**
+ * @param {StaticType} type
+ * @param {TypeName} name
+ */
+function allows(type, name) {
+    return type.types === null || type.types.includes(name);
+}
+
+/**
+ * @param {StaticType} type
+ */
+function describeType(type) {
+    return type.types === null ? 'unknown' : type.types.join(' or ');
+}
+
+/**
+ * Split at each top-level occurrence of a separator, outside (), <>, [] and quotes.
+ *
+ * @param {string} text
+ * @param {(char: string) => boolean} isSeparator
+ * @returns {string[]}
+ */
+function splitTopLevel(text, isSeparator) {
+    const parts = [];
+    let depth = 0;
+    /** @type {string | null} */
+    let quote = null;
+    let start = 0;
+    for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        if (char === '\\') {
+            i++;
+        } else if (quote) {
+            if (char === quote) quote = null;
+        } else if (char === '"' || char === "'") {
+            quote = char;
+        } else if ('([<'.includes(char)) {
+            depth++;
+        } else if (')]>'.includes(char) && depth > 0) {
+            depth--;
+        } else if (depth === 0 && isSeparator(char)) {
+            parts.push(text.slice(start, i));
+            start = i + 1;
+        }
+    }
+    parts.push(text.slice(start));
+    return parts;
+}
+
+const NUMERIC_IDL_TYPES = [
+    'byte',
+    'octet',
+    'short',
+    'unsigned short',
+    'long',
+    'unsigned long',
+    'long long',
+    'unsigned long long',
+    'float',
+    'double',
+    'unrestricted float',
+    'unrestricted double',
+];
+
+const STRING_IDL_TYPES = [
+    'DOMString',
+    'USVString',
+    'ByteString',
+    'CSSOMString',
+];
+
+const ARRAY_IDL_GENERICS = [
+    'sequence',
+    'FrozenArray',
+    'ObservableArray',
+];
+
+/**
+ * The static type of a value of an IDL type, as the property tables write it.
+ *
+ * @param {string} idlType
+ * @returns {StaticType}
+ */
+function typeFromIdl(idlType) {
+    let text = idlType.trim();
+    const nullable = text.endsWith('?');
+    if (nullable) text = text.slice(0, -1).trim();
+
+    /** @type {StaticType} */
+    let result;
+    const generic = /^(\w+)<(.*)>$/.exec(text);
+    if (text.startsWith('(') && text.endsWith(')')) {
+        result = mergeTypes(
+            text
+                .slice(1, -1)
+                .split(' or ')
+                .map((member) => typeFromIdl(member)),
+        );
+    } else if (generic) {
+        result = typeOf(ARRAY_IDL_GENERICS.includes(generic[1]) ? 'array' : 'object');
+    } else if (NUMERIC_IDL_TYPES.includes(text)) {
+        result = {
+            types: [
+                'number',
+            ],
+            nan: text.startsWith('unrestricted '),
+        };
+    } else if (STRING_IDL_TYPES.includes(text)) {
+        result = typeOf('string');
+    } else if (text === 'boolean' || text === 'undefined' || text === 'object') {
+        result = typeOf(text);
+    } else if (text === 'any') {
+        result = UNKNOWN;
+    } else if (PROPERTY_TABLES.interfaces[text]) {
+        result = {
+            types: [
+                'object',
+            ],
+            nan: false,
+            interfaces: [
+                text,
+            ],
+        };
+    } else {
+        // An interface outside the tables: its properties are not checked
+        result = typeOf('object');
+    }
+    return nullable
+        ? mergeTypes([
+              result,
+              typeOf('null'),
+          ])
+        : result;
+}
+
+/** @type {Map<string, Map<string, string>>} */
+const interfacePropertyCache = new Map();
+
+/**
+ * Every attribute of an element interface, its ancestors' included, with its IDL type.
+ *
+ * @param {string} name
+ * @returns {Map<string, string>}
+ */
+function interfaceProperties(name) {
+    let properties = interfacePropertyCache.get(name);
+    if (properties) return properties;
+    const entry = PROPERTY_TABLES.interfaces[name];
+    properties = new Map(entry?.inherits ? interfaceProperties(entry.inherits) : []);
+    for (const [
+        property,
+        type,
+    ] of Object.entries(entry?.properties ?? {})) {
+        properties.set(property, type);
+    }
+    interfacePropertyCache.set(name, properties);
+    return properties;
+}
+
+/** Element interfaces by lower-case tag, across namespaces. `a` is both an HTML and an SVG element. */
+const TAG_INTERFACES = new Map();
+for (const tagTable of Object.values(PROPERTY_TABLES.tags)) {
+    for (const [
+        tag,
+        name,
+    ] of Object.entries(tagTable)) {
+        const key = tag.toLowerCase();
+        TAG_INTERFACES.set(key, [
+            ...new Set([
+                ...(TAG_INTERFACES.get(key) ?? []),
+                name,
+            ]),
+        ]);
+    }
+}
+
+/** Every interface an element can have. */
+const ALL_ELEMENT_INTERFACES = Object.keys(PROPERTY_TABLES.interfaces).filter((name) => {
+    for (let current = /** @type {string | null} */ (name); current; current = PROPERTY_TABLES.interfaces[current]?.inherits ?? null) {
+        if (current === 'Element') return true;
+    }
+    return false;
+});
+
+/**
+ * The tags a selector list can match, or null when one of its selectors names no tag.
+ *
+ * @param {string} selector
+ * @returns {string[] | null}
+ */
+function selectorTags(selector) {
+    const tags = [];
+    for (const complex of splitTopLevel(selector, (char) => char === ',')) {
+        const compounds = splitTopLevel(complex.trim(), (char) => /[\s>+~]/.test(char)).filter((part) => part !== '');
+        const compound = compounds[compounds.length - 1] ?? '';
+        const match = /^([a-zA-Z][a-zA-Z0-9-]*)(?!\|)/.exec(compound);
+        if (!match) return null;
+        tags.push(match[1].toLowerCase());
+    }
+    return tags;
+}
+
+/**
+ * The element interfaces a selector's matches can have. A tag outside the tables is a custom or
+ * unknown element, whose native properties are HTMLElement's.
+ *
+ * @param {unknown} selector - a selector or an array of them
+ * @returns {string[]}
+ */
+function selectorInterfaces(selector) {
+    const names = new Set();
+    for (const entry of asArray(selector)) {
+        const tags = typeof entry === 'string' ? selectorTags(entry) : null;
+        if (!tags) return ALL_ELEMENT_INTERFACES;
+        for (const tag of tags) {
+            for (const name of TAG_INTERFACES.get(tag) ?? [
+                'HTMLElement',
+            ])
+                names.add(name);
+        }
+    }
+    return [
+        ...names,
+    ];
+}
+
+/**
+ * @param {string[]} interfaces
+ */
+function describeInterfaces(interfaces) {
+    return interfaces === ALL_ELEMENT_INTERFACES ? 'any element interface' : interfaces.join(' or ');
+}
+
+/**
+ * @typedef {{
+ *   inMatch: boolean,
+ *   underNone: boolean,
+ *   branch: string[],
+ *   topOperand: number | null,
+ *   matchRoot: boolean,
+ *   owners: string[],
+ * }} Scope
+ *
+ * `branch` lists the `if` branches around the expression. `topOperand` is the index of the
+ * operand of match's top-level `all` holding it. `owners` lists the `as` names around it.
+ */
+
+/**
+ * @typedef {{
+ *   mode: 'collect' | 'check' | 'dry',
+ *   errors: string[],
+ *   structuralErrors: string[],
+ *   names: Map<string, { node: Record<string, any>, path: string, branch: string[] }>,
+ *   dependencies: Map<string, Set<string>>,
+ *   refs: { name: string, path: string, branch: string[], inMatch: boolean }[],
+ *   rooted: { selectors: unknown[], path: string, needsGuard: boolean, inMatch: boolean, topOperand: number | null, owner: string | undefined }[],
+ *   refMemo: Map<string, { errors: string[], type: StaticType }>,
+ *   refFailures: { name: string, position: Position, path: string, errors: string[] }[],
+ *   resolving: Set<string>,
+ * }} Context
+ *
+ * A detector is walked twice. `collect` indexes the `as` names and the refs between them, and
+ * `check` reports every error. `dry` checks a ref's target in the ref's position, reporting into
+ * a scratch list.
+ */
+
+/** @type {Scope} */
+const MATCH_SCOPE = { inMatch: true, underNone: false, branch: [], topOperand: null, matchRoot: true, owners: [] };
+
+/** @type {Scope} */
+const PAYLOAD_SCOPE = { inMatch: false, underNone: false, branch: [], topOperand: null, matchRoot: false, owners: [] };
+
+/**
+ * @param {Context} ctx
+ * @param {string} path
+ * @param {string} message
+ */
+function fail(ctx, path, message) {
+    ctx.errors.push(`${path}: ${message}`);
+}
+
+/**
+ * @param {Scope} scope
+ * @returns {Scope}
+ */
+function child(scope) {
+    return scope.matchRoot ? { ...scope, matchRoot: false } : scope;
+}
+
+/**
+ * @param {Context} ctx
+ * @param {string} path
+ * @param {string} what
+ * @param {Position} position
+ * @param {Position[]} fills
+ */
+function expectPosition(ctx, path, what, position, fills) {
+    if (!fills.includes(position)) {
+        fail(ctx, path, `${what} fills ${fills.join(', ')} position, not ${position} position`);
+    }
+}
+
+/**
+ * @param {Record<string, any>} node
+ * @returns {string[]}
+ */
+function expressionKeysOf(node) {
+    return Object.keys(node).filter((key) => EXPRESSION_KEYS.includes(key));
+}
+
+/**
+ * The expression an `as` names: its value after `catch`, without the `is` test.
+ *
+ * @param {Record<string, any>} node
+ * @returns {Record<string, any>}
+ */
+function valueNode(node) {
+    return Object.fromEntries(
+        Object.entries(node).filter(
+            ([
+                key,
+            ]) => key !== 'as' && key !== 'is',
+        ),
+    );
+}
+
+/**
+ * Whether an operand of `any`, `all`, `none`, `sum`, `mul`, `min` or `max` contributes a list of
+ * values rather than one operand: `element` with `field`, `api`, or a ref to either.
+ *
+ * @param {unknown} node
+ * @param {Context} ctx
+ * @param {Set<string>} [seen]
+ * @returns {boolean}
+ */
+function providesValues(node, ctx, seen = new Set()) {
+    if (!isPlainObject(node) || 'is' in node) return false;
+    const keys = expressionKeysOf(node);
+    if (keys.length !== 1) return false;
+    const body = node[keys[0]];
+    switch (keys[0]) {
+        case 'api':
+            return true;
+        case 'element': {
+            let hasField = false;
+            forEachTextLeaf(body, '', (leaf) => {
+                hasField ||= 'field' in leaf;
+            });
+            return hasField;
+        }
+        case 'ref': {
+            const target = typeof body === 'string' && !seen.has(body) ? ctx.names.get(body) : undefined;
+            return target
+                ? providesValues(
+                      valueNode(target.node),
+                      ctx,
+                      new Set([
+                          ...seen,
+                          body,
+                      ]),
+                  )
+                : false;
+        }
+        default:
+            return false;
+    }
+}
+
+/**
+ * Check an expression fills a position, and return what config shows about its value.
+ *
+ * @param {unknown} node
+ * @param {Position} position
+ * @param {Scope} scope
+ * @param {Context} ctx
+ * @param {string} path
+ * @returns {StaticType}
+ */
+function checkExpr(node, position, scope, ctx, path) {
+    if (typeof node === 'number') {
+        expectPosition(ctx, path, 'A number', position, [
+            'value',
+            'number',
+        ]);
+        return typeOf('number');
+    }
+    if (typeof node === 'boolean') {
+        expectPosition(ctx, path, 'A boolean', position, [
+            'boolean',
+            'value',
+        ]);
+        return typeOf('boolean');
+    }
+    if (Array.isArray(node)) {
+        expectPosition(ctx, path, 'An array, the OR of its entries,', position, [
+            'boolean',
+        ]);
+        node.forEach((entry, index) => checkExpr(entry, 'boolean', child(scope), ctx, `${path}[${index}]`));
+        return typeOf('boolean');
+    }
+    if (!isPlainObject(node)) {
+        fail(ctx, path, `${JSON.stringify(node)} is not an expression`);
+        return UNKNOWN;
+    }
+
+    const keys = Object.keys(node);
+    for (const key of keys) {
+        if (!EXPRESSION_KEYS.includes(key) && !MODIFIER_KEYS.includes(key)) fail(ctx, path, `unknown expression key "${key}"`);
+    }
+    const exprKeys = expressionKeysOf(node);
+    if (exprKeys.length === 0) {
+        fail(ctx, path, 'an object expression needs an expression key');
+        return UNKNOWN;
+    }
+    const hasIs = 'is' in node;
+    if (hasIs && position !== 'boolean')
+        fail(ctx, path, `\`is\` gives a boolean, so it sits in boolean position, not ${position} position`);
+    if (exprKeys.length > 1 && (hasIs || position !== 'boolean')) {
+        fail(ctx, path, `several expression keys [${exprKeys.join(', ')}] are an AND, only in boolean position and never beside \`is\``);
+    }
+
+    let owners = scope.owners;
+    if ('as' in node) {
+        const name = node.as;
+        if (typeof name !== 'string' || !NAME_PATTERN.test(name)) {
+            fail(ctx, path, `\`as\` ${JSON.stringify(name)} does not match ${NAME_PATTERN}`);
+        } else {
+            owners = [
+                ...owners,
+                name,
+            ];
+            if (ctx.mode === 'collect') {
+                const existing = ctx.names.get(name);
+                if (existing) ctx.structuralErrors.push(`${path}: \`as\` "${name}" is already used at ${existing.path}`);
+                else ctx.names.set(name, { node, path, branch: scope.branch });
+            }
+        }
+    }
+
+    const inner = { ...scope, owners };
+    const keyPosition = exprKeys.length > 1 ? 'boolean' : hasIs ? 'value' : position;
+    /** @type {StaticType} */
+    let type;
+    if (exprKeys.length > 1) {
+        for (const key of exprKeys) checkExprKey(key, node[key], 'boolean', child(inner), ctx, `${path}.${key}`, undefined);
+        type = typeOf('boolean');
+    } else {
+        const owner = typeof node.as === 'string' ? node.as : undefined;
+        type = checkExprKey(exprKeys[0], node[exprKeys[0]], keyPosition, inner, ctx, `${path}.${exprKeys[0]}`, owner);
+    }
+    if ('catch' in node) {
+        const handlerTypes = checkCatch(node.catch, keyPosition, child(inner), ctx, `${path}.catch`);
+        for (const handlerType of handlerTypes) {
+            const expected = type.types;
+            if (expected && handlerType.types && !handlerType.types.some((name) => expected.includes(name))) {
+                fail(ctx, `${path}.catch`, `a handler gives ${describeType(handlerType)} where the expression gives ${describeType(type)}`);
+            }
+        }
+        type = mergeTypes([
+            type,
+            ...handlerTypes,
+        ]);
+    }
+    if (hasIs) {
+        // `as` names the value, not the test, so a ref to it from the test is no cycle
+        checkPredicate(node.is, 'value', type, child(scope), ctx, `${path}.is`);
+        return typeOf('boolean');
+    }
+    return type;
+}
+
+/**
+ * @param {unknown} handlers
+ * @param {Position} position - the caught expression's
+ * @param {Scope} scope
+ * @param {Context} ctx
+ * @param {string} path
+ * @returns {StaticType[]}
+ */
+function checkCatch(handlers, position, scope, ctx, path) {
+    if (!isPlainObject(handlers)) {
+        fail(ctx, path, '`catch` maps failure kinds to handlers');
+        return [];
+    }
+    const types = [];
+    for (const [
+        kind,
+        handler,
+    ] of Object.entries(handlers)) {
+        if (!FAILURE_KINDS.includes(kind)) fail(ctx, `${path}.${kind}`, `unknown failure kind; kinds are ${FAILURE_KINDS.join(', ')}`);
+        types.push(checkExpr(handler, position, scope, ctx, `${path}.${kind}`));
+    }
+    return types;
+}
+
+/**
+ * @param {string} key
+ * @param {unknown} body
+ * @param {Position} position
+ * @param {Scope} scope
+ * @param {Context} ctx
+ * @param {string} path
+ * @param {string | undefined} owner - the `as` beside the key
+ * @returns {StaticType}
+ */
+function checkExprKey(key, body, position, scope, ctx, path, owner) {
+    switch (key) {
+        case 'element':
+        case 'text':
+            return checkConditionSource(key, body, position, scope, ctx, path, owner);
+        case 'api':
+            return checkApi(body, position, scope, ctx, path);
+        case 'count':
+            expectPosition(ctx, path, '`count`', position, [
+                'value',
+                'number',
+            ]);
+            checkExpr(body, 'items', child(scope), ctx, path);
+            return typeOf('number');
+        case 'first':
+        case 'last': {
+            expectPosition(ctx, path, `\`${key}\``, position, [
+                'value',
+                'number',
+            ]);
+            const type = checkExpr(body, 'values', child(scope), ctx, path);
+            if (position === 'number' && !allows(type, 'number'))
+                fail(ctx, path, `number position takes a number, and config types the value as ${describeType(type)}`);
+            return type;
+        }
+        case 'sum':
+        case 'mul':
+        case 'min':
+        case 'max': {
+            expectPosition(ctx, path, `\`${key}\``, position, [
+                'value',
+                'number',
+            ]);
+            let nan = false;
+            asArray(body).forEach((operand, index) => {
+                const operandPath = Array.isArray(body) ? `${path}[${index}]` : path;
+                const listed = providesValues(operand, ctx);
+                const type = checkExpr(operand, listed ? 'values' : 'number', child(scope), ctx, operandPath);
+                if (listed && !allows(type, 'number'))
+                    fail(ctx, operandPath, `\`${key}\` takes numbers, and config types the values as ${describeType(type)}`);
+                nan ||= type.nan;
+            });
+            return {
+                types: [
+                    'number',
+                ],
+                nan,
+            };
+        }
+        case 'sub':
+        case 'div': {
+            expectPosition(ctx, path, `\`${key}\``, position, [
+                'value',
+                'number',
+            ]);
+            if (!Array.isArray(body) || body.length !== 2) {
+                fail(ctx, path, `\`${key}\` takes an array of two operands`);
+                return {
+                    types: [
+                        'number',
+                    ],
+                    nan: key === 'div',
+                };
+            }
+            const types = body.map((operand, index) => checkExpr(operand, 'number', child(scope), ctx, `${path}[${index}]`));
+            return {
+                types: [
+                    'number',
+                ],
+                nan: key === 'div' || types.some((type) => type.nan),
+            };
+        }
+        case 'any':
+        case 'all':
+        case 'none': {
+            expectPosition(ctx, path, `\`${key}\``, position, [
+                'boolean',
+            ]);
+            asArray(body).forEach((operand, index) => {
+                const operandPath = Array.isArray(body) ? `${path}[${index}]` : path;
+                /** @type {Scope} */
+                const operandScope = {
+                    ...child(scope),
+                    underNone: scope.underNone || key === 'none',
+                    topOperand: scope.matchRoot && key === 'all' ? index : scope.topOperand,
+                };
+                if (providesValues(operand, ctx)) {
+                    const type = checkExpr(operand, 'values', operandScope, ctx, operandPath);
+                    if (!allows(type, 'boolean'))
+                        fail(ctx, operandPath, `\`${key}\` takes booleans, and config types the values as ${describeType(type)}`);
+                } else {
+                    checkExpr(operand, 'boolean', operandScope, ctx, operandPath);
+                }
+            });
+            return typeOf('boolean');
+        }
+        case 'if': {
+            expectPosition(ctx, path, '`if`', position, [
+                'boolean',
+                'value',
+                'number',
+            ]);
+            if (!isPlainObject(body)) {
+                fail(ctx, path, '`if` takes a body of `test`, `then` and `else`');
+                return UNKNOWN;
+            }
+            const keys = Object.keys(body);
+            const missing = [
+                'test',
+                'then',
+                'else',
+            ].filter((k) => !keys.includes(k));
+            const extra = keys.filter(
+                (k) =>
+                    ![
+                        'test',
+                        'then',
+                        'else',
+                    ].includes(k),
+            );
+            if (missing.length || extra.length)
+                fail(
+                    ctx,
+                    path,
+                    `\`if\` takes exactly \`test\`, \`then\` and \`else\` (missing [${missing.join(', ')}], extra [${extra.join(', ')}])`,
+                );
+            const inner = child(scope);
+            checkExpr(body.test, 'boolean', inner, ctx, `${path}.test`);
+            const branches = [
+                'then',
+                'else',
+            ].map((branch) =>
+                checkExpr(
+                    body[branch],
+                    position,
+                    {
+                        ...inner,
+                        branch: [
+                            ...scope.branch,
+                            `${path}.${branch}`,
+                        ],
+                    },
+                    ctx,
+                    `${path}.${branch}`,
+                ),
+            );
+            return mergeTypes(branches);
+        }
+        case 'ref': {
+            if (typeof body !== 'string' || !NAME_PATTERN.test(body)) {
+                fail(ctx, path, `\`ref\` ${JSON.stringify(body)} does not match ${NAME_PATTERN}`);
+                return UNKNOWN;
+            }
+            if (ctx.mode === 'collect') {
+                for (const name of scope.owners) {
+                    const deps = ctx.dependencies.get(name) ?? new Set();
+                    deps.add(body);
+                    ctx.dependencies.set(name, deps);
+                }
+                return UNKNOWN;
+            }
+            if (ctx.mode === 'check') ctx.refs.push({ name: body, path, branch: scope.branch, inMatch: scope.inMatch });
+            return resolveRef(body, position, ctx, path);
+        }
+        default:
+            return UNKNOWN;
+    }
+}
+
+/**
+ * Check a ref's target fills the ref's position, and return its type.
+ *
+ * @param {string} name
+ * @param {Position} position
+ * @param {Context} ctx
+ * @param {string} path
+ * @returns {StaticType}
+ */
+function resolveRef(name, position, ctx, path) {
+    const target = ctx.names.get(name);
+    if (!target) {
+        fail(ctx, path, `\`ref\` "${name}" names no expression in this detector`);
+        return UNKNOWN;
+    }
+    // A cycle is reported once, from the collect pass
+    if (ctx.resolving.has(name)) return UNKNOWN;
+    const key = `${name}|${position}`;
+    let result = ctx.refMemo.get(key);
+    if (!result) {
+        ctx.resolving.add(name);
+        /** @type {Context} */
+        const dry = { ...ctx, mode: 'dry', errors: [] };
+        const type = checkExpr(valueNode(target.node), position, PAYLOAD_SCOPE, dry, target.path);
+        ctx.resolving.delete(name);
+        result = { errors: dry.errors, type };
+        ctx.refMemo.set(key, result);
+    }
+    if (result.errors.length) {
+        // Reported once the walk ends, and only for errors the target does not give in its own position
+        if (ctx.mode === 'check') ctx.refFailures.push({ name, position, path, errors: result.errors });
+        else fail(ctx, path, `\`ref\` "${name}" is read in ${position} position, which its target does not fill: ${result.errors[0]}`);
+    }
+    return result.type;
+}
+
+/**
+ * @param {unknown} branch
+ * @param {Position} position
+ * @param {Context} ctx
+ * @param {string} path
+ * @returns {{ body: Record<string, any>, path: string, underNone: boolean }[]}
+ */
+function collectBodies(branch, position, ctx, path, underNone = false) {
+    if (Array.isArray(branch)) {
+        return branch.flatMap((entry, index) => collectBodies(entry, position, ctx, `${path}[${index}]`, underNone));
+    }
+    if (!isPlainObject(branch)) {
+        fail(ctx, path, 'a source body is an object, or an array of them');
+        return [];
+    }
+    const opKeys = Object.keys(branch).filter((key) => OPERATOR_KEYS.includes(key));
+    if (opKeys.length === 0)
+        return [
+            { body: branch, path, underNone },
+        ];
+
+    const otherKeys = Object.keys(branch).filter((key) => !OPERATOR_KEYS.includes(key));
+    if (otherKeys.length)
+        fail(ctx, path, `source body mixes operator keys [${opKeys.join(', ')}] with body keys [${otherKeys.join(', ')}]`);
+    if (position !== 'boolean')
+        fail(ctx, path, `\`{${opKeys.join('|')}}\` blocks over source bodies are boolean only, not ${position} position`);
+    return opKeys.flatMap((key) => collectBodies(branch[key], position, ctx, `${path}.${key}`, underNone || key === 'none'));
+}
+
+/**
+ * @param {Record<string, any>} body
+ * @param {string[]} allowed
+ * @param {Context} ctx
+ * @param {string} path
+ */
+function checkBodyKeys(body, allowed, ctx, path) {
+    for (const key of Object.keys(body)) {
+        if (!allowed.includes(key)) fail(ctx, path, `unknown source body key "${key}"`);
+    }
+}
+
+/**
+ * @param {unknown} value
+ * @param {Context} ctx
+ * @param {string} path
+ * @param {string} what
+ * @returns {value is string | string[]}
+ */
+function expectStrings(value, ctx, path, what) {
+    const ok =
+        typeof value === 'string'
+            ? value !== ''
+            : Array.isArray(value) && value.length > 0 && value.every((v) => typeof v === 'string' && v !== '');
+    if (!ok) fail(ctx, path, `${what} is a non-empty string or array of them`);
+    return ok;
+}
+
+/**
+ * `element` and `text`.
+ *
+ * @param {'element' | 'text'} key
+ * @param {unknown} branch
+ * @param {Position} position
+ * @param {Scope} scope
+ * @param {Context} ctx
+ * @param {string} path
+ * @param {string | undefined} owner
+ * @returns {StaticType}
+ */
+function checkConditionSource(key, branch, position, scope, ctx, path, owner) {
+    const bodies = collectBodies(branch, position, ctx, path);
+    const withField = bodies.filter(({ body }) => 'field' in body).length;
+    if (withField && withField !== bodies.length) fail(ctx, path, 'every body of one `element` source has `field`, or none does');
+    const hasField = withField > 0;
+    if (key === 'text')
+        expectPosition(ctx, path, '`text`', position, [
+            'boolean',
+            'items',
+        ]);
+    else if (hasField)
+        expectPosition(ctx, path, '`element` with `field`', position, [
+            'value',
+            'number',
+            'items',
+            'values',
+        ]);
+    else
+        expectPosition(ctx, path, '`element` without `field`', position, [
+            'boolean',
+            'items',
+        ]);
+
+    const valueTypes = [];
+    const interfaces = new Set();
+    for (const { body, path: bodyPath, underNone } of bodies) {
+        checkBodyKeys(body, BODY_KEYS[key], ctx, bodyPath);
+        if (key === 'text') {
+            expectStrings(body.pattern, ctx, `${bodyPath}.pattern`, '`pattern`');
+            if ('selector' in body) expectStrings(body.selector, ctx, `${bodyPath}.selector`, '`selector`');
+            if ('xpath' in body) expectStrings(body.xpath, ctx, `${bodyPath}.xpath`, '`xpath`');
+            if ('root' in body && 'xpath' in body) {
+                for (const expression of asArray(body.xpath)) {
+                    if (typeof expression === 'string' && expression.trimStart().startsWith('/')) {
+                        fail(
+                            ctx,
+                            `${bodyPath}.xpath`,
+                            `${JSON.stringify(expression)} selects from the document whatever its root; a scoped XPath expression starts ".//"`,
+                        );
+                    }
+                }
+            }
+        } else {
+            expectStrings(body.selector, ctx, `${bodyPath}.selector`, '`selector`');
+            if ('visibility' in body && !VISIBILITY_VALUES.includes(body.visibility)) {
+                fail(ctx, `${bodyPath}.visibility`, `unknown visibility ${JSON.stringify(body.visibility)}`);
+            }
+            const itemInterfaces = selectorInterfaces(body.selector);
+            for (const name of itemInterfaces) interfaces.add(name);
+            /** @type {StaticType} */
+            const itemType = {
+                types: [
+                    'object',
+                ],
+                nan: false,
+                interfaces: itemInterfaces,
+            };
+            if ('where' in body)
+                checkPredicate(body.where, 'item', itemType, { ...child(scope), underNone: false }, ctx, `${bodyPath}.where`);
+            if ('field' in body) valueTypes.push(checkFieldRead(body.field, itemType, ctx, `${bodyPath}.field`));
+        }
+        if ('root' in body && expectStrings(body.root, ctx, `${bodyPath}.root`, '`root`') && ctx.mode === 'check') {
+            ctx.rooted.push({
+                selectors: asArray(body.root),
+                path: bodyPath,
+                needsGuard: position !== 'boolean' || !scope.inMatch || scope.underNone || underNone,
+                inMatch: scope.inMatch,
+                topOperand: scope.topOperand,
+                owner,
+            });
+        }
+    }
+
+    if (position === 'boolean') return typeOf('boolean');
+    if (position === 'items')
+        return key === 'element'
+            ? {
+                  types: [
+                      'object',
+                  ],
+                  nan: false,
+                  interfaces: [
+                      ...interfaces,
+                  ],
+              }
+            : UNKNOWN;
+    const type = mergeTypes(valueTypes);
+    if (position === 'number' && !allows(type, 'number'))
+        fail(ctx, path, `number position takes a number, and config types the value as ${describeType(type)}`);
+    return type;
+}
+
+/**
+ * @param {unknown} body
+ * @param {Position} position
+ * @param {Scope} scope
+ * @param {Context} ctx
+ * @param {string} path
+ * @returns {StaticType}
+ */
+function checkApi(body, position, scope, ctx, path) {
+    expectPosition(ctx, path, '`api`', position, [
+        'value',
+        'number',
+        'items',
+        'values',
+    ]);
+    if (!isPlainObject(body)) {
+        fail(ctx, path, '`api` takes one body object');
+        return UNKNOWN;
+    }
+    checkBodyKeys(body, BODY_KEYS.api, ctx, path);
+    if (typeof body.path !== 'string' || body.path === '') {
+        fail(ctx, `${path}.path`, '`path` is a non-empty string');
+        return UNKNOWN;
+    }
+    checkApiName(body.path, ctx, `${path}.path`);
+    if ((position === 'value' || position === 'number') && body.path === 'performance.getEntries') {
+        fail(
+            ctx,
+            `${path}.path`,
+            'performance.getEntries selects every entry, so it is never one value; read it under `count`, or use getEntriesByType or getEntriesByName',
+        );
+    }
+    if ('args' in body) checkArgs(body.args, ctx, `${path}.args`);
+    /** @type {StaticType} */
+    const itemType = { types: null, nan: false, apiPath: body.path };
+    if ('where' in body) checkPredicate(body.where, 'item', itemType, { ...child(scope), underNone: false }, ctx, `${path}.where`);
+    const valueType = 'field' in body ? checkFieldRead(body.field, itemType, ctx, `${path}.field`) : itemType;
+    return position === 'items' ? itemType : valueType;
+}
+
+/**
+ * @param {string} name
+ * @param {Context} ctx
+ * @param {string} path
+ */
+function checkApiName(name, ctx, path) {
+    if (!API_ALLOWLIST.includes(name)) fail(ctx, path, `\`api\` reads "${name}", which is not in API_ALLOWLIST`);
+}
+
+/**
+ * @param {unknown} args
+ * @param {Context} ctx
+ * @param {string} path
+ */
+function checkArgs(args, ctx, path) {
+    const ok =
+        Array.isArray(args) &&
+        args.every(
+            (arg) =>
+                arg === null ||
+                [
+                    'string',
+                    'number',
+                    'boolean',
+                ].includes(typeof arg),
+        );
+    if (!ok) fail(ctx, path, '`args` is an array of strings, numbers, booleans and null');
+}
+
+/**
+ * Check a `field` read, from an item or value of the given type, and return the type it reads.
+ *
+ * @param {unknown} field
+ * @param {StaticType} subject
+ * @param {Context} ctx
+ * @param {string} path
+ * @returns {StaticType}
+ */
+function checkFieldRead(field, subject, ctx, path) {
+    /** @type {Record<string, any>} */
+    let read;
+    if (typeof field === 'string') {
+        read = { path: field };
+    } else if (isPlainObject(field)) {
+        for (const key of Object.keys(field)) {
+            if (!FIELD_KEYS.includes(key)) fail(ctx, path, `unknown \`field\` key "${key}"`);
+        }
+        if (!FIELD_KEYS.some((key) => key in field)) fail(ctx, path, '`field` needs at least one of `path`, `args` and `feature`');
+        if ('args' in field && !('path' in field)) fail(ctx, path, '`args` calls the last name in `path`, so it needs `path`');
+        read = field;
+    } else {
+        fail(ctx, path, '`field` is a string or an object');
+        return UNKNOWN;
+    }
+
+    let current = subject;
+    if (read.path !== undefined) {
+        if (typeof read.path !== 'string' || read.path === '') {
+            fail(ctx, path, '`path` is a non-empty string');
+            return UNKNOWN;
+        }
+        if (read.args !== undefined) checkArgs(read.args, ctx, `${path}.args`);
+        const names = read.path.split('.');
+        names.forEach((name, index) => {
+            current = readName(current, name, read.args !== undefined && index === names.length - 1, ctx, path);
+        });
+    }
+    if (read.feature !== undefined) {
+        const input = Object.hasOwn(FEATURE_INPUTS, read.feature)
+            ? FEATURE_INPUTS[/** @type {keyof typeof FEATURE_INPUTS} */ (read.feature)]
+            : undefined;
+        if (!input) {
+            fail(ctx, path, `unknown feature ${JSON.stringify(read.feature)}`);
+        } else if (current.types !== null && input === 'string' && !current.types.includes('string')) {
+            fail(ctx, path, `${read.feature} takes a string, and config types the value as ${describeType(current)}`);
+        } else if (current.types !== null && input === 'element' && !current.interfaces) {
+            fail(ctx, path, `${read.feature} takes an element, and config types the value as ${describeType(current)}`);
+        }
+        current = typeOf('number');
+    }
+    return current;
+}
+
+/**
+ * Read one name from a value of the given type.
+ *
+ * @param {StaticType} current
+ * @param {string} name
+ * @param {boolean} isCall
+ * @param {Context} ctx
+ * @param {string} path
+ * @returns {StaticType}
+ */
+function readName(current, name, isCall, ctx, path) {
+    if (name === '') {
+        fail(ctx, path, 'a path has an empty name');
+        return UNKNOWN;
+    }
+    if (current.apiPath !== undefined) {
+        const apiPath = `${current.apiPath}.${name}`;
+        checkApiName(apiPath, ctx, path);
+        return { types: null, nan: false, apiPath };
+    }
+    if (isCall) {
+        if (!current.interfaces) {
+            fail(ctx, path, `calls ${name}() on a value that is not an element or an \`api\` read`);
+            return UNKNOWN;
+        }
+        if (!Object.hasOwn(ELEMENT_METHOD_ALLOWLIST, name)) {
+            fail(ctx, path, `calls ${name}() on an element, which is not in ELEMENT_METHOD_ALLOWLIST`);
+            return UNKNOWN;
+        }
+        return typeFromIdl(ELEMENT_METHOD_ALLOWLIST[/** @type {keyof typeof ELEMENT_METHOD_ALLOWLIST} */ (name)]);
+    }
+    if (current.types === null) return UNKNOWN;
+
+    /** @type {StaticType[]} */
+    const results = [];
+    const wrong = [];
+    for (const type of current.types) {
+        if (type === 'null' || type === 'undefined') {
+            results.push(typeOf('undefined'));
+        } else if ((type === 'string' || type === 'array') && name === 'length') {
+            results.push(typeOf('number'));
+        } else if (type === 'object' && current.interfaces) {
+            const found = current.interfaces.map((iface) => interfaceProperties(iface).get(name)).filter((idl) => idl !== undefined);
+            if (found.length) results.push(...found.map(typeFromIdl));
+            else fail(ctx, path, `"${name}" is not a property of ${describeInterfaces(current.interfaces)}`);
+        } else if (type === 'object') {
+            results.push(UNKNOWN);
+        } else {
+            wrong.push(type);
+        }
+    }
+    if (wrong.length) fail(ctx, path, `reads "${name}" on a value config types as ${wrong.join(' or ')}`);
+    return results.length ? mergeTypes(results) : UNKNOWN;
+}
+
+/**
+ * Check a predicate testing an item or a value of the given type.
+ *
+ * @param {unknown} predicate
+ * @param {'item' | 'value'} level
+ * @param {StaticType} subject
+ * @param {Scope} scope - `underNone` is set under a `none`, in the predicate or the match tree
+ * @param {Context} ctx
+ * @param {string} path
+ */
+function checkPredicate(predicate, level, subject, scope, ctx, path) {
+    if (
+        predicate === null ||
+        [
+            'string',
+            'number',
+            'boolean',
+        ].includes(typeof predicate)
+    )
+        return;
+    if (Array.isArray(predicate)) {
+        predicate.forEach((entry, index) => checkPredicate(entry, level, subject, scope, ctx, `${path}[${index}]`));
+        return;
+    }
+    if (!isPlainObject(predicate)) {
+        fail(ctx, path, `${JSON.stringify(predicate)} is not a predicate`);
+        return;
+    }
+
+    if ('field' in predicate !== 'is' in predicate) fail(ctx, path, '`field` and `is` go together: `{"field": F, "is": P}`');
+    const operators = level === 'value' ? Object.keys(predicate).filter((key) => VALUE_OPERATORS.includes(key)) : [];
+    if (operators.length) checkOperators(predicate, subject, scope, ctx, path);
+
+    for (const [
+        key,
+        value,
+    ] of Object.entries(predicate)) {
+        const keyPath = `${path}.${key}`;
+        if (OPERATOR_KEYS.includes(key)) {
+            const entryScope = { ...scope, underNone: scope.underNone || key === 'none' };
+            for (const entry of asArray(value)) checkPredicate(entry, level, subject, entryScope, ctx, keyPath);
+        } else if (key === 'field') {
+            const read = checkFieldRead(value, subject, ctx, keyPath);
+            if ('is' in predicate) checkPredicate(predicate.is, 'value', read, scope, ctx, `${path}.is`);
+        } else if (key === 'is' || operators.includes(key)) {
+            continue;
+        } else {
+            const read = checkFieldRead(key, subject, ctx, keyPath);
+            checkPredicate(value, 'value', read, scope, ctx, keyPath);
+        }
+    }
+}
+
+/**
+ * The operators of a value-level predicate object.
+ *
+ * @param {Record<string, any>} predicate
+ * @param {StaticType} subject
+ * @param {Scope} scope
+ * @param {Context} ctx
+ * @param {string} path
+ */
+function checkOperators(predicate, subject, scope, ctx, path) {
+    /** @param {string} key */
+    const has = (key) => Object.hasOwn(predicate, key);
+
+    if (has('eq')) {
+        const operand = predicate.eq;
+        if (!(operand === null || typeof operand === 'string' || typeof operand === 'boolean')) {
+            checkExpr(operand, 'number', child(scope), ctx, `${path}.eq`);
+        }
+    }
+    const comparisons = COMPARISON_OPERATORS.filter(has);
+    for (const key of comparisons) checkExpr(predicate[key], 'number', child(scope), ctx, `${path}.${key}`);
+
+    if (has('exists') && typeof predicate.exists !== 'boolean') fail(ctx, `${path}.exists`, '`exists` is a boolean');
+    if (predicate.exists === false && Object.keys(predicate).length > 1)
+        fail(ctx, path, '`"exists": false` stands alone: beside another key it never holds for a read value');
+    for (const key of [
+        'finite',
+        'nan',
+    ]) {
+        if (has(key) && typeof predicate[key] !== 'boolean') fail(ctx, `${path}.${key}`, `\`${key}\` is a boolean`);
+    }
+
+    /** @type {string[] | null} */
+    let listed = null;
+    if (has('type')) {
+        const names = asArray(predicate.type);
+        const unknown = names.filter((name) => !TYPE_NAMES.includes(name));
+        if (unknown.length)
+            fail(
+                ctx,
+                `${path}.type`,
+                `unknown type name ${unknown.map((name) => JSON.stringify(name)).join(', ')}; names are ${TYPE_NAMES.join(', ')}`,
+            );
+        listed = names;
+    }
+
+    const numberOnly = predicate.finite === true || predicate.nan === true;
+    if (predicate.finite === true && predicate.nan === true) fail(ctx, path, '`"finite": true` beside `"nan": true` never holds');
+    if (numberOnly && listed && !listed.includes('number'))
+        fail(ctx, path, '`finite` or `nan` true beside a `type` that leaves out number never holds');
+
+    if (comparisons.length) {
+        const operatorList = comparisons.join(', ');
+        if (listed) {
+            const outside = listed.filter((name) => name !== 'number');
+            if (outside.length)
+                fail(ctx, path, `beside \`type\`, ${operatorList} takes numbers only, and \`type\` also lists ${outside.join(', ')}`);
+        } else if (!numberOnly && subject.types !== null) {
+            const outside = subject.types.filter((name) => name !== 'number');
+            if (outside.length) {
+                fail(
+                    ctx,
+                    path,
+                    `${operatorList} takes numbers, and config types the value as ${describeType(subject)}; guard it with "type": "number" or "finite": true`,
+                );
+            }
+        }
+        if (scope.underNone && subject.nan && !has('finite') && !has('nan')) {
+            fail(
+                ctx,
+                path,
+                `under \`none\`, ${operatorList} on a value that can be NaN needs \`finite\` or \`nan\` beside it, since a comparison on NaN is false`,
+            );
+        }
+    }
+}
+
+/**
+ * @param {unknown} data
+ * @param {Context} ctx
+ * @param {string} path
+ */
+function checkPayloadSpec(data, ctx, path) {
+    if (!isPlainObject(data)) {
+        fail(ctx, path, '`data` maps payload keys to fields');
+        return;
+    }
+    for (const [
+        key,
+        field,
+    ] of Object.entries(data)) {
+        const fieldPath = `${path}.${key}`;
+        if (!NAME_PATTERN.test(key)) fail(ctx, fieldPath, `payload key "${key}" does not match ${NAME_PATTERN}`);
+        if (key === 'nativeData') fail(ctx, fieldPath, 'payload key "nativeData" is reserved');
+        if (!isPlainObject(field)) {
+            fail(ctx, fieldPath, 'a payload field is an object with `value`');
+            continue;
+        }
+        for (const fieldKey of Object.keys(field)) {
+            if (!PAYLOAD_FIELD_KEYS.includes(fieldKey)) fail(ctx, fieldPath, `unknown payload field key "${fieldKey}"`);
+        }
+        if (!('value' in field)) {
+            fail(ctx, fieldPath, 'a payload field needs `value`');
+            continue;
+        }
+        const type = checkExpr(field.value, 'value', PAYLOAD_SCOPE, ctx, `${fieldPath}.value`);
+        if ('when' in field) checkPredicate(field.when, 'value', type, PAYLOAD_SCOPE, ctx, `${fieldPath}.when`);
+        if ('buckets' in field) checkBuckets(field.buckets, type, ctx, `${fieldPath}.buckets`);
+    }
+}
+
+/**
+ * @typedef {{ lo: number, loIn: boolean, hi: number, hiIn: boolean }} Interval
+ * @typedef {{ intervals: Interval[], points: unknown[] }} BucketSet
+ */
+
+/**
+ * @param {unknown} value
+ * @returns {value is string | number | boolean | null}
+ */
+function isLiteral(value) {
+    return (
+        value === null ||
+        [
+            'string',
+            'number',
+            'boolean',
+        ].includes(typeof value)
+    );
+}
+
+/**
+ * The values a bucket holds for, when its predicate is a literal, an array of literals or
+ * comparisons against literals. Null for any other predicate, which the overlap check skips.
+ *
+ * @param {unknown} predicate
+ * @returns {BucketSet | null}
+ */
+function simpleBucketSet(predicate) {
+    if (typeof predicate === 'number')
+        return {
+            intervals: [
+                { lo: predicate, loIn: true, hi: predicate, hiIn: true },
+            ],
+            points: [],
+        };
+    if (isLiteral(predicate))
+        return {
+            intervals: [],
+            points: [
+                predicate,
+            ],
+        };
+    if (Array.isArray(predicate)) {
+        const sets = predicate.map(simpleBucketSet);
+        if (!predicate.every(isLiteral)) return null;
+        return {
+            intervals: sets.flatMap((set) => set?.intervals ?? []),
+            points: sets.flatMap((set) => set?.points ?? []),
+        };
+    }
+    if (!isPlainObject(predicate)) return null;
+    const keys = Object.keys(predicate);
+    if (!keys.length || !keys.every((key) => key === 'eq' || COMPARISON_OPERATORS.includes(key))) return null;
+    if (keys.length === 1 && keys[0] === 'eq' && isLiteral(predicate.eq)) return simpleBucketSet(predicate.eq);
+    if (!keys.every((key) => typeof predicate[key] === 'number')) return null;
+
+    /** @type {Interval} */
+    const interval = { lo: -Infinity, loIn: false, hi: Infinity, hiIn: false };
+    /**
+     * @param {number} bound
+     * @param {boolean} inclusive
+     */
+    const raiseLow = (bound, inclusive) => {
+        if (bound > interval.lo || (bound === interval.lo && !inclusive)) Object.assign(interval, { lo: bound, loIn: inclusive });
+    };
+    /**
+     * @param {number} bound
+     * @param {boolean} inclusive
+     */
+    const lowerHigh = (bound, inclusive) => {
+        if (bound < interval.hi || (bound === interval.hi && !inclusive)) Object.assign(interval, { hi: bound, hiIn: inclusive });
+    };
+    for (const key of keys) {
+        const bound = predicate[key];
+        if (key === 'gte' || key === 'eq') raiseLow(bound, true);
+        if (key === 'gt') raiseLow(bound, false);
+        if (key === 'lte' || key === 'eq') lowerHigh(bound, true);
+        if (key === 'lt') lowerHigh(bound, false);
+    }
+    return {
+        intervals: [
+            interval,
+        ],
+        points: [],
+    };
+}
+
+/**
+ * @param {Interval} a
+ * @param {Interval} b
+ */
+function intervalsOverlap(a, b) {
+    const lo = Math.max(a.lo, b.lo);
+    const hi = Math.min(a.hi, b.hi);
+    if (lo < hi) return true;
+    if (lo > hi || !Number.isFinite(lo)) return false;
+    // They meet at one point, held only if every bound there is inclusive
+    return (a.lo < lo || a.loIn) && (b.lo < lo || b.loIn) && (a.hi > hi || a.hiIn) && (b.hi > hi || b.hiIn);
+}
+
+/**
+ * @param {BucketSet} a
+ * @param {BucketSet} b
+ */
+function bucketSetsOverlap(a, b) {
+    return a.points.some((point) => b.points.includes(point)) || a.intervals.some((x) => b.intervals.some((y) => intervalsOverlap(x, y)));
+}
+
+/**
+ * @param {unknown} buckets
+ * @param {StaticType} type - the value's
+ * @param {Context} ctx
+ * @param {string} path
+ */
+function checkBuckets(buckets, type, ctx, path) {
+    if (!isPlainObject(buckets) || Object.keys(buckets).length === 0) {
+        fail(ctx, path, '`buckets` maps at least one bucket name to a predicate');
+        return;
+    }
+    /** @type {{ name: string, set: BucketSet }[]} */
+    const simple = [];
+    for (const [
+        name,
+        predicate,
+    ] of Object.entries(buckets)) {
+        if (name === '') fail(ctx, path, 'a bucket name is a non-empty string');
+        checkPredicate(predicate, 'value', type, PAYLOAD_SCOPE, ctx, `${path}.${name}`);
+        const set = simpleBucketSet(predicate);
+        if (set) simple.push({ name, set });
+    }
+    for (let i = 0; i < simple.length; i++) {
+        for (let j = i + 1; j < simple.length; j++) {
+            if (bucketSetsOverlap(simple[i].set, simple[j].set))
+                fail(ctx, path, `buckets "${simple[i].name}" and "${simple[j].name}" overlap`);
+        }
+    }
+}
+
+/**
+ * Report each cycle of refs once.
+ *
+ * @param {Context} ctx
+ */
+function checkRefCycles(ctx) {
+    /** @type {Map<string, 'visiting' | 'done'>} */
+    const state = new Map();
+    const reported = new Set();
+    /**
+     * @param {string} name
+     * @param {string[]} stack
+     */
+    const visit = (name, stack) => {
+        if (state.get(name) === 'done') return;
+        if (state.get(name) === 'visiting') {
+            const cycle = [
+                ...stack.slice(stack.indexOf(name)),
+                name,
+            ];
+            const key = [
+                ...new Set(cycle),
+            ]
+                .sort()
+                .join(',');
+            if (!reported.has(key)) {
+                reported.add(key);
+                ctx.structuralErrors.push(`${ctx.names.get(name)?.path}: refs form a cycle: ${cycle.join(' -> ')}`);
+            }
+            return;
+        }
+        state.set(name, 'visiting');
+        for (const dependency of ctx.dependencies.get(name) ?? []) {
+            if (ctx.names.has(dependency))
+                visit(dependency, [
+                    ...stack,
+                    name,
+                ]);
+        }
+        state.set(name, 'done');
+    };
+    for (const name of ctx.names.keys()) visit(name, []);
+}
+
+/**
+ * A ref in match into an `if` branch from outside that branch reads an expression that may never
+ * be read.
+ *
+ * @param {Context} ctx
+ */
+function checkBranchRefs(ctx) {
+    for (const ref of ctx.refs) {
+        const target = ctx.names.get(ref.name);
+        if (!ref.inMatch || !target) continue;
+        const outside = target.branch.filter((branch) => !ref.branch.includes(branch));
+        if (outside.length)
+            fail(
+                ctx,
+                ref.path,
+                `\`ref\` "${ref.name}" in match reads an expression inside the \`if\` branch ${outside[0]} from outside it`,
+            );
+    }
+}
+
+/**
+ * @param {unknown} selectors
+ */
+function selectorSetKey(selectors) {
+    return [
+        ...new Set(asArray(selectors)),
+    ]
+        .sort()
+        .join('\u0000');
+}
+
+/**
+ * A rooted source read anywhere but in boolean position with no `none` above it needs a guard:
+ * a presence leaf on the same root selectors, as an earlier operand of match's top-level `all`.
+ *
+ * @param {Record<string, any>} detector
+ * @param {string} path
+ * @param {Context} ctx
+ */
+function checkRootGuards(detector, path, ctx) {
+    const match = detector.match;
+    const topAll = isPlainObject(match) && expressionKeysOf(match).join() === 'all' ? asArray(match.all) : [];
+    const guards = topAll.map((operand) => {
+        if (!isPlainObject(operand) || Object.keys(operand).join() !== 'element' || !isPlainObject(operand.element)) return null;
+        const body = operand.element;
+        const shaped = Object.keys(body).every((key) => key === 'selector' || key === 'visibility') && (body.visibility ?? 'any') === 'any';
+        return shaped ? selectorSetKey(body.selector) : null;
+    });
+    const referenced = new Set(ctx.refs.map((ref) => ref.name));
+
+    for (const rooted of ctx.rooted) {
+        if (!rooted.needsGuard && !(rooted.owner && referenced.has(rooted.owner))) continue;
+        const guardIndex = guards.indexOf(selectorSetKey(rooted.selectors));
+        const ahead = guardIndex >= 0 && (!rooted.inMatch || (rooted.topOperand !== null && guardIndex < rooted.topOperand));
+        if (!ahead) {
+            fail(
+                ctx,
+                rooted.path,
+                `\`root\` ${JSON.stringify(rooted.selectors)} needs a guard ahead of it: {"element": {"selector": ${JSON.stringify(rooted.selectors)}}} as an earlier operand of ${path}.match's top-level \`all\``,
+            );
+        }
+    }
+}
+
+/**
+ * Check a detector's match tree and payloads against the expression, predicate and payload rules.
+ *
+ * @param {Record<string, any>} detector
+ * @param {string} path
+ * @returns {string[]} the errors, empty when the detector is valid
+ */
+function validateDetector(detector, path) {
+    /** @type {Context} */
+    const ctx = {
+        mode: 'collect',
+        errors: [],
+        structuralErrors: [],
+        names: new Map(),
+        dependencies: new Map(),
+        refs: [],
+        rooted: [],
+        refMemo: new Map(),
+        resolving: new Set(),
+        refFailures: [],
+    };
+    const walk = () => {
+        checkExpr(detector.match, 'boolean', MATCH_SCOPE, ctx, `${path}.match`);
+        for (const action of PAYLOAD_ACTIONS) {
+            const data = detector.actions?.[action]?.data;
+            if (data !== undefined) checkPayloadSpec(data, ctx, `${path}.actions.${action}.data`);
+        }
+    };
+
+    walk();
+    checkRefCycles(ctx);
+    ctx.mode = 'check';
+    ctx.errors = [];
+    walk();
+    checkBranchRefs(ctx);
+    checkRootGuards(detector, path, ctx);
+    const reported = new Set(ctx.errors);
+    for (const failure of ctx.refFailures) {
+        const added = failure.errors.find((error) => !reported.has(error));
+        if (added)
+            fail(
+                ctx,
+                failure.path,
+                `\`ref\` "${failure.name}" is read in ${failure.position} position, which its target does not fill: ${added}`,
+            );
+    }
+    return [
+        ...new Set([
+            ...ctx.structuralErrors,
+            ...ctx.errors,
+        ]),
+    ];
+}
+
+/**
+ * @param {Record<string, any>} detector
+ * @param {string} path
+ */
+function assertValidDetector(detector, path) {
+    const errors = validateDetector(detector, path);
+    expect(errors, `\n${errors.join('\n')}`).to.deep.equal([]);
+}
+
+/**
+ * JSON pointer segments of a patch path under `/detectors`.
+ *
+ * @param {string} pointer
+ * @returns {string[]}
+ */
+function detectorPointer(pointer) {
+    const segments = pointer
+        .split('/')
+        .slice(1)
+        .map((segment) => segment.replace(/~1/g, '/').replace(/~0/g, '~'));
+    return segments[0] === 'detectors' ? segments.slice(1, 3) : [];
+}
+
+/**
+ * Invoke `cb` for each detector a patch list touches, as the patch leaves it. Each list is
+ * applied on its own, to the literal settings.
+ *
+ * @param {import('../schema/features/web-detection').WebDetectionFeature<number>} webDetection
+ * @param {(detector: Record<string, any>, path: string) => void} cb
+ */
+function forEachPatchedDetector(webDetection, cb) {
+    const settings = /** @type {Record<string, any>} */ (webDetection.settings);
+    const lists = [
+        ...(settings.domains ?? []).map((/** @type {Record<string, any>} */ entry, /** @type {number} */ index) => ({
+            label: `domains[${index}] (${entry.domain})`,
+            operations: entry.patchSettings ?? [],
+        })),
+        ...(settings.conditionalChanges ?? []).map((/** @type {Record<string, any>} */ entry, /** @type {number} */ index) => ({
+            label: `conditionalChanges[${index}]`,
+            operations: entry.patchSettings ?? [],
+        })),
+    ];
+    for (const { label, operations } of lists) {
+        if (!operations.length) continue;
+        const patched = /** @type {Record<string, any>} */ (immutableJSONPatch(settings, operations));
+        const detectors = patched.detectors ?? {};
+        const touched = new Set();
+        for (const operation of operations) {
+            for (const pointer of [
+                operation.path,
+                operation.from,
+            ]) {
+                if (typeof pointer !== 'string' || !pointer.startsWith('/detectors')) continue;
+                const [
+                    group,
+                    name,
+                ] = detectorPointer(pointer);
+                for (const groupName of group === undefined
+                    ? Object.keys(detectors)
+                    : [
+                          group,
+                      ]) {
+                    for (const detectorName of name === undefined
+                        ? Object.keys(detectors[groupName] ?? {})
+                        : [
+                              name,
+                          ]) {
+                        if (detectors[groupName]?.[detectorName]) touched.add(`${groupName}\u0000${detectorName}`);
+                    }
+                }
+            }
+        }
+        for (const key of touched) {
+            const [
+                group,
+                name,
+            ] = key.split('\u0000');
+            cb(detectors[group][name], `${label} detectors.${group}.${name}`);
+        }
+    }
+}
+
+// Features whose subfeatures may declare experiment metrics that consume events
+// (see tests/experiment-metrics-tests.js).
+const METRIC_PARENTS = [
+    'contentScopeExperiments',
+    'blockList',
+    'contentBlocking',
+];
+
+/**
+ * Event types something in a config consumes: counter and data `source`s, the `trigger.source`
+ * of immediate telemetry entries, and experiment metric events.
+ *
+ * @param {Record<string, any> | undefined} configBody
+ * @returns {Set<string>}
+ */
+function eventHubConsumers(configBody) {
+    const telemetry = /** @type {import('../schema/features/event-hub').EventHubFeature<number> | undefined} */ (
+        configBody?.features?.eventHub
+    )?.settings.telemetry;
+    const consumers = new Set();
+    for (const entry of Object.values(telemetry ?? {})) {
+        for (const param of Object.values(entry.parameters)) {
+            if ('source' in param && param.source) consumers.add(param.source);
+        }
+        if ('source' in entry.trigger && entry.trigger.source) consumers.add(entry.trigger.source);
+    }
+    for (const parent of METRIC_PARENTS) {
+        for (const subFeature of Object.values(configBody?.features?.[parent]?.features ?? {})) {
+            for (const metric of Object.values(/** @type {Record<string, any>} */ (subFeature)?.settings?.metrics ?? {})) {
+                if (typeof metric?.event === 'string') consumers.add(metric.event);
+            }
+        }
+    }
+    return consumers;
+}
+
+/** `temp_` types are placeholders for detectors whose eventHub telemetry is not defined yet (for example, during experiments) */
+const TEMP_EVENT_TYPE_PREFIX = 'temp_';
+
 describe('webDetection config tests', () => {
     describe('match tree validation', () => {
-        forEachWebDetectionConfig(({ configName, detectors }) => {
+        forEachWebDetectionConfig(({ configName, webDetection, detectors }) => {
             describe(configName, () => {
                 for (const [
                     groupName,
@@ -367,11 +2364,22 @@ describe('webDetection config tests', () => {
                         detectorId,
                         detector,
                     ] of Object.entries(group)) {
-                        it(`${groupName}.${detectorId} match tree has no mixed operator/leaf keys`, () => {
-                            assertConditionNode(detector.match, `detectors.${groupName}.${detectorId}.match`);
+                        it(`${groupName}.${detectorId} match tree and payloads are well formed`, () => {
+                            assertValidDetector(detector, `detectors.${groupName}.${detectorId}`);
                         });
                     }
                 }
+
+                it('detectors as patch operations leave them are well formed', () => {
+                    forEachPatchedDetector(webDetection, (detector, path) => {
+                        assertValidDetector(detector, path);
+                        forEachDetectorTextCondition(detector, path, assertTextConditionExpressions);
+                        forEachDetectorTextCondition(detector, path, (condition, conditionPath) => {
+                            if (condition.xpathConfig !== undefined)
+                                assertXPathConfig(condition.xpathConfig, `${conditionPath}/xpathConfig`);
+                        });
+                    });
+                });
             });
         });
 
@@ -384,14 +2392,13 @@ describe('webDetection config tests', () => {
         forEachWebDetectionConfig(({ configName, detectors }) => {
             describe(configName, () => {
                 it('detector and group names should be named correctly', () => {
-                    const detectorNameRegex = /^[a-zA-Z][a-zA-Z0-9_]*$/;
                     for (const [
                         groupName,
                         groupDetectors,
                     ] of Object.entries(detectors)) {
-                        expect(groupName).to.match(detectorNameRegex);
+                        expect(groupName).to.match(NAME_PATTERN);
                         for (const detectorName of Object.keys(groupDetectors)) {
-                            expect(detectorName).to.match(detectorNameRegex);
+                            expect(detectorName).to.match(NAME_PATTERN);
                         }
                     }
                 });
@@ -400,37 +2407,24 @@ describe('webDetection config tests', () => {
     });
 
     describe('eventHub cross-reference', () => {
-        const TEMP_EVENT_TYPE_PREFIX = 'temp_';
-
-        // Features whose subfeatures may declare experiment metrics that consume events
-        // (see tests/experiment-metrics-tests.js).
-        const METRIC_PARENTS = [
-            'contentScopeExperiments',
-            'blockList',
-            'contentBlocking',
-        ];
-
         forEachWebDetectionConfig(({ configName, detectors }) => {
             describe(configName, () => {
-                it('fireEvent.type values should have a corresponding eventHub parameter source or metric event', () => {
-                    const config = latestConfigs.find((c) => c.name === configName);
-                    const eventHubTelemetry = /** @type {import('../schema/features/event-hub').EventHubFeature<number> | undefined} */ (
-                        config?.body.features?.eventHub
-                    )?.settings.telemetry;
-                    const knownConsumers = new Set();
-                    for (const entry of Object.values(eventHubTelemetry ?? {})) {
-                        for (const param of Object.values(entry.parameters)) {
-                            if (param.source) knownConsumers.add(param.source);
-                        }
-                    }
-                    for (const parent of METRIC_PARENTS) {
-                        for (const subFeature of Object.values(config?.body.features?.[parent]?.features ?? {})) {
-                            for (const metric of Object.values(subFeature?.settings?.metrics ?? {})) {
-                                if (typeof metric?.event === 'string') knownConsumers.add(metric.event);
-                            }
-                        }
-                    }
-
+                it('fireEvent.type values should have a corresponding eventHub consumer or metric event', () => {
+                    const knownConsumers = eventHubConsumers(latestConfigs.find((c) => c.name === configName)?.body);
+                    /**
+                     * @param {Record<string, any>} detector
+                     * @param {string} detectorPath
+                     */
+                    const check = (detector, detectorPath) => {
+                        const type = detector.actions?.fireEvent?.type;
+                        if (type === undefined || type.startsWith(TEMP_EVENT_TYPE_PREFIX)) return;
+                        expect(knownConsumers.has(type)).to.equal(
+                            true,
+                            `Detector '${detectorPath}' fires event type '${type}' but no eventHub parameter source, immediate trigger source or experiment metric event consumes '${type}' (known consumers: ${[
+                                ...knownConsumers,
+                            ].join(', ')})`,
+                        );
+                    };
                     for (const [
                         groupName,
                         groupDetectors,
@@ -439,20 +2433,42 @@ describe('webDetection config tests', () => {
                             detectorName,
                             detector,
                         ] of Object.entries(groupDetectors)) {
-                            const type = detector.actions?.fireEvent?.type;
-                            if (type === undefined) continue;
-                            // `temp_` types are placeholders for detectors whose eventHub telemetry is not defined yet (for example, during experiments)
-                            if (type.startsWith(TEMP_EVENT_TYPE_PREFIX)) continue;
-                            expect(knownConsumers.has(type)).to.equal(
-                                true,
-                                `Detector '${groupName}.${detectorName}' fires event type '${type}' but no eventHub parameter source or experiment metric event consumes '${type}' (known consumers: ${[
-                                    ...knownConsumers,
-                                ].join(', ')})`,
-                            );
+                            check(detector, `${groupName}.${detectorName}`);
                         }
                     }
                 });
             });
+        });
+
+        it('counts the trigger source of an immediate_v2 entry as a consumer (self-test)', () => {
+            const consumers = eventHubConsumers({
+                features: {
+                    eventHub: {
+                        settings: {
+                            telemetry: {
+                                webTelemetry_example_immediate: {
+                                    state: 'disabled',
+                                    trigger: { type: 'immediate_v2', source: 'exampleEvent' },
+                                    parameters: { value: { template: 'data', dataKey: 'value' } },
+                                },
+                                webTelemetry_counted_day: {
+                                    state: 'enabled',
+                                    trigger: { period: { seconds: 86400 } },
+                                    parameters: { count: { template: 'counter', source: 'countedEvent', buckets: { '0+': { gte: 0 } } } },
+                                },
+                            },
+                        },
+                    },
+                },
+            });
+            expect(
+                [
+                    ...consumers,
+                ].sort(),
+            ).to.deep.equal([
+                'countedEvent',
+                'exampleEvent',
+            ]);
         });
     });
 
@@ -468,7 +2484,7 @@ describe('webDetection config tests', () => {
                         detector,
                     ] of Object.entries(group)) {
                         it(`${groupName}.${detectorId} xpathConfig values are within sensible bounds`, () => {
-                            forEachTextCondition(detector.match, `detectors.${groupName}.${detectorId}.match`, (condition, path) => {
+                            forEachDetectorTextCondition(detector, `detectors.${groupName}.${detectorId}`, (condition, path) => {
                                 if (condition.xpathConfig !== undefined) {
                                     assertXPathConfig(condition.xpathConfig, `${path}/xpathConfig`);
                                 }
@@ -496,11 +2512,7 @@ describe('webDetection config tests', () => {
                         detector,
                     ] of Object.entries(group)) {
                         it(`${groupName}.${detectorId} xpath and pattern values are well formed`, () => {
-                            forEachTextCondition(
-                                detector.match,
-                                `detectors.${groupName}.${detectorId}.match`,
-                                assertTextConditionExpressions,
-                            );
+                            forEachDetectorTextCondition(detector, `detectors.${groupName}.${detectorId}`, assertTextConditionExpressions);
                         });
                     }
                 }
@@ -509,6 +2521,48 @@ describe('webDetection config tests', () => {
                     forEachPatchOperation(webDetection, assertExpressionPatch);
                 });
             });
+        });
+    });
+
+    describe('element property tables', () => {
+        it('match what the generator builds from the installed @webref packages', async function () {
+            this.timeout(60000);
+            expect(await buildTables()).to.deep.equal(
+                PROPERTY_TABLES,
+                'tests/data/element-property-tables.json is stale: run npm run generate-element-property-tables',
+            );
+        });
+
+        it('carry the types the load-state recipes read', () => {
+            expect(interfaceProperties('HTMLImageElement').get('naturalWidth')).to.equal('unsigned long');
+            expect(interfaceProperties('HTMLImageElement').get('currentSrc')).to.equal('USVString');
+            expect(interfaceProperties('HTMLLinkElement').get('sheet')).to.equal('CSSStyleSheet?');
+            // Inherited from Element and Node
+            expect(interfaceProperties('HTMLImageElement').get('tagName')).to.equal('DOMString');
+            expect(interfaceProperties('HTMLImageElement').get('isConnected')).to.equal('boolean');
+            // `unrestricted` is kept
+            expect(interfaceProperties('HTMLMediaElement').get('duration')).to.equal('unrestricted double');
+        });
+
+        it('map tags to their interfaces, in every namespace', () => {
+            expect(selectorInterfaces('img')).to.deep.equal([
+                'HTMLImageElement',
+            ]);
+            expect(selectorInterfaces('a').sort()).to.deep.equal([
+                'HTMLAnchorElement',
+                'MathMLElement',
+                'SVGAElement',
+            ]);
+            expect(selectorInterfaces('svg')).to.deep.equal([
+                'SVGSVGElement',
+            ]);
+        });
+
+        it('list the properties named like a reserved key, which config reads through the long form', () => {
+            for (const entry of PROPERTY_TABLES.reservedNameProperties) {
+                const property = entry.split('.').pop();
+                expect(OPERATOR_KEYS.concat('field', 'is')).to.include(property);
+            }
         });
     });
 
@@ -575,6 +2629,60 @@ describe('webDetection config tests', () => {
 
         it('ignores element conditions', () => {
             expect(collect({ element: { selector: '.x' } })).to.deep.equal([]);
+        });
+
+        it('reaches text under operators, catch handlers, if branches and predicate operands', () => {
+            const match = {
+                all: [
+                    { count: { text: { pattern: 'a' } }, is: { gte: 1 } },
+                    {
+                        if: { test: { text: { pattern: 'b' } }, then: { count: { text: { pattern: 'c' } } }, else: 0 },
+                        catch: { absent: { count: { text: { pattern: 'd' } } } },
+                        is: { gt: { count: { text: { pattern: 'e' } } } },
+                    },
+                    {
+                        count: { element: { selector: 'img', where: { naturalWidth: { gt: { count: { text: { pattern: 'f' } } } } } } },
+                        is: 0,
+                    },
+                ],
+            };
+            expect(collect(match)).to.deep.equal([
+                'a',
+                'b',
+                'c',
+                'd',
+                'e',
+                'f',
+            ]);
+        });
+
+        it('does not mistake a property named text in `where` for a source', () => {
+            expect(collect({ element: { selector: 'option', where: { text: 'Sign in' } } })).to.deep.equal([]);
+        });
+
+        it('reaches text in payload values, when and buckets', () => {
+            /** @type {string[]} */
+            const found = [];
+            const detector = {
+                match: true,
+                actions: {
+                    fireEvent: {
+                        type: 't',
+                        data: {
+                            a: { value: { count: { text: { pattern: 'a' } } }, when: { gt: { count: { text: { pattern: 'b' } } } } },
+                            c: { value: 1, buckets: { x: { lt: { count: { text: { pattern: 'c' } } } } } },
+                        },
+                    },
+                    breakageReportData: { data: { d: { value: { count: { text: { pattern: 'd' } } } } } },
+                },
+            };
+            forEachDetectorTextCondition(detector, '$', (condition) => found.push(String(condition.pattern)));
+            expect(found).to.deep.equal([
+                'a',
+                'b',
+                'c',
+                'd',
+            ]);
         });
 
         it('finds the text conditions in the real configs (sanity)', () => {
@@ -753,99 +2861,699 @@ describe('webDetection config tests', () => {
         });
     });
 
-    describe('assertConditionNode (self-test)', () => {
-        it('passes a pure leaf node', () => {
-            expect(() => assertConditionNode({ text: { pattern: 'foo' } }, '$')).to.not.throw();
-        });
+    describe('validateDetector (self-test)', () => {
+        /**
+         * @param {unknown} match
+         * @param {Record<string, unknown>} [data]
+         */
+        const errorsOf = (match, data) =>
+            validateDetector({ match, ...(data ? { actions: { fireEvent: { type: 't', data } } } : {}) }, '$');
 
-        it('passes a pure operator node', () => {
-            expect(() =>
-                assertConditionNode(
-                    {
-                        text: {
-                            all: [
-                                { pattern: 'foo' },
-                                { pattern: 'bar' },
-                            ],
-                        },
+        /**
+         * @param {unknown} match
+         * @param {Record<string, unknown>} [data]
+         */
+        const expectValid = (match, data) => {
+            const errors = errorsOf(match, data);
+            expect(errors, errors.join('\n')).to.deep.equal([]);
+        };
+
+        /**
+         * @param {string} fragment - text one of the errors contains
+         * @param {unknown} match
+         * @param {Record<string, unknown>} [data]
+         */
+        const expectError = (fragment, match, data) => {
+            const errors = errorsOf(match, data);
+            expect(
+                errors.some((error) => error.includes(fragment)),
+                `expected an error containing ${JSON.stringify(fragment)}, got:\n${errors.join('\n') || '(none)'}`,
+            ).to.equal(true);
+        };
+
+        const img = { element: { selector: 'img' } };
+        const imgCount = { count: img };
+        const loadEventEnd = {
+            api: {
+                path: 'performance.getEntriesByType',
+                args: [
+                    'navigation',
+                ],
+                field: 'loadEventEnd',
+            },
+        };
+        const now = { api: { path: 'performance.now', args: [] } };
+        const guard = {
+            element: {
+                selector: [
+                    '#comments',
+                ],
+            },
+        };
+        const rootedImages = {
+            count: {
+                element: {
+                    selector: 'img',
+                    root: [
+                        '#comments',
+                    ],
+                },
+            },
+        };
+
+        describe('shape', () => {
+            it('passes the shipped forms: leaves, legacy blocks, arrays and boolean literals', () => {
+                expectValid({ text: { pattern: 'foo' } });
+                expectValid({
+                    text: {
+                        all: [
+                            { pattern: 'foo' },
+                            { pattern: 'bar' },
+                        ],
                     },
-                    '$',
-                ),
-            ).to.not.throw();
-        });
-
-        it('passes nested operators', () => {
-            expect(() =>
-                assertConditionNode(
-                    {
-                        text: {
-                            all: [
-                                {
-                                    any: [
-                                        { pattern: 'a' },
-                                        { pattern: 'b' },
-                                    ],
-                                },
-                                {
-                                    none: [
-                                        { pattern: 'c' },
-                                    ],
-                                },
-                            ],
-                        },
+                });
+                expectValid({
+                    text: {
+                        all: [
+                            {
+                                any: [
+                                    { pattern: 'a' },
+                                    { pattern: 'b' },
+                                ],
+                            },
+                            {
+                                none: [
+                                    { pattern: 'c' },
+                                ],
+                            },
+                        ],
                     },
-                    '$',
-                ),
-            ).to.not.throw();
-        });
+                });
+                expectValid([
+                    { text: { pattern: 'a' } },
+                    { element: { selector: '.x', visibility: 'visible' } },
+                ]);
+                expectValid({
+                    any: [
+                        true,
+                        false,
+                    ],
+                });
+            });
 
-        it('rejects mixing operator and leaf keys at the per-type level', () => {
-            expect(() =>
-                assertConditionNode(
-                    {
-                        text: {
+            it('passes an object mixing operator keys with leaf keys at the match level, which ANDs them', () => {
+                expectValid({
+                    all: [
+                        { text: { pattern: 'foo' } },
+                    ],
+                    text: { pattern: 'bar' },
+                });
+            });
+
+            it('rejects mixing operator and body keys inside a source body', () => {
+                expectError('mixes operator keys', {
+                    text: {
+                        all: [
+                            { pattern: 'foo' },
+                        ],
+                        pattern: 'bar',
+                    },
+                });
+                expectError('mixes operator keys', {
+                    text: [
+                        { pattern: 'ok' },
+                        {
                             all: [
                                 { pattern: 'foo' },
                             ],
                             pattern: 'bar',
                         },
+                    ],
+                });
+            });
+
+            it('rejects legacy blocks over bodies outside boolean position', () => {
+                expectError('boolean only', {
+                    count: {
+                        text: {
+                            any: [
+                                { pattern: 'a' },
+                            ],
+                        },
                     },
-                    '$',
-                ),
-            ).to.throw();
+                    is: { gt: 0 },
+                });
+            });
+
+            it('rejects unknown expression, body, field and payload field keys', () => {
+                expectError('unknown expression key "aggregate"', { aggregate: imgCount });
+                expectError('unknown source body key "root"', {
+                    count: {
+                        api: {
+                            path: 'document.fonts',
+                            root: [
+                                '#a',
+                            ],
+                        },
+                    },
+                    is: 0,
+                });
+                expectError('unknown source body key "where"', { text: { pattern: 'a', where: {} } });
+                expectError('unknown `field` key', { element: { selector: 'img', field: { name: 'src' } }, is: {} });
+                expectError('unknown payload field key', true, { a: { value: 1, bucket: {} } });
+            });
+
+            it('rejects several expression keys outside boolean position or beside `is`', () => {
+                expectError('several expression keys', true, { a: { value: { count: img, sum: 1 } } });
+                expectError('several expression keys', { count: img, sum: 1, is: { gt: 0 } });
+            });
+
+            it('rejects `is` outside boolean position', () => {
+                expectError('`is` gives a boolean', true, { a: { value: { count: img, is: { gt: 0 } } } });
+            });
+
+            it('checks `sub` and `div` take two operands', () => {
+                expectValid({
+                    sub: [
+                        now,
+                        1,
+                    ],
+                    is: { gt: 0 },
+                });
+                expectError('two operands', {
+                    sub: [
+                        now,
+                        1,
+                        2,
+                    ],
+                    is: { gt: 0 },
+                });
+                expectError('two operands', { div: now, is: { gt: 0 } });
+            });
+
+            it('checks `if` has exactly `test`, `then` and `else`', () => {
+                expectValid({ if: { test: true, then: 1, else: 2 }, is: 1 });
+                expectError('missing [else]', { if: { test: true, then: 1 }, is: 1 });
+                expectError('extra [otherwise]', { if: { test: true, then: 1, else: 2, otherwise: 3 }, is: 1 });
+            });
+
+            it('checks `catch` kinds and handler positions', () => {
+                expectValid({
+                    count: { api: { path: 'document.fonts', where: { status: 'error' } } },
+                    catch: { absent: 0 },
+                    is: { gt: 0 },
+                });
+                expectValid({
+                    all: [
+                        { ...loadEventEnd, is: { gte: 400 } },
+                    ],
+                    catch: { absent: true },
+                });
+                expectError('unknown failure kind', { ...imgCount, catch: { missing: 0 }, is: { gt: 0 } });
+                expectError('fills', {
+                    all: [
+                        { ...loadEventEnd, is: { gte: 400 } },
+                    ],
+                    catch: { absent: 0 },
+                });
+                expectError('handler gives boolean', { ...imgCount, catch: { absent: true }, is: { gt: 0 } });
+            });
+
+            it('checks `field` has a key, and `args` only with `path`', () => {
+                expectError('needs at least one', { element: { selector: 'img', field: {} }, is: {} });
+                expectError('needs `path`', { element: { selector: 'img', field: { args: [] } }, is: {} });
+            });
         });
 
-        it('rejects mixing operator and leaf keys at the match level', () => {
-            expect(() =>
-                assertConditionNode(
+        describe('names', () => {
+            it('rejects a duplicate `as`, in match or payloads', () => {
+                expectError('already used', {
+                    all: [
+                        { ...imgCount, as: 'images', is: { gt: 0 } },
+                        { ...imgCount, as: 'images', is: { lt: 9 } },
+                    ],
+                });
+                expectError('already used', { ...imgCount, as: 'images', is: { gt: 0 } }, { a: { value: { ...imgCount, as: 'images' } } });
+            });
+
+            it('rejects an `as` or `ref` not matching the name pattern', () => {
+                expectError('does not match', { ...imgCount, as: '1images', is: { gt: 0 } });
+                expectError('does not match', { ref: 'not-a-name', is: 0 });
+            });
+
+            it('rejects an unresolved ref', () => {
+                expectError('names no expression', { ref: 'missing', is: 0 });
+            });
+
+            it('rejects a cycle of refs, through catch handlers too', () => {
+                expectError('cycle', {
+                    sum: [
+                        { ref: 'a' },
+                        1,
+                    ],
+                    as: 'a',
+                    is: { gt: 0 },
+                });
+                expectError('cycle', {
+                    all: [
+                        { ...now, as: 'a', catch: { absent: { ref: 'b' } }, is: { gt: 0 } },
+                        {
+                            sub: [
+                                { ref: 'a' },
+                                1,
+                            ],
+                            as: 'b',
+                            is: { gt: 0 },
+                        },
+                    ],
+                });
+            });
+
+            it('rejects a ref in match into an `if` branch from outside it', () => {
+                const ifExpr = { if: { test: { ...imgCount, is: { gt: 0 } }, then: { ...imgCount, as: 'inner' }, else: 0 }, is: { gt: 0 } };
+                expectError('from outside it', {
+                    all: [
+                        ifExpr,
+                        { ref: 'inner', is: { gt: 1 } },
+                    ],
+                });
+                expectValid({
+                    if: {
+                        test: true,
+                        then: {
+                            all: [
+                                { ...imgCount, as: 'inner', is: { gt: 0 } },
+                                { ref: 'inner', is: { lt: 5 } },
+                            ],
+                        },
+                        else: false,
+                    },
+                });
+                expectValid(ifExpr, { inner: { value: { ref: 'inner' } } });
+            });
+
+            it('reads a ref in the ref’s own position', () => {
+                expectValid({ ...img, as: 'images' }, { images: { value: { count: { ref: 'images' } } } });
+                expectValid({
+                    all: [
+                        { ...imgCount, as: 'images', is: { gte: 5 } },
+                        { ref: 'images', is: { gte: 5 } },
+                    ],
+                });
+                expectError('which its target does not fill', {
+                    all: [
+                        { ...imgCount, as: 'images', is: { gte: 5 } },
+                        { ref: 'images' },
+                    ],
+                });
+            });
+        });
+
+        describe('placement', () => {
+            it('rejects literals outside their positions', () => {
+                expectError('A number fills', 1);
+                expectError('A boolean fills', {
+                    sum: [
+                        true,
+                        1,
+                    ],
+                    is: { gt: 0 },
+                });
+            });
+
+            it('places `element` with and without `field`', () => {
+                expectValid({ all: { element: { selector: 'img', field: 'complete' } } });
+                expectValid({ max: { element: { selector: 'img', field: 'naturalWidth' } }, is: { gt: 100 } });
+                expectError('`element` with `field` fills', { element: { selector: 'img', field: 'complete' } });
+                expectError('`element` without `field` fills', { ...img, is: {} });
+                expectError('`all` takes booleans', { all: { element: { selector: 'img', field: 'naturalWidth' } } });
+                expectError('`max` takes numbers', { max: { element: { selector: 'img', field: 'src' } }, is: { gt: 0 } });
+                expectError('number position takes a number', {
+                    sub: [
+                        { element: { selector: 'img', field: 'src' } },
+                        1,
+                    ],
+                    is: { gt: 0 },
+                });
+            });
+
+            it('places `api` and `text`', () => {
+                expectError('`api` fills', now);
+                expectError('`text` fills', { text: { pattern: 'a' }, is: {} });
+                expectError('`count` fills', imgCount);
+            });
+
+            it('places `first` and `last` over lists of values only', () => {
+                expectValid({ first: { element: { selector: 'img', field: 'naturalWidth' } }, is: { gt: 0 } });
+                expectError('`count` fills', { first: imgCount, is: { gt: 0 } });
+            });
+
+            it('checks each `field` step suits the type the previous one gives', () => {
+                expectValid({ count: { element: { selector: 'img', where: { 'currentSrc.length': { gt: 0 } } } }, is: 0 });
+                expectValid({ count: { element: { selector: 'link', where: { 'sheet.cssRules': { exists: true } } } }, is: 0 });
+                expectError('reads "length" on a value config types as number', {
+                    count: { element: { selector: 'img', where: { 'naturalWidth.length': 0 } } },
+                    is: 0,
+                });
+                expectError('reads "foo" on a value config types as string', {
+                    count: { element: { selector: 'img', where: { 'src.foo': 0 } } },
+                    is: 0,
+                });
+            });
+
+            it('checks a feature’s input type', () => {
+                expectValid({ api: { path: 'document', field: { path: 'title', feature: 'wordCount' } }, is: { lte: 3 } });
+                expectValid({ element: { selector: 'body', field: { feature: 'renderedTextLength' } }, is: { lt: 1 } });
+                expectError('wordCount takes a string', {
+                    element: { selector: 'img', field: { path: 'naturalWidth', feature: 'wordCount' } },
+                    is: { lt: 1 },
+                });
+                expectError('renderedTextLength takes an element', {
+                    element: { selector: 'img', field: { path: 'src', feature: 'renderedTextLength' } },
+                    is: { lt: 1 },
+                });
+                expectError('unknown feature', { element: { selector: 'img', field: { feature: 'textLength' } }, is: { lt: 1 } });
+            });
+        });
+
+        describe('calls on element items', () => {
+            it('admits methods on ELEMENT_METHOD_ALLOWLIST only', () => {
+                expectValid({
+                    count: {
+                        element: {
+                            selector: 'div',
+                            where: {
+                                field: {
+                                    path: 'getAttribute',
+                                    args: [
+                                        'role',
+                                    ],
+                                },
+                                is: 'dialog',
+                            },
+                        },
+                    },
+                    is: { gt: 0 },
+                });
+                expectError('not in ELEMENT_METHOD_ALLOWLIST', {
+                    count: { element: { selector: 'button', where: { field: { path: 'click', args: [] }, is: true } } },
+                    is: 0,
+                });
+                expectError('not an element', {
+                    count: { element: { selector: 'img', where: { field: { path: 'src.toString', args: [] }, is: 'x' } } },
+                    is: 0,
+                });
+            });
+        });
+
+        describe('`root` guard', () => {
+            it('passes a guard ahead of the scoped expression', () => {
+                expectValid(
                     {
                         all: [
-                            { text: { pattern: 'foo' } },
+                            guard,
+                            { ...rootedImages, is: { lt: 1 } },
                         ],
-                        text: { pattern: 'bar' },
                     },
-                    '$',
-                ),
-            ).to.throw();
+                    { images: { value: rootedImages } },
+                );
+            });
+
+            it('passes a scoped leaf read only in boolean position with no `none` above it', () => {
+                expectValid({
+                    element: {
+                        selector: 'img',
+                        root: [
+                            '#comments',
+                        ],
+                    },
+                });
+            });
+
+            it('rejects a scoped expression with no guard, or a guard behind it', () => {
+                expectError('needs a guard', {
+                    all: [
+                        { ...rootedImages, is: { lt: 1 } },
+                    ],
+                });
+                expectError('needs a guard', {
+                    all: [
+                        { ...rootedImages, is: { lt: 1 } },
+                        guard,
+                    ],
+                });
+                expectError('needs a guard', { ...rootedImages, is: { lt: 1 } });
+                expectError('needs a guard', true, { images: { value: rootedImages } });
+            });
+
+            it('rejects a scoped leaf under `none`, or read through a ref, with no guard', () => {
+                expectError('needs a guard', {
+                    none: [
+                        {
+                            element: {
+                                selector: 'img',
+                                root: [
+                                    '#comments',
+                                ],
+                            },
+                        },
+                    ],
+                });
+                expectError(
+                    'needs a guard',
+                    {
+                        element: {
+                            selector: 'img',
+                            root: [
+                                '#comments',
+                            ],
+                        },
+                        as: 'images',
+                    },
+                    { n: { value: { count: { ref: 'images' } } } },
+                );
+            });
+
+            it('accepts only a guard with the same selectors, no `where` and visibility `any`', () => {
+                expectError('needs a guard', {
+                    all: [
+                        {
+                            element: {
+                                selector: [
+                                    '#other',
+                                ],
+                            },
+                        },
+                        { ...rootedImages, is: { lt: 1 } },
+                    ],
+                });
+                expectError('needs a guard', {
+                    all: [
+                        {
+                            element: {
+                                selector: [
+                                    '#comments',
+                                ],
+                                visibility: 'visible',
+                            },
+                        },
+                        { ...rootedImages, is: { lt: 1 } },
+                    ],
+                });
+                expectValid({
+                    all: [
+                        { element: { selector: '#comments', visibility: 'any' } },
+                        { ...rootedImages, is: { lt: 1 } },
+                    ],
+                });
+            });
+
+            it('rejects a scoped XPath expression that selects from the document', () => {
+                expectError('starts ".//"', {
+                    text: {
+                        pattern: 'a',
+                        xpath: '//p//text()',
+                        root: [
+                            '#comments',
+                        ],
+                    },
+                });
+                expectValid({
+                    text: {
+                        pattern: 'a',
+                        xpath: './/p//text()',
+                        root: [
+                            '#comments',
+                        ],
+                    },
+                });
+            });
         });
 
-        it('rejects mixing nested in an array', () => {
-            expect(() =>
-                assertConditionNode(
-                    {
-                        text: [
-                            { pattern: 'ok' },
-                            {
-                                all: [
-                                    { pattern: 'foo' },
-                                ],
-                                pattern: 'bar',
-                            },
+        describe('predicates', () => {
+            it('rejects `field` without `is`, and `is` without `field`', () => {
+                expectError('go together', { count: { element: { selector: 'img', where: { field: 'src' } } }, is: 0 });
+                expectError('go together', { count: { element: { selector: 'img', where: { is: true } } }, is: 0 });
+            });
+
+            it('rejects an unknown type name', () => {
+                expectError('unknown type name', { ...loadEventEnd, is: { type: 'integer' } });
+            });
+
+            it('rejects predicates that never hold for a read value', () => {
+                expectError('stands alone', { ...loadEventEnd, is: { exists: false, gt: 0 } });
+                expectError('also lists string, null', {
+                    ...loadEventEnd,
+                    is: {
+                        type: [
+                            'string',
+                            'null',
                         ],
+                        gt: 0,
                     },
-                    '$',
-                ),
-            ).to.throw();
+                });
+                expectError('leaves out number', { ...loadEventEnd, is: { type: 'string', finite: true } });
+                expectError('never holds', { ...loadEventEnd, is: { finite: true, nan: true } });
+                expectValid({ ...loadEventEnd, is: { exists: false } });
+                expectValid({ ...loadEventEnd, is: { type: 'number', gt: 0 } });
+            });
+
+            it('checks operators suit an element property’s type', () => {
+                expectError('guard it', { count: { element: { selector: 'input', where: { selectionStart: { gt: 0 } } } }, is: 0 });
+                expectError('guard it', { count: { element: { selector: 'img', where: { src: { gt: 0 } } } }, is: 0 });
+                expectValid({ count: { element: { selector: 'input', where: { selectionStart: { type: 'number', gt: 0 } } } }, is: 0 });
+                expectValid({ count: { element: { selector: 'link', where: { sheet: null } } }, is: 0 });
+            });
+
+            it('checks property names per tag, and against every element interface when the selector names none', () => {
+                expectError('"naturalwidth" is not a property of HTMLImageElement', {
+                    count: { element: { selector: 'img', where: { naturalwidth: 0 } } },
+                    is: 0,
+                });
+                expectError('is not a property of HTMLDivElement', {
+                    count: { element: { selector: 'div.card', where: { naturalWidth: 0 } } },
+                    is: 0,
+                });
+                expectValid({ count: { element: { selector: '.card', where: { naturalWidth: 0 } } }, is: 0 });
+                expectValid({ count: { element: { selector: 'x-widget', where: { hidden: false } } }, is: 0 });
+            });
+
+            it('rejects a property path on a value typed as a number', () => {
+                expectError('reads "length" on a value config types as number', { ...imgCount, is: { length: 0 } });
+            });
+
+            it('requires `finite` or `nan` beside a comparison under `none` on a value that can be NaN', () => {
+                const ratio = {
+                    div: [
+                        imgCount,
+                        2,
+                    ],
+                };
+                expectError('can be NaN', {
+                    none: [
+                        { ...ratio, is: { gt: 0 } },
+                    ],
+                });
+                expectError('can be NaN', { ...ratio, is: { none: { gt: 0 } } });
+                expectError('can be NaN', { count: { element: { selector: 'video', where: { none: { duration: { gt: 10 } } } } }, is: 0 });
+                expectValid({
+                    none: [
+                        { ...ratio, is: { finite: true, gt: 0 } },
+                    ],
+                });
+                expectValid({ ...ratio, is: { gt: 0 } });
+                expectValid({
+                    none: [
+                        { ...imgCount, is: { gt: 0 } },
+                    ],
+                });
+            });
+        });
+
+        describe('`api` allowlist', () => {
+            it('checks the path, `field` names and the names predicates read', () => {
+                expectError('"document.cookie", which is not in API_ALLOWLIST', {
+                    api: { path: 'document.cookie' },
+                    is: { type: 'string' },
+                });
+                expectError('"document.title.foo"', { api: { path: 'document', field: 'title.foo' }, is: {} });
+                expectError('"performance.getEntriesByType.name"', {
+                    count: {
+                        api: {
+                            path: 'performance.getEntriesByType',
+                            args: [
+                                'resource',
+                            ],
+                            where: { name: 'x' },
+                        },
+                    },
+                    is: 0,
+                });
+                expectError('"document.readyState.length"', { api: { path: 'document.readyState' }, is: { length: 8 } });
+                expectValid({ api: { path: 'document.title' }, is: { type: 'string', length: { gte: 7 } } });
+                expectValid({
+                    count: {
+                        api: {
+                            path: 'performance.getEntriesByType',
+                            args: [
+                                'resource',
+                            ],
+                            where: { responseStatus: { exists: true, gte: 400 } },
+                        },
+                    },
+                    is: 0,
+                });
+            });
+
+            it('rejects performance.getEntries in value position only', () => {
+                expectError('performance.getEntries selects every entry', {
+                    api: { path: 'performance.getEntries', field: 'duration' },
+                    is: { gt: 0 },
+                });
+                expectValid({ count: { api: { path: 'performance.getEntries' } }, is: { gt: 0 } });
+            });
+        });
+
+        describe('payloads', () => {
+            it('checks payload keys', () => {
+                expectValid(true, { brokenImages: { value: imgCount } });
+                expectError('reserved', true, { nativeData: { value: imgCount } });
+                expectError('does not match', true, { _errors: { value: imgCount } });
+                expectError('does not match', true, { '2x': { value: imgCount } });
+                expectError('needs `value`', true, { a: { buckets: { x: 1 } } });
+            });
+
+            it('checks buckets: at least one, and no overlap among simple predicates', () => {
+                expectValid(true, { a: { value: imgCount, buckets: { 0: 0, '1-2': { gte: 1, lt: 3 }, '3+': { gte: 3 } } } });
+                expectValid(true, { a: { value: loadEventEnd, buckets: { loading: 0, fast: { gt: 0, lt: 3000 } } } });
+                expectError('at least one bucket', true, { a: { value: imgCount, buckets: {} } });
+                expectError('overlap', true, { a: { value: imgCount, buckets: { 0: 0, '0-3': { gte: 0, lt: 3 } } } });
+                expectError('overlap', true, { a: { value: imgCount, buckets: { low: { lte: 3 }, high: { gte: 3 } } } });
+                expectError('overlap', true, {
+                    a: {
+                        value: { api: { path: 'document.readyState' } },
+                        buckets: {
+                            early: [
+                                'loading',
+                                'interactive',
+                            ],
+                            mid: 'interactive',
+                        },
+                    },
+                });
+                expectValid(true, {
+                    a: { value: { api: { path: 'document.title' } }, buckets: { empty: { length: 0 }, any: { length: { gte: 0 } } } },
+                });
+            });
+
+            it('checks bucket and `when` operators against the value’s type', () => {
+                expectError('guard it', true, {
+                    a: { value: { first: { element: { selector: 'img', field: 'src' } } }, buckets: { long: { gt: 100 } } },
+                });
+                expectError('guard it', true, {
+                    a: { value: { first: { element: { selector: 'img', field: 'src' } } }, when: { gt: 100 } },
+                });
+            });
         });
     });
 });

@@ -22,13 +22,6 @@ type ActionBase = {
     state?: FeatureState;
 };
 
-type Actions = Partial<{
-    breakageReportData: ActionBase;
-    fireEvent: ActionBase & {
-        type: string;
-    };
-}>;
-
 export type ConditionBranch<Final> = ConditionNode<Final> | ConditionNode<Final>[];
 
 type ConditionOperator = 'any' | 'all' | 'none';
@@ -74,9 +67,142 @@ export type MatchConditionSingle = {
     [K in keyof ConditionTypes]?: ConditionBranch<ConditionTypes[K]>;
 };
 
+/** `^[a-zA-Z][a-zA-Z0-9_]*$` */
+type Name = string;
+
+/** Why an expression could not read the page. */
+type FailureKind = 'absent' | 'denied';
+
+/** Keys that sit beside an expression key. */
+type Modifiers = {
+    /** Names the expression's value, after `catch`, for `ref` and payloads. Unique within the detector. */
+    as?: Name;
+    /** Handlers by failure kind, each an expression in the caught expression's position. */
+    catch?: Partial<Record<FailureKind, Expr>>;
+    /** Tests the value, giving a boolean. Only on an object in boolean position with one expression key. */
+    is?: Predicate;
+};
+
+type Arg = string | number | boolean | null;
+
+/** A string is short for `{ path }`. At least one key. */
+type FieldRead =
+    | string
+    | {
+          path?: string;
+          args?: Arg[];
+          feature?: 'wordCount' | 'renderedTextLength';
+      };
+
+type TypeName = 'number' | 'string' | 'boolean' | 'null' | 'undefined' | 'array' | 'object';
+
+type PredicateReserved = {
+    any?: MaybeArray<Predicate>;
+    all?: MaybeArray<Predicate>;
+    none?: MaybeArray<Predicate>;
+    /** With `is`: reads a value from the item or value under test. */
+    field?: FieldRead;
+    is?: Predicate;
+};
+
+type PredicateOperators = {
+    eq?: Expr | string | null;
+    lt?: Expr;
+    lte?: Expr;
+    gt?: Expr;
+    gte?: Expr;
+    exists?: boolean;
+    type?: MaybeArray<TypeName>;
+    finite?: boolean;
+    nan?: boolean;
+};
+
+/**
+ * Every other key is a property path. At item level, operator names are property paths too.
+ * Position decides which applies; the parser and CI check it, not these types.
+ */
+type PredicateObject = PredicateReserved & PredicateOperators & { [path: string]: Predicate | Expr | FieldRead | undefined };
+
+export type Predicate = string | number | boolean | null | Predicate[] | PredicateObject;
+
+type Root = {
+    /** Scopes the source to the union of the elements these selectors match. */
+    root?: MaybeArray<string>;
+};
+
+type ItemKeys = {
+    /** A predicate each item must pass. */
+    where?: Predicate;
+    /** The value read from each item that passes `where`. */
+    field?: FieldRead;
+};
+
+export type ElementBody = ConditionTypes['element'] & Root & ItemKeys;
+export type TextBody = ConditionTypes['text'] & Root;
+export type ApiBody = { path: string; args?: Arg[] } & ItemKeys;
+
+type Operands = MaybeArray<Expr>;
+
+/**
+ * `element` and `text` also take `{ any | all | none }` blocks over bodies in boolean position,
+ * the form shipped before expressions.
+ */
+type ExprKeys = {
+    element: ConditionBranch<ElementBody>;
+    text: ConditionBranch<TextBody>;
+    api: ApiBody;
+    count: Expr;
+    first: Expr;
+    last: Expr;
+    sum: Operands;
+    mul: Operands;
+    min: Operands;
+    max: Operands;
+    sub: [
+        Expr,
+        Expr,
+    ];
+    div: [
+        Expr,
+        Expr,
+    ];
+    if: { test: Expr; then: Expr; else: Expr };
+    any: Operands;
+    all: Operands;
+    none: Operands;
+    ref: Name;
+};
+
+/**
+ * One expression key is that expression; several are their AND, in boolean position only,
+ * and never beside `is`. Placement is checked by the parser and CI, not by these types.
+ */
+export type ExprObject = Partial<ExprKeys> & Modifiers;
+export type Expr = number | boolean | ExprObject | Expr[];
+
+export type PayloadField = {
+    /** An expression in value position. */
+    value: Expr;
+    /** The value is sent only when this holds. */
+    when?: Predicate;
+    /** Bucket name to predicate. The first that holds, in key order, is sent instead of the value. */
+    buckets?: Record<string, Predicate>;
+};
+
+/** Payload key to field. Keys match `^[a-zA-Z][a-zA-Z0-9_]*$` and are never `nativeData`. */
+export type PayloadSpec = Record<Name, PayloadField>;
+
+type Actions = Partial<{
+    breakageReportData: ActionBase & { data?: PayloadSpec };
+    fireEvent: ActionBase & {
+        type: string;
+        data?: PayloadSpec;
+    };
+}>;
+
 export type DetectorConfig = {
     state?: FeatureState;
-    match: ConditionBranch<MatchConditionSingle>;
+    match: Expr;
     triggers?: Triggers;
     actions?: Actions;
 };
