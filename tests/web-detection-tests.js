@@ -24,8 +24,7 @@ const SOURCE_KEYS = [
 const EXPRESSION_KEYS = [
     ...SOURCE_KEYS,
     'count',
-    'first',
-    'last',
+    'only',
     'sum',
     'mul',
     'min',
@@ -66,6 +65,7 @@ const BODY_KEYS = {
     api: [
         'path',
         'args',
+        'root',
         'where',
         'field',
     ],
@@ -379,7 +379,7 @@ function forEachTextLeaf(node, path, cb) {
 
 /**
  * Invoke `cb` for every source in an expression, wherever it sits: under operators, in `catch`
- * handlers and `if` branches, and in the operands of predicates.
+ * handlers and `if` branches, in the operands of predicates, and in source roots.
  *
  * @param {unknown} node
  * @param {string} path
@@ -407,7 +407,9 @@ function forEachSource(node, path, cb) {
                     : [];
             if (key !== 'api') forEachTextLeaf(value, childPath, (body, bodyPath) => bodies.push({ body, path: bodyPath }));
             for (const { body, path: bodyPath } of bodies) {
-                if (isPlainObject(body) && 'where' in body) forEachPredicateSource(body.where, 'item', `${bodyPath}.where`, cb);
+                if (!isPlainObject(body)) continue;
+                if ('where' in body) forEachPredicateSource(body.where, 'item', `${bodyPath}.where`, cb);
+                if (isPlainObject(body.root)) forEachSource(body.root, `${bodyPath}.root`, cb);
             }
         } else if (key === 'if') {
             if (!isPlainObject(value)) continue;
@@ -650,7 +652,14 @@ function forEachWebDetectionConfig(cb) {
 
 /**
  * @typedef {'number' | 'string' | 'boolean' | 'null' | 'undefined' | 'array' | 'object'} TypeName
- * @typedef {'boolean' | 'value' | 'number' | 'items' | 'values'} Position
+ */
+
+/**
+ * What an expression's position expects, as C-S-S names it. `list` is the operand of `count` and
+ * `only`. `spread` is an operand of `sum`, `mul`, `min`, `max`, `any`, `all` and `none` that gives
+ * a list, contributing each item. `root` is the `root` of a source.
+ *
+ * @typedef {'boolean' | 'value' | 'number' | 'list' | 'spread' | 'root'} Position
  */
 
 /**
@@ -661,14 +670,19 @@ function forEachWebDetectionConfig(cb) {
  *   nan: boolean,
  *   interfaces?: string[],
  *   customElement?: boolean,
- *   apiPath?: string,
+ *   apiPaths?: string[],
+ *   list?: 'selected' | 'maybe',
  * }} StaticType
  *
  * `types` is null when config does not show the type. `nan` is set when the value can be NaN.
  * `interfaces` names the element interfaces an element value can have, and `customElement` is
  * set when it can also be a custom element, whose page-defined values have names outside the
- * tables. `apiPath` is the `api` name the value was read through, which names read from it
- * extend for the allowlist.
+ * tables. `apiPaths` are the `api` names the value may have been read through, one for each
+ * branch that reads a different one, which names read from it extend for the allowlist.
+ *
+ * `list` marks a selected list, and the other keys then describe its items. `selected` is what
+ * `element`, `text` and `api` with `where` give. `maybe` is a value that is a selected list on
+ * some pages or branches only: an `api` with `field`, or an `if` with one list branch.
  */
 
 /** @type {StaticType} */
@@ -705,7 +719,7 @@ function mergeTypes(list) {
         nan ||= entry.nan;
         customElement ||= entry.customElement === true;
         for (const name of entry.interfaces ?? []) interfaces.add(name);
-        if (entry.apiPath !== undefined) apiPaths.add(entry.apiPath);
+        for (const name of entry.apiPaths ?? []) apiPaths.add(name);
     }
     /** @type {StaticType} */
     const merged = {
@@ -721,11 +735,43 @@ function mergeTypes(list) {
             ...interfaces,
         ];
     if (customElement) merged.customElement = true;
-    if (apiPaths.size === 1)
-        merged.apiPath = [
+    if (apiPaths.size)
+        merged.apiPaths = [
             ...apiPaths,
-        ][0];
+        ];
+    if (list.length && list.every((entry) => entry.list === 'selected')) merged.list = 'selected';
+    else if (list.some((entry) => entry.list !== undefined)) merged.list = 'maybe';
     return merged;
+}
+
+/**
+ * @param {StaticType} type
+ * @returns {StaticType} the type of one item of a selected list, or the type itself
+ */
+function itemOf(type) {
+    const item = { ...type };
+    delete item.list;
+    return item;
+}
+
+/**
+ * The one item of a list, where an expression reads one value from it.
+ *
+ * @param {StaticType} type
+ * @param {Context} ctx
+ * @param {string} path
+ * @returns {StaticType}
+ */
+function oneItem(type, ctx, path) {
+    const item = itemOf(type);
+    if (item.apiPaths?.some((name) => name === 'performance.getEntries' || name.startsWith('performance.getEntries.'))) {
+        fail(
+            ctx,
+            path,
+            'performance.getEntries selects every entry, so it never gives one value; read it under `count`, or use getEntriesByType or getEntriesByName',
+        );
+    }
+    return item;
 }
 
 /**
@@ -740,7 +786,8 @@ function allows(type, name) {
  * @param {StaticType} type
  */
 function describeType(type) {
-    return type.types === null ? 'unknown' : type.types.join(' or ');
+    const item = type.types === null ? 'unknown' : type.types.join(' or ');
+    return type.list === 'selected' ? `a list of ${item}` : item;
 }
 
 /**
@@ -993,7 +1040,7 @@ function describeInterfaces(interfaces) {
  *   names: Map<string, { node: Record<string, any>, path: string, branch: string[] }>,
  *   dependencies: Map<string, Set<string>>,
  *   refs: { name: string, path: string, branch: string[], inMatch: boolean }[],
- *   rooted: { selectors: unknown[], path: string, needsGuard: boolean, inMatch: boolean, topOperand: number | null, owner: string | undefined }[],
+ *   rooted: { root: unknown, path: string, needsGuard: boolean, inMatch: boolean, topOperand: number | null, owner: string | undefined }[],
  *   refMemo: Map<string, { errors: string[], type: StaticType }>,
  *   refFailures: { name: string, position: Position, path: string, errors: string[] }[],
  *   resolving: Set<string>,
@@ -1065,15 +1112,17 @@ function valueNode(node) {
 }
 
 /**
- * Whether an operand of `any`, `all`, `none`, `sum`, `mul`, `min` or `max` contributes a list of
- * values rather than one operand: `element` with `field`, `api`, or a ref to either.
+ * Whether an operand of `any`, `all`, `none`, `sum`, `mul`, `min` or `max` is in spread position,
+ * contributing each item of a list: a source, or a ref to one. Under `any`, `all` and `none`,
+ * `element` without `field` and `text` are presence leaves, booleans.
  *
  * @param {unknown} node
+ * @param {'number' | 'boolean'} single - the position of an operand that is not spread
  * @param {Context} ctx
  * @param {Set<string>} [seen]
  * @returns {boolean}
  */
-function providesValues(node, ctx, seen = new Set()) {
+function providesValues(node, single, ctx, seen = new Set()) {
     if (!isPlainObject(node) || 'is' in node) return false;
     const keys = expressionKeysOf(node);
     if (keys.length !== 1) return false;
@@ -1081,18 +1130,21 @@ function providesValues(node, ctx, seen = new Set()) {
     switch (keys[0]) {
         case 'api':
             return true;
+        case 'text':
+            return single === 'number';
         case 'element': {
             let hasField = false;
             forEachTextLeaf(body, '', (leaf) => {
                 hasField ||= 'field' in leaf;
             });
-            return hasField;
+            return hasField || single === 'number';
         }
         case 'ref': {
             const target = typeof body === 'string' && !seen.has(body) ? ctx.names.get(body) : undefined;
             return target
                 ? providesValues(
                       valueNode(target.node),
+                      single,
                       ctx,
                       new Set([
                           ...seen,
@@ -1104,6 +1156,40 @@ function providesValues(node, ctx, seen = new Set()) {
         default:
             return false;
     }
+}
+
+/**
+ * Whether a predicate compares the value: a literal, `eq`, `lt`, `lte`, `gt` or `gte` at its top
+ * level or in its `any`, `all`, `none` or array entries. A selected list under such a predicate
+ * gives its one item, and under any other the list, as an array. Mirrors `scalar` in C-S-S
+ * predicates.js.
+ *
+ * @param {unknown} predicate
+ * @returns {boolean}
+ */
+function isScalarPredicate(predicate) {
+    if (isLiteral(predicate)) return true;
+    if (Array.isArray(predicate)) return predicate.some(isScalarPredicate);
+    if (!isPlainObject(predicate)) return false;
+    return Object.keys(predicate).some(
+        (key) =>
+            key === 'eq' ||
+            COMPARISON_OPERATORS.includes(key) ||
+            (OPERATOR_KEYS.includes(key) && asArray(predicate[key]).some(isScalarPredicate)),
+    );
+}
+
+/**
+ * What a predicate under `is`, `when` or a bucket tests, for a value of the given type.
+ *
+ * @param {StaticType} type
+ * @param {unknown} predicate
+ * @param {Context} ctx
+ * @param {string} path
+ * @returns {StaticType}
+ */
+function predicateSubject(type, predicate, ctx, path) {
+    return type.list && isScalarPredicate(predicate) ? oneItem(type, ctx, path) : type;
 }
 
 /**
@@ -1195,20 +1281,23 @@ function checkExpr(node, position, scope, ctx, path) {
     }
     if ('catch' in node) {
         const handlerTypes = checkCatch(node.catch, keyPosition, child(inner), ctx, `${path}.catch`);
+        // On a selected list, a handler is checked against the item type
         for (const handlerType of handlerTypes) {
             const expected = type.types;
             if (expected && handlerType.types && !handlerType.types.some((name) => expected.includes(name))) {
                 fail(ctx, `${path}.catch`, `a handler gives ${describeType(handlerType)} where the expression gives ${describeType(type)}`);
             }
         }
+        const list = type.list;
         type = mergeTypes([
-            type,
-            ...handlerTypes,
+            itemOf(type),
+            ...handlerTypes.map(itemOf),
         ]);
+        if (list) type.list = list;
     }
     if (hasIs) {
         // `as` names the value, not the test, so a ref to it from the test is no cycle
-        checkPredicate(node.is, 'value', type, child(scope), ctx, `${path}.is`);
+        checkPredicate(node.is, 'value', predicateSubject(type, node.is, ctx, `${path}.is`), child(scope), ctx, `${path}.is`);
         return typeOf('boolean');
     }
     return type;
@@ -1260,15 +1349,15 @@ function checkExprKey(key, body, position, scope, ctx, path, owner) {
                 'value',
                 'number',
             ]);
-            checkExpr(body, 'items', child(scope), ctx, path);
+            checkExpr(body, 'list', child(scope), ctx, path);
             return typeOf('number');
-        case 'first':
-        case 'last': {
-            expectPosition(ctx, path, `\`${key}\``, position, [
+        case 'only': {
+            expectPosition(ctx, path, '`only`', position, [
                 'value',
                 'number',
+                'root',
             ]);
-            const type = checkExpr(body, 'values', child(scope), ctx, path);
+            const type = oneItem(checkExpr(body, 'list', child(scope), ctx, path), ctx, path);
             if (position === 'number' && !allows(type, 'number'))
                 fail(ctx, path, `number position takes a number, and config types the value as ${describeType(type)}`);
             return type;
@@ -1284,8 +1373,8 @@ function checkExprKey(key, body, position, scope, ctx, path, owner) {
             let nan = false;
             asArray(body).forEach((operand, index) => {
                 const operandPath = Array.isArray(body) ? `${path}[${index}]` : path;
-                const listed = providesValues(operand, ctx);
-                const type = checkExpr(operand, listed ? 'values' : 'number', child(scope), ctx, operandPath);
+                const listed = providesValues(operand, 'number', ctx);
+                const type = checkExpr(operand, listed ? 'spread' : 'number', child(scope), ctx, operandPath);
                 if (listed && !allows(type, 'number'))
                     fail(ctx, operandPath, `\`${key}\` takes numbers, and config types the values as ${describeType(type)}`);
                 nan ||= type.nan;
@@ -1335,8 +1424,8 @@ function checkExprKey(key, body, position, scope, ctx, path, owner) {
                     underNone: scope.underNone || key === 'none',
                     topOperand: scope.matchRoot && key === 'all' ? index : scope.topOperand,
                 };
-                if (providesValues(operand, ctx)) {
-                    const type = checkExpr(operand, 'values', operandScope, ctx, operandPath);
+                if (providesValues(operand, 'boolean', ctx)) {
+                    const type = checkExpr(operand, 'spread', operandScope, ctx, operandPath);
                     if (!allows(type, 'boolean'))
                         fail(ctx, operandPath, `\`${key}\` takes booleans, and config types the values as ${describeType(type)}`);
                 } else {
@@ -1350,6 +1439,7 @@ function checkExprKey(key, body, position, scope, ctx, path, owner) {
                 'boolean',
                 'value',
                 'number',
+                'root',
             ]);
             if (!isPlainObject(body)) {
                 fail(ctx, path, '`if` takes a body of `test`, `then` and `else`');
@@ -1532,8 +1622,9 @@ function checkConditionSource(key, branch, position, scope, ctx, path, owner) {
         expectPosition(ctx, path, '`element` with `field`', position, [
             'value',
             'number',
-            'items',
-            'values',
+            'list',
+            'spread',
+            'root',
         ]);
 
     /** @type {StaticType[]} */
@@ -1574,23 +1665,72 @@ function checkConditionSource(key, branch, position, scope, ctx, path, owner) {
                 checkPredicate(body.where, 'item', itemType, { ...child(scope), underNone: false }, ctx, `${bodyPath}.where`);
             valueTypes.push('field' in body ? checkFieldRead(body.field, itemType, ctx, `${bodyPath}.field`) : itemType);
         }
-        if ('root' in body && expectStrings(body.root, ctx, `${bodyPath}.root`, '`root`') && ctx.mode === 'check') {
-            ctx.rooted.push({
-                selectors: asArray(body.root),
-                path: bodyPath,
-                needsGuard: position !== 'boolean' || !scope.inMatch || scope.underNone || underNone,
-                inMatch: scope.inMatch,
-                topOperand: scope.topOperand,
-                owner,
-            });
+        if ('root' in body) {
+            const rootPath = `${bodyPath}.root`;
+            let valid = true;
+            if (isPlainObject(body.root)) checkNodeRoot(body.root, child(scope), ctx, rootPath);
+            else valid = expectStrings(body.root, ctx, rootPath, '`root`');
+            if (valid && ctx.mode === 'check') {
+                ctx.rooted.push({
+                    root: body.root,
+                    path: bodyPath,
+                    needsGuard: position !== 'boolean' || !scope.inMatch || scope.underNone || underNone,
+                    inMatch: scope.inMatch,
+                    topOperand: scope.topOperand,
+                    owner,
+                });
+            }
         }
     }
 
     if (position === 'boolean') return typeOf('boolean');
-    const type = mergeTypes(valueTypes);
-    if (position === 'number' && !allows(type, 'number'))
-        fail(ctx, path, `number position takes a number, and config types the value as ${describeType(type)}`);
-    return type;
+    return sourceType(mergeTypes(valueTypes), 'selected', position, ctx, path);
+}
+
+/**
+ * Check an expression `root` of `element` or `text` gives a node or a list of nodes.
+ *
+ * @param {Record<string, any>} root
+ * @param {Scope} scope
+ * @param {Context} ctx
+ * @param {string} path
+ */
+function checkNodeRoot(root, scope, ctx, path) {
+    const type = checkExpr(root, 'root', scope, ctx, path);
+    // `null` and `undefined` are an empty scope
+    if (
+        type.types !== null &&
+        type.types.some(
+            (name) =>
+                ![
+                    'object',
+                    'null',
+                    'undefined',
+                ].includes(name),
+        )
+    )
+        fail(ctx, path, `a root gives a node or a list of nodes, and config types it as ${describeType(type)}`);
+}
+
+/**
+ * The type a source gives in a position. A selected list gives its one item in number position,
+ * and each item in spread position.
+ *
+ * @param {StaticType} type - each item's, when `list` is set
+ * @param {StaticType['list']} list
+ * @param {Position} position - other than boolean
+ * @param {Context} ctx
+ * @param {string} path
+ * @returns {StaticType}
+ */
+function sourceType(type, list, position, ctx, path) {
+    if (position === 'spread') return type;
+    if (position === 'number') {
+        const item = list ? oneItem(type, ctx, path) : type;
+        if (!allows(item, 'number')) fail(ctx, path, `number position takes a number, and config types the value as ${describeType(item)}`);
+        return item;
+    }
+    return list ? { ...type, list } : type;
 }
 
 /**
@@ -1602,39 +1742,67 @@ function checkConditionSource(key, branch, position, scope, ctx, path, owner) {
  * @returns {StaticType}
  */
 function checkApi(body, position, scope, ctx, path) {
-    expectPosition(ctx, path, '`api`', position, [
-        'value',
-        'number',
-        'items',
-        'values',
-    ]);
     if (!isPlainObject(body)) {
         fail(ctx, path, '`api` takes one body object');
         return UNKNOWN;
     }
+    const hasWhere = 'where' in body;
+    expectPosition(ctx, path, hasWhere ? '`api` with `where`' : '`api`', position, [
+        ...(hasWhere
+            ? []
+            : [
+                  'boolean',
+              ]),
+        'value',
+        'number',
+        'list',
+        'spread',
+        'root',
+    ]);
     checkBodyKeys(body, BODY_KEYS.api, ctx, path);
     if (typeof body.path !== 'string' || body.path === '') {
         fail(ctx, `${path}.path`, '`path` is a non-empty string');
         return UNKNOWN;
     }
-    const names = body.path.split('.');
-    names.forEach((_, index) => {
-        const isCall = 'args' in body && index === names.length - 1;
-        checkApiName(names.slice(0, index + 1).join('.'), isCall, ctx, `${path}.path`);
-    });
-    if ((position === 'value' || position === 'number') && body.path === 'performance.getEntries') {
-        fail(
-            ctx,
-            `${path}.path`,
-            'performance.getEntries selects every entry, so it is never one value; read it under `count`, or use getEntriesByType or getEntriesByName',
-        );
-    }
     if ('args' in body) checkArgs(body.args, ctx, `${path}.args`);
+    const names = body.path.split('.');
     /** @type {StaticType} */
-    const itemType = { types: null, nan: false, apiPath: body.path };
-    if ('where' in body) checkPredicate(body.where, 'item', itemType, { ...child(scope), underNone: false }, ctx, `${path}.where`);
+    let read;
+    if ('root' in body) {
+        const rootPath = `${path}.root`;
+        read = checkExpr(body.root, 'root', child(scope), ctx, rootPath);
+        if (read.apiPaths === undefined && !read.interfaces) {
+            fail(ctx, rootPath, 'CI names what `path` reads by the root’s `api` names or element type, and this root has neither');
+            read = UNKNOWN;
+        }
+        names.forEach((name, index) => {
+            const isCall = 'args' in body && index === names.length - 1;
+            read = readName(read, name, isCall, ctx, `${path}.path`, body.args);
+        });
+    } else {
+        names.forEach((_, index) => {
+            const isCall = 'args' in body && index === names.length - 1;
+            checkApiName(names.slice(0, index + 1).join('.'), isCall, ctx, `${path}.path`);
+        });
+        read = {
+            types: null,
+            nan: false,
+            apiPaths: [
+                body.path,
+            ],
+        };
+    }
+    const itemType = itemOf(read);
+    if (hasWhere) checkPredicate(body.where, 'item', itemType, { ...child(scope), underNone: false }, ctx, `${path}.where`);
     const valueType = 'field' in body ? checkFieldRead(body.field, itemType, ctx, `${path}.field`) : itemType;
-    return position === 'items' ? itemType : valueType;
+    // `field` gives a list when `path` reads one, which config does not show
+    const list = hasWhere ? 'selected' : 'field' in body ? 'maybe' : undefined;
+    if (position === 'boolean') {
+        if (!allows(valueType, 'boolean'))
+            fail(ctx, path, `boolean position takes a boolean, and config types the value as ${describeType(valueType)}`);
+        return typeOf('boolean');
+    }
+    return sourceType(valueType, list, position, ctx, path);
 }
 
 /**
@@ -1711,7 +1879,7 @@ function checkFieldRead(field, subject, ctx, path) {
         if (read.args !== undefined) checkArgs(read.args, ctx, `${path}.args`);
         const names = read.path.split('.');
         names.forEach((name, index) => {
-            current = readName(current, name, read.args !== undefined && index === names.length - 1, ctx, path);
+            current = readName(current, name, read.args !== undefined && index === names.length - 1, ctx, path, read.args);
         });
     }
     if (read.feature !== undefined) {
@@ -1731,25 +1899,60 @@ function checkFieldRead(field, subject, ctx, path) {
 }
 
 /**
+ * Whether a read takes one item of an array: `at` called with one integer, or an index.
+ *
+ * @param {string} name
+ * @param {boolean} isCall
+ * @param {unknown} args
+ */
+function readsItem(name, isCall, args) {
+    if (!isCall) return /^\d+$/.test(name);
+    return name === 'at' && Array.isArray(args) && args.length === 1 && Number.isInteger(args[0]);
+}
+
+/**
  * Read one name from a value of the given type.
+ *
+ * An item read on a list, or on an `api` value, takes no name of its own: an item of
+ * `performance.getEntriesByType` is named `performance.getEntriesByType`, as `where` names it.
  *
  * @param {StaticType} current
  * @param {string} name
  * @param {boolean} isCall
  * @param {Context} ctx
  * @param {string} path
+ * @param {unknown} [args] - when `isCall`, the arguments
  * @returns {StaticType}
  */
-function readName(current, name, isCall, ctx, path) {
+function readName(current, name, isCall, ctx, path, args) {
     if (name === '') {
         fail(ctx, path, 'a path has an empty name');
         return UNKNOWN;
     }
-    if (current.apiPath !== undefined) {
-        const apiPath = `${current.apiPath}.${name}`;
-        checkApiName(apiPath, isCall, ctx, path);
-        return { types: null, nan: false, apiPath };
+    const item = readsItem(name, isCall, args);
+    if (current.list === 'selected') {
+        if (item) return oneItem(current, ctx, path);
+        if (name === 'length' && !isCall) return typeOf('number');
+        fail(ctx, path, `reads "${name}" on a list, which \`at\`, an index and \`length\` read; \`only\` takes its one item`);
+        return UNKNOWN;
     }
+    if (item && (current.list === 'maybe' || current.apiPaths !== undefined)) return oneItem(current, ctx, path);
+    if (current.list) current = itemOf(current);
+    if (current.apiPaths !== undefined && current.interfaces) {
+        // Branches reading an `api` and branches giving an element: check the name both ways
+        const { apiPaths, ...element } = current;
+        return mergeTypes([
+            readName({ types: null, nan: false, apiPaths }, name, isCall, ctx, path, args),
+            readName(element, name, isCall, ctx, path, args),
+        ]);
+    }
+    if (current.apiPaths !== undefined) {
+        const apiPaths = current.apiPaths.map((apiPath) => `${apiPath}.${name}`);
+        for (const apiPath of apiPaths) checkApiName(apiPath, isCall, ctx, path);
+        return { types: null, nan: false, apiPaths };
+    }
+    // The tables do not type the items of an IDL sequence
+    if (isCall && item && current.types?.includes('array')) return UNKNOWN;
     if (isCall) {
         if (!current.interfaces) {
             fail(ctx, path, `calls ${name}() on a value that is not an element or an \`api\` read`);
@@ -1959,7 +2162,12 @@ function checkPayloadSpec(data, ctx, path) {
             continue;
         }
         const type = checkExpr(field.value, 'value', PAYLOAD_SCOPE, ctx, `${fieldPath}.value`);
-        if ('when' in field) checkPredicate(field.when, 'value', type, PAYLOAD_SCOPE, ctx, `${fieldPath}.when`);
+        if (type.list === 'selected' && !('buckets' in field))
+            fail(ctx, `${fieldPath}.value`, 'a selected list is sent through `buckets`, or read with `count` or `only`');
+        if ('when' in field) {
+            const whenPath = `${fieldPath}.when`;
+            checkPredicate(field.when, 'value', predicateSubject(type, field.when, ctx, whenPath), PAYLOAD_SCOPE, ctx, whenPath);
+        }
         if ('buckets' in field) checkBuckets(field.buckets, type, ctx, `${fieldPath}.buckets`);
     }
 }
@@ -2090,7 +2298,8 @@ function checkBuckets(buckets, type, ctx, path) {
         predicate,
     ] of Object.entries(buckets)) {
         if (name === '') fail(ctx, path, 'a bucket name is a non-empty string');
-        checkPredicate(predicate, 'value', type, PAYLOAD_SCOPE, ctx, `${path}.${name}`);
+        const bucketPath = `${path}.${name}`;
+        checkPredicate(predicate, 'value', predicateSubject(type, predicate, ctx, bucketPath), PAYLOAD_SCOPE, ctx, bucketPath);
         const set = simpleBucketSet(predicate);
         if (set) simple.push({ name, set });
     }
@@ -2167,19 +2376,9 @@ function checkBranchRefs(ctx) {
 }
 
 /**
- * @param {unknown} selectors
- */
-function selectorSetKey(selectors) {
-    return [
-        ...new Set(asArray(selectors)),
-    ]
-        .sort()
-        .join('\u0000');
-}
-
-/**
- * A rooted source read anywhere but in boolean position with no `none` above it needs a guard:
- * a presence leaf on the same root selectors, as an earlier operand of match's top-level `all`.
+ * A rooted `element` or `text` read anywhere but in boolean position with no `none` above it needs
+ * a guard. Its `root` is a `ref` to an earlier operand of match's top-level `all`, which carries
+ * `is` unless it is an `element` or `text` source.
  *
  * @param {Record<string, any>} detector
  * @param {string} path
@@ -2188,23 +2387,34 @@ function selectorSetKey(selectors) {
 function checkRootGuards(detector, path, ctx) {
     const match = detector.match;
     const topAll = isPlainObject(match) && expressionKeysOf(match).join() === 'all' ? asArray(match.all) : [];
-    const guards = topAll.map((operand) => {
-        if (!isPlainObject(operand) || Object.keys(operand).join() !== 'element' || !isPlainObject(operand.element)) return null;
-        const body = operand.element;
-        const shaped = Object.keys(body).every((key) => key === 'selector' || key === 'visibility') && (body.visibility ?? 'any') === 'any';
-        return shaped ? selectorSetKey(body.selector) : null;
+    /** @type {Map<string, number>} */
+    const guards = new Map();
+    topAll.forEach((operand, index) => {
+        if (isPlainObject(operand) && typeof operand.as === 'string') guards.set(operand.as, index);
     });
     const referenced = new Set(ctx.refs.map((ref) => ref.name));
 
     for (const rooted of ctx.rooted) {
         if (!rooted.needsGuard && !(rooted.owner && referenced.has(rooted.owner))) continue;
-        const guardIndex = guards.indexOf(selectorSetKey(rooted.selectors));
-        const ahead = guardIndex >= 0 && (!rooted.inMatch || (rooted.topOperand !== null && guardIndex < rooted.topOperand));
+        const name = isPlainObject(rooted.root) && Object.keys(rooted.root).join() === 'ref' ? rooted.root.ref : undefined;
+        const guardIndex = typeof name === 'string' ? guards.get(name) : undefined;
+        const ahead = guardIndex !== undefined && (!rooted.inMatch || (rooted.topOperand !== null && guardIndex < rooted.topOperand));
         if (!ahead) {
             fail(
                 ctx,
-                rooted.path,
-                `\`root\` ${JSON.stringify(rooted.selectors)} needs a guard ahead of it: {"element": {"selector": ${JSON.stringify(rooted.selectors)}}} as an earlier operand of ${path}.match's top-level \`all\``,
+                `${rooted.path}.root`,
+                `\`root\` needs a guard: the root's expression, named with \`as\`, as an earlier operand of ${path}.match's top-level \`all\`, and \`root\` a \`ref\` to it`,
+            );
+            continue;
+        }
+        const guard = topAll[guardIndex];
+        const keys = expressionKeysOf(guard);
+        const isSource = keys.length === 1 && (keys[0] === 'element' || keys[0] === 'text');
+        if (!isSource && !('is' in guard)) {
+            fail(
+                ctx,
+                `${path}.match.all[${guardIndex}]`,
+                `the guard "${name}" is not an \`element\` or \`text\` source, so it carries \`is\`, such as "is": {"type": "object"}`,
             );
         }
     }
@@ -2689,6 +2899,29 @@ describe('webDetection config tests', () => {
             ]);
         });
 
+        it('reaches text in source roots', () => {
+            const match = {
+                all: [
+                    { element: { selector: 'img', root: { only: { text: { pattern: 'a' } } } } },
+                    {
+                        api: {
+                            root: {
+                                element: {
+                                    selector: 'p',
+                                    root: { if: { test: { text: { pattern: 'b' } }, then: { ref: 'x' }, else: { ref: 'y' } } },
+                                },
+                            },
+                            path: 'length',
+                        },
+                    },
+                ],
+            };
+            expect(collect(match)).to.deep.equal([
+                'a',
+                'b',
+            ]);
+        });
+
         it('does not mistake a property named text in `where` for a source', () => {
             expect(collect({ element: { selector: 'option', where: { text: 'Sign in' } } })).to.deep.equal([]);
         });
@@ -2943,17 +3176,9 @@ describe('webDetection config tests', () => {
                     '#comments',
                 ],
             },
+            as: 'comments',
         };
-        const rootedImages = {
-            count: {
-                element: {
-                    selector: 'img',
-                    root: [
-                        '#comments',
-                    ],
-                },
-            },
-        };
+        const rootedImages = { count: { element: { selector: 'img', root: { ref: 'comments' } } } };
         const text = { text: { pattern: 'a' } };
 
         /**
@@ -3056,17 +3281,7 @@ describe('webDetection config tests', () => {
 
             it('rejects unknown expression, body, field and payload field keys', () => {
                 expectError('unknown expression key "aggregate"', { aggregate: imgCount });
-                expectError('unknown source body key "root"', {
-                    count: {
-                        api: {
-                            path: 'document.fonts',
-                            root: [
-                                '#a',
-                            ],
-                        },
-                    },
-                    is: 0,
-                });
+                expectError('unknown source body key "selector"', { count: { api: { path: 'document.fonts', selector: '#a' } }, is: 0 });
                 expectError('unknown source body key "where"', { text: { pattern: 'a', where: {} } });
                 expectError('unknown source body key "allowGetter"', { text: { pattern: 'a', allowGetter: true } });
                 expectError('unknown `field` key', { ...fieldOf('img', { name: 'src' }), is: {} });
@@ -3239,8 +3454,8 @@ describe('webDetection config tests', () => {
 
             it('places every source and boolean expression in value position', () => {
                 expectValid(true, {
-                    matched: { value: text },
-                    image: { value: img },
+                    matched: { value: text, buckets: { some: { length: { gt: 0 } } } },
+                    image: { value: img, buckets: { some: { length: { gt: 0 } } } },
                     either: {
                         value: {
                             any: [
@@ -3257,13 +3472,25 @@ describe('webDetection config tests', () => {
                     },
                     always: { value: true },
                 });
+                // `length` on a selected list counts its items: here, the text's matches
                 expectValid({ ...text, is: { length: { gt: 0 } } });
-                expectValid({ element: { selector: 'input' }, is: { hidden: false } });
+                expectValid({ only: { element: { selector: 'input' } }, is: { hidden: false } });
             });
 
-            it('places `text` and `element` without `field` in list-of-values position', () => {
-                expectValid({ first: text, is: { length: { gt: 0 } } });
-                expectValid({ first: img, is: { field: { path: 'tagName' }, is: 'IMG' } });
+            it('rejects a selected list in a payload without buckets', () => {
+                expectError('sent through `buckets`', true, { matched: { value: text } });
+                expectError('sent through `buckets`', true, {
+                    image: { value: { ...img, catch: { absent: { element: { selector: 'p' } } } } },
+                });
+                expectError('sent through `buckets`', { ...img, as: 'images' }, { image: { value: { ref: 'images' } } });
+                expectValid({ ...img, as: 'images' }, { image: { value: { count: { ref: 'images' } } } });
+                expectValid(true, { width: { value: fieldOf('img', 'naturalWidth'), buckets: { wide: { gt: 100 } } } });
+            });
+
+            it('places `text` and `element` without `field` in list position', () => {
+                expectValid({ only: text, is: { length: { gt: 0 } } });
+                expectValid({ only: img, is: { field: { path: 'tagName' }, is: 'IMG' } });
+                expectValid({ count: text, is: { gt: 0 } });
             });
 
             it('rejects `text` and `element` without `field` in number position', () => {
@@ -3283,10 +3510,23 @@ describe('webDetection config tests', () => {
                 });
             });
 
-            it('keeps `element` with `field` and `api` out of boolean position', () => {
+            it('places a bare `api` in boolean position, and keeps `element` with `field`, `api` with `where` and `count` out of it', () => {
+                expectValid({ api: { path: 'document.hidden' } });
+                expectValid({
+                    api: {
+                        path: 'matchMedia',
+                        args: [
+                            '(prefers-reduced-motion: reduce)',
+                        ],
+                        field: 'matches',
+                    },
+                });
                 expectError('`element` with `field` fills', fieldOf('img', 'complete'));
-                expectError('`api` fills', now);
+                expectError('`api` with `where` fills', { api: { path: 'document.fonts', where: { status: 'error' } } });
                 expectError('`count` fills', imgCount);
+                expectError('boolean position takes a boolean, and config types the value as number', {
+                    api: { root: { only: img }, path: 'naturalWidth' },
+                });
             });
 
             it('places lists of values under operators', () => {
@@ -3303,9 +3543,68 @@ describe('webDetection config tests', () => {
                 });
             });
 
-            it('places `first` and `last` over lists of values only', () => {
-                expectValid({ first: fieldOf('img', 'naturalWidth'), is: { gt: 0 } });
-                expectError('`count` fills', { first: imgCount, is: { gt: 0 } });
+            it('places `only` and `count` over lists only', () => {
+                expectValid({ only: fieldOf('img', 'naturalWidth'), is: { gt: 0 } });
+                expectValid({ only: { api: { path: 'document.fonts' } }, is: { field: 'status', is: 'loaded' } });
+                expectValid({
+                    sub: [
+                        { only: fieldOf('img', 'naturalWidth') },
+                        1,
+                    ],
+                    is: { gt: 0 },
+                });
+                expectError('`count` fills', { only: imgCount, is: { gt: 0 } });
+                expectError('A number fills', { count: 1, is: 0 });
+                expectError('`if` fills', { count: { if: { test: true, then: img, else: img } }, is: 0 });
+                expectError('`only` fills', { only: img });
+                expectError('number position takes a number, and config types the value as string', {
+                    sub: [
+                        { only: fieldOf('img', 'src') },
+                        1,
+                    ],
+                    is: { gt: 0 },
+                });
+            });
+
+            it('spreads sources under operators, with presence leaves booleans under `any`, `all` and `none`', () => {
+                expectValid({
+                    any: [
+                        img,
+                        text,
+                    ],
+                });
+                expectValid({
+                    sum: [
+                        fieldOf('img', 'naturalWidth'),
+                        loadEventEnd,
+                    ],
+                    is: { gt: 0 },
+                });
+                expectError('`sum` takes numbers, and config types the values as object', { sum: img, is: { gt: 0 } });
+                expectError('`max` takes numbers, and config types the values as string', { max: text, is: { gt: 0 } });
+            });
+
+            it('tests a selected list’s one item under a predicate that compares, and the list as an array under any other', () => {
+                expectValid({ element: { selector: 'body', field: { feature: 'renderedTextLength' } }, is: { lt: 2000 } });
+                expectValid({ ...img, is: { length: { gte: 5 } } });
+                expectValid({ ...img, is: { type: 'array' } });
+                expectError('guard it', { ...fieldOf('img', 'src'), is: { gt: 3 } });
+                expectError('guard it', {
+                    ...img,
+                    is: {
+                        any: [
+                            { gt: 0 },
+                        ],
+                    },
+                });
+                expectError('reads "length" on a value config types as number', {
+                    ...fieldOf('img', 'naturalWidth'),
+                    is: { length: 2, gt: 0 },
+                });
+                expectError('reads "naturalWidth" on a list', { ...img, is: { naturalWidth: 0 } });
+                expectValid(true, { images: { value: img, buckets: { many: { length: { gte: 5 } } }, when: { length: { gt: 1 } } } });
+                expectError('guard it', true, { images: { value: img, buckets: { many: { length: { gte: 5 } } }, when: { gt: 1 } } });
+                expectError('guard it', true, { sources: { value: fieldOf('img', 'src'), buckets: { long: { gt: 100 } } } });
             });
 
             it('checks each `field` step suits the type the previous one gives', () => {
@@ -3362,13 +3661,13 @@ describe('webDetection config tests', () => {
             });
 
             it('reads `length` and indexes on strings', () => {
-                expectValid({ first: text, is: { length: 1 } });
-                expectValid({ first: text, is: { 0: 'a' } });
+                expectValid({ only: text, is: { length: 1 } });
+                expectValid({ only: text, is: { 0: 'a' } });
             });
 
             it('reads page-defined values under names outside the tables on custom elements only', () => {
-                expectValid({ element: { selector: 'x-widget' }, is: { value: 3 } });
-                expectError('"value" is not a property of HTMLDivElement', { element: { selector: 'div' }, is: { value: 3 } });
+                expectValid({ only: { element: { selector: 'x-widget' } }, is: { value: 3 } });
+                expectError('"value" is not a property of HTMLDivElement', { only: { element: { selector: 'div' } }, is: { value: 3 } });
             });
         });
 
@@ -3410,6 +3709,12 @@ describe('webDetection config tests', () => {
                     },
                     { images: { value: rootedImages } },
                 );
+                expectValid({
+                    all: [
+                        { element: { selector: '#comments', visibility: 'visible', where: { hidden: false } }, as: 'comments' },
+                        { ...rootedImages, is: { lt: 1 } },
+                    ],
+                });
             });
 
             it('passes a scoped leaf read only in boolean position with no `none` above it', () => {
@@ -3421,12 +3726,18 @@ describe('webDetection config tests', () => {
                         ],
                     },
                 });
+                expectValid({ element: { selector: 'img', root: { element: { selector: '#comments' } } } });
             });
 
             it('rejects a scoped expression with no guard, or a guard behind it', () => {
                 expectError('needs a guard', {
                     all: [
-                        { ...rootedImages, is: { lt: 1 } },
+                        { count: { element: { selector: 'img', root: '#comments' } }, is: { lt: 1 } },
+                    ],
+                });
+                expectError('needs a guard', {
+                    all: [
+                        { count: { element: { selector: 'img', root: { element: { selector: '#comments' } } } }, is: { lt: 1 } },
                     ],
                 });
                 expectError('needs a guard', {
@@ -3435,8 +3746,17 @@ describe('webDetection config tests', () => {
                         guard,
                     ],
                 });
-                expectError('needs a guard', { ...rootedImages, is: { lt: 1 } });
-                expectError('needs a guard', true, { images: { value: rootedImages } });
+                expectError('needs a guard', {
+                    all: [
+                        { any: guard },
+                        { ...rootedImages, is: { lt: 1 } },
+                    ],
+                });
+                expectError(
+                    'needs a guard',
+                    { ...guard, as: 'region' },
+                    { images: { value: { count: { element: { selector: 'img', root: '#comments' } } } } },
+                );
             });
 
             it('rejects a scoped leaf under `none`, or read through a ref, with no guard', () => {
@@ -3467,36 +3787,19 @@ describe('webDetection config tests', () => {
                 );
             });
 
-            it('accepts only a guard with the same selectors, no `where` and visibility `any`', () => {
-                expectError('needs a guard', {
+            it('requires `is` on a guard that is not an `element` or `text` source', () => {
+                const shadowRoot = { api: { root: { only: { element: { selector: 'my-widget' } } }, path: 'shadowRoot' }, as: 'shadow' };
+                const shadowImages = { count: { element: { selector: 'img', root: { ref: 'shadow' } } }, is: { lt: 1 } };
+                expectError('carries `is`', {
                     all: [
-                        {
-                            element: {
-                                selector: [
-                                    '#other',
-                                ],
-                            },
-                        },
-                        { ...rootedImages, is: { lt: 1 } },
-                    ],
-                });
-                expectError('needs a guard', {
-                    all: [
-                        {
-                            element: {
-                                selector: [
-                                    '#comments',
-                                ],
-                                visibility: 'visible',
-                            },
-                        },
-                        { ...rootedImages, is: { lt: 1 } },
+                        shadowRoot,
+                        shadowImages,
                     ],
                 });
                 expectValid({
                     all: [
-                        { element: { selector: '#comments', visibility: 'any' } },
-                        { ...rootedImages, is: { lt: 1 } },
+                        { ...shadowRoot, is: { type: 'object' } },
+                        shadowImages,
                     ],
                 });
             });
@@ -3547,7 +3850,7 @@ describe('webDetection config tests', () => {
                 });
                 expectError('leaves out number', { ...loadEventEnd, is: { type: 'string', finite: true } });
                 expectError('never holds', { ...loadEventEnd, is: { finite: true, nan: true } });
-                expectValid({ ...loadEventEnd, is: { exists: false } });
+                expectValid({ only: loadEventEnd, is: { exists: false } });
                 expectValid({ ...loadEventEnd, is: { type: 'number', gt: 0 } });
             });
 
@@ -3636,12 +3939,219 @@ describe('webDetection config tests', () => {
                 });
             });
 
-            it('rejects performance.getEntries in value position only', () => {
+            it('rejects reading one value from performance.getEntries', () => {
+                const entries = { api: { path: 'performance.getEntries', args: [] } };
+                const durations = { api: { path: 'performance.getEntries', args: [], field: 'duration' } };
+                expectError('performance.getEntries selects every entry', { ...durations, is: { gt: 0 } });
+                expectError('performance.getEntries selects every entry', { only: entries, is: {} });
                 expectError('performance.getEntries selects every entry', {
-                    api: { path: 'performance.getEntries', args: [], field: 'duration' },
+                    sub: [
+                        durations,
+                        1,
+                    ],
                     is: { gt: 0 },
                 });
-                expectValid({ count: { api: { path: 'performance.getEntries', args: [] } }, is: { gt: 0 } });
+                expectError('performance.getEntries selects every entry', {
+                    api: {
+                        root: entries,
+                        path: 'at',
+                        args: [
+                            0,
+                        ],
+                    },
+                    is: {},
+                });
+                expectValid({ count: entries, is: { gt: 0 } });
+            });
+        });
+
+        describe('`root` on `api`', () => {
+            const navigation = {
+                api: {
+                    path: 'performance.getEntriesByType',
+                    args: [
+                        'navigation',
+                    ],
+                },
+            };
+
+            it('names a path read from an `api` root by the root’s name, through `ref` and `only`', () => {
+                expectValid({
+                    all: [
+                        { only: navigation, as: 'navigation', is: { type: 'object' } },
+                        { api: { root: { ref: 'navigation' }, path: 'loadEventEnd' }, is: { gt: 0 } },
+                    ],
+                });
+                expectValid({ api: { root: { only: navigation }, path: 'responseStatus' }, is: { gte: 400 } });
+                expectError('"performance.getEntriesByType.name", which is not in API_ALLOWLIST', {
+                    api: { root: { only: navigation }, path: 'name' },
+                    is: { type: 'string' },
+                });
+                expectError('reads the method "performance.now" without calling it', {
+                    api: { root: { api: { path: 'performance' } }, path: 'now' },
+                    is: { gt: 0 },
+                });
+            });
+
+            it('reads an item with `at` or an index on a list or `api` root, under the item’s name', () => {
+                const at = (/** @type {unknown} */ root, /** @type {unknown[]} */ args) => ({ root, path: 'at', args });
+                expectValid({
+                    api: {
+                        ...at(
+                            navigation,
+                            [
+                                0,
+                            ],
+                        ),
+                        field: 'loadEventEnd',
+                    },
+                    is: { gt: 0 },
+                });
+                expectValid({
+                    api: {
+                        ...at(
+                            img,
+                            [
+                                -1,
+                            ],
+                        ),
+                        field: 'naturalWidth',
+                    },
+                    is: { gt: 0 },
+                });
+                expectValid({ api: { root: img, path: '0.naturalWidth' }, is: { gt: 0 } });
+                expectValid({ api: { root: img, path: 'length' }, is: { gte: 5 } });
+                expectError('"naturalWidth" is not a property of HTMLHeadingElement', {
+                    api: {
+                        ...at(
+                            { element: { selector: 'h1' } },
+                            [
+                                0,
+                            ],
+                        ),
+                        field: 'naturalWidth',
+                    },
+                    is: { gt: 0 },
+                });
+                expectError('reads "slice" on a list', {
+                    api: {
+                        root: img,
+                        path: 'slice',
+                        args: [
+                            0,
+                        ],
+                    },
+                    is: {},
+                });
+                expectError('reads "at" on a list', {
+                    api: at(
+                        img,
+                        [
+                            0,
+                            1,
+                        ],
+                    ),
+                    is: {},
+                });
+                expectError('"performance.getEntriesByType.at", which is not in API_ALLOWLIST', {
+                    api: at(navigation, [
+                        'x',
+                    ]),
+                    is: {},
+                });
+            });
+
+            it('checks a root under each name it may have', () => {
+                const document = { api: { path: 'document' } };
+                expectValid({
+                    api: { root: { if: { test: true, then: document, else: document } }, path: 'title' },
+                    is: { type: 'string' },
+                });
+                const byType = {
+                    only: {
+                        api: {
+                            path: 'performance.getEntriesByType',
+                            args: [
+                                'paint',
+                            ],
+                        },
+                    },
+                };
+                const byName = {
+                    only: {
+                        api: {
+                            path: 'performance.getEntriesByName',
+                            args: [
+                                'first-paint',
+                                'paint',
+                            ],
+                        },
+                    },
+                };
+                const entry = { if: { test: { api: { path: 'document.hidden' } }, then: byType, else: byName } };
+                expectError('"performance.getEntriesByType.startTime", which is not in API_ALLOWLIST', {
+                    api: { root: entry, path: 'startTime' },
+                    is: { gt: 0 },
+                });
+                expectError('"performance.getEntriesByName.duration", which is not in API_ALLOWLIST', {
+                    all: [
+                        { ...entry, as: 'entry', is: {} },
+                        { api: { root: { ref: 'entry' }, path: 'duration' }, is: { gt: 0 } },
+                    ],
+                });
+                const image = { only: { element: { selector: 'img' } } };
+                const either = { if: { test: true, then: image, else: document } };
+                expectValid({ api: { root: either, path: 'title' }, is: { type: 'string' } });
+                expectError('"document.naturalWidth", which is not in API_ALLOWLIST', {
+                    api: { root: either, path: 'naturalWidth' },
+                    is: { gt: 0 },
+                });
+            });
+
+            it('rejects a root CI cannot name', () => {
+                expectError('this root has neither', { api: { root: { only: text }, path: 'length' }, is: { gt: 0 } });
+                expectError('`count` fills', { api: { root: imgCount, path: 'toFixed', args: [] }, is: {} });
+                expectError('A number fills', { api: { root: 1, path: 'toFixed', args: [] }, is: {} });
+            });
+        });
+
+        describe('expression `root` on `element` and `text`', () => {
+            it('takes an expression giving a node or a list of nodes', () => {
+                expectValid({ element: { selector: 'img', root: { element: { selector: 'article' } } } });
+                expectValid({ text: { pattern: 'a', root: { only: { element: { selector: 'article' } } } } });
+                expectValid({
+                    element: {
+                        selector: 'img',
+                        root: { api: { root: { only: { element: { selector: 'my-widget' } } }, path: 'shadowRoot' } },
+                    },
+                });
+                expectValid({ element: { selector: 'img', root: { api: { path: 'document' } } } });
+            });
+
+            it('rejects a root of text, numbers or values that are not nodes', () => {
+                expectError('config types it as a list of string', { element: { selector: 'img', root: text } });
+                expectError('config types it as a list of number', { element: { selector: 'img', root: fieldOf('img', 'naturalWidth') } });
+                expectError('config types it as string', { text: { pattern: 'a', root: { only: fieldOf('a', 'href') } } });
+                expectError('`count` fills', { element: { selector: 'img', root: imgCount } });
+            });
+
+            it('collects names, refs and cycles inside roots', () => {
+                expectValid({
+                    all: [
+                        { element: { selector: 'img', root: { element: { selector: '#a' }, as: 'region' } } },
+                        { ref: 'region' },
+                    ],
+                });
+                expectError('names no expression', { element: { selector: 'img', root: { ref: 'missing' } } });
+                expectError('names no expression', { api: { root: { ref: 'missing' }, path: 'length' }, is: {} });
+                expectError('cycle', { element: { selector: 'img', root: { ref: 'images' } }, as: 'images' });
+                expectError('cycle', { api: { root: { ref: 'widths' }, path: 'length' }, as: 'widths', is: {} });
+                expectError('from outside it', {
+                    all: [
+                        { if: { test: true, then: { element: { selector: '#a' }, as: 'inner' }, else: false } },
+                        { element: { selector: 'img', root: { ref: 'inner' } } },
+                    ],
+                });
             });
         });
 
@@ -3676,8 +4186,8 @@ describe('webDetection config tests', () => {
             });
 
             it('checks bucket and `when` operators against the value’s type', () => {
-                expectError('guard it', true, { a: { value: { first: fieldOf('img', 'src') }, buckets: { long: { gt: 100 } } } });
-                expectError('guard it', true, { a: { value: { first: fieldOf('img', 'src') }, when: { gt: 100 } } });
+                expectError('guard it', true, { a: { value: { only: fieldOf('img', 'src') }, buckets: { long: { gt: 100 } } } });
+                expectError('guard it', true, { a: { value: { only: fieldOf('img', 'src') }, when: { gt: 100 } } });
             });
         });
     });

@@ -126,20 +126,28 @@ type PredicateObject = PredicateReserved & PredicateOperators & { [path: string]
 export type Predicate = string | number | boolean | null | Predicate[] | PredicateObject;
 
 type Root = {
-    /** Scopes the source to the union of the elements these selectors match. */
-    root?: MaybeArray<string>;
+    /**
+     * Where the source's reads start: the union of the nodes these selectors match, or of the node
+     * or list of nodes an expression gives. Without it, the document.
+     */
+    root?: MaybeArray<string> | ExprObject;
 };
 
 type ItemKeys = {
     /** A predicate each item must pass. */
     where?: Predicate;
-    /** The value read from each item that passes `where`. */
+    /** The value read from each item that passes `where`, or on `api`, from a value that is not a list. */
     field?: FieldRead;
 };
 
 export type ElementBody = ConditionTypes['element'] & Root & ItemKeys;
 export type TextBody = ConditionTypes['text'] & Root;
-export type ApiBody = { path: string; args?: Arg[] } & ItemKeys;
+export type ApiBody = {
+    path: string;
+    args?: Arg[];
+    /** The value `path` reads from. Without it, the global object. */
+    root?: Expr;
+} & ItemKeys;
 
 type Operands = MaybeArray<Expr>;
 
@@ -152,8 +160,7 @@ type ExprKeys = {
     text: ConditionBranch<TextBody>;
     api: ApiBody;
     count: Expr;
-    first: Expr;
-    last: Expr;
+    only: Expr;
     sum: Operands;
     mul: Operands;
     min: Operands;
@@ -174,8 +181,8 @@ type ExprKeys = {
 };
 
 /**
- * One expression key is that expression; several are their AND, in boolean position only,
- * and never beside `is`. Placement is checked by the parser and CI, not by these types.
+ * One expression key is that expression; several are their AND, in boolean or value position,
+ * and never beside `is`. Placement and types are checked by the parser and CI, not by these types.
  */
 export type ExprObject = Partial<ExprKeys> & Modifiers;
 export type Expr = number | boolean | ExprObject | Expr[];
