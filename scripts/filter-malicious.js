@@ -32,6 +32,14 @@ function rateLimit(fn, windowMs, reqInWindow = 1) {
 
 const slowFetch = rateLimit(fetch, 1000, 30);
 
+// Domains that must always be retained regardless of the dataset. These are
+// synthetic test pages (never present in the malicious dataset) used to verify
+// that exceptions work correctly, so the staleness check would otherwise remove
+// them on every run. See PR #3964.
+const PERMANENT_EXCEPTIONS = new Set([
+    'broken.third-party.site',
+]);
+
 class ConfigProcessor {
     constructor(options = {}) {
         this.apiBaseUrl = options.apiBaseUrl || 'https://duckduckgo.com/api/protection/v2';
@@ -154,6 +162,10 @@ class ConfigProcessor {
         const updatedExceptions = [];
         const removedExceptions = [];
         for (const exception of exceptions) {
+            if (PERMANENT_EXCEPTIONS.has(exception.domain)) {
+                updatedExceptions.push(exception);
+                continue;
+            }
             const inDataset = await this.checkDomainMatch(exception.domain, platformName);
             if (inDataset) {
                 updatedExceptions.push(exception);
