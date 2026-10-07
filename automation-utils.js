@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { immutableJSONPatch } from 'immutable-json-patch';
 import pkg from 'fast-json-patch';
+import tldts from 'tldts';
 
 const { compare } = pkg;
 
@@ -172,6 +173,17 @@ export function isAllowedChangesOnly(patches) {
 export const SITE_SPECIFIC_FIXES_PATH = '/features/autofill/features/siteSpecificFixes';
 
 /**
+ * Only the subfeature's settings are evaluated semantically. Its state,
+ * rollout, minSupportedVersion and the like apply to every site, so changes to
+ * them fall through to the path allowlist, which leaves them for a human.
+ */
+const SITE_SPECIFIC_FIXES_SETTINGS_PATH = `${SITE_SPECIFIC_FIXES_PATH}/settings`;
+
+function isSiteSpecificFixesSettingsPatch(patch) {
+    return patch.path === SITE_SPECIFIC_FIXES_SETTINGS_PATH || patch.path.startsWith(`${SITE_SPECIFIC_FIXES_SETTINGS_PATH}/`);
+}
+
+/**
  * Settings keys a site-scoped autofill fix is allowed to affect.
  */
 export const SITE_SPECIFIC_FIXES_ALLOWED_KEYS = [
@@ -252,18 +264,35 @@ export function getScopedDomains(condition) {
         if (keys.length === 0 || !keys.every((key) => DOMAIN_SCOPED_CONDITION_KEYS.includes(key))) {
             return null;
         }
-        const blockDomains = Array.isArray(block.domain)
-            ? block.domain
-            : [
-                  block.domain,
-              ];
-        if (!blockDomains.length || !blockDomains.every((domain) => typeof domain === 'string' && domain.length > 0)) {
+        // Clients never match an array-valued domain, so such a fix would be inert.
+        if (!isScopableDomain(block.domain)) {
             return null;
         }
-        domains.push(...blockDomains);
+        domains.push(block.domain);
     }
 
     return domains;
+}
+
+/**
+ * Checks that a condition domain names a specific site.
+ *
+ * Clients match a domain condition as a hostname suffix, so a public suffix
+ * such as `com`, `co.uk` or `github.io` would apply the fix to every site under
+ * it. The domain must therefore sit under a known public suffix. `localhost` is
+ * allowed because fixes conventionally target it for local testing.
+ * @param {unknown} domain - The value of a condition block's domain key
+ * @returns {boolean} True when the domain is safe to treat as a single site
+ */
+export function isScopableDomain(domain) {
+    if (typeof domain !== 'string') {
+        return false;
+    }
+    if (domain === 'localhost') {
+        return true;
+    }
+    const parsed = tldts.parse(domain, { allowPrivateDomains: true });
+    return parsed.hostname === domain && (parsed.isIcann || parsed.isPrivate) && parsed.domain !== null;
 }
 
 /**
@@ -470,8 +499,8 @@ export function analyzePatchesForApproval(patches, context = {}) {
         };
     }
 
-    const siteSpecificFixesPatches = patches.filter((patch) => patch.path.startsWith(SITE_SPECIFIC_FIXES_PATH));
-    const remainingPatches = patches.filter((patch) => !patch.path.startsWith(SITE_SPECIFIC_FIXES_PATH));
+    const siteSpecificFixesPatches = patches.filter(isSiteSpecificFixesSettingsPatch);
+    const remainingPatches = patches.filter((patch) => !isSiteSpecificFixesSettingsPatch(patch));
 
     let siteSpecificFixesReasons = [];
     if (siteSpecificFixesPatches.length > 0) {

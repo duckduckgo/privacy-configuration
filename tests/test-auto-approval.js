@@ -658,4 +658,142 @@ describe('Autofill siteSpecificFixes approval tests', () => {
         expect(rejected.shouldApprove).to.equal(false);
         expect(rejected.disallowedPatches).to.have.length(1);
     });
+
+    for (const domain of [
+        'com',
+        'co.uk',
+        'github.io',
+        '0.1',
+        '*.com',
+        '127.0.0.1',
+    ]) {
+        it(`rejects the domain \`${domain}\`, which clients would match beyond a single site`, () => {
+            const updated = configWithEntries([
+                existingEntry,
+                {
+                    condition: [
+                        { domain },
+                    ],
+                    patchSettings: [
+                        { path: '/formBoundarySelector', op: 'replace', value: 'body' },
+                    ],
+                },
+            ]);
+
+            const result = evaluateSiteSpecificFixesChange(base, updated);
+
+            expect(result.approved).to.equal(false);
+            expect(result.reasons.join(' ')).to.include('not scoped to specific domains');
+        });
+    }
+
+    it('approves subdomains, private-suffix sites and localhost', () => {
+        const updated = configWithEntries([
+            existingEntry,
+            {
+                condition: [
+                    { domain: 'idmsa.apple.com' },
+                    { domain: 'example.github.io' },
+                    { domain: 'localhost' },
+                ],
+                patchSettings: [
+                    { path: '/formBoundarySelector', op: 'replace', value: '#sign_in_form' },
+                ],
+            },
+        ]);
+
+        const result = evaluateSiteSpecificFixesChange(base, updated);
+
+        expect(result.reasons).to.deep.equal([]);
+        expect(result.approved).to.equal(true);
+    });
+
+    it('rejects an array-valued domain, which clients never match', () => {
+        const updated = configWithEntries([
+            existingEntry,
+            {
+                condition: [
+                    {
+                        domain: [
+                            'icloud.com',
+                            'apple.com',
+                        ],
+                    },
+                ],
+                patchSettings: [
+                    { path: '/formBoundarySelector', op: 'replace', value: '#sign_in_form' },
+                ],
+            },
+        ]);
+
+        const result = evaluateSiteSpecificFixesChange(base, updated);
+
+        expect(result.approved).to.equal(false);
+        expect(result.reasons.join(' ')).to.include('not scoped to specific domains');
+    });
+
+    describe('changes outside the subfeature settings', () => {
+        const siteFix = {
+            condition: [
+                { domain: 'icloud.com' },
+            ],
+            patchSettings: [
+                { path: '/formBoundarySelector', op: 'replace', value: '#sign_in_form' },
+            ],
+        };
+        const withFix = configWithEntries([
+            existingEntry,
+            siteFix,
+        ]);
+        const fixPatch = {
+            op: 'add',
+            path: '/features/autofill/features/siteSpecificFixes/settings/conditionalChanges/1',
+            value: siteFix,
+        };
+
+        for (const [
+            label,
+            patch,
+        ] of [
+            [
+                'disabling the subfeature',
+                { op: 'replace', path: '/features/autofill/features/siteSpecificFixes/state', value: 'disabled' },
+            ],
+            [
+                'adding a rollout',
+                {
+                    op: 'add',
+                    path: '/features/autofill/features/siteSpecificFixes/rollout',
+                    value: {
+                        steps: [
+                            { percent: 1 },
+                        ],
+                    },
+                },
+            ],
+            [
+                'adding a minSupportedVersion',
+                { op: 'add', path: '/features/autofill/features/siteSpecificFixes/minSupportedVersion', value: 1 },
+            ],
+            [
+                'adding a sibling subfeature with a shared prefix',
+                { op: 'add', path: '/features/autofill/features/siteSpecificFixesV2', value: { state: 'enabled' } },
+            ],
+        ]) {
+            it(`requires review for ${label}, even alongside a valid site fix`, () => {
+                const result = analyzePatchesForApproval(
+                    [
+                        fixPatch,
+                        patch,
+                    ],
+                    { baseConfig: base, updatedConfig: withFix },
+                );
+
+                expect(result.shouldApprove).to.equal(false);
+                expect(result.disallowedPatches).to.deep.equal([
+                    patch,
+                ]);
+            });
+        }
+    });
 });
