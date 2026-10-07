@@ -92,6 +92,8 @@ type FieldRead =
           path?: string;
           args?: Arg[];
           feature?: 'wordCount' | 'renderedTextLength';
+          /** Lets this read run accessors' getters. Without it, a read takes data values only. */
+          allowGetter?: boolean;
       };
 
 type TypeName = 'number' | 'string' | 'boolean' | 'null' | 'undefined' | 'array' | 'object';
@@ -135,6 +137,11 @@ type ItemKeys = {
     where?: Predicate;
     /** The value read from each item that passes `where`. */
     field?: FieldRead;
+    /**
+     * Lets every read the source makes run accessors' getters: `path`, `where`, `field`, and an
+     * `is` on the source expression. Without it, a read takes data values only.
+     */
+    allowGetter?: boolean;
 };
 
 export type ElementBody = ConditionTypes['element'] & Root & ItemKeys;
