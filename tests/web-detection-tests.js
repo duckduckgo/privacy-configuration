@@ -400,6 +400,8 @@ describe('webDetection config tests', () => {
     });
 
     describe('eventHub cross-reference', () => {
+        const TEMP_EVENT_TYPE_PREFIX = 'temp_';
+
         // Features whose subfeatures may declare experiment metrics that consume events
         // (see tests/experiment-metrics-tests.js).
         const METRIC_PARENTS = [
@@ -439,6 +441,8 @@ describe('webDetection config tests', () => {
                         ] of Object.entries(groupDetectors)) {
                             const type = detector.actions?.fireEvent?.type;
                             if (type === undefined) continue;
+                            // `temp_` types are placeholders for detectors whose eventHub telemetry is not defined yet (for example, during experiments)
+                            if (type.startsWith(TEMP_EVENT_TYPE_PREFIX)) continue;
                             expect(knownConsumers.has(type)).to.equal(
                                 true,
                                 `Detector '${groupName}.${detectorName}' fires event type '${type}' but no eventHub parameter source or experiment metric event consumes '${type}' (known consumers: ${[
