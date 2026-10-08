@@ -35,7 +35,7 @@ Reference tests: [privacy-reference-tests](https://github.com/duckduckgo/privacy
       - `domain`: top level URL
       - `reason`: [removed from [v4](https://app.asana.com/1/137249556945/project/1200890834746050/task/1205680646032200?focus=true) onwards and should not be relied upon] the reason for the exception
     - `minSupportedVersion`: Minimum platform version for which this feature should be enabled. (Android uses numbers, others use strings)
-    - `maxSupportedVersion`: Maximum platform version for which this feature should be enabled, inclusive. Same format as `minSupportedVersion`. See the [change log](./remote-configuration-change-log.md) for the gating rule.
+    - `maxSupportedVersion`: Maximum platform version for which this feature should be enabled, inclusive. Same format as `minSupportedVersion`. Added in v6.
     - `features`: Some features have sub-features.
       - `state`: same as parent features.
           - ⚠️ unclear if a disabled feature should make a sub-feature disabled (Android/Extensions does not but iOS/macOS and Windows does).

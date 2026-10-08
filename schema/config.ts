@@ -64,9 +64,9 @@ export type ExportedSchemas =
     | 'AttributedMetricsFeature';
 
 /**
- * Defines the structure of the built V5 config output as downloaded by clients.
+ * Defines the structure of the built V6 config output as downloaded by clients.
  */
-export type ConfigV5<VersionType> = {
+export type ConfigV6<VersionType> = {
     readme: string;
     version: number;
     features: Record<string, Feature<any, VersionType>> & {
@@ -128,7 +128,7 @@ export type ConfigV5<VersionType> = {
  *  - Uses integer version numbers for minSupportedVersion
  *  - Adds 'experimentalVariants' top level property
  */
-export type AndroidCurrentConfig = ConfigV5<number> & {
+export type AndroidCurrentConfig = ConfigV6<number> & {
     experimentalVariants: {
         variants: {
             desc: string;
@@ -145,7 +145,7 @@ export type AndroidCurrentConfig = ConfigV5<number> & {
  * Generic spec: covers mac, iOS, windows and extension configs
  *  - Use string version numbers for minSupportedVersion
  */
-export type CurrentGenericConfig = ConfigV5<string>;
+export type CurrentGenericConfig = ConfigV6<string>;
 
 export type LegacyConfig = CurrentGenericConfig;
 export type LegacyAndroidConfig = AndroidCurrentConfig;

@@ -157,4 +157,25 @@ export const compatFunctions = {
         }
         return v4Config;
     },
+    v5: (config) => {
+        // Breaking changes: maxSupportedVersion key in features and sub-features
+
+        const v5Config = JSON.parse(JSON.stringify(config));
+        for (const feature of Object.values(v5Config.features)) {
+            if ('maxSupportedVersion' in feature) {
+                delete feature.maxSupportedVersion;
+                feature.state = 'disabled';
+            }
+
+            if (feature.features) {
+                for (const subFeature of Object.values(feature.features)) {
+                    if ('maxSupportedVersion' in subFeature) {
+                        delete subFeature.maxSupportedVersion;
+                        subFeature.state = 'disabled';
+                    }
+                }
+            }
+        }
+        return v5Config;
+    },
 };

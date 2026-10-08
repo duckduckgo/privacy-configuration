@@ -11,14 +11,15 @@ Unless otherwise noted, each change in a version can be optionally implemented. 
 
 ## Version History
 
+### v6
+- `maxSupportedVersion` (Required Support): added to features and sub-features. If present, the corresponding feature should not be enabled if the platform version is above this value. A platform version equal to the value is supported.
+  - Earlier config versions remove the key and set the feature or sub-feature to `disabled`.
+
 ### v5 ([PR #3358](https://github.com/duckduckgo/privacy-configuration/pull/3358))
 - `preview` added as a possible state for features and sub-features.
   - For release channels, this should be considered as disabled.
   - If the platform has a preview channel, consider making it enabled.
   - Support for v5 is ensuring that release doesn't get enabled when preview is set.
-- `maxSupportedVersion` (Optional Support): added to features and sub-features. If present, the corresponding feature should not be enabled if the platform version is above this value. The comparison is inclusive: a platform version equal to the value is supported.
-  - Clients that do not implement it ignore the key. Config that sets `maxSupportedVersion` must also set `minSupportedVersion` on the same object, at or above the platform's first release that implements it.
-  - A platform adds that release to `maxSupportedVersionSince` in `tests/config-tests.js` when it ships support. The tests reject `maxSupportedVersion` on platforms without an entry.
 
 ### v4 ([PR #1325](https://github.com/duckduckgo/privacy-configuration/pull/1325))
 - `reason` fields stripped from generated output.
