@@ -103,11 +103,6 @@ const DOMAIN_PATCH_OPS = [
 ];
 
 /**
- * List of auto-approvable feature paths for summary generation
- */
-export const AUTO_APPROVABLE_FEATURE_PATHS = Object.keys(AUTO_APPROVABLE_FEATURES);
-
-/**
  * Checks whether a path is the given path or sits beneath it
  * @param {string} patchPath - The path to check
  * @param {string} parentPath - The path it may sit under
@@ -371,20 +366,16 @@ function stableStringify(value) {
 }
 
 /**
- * Resolves a JSON pointer against an object
+ * Reads the value at a path such as `/features/autofill`
  * @param {Object} obj - The object to read from
- * @param {string} pointer - A JSON pointer such as `/features/autofill`
- * @returns {*} The value at the pointer, or undefined if it does not exist
+ * @param {string} path - A slash-separated path from the root
+ * @returns {*} The value at the path, or undefined if it does not exist
  */
-export function getAtPath(obj, pointer) {
-    if (pointer === '') {
-        return obj;
-    }
-    return pointer
-        .slice(1)
+function getAtPath(obj, path) {
+    return path
         .split('/')
-        .map((segment) => segment.replace(/~1/g, '/').replace(/~0/g, '~'))
-        .reduce((node, segment) => (node && typeof node === 'object' ? node[segment] : undefined), obj);
+        .slice(1)
+        .reduce((node, key) => node?.[key], obj);
 }
 
 /**
@@ -471,37 +462,29 @@ function hasIndexablePatchOperations(patchSettings) {
 }
 
 /**
- * Pairs up identical entries between two arrays, ignoring order, and returns
- * the ones left over on each side.
- * @param {Array} baseEntries - Entries before the change
- * @param {Array} updatedEntries - Entries after the change
- * @returns {Array<{change: 'add'|'remove', entry: *, index: number}>} The added and removed entries
+ * Returns the entries that have no identical counterpart in the other array,
+ * ignoring order.
+ * @param {Array} entries - Entries to report
+ * @param {Array} otherEntries - Entries to match them against
+ * @param {'add'|'remove'} change - The change an unmatched entry represents
+ * @returns {Array<{change: 'add'|'remove', entry: *, index: number}>} The unmatched entries
  */
-function diffEntries(baseEntries, updatedEntries) {
-    const countHashes = (entries) => {
-        const counts = new Map();
-        for (const entry of entries) {
-            const hash = stableStringify(entry);
-            counts.set(hash, (counts.get(hash) || 0) + 1);
+function unmatchedEntries(entries, otherEntries, change) {
+    const counts = new Map();
+    for (const entry of otherEntries) {
+        const hash = stableStringify(entry);
+        counts.set(hash, (counts.get(hash) || 0) + 1);
+    }
+    return entries.flatMap((entry, index) => {
+        const hash = stableStringify(entry);
+        if (counts.get(hash) > 0) {
+            counts.set(hash, counts.get(hash) - 1);
+            return [];
         }
-        return counts;
-    };
-    const collectUnmatched = (entries, otherCounts, change) =>
-        entries.flatMap((entry, index) => {
-            const hash = stableStringify(entry);
-            if (otherCounts.get(hash) > 0) {
-                otherCounts.set(hash, otherCounts.get(hash) - 1);
-                return [];
-            }
-            return [
-                { change, entry, index },
-            ];
-        });
-
-    return [
-        ...collectUnmatched(baseEntries, countHashes(updatedEntries), 'remove'),
-        ...collectUnmatched(updatedEntries, countHashes(baseEntries), 'add'),
-    ];
+        return [
+            { change, entry, index },
+        ];
+    });
 }
 
 /**
@@ -539,7 +522,11 @@ export function indexDomainPatches(patches, baseConfig, updatedConfig) {
             const entriesPath = `${featurePath}/settings/${entryKey}`;
             indexedPaths.push(entriesPath);
 
-            for (const { change, entry, index } of diffEntries(baseEntries, updatedEntries)) {
+            const changedEntries = [
+                ...unmatchedEntries(baseEntries, updatedEntries, 'remove'),
+                ...unmatchedEntries(updatedEntries, baseEntries, 'add'),
+            ];
+            for (const { change, entry, index } of changedEntries) {
                 const domains = getScopedDomains(entry, entryKey);
                 if (domains && hasIndexablePatchOperations(entry.patchSettings)) {
                     for (const operation of entry.patchSettings) {
