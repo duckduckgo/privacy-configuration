@@ -27,8 +27,6 @@ const EXPRESSION_KEYS = [
     'only',
     'sum',
     'mul',
-    'min',
-    'max',
     'sub',
     'div',
     'if',
@@ -131,7 +129,8 @@ const PAYLOAD_FIELD_KEYS = [
 /**
  * Every name an `api` may read: each prefix of the `path`, and the path joined by `.` to each
  * name a `field` path or a predicate reads from its items or values. A `method` is called
- * through `args`, as the last name of a path; a `property` is read.
+ * through `args`, as the last name of a path, or read as a function before `apply` or `call`, or
+ * as the last name of an `args` entry; a `property` is read.
  *
  * C-S-S reads any name config gives, so this list is the review point. A detector reading a name
  * not listed adds it here in the same change. Names reading user data or URLs, such as
@@ -140,6 +139,11 @@ const PAYLOAD_FIELD_KEYS = [
  * @type {Record<string, 'method' | 'property'>}
  */
 const API_ALLOWLIST = {
+    Math: 'property',
+    'Math.max': 'method',
+    'Math.max.apply': 'method',
+    'Math.min': 'method',
+    'Math.min.apply': 'method',
     document: 'property',
     'document.fonts': 'property',
     'document.fonts.status': 'property',
@@ -163,6 +167,24 @@ const API_ALLOWLIST = {
     'performance.getEntriesByType.type': 'property',
     'performance.now': 'method',
 };
+
+/**
+ * The type each JS builtin on API_ALLOWLIST returns. The tables from WebIDL do not cover them.
+ *
+ * @type {Record<string, TypeName>}
+ */
+const BUILTIN_RETURN_TYPES = {
+    'Math.max': 'number',
+    'Math.max.apply': 'number',
+    'Math.min': 'number',
+    'Math.min.apply': 'number',
+};
+
+/** Names that read the method before them as a function. */
+const FUNCTION_READS = [
+    'apply',
+    'call',
+];
 
 /**
  * Methods a `field` may call on `element` items, with the IDL type each returns. Each leaves the
@@ -1036,6 +1058,7 @@ function describeInterfaces(interfaces) {
  * @typedef {{
  *   mode: 'collect' | 'check' | 'dry',
  *   errors: string[],
+ *   argumentApis: WeakSet<object>,
  *   structuralErrors: string[],
  *   names: Map<string, { node: Record<string, any>, path: string, branch: string[] }>,
  *   dependencies: Map<string, Set<string>>,
@@ -1112,7 +1135,7 @@ function valueNode(node) {
 }
 
 /**
- * Whether an operand of `any`, `all`, `none`, `sum`, `mul`, `min` or `max` is in spread position,
+ * Whether an operand of `any`, `all`, `none`, `sum` or `mul` is in spread position,
  * contributing each item of a list: a source, or a ref to one. Under `any`, `all` and `none`,
  * `element` without `field` and `text` are presence leaves, booleans.
  *
@@ -1363,9 +1386,7 @@ function checkExprKey(key, body, position, scope, ctx, path, owner) {
             return type;
         }
         case 'sum':
-        case 'mul':
-        case 'min':
-        case 'max': {
+        case 'mul': {
             expectPosition(ctx, path, `\`${key}\``, position, [
                 'value',
                 'number',
@@ -1663,7 +1684,7 @@ function checkConditionSource(key, branch, position, scope, ctx, path, owner) {
             if (selectorNamesCustomElement(body.selector)) itemType.customElement = true;
             if ('where' in body)
                 checkPredicate(body.where, 'item', itemType, { ...child(scope), underNone: false }, ctx, `${bodyPath}.where`);
-            valueTypes.push('field' in body ? checkFieldRead(body.field, itemType, ctx, `${bodyPath}.field`) : itemType);
+            valueTypes.push('field' in body ? checkFieldRead(body.field, itemType, scope, ctx, `${bodyPath}.field`) : itemType);
         }
         if ('root' in body) {
             const rootPath = `${bodyPath}.root`;
@@ -1764,39 +1785,60 @@ function checkApi(body, position, scope, ctx, path) {
         fail(ctx, `${path}.path`, '`path` is a non-empty string');
         return UNKNOWN;
     }
-    if ('args' in body) checkArgs(body.args, ctx, `${path}.args`);
     const names = body.path.split('.');
+    const asArgument = ctx.argumentApis.has(body);
     /** @type {StaticType} */
     let read;
     if ('root' in body) {
         const rootPath = `${path}.root`;
         read = checkExpr(body.root, 'root', child(scope), ctx, rootPath);
-        if (read.apiPaths === undefined && !read.interfaces) {
+        // `concat` and an item read on a list root add no name
+        const addsNoName =
+            read.list !== undefined &&
+            names.length === 1 &&
+            'args' in body &&
+            (names[0] === 'concat' || readsItem(names[0], true, body.args));
+        if (read.apiPaths === undefined && !read.interfaces && !addsNoName) {
             fail(ctx, rootPath, 'CI names what `path` reads by the root’s `api` names or element type, and this root has neither');
             read = UNKNOWN;
         }
+    }
+    const argTypes = 'args' in body ? checkArgs(body.args, scope, ctx, `${path}.args`) : undefined;
+    if ('root' in body) {
         names.forEach((name, index) => {
-            const isCall = 'args' in body && index === names.length - 1;
-            read = readName(read, name, isCall, ctx, `${path}.path`, body.args);
+            const last = index === names.length - 1;
+            const isCall = 'args' in body && last;
+            read = readName(read, name, isCall, ctx, `${path}.path`, body.args, {
+                next: names[index + 1],
+                argTypes: isCall ? argTypes : undefined,
+                asArgument: asArgument && last,
+            });
         });
     } else {
         names.forEach((_, index) => {
-            const isCall = 'args' in body && index === names.length - 1;
-            checkApiName(names.slice(0, index + 1).join('.'), isCall, ctx, `${path}.path`);
+            const last = index === names.length - 1;
+            const isCall = 'args' in body && last;
+            checkApiName(names.slice(0, index + 1).join('.'), isCall, ctx, `${path}.path`, names[index + 1], asArgument && last);
         });
+        const returns = 'args' in body && Object.hasOwn(BUILTIN_RETURN_TYPES, body.path) ? BUILTIN_RETURN_TYPES[body.path] : undefined;
         read = {
-            types: null,
-            nan: false,
+            types: returns
+                ? [
+                      returns,
+                  ]
+                : null,
+            nan: returns === 'number',
             apiPaths: [
                 body.path,
             ],
         };
+        if (argTypes) checkCallArgs(body.path, body.args, argTypes, ctx, `${path}.args`);
     }
     const itemType = itemOf(read);
     if (hasWhere) checkPredicate(body.where, 'item', itemType, { ...child(scope), underNone: false }, ctx, `${path}.where`);
-    const valueType = 'field' in body ? checkFieldRead(body.field, itemType, ctx, `${path}.field`) : itemType;
-    // `field` gives a list when `path` reads one, which config does not show
-    const list = hasWhere ? 'selected' : 'field' in body ? 'maybe' : undefined;
+    const valueType = 'field' in body ? checkFieldRead(body.field, itemType, scope, ctx, `${path}.field`) : itemType;
+    // `field` gives a list when `path` reads one, which config does not show, and `concat` gives an array
+    const list = hasWhere ? 'selected' : 'field' in body || read.list !== undefined ? 'maybe' : undefined;
     if (position === 'boolean') {
         if (!allows(valueType, 'boolean'))
             fail(ctx, path, `boolean position takes a boolean, and config types the value as ${describeType(valueType)}`);
@@ -1806,42 +1848,121 @@ function checkApi(body, position, scope, ctx, path) {
 }
 
 /**
- * Check one name an `api` reads: listed, and called exactly when it is a method.
+ * Check one name an `api` reads: listed, and called exactly when it is a method. A method is also
+ * read as a function before `apply` or `call`, and as the last name of an `args` entry, where its
+ * listing as a method names the function the receiving method may call.
  *
  * @param {string} name
  * @param {boolean} isCall
  * @param {Context} ctx
  * @param {string} path
+ * @param {string} [next] - the name read after it
+ * @param {boolean} [asArgument] - whether the value is an `args` entry
  */
-function checkApiName(name, isCall, ctx, path) {
+function checkApiName(name, isCall, ctx, path, next, asArgument = false) {
     const kind = Object.hasOwn(API_ALLOWLIST, name) ? API_ALLOWLIST[name] : undefined;
     if (!kind) {
         fail(ctx, path, `\`api\` reads "${name}", which is not in API_ALLOWLIST`);
     } else if (isCall && kind !== 'method') {
         fail(ctx, path, `calls "${name}", which API_ALLOWLIST records as a ${kind}`);
-    } else if (!isCall && kind === 'method') {
-        fail(ctx, path, `reads the method "${name}" without calling it; a method is called through \`args\`, as the last name of a path`);
+    } else if (!isCall && kind === 'method' && !asArgument && !(next !== undefined && FUNCTION_READS.includes(next))) {
+        fail(
+            ctx,
+            path,
+            `reads the method "${name}" without calling it; a method is called through \`args\`, as the last name of a path, or read before \`apply\` or \`call\``,
+        );
     }
 }
 
 /**
+ * Check `args`, and return the type of each entry.
+ *
  * @param {unknown} args
+ * @param {Scope} scope
+ * @param {Context} ctx
+ * @param {string} path
+ * @returns {StaticType[]}
+ */
+function checkArgs(args, scope, ctx, path) {
+    if (!Array.isArray(args)) {
+        fail(ctx, path, '`args` is an array');
+        return [];
+    }
+    return args.map((arg, index) => checkArg(arg, scope, ctx, `${path}[${index}]`));
+}
+
+/**
+ * An `args` entry: a literal, an expression in value position, or an array of entries.
+ *
+ * @param {unknown} arg
+ * @param {Scope} scope
+ * @param {Context} ctx
+ * @param {string} path
+ * @returns {StaticType}
+ */
+function checkArg(arg, scope, ctx, path) {
+    if (arg === null) return typeOf('null');
+    if (typeof arg === 'string' || typeof arg === 'number' || typeof arg === 'boolean') return typeOf(typeof arg);
+    if (Array.isArray(arg)) {
+        // An array is typed as a list of its entries, as `apply` and `concat` read it
+        const entries = arg.map((entry, index) => checkArg(entry, scope, ctx, `${path}[${index}]`));
+        return { ...(entries.length ? mergeTypes(entries.map(itemOf)) : UNKNOWN), list: 'maybe' };
+    }
+    if (isPlainObject(arg)) {
+        if (isPlainObject(arg.api)) ctx.argumentApis.add(arg.api);
+        return checkExpr(arg, 'value', child(scope), ctx, path);
+    }
+    fail(ctx, path, '`args` entries are literals, expressions and arrays');
+    return UNKNOWN;
+}
+
+/**
+ * Whether an `apply` list is one config shows is a list: a selected list, an array in `args`, or
+ * `Array.from`, `Array.of` or `concat` over one. `apply` over any other value, such as `null` or
+ * a `FontFaceSet`, passes no arguments.
+ *
+ * @param {unknown} arg
+ * @param {StaticType | undefined} type
+ * @returns {boolean}
+ */
+function isApplyList(arg, type) {
+    if (Array.isArray(arg) || type?.list !== undefined) return true;
+    if (!isPlainObject(arg) || !isPlainObject(arg.api) || typeof arg.api.path !== 'string') return false;
+    const path = arg.api.path;
+    return path === 'Array.from' || path === 'Array.of' || path.endsWith('.concat.call');
+}
+
+/**
+ * Check the arguments of a call config can type: the list `apply` takes, a string `JSON.parse`
+ * parses, and the numbers `Math.max` and `Math.min` take.
+ *
+ * @param {string} apiPath
+ * @param {unknown[]} args
+ * @param {StaticType[]} argTypes
  * @param {Context} ctx
  * @param {string} path
  */
-function checkArgs(args, ctx, path) {
-    const ok =
-        Array.isArray(args) &&
-        args.every(
-            (arg) =>
-                arg === null ||
-                [
-                    'string',
-                    'number',
-                    'boolean',
-                ].includes(typeof arg),
-        );
-    if (!ok) fail(ctx, path, '`args` is an array of strings, numbers, booleans and null');
+function checkCallArgs(apiPath, args, argTypes, ctx, path) {
+    const isApply = apiPath.endsWith('.apply');
+    if (isApply && !isApplyList(args[1], argTypes[1])) {
+        fail(ctx, `${path}[1]`, '`apply` takes its arguments as a selected list, an array in `args`, or `Array.from` or `concat` over one');
+    }
+    if (apiPath === 'JSON.parse' && typeof args[0] === 'string') {
+        try {
+            JSON.parse(args[0]);
+        } catch {
+            fail(ctx, `${path}[0]`, 'the string passed to `JSON.parse` does not parse');
+        }
+    }
+    const method = isApply ? apiPath.slice(0, -'.apply'.length) : apiPath;
+    if (method !== 'Math.max' && method !== 'Math.min') return;
+    const numbers = isApply ? argTypes.slice(1, 2).map(itemOf) : argTypes;
+    numbers.forEach((type, index) => {
+        const argPath = `${path}[${isApply ? 1 : index}]`;
+        if (!isApply && type.list === 'selected') fail(ctx, argPath, `\`${method}\` takes numbers; \`${method}.apply\` takes a list`);
+        else if (!allows(type, 'number'))
+            fail(ctx, argPath, `\`${method}\` takes numbers, and config types the value as ${describeType(type)}`);
+    });
 }
 
 /**
@@ -1849,11 +1970,12 @@ function checkArgs(args, ctx, path) {
  *
  * @param {unknown} field
  * @param {StaticType} subject
+ * @param {Scope} scope
  * @param {Context} ctx
  * @param {string} path
  * @returns {StaticType}
  */
-function checkFieldRead(field, subject, ctx, path) {
+function checkFieldRead(field, subject, scope, ctx, path) {
     /** @type {Record<string, any>} */
     let read;
     if (typeof field === 'string') {
@@ -1876,10 +1998,14 @@ function checkFieldRead(field, subject, ctx, path) {
             fail(ctx, path, '`path` is a non-empty string');
             return UNKNOWN;
         }
-        if (read.args !== undefined) checkArgs(read.args, ctx, `${path}.args`);
+        const argTypes = read.args !== undefined ? checkArgs(read.args, scope, ctx, `${path}.args`) : undefined;
         const names = read.path.split('.');
         names.forEach((name, index) => {
-            current = readName(current, name, read.args !== undefined && index === names.length - 1, ctx, path, read.args);
+            const isCall = read.args !== undefined && index === names.length - 1;
+            current = readName(current, name, isCall, ctx, path, read.args, {
+                next: names[index + 1],
+                argTypes: isCall ? argTypes : undefined,
+            });
         });
     }
     if (read.feature !== undefined) {
@@ -1922,12 +2048,23 @@ function readsItem(name, isCall, args) {
  * @param {Context} ctx
  * @param {string} path
  * @param {unknown} [args] - when `isCall`, the arguments
+ * @param {{ next?: string, argTypes?: StaticType[], asArgument?: boolean }} [options] - the name read after it, the type of each argument, and whether the value is an `args` entry
  * @returns {StaticType}
  */
-function readName(current, name, isCall, ctx, path, args) {
+function readName(current, name, isCall, ctx, path, args, options = {}) {
     if (name === '') {
         fail(ctx, path, 'a path has an empty name');
         return UNKNOWN;
+    }
+    if (isCall && name === 'concat' && (current.list !== undefined || current.apiPaths !== undefined)) {
+        // `concat` joins lists, and each item keeps the name and type of its list
+        return {
+            ...mergeTypes([
+                itemOf(current),
+                ...(options.argTypes ?? []).map(itemOf),
+            ]),
+            list: 'maybe',
+        };
     }
     const item = readsItem(name, isCall, args);
     if (current.list === 'selected') {
@@ -1942,13 +2079,13 @@ function readName(current, name, isCall, ctx, path, args) {
         // Branches reading an `api` and branches giving an element: check the name both ways
         const { apiPaths, ...element } = current;
         return mergeTypes([
-            readName({ types: null, nan: false, apiPaths }, name, isCall, ctx, path, args),
-            readName(element, name, isCall, ctx, path, args),
+            readName({ types: null, nan: false, apiPaths }, name, isCall, ctx, path, args, options),
+            readName(element, name, isCall, ctx, path, args, options),
         ]);
     }
     if (current.apiPaths !== undefined) {
         const apiPaths = current.apiPaths.map((apiPath) => `${apiPath}.${name}`);
-        for (const apiPath of apiPaths) checkApiName(apiPath, isCall, ctx, path);
+        for (const apiPath of apiPaths) checkApiName(apiPath, isCall, ctx, path, options.next, options.asArgument);
         return { types: null, nan: false, apiPaths };
     }
     // The tables do not type the items of an IDL sequence
@@ -2045,12 +2182,12 @@ function checkPredicate(predicate, level, subject, scope, ctx, path) {
             const entryScope = { ...scope, underNone: scope.underNone || key === 'none' };
             for (const entry of asArray(value)) checkPredicate(entry, level, subject, entryScope, ctx, keyPath);
         } else if (key === 'field') {
-            const read = checkFieldRead(value, subject, ctx, keyPath);
+            const read = checkFieldRead(value, subject, scope, ctx, keyPath);
             if ('is' in predicate) checkPredicate(predicate.is, 'value', read, scope, ctx, `${path}.is`);
         } else if (key === 'is' || operators.includes(key)) {
             continue;
         } else {
-            const read = checkFieldRead(key, subject, ctx, keyPath);
+            const read = checkFieldRead(key, subject, scope, ctx, keyPath);
             checkPredicate(value, 'value', read, scope, ctx, keyPath);
         }
     }
@@ -2432,6 +2569,7 @@ function validateDetector(detector, path) {
     const ctx = {
         mode: 'collect',
         errors: [],
+        argumentApis: new WeakSet(),
         structuralErrors: [],
         names: new Map(),
         dependencies: new Map(),
@@ -3531,9 +3669,9 @@ describe('webDetection config tests', () => {
 
             it('places lists of values under operators', () => {
                 expectValid({ all: fieldOf('img', 'complete') });
-                expectValid({ max: fieldOf('img', 'naturalWidth'), is: { gt: 100 } });
+                expectValid({ sum: fieldOf('img', 'naturalWidth'), is: { gt: 100 } });
                 expectError('`all` takes booleans', { all: fieldOf('img', 'naturalWidth') });
-                expectError('`max` takes numbers', { max: fieldOf('img', 'src'), is: { gt: 0 } });
+                expectError('`sum` takes numbers', { sum: fieldOf('img', 'src'), is: { gt: 0 } });
                 expectError('number position takes a number', {
                     sub: [
                         fieldOf('img', 'src'),
@@ -3581,7 +3719,7 @@ describe('webDetection config tests', () => {
                     is: { gt: 0 },
                 });
                 expectError('`sum` takes numbers, and config types the values as object', { sum: img, is: { gt: 0 } });
-                expectError('`max` takes numbers, and config types the values as string', { max: text, is: { gt: 0 } });
+                expectError('`mul` takes numbers, and config types the values as string', { mul: text, is: { gt: 0 } });
             });
 
             it('tests a selected list’s one item under a predicate that compares, and the list as an array under any other', () => {
@@ -3645,6 +3783,129 @@ describe('webDetection config tests', () => {
                 expectError('unknown `field` key "allowGetter"', {
                     ...fieldOf('img', { path: 'naturalWidth', allowGetter: true }),
                     is: { gt: 0 },
+                });
+            });
+
+            it('checks expression `args`, and the calls config can type', () => {
+                const widths = fieldOf('img', 'naturalWidth');
+                const maxOf = (/** @type {unknown} */ list) => ({
+                    api: {
+                        path: 'Math.max.apply',
+                        args: [
+                            null,
+                            list,
+                        ],
+                    },
+                });
+                expectValid({ ...maxOf(widths), is: { gt: 100 } });
+                expectValid({
+                    ...maxOf({
+                        api: {
+                            root: widths,
+                            path: 'concat',
+                            args: [
+                                100,
+                            ],
+                        },
+                    }),
+                    is: { gt: 0 },
+                });
+                expectValid({
+                    ...maxOf({
+                        api: {
+                            path: 'performance.getEntriesByType',
+                            args: [
+                                'resource',
+                            ],
+                            field: 'duration',
+                        },
+                    }),
+                    is: { gt: 0 },
+                });
+                expectValid({
+                    ...maxOf([
+                        1,
+                        { count: img },
+                    ]),
+                    is: { gt: 0 },
+                });
+                expectValid({
+                    all: [
+                        { ...imgCount, as: 'images', is: { gt: 0 } },
+                        {
+                            api: {
+                                path: 'Math.max',
+                                args: [
+                                    { ref: 'images' },
+                                    1,
+                                ],
+                            },
+                            is: { gt: 0 },
+                        },
+                    ],
+                });
+                expectError('`apply` takes its arguments as a selected list', { ...maxOf(5), is: {} });
+                expectError('`apply` takes its arguments as a selected list', { ...maxOf({ api: { path: 'document.title' } }), is: {} });
+                expectError('`Math.max` takes numbers, and config types the value as string', { ...maxOf(fieldOf('img', 'src')), is: {} });
+                expectError('`Math.max.apply` takes a list', {
+                    api: {
+                        path: 'Math.max',
+                        args: [
+                            widths,
+                        ],
+                    },
+                    is: {},
+                });
+                expectError('boolean position takes a boolean, and config types the value as number', maxOf(widths));
+                expectError('reads the method "Math.max" without calling it', { api: { path: 'Math.max' }, is: {} });
+                expectError('unknown expression key "composed"', {
+                    api: {
+                        path: 'Math.max',
+                        args: [
+                            { composed: true },
+                        ],
+                    },
+                    is: {},
+                });
+                expectError('`args` is an array', { api: { path: 'Math.max', args: 1 }, is: {} });
+                expectError('does not parse', {
+                    api: {
+                        path: 'JSON.parse',
+                        args: [
+                            '{',
+                        ],
+                    },
+                    is: {},
+                });
+            });
+
+            it('reads a method as a function in an `args` entry, named as its own call', () => {
+                expectValid({
+                    api: {
+                        path: 'Math.max',
+                        args: [
+                            { api: { path: 'performance.now' } },
+                        ],
+                    },
+                    is: {},
+                });
+                expectError('"Math.round", which is not in API_ALLOWLIST', {
+                    api: {
+                        path: 'Math.max',
+                        args: [
+                            { api: { path: 'Math.round' } },
+                        ],
+                    },
+                    is: {},
+                });
+                expectError('reads the method "performance.now" without calling it', {
+                    api: {
+                        path: 'Math.max',
+                        args: [
+                            { count: { api: { path: 'performance.now' } } },
+                        ],
+                    },
+                    is: {},
                 });
             });
 
