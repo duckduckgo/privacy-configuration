@@ -1240,6 +1240,12 @@ function checkExpr(node, position, scope, ctx, path) {
         ]);
         return typeOf('boolean');
     }
+    if (typeof node === 'string' || node === null) {
+        expectPosition(ctx, path, typeof node === 'string' ? 'A string' : '`null`', position, [
+            'value',
+        ]);
+        return typeOf(node === null ? 'null' : 'string');
+    }
     if (Array.isArray(node)) {
         expectPosition(ctx, path, 'An array, the OR of its entries,', position, [
             'boolean',
@@ -1892,7 +1898,7 @@ function checkArgs(args, scope, ctx, path) {
 }
 
 /**
- * An `args` entry: a literal, an expression in value position, or an array of entries.
+ * An `args` entry: an expression in value position, or an array of entries.
  *
  * @param {unknown} arg
  * @param {Scope} scope
@@ -1901,19 +1907,13 @@ function checkArgs(args, scope, ctx, path) {
  * @returns {StaticType}
  */
 function checkArg(arg, scope, ctx, path) {
-    if (arg === null) return typeOf('null');
-    if (typeof arg === 'string' || typeof arg === 'number' || typeof arg === 'boolean') return typeOf(typeof arg);
     if (Array.isArray(arg)) {
         // An array is typed as a list of its entries, as `apply` and `concat` read it
         const entries = arg.map((entry, index) => checkArg(entry, scope, ctx, `${path}[${index}]`));
         return { ...(entries.length ? mergeTypes(entries.map(itemOf)) : UNKNOWN), list: 'maybe' };
     }
-    if (isPlainObject(arg)) {
-        if (isPlainObject(arg.api)) ctx.argumentApis.add(arg.api);
-        return checkExpr(arg, 'value', child(scope), ctx, path);
-    }
-    fail(ctx, path, '`args` entries are literals, expressions and arrays');
-    return UNKNOWN;
+    if (isPlainObject(arg) && isPlainObject(arg.api)) ctx.argumentApis.add(arg.api);
+    return checkExpr(arg, 'value', child(scope), ctx, path);
 }
 
 /**
@@ -2206,12 +2206,7 @@ function checkOperators(predicate, subject, scope, ctx, path) {
     /** @param {string} key */
     const has = (key) => Object.hasOwn(predicate, key);
 
-    if (has('eq')) {
-        const operand = predicate.eq;
-        if (!(operand === null || typeof operand === 'string' || typeof operand === 'boolean')) {
-            checkExpr(operand, 'number', child(scope), ctx, `${path}.eq`);
-        }
-    }
+    if (has('eq')) checkExpr(predicate.eq, 'value', child(scope), ctx, `${path}.eq`);
     const comparisons = COMPARISON_OPERATORS.filter(has);
     for (const key of comparisons) checkExpr(predicate[key], 'number', child(scope), ctx, `${path}.${key}`);
 
@@ -3588,6 +3583,27 @@ describe('webDetection config tests', () => {
                     ],
                     is: { gt: 0 },
                 });
+            });
+
+            it('takes string and null literals in value position only', () => {
+                expectError('A string fills', 'x');
+                expectError('`null` fills', [
+                    null,
+                ]);
+                expectError('A string fills', {
+                    sum: [
+                        'x',
+                        1,
+                    ],
+                    is: { gt: 0 },
+                });
+                expectError('A string fills', { count: 'x', is: 1 });
+                expectError('A string fills', { count: { element: { selector: 'p' } }, is: { gt: 'x' } });
+                expectValid(true, {
+                    word: { value: { if: { test: true, then: 'yes', else: 'no' } } },
+                    state: { value: { api: { path: 'document.readyState' }, catch: { absent: null } } },
+                });
+                expectValid({ api: { path: 'document.readyState' }, is: { eq: { api: { path: 'document.readyState' } } } });
             });
 
             it('places every source and boolean expression in value position', () => {
