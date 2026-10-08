@@ -62,6 +62,7 @@ describe('Config schema tests', () => {
             it('all features should be named correctly', () => {
                 const legacyFeatures = [
                     'androidBrowserConfig',
+                    'androidNativeCrash',
                     'androidNewStateKillSwitch',
                     'windowsDownloadLink',
                     'windowsExternalPreviewReleases',
