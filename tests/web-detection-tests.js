@@ -137,6 +137,8 @@ const API_ALLOWLIST = {
     Number: 'property',
     'Number.isFinite': 'method',
     'Number.isNaN': 'method',
+    PerformanceResourceTiming: 'property',
+    'PerformanceResourceTiming.prototype': 'property',
     Reflect: 'property',
     'Reflect.has': 'method',
     document: 'property',
@@ -720,6 +722,7 @@ function forEachWebDetectionConfig(cb) {
  *   customElement?: boolean,
  *   apiPaths?: string[],
  *   list?: 'selected' | 'maybe',
+ *   nonNumericStrings?: boolean,
  * }} StaticType
  *
  * `types` is null when config does not show the type. `nan` is set when the value can be NaN.
@@ -731,6 +734,9 @@ function forEachWebDetectionConfig(cb) {
  * `list` marks a selected list, and the other keys then describe its items. `selected` is what
  * `element`, `text` and `api` with `where` give. `maybe` is a value that is a selected list on
  * some pages or branches only: an `api` with `field`, or an `if` with one list branch.
+ *
+ * `nonNumericStrings` is set when every string the value can be is a literal that converts to
+ * NaN, such as `"unsupported"`, so a comparison on it is false.
  */
 
 /** @type {StaticType} */
@@ -787,6 +793,8 @@ function mergeTypes(list) {
         merged.apiPaths = [
             ...apiPaths,
         ];
+    const withStrings = list.filter((entry) => entry.types?.includes('string'));
+    if (merged.types && withStrings.length && withStrings.every((entry) => entry.nonNumericStrings)) merged.nonNumericStrings = true;
     if (list.length && list.every((entry) => entry.list === 'selected')) merged.list = 'selected';
     else if (list.some((entry) => entry.list !== undefined)) merged.list = 'maybe';
     return merged;
@@ -1077,6 +1085,7 @@ function describeInterfaces(interfaces) {
  *   bound?: StaticType,
  *   perItem?: boolean,
  *   perItemBranch?: boolean,
+ *   noneAbove?: boolean,
  * }} Scope
  *
  * `branch` lists the `if` branches around the expression. `topOperand` is the index of the
@@ -1084,7 +1093,8 @@ function describeInterfaces(interfaces) {
  * `bound` is the type `self` reads, set inside `using`, `where` and `field`. `perItem` is set where
  * `self` reads a value per item: inside `where` and `field`, and inside a `using` beside an
  * expression that reads such a `self`. `perItemBranch` is set inside the branches of an `if` that
- * reads one.
+ * reads one. `noneAbove` is set under a `none` anywhere above, in the match tree or a predicate:
+ * `where` clears `underNone` for its own comparisons, and keeps `noneAbove`.
  */
 
 /**
@@ -1395,7 +1405,10 @@ function checkExpr(node, position, scope, ctx, path) {
             'value',
             'root',
         ]);
-        return typeOf(node === null ? 'null' : 'string');
+        if (node === null) return typeOf('null');
+        const type = typeOf('string');
+        if (Number.isNaN(Number(node))) type.nonNumericStrings = true;
+        return type;
     }
     if (Array.isArray(node)) {
         expectPosition(ctx, path, 'An array, the OR of its entries,', position, [
@@ -1610,6 +1623,7 @@ function checkExprKey(key, body, position, scope, ctx, path, owner, holder) {
                 const operandScope = {
                     ...child(scope),
                     underNone: scope.underNone || key === 'none',
+                    noneAbove: scope.noneAbove || key === 'none',
                     topOperand: scope.matchRoot && key === 'all' ? index : scope.topOperand,
                 };
                 if (providesValues(operand, 'boolean', ctx)) {
@@ -1862,7 +1876,7 @@ function checkConditionSource(key, branch, position, scope, ctx, path, owner) {
                 ctx.rooted.push({
                     root: body.root,
                     path: bodyPath,
-                    needsGuard: position !== 'boolean' || !scope.inMatch || scope.underNone || underNone,
+                    needsGuard: position !== 'boolean' || !scope.inMatch || scope.underNone || scope.noneAbove === true || underNone,
                     inMatch: scope.inMatch,
                     topOperand: scope.topOperand,
                     owner,
@@ -2420,7 +2434,7 @@ function checkPredicate(predicate, level, subject, scope, ctx, path) {
     ] of Object.entries(predicate)) {
         const keyPath = `${path}.${key}`;
         if (OPERATOR_KEYS.includes(key)) {
-            const entryScope = { ...scope, underNone: scope.underNone || key === 'none' };
+            const entryScope = { ...scope, underNone: scope.underNone || key === 'none', noneAbove: scope.noneAbove || key === 'none' };
             for (const entry of asArray(value)) checkPredicate(entry, level, subject, entryScope, ctx, keyPath);
         } else if (key === 'field') {
             const read = checkFieldRead(value, subject, scope, ctx, keyPath);
@@ -2477,10 +2491,11 @@ function checkOperators(predicate, subject, scope, ctx, path) {
     }
 
     const guard = numberGuard(predicate);
-    // `Number.isFinite` or `Number.isNaN` holding means a number, when tested before the comparisons
+    // `Number.isFinite` holding means a number, when tested before the comparisons. `Number.isNaN`
+    // holding means NaN, on which every comparison is false, so it guards nothing
     const keys = Object.keys(predicate);
     const guardsFirst = keys.indexOf('field') < Math.min(...comparisons.map((key) => keys.indexOf(key)));
-    const numberOnly = guard?.expected === true && guardsFirst;
+    const numberOnly = guard?.name === 'Number.isFinite' && guard.expected === true && guardsFirst;
     if (guard?.expected === true && listed && !listed.includes('number'))
         fail(ctx, path, `\`${guard.name}\` holding beside a \`type\` that leaves out number never holds`);
 
@@ -2491,7 +2506,8 @@ function checkOperators(predicate, subject, scope, ctx, path) {
             if (outside.length)
                 fail(ctx, path, `beside \`type\`, ${operatorList} takes numbers only, and \`type\` also lists ${outside.join(', ')}`);
         } else if (!numberOnly && subject.types !== null) {
-            const outside = subject.types.filter((name) => name !== 'number');
+            // A comparison on a string literal that converts to NaN is false, as on a number out of range
+            const outside = subject.types.filter((name) => name !== 'number' && !(name === 'string' && subject.nonNumericStrings));
             if (outside.length) {
                 fail(
                     ctx,
@@ -2554,7 +2570,7 @@ function checkPayloadSpec(data, ctx, path) {
 }
 
 /**
- * @typedef {{ lo: number, loIn: boolean, hi: number, hiIn: boolean }} Interval
+ * @typedef {{ lo: number, loIn: boolean, hi: number, hiIn: boolean, strict?: boolean }} Interval
  * @typedef {{ intervals: Interval[], points: unknown[] }} BucketSet
  */
 
@@ -2581,10 +2597,11 @@ function isLiteral(value) {
  * @returns {BucketSet | null}
  */
 function simpleBucketSet(predicate) {
+    // A number literal tests with `===`, so it holds for no other type
     if (typeof predicate === 'number')
         return {
             intervals: [
-                { lo: predicate, loIn: true, hi: predicate, hiIn: true },
+                { lo: predicate, loIn: true, hi: predicate, hiIn: true, strict: true },
             ],
             points: [],
         };
@@ -2654,11 +2671,28 @@ function intervalsOverlap(a, b) {
 }
 
 /**
+ * Whether a comparison interval holds for a literal that is not a number, which it converts as
+ * JS does: `null` and `""` to 0, a boolean to 0 or 1, and `"7"` to 7.
+ *
+ * @param {unknown} point
+ * @param {Interval[]} intervals
+ */
+function pointCoercesInto(point, intervals) {
+    const value = Number(point);
+    if (Number.isNaN(value)) return false;
+    return intervals.some((x) => !x.strict && (x.lo < value || (x.lo === value && x.loIn)) && (value < x.hi || (value === x.hi && x.hiIn)));
+}
+
+/**
  * @param {BucketSet} a
  * @param {BucketSet} b
  */
 function bucketSetsOverlap(a, b) {
-    return a.points.some((point) => b.points.includes(point)) || a.intervals.some((x) => b.intervals.some((y) => intervalsOverlap(x, y)));
+    return (
+        a.points.some((point) => b.points.includes(point) || pointCoercesInto(point, b.intervals)) ||
+        b.points.some((point) => pointCoercesInto(point, a.intervals)) ||
+        a.intervals.some((x) => b.intervals.some((y) => intervalsOverlap(x, y)))
+    );
 }
 
 /**
@@ -3749,6 +3783,12 @@ describe('webDetection config tests', () => {
                 expectError('`field` needs `path`', { ...fieldOf('img', {}), is: {} });
                 expectError('needs `path`', { ...fieldOf('img', { args: [] }), is: {} });
             });
+
+            it('rejects `"using": {}`, a `self` with `args` and no `path`, and an unknown `visibility`', () => {
+                expectError('`path` is a non-empty string', { ...img, using: {}, is: {} });
+                expectError('needs `path`', { ...img, using: { self: { args: [] } }, is: {} });
+                expectError('unknown visibility', { element: { selector: 'img', visibility: 'shown' } });
+            });
         });
 
         describe('names', () => {
@@ -4372,6 +4412,15 @@ describe('webDetection config tests', () => {
                 );
             });
 
+            it('rejects a scoped leaf in `where` with a `none` above it, in the match tree or the predicate, with no guard', () => {
+                const cardsWithImage = { selector: '.card', where: { element: { selector: 'img', root: '#comments' } } };
+                expectValid({ element: cardsWithImage });
+                expectError('needs a guard', { none: { element: cardsWithImage } });
+                expectError('needs a guard', {
+                    element: { selector: '.card', where: { none: { element: { selector: 'img', root: '#comments' } } } },
+                });
+            });
+
             it('requires `is` on a guard that is not an `element` or `text` source', () => {
                 const shadowRoot = { only: { element: { selector: 'my-widget' } }, using: 'shadowRoot', as: 'shadow' };
                 const shadowImages = { element: { selector: 'img', root: { ref: 'shadow' } }, using: 'length', is: { lt: 1 } };
@@ -4459,6 +4508,7 @@ describe('webDetection config tests', () => {
                 expectValid(items('input', { selectionStart: { ...numberTest('isFinite'), gt: 0 } }));
                 expectError('guard it', items('input', { selectionStart: { gt: 0, ...numberTest('isFinite') } }));
                 expectError('guard it', items('input', { selectionStart: { ...numberTest('isFinite', false), gt: 0 } }));
+                expectError('guard it', items('input', { selectionStart: { ...numberTest('isNaN'), gt: 0 } }));
                 expectValid(items('link', { sheet: null }));
             });
 
@@ -5115,9 +5165,62 @@ describe('webDetection config tests', () => {
                 expectValid(true, { a: { value: title, buckets: { empty: { length: 0 }, any: { length: { gte: 0 } } } } });
             });
 
+            it('checks overlap between a literal and a comparison that converts it', () => {
+                // Config does not type `document.title`, so its buckets compare without a guard
+                expectError('overlap', true, { a: { value: title, buckets: { none: null, some: { gte: 0 } } } });
+                expectError('overlap', true, { a: { value: title, buckets: { s: '7', n: { gte: 0 } } } });
+                expectError('overlap', true, {
+                    a: {
+                        value: title,
+                        buckets: {
+                            s: [
+                                true,
+                            ],
+                            n: { gte: 1 },
+                        },
+                    },
+                });
+                expectValid(true, { a: { value: title, buckets: { s: '7', n: 7 } } });
+                expectValid(true, { a: { value: title, buckets: { none: null, some: { gt: 0 } } } });
+                expectValid(true, { a: { value: title, buckets: { unsupported: 'unsupported', some: { gte: 0 } } } });
+                expectValid(true, {
+                    a: { value: { only: fieldOf('img', 'src') }, buckets: { none: null, some: { type: 'number', gte: 0 } } },
+                });
+            });
+
             it('checks bucket and `when` operators against the value’s type', () => {
                 expectError('guard it', true, { a: { value: { only: fieldOf('img', 'src') }, buckets: { long: { gt: 100 } } } });
                 expectError('guard it', true, { a: { value: { only: fieldOf('img', 'src') }, when: { gt: 100 } } });
+            });
+
+            it('admits a comparison on a value whose only strings are literals that convert to NaN', () => {
+                /**
+                 * @param {unknown} then
+                 * @param {unknown} otherwise
+                 */
+                const engineGuarded = (then, otherwise) => ({
+                    if: {
+                        test: {
+                            api: {
+                                path: 'Reflect.has',
+                                args: [
+                                    { api: 'PerformanceResourceTiming.prototype' },
+                                    'responseStatus',
+                                ],
+                            },
+                        },
+                        then,
+                        else: otherwise,
+                    },
+                });
+                const buckets = { unsupported: 'unsupported', 0: 0, '1+': { gte: 1 } };
+                expectValid(true, { a: { value: engineGuarded(imgCount, 'unsupported'), buckets } });
+                // "7" and "" convert to numbers, and a string read from the page may too
+                expectError('guard it', true, { a: { value: engineGuarded(imgCount, '7'), buckets: { '1+': { gte: 1 } } } });
+                expectError('guard it', true, { a: { value: engineGuarded(imgCount, ''), buckets: { '1+': { gte: 1 } } } });
+                expectError('guard it', true, {
+                    a: { value: engineGuarded({ only: fieldOf('img', 'src') }, 'unsupported'), buckets: { '1+': { gte: 1 } } },
+                });
             });
         });
     });

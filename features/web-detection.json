@@ -1161,9 +1161,26 @@
                             "data": {
                                 "status": {
                                     "value": {
-                                        "ref": "status"
+                                        "if": {
+                                            "test": {
+                                                "api": {
+                                                    "path": "Reflect.has",
+                                                    "args": [
+                                                        {
+                                                            "api": "PerformanceResourceTiming.prototype"
+                                                        },
+                                                        "responseStatus"
+                                                    ]
+                                                }
+                                            },
+                                            "then": {
+                                                "ref": "status"
+                                            },
+                                            "else": "unsupported"
+                                        }
                                     },
                                     "buckets": {
+                                        "unsupported": "unsupported",
                                         "2xx": {
                                             "gte": 200,
                                             "lt": 300
@@ -1254,9 +1271,26 @@
                             "data": {
                                 "status": {
                                     "value": {
-                                        "ref": "status"
+                                        "if": {
+                                            "test": {
+                                                "api": {
+                                                    "path": "Reflect.has",
+                                                    "args": [
+                                                        {
+                                                            "api": "PerformanceResourceTiming.prototype"
+                                                        },
+                                                        "responseStatus"
+                                                    ]
+                                                }
+                                            },
+                                            "then": {
+                                                "ref": "status"
+                                            },
+                                            "else": "unsupported"
+                                        }
                                     },
                                     "buckets": {
+                                        "unsupported": "unsupported",
                                         "2xx": {
                                             "gte": 200,
                                             "lt": 300
@@ -1926,21 +1960,38 @@
                                 },
                                 "failedScripts": {
                                     "value": {
-                                        "api": {
-                                            "path": "performance.getEntriesByType",
-                                            "args": [
-                                                "resource"
-                                            ],
-                                            "where": {
-                                                "initiatorType": "script",
-                                                "responseStatus": {
-                                                    "gte": 400
+                                        "if": {
+                                            "test": {
+                                                "api": {
+                                                    "path": "Reflect.has",
+                                                    "args": [
+                                                        {
+                                                            "api": "PerformanceResourceTiming.prototype"
+                                                        },
+                                                        "responseStatus"
+                                                    ]
                                                 }
-                                            }
-                                        },
-                                        "using": "length"
+                                            },
+                                            "then": {
+                                                "api": {
+                                                    "path": "performance.getEntriesByType",
+                                                    "args": [
+                                                        "resource"
+                                                    ],
+                                                    "where": {
+                                                        "initiatorType": "script",
+                                                        "responseStatus": {
+                                                            "gte": 400
+                                                        }
+                                                    }
+                                                },
+                                                "using": "length"
+                                            },
+                                            "else": "unsupported"
+                                        }
                                     },
                                     "buckets": {
+                                        "unsupported": "unsupported",
                                         "0": 0,
                                         "1": 1,
                                         "2+": {
@@ -2039,8 +2090,8 @@
                 "slow_load": {
                     "state": "disabled",
                     "match": {
-                        "any": [
-                            {
+                        "if": {
+                            "test": {
                                 "api": {
                                     "path": "performance.getEntriesByType",
                                     "args": [
@@ -2050,27 +2101,25 @@
                                 },
                                 "as": "loadEventEnd",
                                 "is": {
+                                    "gt": 0
+                                }
+                            },
+                            "then": {
+                                "ref": "loadEventEnd",
+                                "is": {
                                     "gte": 8000
                                 }
                             },
-                            {
-                                "all": [
-                                    {
-                                        "ref": "loadEventEnd",
-                                        "is": 0
-                                    },
-                                    {
-                                        "api": {
-                                            "path": "performance.now",
-                                            "args": []
-                                        },
-                                        "is": {
-                                            "gte": 15000
-                                        }
-                                    }
-                                ]
+                            "else": {
+                                "api": {
+                                    "path": "performance.now",
+                                    "args": []
+                                },
+                                "is": {
+                                    "gte": 15000
+                                }
                             }
-                        ]
+                        }
                     },
                     "triggers": {
                         "auto": {
@@ -2219,9 +2268,26 @@
                             "data": {
                                 "failedStylesheets": {
                                     "value": {
-                                        "ref": "failedStylesheets"
+                                        "if": {
+                                            "test": {
+                                                "api": {
+                                                    "path": "Reflect.has",
+                                                    "args": [
+                                                        {
+                                                            "api": "PerformanceResourceTiming.prototype"
+                                                        },
+                                                        "responseStatus"
+                                                    ]
+                                                }
+                                            },
+                                            "then": {
+                                                "ref": "failedStylesheets"
+                                            },
+                                            "else": "unsupported"
+                                        }
                                     },
                                     "buckets": {
+                                        "unsupported": "unsupported",
                                         "0": 0,
                                         "1": 1,
                                         "2-4": {
