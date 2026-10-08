@@ -35,13 +35,7 @@ const EXPRESSION_KEYS = [
 
 const MODIFIER_KEYS = [
     'as',
-    'catch',
     'is',
-];
-
-const FAILURE_KINDS = [
-    'absent',
-    'denied',
 ];
 
 const BODY_KEYS = {
@@ -108,6 +102,7 @@ const COMPARISON_OPERATORS = [
 const VALUE_OPERATORS = [
     'eq',
     ...COMPARISON_OPERATORS,
+    'fails',
     'exists',
     'type',
     'finite',
@@ -399,8 +394,8 @@ function forEachTextLeaf(node, path, cb) {
 }
 
 /**
- * Invoke `cb` for every source in an expression, wherever it sits: under operators, in `catch`
- * handlers and `if` branches, in the operands of predicates, and in source roots.
+ * Invoke `cb` for every source in an expression, wherever it sits: under operators, in `if`
+ * branches, in the operands of predicates, and in source roots.
  *
  * @param {unknown} node
  * @param {string} path
@@ -440,14 +435,6 @@ function forEachSource(node, path, cb) {
                 'else',
             ]) {
                 forEachSource(value[branch], `${childPath}.${branch}`, cb);
-            }
-        } else if (key === 'catch') {
-            if (!isPlainObject(value)) continue;
-            for (const [
-                kind,
-                handler,
-            ] of Object.entries(value)) {
-                forEachSource(handler, `${childPath}.${kind}`, cb);
             }
         } else if (key === 'is') {
             forEachPredicateSource(value, 'value', childPath, cb);
@@ -1118,7 +1105,7 @@ function expressionKeysOf(node) {
 }
 
 /**
- * The expression an `as` names: its value after `catch`, without the `is` test.
+ * The expression an `as` names: its value, without the `is` test.
  *
  * @param {Record<string, any>} node
  * @returns {Record<string, any>}
@@ -1309,52 +1296,12 @@ function checkExpr(node, position, scope, ctx, path) {
         const owner = typeof node.as === 'string' ? node.as : undefined;
         type = checkExprKey(exprKeys[0], node[exprKeys[0]], keyPosition, inner, ctx, `${path}.${exprKeys[0]}`, owner);
     }
-    if ('catch' in node) {
-        const handlerTypes = checkCatch(node.catch, keyPosition, child(inner), ctx, `${path}.catch`);
-        // On a selected list, a handler is checked against the item type
-        for (const handlerType of handlerTypes) {
-            const expected = type.types;
-            if (expected && handlerType.types && !handlerType.types.some((name) => expected.includes(name))) {
-                fail(ctx, `${path}.catch`, `a handler gives ${describeType(handlerType)} where the expression gives ${describeType(type)}`);
-            }
-        }
-        const list = type.list;
-        type = mergeTypes([
-            itemOf(type),
-            ...handlerTypes.map(itemOf),
-        ]);
-        if (list) type.list = list;
-    }
     if (hasIs) {
         // `as` names the value, not the test, so a ref to it from the test is no cycle
         checkPredicate(node.is, 'value', predicateSubject(type, node.is, ctx, `${path}.is`), child(scope), ctx, `${path}.is`);
         return typeOf('boolean');
     }
     return type;
-}
-
-/**
- * @param {unknown} handlers
- * @param {Position} position - the caught expression's
- * @param {Scope} scope
- * @param {Context} ctx
- * @param {string} path
- * @returns {StaticType[]}
- */
-function checkCatch(handlers, position, scope, ctx, path) {
-    if (!isPlainObject(handlers)) {
-        fail(ctx, path, '`catch` maps failure kinds to handlers');
-        return [];
-    }
-    const types = [];
-    for (const [
-        kind,
-        handler,
-    ] of Object.entries(handlers)) {
-        if (!FAILURE_KINDS.includes(kind)) fail(ctx, `${path}.${kind}`, `unknown failure kind; kinds are ${FAILURE_KINDS.join(', ')}`);
-        types.push(checkExpr(handler, position, scope, ctx, `${path}.${kind}`));
-    }
-    return types;
 }
 
 /**
@@ -2227,7 +2174,21 @@ function checkOperators(predicate, subject, scope, ctx, path) {
     const comparisons = COMPARISON_OPERATORS.filter(has);
     for (const key of comparisons) checkExpr(predicate[key], 'number', child(scope), ctx, `${path}.${key}`);
 
-    if (has('exists') && typeof predicate.exists !== 'boolean') fail(ctx, `${path}.exists`, '`exists` is a boolean');
+    for (const key of [
+        'fails',
+        'exists',
+    ]) {
+        if (has(key) && typeof predicate[key] !== 'boolean') fail(ctx, `${path}.${key}`, `\`${key}\` is a boolean`);
+    }
+    if (predicate.fails === true) {
+        const beside = Object.keys(predicate).filter((key) => key !== 'fails' && key !== 'exists' && key !== 'type');
+        if (beside.length)
+            fail(
+                ctx,
+                path,
+                `beside \`"fails": true\`, ${beside.join(', ')} read${beside.length === 1 ? 's' : ''} the failed value, which aborts the detector`,
+            );
+    }
     if (predicate.exists === false && Object.keys(predicate).length > 1)
         fail(ctx, path, '`"exists": false` stands alone: beside another key it never holds for a read value');
     for (const key of [
@@ -3027,13 +2988,16 @@ describe('webDetection config tests', () => {
             expect(collect({ element: { selector: '.x' } })).to.deep.equal([]);
         });
 
-        it('reaches text under operators, catch handlers, if branches and predicate operands', () => {
+        it('reaches text under operators, if branches and predicate operands', () => {
             const match = {
                 all: [
                     { count: { text: { pattern: 'a' } }, is: { gte: 1 } },
                     {
-                        if: { test: { text: { pattern: 'b' } }, then: { count: { text: { pattern: 'c' } } }, else: 0 },
-                        catch: { absent: { count: { text: { pattern: 'd' } } } },
+                        if: {
+                            test: { text: { pattern: 'b' } },
+                            then: { count: { text: { pattern: 'c' } } },
+                            else: { count: { text: { pattern: 'd' } } },
+                        },
                         is: { gt: { count: { text: { pattern: 'e' } } } },
                     },
                     {
@@ -3481,26 +3445,8 @@ describe('webDetection config tests', () => {
                 expectError('extra [otherwise]', { if: { test: true, then: 1, else: 2, otherwise: 3 }, is: 1 });
             });
 
-            it('checks `catch` kinds and handler positions', () => {
-                expectValid({
-                    count: { api: { path: 'document.fonts', where: { status: 'error' } } },
-                    catch: { absent: 0 },
-                    is: { gt: 0 },
-                });
-                expectValid({
-                    all: [
-                        { ...loadEventEnd, is: { gte: 400 } },
-                    ],
-                    catch: { absent: true },
-                });
-                expectError('unknown failure kind', { ...imgCount, catch: { missing: 0 }, is: { gt: 0 } });
-                expectError('fills', {
-                    all: [
-                        { ...loadEventEnd, is: { gte: 400 } },
-                    ],
-                    catch: { absent: 0 },
-                });
-                expectError('handler gives boolean', { ...imgCount, catch: { absent: true }, is: { gt: 0 } });
+            it('rejects `catch`', () => {
+                expectError('unknown expression key "catch"', { ...imgCount, catch: { absent: 0 }, is: { gt: 0 } });
             });
 
             it('checks `field` has a read key, and `args` only with `path`', () => {
@@ -3529,7 +3475,7 @@ describe('webDetection config tests', () => {
                 expectError('names no expression', { ref: 'missing', is: 0 });
             });
 
-            it('rejects a cycle of refs, through catch handlers too', () => {
+            it('rejects a cycle of refs', () => {
                 expectError('cycle', {
                     sum: [
                         { ref: 'a' },
@@ -3540,7 +3486,14 @@ describe('webDetection config tests', () => {
                 });
                 expectError('cycle', {
                     all: [
-                        { ...now, as: 'a', catch: { absent: { ref: 'b' } }, is: { gt: 0 } },
+                        {
+                            sum: [
+                                now,
+                                { ref: 'b' },
+                            ],
+                            as: 'a',
+                            is: { gt: 0 },
+                        },
                         {
                             div: [
                                 { ref: 'a' },
@@ -3621,7 +3574,7 @@ describe('webDetection config tests', () => {
                 expectError('A string fills', { count: { element: { selector: 'p' } }, is: { gt: 'x' } });
                 expectValid(true, {
                     word: { value: { if: { test: true, then: 'yes', else: 'no' } } },
-                    state: { value: { api: { path: 'document.readyState' }, catch: { absent: null } } },
+                    state: { value: { if: { test: false, then: 'x', else: null } } },
                 });
                 expectValid({ api: { path: 'document.readyState' }, is: { eq: { api: { path: 'document.readyState' } } } });
             });
@@ -3653,9 +3606,6 @@ describe('webDetection config tests', () => {
 
             it('rejects a selected list in a payload without buckets', () => {
                 expectError('sent through `buckets`', true, { matched: { value: text } });
-                expectError('sent through `buckets`', true, {
-                    image: { value: { ...img, catch: { absent: { element: { selector: 'p' } } } } },
-                });
                 expectError('sent through `buckets`', { ...img, as: 'images' }, { image: { value: { ref: 'images' } } });
                 expectValid({ ...img, as: 'images' }, { image: { value: { count: { ref: 'images' } } } });
                 expectValid(true, { width: { value: fieldOf('img', 'naturalWidth'), buckets: { wide: { gt: 100 } } } });
@@ -4173,6 +4123,15 @@ describe('webDetection config tests', () => {
                 expectError('never holds', { ...loadEventEnd, is: { finite: true, nan: true } });
                 expectValid({ only: loadEventEnd, is: { exists: false } });
                 expectValid({ ...loadEventEnd, is: { type: 'number', gt: 0 } });
+            });
+
+            it('checks `fails` is a boolean, and `"fails": true` reads no value', () => {
+                expectValid({ ...loadEventEnd, is: { fails: false, gt: 0 } });
+                expectValid({ ...loadEventEnd, is: { exists: true, fails: true } });
+                expectValid({ ...loadEventEnd, is: { fails: true } });
+                expectValid(items('link', { sheet: { fails: false } }));
+                expectError('is a boolean', { ...loadEventEnd, is: { fails: 1 } });
+                expectError('the failed value, which aborts', { ...loadEventEnd, is: { fails: true, gt: 0 } });
             });
 
             it('checks operators suit an element property’s type', () => {
