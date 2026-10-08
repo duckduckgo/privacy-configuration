@@ -633,6 +633,67 @@ describe('webInterferenceDetection interferenceTypes override merge', () => {
     });
 });
 
+describe('Web detection detector schema', () => {
+    const validate = createValidator('DetectorConfig');
+    const images = { element: { selector: 'img' } };
+
+    it('accepts self, with a path or a body, and {} for the bound value', () => {
+        const detector = {
+            match: {
+                ...images,
+                using: {
+                    api: {
+                        path: 'Math.max.apply',
+                        args: [
+                            null,
+                            { self: {} },
+                        ],
+                    },
+                },
+                is: { gt: { self: 'length' } },
+            },
+        };
+        expect(validate(detector), formatErrors(validate.errors)).to.equal(true);
+    });
+
+    it('accepts using as an expression over self', () => {
+        const detector = {
+            match: {
+                api: 'document',
+                using: {
+                    div: [
+                        { self: 'title.length' },
+                        { self: { path: 'fonts.size' } },
+                    ],
+                },
+                is: { gt: 0 },
+            },
+        };
+        expect(validate(detector), formatErrors(validate.errors)).to.equal(true);
+    });
+
+    it('accepts self in the arguments of a field expression', () => {
+        const detector = {
+            match: {
+                element: {
+                    selector: 'img',
+                    field: {
+                        api: {
+                            path: 'Math.min',
+                            args: [
+                                { self: 'naturalWidth' },
+                                2000,
+                            ],
+                        },
+                    },
+                },
+                is: {},
+            },
+        };
+        expect(validate(detector), formatErrors(validate.errors)).to.equal(true);
+    });
+});
+
 describe('EventHub schema source rules', () => {
     const validate = createValidator('EventHubSettings');
 

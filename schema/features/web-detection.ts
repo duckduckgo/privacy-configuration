@@ -73,13 +73,13 @@ type Name = string;
 /** Keys that sit beside an expression key, applied in the order `using`, `as`, `is`. */
 type Modifiers = {
     /**
-     * Reads a path from the expression's value, as `api` reads from the global object. A string is
-     * short for `{ path }`. `"length"` on a list reads only as many items as its tests need.
+     * An expression over the expression's value, which `self` reads. A path or an `api` body is short
+     * for a `self` with that body. `"length"` on a list reads only as many items as its tests need.
      */
-    using?: string | UsingBody;
+    using?: string | UsingBody | ExprObject;
     /** Names the expression's value for `ref` and payloads. Unique within the detector. */
     as?: Name;
-    /** Tests the value, giving a boolean. Only on an object in boolean position with one expression key. */
+    /** Tests the value, giving a boolean. Only in boolean position, on one expression key, or several beside `using`. */
     is?: Predicate;
 };
 
@@ -112,9 +112,8 @@ type PredicateOperators = {
     lte?: Expr;
     gt?: Expr;
     gte?: Expr;
-    /** Holds when the read fails: the name is absent, or a getter or method threw. */
+    /** Holds when the read fails: a getter or method threw. A missing name reads `undefined`. */
     fails?: boolean;
-    exists?: boolean;
     type?: MaybeArray<TypeName>;
 };
 
@@ -152,6 +151,11 @@ export type ApiBody = {
 } & ItemKeys;
 /** An `api` body read from the value of the expression beside `using`. */
 type UsingBody = ApiBody;
+/** An `api` body read from the value `self` is bound to. `args` only with `path`; `{}` is the bound value. */
+type SelfBody = {
+    path?: string;
+    args?: Arg[];
+} & ItemKeys;
 
 type Operands = MaybeArray<Expr>;
 
@@ -164,6 +168,8 @@ type ExprKeys = {
     text: ConditionBranch<TextBody>;
     /** A string is short for `{ path }`. */
     api: string | ApiBody;
+    /** Reads from the value the innermost `using`, `where` or `field` binds. A string is short for `{ path }`. */
+    self: string | SelfBody;
     /** Its operand's value, so modifiers stack. */
     expr: Expr;
     only: Expr;
