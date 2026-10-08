@@ -86,16 +86,14 @@ type Modifiers = {
 /** An expression in value position, or a JS array of entries. */
 type Arg = Expr | Arg[];
 
-/** A string is short for `{ path }`. At least one key. */
+/** A string is short for `{ path }`, and `args` calls the last name in `path`. An expression reads with `self` bound to the item or value. */
 type FieldRead =
     | string
     | {
-          path?: string;
+          path: string;
           args?: Arg[];
-          feature?: 'renderedTextLength';
-          /** An expression giving a function, applied to the value read so far as its one argument. */
-          call?: Expr;
-      };
+      }
+    | ExprObject;
 
 type TypeName = 'number' | 'string' | 'boolean' | 'null' | 'undefined' | 'array' | 'object';
 
