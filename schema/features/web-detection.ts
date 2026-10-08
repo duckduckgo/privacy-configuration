@@ -93,6 +93,8 @@ type FieldRead =
           path?: string;
           args?: Arg[];
           feature?: 'wordCount' | 'renderedTextLength';
+          /** An expression giving a function, applied to the value read so far as its one argument. */
+          call?: Expr;
       };
 
 type TypeName = 'number' | 'string' | 'boolean' | 'null' | 'undefined' | 'array' | 'object';
@@ -116,8 +118,6 @@ type PredicateOperators = {
     fails?: boolean;
     exists?: boolean;
     type?: MaybeArray<TypeName>;
-    finite?: boolean;
-    nan?: boolean;
 };
 
 /**
@@ -161,7 +161,8 @@ type Operands = MaybeArray<Expr>;
 type ExprKeys = {
     element: ConditionBranch<ElementBody>;
     text: ConditionBranch<TextBody>;
-    api: ApiBody;
+    /** A string is short for `{ path }`. */
+    api: string | ApiBody;
     /** Its operand's value, so modifiers stack. */
     expr: Expr;
     only: Expr;
