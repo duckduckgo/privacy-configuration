@@ -2392,25 +2392,18 @@
                         ]
                     },
                     "triggers": {
-                        "auto": {
-                            "state": "enabled",
+                        "breakageReport": {
                             "runConditions": {
                                 "context": {
                                     "top": true
                                 },
                                 "urlPattern": "https://www.example.com/*"
-                            },
-                            "when": {
-                                "intervalMs": [
-                                    5000
-                                ]
                             }
                         }
                     },
                     "actions": {
-                        "fireEvent": {
+                        "breakageReportData": {
                             "state": "enabled",
-                            "type": "regionEmpty",
                             "data": {
                                 "brokenImages": {
                                     "value": {
