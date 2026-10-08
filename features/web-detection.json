@@ -1292,12 +1292,13 @@
                             {
                                 "any": [
                                     {
-                                        "element": {
-                                            "selector": "body",
-                                            "field": {
-                                                "feature": "renderedTextLength"
-                                            }
+                                        "text": {
+                                            "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                            "pattern": [
+                                                "\\S"
+                                            ]
                                         },
+                                        "using": "length",
                                         "as": "bodyTextLength",
                                         "is": {
                                             "lt": 2000
@@ -1504,12 +1505,13 @@
                             {
                                 "div": [
                                     {
-                                        "element": {
-                                            "selector": "body",
-                                            "field": {
-                                                "feature": "renderedTextLength"
-                                            }
-                                        }
+                                        "text": {
+                                            "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                            "pattern": [
+                                                "\\S"
+                                            ]
+                                        },
+                                        "using": "length"
                                     },
                                     {
                                         "api": {
@@ -1671,12 +1673,13 @@
                                 }
                             },
                             {
-                                "element": {
-                                    "selector": "body",
-                                    "field": {
-                                        "feature": "renderedTextLength"
-                                    }
+                                "text": {
+                                    "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                    "pattern": [
+                                        "\\S"
+                                    ]
                                 },
+                                "using": "length",
                                 "as": "bodyTextLength",
                                 "is": {
                                     "lt": 2000
@@ -2356,14 +2359,16 @@
                                 "as": "comments"
                             },
                             {
-                                "element": {
-                                    "selector": "#comments",
-                                    "field": {
-                                        "feature": "renderedTextLength"
+                                "none": {
+                                    "text": {
+                                        "xpath": ".//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                        "pattern": [
+                                            "\\S"
+                                        ],
+                                        "root": {
+                                            "ref": "comments"
+                                        }
                                     }
-                                },
-                                "is": {
-                                    "lt": 1
                                 }
                             },
                             {

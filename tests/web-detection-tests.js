@@ -74,13 +74,7 @@ const VISIBILITY_VALUES = [
 const FIELD_KEYS = [
     'path',
     'args',
-    'feature',
 ];
-
-/** Each feature and the input it takes. */
-const FEATURE_INPUTS = {
-    renderedTextLength: 'element',
-};
 
 const TYPE_NAMES = [
     'number',
@@ -2213,9 +2207,13 @@ function checkFieldRead(field, subject, scope, ctx, path) {
         for (const key of Object.keys(field)) {
             if (!FIELD_KEYS.includes(key)) fail(ctx, path, `unknown \`field\` key "${key}"`);
         }
-        if (!FIELD_KEYS.some((key) => key in field))
-            fail(ctx, path, '`field` needs at least one of `path`, `args` and `feature`, or is an expression');
-        if ('args' in field && !('path' in field)) fail(ctx, path, '`args` calls the last name in `path`, so it needs `path`');
+        if (!('path' in field)) {
+            fail(
+                ctx,
+                path,
+                'args' in field ? '`args` calls the last name in `path`, so it needs `path`' : '`field` needs `path`, or is an expression',
+            );
+        }
         read = field;
     } else {
         fail(ctx, path, '`field` is a string, an object or an expression');
@@ -2237,19 +2235,6 @@ function checkFieldRead(field, subject, scope, ctx, path) {
                 argTypes: isCall ? argTypes : undefined,
             });
         });
-    }
-    if (read.feature !== undefined) {
-        const input = Object.hasOwn(FEATURE_INPUTS, read.feature)
-            ? FEATURE_INPUTS[/** @type {keyof typeof FEATURE_INPUTS} */ (read.feature)]
-            : undefined;
-        if (!input) {
-            fail(ctx, path, `unknown feature ${JSON.stringify(read.feature)}`);
-        } else if (current.types !== null && input === 'string' && !current.types.includes('string')) {
-            fail(ctx, path, `${read.feature} takes a string, and config types the value as ${describeType(current)}`);
-        } else if (current.types !== null && input === 'element' && !current.interfaces) {
-            fail(ctx, path, `${read.feature} takes an element, and config types the value as ${describeType(current)}`);
-        }
-        current = typeOf('number');
     }
     return current;
 }
@@ -3759,8 +3744,8 @@ describe('webDetection config tests', () => {
                 expectError('unknown expression key "catch"', { ...imgCount, catch: { absent: 0 }, is: { gt: 0 } });
             });
 
-            it('checks `field` has a read key, and `args` only with `path`', () => {
-                expectError('needs at least one', { ...fieldOf('img', {}), is: {} });
+            it('checks `field` has `path`, and `args` only with `path`', () => {
+                expectError('`field` needs `path`', { ...fieldOf('img', {}), is: {} });
                 expectError('needs `path`', { ...fieldOf('img', { args: [] }), is: {} });
             });
         });
@@ -4020,7 +4005,7 @@ describe('webDetection config tests', () => {
             });
 
             it('tests a selected list’s one item under a predicate that compares, and the list as an array under any other', () => {
-                expectValid({ element: { selector: 'body', field: { feature: 'renderedTextLength' } }, is: { lt: 2000 } });
+                expectValid({ ...fieldOf('img', 'naturalWidth'), is: { lt: 2000 } });
                 expectValid({ ...img, is: { length: { gte: 5 } } });
                 expectValid({ ...img, is: { type: 'array' } });
                 expectError('guard it', { ...fieldOf('img', 'src'), is: { gt: 3 } });
@@ -4049,17 +4034,16 @@ describe('webDetection config tests', () => {
                 expectError('reads "foo" on a value config types as string', items('img', { 'src.foo': 0 }));
             });
 
-            it('checks a feature’s input type', () => {
-                expectValid({ element: { selector: 'body', field: { feature: 'renderedTextLength' } }, is: { lt: 1 } });
-                expectError('renderedTextLength takes an element', {
-                    ...fieldOf('img', { path: 'src', feature: 'renderedTextLength' }),
+            it('rejects `feature` in `field`, and counts rendered text through `text`', () => {
+                expectError('unknown `field` key "feature"', {
+                    ...fieldOf('body', { path: 'textContent', feature: 'renderedTextLength' }),
                     is: { lt: 1 },
                 });
-                expectError('unknown feature', { ...fieldOf('img', { feature: 'textLength' }), is: { lt: 1 } });
-                expectError('unknown feature', {
-                    api: { path: 'document', field: { path: 'title', feature: 'wordCount' } },
-                    is: { lte: 3 },
-                });
+                const excluded = '[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]';
+                const rendered = (root) => ({ text: { xpath: `.//text()${excluded}`, pattern: '\\S', root } });
+                expectValid({ text: { xpath: `//body//text()${excluded}`, pattern: '\\S' }, using: 'length', is: { lt: 2000 } });
+                expectValid({ element: { selector: 'p', where: { none: rendered({ self: {} }) } }, using: 'length', is: { gt: 0 } });
+                expectValid({ sum: fieldOf('p', { ...rendered({ self: {} }), using: 'length' }), is: { gt: 0 } });
             });
         });
 
