@@ -4491,7 +4491,7 @@ describe('webDetection config tests', () => {
                         args: [
                             'resource',
                         ],
-                        where: { responseStatus: { fails: false, gte: 400 } },
+                        where: { responseStatus: { gte: 400 } },
                     },
                     using: 'length',
                     is: 0,
