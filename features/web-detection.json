@@ -1847,19 +1847,19 @@
                                 }
                             },
                             {
-                                "sub": [
-                                    {
-                                        "api": {
-                                            "path": "performance.now",
-                                            "args": []
-                                        }
-                                    },
-                                    {
-                                        "ref": "loadEventEnd"
-                                    }
-                                ],
+                                "api": {
+                                    "path": "performance.now",
+                                    "args": []
+                                },
                                 "is": {
-                                    "gte": 3000
+                                    "gte": {
+                                        "sum": [
+                                            {
+                                                "ref": "loadEventEnd"
+                                            },
+                                            3000
+                                        ]
+                                    }
                                 }
                             },
                             {
