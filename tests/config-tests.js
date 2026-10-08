@@ -233,6 +233,66 @@ describe('Config schema tests', () => {
     });
 });
 
+// First release on each platform that honours `maxSupportedVersion` on features and sub-features.
+// Clients that predate support ignore the key, so `minSupportedVersion` on the same object must
+// exclude them. Extension browser variants share the `extension` entry.
+/** @type {Record<string, number | string>} */
+const maxSupportedVersionSince = {};
+
+/**
+ * @param {number | string} a
+ * @param {number | string} b
+ * @returns {number} negative if a < b, 0 if equal, positive if a > b
+ */
+function compareVersions(a, b) {
+    if (typeof a === 'number' && typeof b === 'number') {
+        return a - b;
+    }
+    const aParts = String(a).split('.').map(Number);
+    const bParts = String(b).split('.').map(Number);
+    for (let i = 0; i < Math.max(aParts.length, bParts.length); i++) {
+        const diff = (aParts[i] || 0) - (bParts[i] || 0);
+        if (diff !== 0) return diff;
+    }
+    return 0;
+}
+
+describe('maxSupportedVersion gating', () => {
+    for (const config of latestConfigs) {
+        const platform = config.name.startsWith('v5/extension') ? 'extension' : config.name.replace(/^v5\/(.*)-config\.json$/, '$1');
+        const since = maxSupportedVersionSince[platform];
+
+        const gated = [];
+        for (const [
+            featureName,
+            feature,
+        ] of Object.entries(config.body.features)) {
+            if ('maxSupportedVersion' in feature) gated.push({ path: featureName, entry: feature });
+            for (const [
+                subFeatureName,
+                subFeature,
+            ] of Object.entries(feature.features || {})) {
+                if ('maxSupportedVersion' in subFeature) gated.push({ path: `${featureName}.${subFeatureName}`, entry: subFeature });
+            }
+        }
+
+        for (const { path: entryPath, entry } of gated) {
+            it(`${config.name} ${entryPath} should gate maxSupportedVersion with minSupportedVersion`, () => {
+                expect(since, `${platform} has no maxSupportedVersionSince entry`).to.not.equal(undefined);
+                expect(entry.minSupportedVersion, 'minSupportedVersion must be set alongside maxSupportedVersion').to.not.equal(undefined);
+                expect(
+                    compareVersions(entry.minSupportedVersion, since),
+                    `minSupportedVersion ${entry.minSupportedVersion} is below ${since}, the first ${platform} release that honours maxSupportedVersion`,
+                ).to.be.at.least(0);
+                expect(
+                    compareVersions(entry.minSupportedVersion, entry.maxSupportedVersion),
+                    `minSupportedVersion ${entry.minSupportedVersion} is above maxSupportedVersion ${entry.maxSupportedVersion}`,
+                ).to.be.at.most(0);
+            });
+        }
+    }
+});
+
 describe('EventHub validation tests', () => {
     for (const config of latestConfigs) {
         const eventHub = /** @type {import('../schema/features/event-hub').EventHubFeature<number> | undefined} */ (
