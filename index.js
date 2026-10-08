@@ -8,6 +8,7 @@ import {
     mergeAllowlistedTrackers,
     mergeEventHubTelemetry,
     mergeInterferenceTypes,
+    mergeRevokedBundleSigningKeys,
     addHashToFeatures,
     stripReasons,
     getBaseFeatureConfigs,
@@ -310,11 +311,15 @@ async function buildPlatforms() {
                             ),
                         };
                     } else if (key === 'dbp' && platformKey === 'settings') {
-                        // revokedBundleSigningKeys lives in the base feature so every platform gets the same
-                        // revocation list, even when it overrides other dbp settings.
+                        const baseSettings = platformConfig.features[key].settings || {};
+                        const overrideSettings = platformOverride.features[key][platformKey];
                         platformConfig.features[key][platformKey] = {
-                            ...platformConfig.features[key].settings,
-                            ...platformOverride.features[key][platformKey],
+                            ...baseSettings,
+                            ...overrideSettings,
+                            revokedBundleSigningKeys: mergeRevokedBundleSigningKeys(
+                                baseSettings.revokedBundleSigningKeys || [],
+                                overrideSettings.revokedBundleSigningKeys || [],
+                            ),
                         };
                     } else if ((key === 'clickToLoad' || key === 'clickToPlay') && platformKey === 'settings') {
                         // Handle Click to Load settings override later, so that individual entities

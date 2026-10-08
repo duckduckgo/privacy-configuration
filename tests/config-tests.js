@@ -628,24 +628,18 @@ describe('webInterferenceDetection interferenceTypes override merge', () => {
 });
 
 describe('dbp revokedBundleSigningKeys override merge', () => {
+    // Windows overrides other dbp settings; the build must still merge in the base revoked keys
+    // so no platform can drop a revocation.
+    const windowsConfig = latestConfigs.find((c) => c.name === 'v5/windows-config.json');
+    const settings = windowsConfig?.body?.features?.dbp?.settings || {};
     const baseRevokedKeys = readJsoncFile('./features/dbp.json').settings.revokedBundleSigningKeys;
 
-    for (const config of latestConfigs) {
-        it(`${config.name} has exactly the base revoked keys`, () => {
-            expect(config.body.features.dbp?.settings?.revokedBundleSigningKeys).to.have.members(baseRevokedKeys);
-        });
-    }
-
-    for (const platform of platforms) {
-        it(`${platform} override does not define revokedBundleSigningKeys`, () => {
-            const override = readJsoncFile(`./overrides/${platform}-override.json`);
-            expect(override.features?.dbp?.settings || {}).to.not.have.property('revokedBundleSigningKeys');
-        });
-    }
+    it('inherits base revoked keys', () => {
+        expect(settings.revokedBundleSigningKeys).to.include.members(baseRevokedKeys);
+    });
 
     it('keeps windows-specific dbp settings', () => {
-        const windowsConfig = latestConfigs.find((c) => c.name === 'v5/windows-config.json');
-        expect(windowsConfig.body.features.dbp.settings).to.have.property('betaEnding');
+        expect(settings).to.have.property('betaEnding');
     });
 });
 

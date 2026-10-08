@@ -9,6 +9,7 @@ type BundleSigningKeyHash = string;
 type SettingsType = {
     /**
      * Keys clients must stop trusting for PIR broker bundles. Entries must never be removed.
+     * @uniqueItems true
      */
     revokedBundleSigningKeys: BundleSigningKeyHash[];
     daysBeforeSurvey?: number;
