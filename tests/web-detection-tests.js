@@ -431,7 +431,7 @@ function forEachSource(node, path, cb) {
             for (const { body, path: bodyPath } of bodies) {
                 if (!isPlainObject(body)) continue;
                 if ('where' in body) forEachPredicateSource(body.where, 'item', `${bodyPath}.where`, cb);
-                if (isPlainObject(body.root)) forEachSource(body.root, `${bodyPath}.root`, cb);
+                if ('root' in body) forEachSource(body.root, `${bodyPath}.root`, cb);
             }
         } else if (key === 'if') {
             if (!isPlainObject(value)) continue;
@@ -1241,8 +1241,10 @@ function checkExpr(node, position, scope, ctx, path) {
         return typeOf('boolean');
     }
     if (typeof node === 'string' || node === null) {
+        // In `root`, a string is a selector and `null` no node
         expectPosition(ctx, path, typeof node === 'string' ? 'A string' : '`null`', position, [
             'value',
+            'root',
         ]);
         return typeOf(node === null ? 'null' : 'string');
     }
@@ -1694,9 +1696,7 @@ function checkConditionSource(key, branch, position, scope, ctx, path, owner) {
         }
         if ('root' in body) {
             const rootPath = `${bodyPath}.root`;
-            let valid = true;
-            if (isPlainObject(body.root)) checkNodeRoot(body.root, child(scope), ctx, rootPath);
-            else valid = expectStrings(body.root, ctx, rootPath, '`root`');
+            const valid = checkRoot(body.root, child(scope), ctx, rootPath);
             if (valid && ctx.mode === 'check') {
                 ctx.rooted.push({
                     root: body.root,
@@ -1715,28 +1715,47 @@ function checkConditionSource(key, branch, position, scope, ctx, path, owner) {
 }
 
 /**
- * Check an expression `root` of `element` or `text` gives a node or a list of nodes.
+ * Check the `root` of `element` or `text`: an expression or an array of them, each giving a
+ * selector, a node or a list of nodes.
  *
- * @param {Record<string, any>} root
+ * @param {unknown} root
+ * @param {Scope} scope
+ * @param {Context} ctx
+ * @param {string} path
+ * @returns {boolean} whether the root has entries
+ */
+function checkRoot(root, scope, ctx, path) {
+    if (Array.isArray(root) && root.length === 0) {
+        fail(ctx, path, '`root` needs at least one entry');
+        return false;
+    }
+    asArray(root).forEach((entry, index) => checkRootEntry(entry, scope, ctx, Array.isArray(root) ? `${path}[${index}]` : path));
+    return true;
+}
+
+/**
+ * @param {unknown} entry
  * @param {Scope} scope
  * @param {Context} ctx
  * @param {string} path
  */
-function checkNodeRoot(root, scope, ctx, path) {
-    const type = checkExpr(root, 'root', scope, ctx, path);
-    // `null` and `undefined` are an empty scope
-    if (
-        type.types !== null &&
-        type.types.some(
-            (name) =>
-                ![
-                    'object',
-                    'null',
-                    'undefined',
-                ].includes(name),
-        )
-    )
-        fail(ctx, path, `a root gives a node or a list of nodes, and config types it as ${describeType(type)}`);
+function checkRootEntry(entry, scope, ctx, path) {
+    if (entry === '') fail(ctx, path, 'a selector root is a non-empty string');
+    const type = checkExpr(entry, 'root', scope, ctx, path);
+    // `null` and `undefined` are an empty scope. A list's items are nodes
+    const allowed =
+        type.list === 'selected'
+            ? [
+                  'object',
+              ]
+            : [
+                  'string',
+                  'object',
+                  'null',
+                  'undefined',
+              ];
+    if (type.types !== null && type.types.some((name) => !allowed.includes(name)))
+        fail(ctx, path, `a root gives a selector, a node or a list of nodes, and config types it as ${describeType(type)}`);
 }
 
 /**
@@ -2509,8 +2528,8 @@ function checkBranchRefs(ctx) {
 
 /**
  * A rooted `element` or `text` read anywhere but in boolean position with no `none` above it needs
- * a guard. Its `root` is a `ref` to an earlier operand of match's top-level `all`, which carries
- * `is` unless it is an `element` or `text` source.
+ * a guard. Each entry of its `root` is a `ref` to an earlier operand of match's top-level `all`,
+ * which carries `is` unless it is an `element` or `text` source.
  *
  * @param {Record<string, any>} detector
  * @param {string} path
@@ -2528,27 +2547,30 @@ function checkRootGuards(detector, path, ctx) {
 
     for (const rooted of ctx.rooted) {
         if (!rooted.needsGuard && !(rooted.owner && referenced.has(rooted.owner))) continue;
-        const name = isPlainObject(rooted.root) && Object.keys(rooted.root).join() === 'ref' ? rooted.root.ref : undefined;
-        const guardIndex = typeof name === 'string' ? guards.get(name) : undefined;
-        const ahead = guardIndex !== undefined && (!rooted.inMatch || (rooted.topOperand !== null && guardIndex < rooted.topOperand));
-        if (!ahead) {
-            fail(
-                ctx,
-                `${rooted.path}.root`,
-                `\`root\` needs a guard: the root's expression, named with \`as\`, as an earlier operand of ${path}.match's top-level \`all\`, and \`root\` a \`ref\` to it`,
-            );
-            continue;
-        }
-        const guard = topAll[guardIndex];
-        const keys = expressionKeysOf(guard);
-        const isSource = keys.length === 1 && (keys[0] === 'element' || keys[0] === 'text');
-        if (!isSource && !('is' in guard)) {
-            fail(
-                ctx,
-                `${path}.match.all[${guardIndex}]`,
-                `the guard "${name}" is not an \`element\` or \`text\` source, so it carries \`is\`, such as "is": {"type": "object"}`,
-            );
-        }
+        asArray(rooted.root).forEach((entry, index) => {
+            const entryPath = Array.isArray(rooted.root) ? `${rooted.path}.root[${index}]` : `${rooted.path}.root`;
+            const name = isPlainObject(entry) && Object.keys(entry).join() === 'ref' ? entry.ref : undefined;
+            const guardIndex = typeof name === 'string' ? guards.get(name) : undefined;
+            const ahead = guardIndex !== undefined && (!rooted.inMatch || (rooted.topOperand !== null && guardIndex < rooted.topOperand));
+            if (!ahead) {
+                fail(
+                    ctx,
+                    entryPath,
+                    `\`root\` needs a guard: each root's expression, named with \`as\`, as an earlier operand of ${path}.match's top-level \`all\`, and the root a \`ref\` to it`,
+                );
+                return;
+            }
+            const guard = topAll[guardIndex];
+            const keys = expressionKeysOf(guard);
+            const isSource = keys.length === 1 && (keys[0] === 'element' || keys[0] === 'text');
+            if (!isSource && !('is' in guard)) {
+                fail(
+                    ctx,
+                    `${path}.match.all[${guardIndex}]`,
+                    `the guard "${name}" is not an \`element\` or \`text\` source, so it carries \`is\`, such as "is": {"type": "object"}`,
+                );
+            }
+        });
     }
 }
 
@@ -3994,6 +4016,30 @@ describe('webDetection config tests', () => {
                 });
             });
 
+            it('checks each entry of an array root for a guard', () => {
+                const sidebar = { element: { selector: '#sidebar' }, as: 'sidebar' };
+                const scoped = (/** @type {unknown} */ root) => ({ count: { element: { selector: 'img', root } }, is: { lt: 1 } });
+                expectValid({
+                    all: [
+                        guard,
+                        sidebar,
+                        scoped([
+                            { ref: 'comments' },
+                            { ref: 'sidebar' },
+                        ]),
+                    ],
+                });
+                expectError('root[1]', {
+                    all: [
+                        guard,
+                        scoped([
+                            { ref: 'comments' },
+                            '#sidebar',
+                        ]),
+                    ],
+                });
+            });
+
             it('passes a scoped leaf read only in boolean position with no `none` above it', () => {
                 expectValid({
                     element: {
@@ -4405,10 +4451,43 @@ describe('webDetection config tests', () => {
                 expectValid({ element: { selector: 'img', root: { api: { path: 'document' } } } });
             });
 
+            it('takes an array of selectors and expressions, and a selector a read gives', () => {
+                expectValid({
+                    element: {
+                        selector: 'img',
+                        root: [
+                            '#comments',
+                            { only: { element: { selector: 'article' } } },
+                            null,
+                        ],
+                    },
+                });
+                expectValid({ text: { pattern: 'a', root: { only: fieldOf('a', 'href') } } });
+            });
+
             it('rejects a root of text, numbers or values that are not nodes', () => {
                 expectError('config types it as a list of string', { element: { selector: 'img', root: text } });
                 expectError('config types it as a list of number', { element: { selector: 'img', root: fieldOf('img', 'naturalWidth') } });
-                expectError('config types it as string', { text: { pattern: 'a', root: { only: fieldOf('a', 'href') } } });
+                expectError('config types it as number', { text: { pattern: 'a', root: { only: fieldOf('img', 'naturalWidth') } } });
+                expectError('A number fills', {
+                    element: {
+                        selector: 'img',
+                        root: [
+                            1,
+                        ],
+                    },
+                });
+                expectError('at least one entry', { element: { selector: 'img', root: [] } });
+                expectError('An array, the OR of its entries,', {
+                    element: {
+                        selector: 'img',
+                        root: [
+                            [
+                                '#a',
+                            ],
+                        ],
+                    },
+                });
                 expectError('`count` fills', { element: { selector: 'img', root: imgCount } });
             });
 
