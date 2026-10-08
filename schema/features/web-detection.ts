@@ -128,10 +128,10 @@ export type Predicate = string | number | boolean | null | Predicate[] | Predica
 
 type Root = {
     /**
-     * Where the source's reads start: the union of the nodes these selectors match, or of the node
-     * or list of nodes an expression gives. Without it, the document.
+     * Where the source's reads start: an expression or an array of them, each giving a selector, a
+     * node or a list of nodes. The scope is the union of their nodes. Without it, the document.
      */
-    root?: MaybeArray<string> | ExprObject;
+    root?: MaybeArray<Expr>;
 };
 
 type ItemKeys = {
