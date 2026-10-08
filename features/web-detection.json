@@ -1129,13 +1129,17 @@
                                         },
                                         "as": "status",
                                         "is": {
-                                            "gte": 400
+                                            "any": [
+                                                {
+                                                    "exists": false
+                                                },
+                                                {
+                                                    "gte": 400
+                                                }
+                                            ]
                                         }
                                     }
-                                ],
-                                "catch": {
-                                    "absent": true
-                                }
+                                ]
                             }
                         ]
                     },
@@ -1218,13 +1222,17 @@
                                         },
                                         "as": "status",
                                         "is": {
-                                            "gte": 400
+                                            "any": [
+                                                {
+                                                    "exists": false
+                                                },
+                                                {
+                                                    "gte": 400
+                                                }
+                                            ]
                                         }
                                     }
-                                ],
-                                "catch": {
-                                    "absent": true
-                                }
+                                ]
                             }
                         ]
                     },
@@ -1303,10 +1311,8 @@
                                             ],
                                             "field": "responseStatus"
                                         },
-                                        "catch": {
-                                            "absent": 0
-                                        },
                                         "is": {
+                                            "exists": true,
                                             "gte": 400
                                         }
                                     }
@@ -2188,11 +2194,9 @@
                                         }
                                     }
                                 },
-                                "catch": {
-                                    "absent": 0
-                                },
                                 "as": "failedFontFaces",
                                 "is": {
+                                    "exists": true,
                                     "gt": 0
                                 }
                             }

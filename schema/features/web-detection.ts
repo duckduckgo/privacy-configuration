@@ -70,15 +70,10 @@ export type MatchConditionSingle = {
 /** `^[a-zA-Z][a-zA-Z0-9_]*$` */
 type Name = string;
 
-/** Why an expression could not read the page. */
-type FailureKind = 'absent' | 'denied';
-
 /** Keys that sit beside an expression key. */
 type Modifiers = {
-    /** Names the expression's value, after `catch`, for `ref` and payloads. Unique within the detector. */
+    /** Names the expression's value for `ref` and payloads. Unique within the detector. */
     as?: Name;
-    /** Handlers by failure kind, each an expression in the caught expression's position. */
-    catch?: Partial<Record<FailureKind, Expr>>;
     /** Tests the value, giving a boolean. Only on an object in boolean position with one expression key. */
     is?: Predicate;
 };
@@ -112,6 +107,8 @@ type PredicateOperators = {
     lte?: Expr;
     gt?: Expr;
     gte?: Expr;
+    /** Holds when the read fails: the name is absent, or a getter or method threw. */
+    fails?: boolean;
     exists?: boolean;
     type?: MaybeArray<TypeName>;
     finite?: boolean;
