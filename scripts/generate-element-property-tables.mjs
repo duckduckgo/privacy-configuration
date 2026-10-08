@@ -11,8 +11,9 @@
  * `DOMString`, and `unrestricted` kept on `double` and `float`. Tags map to their interfaces per
  * namespace.
  *
- * Attributes named like a reserved predicate key are listed in `reservedNameProperties`:
- * config can only test them through the long form `{"field": <name>, "is": ...}`.
+ * Attributes named like a key a predicate reserves at item level are listed in
+ * `reservedNameProperties`: config can only test them through the long form
+ * `{"field": <name>, "is": ...}`, or `{"self": <name>, "is": ...}`.
  *
  * Usage: node scripts/generate-element-property-tables.mjs
  *
@@ -31,13 +32,24 @@ const elements = require('@webref/elements');
 const rootDir = join(dirname(fileURLToPath(import.meta.url)), '..');
 const OUTPUT_PATH = join(rootDir, 'tests/data/element-property-tables.json');
 
-/** Keys a predicate reserves at every level. */
+/** Keys a predicate reserves at item level: its own, and the expression keys that make an object an expression there. */
 const RESERVED_KEYS = [
     'any',
     'all',
     'none',
     'field',
     'is',
+    'element',
+    'text',
+    'api',
+    'self',
+    'expr',
+    'only',
+    'sum',
+    'mul',
+    'div',
+    'if',
+    'ref',
 ];
 
 /** Element specs in @webref/elements, by namespace. SVG 1.1 is left out: SVG 2 and its modules supersede it. */

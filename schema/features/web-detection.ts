@@ -137,8 +137,11 @@ type Root = {
 };
 
 type ItemKeys = {
-    /** A predicate each item must pass. */
-    where?: Predicate;
+    /**
+     * A predicate each item must pass. At item level, an object with an expression key other than
+     * `any`, `all` and `none` is a boolean expression over `self`, the item.
+     */
+    where?: Predicate | Expr;
     /** The value read from each item that passes `where`, or on `api`, from a value that is not a list. */
     field?: FieldRead;
 };

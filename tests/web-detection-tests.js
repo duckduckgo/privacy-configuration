@@ -471,7 +471,7 @@ function forEachSource(node, path, cb) {
 }
 
 /**
- * Invoke `cb` for every source in the operands of a predicate.
+ * Invoke `cb` for every source in the operands of a predicate, and in its expressions at item level.
  *
  * @param {unknown} predicate
  * @param {'item' | 'value'} level
@@ -484,6 +484,10 @@ function forEachPredicateSource(predicate, level, path, cb) {
         return;
     }
     if (!isPlainObject(predicate)) return;
+    if (level === 'item' && isItemExpression(predicate)) {
+        forEachSource(predicate, path, cb);
+        return;
+    }
 
     for (const [
         key,
@@ -1149,6 +1153,29 @@ function expectPosition(ctx, path, what, position, fills) {
  */
 function expressionKeysOf(node) {
     return Object.keys(node).filter((key) => EXPRESSION_KEYS.includes(key));
+}
+
+/**
+ * Whether config at item level is a boolean expression over `self`: an object with an expression key
+ * other than `any`, `all` and `none`, which a predicate shares.
+ *
+ * @param {unknown} node
+ * @returns {node is Record<string, any>}
+ */
+function isItemExpression(node) {
+    return isPlainObject(node) && expressionKeysOf(node).some((key) => !OPERATOR_KEYS.includes(key));
+}
+
+/**
+ * Whether a `root` entry is `{"self": {}}`, the item a `where` or `field` binds, which is never absent.
+ *
+ * @param {unknown} entry
+ * @returns {boolean}
+ */
+function isBoundItem(entry) {
+    return (
+        isPlainObject(entry) && Object.keys(entry).join() === 'self' && isPlainObject(entry.self) && Object.keys(entry.self).length === 0
+    );
 }
 
 /**
@@ -2388,6 +2415,10 @@ function checkPredicate(predicate, level, subject, scope, ctx, path) {
         fail(ctx, path, `${JSON.stringify(predicate)} is not a predicate`);
         return;
     }
+    if (level === 'item' && isItemExpression(predicate)) {
+        checkExpr(predicate, 'boolean', child(scope), ctx, path);
+        return;
+    }
 
     if ('field' in predicate !== 'is' in predicate) fail(ctx, path, '`field` and `is` go together: `{"field": F, "is": P}`');
     const operators = level === 'value' ? Object.keys(predicate).filter((key) => VALUE_OPERATORS.includes(key)) : [];
@@ -2737,8 +2768,8 @@ function checkBranchRefs(ctx) {
 
 /**
  * A rooted `element` or `text` read anywhere but in boolean position with no `none` above it needs
- * a guard. Each entry of its `root` is a `ref` to an earlier operand of match's top-level `all`,
- * which carries `is` unless it is an `element` or `text` source.
+ * a guard. Each entry of its `root` other than `{"self": {}}` is a `ref` to an earlier operand of
+ * match's top-level `all`, which carries `is` unless it is an `element` or `text` source.
  *
  * @param {Record<string, any>} detector
  * @param {string} path
@@ -2757,6 +2788,7 @@ function checkRootGuards(detector, path, ctx) {
     for (const rooted of ctx.rooted) {
         if (!rooted.needsGuard && !(rooted.owner && referenced.has(rooted.owner))) continue;
         asArray(rooted.root).forEach((entry, index) => {
+            if (isBoundItem(entry)) return;
             const entryPath = Array.isArray(rooted.root) ? `${rooted.path}.root[${index}]` : `${rooted.path}.root`;
             const name = isPlainObject(entry) && Object.keys(entry).join() === 'ref' ? entry.ref : undefined;
             const guardIndex = typeof name === 'string' ? guards.get(name) : undefined;
@@ -3168,7 +3200,7 @@ describe('webDetection config tests', () => {
         it('list the properties named like a reserved key, which config reads through the long form', () => {
             for (const entry of PROPERTY_TABLES.reservedNameProperties) {
                 const property = entry.split('.').pop();
-                expect(OPERATOR_KEYS.concat('field', 'is')).to.include(property);
+                expect(EXPRESSION_KEYS.concat('field', 'is')).to.include(property);
             }
         });
     });
@@ -3286,8 +3318,11 @@ describe('webDetection config tests', () => {
             ]);
         });
 
-        it('does not mistake a property named text in `where` for a source', () => {
-            expect(collect({ element: { selector: 'option', where: { text: 'Sign in' } } })).to.deep.equal([]);
+        it('reaches text in a `where` expression, and not a property named text read through the long form', () => {
+            expect(collect({ element: { selector: 'option', where: { text: { pattern: 'g' } } } })).to.deep.equal([
+                'g',
+            ]);
+            expect(collect({ element: { selector: 'option', where: { field: 'text', is: 'Sign in' } } })).to.deep.equal([]);
         });
 
         it('reaches text in payload values, when and buckets', () => {
@@ -4458,6 +4493,55 @@ describe('webDetection config tests', () => {
                         { ...imgCount, is: { gt: 0 } },
                     ],
                 });
+            });
+        });
+
+        describe('`where` expressions', () => {
+            it('admits a boolean expression over `self`, alone and beside predicates under combinators', () => {
+                const has = {
+                    api: {
+                        path: 'Reflect.has',
+                        args: [
+                            { self: {} },
+                            'currentSrc',
+                        ],
+                    },
+                };
+                expectValid(items('img', has));
+                expectValid(
+                    items('input', {
+                        any: [
+                            { self: 'checked', is: true },
+                            { type: 'checkbox' },
+                        ],
+                    }),
+                );
+                expectValid(
+                    items('input', [
+                        { self: 'checked', is: true },
+                        { type: 'checkbox' },
+                    ]),
+                );
+                expectValid(items('option', { field: 'text', is: 'Sign in' }));
+                expectValid(items('option', { self: 'text', is: 'Sign in' }));
+            });
+
+            it('admits a source rooted at the item without a guard', () => {
+                expectValid(items('.card', { element: { selector: 'img', root: { self: {} } } }));
+                expectValid(items('.card', { element: { selector: 'p', root: { self: {} } }, using: 'length', is: { gte: 2 } }));
+                expectError(
+                    'needs a guard',
+                    items('.card', { element: { selector: 'p', root: { self: 'shadowRoot' } }, using: 'length', is: 0 }),
+                );
+            });
+
+            it('checks the names `self` reads against the item’s properties', () => {
+                expectError('"naturalwidth" is not a property of HTMLImageElement', items('img', { self: 'naturalwidth', is: 0 }));
+            });
+
+            it('rejects an object mixing expression keys and property paths, and a property named like an expression key', () => {
+                expectError('unknown expression key "naturalWidth"', items('img', { self: 'complete', is: true, naturalWidth: 0 }));
+                expect(errorsOf(items('option', { text: 'Sign in' }))).to.not.deep.equal([]);
             });
         });
 
