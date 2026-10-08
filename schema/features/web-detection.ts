@@ -92,7 +92,7 @@ type FieldRead =
     | {
           path?: string;
           args?: Arg[];
-          feature?: 'wordCount' | 'renderedTextLength';
+          feature?: 'renderedTextLength';
           /** An expression giving a function, applied to the value read so far as its one argument. */
           call?: Expr;
       };
