@@ -23,7 +23,7 @@ const SOURCE_KEYS = [
 
 const EXPRESSION_KEYS = [
     ...SOURCE_KEYS,
-    'count',
+    'expr',
     'only',
     'sum',
     'mul',
@@ -33,7 +33,9 @@ const EXPRESSION_KEYS = [
     'ref',
 ];
 
+/** In the order they apply: `using` reads from the expression's value, `as` names the result and `is` tests it. */
 const MODIFIER_KEYS = [
+    'using',
     'as',
     'is',
 ];
@@ -56,7 +58,6 @@ const BODY_KEYS = {
     api: [
         'path',
         'args',
-        'root',
         'where',
         'field',
     ],
@@ -427,6 +428,8 @@ function forEachSource(node, path, cb) {
                 if ('where' in body) forEachPredicateSource(body.where, 'item', `${bodyPath}.where`, cb);
                 if ('root' in body) forEachSource(body.root, `${bodyPath}.root`, cb);
             }
+        } else if (key === 'using') {
+            if (isPlainObject(value) && 'where' in value) forEachPredicateSource(value.where, 'item', `${childPath}.where`, cb);
         } else if (key === 'if') {
             if (!isPlainObject(value)) continue;
             for (const branch of [
@@ -663,9 +666,9 @@ function forEachWebDetectionConfig(cb) {
  */
 
 /**
- * What an expression's position expects, as C-S-S names it. `list` is the operand of `count` and
- * `only`. `spread` is an operand of `sum`, `mul`, `min`, `max`, `any`, `all` and `none` that gives
- * a list, contributing each item. `root` is the `root` of a source.
+ * What an expression's position expects, as C-S-S names it. `list` is the operand of `only`.
+ * `spread` is an operand of `sum`, `mul`, `any`, `all` and `none` that gives a list, contributing
+ * each item. `root` is the `root` of a source, and the expression beside `using`.
  *
  * @typedef {'boolean' | 'value' | 'number' | 'list' | 'spread' | 'root'} Position
  */
@@ -776,7 +779,7 @@ function oneItem(type, ctx, path) {
         fail(
             ctx,
             path,
-            'performance.getEntries selects every entry, so it never gives one value; read it under `count`, or use getEntriesByType or getEntriesByName',
+            'performance.getEntries selects every entry, so it never gives one value; read its length through `using`, or use getEntriesByType or getEntriesByName',
         );
     }
     return item;
@@ -1122,7 +1125,7 @@ function valueNode(node) {
 
 /**
  * Whether an operand of `any`, `all`, `none`, `sum` or `mul` is in spread position,
- * contributing each item of a list: a source, or a ref to one. Under `any`, `all` and `none`,
+ * contributing each item of a list: a source, or a ref or `expr` over one. Under `any`, `all` and `none`,
  * `element` without `field` and `text` are presence leaves, booleans.
  *
  * @param {unknown} node
@@ -1133,6 +1136,8 @@ function valueNode(node) {
  */
 function providesValues(node, single, ctx, seen = new Set()) {
     if (!isPlainObject(node) || 'is' in node) return false;
+    // `using` reads one value from the expression beside it
+    if ('using' in node) return false;
     const keys = expressionKeysOf(node);
     if (keys.length !== 1) return false;
     const body = node[keys[0]];
@@ -1148,6 +1153,8 @@ function providesValues(node, single, ctx, seen = new Set()) {
             });
             return hasField || single === 'number';
         }
+        case 'expr':
+            return providesValues(body, single, ctx, seen);
         case 'ref': {
             const target = typeof body === 'string' && !seen.has(body) ? ctx.names.get(body) : undefined;
             return target
@@ -1252,14 +1259,21 @@ function checkExpr(node, position, scope, ctx, path) {
         if (!EXPRESSION_KEYS.includes(key) && !MODIFIER_KEYS.includes(key)) fail(ctx, path, `unknown expression key "${key}"`);
     }
     const exprKeys = expressionKeysOf(node);
+    const hasUsing = 'using' in node;
     if (exprKeys.length === 0) {
-        fail(ctx, path, 'an object expression needs an expression key');
+        fail(
+            ctx,
+            path,
+            hasUsing
+                ? '`using` reads from an expression, and this object has no expression key'
+                : 'an object expression needs an expression key',
+        );
         return UNKNOWN;
     }
     const hasIs = 'is' in node;
     if (hasIs && position !== 'boolean')
         fail(ctx, path, `\`is\` gives a boolean, so it sits in boolean position, not ${position} position`);
-    if (exprKeys.length > 1 && (hasIs || (position !== 'boolean' && position !== 'value'))) {
+    if (exprKeys.length > 1 && !hasUsing && (hasIs || (position !== 'boolean' && position !== 'value'))) {
         fail(
             ctx,
             path,
@@ -1286,16 +1300,20 @@ function checkExpr(node, position, scope, ctx, path) {
     }
 
     const inner = { ...scope, owners };
-    const keyPosition = exprKeys.length > 1 ? 'boolean' : hasIs ? 'value' : position;
+    // With `is`, the expression computes a value for the predicate
+    const valuePosition = hasIs ? 'value' : position;
+    // With `using`, the expression keys give the value `using` reads from
+    const keyPosition = exprKeys.length > 1 ? 'boolean' : hasUsing ? 'root' : valuePosition;
     /** @type {StaticType} */
     let type;
     if (exprKeys.length > 1) {
         for (const key of exprKeys) checkExprKey(key, node[key], 'boolean', child(inner), ctx, `${path}.${key}`, undefined);
         type = typeOf('boolean');
     } else {
-        const owner = typeof node.as === 'string' ? node.as : undefined;
+        const owner = typeof node.as === 'string' && !hasUsing ? node.as : undefined;
         type = checkExprKey(exprKeys[0], node[exprKeys[0]], keyPosition, inner, ctx, `${path}.${exprKeys[0]}`, owner);
     }
+    if (hasUsing) type = checkUsing(node.using, type, valuePosition, inner, ctx, path);
     if (hasIs) {
         // `as` names the value, not the test, so a ref to it from the test is no cycle
         checkPredicate(node.is, 'value', predicateSubject(type, node.is, ctx, `${path}.is`), child(scope), ctx, `${path}.is`);
@@ -1321,13 +1339,16 @@ function checkExprKey(key, body, position, scope, ctx, path, owner) {
             return checkConditionSource(key, body, position, scope, ctx, path, owner);
         case 'api':
             return checkApi(body, position, scope, ctx, path);
-        case 'count':
-            expectPosition(ctx, path, '`count`', position, [
-                'value',
-                'number',
-            ]);
-            checkExpr(body, 'list', child(scope), ctx, path);
-            return typeOf('number');
+        case 'expr':
+            // Its operand's value in its own position. An operand with `is` gives a boolean
+            if (isPlainObject(body) && 'is' in body) {
+                expectPosition(ctx, path, '`expr` over `is`', position, [
+                    'boolean',
+                    'value',
+                ]);
+                return checkExpr(body, 'boolean', scope, ctx, path);
+            }
+            return checkExpr(body, position, scope, ctx, path);
         case 'only': {
             expectPosition(ctx, path, '`only`', position, [
                 'value',
@@ -1725,14 +1746,44 @@ function sourceType(type, list, position, ctx, path) {
 }
 
 /**
+ * `using`: an `api` body read from the value of the expression beside it. A string is short for
+ * `{ path }`.
+ *
+ * @param {unknown} using
+ * @param {StaticType} root - the type of the expression beside `using`
+ * @param {Position} position
+ * @param {Scope} scope
+ * @param {Context} ctx
+ * @param {string} path - the path of the object holding `using`
+ * @returns {StaticType}
+ */
+function checkUsing(using, root, position, scope, ctx, path) {
+    const usingPath = `${path}.using`;
+    const body = typeof using === 'string' ? { path: using } : using;
+    if (!isPlainObject(body)) {
+        fail(ctx, usingPath, '`using` takes a path or an `api` body without `root`');
+        return UNKNOWN;
+    }
+    // `length` alone is a number, as C-S-S compiles it
+    if (body.path === 'length' && Object.keys(body).length === 1)
+        expectPosition(ctx, usingPath, '`using` `length`', position, [
+            'value',
+            'number',
+            'root',
+        ]);
+    return checkApi(body, position, scope, ctx, usingPath, root);
+}
+
+/**
  * @param {unknown} body
  * @param {Position} position
  * @param {Scope} scope
  * @param {Context} ctx
  * @param {string} path
+ * @param {StaticType} [root] - through `using`, the type of the value `path` reads from. Without it, the global object
  * @returns {StaticType}
  */
-function checkApi(body, position, scope, ctx, path) {
+function checkApi(body, position, scope, ctx, path, root) {
     if (!isPlainObject(body)) {
         fail(ctx, path, '`api` takes one body object');
         return UNKNOWN;
@@ -1758,23 +1809,24 @@ function checkApi(body, position, scope, ctx, path) {
     const names = body.path.split('.');
     const asArgument = ctx.argumentApis.has(body);
     /** @type {StaticType} */
-    let read;
-    if ('root' in body) {
-        const rootPath = `${path}.root`;
-        read = checkExpr(body.root, 'root', child(scope), ctx, rootPath);
-        // `concat` and an item read on a list root add no name
+    let read = root ?? UNKNOWN;
+    if (root) {
+        // `concat`, an item read and `length` on a list add no name
         const addsNoName =
             read.list !== undefined &&
             names.length === 1 &&
-            'args' in body &&
-            (names[0] === 'concat' || readsItem(names[0], true, body.args));
+            ('args' in body ? names[0] === 'concat' || readsItem(names[0], true, body.args) : names[0] === 'length');
         if (read.apiPaths === undefined && !read.interfaces && !addsNoName) {
-            fail(ctx, rootPath, 'CI names what `path` reads by the root’s `api` names or element type, and this root has neither');
+            fail(
+                ctx,
+                path,
+                'CI names what `using` reads by the `api` names or element type of the expression beside it, and this expression has neither',
+            );
             read = UNKNOWN;
         }
     }
     const argTypes = 'args' in body ? checkArgs(body.args, scope, ctx, `${path}.args`) : undefined;
-    if ('root' in body) {
+    if (root) {
         names.forEach((name, index) => {
             const last = index === names.length - 1;
             const isCall = 'args' in body && last;
@@ -2273,7 +2325,11 @@ function checkPayloadSpec(data, ctx, path) {
         }
         const type = checkExpr(field.value, 'value', PAYLOAD_SCOPE, ctx, `${fieldPath}.value`);
         if (type.list === 'selected' && !('buckets' in field))
-            fail(ctx, `${fieldPath}.value`, 'a selected list is sent through `buckets`, or read with `count` or `only`');
+            fail(
+                ctx,
+                `${fieldPath}.value`,
+                'a selected list is sent through `buckets`, read with `only`, or sent as its length through `using`',
+            );
         if ('when' in field) {
             const whenPath = `${fieldPath}.when`;
             checkPredicate(field.when, 'value', predicateSubject(type, field.when, ctx, whenPath), PAYLOAD_SCOPE, ctx, whenPath);
@@ -2991,17 +3047,18 @@ describe('webDetection config tests', () => {
         it('reaches text under operators, if branches and predicate operands', () => {
             const match = {
                 all: [
-                    { count: { text: { pattern: 'a' } }, is: { gte: 1 } },
+                    { text: { pattern: 'a' }, using: 'length', is: { gte: 1 } },
                     {
                         if: {
                             test: { text: { pattern: 'b' } },
-                            then: { count: { text: { pattern: 'c' } } },
-                            else: { count: { text: { pattern: 'd' } } },
+                            then: { text: { pattern: 'c' }, using: 'length' },
+                            else: { text: { pattern: 'd' }, using: 'length' },
                         },
-                        is: { gt: { count: { text: { pattern: 'e' } } } },
+                        is: { gt: { text: { pattern: 'e' }, using: 'length' } },
                     },
                     {
-                        count: { element: { selector: 'img', where: { naturalWidth: { gt: { count: { text: { pattern: 'f' } } } } } } },
+                        element: { selector: 'img', where: { naturalWidth: { gt: { text: { pattern: 'f' }, using: 'length' } } } },
+                        using: 'length',
                         is: 0,
                     },
                 ],
@@ -3021,15 +3078,11 @@ describe('webDetection config tests', () => {
                 all: [
                     { element: { selector: 'img', root: { only: { text: { pattern: 'a' } } } } },
                     {
-                        api: {
-                            root: {
-                                element: {
-                                    selector: 'p',
-                                    root: { if: { test: { text: { pattern: 'b' } }, then: { ref: 'x' }, else: { ref: 'y' } } },
-                                },
-                            },
-                            path: 'length',
+                        element: {
+                            selector: 'p',
+                            root: { if: { test: { text: { pattern: 'b' } }, then: { ref: 'x' }, else: { ref: 'y' } } },
                         },
+                        using: 'length',
                     },
                 ],
             };
@@ -3052,11 +3105,14 @@ describe('webDetection config tests', () => {
                     fireEvent: {
                         type: 't',
                         data: {
-                            a: { value: { count: { text: { pattern: 'a' } } }, when: { gt: { count: { text: { pattern: 'b' } } } } },
-                            c: { value: 1, buckets: { x: { lt: { count: { text: { pattern: 'c' } } } } } },
+                            a: {
+                                value: { text: { pattern: 'a' }, using: 'length' },
+                                when: { gt: { text: { pattern: 'b' }, using: 'length' } },
+                            },
+                            c: { value: 1, buckets: { x: { lt: { text: { pattern: 'c' }, using: 'length' } } } },
                         },
                     },
-                    breakageReportData: { data: { d: { value: { count: { text: { pattern: 'd' } } } } } },
+                    breakageReportData: { data: { d: { value: { text: { pattern: 'd' }, using: 'length' } } } },
                 },
             };
             forEachDetectorTextCondition(detector, '$', (condition) => found.push(String(condition.pattern)));
@@ -3275,7 +3331,7 @@ describe('webDetection config tests', () => {
         };
 
         const img = { element: { selector: 'img' } };
-        const imgCount = { count: img };
+        const imgCount = { ...img, using: 'length' };
         const loadEventEnd = {
             api: {
                 path: 'performance.getEntriesByType',
@@ -3295,7 +3351,7 @@ describe('webDetection config tests', () => {
             },
             as: 'comments',
         };
-        const rootedImages = { count: { element: { selector: 'img', root: { ref: 'comments' } } } };
+        const rootedImages = { element: { selector: 'img', root: { ref: 'comments' } }, using: 'length' };
         const text = { text: { pattern: 'a' } };
 
         /**
@@ -3304,7 +3360,7 @@ describe('webDetection config tests', () => {
          * @param {string} selector
          * @param {unknown} where
          */
-        const items = (selector, where) => ({ count: { element: { selector, where } }, is: 0 });
+        const items = (selector, where) => ({ element: { selector, where }, using: 'length', is: 0 });
 
         /**
          * @param {string} selector
@@ -3385,20 +3441,23 @@ describe('webDetection config tests', () => {
 
             it('rejects legacy blocks over bodies outside boolean position', () => {
                 expectError('boolean only', {
-                    count: {
-                        text: {
-                            any: [
-                                { pattern: 'a' },
-                            ],
-                        },
+                    text: {
+                        any: [
+                            { pattern: 'a' },
+                        ],
                     },
+                    using: 'length',
                     is: { gt: 0 },
                 });
             });
 
             it('rejects unknown expression, body, field and payload field keys', () => {
                 expectError('unknown expression key "aggregate"', { aggregate: imgCount });
-                expectError('unknown source body key "selector"', { count: { api: { path: 'document.fonts', selector: '#a' } }, is: 0 });
+                expectError('unknown source body key "selector"', {
+                    api: { path: 'document.fonts', selector: '#a' },
+                    using: 'length',
+                    is: 0,
+                });
                 expectError('unknown source body key "where"', { text: { pattern: 'a', where: {} } });
                 expectError('unknown source body key "allowGetter"', { text: { pattern: 'a', allowGetter: true } });
                 expectError('unknown `field` key', { ...fieldOf('img', { name: 'src' }), is: {} });
@@ -3417,7 +3476,7 @@ describe('webDetection config tests', () => {
             });
 
             it('rejects `is` outside boolean position', () => {
-                expectError('`is` gives a boolean', true, { a: { value: { count: img, is: { gt: 0 } } } });
+                expectError('`is` gives a boolean', true, { a: { value: { ...img, using: 'length', is: { gt: 0 } } } });
             });
 
             it('checks `div` takes two operands', () => {
@@ -3530,7 +3589,7 @@ describe('webDetection config tests', () => {
             });
 
             it('reads a ref in the ref’s own position', () => {
-                expectValid({ ...img, as: 'images' }, { images: { value: { count: { ref: 'images' } } } });
+                expectValid({ ...img, as: 'images' }, { images: { value: { ref: 'images', using: 'length' } } });
                 expectValid({
                     all: [
                         { ...imgCount, as: 'images', is: { gte: 5 } },
@@ -3570,8 +3629,8 @@ describe('webDetection config tests', () => {
                     ],
                     is: { gt: 0 },
                 });
-                expectError('A string fills', { count: 'x', is: 1 });
-                expectError('A string fills', { count: { element: { selector: 'p' } }, is: { gt: 'x' } });
+                expectError('A string fills', { only: 'x', is: 1 });
+                expectError('A string fills', { element: { selector: 'p' }, using: 'length', is: { gt: 'x' } });
                 expectValid(true, {
                     word: { value: { if: { test: true, then: 'yes', else: 'no' } } },
                     state: { value: { if: { test: false, then: 'x', else: null } } },
@@ -3607,14 +3666,14 @@ describe('webDetection config tests', () => {
             it('rejects a selected list in a payload without buckets', () => {
                 expectError('sent through `buckets`', true, { matched: { value: text } });
                 expectError('sent through `buckets`', { ...img, as: 'images' }, { image: { value: { ref: 'images' } } });
-                expectValid({ ...img, as: 'images' }, { image: { value: { count: { ref: 'images' } } } });
+                expectValid({ ...img, as: 'images' }, { image: { value: { ref: 'images', using: 'length' } } });
                 expectValid(true, { width: { value: fieldOf('img', 'naturalWidth'), buckets: { wide: { gt: 100 } } } });
             });
 
             it('places `text` and `element` without `field` in list position', () => {
                 expectValid({ only: text, is: { length: { gt: 0 } } });
                 expectValid({ only: img, is: { field: { path: 'tagName' }, is: 'IMG' } });
-                expectValid({ count: text, is: { gt: 0 } });
+                expectValid({ ...text, using: 'length', is: { gt: 0 } });
             });
 
             it('rejects `text` and `element` without `field` in number position', () => {
@@ -3634,7 +3693,7 @@ describe('webDetection config tests', () => {
                 });
             });
 
-            it('places a bare `api` in boolean position, and keeps `element` with `field`, `api` with `where` and `count` out of it', () => {
+            it('places a bare `api` in boolean position, and keeps `element` with `field`, `api` with `where` and a length out of it', () => {
                 expectValid({ api: { path: 'document.hidden' } });
                 expectValid({
                     api: {
@@ -3647,9 +3706,10 @@ describe('webDetection config tests', () => {
                 });
                 expectError('`element` with `field` fills', fieldOf('img', 'complete'));
                 expectError('`api` with `where` fills', { api: { path: 'document.fonts', where: { status: 'error' } } });
-                expectError('`count` fills', imgCount);
+                expectError('boolean position takes a boolean, and config types the value as number', imgCount);
                 expectError('boolean position takes a boolean, and config types the value as number', {
-                    api: { root: { only: img }, path: 'naturalWidth' },
+                    only: img,
+                    using: 'naturalWidth',
                 });
             });
 
@@ -3667,7 +3727,7 @@ describe('webDetection config tests', () => {
                 });
             });
 
-            it('places `only` and `count` over lists only', () => {
+            it('places `only` over lists only', () => {
                 expectValid({ only: fieldOf('img', 'naturalWidth'), is: { gt: 0 } });
                 expectValid({ only: { api: { path: 'document.fonts' } }, is: { field: 'status', is: 'loaded' } });
                 expectValid({
@@ -3677,9 +3737,9 @@ describe('webDetection config tests', () => {
                     ],
                     is: { gt: 0 },
                 });
-                expectError('`count` fills', { only: imgCount, is: { gt: 0 } });
-                expectError('A number fills', { count: 1, is: 0 });
-                expectError('`if` fills', { count: { if: { test: true, then: img, else: img } }, is: 0 });
+                expectError('`using` `length` fills', { only: imgCount, is: { gt: 0 } });
+                expectError('A number fills', { only: 1, is: 0 });
+                expectError('`if` fills', { only: { if: { test: true, then: img, else: img } }, is: 0 });
                 expectError('`only` fills', { only: img });
                 expectError('number position takes a number, and config types the value as string', {
                     div: [
@@ -3759,7 +3819,8 @@ describe('webDetection config tests', () => {
         describe('`api` names and data reads', () => {
             it('rejects `allowGetter`, which is no source body or `field` key', () => {
                 expectError('unknown source body key "allowGetter"', {
-                    count: { element: { selector: 'img', allowGetter: true, where: { complete: true } } },
+                    element: { selector: 'img', allowGetter: true, where: { complete: true } },
+                    using: 'length',
                     is: 0,
                 });
                 expectError('unknown source body key "allowGetter"', {
@@ -3786,8 +3847,8 @@ describe('webDetection config tests', () => {
                 expectValid({ ...maxOf(widths), is: { gt: 100 } });
                 expectValid({
                     ...maxOf({
-                        api: {
-                            root: widths,
+                        ...widths,
+                        using: {
                             path: 'concat',
                             args: [
                                 100,
@@ -3811,7 +3872,7 @@ describe('webDetection config tests', () => {
                 expectValid({
                     ...maxOf([
                         1,
-                        { count: img },
+                        { ...img, using: 'length' },
                     ]),
                     is: { gt: 0 },
                 });
@@ -3888,7 +3949,7 @@ describe('webDetection config tests', () => {
                     api: {
                         path: 'Math.max',
                         args: [
-                            { count: { api: { path: 'performance.now' } } },
+                            { only: { api: { path: 'performance.now' } } },
                         ],
                     },
                     is: {},
@@ -3921,24 +3982,24 @@ describe('webDetection config tests', () => {
         describe('calls on element items', () => {
             it('admits methods on ELEMENT_METHOD_ALLOWLIST only', () => {
                 expectValid({
-                    count: {
-                        element: {
-                            selector: 'div',
-                            where: {
-                                field: {
-                                    path: 'getAttribute',
-                                    args: [
-                                        'role',
-                                    ],
-                                },
-                                is: 'dialog',
+                    element: {
+                        selector: 'div',
+                        where: {
+                            field: {
+                                path: 'getAttribute',
+                                args: [
+                                    'role',
+                                ],
                             },
+                            is: 'dialog',
                         },
                     },
+                    using: 'length',
                     is: { gt: 0 },
                 });
                 expectError('not in ELEMENT_METHOD_ALLOWLIST', {
-                    count: { element: { selector: 'button', where: { field: { path: 'click', args: [] }, is: true } } },
+                    element: { selector: 'button', where: { field: { path: 'click', args: [] }, is: true } },
+                    using: 'length',
                     is: 0,
                 });
                 expectError('not an element', items('img', { field: { path: 'src.toString', args: [] }, is: 'x' }));
@@ -3966,7 +4027,7 @@ describe('webDetection config tests', () => {
 
             it('checks each entry of an array root for a guard', () => {
                 const sidebar = { element: { selector: '#sidebar' }, as: 'sidebar' };
-                const scoped = (/** @type {unknown} */ root) => ({ count: { element: { selector: 'img', root } }, is: { lt: 1 } });
+                const scoped = (/** @type {unknown} */ root) => ({ element: { selector: 'img', root }, using: 'length', is: { lt: 1 } });
                 expectValid({
                     all: [
                         guard,
@@ -4003,12 +4064,12 @@ describe('webDetection config tests', () => {
             it('rejects a scoped expression with no guard, or a guard behind it', () => {
                 expectError('needs a guard', {
                     all: [
-                        { count: { element: { selector: 'img', root: '#comments' } }, is: { lt: 1 } },
+                        { element: { selector: 'img', root: '#comments' }, using: 'length', is: { lt: 1 } },
                     ],
                 });
                 expectError('needs a guard', {
                     all: [
-                        { count: { element: { selector: 'img', root: { element: { selector: '#comments' } } } }, is: { lt: 1 } },
+                        { element: { selector: 'img', root: { element: { selector: '#comments' } } }, using: 'length', is: { lt: 1 } },
                     ],
                 });
                 expectError('needs a guard', {
@@ -4026,7 +4087,7 @@ describe('webDetection config tests', () => {
                 expectError(
                     'needs a guard',
                     { ...guard, as: 'region' },
-                    { images: { value: { count: { element: { selector: 'img', root: '#comments' } } } } },
+                    { images: { value: { element: { selector: 'img', root: '#comments' }, using: 'length' } } },
                 );
             });
 
@@ -4054,13 +4115,13 @@ describe('webDetection config tests', () => {
                         },
                         as: 'images',
                     },
-                    { n: { value: { count: { ref: 'images' } } } },
+                    { n: { value: { ref: 'images', using: 'length' } } },
                 );
             });
 
             it('requires `is` on a guard that is not an `element` or `text` source', () => {
-                const shadowRoot = { api: { root: { only: { element: { selector: 'my-widget' } } }, path: 'shadowRoot' }, as: 'shadow' };
-                const shadowImages = { count: { element: { selector: 'img', root: { ref: 'shadow' } } }, is: { lt: 1 } };
+                const shadowRoot = { only: { element: { selector: 'my-widget' } }, using: 'shadowRoot', as: 'shadow' };
+                const shadowImages = { element: { selector: 'img', root: { ref: 'shadow' } }, using: 'length', is: { lt: 1 } };
                 expectError('carries `is`', {
                     all: [
                         shadowRoot,
@@ -4192,29 +4253,27 @@ describe('webDetection config tests', () => {
                 });
                 expectError('"document.title.foo"', { api: { path: 'document', field: 'title.foo' }, is: {} });
                 expectError('"performance.getEntriesByType.name"', {
-                    count: {
-                        api: {
-                            path: 'performance.getEntriesByType',
-                            args: [
-                                'resource',
-                            ],
-                            where: { name: 'x' },
-                        },
+                    api: {
+                        path: 'performance.getEntriesByType',
+                        args: [
+                            'resource',
+                        ],
+                        where: { name: 'x' },
                     },
+                    using: 'length',
                     is: 0,
                 });
                 expectError('"document.readyState.length"', { api: { path: 'document.readyState' }, is: { length: 8 } });
                 expectValid({ ...title, is: { type: 'string', length: { gte: 7 } } });
                 expectValid({
-                    count: {
-                        api: {
-                            path: 'performance.getEntriesByType',
-                            args: [
-                                'resource',
-                            ],
-                            where: { responseStatus: { exists: true, gte: 400 } },
-                        },
+                    api: {
+                        path: 'performance.getEntriesByType',
+                        args: [
+                            'resource',
+                        ],
+                        where: { responseStatus: { exists: true, gte: 400 } },
                     },
+                    using: 'length',
                     is: 0,
                 });
             });
@@ -4232,8 +4291,8 @@ describe('webDetection config tests', () => {
                     is: { gt: 0 },
                 });
                 expectError('performance.getEntries selects every entry', {
-                    api: {
-                        root: entries,
+                    ...entries,
+                    using: {
                         path: 'at',
                         args: [
                             0,
@@ -4241,11 +4300,16 @@ describe('webDetection config tests', () => {
                     },
                     is: {},
                 });
-                expectValid({ count: entries, is: { gt: 0 } });
+                expectValid({ api: { ...entries.api, where: {} }, using: 'length', is: { gt: 0 } });
+                expectError('"performance.getEntries.length", which is not in API_ALLOWLIST', {
+                    ...entries,
+                    using: 'length',
+                    is: { gt: 0 },
+                });
             });
         });
 
-        describe('`root` on `api`', () => {
+        describe('`using`', () => {
             const navigation = {
                 api: {
                     path: 'performance.getEntriesByType',
@@ -4255,67 +4319,70 @@ describe('webDetection config tests', () => {
                 },
             };
 
-            it('names a path read from an `api` root by the root’s name, through `ref` and `only`', () => {
+            it('names a path `using` reads by the name of the expression beside it, through `ref` and `only`', () => {
                 expectValid({
                     all: [
                         { only: navigation, as: 'navigation', is: { type: 'object' } },
-                        { api: { root: { ref: 'navigation' }, path: 'loadEventEnd' }, is: { gt: 0 } },
+                        { ref: 'navigation', using: 'loadEventEnd', is: { gt: 0 } },
                     ],
                 });
-                expectValid({ api: { root: { only: navigation }, path: 'responseStatus' }, is: { gte: 400 } });
+                expectValid({ only: navigation, using: 'responseStatus', is: { gte: 400 } });
                 expectError('"performance.getEntriesByType.name", which is not in API_ALLOWLIST', {
-                    api: { root: { only: navigation }, path: 'name' },
+                    only: navigation,
+                    using: 'name',
                     is: { type: 'string' },
                 });
                 expectError('reads the method "performance.now" without calling it', {
-                    api: { root: { api: { path: 'performance' } }, path: 'now' },
+                    api: { path: 'performance' },
+                    using: 'now',
                     is: { gt: 0 },
                 });
             });
 
-            it('reads an item with `at` or an index on a list or `api` root, under the item’s name', () => {
-                const at = (/** @type {unknown} */ root, /** @type {unknown[]} */ args) => ({ root, path: 'at', args });
+            it('reads an item with `at` or an index on a list or an `api` read, under the item’s name', () => {
+                const at = (
+                    /** @type {Record<string, unknown>} */ root,
+                    /** @type {unknown[]} */ args,
+                    /** @type {string} */ field = '',
+                ) => ({
+                    ...root,
+                    using: { path: 'at', args, ...(field && { field }) },
+                });
                 expectValid({
-                    api: {
-                        ...at(
-                            navigation,
-                            [
-                                0,
-                            ],
-                        ),
-                        field: 'loadEventEnd',
-                    },
+                    ...at(
+                        navigation,
+                        [
+                            0,
+                        ],
+                        'loadEventEnd',
+                    ),
                     is: { gt: 0 },
                 });
                 expectValid({
-                    api: {
-                        ...at(
-                            img,
-                            [
-                                -1,
-                            ],
-                        ),
-                        field: 'naturalWidth',
-                    },
+                    ...at(
+                        img,
+                        [
+                            -1,
+                        ],
+                        'naturalWidth',
+                    ),
                     is: { gt: 0 },
                 });
-                expectValid({ api: { root: img, path: '0.naturalWidth' }, is: { gt: 0 } });
-                expectValid({ api: { root: img, path: 'length' }, is: { gte: 5 } });
+                expectValid({ ...img, using: '0.naturalWidth', is: { gt: 0 } });
+                expectValid({ ...img, using: 'length', is: { gte: 5 } });
                 expectError('"naturalWidth" is not a property of HTMLHeadingElement', {
-                    api: {
-                        ...at(
-                            { element: { selector: 'h1' } },
-                            [
-                                0,
-                            ],
-                        ),
-                        field: 'naturalWidth',
-                    },
+                    ...at(
+                        { element: { selector: 'h1' } },
+                        [
+                            0,
+                        ],
+                        'naturalWidth',
+                    ),
                     is: { gt: 0 },
                 });
                 expectError('reads "slice" on a list', {
-                    api: {
-                        root: img,
+                    ...img,
+                    using: {
                         path: 'slice',
                         args: [
                             0,
@@ -4324,7 +4391,7 @@ describe('webDetection config tests', () => {
                     is: {},
                 });
                 expectError('reads "at" on a list', {
-                    api: at(
+                    ...at(
                         img,
                         [
                             0,
@@ -4334,17 +4401,18 @@ describe('webDetection config tests', () => {
                     is: {},
                 });
                 expectError('"performance.getEntriesByType.at", which is not in API_ALLOWLIST', {
-                    api: at(navigation, [
+                    ...at(navigation, [
                         'x',
                     ]),
                     is: {},
                 });
             });
 
-            it('checks a root under each name it may have', () => {
+            it('checks what `using` reads under each name the expression beside it may have', () => {
                 const document = { api: { path: 'document' } };
                 expectValid({
-                    api: { root: { if: { test: true, then: document, else: document } }, path: 'title' },
+                    if: { test: true, then: document, else: document },
+                    using: 'title',
                     is: { type: 'string' },
                 });
                 const byType = {
@@ -4370,28 +4438,90 @@ describe('webDetection config tests', () => {
                 };
                 const entry = { if: { test: { api: { path: 'document.hidden' } }, then: byType, else: byName } };
                 expectError('"performance.getEntriesByType.startTime", which is not in API_ALLOWLIST', {
-                    api: { root: entry, path: 'startTime' },
+                    ...entry,
+                    using: 'startTime',
                     is: { gt: 0 },
                 });
                 expectError('"performance.getEntriesByName.duration", which is not in API_ALLOWLIST', {
                     all: [
                         { ...entry, as: 'entry', is: {} },
-                        { api: { root: { ref: 'entry' }, path: 'duration' }, is: { gt: 0 } },
+                        { ref: 'entry', using: 'duration', is: { gt: 0 } },
                     ],
                 });
                 const image = { only: { element: { selector: 'img' } } };
                 const either = { if: { test: true, then: image, else: document } };
-                expectValid({ api: { root: either, path: 'title' }, is: { type: 'string' } });
+                expectValid({ ...either, using: 'title', is: { type: 'string' } });
                 expectError('"document.naturalWidth", which is not in API_ALLOWLIST', {
-                    api: { root: either, path: 'naturalWidth' },
+                    ...either,
+                    using: 'naturalWidth',
                     is: { gt: 0 },
                 });
             });
 
-            it('rejects a root CI cannot name', () => {
-                expectError('this root has neither', { api: { root: { only: text }, path: 'length' }, is: { gt: 0 } });
-                expectError('`count` fills', { api: { root: imgCount, path: 'toFixed', args: [] }, is: {} });
-                expectError('A number fills', { api: { root: 1, path: 'toFixed', args: [] }, is: {} });
+            it('rejects an expression beside `using` that CI cannot name', () => {
+                expectError('this expression has neither', { only: text, using: 'length', is: { gt: 0 } });
+                expectError('this expression has neither', { expr: imgCount, using: { path: 'toFixed', args: [] }, is: {} });
+                expectError('A number fills', { expr: 1, using: { path: 'toFixed', args: [] }, is: {} });
+            });
+
+            it('takes a path, or an `api` body without `root`, beside an expression', () => {
+                expectValid({ api: { path: 'document' }, using: 'fonts', is: { type: 'object' } });
+                expectValid({ api: { path: 'document' }, using: { path: 'fonts', where: { status: 'error' } }, as: 'failed', is: {} });
+                expectError('`using` reads from an expression', { using: 'length', is: 1 });
+                expectError('`using` takes a path', { ...img, using: 1, is: {} });
+                expectError('unknown source body key "root"', {
+                    ...img,
+                    using: {
+                        path: 'at',
+                        args: [
+                            0,
+                        ],
+                        root: img,
+                    },
+                    is: {},
+                });
+                expectError('unknown source body key "root"', { api: { root: img, path: 'length' }, is: { gt: 0 } });
+            });
+
+            it('applies `using`, then `as`, then `is`', () => {
+                expectValid({ ...img, using: 'length', as: 'images', is: { gte: 5 } }, { images: { value: { ref: 'images' } } });
+                expectError(
+                    'a selected list is sent through `buckets`',
+                    { ...img, as: 'images' },
+                    { images: { value: { ref: 'images' } } },
+                );
+            });
+        });
+
+        describe('`expr`', () => {
+            it('names a value and what `using` reads from it', () => {
+                expectValid(
+                    { expr: { ...img, as: 'imageElements' }, using: 'length', as: 'imageCount', is: { gte: 2 } },
+                    {
+                        imageCount: { value: { ref: 'imageCount' } },
+                        imageElements: { value: { ref: 'imageElements' }, buckets: { two: { length: 2 } } },
+                    },
+                );
+            });
+
+            it('names the boolean an `is` inside it gives', () => {
+                expectValid(
+                    { expr: { ...img, using: 'length', is: { gte: 2 } }, as: 'enoughImages' },
+                    { enough: { value: { ref: 'enoughImages' } } },
+                );
+                expectValid(true, { enough: { value: { expr: { ...img, using: 'length', is: { gte: 2 } } } } });
+                expectError('`expr` over `is` fills', {
+                    sum: [
+                        { expr: { ...img, using: 'length', is: { gte: 2 } } },
+                    ],
+                    is: 1,
+                });
+            });
+
+            it('gives its operand in its own position', () => {
+                expectValid({ sum: { expr: { element: { selector: 'img', field: 'naturalWidth' } } }, is: { gt: 0 } });
+                expectValid({ expr: img });
+                expectError('`element` with `field` fills', { expr: { element: { selector: 'img', field: 'naturalWidth' } } });
             });
         });
 
@@ -4402,7 +4532,7 @@ describe('webDetection config tests', () => {
                 expectValid({
                     element: {
                         selector: 'img',
-                        root: { api: { root: { only: { element: { selector: 'my-widget' } } }, path: 'shadowRoot' } },
+                        root: { only: { element: { selector: 'my-widget' } }, using: 'shadowRoot' },
                     },
                 });
                 expectValid({ element: { selector: 'img', root: { api: { path: 'document' } } } });
@@ -4445,7 +4575,7 @@ describe('webDetection config tests', () => {
                         ],
                     },
                 });
-                expectError('`count` fills', { element: { selector: 'img', root: imgCount } });
+                expectError('config types it as number', { element: { selector: 'img', root: imgCount } });
             });
 
             it('collects names, refs and cycles inside roots', () => {
@@ -4456,9 +4586,9 @@ describe('webDetection config tests', () => {
                     ],
                 });
                 expectError('names no expression', { element: { selector: 'img', root: { ref: 'missing' } } });
-                expectError('names no expression', { api: { root: { ref: 'missing' }, path: 'length' }, is: {} });
+                expectError('names no expression', { ref: 'missing', using: 'length', is: {} });
                 expectError('cycle', { element: { selector: 'img', root: { ref: 'images' } }, as: 'images' });
-                expectError('cycle', { api: { root: { ref: 'widths' }, path: 'length' }, as: 'widths', is: {} });
+                expectError('cycle', { ref: 'widths', using: 'length', as: 'widths', is: {} });
                 expectError('from outside it', {
                     all: [
                         { if: { test: true, then: { element: { selector: '#a' }, as: 'inner' }, else: false } },

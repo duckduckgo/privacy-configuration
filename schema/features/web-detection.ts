@@ -70,8 +70,13 @@ export type MatchConditionSingle = {
 /** `^[a-zA-Z][a-zA-Z0-9_]*$` */
 type Name = string;
 
-/** Keys that sit beside an expression key. */
+/** Keys that sit beside an expression key, applied in the order `using`, `as`, `is`. */
 type Modifiers = {
+    /**
+     * Reads a path from the expression's value, as `api` reads from the global object. A string is
+     * short for `{ path }`. `"length"` on a list reads only as many items as its tests need.
+     */
+    using?: string | UsingBody;
     /** Names the expression's value for `ref` and payloads. Unique within the detector. */
     as?: Name;
     /** Tests the value, giving a boolean. Only on an object in boolean position with one expression key. */
@@ -143,9 +148,9 @@ export type TextBody = ConditionTypes['text'] & Root;
 export type ApiBody = {
     path: string;
     args?: Arg[];
-    /** The value `path` reads from. Without it, the global object. */
-    root?: Expr;
 } & ItemKeys;
+/** An `api` body read from the value of the expression beside `using`. */
+type UsingBody = ApiBody;
 
 type Operands = MaybeArray<Expr>;
 
@@ -157,7 +162,8 @@ type ExprKeys = {
     element: ConditionBranch<ElementBody>;
     text: ConditionBranch<TextBody>;
     api: ApiBody;
-    count: Expr;
+    /** Its operand's value, so modifiers stack. */
+    expr: Expr;
     only: Expr;
     sum: Operands;
     mul: Operands;
