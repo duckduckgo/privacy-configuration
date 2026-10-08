@@ -79,7 +79,6 @@ const FIELD_KEYS = [
 
 /** Each feature and the input it takes. */
 const FEATURE_INPUTS = {
-    wordCount: 'string',
     renderedTextLength: 'element',
 };
 
@@ -132,6 +131,9 @@ const PAYLOAD_FIELD_KEYS = [
  * @type {Record<string, 'method' | 'property'>}
  */
 const API_ALLOWLIST = {
+    Array: 'property',
+    'Array.from': 'method',
+    'Array.from.length': 'property',
     Math: 'property',
     'Math.max': 'method',
     'Math.max.apply': 'method',
@@ -149,6 +151,7 @@ const API_ALLOWLIST = {
     'document.readyState': 'property',
     'document.title': 'property',
     'document.title.length': 'property',
+    'document.title.matchAll': 'method',
     matchMedia: 'method',
     'matchMedia.matches': 'property',
     performance: 'property',
@@ -172,6 +175,7 @@ const API_ALLOWLIST = {
  * @type {Record<string, TypeName>}
  */
 const BUILTIN_RETURN_TYPES = {
+    'Array.from': 'array',
     'Math.max': 'number',
     'Math.max.apply': 'number',
     'Math.min': 'number',
@@ -4046,20 +4050,16 @@ describe('webDetection config tests', () => {
             });
 
             it('checks a feature’s input type', () => {
-                expectValid({
-                    api: { path: 'document', field: { path: 'title', feature: 'wordCount' } },
-                    is: { lte: 3 },
-                });
                 expectValid({ element: { selector: 'body', field: { feature: 'renderedTextLength' } }, is: { lt: 1 } });
-                expectError('wordCount takes a string', {
-                    ...fieldOf('img', { path: 'naturalWidth', feature: 'wordCount' }),
-                    is: { lt: 1 },
-                });
                 expectError('renderedTextLength takes an element', {
                     ...fieldOf('img', { path: 'src', feature: 'renderedTextLength' }),
                     is: { lt: 1 },
                 });
                 expectError('unknown feature', { ...fieldOf('img', { feature: 'textLength' }), is: { lt: 1 } });
+                expectError('unknown feature', {
+                    api: { path: 'document', field: { path: 'title', feature: 'wordCount' } },
+                    is: { lte: 3 },
+                });
             });
         });
 
@@ -4213,6 +4213,27 @@ describe('webDetection config tests', () => {
                     api: { path: 'performance', field: 'getEntriesByType.length' },
                     is: {},
                 });
+            });
+
+            it('counts words with `matchAll` and `Array.from`, as a number', () => {
+                const words = {
+                    api: {
+                        path: 'Array.from',
+                        args: [
+                            {
+                                api: {
+                                    path: 'document.title.matchAll',
+                                    args: [
+                                        '\\S+',
+                                    ],
+                                },
+                            },
+                        ],
+                    },
+                    using: 'length',
+                };
+                expectValid({ ...words, is: { lte: 3 } });
+                expectError('A string fills', { ...words, is: { lte: 'x' } });
             });
 
             it('reads `length` and indexes on strings', () => {
