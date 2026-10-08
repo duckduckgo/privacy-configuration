@@ -27,7 +27,6 @@ const EXPRESSION_KEYS = [
     'only',
     'sum',
     'mul',
-    'sub',
     'div',
     'if',
     ...OPERATOR_KEYS,
@@ -1415,27 +1414,26 @@ function checkExprKey(key, body, position, scope, ctx, path, owner) {
                 nan,
             };
         }
-        case 'sub':
         case 'div': {
-            expectPosition(ctx, path, `\`${key}\``, position, [
+            expectPosition(ctx, path, '`div`', position, [
                 'value',
                 'number',
             ]);
             if (!Array.isArray(body) || body.length !== 2) {
-                fail(ctx, path, `\`${key}\` takes an array of two operands`);
+                fail(ctx, path, '`div` takes an array of two operands');
                 return {
                     types: [
                         'number',
                     ],
-                    nan: key === 'div',
+                    nan: true,
                 };
             }
-            const types = body.map((operand, index) => checkExpr(operand, 'number', child(scope), ctx, `${path}[${index}]`));
+            body.forEach((operand, index) => checkExpr(operand, 'number', child(scope), ctx, `${path}[${index}]`));
             return {
                 types: [
                     'number',
                 ],
-                nan: key === 'div' || types.some((type) => type.nan),
+                nan: true,
             };
         }
         case 'any':
@@ -3458,16 +3456,16 @@ describe('webDetection config tests', () => {
                 expectError('`is` gives a boolean', true, { a: { value: { count: img, is: { gt: 0 } } } });
             });
 
-            it('checks `sub` and `div` take two operands', () => {
+            it('checks `div` takes two operands', () => {
                 expectValid({
-                    sub: [
+                    div: [
                         now,
                         1,
                     ],
                     is: { gt: 0 },
                 });
                 expectError('two operands', {
-                    sub: [
+                    div: [
                         now,
                         1,
                         2,
@@ -3544,7 +3542,7 @@ describe('webDetection config tests', () => {
                     all: [
                         { ...now, as: 'a', catch: { absent: { ref: 'b' } }, is: { gt: 0 } },
                         {
-                            sub: [
+                            div: [
                                 { ref: 'a' },
                                 1,
                             ],
@@ -3671,14 +3669,14 @@ describe('webDetection config tests', () => {
 
             it('rejects `text` and `element` without `field` in number position', () => {
                 expectError('config types the value as string', {
-                    sub: [
+                    div: [
                         text,
                         1,
                     ],
                     is: { gt: 0 },
                 });
                 expectError('config types the value as object', {
-                    sub: [
+                    div: [
                         img,
                         1,
                     ],
@@ -3711,7 +3709,7 @@ describe('webDetection config tests', () => {
                 expectError('`all` takes booleans', { all: fieldOf('img', 'naturalWidth') });
                 expectError('`sum` takes numbers', { sum: fieldOf('img', 'src'), is: { gt: 0 } });
                 expectError('number position takes a number', {
-                    sub: [
+                    div: [
                         fieldOf('img', 'src'),
                         1,
                     ],
@@ -3723,7 +3721,7 @@ describe('webDetection config tests', () => {
                 expectValid({ only: fieldOf('img', 'naturalWidth'), is: { gt: 0 } });
                 expectValid({ only: { api: { path: 'document.fonts' } }, is: { field: 'status', is: 'loaded' } });
                 expectValid({
-                    sub: [
+                    div: [
                         { only: fieldOf('img', 'naturalWidth') },
                         1,
                     ],
@@ -3734,7 +3732,7 @@ describe('webDetection config tests', () => {
                 expectError('`if` fills', { count: { if: { test: true, then: img, else: img } }, is: 0 });
                 expectError('`only` fills', { only: img });
                 expectError('number position takes a number, and config types the value as string', {
-                    sub: [
+                    div: [
                         { only: fieldOf('img', 'src') },
                         1,
                     ],
@@ -4268,7 +4266,7 @@ describe('webDetection config tests', () => {
                 expectError('performance.getEntries selects every entry', { ...durations, is: { gt: 0 } });
                 expectError('performance.getEntries selects every entry', { only: entries, is: {} });
                 expectError('performance.getEntries selects every entry', {
-                    sub: [
+                    div: [
                         durations,
                         1,
                     ],

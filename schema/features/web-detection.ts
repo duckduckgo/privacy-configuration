@@ -164,10 +164,6 @@ type ExprKeys = {
     only: Expr;
     sum: Operands;
     mul: Operands;
-    sub: [
-        Expr,
-        Expr,
-    ];
     div: [
         Expr,
         Expr,
