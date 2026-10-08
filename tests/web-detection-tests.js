@@ -74,6 +74,7 @@ const FIELD_KEYS = [
     'path',
     'args',
     'feature',
+    'call',
 ];
 
 /** Each feature and the input it takes. */
@@ -106,8 +107,6 @@ const VALUE_OPERATORS = [
     'fails',
     'exists',
     'type',
-    'finite',
-    'nan',
 ];
 
 const PAYLOAD_ACTIONS = [
@@ -124,8 +123,9 @@ const PAYLOAD_FIELD_KEYS = [
 /**
  * Every name an `api` may read: each prefix of the `path`, and the path joined by `.` to each
  * name a `field` path or a predicate reads from its items or values. A `method` is called
- * through `args`, as the last name of a path, or read as a function before `apply` or `call`, or
- * as the last name of an `args` entry; a `property` is read.
+ * through `args`, as the last name of a path, or read as a function before `apply`, `call` or
+ * `bind`, or as the last name of an `args` entry or of a `field`'s `call` operand; a `property` is
+ * read.
  *
  * C-S-S reads any name config gives, so this list is the review point. A detector reading a name
  * not listed adds it here in the same change. Names reading user data or URLs, such as
@@ -139,6 +139,9 @@ const API_ALLOWLIST = {
     'Math.max.apply': 'method',
     'Math.min': 'method',
     'Math.min.apply': 'method',
+    Number: 'property',
+    'Number.isFinite': 'method',
+    'Number.isNaN': 'method',
     document: 'property',
     'document.fonts': 'property',
     'document.fonts.status': 'property',
@@ -173,13 +176,26 @@ const BUILTIN_RETURN_TYPES = {
     'Math.max.apply': 'number',
     'Math.min': 'number',
     'Math.min.apply': 'number',
+    'Number.isFinite': 'boolean',
+    'Number.isNaN': 'boolean',
 };
 
 /** Names that read the method before them as a function. */
 const FUNCTION_READS = [
     'apply',
     'call',
+    'bind',
 ];
+
+/**
+ * An `api` body: a string is short for `{"path": <string>}`.
+ *
+ * @param {unknown} raw
+ * @returns {unknown}
+ */
+function apiBody(raw) {
+    return typeof raw === 'string' ? { path: raw } : raw;
+}
 
 /**
  * Methods a `field` may call on `element` items, with the IDL type each returns. Each leaves the
@@ -427,9 +443,11 @@ function forEachSource(node, path, cb) {
                 if (!isPlainObject(body)) continue;
                 if ('where' in body) forEachPredicateSource(body.where, 'item', `${bodyPath}.where`, cb);
                 if ('root' in body) forEachSource(body.root, `${bodyPath}.root`, cb);
+                if ('field' in body) forEachCallSource(body.field, `${bodyPath}.field`, cb);
             }
         } else if (key === 'using') {
             if (isPlainObject(value) && 'where' in value) forEachPredicateSource(value.where, 'item', `${childPath}.where`, cb);
+            if (isPlainObject(value) && 'field' in value) forEachCallSource(value.field, `${childPath}.field`, cb);
         } else if (key === 'if') {
             if (!isPlainObject(value)) continue;
             for (const branch of [
@@ -472,13 +490,24 @@ function forEachPredicateSource(predicate, level, path, cb) {
         } else if (key === 'is') {
             forEachPredicateSource(value, 'value', childPath, cb);
         } else if (key === 'field') {
-            continue;
+            forEachCallSource(value, childPath, cb);
         } else if (level === 'value' && VALUE_OPERATORS.includes(key)) {
             if (key === 'eq' || COMPARISON_OPERATORS.includes(key)) forEachSource(value, childPath, cb);
         } else {
             forEachPredicateSource(value, 'value', childPath, cb);
         }
     }
+}
+
+/**
+ * Invoke `cb` for every source in the `call` operand of a `field`.
+ *
+ * @param {unknown} field
+ * @param {string} path
+ * @param {(key: string, body: unknown, path: string) => void} cb
+ */
+function forEachCallSource(field, path, cb) {
+    if (isPlainObject(field) && 'call' in field) forEachSource(field.call, `${path}.call`, cb);
 }
 
 /**
@@ -1047,7 +1076,7 @@ function describeInterfaces(interfaces) {
  * @typedef {{
  *   mode: 'collect' | 'check' | 'dry',
  *   errors: string[],
- *   argumentApis: WeakSet<object>,
+ *   functionApis: WeakSet<object>,
  *   structuralErrors: string[],
  *   names: Map<string, { node: Record<string, any>, path: string, branch: string[] }>,
  *   dependencies: Map<string, Set<string>>,
@@ -1057,6 +1086,9 @@ function describeInterfaces(interfaces) {
  *   refFailures: { name: string, position: Position, path: string, errors: string[] }[],
  *   resolving: Set<string>,
  * }} Context
+ *
+ * `functionApis` holds the expressions whose `api` may read a method as a function: `args`
+ * entries and the operands of a `field`'s `call`.
  *
  * A detector is walked twice. `collect` indexes the `as` names and the refs between them, and
  * `check` reports every error. `dry` checks a ref's target in the ref's position, reporting into
@@ -1311,7 +1343,7 @@ function checkExpr(node, position, scope, ctx, path) {
         type = typeOf('boolean');
     } else {
         const owner = typeof node.as === 'string' && !hasUsing ? node.as : undefined;
-        type = checkExprKey(exprKeys[0], node[exprKeys[0]], keyPosition, inner, ctx, `${path}.${exprKeys[0]}`, owner);
+        type = checkExprKey(exprKeys[0], node[exprKeys[0]], keyPosition, inner, ctx, `${path}.${exprKeys[0]}`, owner, node);
     }
     if (hasUsing) type = checkUsing(node.using, type, valuePosition, inner, ctx, path);
     if (hasIs) {
@@ -1330,15 +1362,16 @@ function checkExpr(node, position, scope, ctx, path) {
  * @param {Context} ctx
  * @param {string} path
  * @param {string | undefined} owner - the `as` beside the key
+ * @param {Record<string, unknown>} [holder] - the expression object holding the key
  * @returns {StaticType}
  */
-function checkExprKey(key, body, position, scope, ctx, path, owner) {
+function checkExprKey(key, body, position, scope, ctx, path, owner, holder) {
     switch (key) {
         case 'element':
         case 'text':
             return checkConditionSource(key, body, position, scope, ctx, path, owner);
         case 'api':
-            return checkApi(body, position, scope, ctx, path);
+            return checkApi(apiBody(body), position, scope, ctx, path, undefined, holder !== undefined && ctx.functionApis.has(holder));
         case 'expr':
             // Its operand's value in its own position. An operand with `is` gives a boolean
             if (isPlainObject(body) && 'is' in body) {
@@ -1781,11 +1814,12 @@ function checkUsing(using, root, position, scope, ctx, path) {
  * @param {Context} ctx
  * @param {string} path
  * @param {StaticType} [root] - through `using`, the type of the value `path` reads from. Without it, the global object
+ * @param {boolean} [asFunction] - whether the `api` is an `args` entry or a `call` operand, which may read a method as a function
  * @returns {StaticType}
  */
-function checkApi(body, position, scope, ctx, path, root) {
+function checkApi(body, position, scope, ctx, path, root, asFunction = false) {
     if (!isPlainObject(body)) {
-        fail(ctx, path, '`api` takes one body object');
+        fail(ctx, path, '`api` takes a path or one body object');
         return UNKNOWN;
     }
     const hasWhere = 'where' in body;
@@ -1807,7 +1841,7 @@ function checkApi(body, position, scope, ctx, path, root) {
         return UNKNOWN;
     }
     const names = body.path.split('.');
-    const asArgument = ctx.argumentApis.has(body);
+    const asArgument = asFunction && !('args' in body);
     /** @type {StaticType} */
     let read = root ?? UNKNOWN;
     if (root) {
@@ -1891,7 +1925,7 @@ function checkApiName(name, isCall, ctx, path, next, asArgument = false) {
         fail(
             ctx,
             path,
-            `reads the method "${name}" without calling it; a method is called through \`args\`, as the last name of a path, or read before \`apply\` or \`call\``,
+            `reads the method "${name}" without calling it; a method is called through \`args\`, as the last name of a path, or read before \`apply\`, \`call\` or \`bind\`, as an \`args\` entry or as a \`call\` operand`,
         );
     }
 }
@@ -1928,7 +1962,7 @@ function checkArg(arg, scope, ctx, path) {
         const entries = arg.map((entry, index) => checkArg(entry, scope, ctx, `${path}[${index}]`));
         return { ...(entries.length ? mergeTypes(entries.map(itemOf)) : UNKNOWN), list: 'maybe' };
     }
-    if (isPlainObject(arg) && isPlainObject(arg.api)) ctx.argumentApis.add(arg.api);
+    if (isPlainObject(arg) && 'api' in arg) ctx.functionApis.add(arg);
     return checkExpr(arg, 'value', child(scope), ctx, path);
 }
 
@@ -1943,8 +1977,10 @@ function checkArg(arg, scope, ctx, path) {
  */
 function isApplyList(arg, type) {
     if (Array.isArray(arg) || type?.list !== undefined) return true;
-    if (!isPlainObject(arg) || !isPlainObject(arg.api) || typeof arg.api.path !== 'string') return false;
-    const path = arg.api.path;
+    if (!isPlainObject(arg)) return false;
+    const body = apiBody(arg.api);
+    if (!isPlainObject(body) || typeof body.path !== 'string') return false;
+    const path = body.path;
     return path === 'Array.from' || path === 'Array.of' || path.endsWith('.concat.call');
 }
 
@@ -2000,7 +2036,7 @@ function checkFieldRead(field, subject, scope, ctx, path) {
         for (const key of Object.keys(field)) {
             if (!FIELD_KEYS.includes(key)) fail(ctx, path, `unknown \`field\` key "${key}"`);
         }
-        if (!FIELD_KEYS.some((key) => key in field)) fail(ctx, path, '`field` needs at least one of `path`, `args` and `feature`');
+        if (!FIELD_KEYS.some((key) => key in field)) fail(ctx, path, '`field` needs at least one of `path`, `args`, `feature` and `call`');
         if ('args' in field && !('path' in field)) fail(ctx, path, '`args` calls the last name in `path`, so it needs `path`');
         read = field;
     } else {
@@ -2037,7 +2073,65 @@ function checkFieldRead(field, subject, scope, ctx, path) {
         }
         current = typeOf('number');
     }
+    if (read.call !== undefined) current = checkCallee(read.call, scope, ctx, `${path}.call`);
     return current;
+}
+
+/**
+ * Check a `field`'s `call` operand, and return the type the call gives. The operand names the
+ * function it gives, so the allowlist reviews what is called: an `api` reading a listed method
+ * without calling it, or a `bind` of one.
+ *
+ * @param {unknown} callee
+ * @param {Scope} scope
+ * @param {Context} ctx
+ * @param {string} path
+ * @returns {StaticType}
+ */
+function checkCallee(callee, scope, ctx, path) {
+    if (isPlainObject(callee) && 'api' in callee) ctx.functionApis.add(callee);
+    checkExpr(callee, 'value', child(scope), ctx, path);
+    const name = calleeName(callee);
+    if (name === undefined || (Object.hasOwn(API_ALLOWLIST, name) && API_ALLOWLIST[name] !== 'method')) {
+        fail(ctx, path, '`call` takes a function: an `api` reading a listed method without calling it, or a `bind` of one');
+        return UNKNOWN;
+    }
+    const returns = Object.hasOwn(BUILTIN_RETURN_TYPES, name) ? BUILTIN_RETURN_TYPES[name] : undefined;
+    return returns ? { ...typeOf(returns), nan: returns === 'number' } : UNKNOWN;
+}
+
+/**
+ * The method a `call` operand gives, or undefined when config does not show one.
+ *
+ * @param {unknown} callee
+ * @returns {string | undefined}
+ */
+function calleeName(callee) {
+    if (!isPlainObject(callee)) return undefined;
+    const keys = Object.keys(callee).filter((key) => key !== 'as');
+    if (keys.length !== 1 || keys[0] !== 'api') return undefined;
+    const body = apiBody(callee.api);
+    if (!isPlainObject(body) || typeof body.path !== 'string' || 'where' in body || 'field' in body) return undefined;
+    if (!('args' in body)) return body.path;
+    return body.path.endsWith('.bind') ? body.path.slice(0, -'.bind'.length) : undefined;
+}
+
+/**
+ * The `Number` test a predicate object makes on its value through `{"field": {"call": …}, "is": <boolean>}`:
+ * `Number.isFinite` or `Number.isNaN`, with the boolean it expects.
+ *
+ * @param {Record<string, any>} predicate
+ * @returns {{ name: string, expected: boolean } | undefined}
+ */
+function numberGuard(predicate) {
+    const { field, is } = predicate;
+    if (typeof is !== 'boolean' || !isPlainObject(field) || Object.keys(field).length !== 1 || !('call' in field)) return undefined;
+    const callee = field.call;
+    if (!isPlainObject(callee) || Object.keys(callee).length !== 1) return undefined;
+    const body = apiBody(callee.api);
+    if (!isPlainObject(body) || Object.keys(body).length !== 1) return undefined;
+    if (body.path !== 'Number.isFinite' && body.path !== 'Number.isNaN') return undefined;
+    return { name: body.path, expected: is };
 }
 
 /**
@@ -2243,12 +2337,6 @@ function checkOperators(predicate, subject, scope, ctx, path) {
     }
     if (predicate.exists === false && Object.keys(predicate).length > 1)
         fail(ctx, path, '`"exists": false` stands alone: beside another key it never holds for a read value');
-    for (const key of [
-        'finite',
-        'nan',
-    ]) {
-        if (has(key) && typeof predicate[key] !== 'boolean') fail(ctx, `${path}.${key}`, `\`${key}\` is a boolean`);
-    }
 
     /** @type {string[] | null} */
     let listed = null;
@@ -2264,10 +2352,13 @@ function checkOperators(predicate, subject, scope, ctx, path) {
         listed = names;
     }
 
-    const numberOnly = predicate.finite === true || predicate.nan === true;
-    if (predicate.finite === true && predicate.nan === true) fail(ctx, path, '`"finite": true` beside `"nan": true` never holds');
-    if (numberOnly && listed && !listed.includes('number'))
-        fail(ctx, path, '`finite` or `nan` true beside a `type` that leaves out number never holds');
+    const guard = numberGuard(predicate);
+    // `Number.isFinite` or `Number.isNaN` holding means a number, when tested before the comparisons
+    const keys = Object.keys(predicate);
+    const guardsFirst = keys.indexOf('field') < Math.min(...comparisons.map((key) => keys.indexOf(key)));
+    const numberOnly = guard?.expected === true && guardsFirst;
+    if (guard?.expected === true && listed && !listed.includes('number'))
+        fail(ctx, path, `\`${guard.name}\` holding beside a \`type\` that leaves out number never holds`);
 
     if (comparisons.length) {
         const operatorList = comparisons.join(', ');
@@ -2281,15 +2372,15 @@ function checkOperators(predicate, subject, scope, ctx, path) {
                 fail(
                     ctx,
                     path,
-                    `${operatorList} takes numbers, and config types the value as ${describeType(subject)}; guard it with "type": "number" or "finite": true`,
+                    `${operatorList} takes numbers, and config types the value as ${describeType(subject)}; guard it with "type": "number", or a \`call\` of \`Number.isFinite\` holding, before the comparison`,
                 );
             }
         }
-        if (scope.underNone && subject.nan && !has('finite') && !has('nan')) {
+        if (scope.underNone && subject.nan && !guard) {
             fail(
                 ctx,
                 path,
-                `under \`none\`, ${operatorList} on a value that can be NaN needs \`finite\` or \`nan\` beside it, since a comparison on NaN is false`,
+                `under \`none\`, ${operatorList} on a value that can be NaN needs a \`call\` of \`Number.isFinite\` or \`Number.isNaN\` beside it, since a comparison on NaN is false`,
             );
         }
     }
@@ -2601,7 +2692,7 @@ function validateDetector(detector, path) {
     const ctx = {
         mode: 'collect',
         errors: [],
-        argumentApis: new WeakSet(),
+        functionApis: new WeakSet(),
         structuralErrors: [],
         names: new Map(),
         dependencies: new Map(),
@@ -3367,6 +3458,14 @@ describe('webDetection config tests', () => {
          * @param {unknown} field
          */
         const fieldOf = (selector, field) => ({ element: { selector, field } });
+
+        /**
+         * A predicate testing the value with `Number.isFinite` or `Number.isNaN` through `call`.
+         *
+         * @param {'isFinite' | 'isNaN'} name
+         * @param {boolean} [expected]
+         */
+        const numberTest = (name, expected = true) => ({ field: { call: { api: `Number.${name}` } }, is: expected });
 
         describe('shape', () => {
             it('passes the shipped forms: leaves, legacy blocks, arrays and boolean literals', () => {
@@ -4180,8 +4279,7 @@ describe('webDetection config tests', () => {
                         gt: 0,
                     },
                 });
-                expectError('leaves out number', { ...loadEventEnd, is: { type: 'string', finite: true } });
-                expectError('never holds', { ...loadEventEnd, is: { finite: true, nan: true } });
+                expectError('leaves out number', { ...loadEventEnd, is: { type: 'string', ...numberTest('isFinite') } });
                 expectValid({ only: loadEventEnd, is: { exists: false } });
                 expectValid({ ...loadEventEnd, is: { type: 'number', gt: 0 } });
             });
@@ -4199,6 +4297,9 @@ describe('webDetection config tests', () => {
                 expectError('guard it', items('input', { selectionStart: { gt: 0 } }));
                 expectError('guard it', items('img', { src: { gt: 0 } }));
                 expectValid(items('input', { selectionStart: { type: 'number', gt: 0 } }));
+                expectValid(items('input', { selectionStart: { ...numberTest('isFinite'), gt: 0 } }));
+                expectError('guard it', items('input', { selectionStart: { gt: 0, ...numberTest('isFinite') } }));
+                expectError('guard it', items('input', { selectionStart: { ...numberTest('isFinite', false), gt: 0 } }));
                 expectValid(items('link', { sheet: null }));
             });
 
@@ -4213,7 +4314,7 @@ describe('webDetection config tests', () => {
                 expectError('reads "length" on a value config types as number', { ...imgCount, is: { length: 0 } });
             });
 
-            it('requires `finite` or `nan` beside a comparison under `none` on a value that can be NaN', () => {
+            it('requires a `call` of `Number.isFinite` or `Number.isNaN` beside a comparison under `none` on a value that can be NaN', () => {
                 const ratio = {
                     div: [
                         imgCount,
@@ -4229,9 +4330,10 @@ describe('webDetection config tests', () => {
                 expectError('can be NaN', items('video', { none: { duration: { gt: 10 } } }));
                 expectValid({
                     none: [
-                        { ...ratio, is: { finite: true, gt: 0 } },
+                        { ...ratio, is: { ...numberTest('isFinite'), gt: 0 } },
                     ],
                 });
+                expectValid(items('video', { none: { duration: { ...numberTest('isNaN', false), gt: 10 } } }));
                 expectValid({ ...ratio, is: { gt: 0 } });
                 expectValid({
                     none: [
@@ -4304,6 +4406,82 @@ describe('webDetection config tests', () => {
                 expectError('"performance.getEntries.length", which is not in API_ALLOWLIST', {
                     ...entries,
                     using: 'length',
+                    is: { gt: 0 },
+                });
+            });
+        });
+
+        describe('`call` and `api` paths', () => {
+            it('takes a path as short for an `api` body', () => {
+                expectValid({ api: 'document.title', is: { type: 'string' } });
+                expectValid({
+                    api: {
+                        path: 'Math.max',
+                        args: [
+                            1,
+                            { api: 'document.title.length' },
+                        ],
+                    },
+                    is: { gt: 0 },
+                });
+                expectError('"document.cookie", which is not in API_ALLOWLIST', { api: 'document.cookie', is: {} });
+                expectError('reads the method "performance.now" without calling it', { api: 'performance.now', is: {} });
+                expectError('`api` takes a path or one body object', { api: 5, is: {} });
+            });
+
+            it('applies a listed method through `call`, in `where` and under `is`', () => {
+                expectValid(items('video', { duration: numberTest('isFinite') }));
+                expectValid(items('video', { field: { path: 'duration', call: { api: 'Number.isNaN' } }, is: true }));
+                expectValid({ ...imgCount, is: numberTest('isFinite') });
+                expectValid({
+                    ...imgCount,
+                    is: {
+                        all: [
+                            numberTest('isFinite'),
+                            numberTest('isNaN', false),
+                        ],
+                    },
+                });
+            });
+
+            it('rejects an operand that names no listed method', () => {
+                expectError(
+                    '"Number.isInteger", which is not in API_ALLOWLIST',
+                    items('video', { duration: { field: { call: { api: 'Number.isInteger' } }, is: true } }),
+                );
+                expectError('`call` takes a function', items('video', { duration: { field: { call: 5 }, is: true } }));
+                expectError('`call` takes a function', items('video', { duration: { field: { call: title }, is: true } }));
+                expectError(
+                    '`call` takes a function',
+                    items('video', {
+                        duration: {
+                            field: {
+                                call: {
+                                    api: {
+                                        path: 'Number.isFinite',
+                                        args: [
+                                            1,
+                                        ],
+                                    },
+                                },
+                            },
+                            is: true,
+                        },
+                    }),
+                );
+                expectError('"Math.min.bind", which is not in API_ALLOWLIST', {
+                    sum: fieldOf('img', {
+                        path: 'naturalWidth',
+                        call: {
+                            api: {
+                                path: 'Math.min.bind',
+                                args: [
+                                    null,
+                                    5,
+                                ],
+                            },
+                        },
+                    }),
                     is: { gt: 0 },
                 });
             });
