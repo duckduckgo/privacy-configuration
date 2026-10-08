@@ -23,6 +23,7 @@ const SOURCE_KEYS = [
 
 const EXPRESSION_KEYS = [
     ...SOURCE_KEYS,
+    'self',
     'expr',
     'only',
     'sum',
@@ -33,7 +34,7 @@ const EXPRESSION_KEYS = [
     'ref',
 ];
 
-/** In the order they apply: `using` reads from the expression's value, `as` names the result and `is` tests it. */
+/** In the order they apply: `using` binds `self` to the expression's value, `as` names the result and `is` tests it. */
 const MODIFIER_KEYS = [
     'using',
     'as',
@@ -74,7 +75,6 @@ const FIELD_KEYS = [
     'path',
     'args',
     'feature',
-    'call',
 ];
 
 /** Each feature and the input it takes. */
@@ -124,8 +124,7 @@ const PAYLOAD_FIELD_KEYS = [
  * Every name an `api` may read: each prefix of the `path`, and the path joined by `.` to each
  * name a `field` path or a predicate reads from its items or values. A `method` is called
  * through `args`, as the last name of a path, or read as a function before `apply`, `call` or
- * `bind`, or as the last name of an `args` entry or of a `field`'s `call` operand; a `property` is
- * read.
+ * `bind`, or as the last name of an `args` entry; a `property` is read.
  *
  * C-S-S reads any name config gives, so this list is the review point. A detector reading a name
  * not listed adds it here in the same change. Names reading user data or URLs, such as
@@ -142,6 +141,8 @@ const API_ALLOWLIST = {
     Number: 'property',
     'Number.isFinite': 'method',
     'Number.isNaN': 'method',
+    Reflect: 'property',
+    'Reflect.has': 'method',
     document: 'property',
     'document.fonts': 'property',
     'document.fonts.status': 'property',
@@ -178,6 +179,7 @@ const BUILTIN_RETURN_TYPES = {
     'Math.min.apply': 'number',
     'Number.isFinite': 'boolean',
     'Number.isNaN': 'boolean',
+    'Reflect.has': 'boolean',
 };
 
 /** Names that read the method before them as a function. */
@@ -443,11 +445,15 @@ function forEachSource(node, path, cb) {
                 if (!isPlainObject(body)) continue;
                 if ('where' in body) forEachPredicateSource(body.where, 'item', `${bodyPath}.where`, cb);
                 if ('root' in body) forEachSource(body.root, `${bodyPath}.root`, cb);
-                if ('field' in body) forEachCallSource(body.field, `${bodyPath}.field`, cb);
+                if ('field' in body) forEachFieldSource(body.field, `${bodyPath}.field`, cb);
             }
-        } else if (key === 'using') {
-            if (isPlainObject(value) && 'where' in value) forEachPredicateSource(value.where, 'item', `${childPath}.where`, cb);
-            if (isPlainObject(value) && 'field' in value) forEachCallSource(value.field, `${childPath}.field`, cb);
+        } else if (key === 'using' || key === 'self') {
+            if (isPlainObject(value) && expressionKeysOf(value).length) {
+                forEachSource(value, childPath, cb);
+            } else if (isPlainObject(value)) {
+                if ('where' in value) forEachPredicateSource(value.where, 'item', `${childPath}.where`, cb);
+                if ('field' in value) forEachFieldSource(value.field, `${childPath}.field`, cb);
+            }
         } else if (key === 'if') {
             if (!isPlainObject(value)) continue;
             for (const branch of [
@@ -490,7 +496,7 @@ function forEachPredicateSource(predicate, level, path, cb) {
         } else if (key === 'is') {
             forEachPredicateSource(value, 'value', childPath, cb);
         } else if (key === 'field') {
-            forEachCallSource(value, childPath, cb);
+            forEachFieldSource(value, childPath, cb);
         } else if (level === 'value' && VALUE_OPERATORS.includes(key)) {
             if (key === 'eq' || COMPARISON_OPERATORS.includes(key)) forEachSource(value, childPath, cb);
         } else {
@@ -500,14 +506,14 @@ function forEachPredicateSource(predicate, level, path, cb) {
 }
 
 /**
- * Invoke `cb` for every source in the `call` operand of a `field`.
+ * Invoke `cb` for every source in a `field` given as an expression.
  *
  * @param {unknown} field
  * @param {string} path
  * @param {(key: string, body: unknown, path: string) => void} cb
  */
-function forEachCallSource(field, path, cb) {
-    if (isPlainObject(field) && 'call' in field) forEachSource(field.call, `${path}.call`, cb);
+function forEachFieldSource(field, path, cb) {
+    if (isPlainObject(field) && expressionKeysOf(field).length) forEachSource(field, path, cb);
 }
 
 /**
@@ -1066,10 +1072,17 @@ function describeInterfaces(interfaces) {
  *   topOperand: number | null,
  *   matchRoot: boolean,
  *   owners: string[],
+ *   bound?: StaticType,
+ *   perItem?: boolean,
+ *   perItemBranch?: boolean,
  * }} Scope
  *
  * `branch` lists the `if` branches around the expression. `topOperand` is the index of the
  * operand of match's top-level `all` holding it. `owners` lists the `as` names around it.
+ * `bound` is the type `self` reads, set inside `using`, `where` and `field`. `perItem` is set where
+ * `self` reads a value per item: inside `where` and `field`, and inside a `using` beside an
+ * expression that reads such a `self`. `perItemBranch` is set inside the branches of an `if` that
+ * reads one.
  */
 
 /**
@@ -1088,7 +1101,7 @@ function describeInterfaces(interfaces) {
  * }} Context
  *
  * `functionApis` holds the expressions whose `api` may read a method as a function: `args`
- * entries and the operands of a `field`'s `call`.
+ * entries.
  *
  * A detector is walked twice. `collect` indexes the `as` names and the refs between them, and
  * `check` reports every error. `dry` checks a ref's target in the ref's position, reporting into
@@ -1153,6 +1166,92 @@ function valueNode(node) {
             ]) => key !== 'as' && key !== 'is',
         ),
     );
+}
+
+/**
+ * Whether an expression reads a `self` it does not bind itself: one outside every `using`, `where`
+ * and `field` inside the expression.
+ *
+ * @param {unknown} node
+ * @returns {boolean}
+ */
+function readsOuterSelf(node) {
+    if (Array.isArray(node)) return node.some(readsOuterSelf);
+    if (!isPlainObject(node)) return false;
+    return Object.entries(node).some(
+        ([
+            key,
+            value,
+        ]) => {
+            switch (key) {
+                case 'self':
+                    return true;
+                case 'is':
+                    return predicateReadsOuterSelf(value, 'value');
+                case 'api': {
+                    const body = apiBody(value);
+                    return isPlainObject(body) && 'args' in body && readsOuterSelf(body.args);
+                }
+                case 'element':
+                case 'text': {
+                    let reads = false;
+                    forEachTextLeaf(value, '', (leaf) => {
+                        reads ||= 'root' in leaf && readsOuterSelf(leaf.root);
+                    });
+                    return reads;
+                }
+                case 'if':
+                    return (
+                        isPlainObject(value) &&
+                        [
+                            'test',
+                            'then',
+                            'else',
+                        ].some((branch) => readsOuterSelf(value[branch]))
+                    );
+                case 'ref':
+                    return false;
+                default:
+                    return EXPRESSION_KEYS.includes(key) && readsOuterSelf(value);
+            }
+        },
+    );
+}
+
+/**
+ * Whether the operands of a predicate read a `self` the predicate does not bind.
+ *
+ * @param {unknown} predicate
+ * @param {'item' | 'value'} level
+ * @returns {boolean}
+ */
+function predicateReadsOuterSelf(predicate, level) {
+    if (Array.isArray(predicate)) return predicate.some((entry) => predicateReadsOuterSelf(entry, level));
+    if (!isPlainObject(predicate)) return false;
+    return Object.entries(predicate).some(
+        ([
+            key,
+            value,
+        ]) => {
+            if (OPERATOR_KEYS.includes(key)) return predicateReadsOuterSelf(value, level);
+            if (key === 'field') return false;
+            if (key === 'is') return predicateReadsOuterSelf(value, 'value');
+            if (level === 'value' && (key === 'eq' || COMPARISON_OPERATORS.includes(key))) return readsOuterSelf(value);
+            if (level === 'value' && VALUE_OPERATORS.includes(key)) return false;
+            return predicateReadsOuterSelf(value, 'value');
+        },
+    );
+}
+
+/**
+ * The scope inside a `where` or `field`, where `self` reads each item or value of the given type.
+ *
+ * @param {Scope} scope
+ * @param {StaticType} type
+ * @returns {Scope}
+ */
+function bindItem(scope, type) {
+    return { ...child(scope), bound: type, perItem: true };
 }
 
 /**
@@ -1331,6 +1430,18 @@ function checkExpr(node, position, scope, ctx, path) {
         }
     }
 
+    if ('as' in node) {
+        const named = Object.fromEntries(
+            Object.entries(node).filter(
+                ([
+                    key,
+                ]) => key !== 'as',
+            ),
+        );
+        if (scope.perItemBranch || (scope.perItem && readsOuterSelf(named)))
+            fail(ctx, path, '`as` names one value per run, and this expression reads `self` per item');
+    }
+
     const inner = { ...scope, owners };
     // With `is`, the expression computes a value for the predicate
     const valuePosition = hasIs ? 'value' : position;
@@ -1345,7 +1456,16 @@ function checkExpr(node, position, scope, ctx, path) {
         const owner = typeof node.as === 'string' && !hasUsing ? node.as : undefined;
         type = checkExprKey(exprKeys[0], node[exprKeys[0]], keyPosition, inner, ctx, `${path}.${exprKeys[0]}`, owner, node);
     }
-    if (hasUsing) type = checkUsing(node.using, type, valuePosition, inner, ctx, path);
+    if (hasUsing) {
+        const root = Object.fromEntries(
+            exprKeys.map((key) => [
+                key,
+                node[key],
+            ]),
+        );
+        const usingScope = { ...inner, bound: type, perItem: scope.perItem === true && readsOuterSelf(root) };
+        type = checkUsing(node.using, type, valuePosition, usingScope, ctx, path);
+    }
     if (hasIs) {
         // `as` names the value, not the test, so a ref to it from the test is no cycle
         checkPredicate(node.is, 'value', predicateSubject(type, node.is, ctx, `${path}.is`), child(scope), ctx, `${path}.is`);
@@ -1372,6 +1492,21 @@ function checkExprKey(key, body, position, scope, ctx, path, owner, holder) {
             return checkConditionSource(key, body, position, scope, ctx, path, owner);
         case 'api':
             return checkApi(apiBody(body), position, scope, ctx, path, undefined, holder !== undefined && ctx.functionApis.has(holder));
+        case 'self': {
+            if (!scope.bound) {
+                fail(ctx, path, '`self` reads from `using`, `where` or `field`, and none encloses it');
+                return UNKNOWN;
+            }
+            const selfBody = apiBody(body);
+            if (isPlainObject(selfBody) && Object.keys(selfBody).length === 0) {
+                // The bound value itself
+                if (position !== 'boolean') return sourceType(itemOf(scope.bound), scope.bound.list, position, ctx, path);
+                if (!allows(scope.bound, 'boolean'))
+                    fail(ctx, path, `boolean position takes a boolean, and config types the value as ${describeType(scope.bound)}`);
+                return typeOf('boolean');
+            }
+            return checkApi(selfBody, position, scope, ctx, path, scope.bound, false, true);
+        }
         case 'expr':
             // Its operand's value in its own position. An operand with `is` gives a boolean
             if (isPlainObject(body) && 'is' in body) {
@@ -1495,6 +1630,7 @@ function checkExprKey(key, body, position, scope, ctx, path, owner, holder) {
                 );
             const inner = child(scope);
             checkExpr(body.test, 'boolean', inner, ctx, `${path}.test`);
+            const perItemBranch = scope.perItemBranch === true || (scope.perItem === true && readsOuterSelf({ if: body }));
             const branches = [
                 'then',
                 'else',
@@ -1504,6 +1640,7 @@ function checkExprKey(key, body, position, scope, ctx, path, owner, holder) {
                     position,
                     {
                         ...inner,
+                        perItemBranch,
                         branch: [
                             ...scope.branch,
                             `${path}.${branch}`,
@@ -1690,7 +1827,7 @@ function checkConditionSource(key, branch, position, scope, ctx, path, owner) {
             };
             if (selectorNamesCustomElement(body.selector)) itemType.customElement = true;
             if ('where' in body)
-                checkPredicate(body.where, 'item', itemType, { ...child(scope), underNone: false }, ctx, `${bodyPath}.where`);
+                checkPredicate(body.where, 'item', itemType, { ...bindItem(scope, itemType), underNone: false }, ctx, `${bodyPath}.where`);
             valueTypes.push('field' in body ? checkFieldRead(body.field, itemType, scope, ctx, `${bodyPath}.field`) : itemType);
         }
         if ('root' in body) {
@@ -1779,22 +1916,23 @@ function sourceType(type, list, position, ctx, path) {
 }
 
 /**
- * `using`: an `api` body read from the value of the expression beside it. A string is short for
- * `{ path }`.
+ * `using`: an expression over the value of the expression beside it, which `self` reads. A path or
+ * an `api` body is short for a `self` with that body.
  *
  * @param {unknown} using
  * @param {StaticType} root - the type of the expression beside `using`
  * @param {Position} position
- * @param {Scope} scope
+ * @param {Scope} scope - with `bound` the type of the expression beside `using`
  * @param {Context} ctx
  * @param {string} path - the path of the object holding `using`
  * @returns {StaticType}
  */
 function checkUsing(using, root, position, scope, ctx, path) {
     const usingPath = `${path}.using`;
+    if (isPlainObject(using) && expressionKeysOf(using).length) return checkExpr(using, position, scope, ctx, usingPath);
     const body = typeof using === 'string' ? { path: using } : using;
     if (!isPlainObject(body)) {
-        fail(ctx, usingPath, '`using` takes a path or an `api` body without `root`');
+        fail(ctx, usingPath, '`using` takes a path, an `api` body without `root`, or an expression');
         return UNKNOWN;
     }
     // `length` alone is a number, as C-S-S compiles it
@@ -1813,11 +1951,12 @@ function checkUsing(using, root, position, scope, ctx, path) {
  * @param {Scope} scope
  * @param {Context} ctx
  * @param {string} path
- * @param {StaticType} [root] - through `using`, the type of the value `path` reads from. Without it, the global object
- * @param {boolean} [asFunction] - whether the `api` is an `args` entry or a `call` operand, which may read a method as a function
+ * @param {StaticType} [root] - through `using` or `self`, the type of the value `path` reads from. Without it, the global object
+ * @param {boolean} [asFunction] - whether the `api` is an `args` entry, which may read a method as a function
+ * @param {boolean} [bound] - whether the body is a `self` body, whose `path` may be left out to read the bound value itself
  * @returns {StaticType}
  */
-function checkApi(body, position, scope, ctx, path, root, asFunction = false) {
+function checkApi(body, position, scope, ctx, path, root, asFunction = false, bound = false) {
     if (!isPlainObject(body)) {
         fail(ctx, path, '`api` takes a path or one body object');
         return UNKNOWN;
@@ -1836,11 +1975,13 @@ function checkApi(body, position, scope, ctx, path, root, asFunction = false) {
         'root',
     ]);
     checkBodyKeys(body, BODY_KEYS.api, ctx, path);
-    if (typeof body.path !== 'string' || body.path === '') {
+    const pathless = bound && body.path === undefined;
+    if (pathless && 'args' in body) fail(ctx, path, '`args` calls the last name in `path`, so it needs `path`');
+    if (!pathless && (typeof body.path !== 'string' || body.path === '')) {
         fail(ctx, `${path}.path`, '`path` is a non-empty string');
         return UNKNOWN;
     }
-    const names = body.path.split('.');
+    const names = pathless ? [] : String(body.path).split('.');
     const asArgument = asFunction && !('args' in body);
     /** @type {StaticType} */
     let read = root ?? UNKNOWN;
@@ -1850,11 +1991,11 @@ function checkApi(body, position, scope, ctx, path, root, asFunction = false) {
             read.list !== undefined &&
             names.length === 1 &&
             ('args' in body ? names[0] === 'concat' || readsItem(names[0], true, body.args) : names[0] === 'length');
-        if (read.apiPaths === undefined && !read.interfaces && !addsNoName) {
+        if (read.apiPaths === undefined && !read.interfaces && !addsNoName && names.length > 0) {
             fail(
                 ctx,
                 path,
-                'CI names what `using` reads by the `api` names or element type of the expression beside it, and this expression has neither',
+                'CI names what `using` or `self` reads by the `api` names or element type of the value it reads from, and this expression has neither',
             );
             read = UNKNOWN;
         }
@@ -1891,7 +2032,7 @@ function checkApi(body, position, scope, ctx, path, root, asFunction = false) {
         if (argTypes) checkCallArgs(body.path, body.args, argTypes, ctx, `${path}.args`);
     }
     const itemType = itemOf(read);
-    if (hasWhere) checkPredicate(body.where, 'item', itemType, { ...child(scope), underNone: false }, ctx, `${path}.where`);
+    if (hasWhere) checkPredicate(body.where, 'item', itemType, { ...bindItem(scope, itemType), underNone: false }, ctx, `${path}.where`);
     const valueType = 'field' in body ? checkFieldRead(body.field, itemType, scope, ctx, `${path}.field`) : itemType;
     // `field` gives a list when `path` reads one, which config does not show, and `concat` gives an array
     const list = hasWhere ? 'selected' : 'field' in body || read.list !== undefined ? 'maybe' : undefined;
@@ -1925,7 +2066,7 @@ function checkApiName(name, isCall, ctx, path, next, asArgument = false) {
         fail(
             ctx,
             path,
-            `reads the method "${name}" without calling it; a method is called through \`args\`, as the last name of a path, or read before \`apply\`, \`call\` or \`bind\`, as an \`args\` entry or as a \`call\` operand`,
+            `reads the method "${name}" without calling it; a method is called through \`args\`, as the last name of a path, or read before \`apply\`, \`call\` or \`bind\`, or as an \`args\` entry`,
         );
     }
 }
@@ -2018,7 +2159,8 @@ function checkCallArgs(apiPath, args, argTypes, ctx, path) {
 }
 
 /**
- * Check a `field` read, from an item or value of the given type, and return the type it reads.
+ * Check a `field` read, from an item or value of the given type, and return the type it reads. A
+ * `field` given as an expression, and its `args`, read the item or value through `self`.
  *
  * @param {unknown} field
  * @param {StaticType} subject
@@ -2028,6 +2170,11 @@ function checkCallArgs(apiPath, args, argTypes, ctx, path) {
  * @returns {StaticType}
  */
 function checkFieldRead(field, subject, scope, ctx, path) {
+    if (isPlainObject(field) && expressionKeysOf(field).length) {
+        const type = checkExpr(field, 'value', bindItem(scope, subject), ctx, path);
+        // A selected list reaches the predicate as an array
+        return type.list === 'selected' ? { ...type, list: 'maybe' } : type;
+    }
     /** @type {Record<string, any>} */
     let read;
     if (typeof field === 'string') {
@@ -2036,11 +2183,12 @@ function checkFieldRead(field, subject, scope, ctx, path) {
         for (const key of Object.keys(field)) {
             if (!FIELD_KEYS.includes(key)) fail(ctx, path, `unknown \`field\` key "${key}"`);
         }
-        if (!FIELD_KEYS.some((key) => key in field)) fail(ctx, path, '`field` needs at least one of `path`, `args`, `feature` and `call`');
+        if (!FIELD_KEYS.some((key) => key in field))
+            fail(ctx, path, '`field` needs at least one of `path`, `args` and `feature`, or is an expression');
         if ('args' in field && !('path' in field)) fail(ctx, path, '`args` calls the last name in `path`, so it needs `path`');
         read = field;
     } else {
-        fail(ctx, path, '`field` is a string or an object');
+        fail(ctx, path, '`field` is a string, an object or an expression');
         return UNKNOWN;
     }
 
@@ -2050,7 +2198,7 @@ function checkFieldRead(field, subject, scope, ctx, path) {
             fail(ctx, path, '`path` is a non-empty string');
             return UNKNOWN;
         }
-        const argTypes = read.args !== undefined ? checkArgs(read.args, scope, ctx, `${path}.args`) : undefined;
+        const argTypes = read.args !== undefined ? checkArgs(read.args, bindItem(scope, subject), ctx, `${path}.args`) : undefined;
         const names = read.path.split('.');
         names.forEach((name, index) => {
             const isCall = read.args !== undefined && index === names.length - 1;
@@ -2073,64 +2221,27 @@ function checkFieldRead(field, subject, scope, ctx, path) {
         }
         current = typeOf('number');
     }
-    if (read.call !== undefined) current = checkCallee(read.call, scope, ctx, `${path}.call`);
     return current;
 }
 
 /**
- * Check a `field`'s `call` operand, and return the type the call gives. The operand names the
- * function it gives, so the allowlist reviews what is called: an `api` reading a listed method
- * without calling it, or a `bind` of one.
- *
- * @param {unknown} callee
- * @param {Scope} scope
- * @param {Context} ctx
- * @param {string} path
- * @returns {StaticType}
- */
-function checkCallee(callee, scope, ctx, path) {
-    if (isPlainObject(callee) && 'api' in callee) ctx.functionApis.add(callee);
-    checkExpr(callee, 'value', child(scope), ctx, path);
-    const name = calleeName(callee);
-    if (name === undefined || (Object.hasOwn(API_ALLOWLIST, name) && API_ALLOWLIST[name] !== 'method')) {
-        fail(ctx, path, '`call` takes a function: an `api` reading a listed method without calling it, or a `bind` of one');
-        return UNKNOWN;
-    }
-    const returns = Object.hasOwn(BUILTIN_RETURN_TYPES, name) ? BUILTIN_RETURN_TYPES[name] : undefined;
-    return returns ? { ...typeOf(returns), nan: returns === 'number' } : UNKNOWN;
-}
-
-/**
- * The method a `call` operand gives, or undefined when config does not show one.
- *
- * @param {unknown} callee
- * @returns {string | undefined}
- */
-function calleeName(callee) {
-    if (!isPlainObject(callee)) return undefined;
-    const keys = Object.keys(callee).filter((key) => key !== 'as');
-    if (keys.length !== 1 || keys[0] !== 'api') return undefined;
-    const body = apiBody(callee.api);
-    if (!isPlainObject(body) || typeof body.path !== 'string' || 'where' in body || 'field' in body) return undefined;
-    if (!('args' in body)) return body.path;
-    return body.path.endsWith('.bind') ? body.path.slice(0, -'.bind'.length) : undefined;
-}
-
-/**
- * The `Number` test a predicate object makes on its value through `{"field": {"call": …}, "is": <boolean>}`:
- * `Number.isFinite` or `Number.isNaN`, with the boolean it expects.
+ * The `Number` test a predicate object makes on its value through
+ * `{"field": {"api": {"path": <test>, "args": [{"self": {}}]}}, "is": <boolean>}`: `Number.isFinite`
+ * or `Number.isNaN`, with the boolean it expects.
  *
  * @param {Record<string, any>} predicate
  * @returns {{ name: string, expected: boolean } | undefined}
  */
 function numberGuard(predicate) {
     const { field, is } = predicate;
-    if (typeof is !== 'boolean' || !isPlainObject(field) || Object.keys(field).length !== 1 || !('call' in field)) return undefined;
-    const callee = field.call;
-    if (!isPlainObject(callee) || Object.keys(callee).length !== 1) return undefined;
-    const body = apiBody(callee.api);
-    if (!isPlainObject(body) || Object.keys(body).length !== 1) return undefined;
+    if (typeof is !== 'boolean' || !isPlainObject(field) || Object.keys(field).length !== 1 || !('api' in field)) return undefined;
+    const body = apiBody(field.api);
+    if (!isPlainObject(body) || Object.keys(body).length !== 2 || !Array.isArray(body.args) || body.args.length !== 1) return undefined;
     if (body.path !== 'Number.isFinite' && body.path !== 'Number.isNaN') return undefined;
+    const [
+        arg,
+    ] = body.args;
+    if (!isPlainObject(arg) || Object.keys(arg).length !== 1 || !isPlainObject(arg.self) || Object.keys(arg.self).length) return undefined;
     return { name: body.path, expected: is };
 }
 
@@ -2372,7 +2483,7 @@ function checkOperators(predicate, subject, scope, ctx, path) {
                 fail(
                     ctx,
                     path,
-                    `${operatorList} takes numbers, and config types the value as ${describeType(subject)}; guard it with "type": "number", or a \`call\` of \`Number.isFinite\` holding, before the comparison`,
+                    `${operatorList} takes numbers, and config types the value as ${describeType(subject)}; guard it with "type": "number", or \`Number.isFinite\` of \`self\` holding, before the comparison`,
                 );
             }
         }
@@ -2380,7 +2491,7 @@ function checkOperators(predicate, subject, scope, ctx, path) {
             fail(
                 ctx,
                 path,
-                `under \`none\`, ${operatorList} on a value that can be NaN needs a \`call\` of \`Number.isFinite\` or \`Number.isNaN\` beside it, since a comparison on NaN is false`,
+                `under \`none\`, ${operatorList} on a value that can be NaN needs \`Number.isFinite\` or \`Number.isNaN\` of \`self\` beside it, since a comparison on NaN is false`,
             );
         }
     }
@@ -3460,12 +3571,22 @@ describe('webDetection config tests', () => {
         const fieldOf = (selector, field) => ({ element: { selector, field } });
 
         /**
-         * A predicate testing the value with `Number.isFinite` or `Number.isNaN` through `call`.
+         * A predicate testing the value with `Number.isFinite` or `Number.isNaN`, passed it through `self`.
          *
          * @param {'isFinite' | 'isNaN'} name
          * @param {boolean} [expected]
          */
-        const numberTest = (name, expected = true) => ({ field: { call: { api: `Number.${name}` } }, is: expected });
+        const numberTest = (name, expected = true) => ({
+            field: {
+                api: {
+                    path: `Number.${name}`,
+                    args: [
+                        { self: {} },
+                    ],
+                },
+            },
+            is: expected,
+        });
 
         describe('shape', () => {
             it('passes the shipped forms: leaves, legacy blocks, arrays and boolean literals', () => {
@@ -4314,7 +4435,7 @@ describe('webDetection config tests', () => {
                 expectError('reads "length" on a value config types as number', { ...imgCount, is: { length: 0 } });
             });
 
-            it('requires a `call` of `Number.isFinite` or `Number.isNaN` beside a comparison under `none` on a value that can be NaN', () => {
+            it('requires `Number.isFinite` or `Number.isNaN` beside a comparison under `none` on a value that can be NaN', () => {
                 const ratio = {
                     div: [
                         imgCount,
@@ -4411,7 +4532,7 @@ describe('webDetection config tests', () => {
             });
         });
 
-        describe('`call` and `api` paths', () => {
+        describe('`self` and `api` paths', () => {
             it('takes a path as short for an `api` body', () => {
                 expectValid({ api: 'document.title', is: { type: 'string' } });
                 expectValid({
@@ -4429,9 +4550,21 @@ describe('webDetection config tests', () => {
                 expectError('`api` takes a path or one body object', { api: 5, is: {} });
             });
 
-            it('applies a listed method through `call`, in `where` and under `is`', () => {
+            it('passes the value to a listed method through `self`, in `where` and under `is`', () => {
                 expectValid(items('video', { duration: numberTest('isFinite') }));
-                expectValid(items('video', { field: { path: 'duration', call: { api: 'Number.isNaN' } }, is: true }));
+                expectValid(
+                    items('video', {
+                        field: {
+                            api: {
+                                path: 'Number.isNaN',
+                                args: [
+                                    { self: 'duration' },
+                                ],
+                            },
+                        },
+                        is: true,
+                    }),
+                );
                 expectValid({ ...imgCount, is: numberTest('isFinite') });
                 expectValid({
                     ...imgCount,
@@ -4442,48 +4575,113 @@ describe('webDetection config tests', () => {
                         ],
                     },
                 });
-            });
-
-            it('rejects an operand that names no listed method', () => {
-                expectError(
-                    '"Number.isInteger", which is not in API_ALLOWLIST',
-                    items('video', { duration: { field: { call: { api: 'Number.isInteger' } }, is: true } }),
-                );
-                expectError('`call` takes a function', items('video', { duration: { field: { call: 5 }, is: true } }));
-                expectError('`call` takes a function', items('video', { duration: { field: { call: title }, is: true } }));
-                expectError(
-                    '`call` takes a function',
-                    items('video', {
-                        duration: {
-                            field: {
-                                call: {
-                                    api: {
-                                        path: 'Number.isFinite',
-                                        args: [
-                                            1,
-                                        ],
-                                    },
-                                },
-                            },
-                            is: true,
-                        },
-                    }),
-                );
-                expectError('"Math.min.bind", which is not in API_ALLOWLIST', {
+                expectValid({
                     sum: fieldOf('img', {
-                        path: 'naturalWidth',
-                        call: {
-                            api: {
-                                path: 'Math.min.bind',
-                                args: [
-                                    null,
-                                    5,
-                                ],
-                            },
+                        api: {
+                            path: 'Math.min',
+                            args: [
+                                { self: 'naturalWidth' },
+                                5,
+                            ],
                         },
                     }),
                     is: { gt: 0 },
                 });
+            });
+
+            it('reads each item through `self` in `where`, by the item’s type', () => {
+                expectValid(items('img', { naturalWidth: { gt: { self: 'naturalHeight' } } }));
+                expectValid(
+                    items('img', {
+                        field: {
+                            api: {
+                                path: 'Reflect.has',
+                                args: [
+                                    { self: {} },
+                                    'naturalWidth',
+                                ],
+                            },
+                        },
+                        is: true,
+                    }),
+                );
+                expectValid(items('img', { field: { self: 'naturalWidth' }, is: 0 }));
+                expectError(
+                    '"noSuchProperty" is not a property of HTMLImageElement',
+                    items('img', { field: { self: 'noSuchProperty' }, is: 0 }),
+                );
+                expectError('"performance.getEntriesByType.name", which is not in API_ALLOWLIST', {
+                    api: {
+                        path: 'performance.getEntriesByType',
+                        args: [
+                            'resource',
+                        ],
+                        where: { duration: { gt: { self: 'name.length' } } },
+                    },
+                    using: 'length',
+                    is: 0,
+                });
+            });
+
+            it('rejects a method not on the allowlist, and `call` in `field`', () => {
+                expectError(
+                    '"Number.isInteger", which is not in API_ALLOWLIST',
+                    items('video', {
+                        field: {
+                            api: {
+                                path: 'Number.isInteger',
+                                args: [
+                                    { self: 'duration' },
+                                ],
+                            },
+                        },
+                        is: true,
+                    }),
+                );
+                expectError(
+                    'unknown `field` key "call"',
+                    items('video', { duration: { field: { call: { api: 'Number.isFinite' } }, is: true } }),
+                );
+            });
+
+            it('rejects `self` outside `using`, `where` and `field`', () => {
+                expectError('`self` reads from `using`, `where` or `field`', { self: 'length', is: 0 });
+                expectError('`self` reads from `using`, `where` or `field`', true, { x: { value: { self: {} } } });
+            });
+
+            it('rejects `as` on an expression reading `self` per item, and inside the branches of an `if` reading one', () => {
+                expectError('`as` names one value per run', items('img', { naturalWidth: { gt: { self: 'naturalHeight', as: 'h' } } }));
+                expectError(
+                    '`as` names one value per run',
+                    items('img', {
+                        naturalWidth: {
+                            gt: {
+                                if: {
+                                    test: { self: 'complete' },
+                                    then: {
+                                        sum: [
+                                            1,
+                                        ],
+                                        as: 'one',
+                                    },
+                                    else: 2,
+                                },
+                            },
+                        },
+                    }),
+                );
+                expectValid(
+                    items('img', {
+                        naturalWidth: {
+                            gt: {
+                                sum: [
+                                    1,
+                                ],
+                                as: 'one',
+                            },
+                        },
+                    }),
+                );
             });
         });
 
@@ -4659,6 +4857,30 @@ describe('webDetection config tests', () => {
                     is: {},
                 });
                 expectError('unknown source body key "root"', { api: { root: img, path: 'length' }, is: { gt: 0 } });
+            });
+
+            it('takes an expression reading the value beside it through `self`', () => {
+                expectValid({
+                    only: navigation,
+                    using: {
+                        div: [
+                            { self: 'decodedBodySize' },
+                            { self: 'duration' },
+                        ],
+                    },
+                    as: 'ratio',
+                    is: { gt: 0 },
+                });
+                expectValid({ ...img, using: { self: 'length' }, is: { gte: 5 } });
+                expectError('"performance.getEntriesByType.name", which is not in API_ALLOWLIST', {
+                    only: navigation,
+                    using: {
+                        sum: [
+                            { self: 'name.length' },
+                        ],
+                    },
+                    is: { gt: 0 },
+                });
             });
 
             it('applies `using`, then `as`, then `is`', () => {
