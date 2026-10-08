@@ -105,7 +105,6 @@ const VALUE_OPERATORS = [
     'eq',
     ...COMPARISON_OPERATORS,
     'fails',
-    'exists',
     'type',
 ];
 
@@ -2431,14 +2430,9 @@ function checkOperators(predicate, subject, scope, ctx, path) {
     const comparisons = COMPARISON_OPERATORS.filter(has);
     for (const key of comparisons) checkExpr(predicate[key], 'number', child(scope), ctx, `${path}.${key}`);
 
-    for (const key of [
-        'fails',
-        'exists',
-    ]) {
-        if (has(key) && typeof predicate[key] !== 'boolean') fail(ctx, `${path}.${key}`, `\`${key}\` is a boolean`);
-    }
+    if (has('fails') && typeof predicate.fails !== 'boolean') fail(ctx, `${path}.fails`, '`fails` is a boolean');
     if (predicate.fails === true) {
-        const beside = Object.keys(predicate).filter((key) => key !== 'fails' && key !== 'exists' && key !== 'type');
+        const beside = Object.keys(predicate).filter((key) => key !== 'fails');
         if (beside.length)
             fail(
                 ctx,
@@ -2446,8 +2440,6 @@ function checkOperators(predicate, subject, scope, ctx, path) {
                 `beside \`"fails": true\`, ${beside.join(', ')} read${beside.length === 1 ? 's' : ''} the failed value, which aborts the detector`,
             );
     }
-    if (predicate.exists === false && Object.keys(predicate).length > 1)
-        fail(ctx, path, '`"exists": false` stands alone: beside another key it never holds for a read value');
 
     /** @type {string[] | null} */
     let listed = null;
@@ -4013,7 +4005,7 @@ describe('webDetection config tests', () => {
 
             it('checks each `field` step suits the type the previous one gives', () => {
                 expectValid(items('img', { 'currentSrc.length': { gt: 0 } }));
-                expectValid(items('link', { 'sheet.cssRules': { exists: true } }));
+                expectValid(items('link', { 'sheet.cssRules': { fails: false } }));
                 expectError('reads "length" on a value config types as number', items('img', { 'naturalWidth.length': 0 }));
                 expectError('reads "foo" on a value config types as string', items('img', { 'src.foo': 0 }));
             });
@@ -4389,7 +4381,6 @@ describe('webDetection config tests', () => {
             });
 
             it('rejects predicates that never hold for a read value', () => {
-                expectError('stands alone', { ...loadEventEnd, is: { exists: false, gt: 0 } });
                 expectError('also lists string, null', {
                     ...loadEventEnd,
                     is: {
@@ -4401,17 +4392,23 @@ describe('webDetection config tests', () => {
                     },
                 });
                 expectError('leaves out number', { ...loadEventEnd, is: { type: 'string', ...numberTest('isFinite') } });
-                expectValid({ only: loadEventEnd, is: { exists: false } });
                 expectValid({ ...loadEventEnd, is: { type: 'number', gt: 0 } });
             });
 
             it('checks `fails` is a boolean, and `"fails": true` reads no value', () => {
                 expectValid({ ...loadEventEnd, is: { fails: false, gt: 0 } });
-                expectValid({ ...loadEventEnd, is: { exists: true, fails: true } });
                 expectValid({ ...loadEventEnd, is: { fails: true } });
                 expectValid(items('link', { sheet: { fails: false } }));
                 expectError('is a boolean', { ...loadEventEnd, is: { fails: 1 } });
                 expectError('the failed value, which aborts', { ...loadEventEnd, is: { fails: true, gt: 0 } });
+                expectError('the failed value, which aborts', { ...loadEventEnd, is: { fails: true, type: 'number' } });
+            });
+
+            it('reads `exists` as a property name', () => {
+                expectError('"performance.getEntriesByType.loadEventEnd.exists", which is not in API_ALLOWLIST', {
+                    ...loadEventEnd,
+                    is: { exists: true },
+                });
             });
 
             it('checks operators suit an element property’s type', () => {
@@ -4494,7 +4491,7 @@ describe('webDetection config tests', () => {
                         args: [
                             'resource',
                         ],
-                        where: { responseStatus: { exists: true, gte: 400 } },
+                        where: { responseStatus: { fails: false, gte: 400 } },
                     },
                     using: 'length',
                     is: 0,
