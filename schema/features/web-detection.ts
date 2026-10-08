@@ -83,7 +83,8 @@ type Modifiers = {
     is?: Predicate;
 };
 
-type Arg = string | number | boolean | null;
+/** A literal, an expression in value position, or a JS array of entries. */
+type Arg = string | null | Expr | Arg[];
 
 /** A string is short for `{ path }`. At least one key. */
 type FieldRead =
@@ -163,8 +164,6 @@ type ExprKeys = {
     only: Expr;
     sum: Operands;
     mul: Operands;
-    min: Operands;
-    max: Operands;
     sub: [
         Expr,
         Expr,
