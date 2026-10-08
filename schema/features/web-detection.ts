@@ -83,8 +83,8 @@ type Modifiers = {
     is?: Predicate;
 };
 
-/** A literal, an expression in value position, or a JS array of entries. */
-type Arg = string | null | Expr | Arg[];
+/** An expression in value position, or a JS array of entries. */
+type Arg = Expr | Arg[];
 
 /** A string is short for `{ path }`. At least one key. */
 type FieldRead =
@@ -107,7 +107,7 @@ type PredicateReserved = {
 };
 
 type PredicateOperators = {
-    eq?: Expr | string | null;
+    eq?: Expr;
     lt?: Expr;
     lte?: Expr;
     gt?: Expr;
@@ -184,7 +184,7 @@ type ExprKeys = {
  * and never beside `is`. Placement and types are checked by the parser and CI, not by these types.
  */
 export type ExprObject = Partial<ExprKeys> & Modifiers;
-export type Expr = number | boolean | ExprObject | Expr[];
+export type Expr = number | boolean | string | null | ExprObject | Expr[];
 
 export type PayloadField = {
     /** An expression in value position. */
