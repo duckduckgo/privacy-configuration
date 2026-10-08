@@ -30,6 +30,13 @@ type SubFeatures<VersionType> = {
             maxInteractions: number;
         }
     >;
+    pageSignals?: SubFeature<
+        VersionType,
+        {
+            // Max entries per Page Signals list in the breakage report
+            maxEntries: number;
+        }
+    >;
 };
 
 export type IOSBrowserConfig<VersionType> = Feature<

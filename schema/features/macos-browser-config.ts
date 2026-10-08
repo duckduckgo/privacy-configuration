@@ -15,6 +15,13 @@ type SubFeatures<VersionType> = {
             domainsAllowList: string[];
         }
     >;
+    pageSignals?: SubFeature<
+        VersionType,
+        {
+            // Max entries per Page Signals list in the breakage report
+            maxEntries: number;
+        }
+    >;
 };
 
 export type MacOSBrowserConfig<VersionType> = Feature<
