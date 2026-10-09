@@ -50,6 +50,7 @@ export { WebCompatSettings } from './features/webcompat';
 export { DuckPlayerSettings } from './features/duckplayer';
 export { EventHubSettings } from './features/event-hub';
 export { ExperimentMetricsSettings } from './features/experiment-metrics';
+export { DetectorConfig } from './features/web-detection';
 
 export type ExportedSchemas =
     | 'CurrentGenericConfig'
@@ -61,6 +62,7 @@ export type ExportedSchemas =
     | 'DuckPlayerNativeSettings'
     | 'EventHubSettings'
     | 'ExperimentMetricsSettings'
+    | 'DetectorConfig'
     | 'AttributedMetricsFeature';
 
 /**

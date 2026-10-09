@@ -233,6 +233,12 @@ describe('Config schema tests', () => {
     });
 });
 
+/** Trigger types that fire once per event: `immediate` per raw occurrence, `immediate_v2` per delivered event. */
+const IMMEDIATE_TRIGGER_TYPES = [
+    'immediate',
+    'immediate_v2',
+];
+
 describe('EventHub validation tests', () => {
     for (const config of latestConfigs) {
         const eventHub = /** @type {import('../schema/features/event-hub').EventHubFeature<number> | undefined} */ (
@@ -268,11 +274,11 @@ describe('EventHub validation tests', () => {
                     expect(type).to.be.oneOf(
                         [
                             'period',
-                            'immediate',
+                            ...IMMEDIATE_TRIGGER_TYPES,
                         ],
                         `Telemetry '${name}' has invalid trigger.type '${trigger.type}'`,
                     );
-                    if (type === 'immediate') {
+                    if (IMMEDIATE_TRIGGER_TYPES.includes(type)) {
                         // Immediate triggers fire per event: no period, and a `source` naming the event.
                         expect(trigger.period, `Immediate telemetry '${name}' must not specify a period`).to.equal(undefined);
                         expect(trigger.source, `Immediate telemetry '${name}' source must be a string`).to.be.a('string');
@@ -296,7 +302,7 @@ describe('EventHub validation tests', () => {
                     // per-provider captcha pixel, where the provider is the pixel itself). Skip the check only
                     // for immediate triggers rather than matching on 'period', so any future trigger type is
                     // still required to carry at least one parameter until it's explicitly exempted here.
-                    if ((entry.trigger.type ?? 'period') !== 'immediate') {
+                    if (!IMMEDIATE_TRIGGER_TYPES.includes(entry.trigger.type ?? 'period')) {
                         expect(Object.keys(params).length).to.be.greaterThan(
                             0,
                             `Non-immediate telemetry '${name}' must have at least one parameter`,
@@ -319,7 +325,7 @@ describe('EventHub validation tests', () => {
                 ([
                     ,
                     entry,
-                ]) => entry.trigger.type === 'immediate',
+                ]) => IMMEDIATE_TRIGGER_TYPES.includes(entry.trigger.type ?? 'period'),
             );
 
             describe('period telemetry entries', () => {
@@ -461,7 +467,7 @@ describe('EventHub validation tests', () => {
                     param,
                 ] of Object.entries(entry.parameters || {})) {
                     describe(`${entryName}.${paramName}`, () => {
-                        const isImmediateTrigger = entry.trigger?.type === 'immediate';
+                        const isImmediateTrigger = IMMEDIATE_TRIGGER_TYPES.includes(entry.trigger?.type ?? 'period');
 
                         if (param.template === 'data' && isImmediateTrigger) {
                             // Immediate-trigger data params forward the triggering event's payload; the
@@ -628,6 +634,67 @@ describe('webInterferenceDetection interferenceTypes override merge', () => {
     });
 });
 
+describe('Web detection detector schema', () => {
+    const validate = createValidator('DetectorConfig');
+    const images = { element: { selector: 'img' } };
+
+    it('accepts self, with a path or a body, and {} for the bound value', () => {
+        const detector = {
+            match: {
+                ...images,
+                using: {
+                    api: {
+                        path: 'Math.max.apply',
+                        args: [
+                            null,
+                            { self: {} },
+                        ],
+                    },
+                },
+                is: { gt: { self: 'length' } },
+            },
+        };
+        expect(validate(detector), formatErrors(validate.errors)).to.equal(true);
+    });
+
+    it('accepts using as an expression over self', () => {
+        const detector = {
+            match: {
+                api: 'document',
+                using: {
+                    div: [
+                        { self: 'title.length' },
+                        { self: { path: 'fonts.size' } },
+                    ],
+                },
+                is: { gt: 0 },
+            },
+        };
+        expect(validate(detector), formatErrors(validate.errors)).to.equal(true);
+    });
+
+    it('accepts self in the arguments of a field expression', () => {
+        const detector = {
+            match: {
+                element: {
+                    selector: 'img',
+                    field: {
+                        api: {
+                            path: 'Math.min',
+                            args: [
+                                { self: 'naturalWidth' },
+                                2000,
+                            ],
+                        },
+                    },
+                },
+                is: {},
+            },
+        };
+        expect(validate(detector), formatErrors(validate.errors)).to.equal(true);
+    });
+});
+
 describe('EventHub schema source rules', () => {
     const validate = createValidator('EventHubSettings');
 
@@ -674,6 +741,14 @@ describe('EventHub schema source rules', () => {
     it('accepts an immediate data param that omits its source', () => {
         const settings = immediateEntry({ template: 'data', dataKey: 'loginState' });
         expect(validate(settings), formatErrors(validate.errors)).to.equal(true);
+    });
+
+    it('accepts an immediate_v2 trigger, and rejects an unknown trigger type', () => {
+        const settings = immediateEntry({ template: 'data', dataKey: 'loginState' });
+        settings.telemetry.test_pixel_immediate.trigger.type = 'immediate_v2';
+        expect(validate(settings), formatErrors(validate.errors)).to.equal(true);
+        settings.telemetry.test_pixel_immediate.trigger.type = 'immediate_v3';
+        expect(validate(settings)).to.equal(false);
     });
 
     it('accepts an eventHub_baseline_* pixel whose baseline counter has no matching detector source', () => {
