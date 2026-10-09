@@ -58,7 +58,7 @@ describe('Config schema tests', () => {
                 );
             });
 
-            it('should validate against the full configV5 schema', () => {
+            it(`should validate against the full config${latestVersion.toUpperCase()} schema`, () => {
                 const validate = createValidator(platformSpecificSchemas[config.name] || 'CurrentGenericConfig');
                 expect(validate(config.body)).to.be.equal(true, formatErrors(validate.errors));
             });
