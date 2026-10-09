@@ -5,26 +5,30 @@ import { createValidator, formatErrors } from './schema-validation.js';
 import platforms from './../platforms.js';
 import { immutableJSONPatch } from 'immutable-json-patch';
 import { getBaseFeatureConfigs, readJsoncFile } from '../util.js';
+import { CURRENT_CONFIG_VERSION } from '../constants.js';
 
 const platformOutput = platforms.map((item) => item.replace('browsers/', 'extension-'));
 
+const latestVersion = `v${CURRENT_CONFIG_VERSION}`;
+const previousVersion = `v${CURRENT_CONFIG_VERSION - 1}`;
+
 const platformSpecificSchemas = {
-    'v5/android-config.json': 'AndroidCurrentConfig',
-    'v4/android-config.json': 'LegacyAndroidConfig',
+    [`${latestVersion}/android-config.json`]: 'AndroidCurrentConfig',
+    [`${previousVersion}/android-config.json`]: 'LegacyAndroidConfig',
 };
 
 // Test the latest 2 versions of each platform
 const latestConfigs = platformOutput.map((plat) => {
     return {
-        name: `v5/${plat}-config.json`,
-        body: JSON.parse(fs.readFileSync(`./generated/v5/${plat}-config.json`)),
+        name: `${latestVersion}/${plat}-config.json`,
+        body: JSON.parse(fs.readFileSync(`./generated/${latestVersion}/${plat}-config.json`)),
     };
 });
 
 const previousConfigs = platformOutput.map((plat) => {
     return {
-        name: `v4/${plat}-config.json`,
-        body: JSON.parse(fs.readFileSync(`./generated/v4/${plat}-config.json`)),
+        name: `${previousVersion}/${plat}-config.json`,
+        body: JSON.parse(fs.readFileSync(`./generated/${previousVersion}/${plat}-config.json`)),
     };
 });
 
@@ -54,7 +58,7 @@ describe('Config schema tests', () => {
                 );
             });
 
-            it('should validate against the full configV5 schema', () => {
+            it(`should validate against the full config${latestVersion.toUpperCase()} schema`, () => {
                 const validate = createValidator(platformSpecificSchemas[config.name] || 'CurrentGenericConfig');
                 expect(validate(config.body)).to.be.equal(true, formatErrors(validate.errors));
             });
@@ -231,6 +235,85 @@ describe('Config schema tests', () => {
             }
         }
     });
+});
+
+/**
+ * @param {number | string} a
+ * @param {number | string} b
+ * @returns {number} negative if a < b, 0 if equal, positive if a > b
+ */
+function compareVersions(a, b) {
+    if (typeof a === 'number' && typeof b === 'number') {
+        return a - b;
+    }
+    const aParts = String(a).split('.').map(Number);
+    const bParts = String(b).split('.').map(Number);
+    for (let i = 0; i < Math.max(aParts.length, bParts.length); i++) {
+        const diff = (aParts[i] || 0) - (bParts[i] || 0);
+        if (diff !== 0) return diff;
+    }
+    return 0;
+}
+
+/**
+ * @param {Record<string, any>} features
+ * @returns {{ path: string, entry: Record<string, any> }[]} every feature and sub-feature
+ */
+function featureEntries(features) {
+    const entries = [];
+    for (const [
+        featureName,
+        feature,
+    ] of Object.entries(features)) {
+        entries.push({ path: featureName, entry: feature });
+        for (const [
+            subFeatureName,
+            subFeature,
+        ] of Object.entries(feature.features || {})) {
+            entries.push({ path: `${featureName}.${subFeatureName}`, entry: subFeature });
+        }
+    }
+    return entries;
+}
+
+describe('maxSupportedVersion', () => {
+    for (const config of latestConfigs) {
+        for (const { path: entryPath, entry } of featureEntries(config.body.features)) {
+            if (!('maxSupportedVersion' in entry) || !('minSupportedVersion' in entry)) continue;
+            it(`${config.name} ${entryPath} minSupportedVersion should not exceed maxSupportedVersion`, () => {
+                expect(compareVersions(entry.minSupportedVersion, entry.maxSupportedVersion)).to.be.at.most(
+                    0,
+                    `minSupportedVersion ${entry.minSupportedVersion} is above maxSupportedVersion ${entry.maxSupportedVersion}`,
+                );
+            });
+        }
+    }
+
+    for (const config of previousConfigs) {
+        it(`${config.name} should not contain maxSupportedVersion`, () => {
+            for (const { path: entryPath, entry } of featureEntries(config.body.features)) {
+                expect(entry, entryPath).to.not.have.property('maxSupportedVersion');
+            }
+        });
+    }
+
+    for (const latest of latestConfigs) {
+        const previous = previousConfigs.find((c) => c.name === latest.name.replace(latestVersion, previousVersion));
+        it(`${previous?.name} should disable features that set maxSupportedVersion in ${latest.name}`, () => {
+            for (const { path: entryPath, entry } of featureEntries(latest.body.features)) {
+                if (!('maxSupportedVersion' in entry)) continue;
+                const [
+                    featureName,
+                    subFeatureName,
+                ] = entryPath.split('.');
+                const feature = previous?.body.features[featureName];
+                const previousEntry = subFeatureName ? feature?.features?.[subFeatureName] : feature;
+                // End-of-life features are absent from older versions entirely.
+                if (!previousEntry) continue;
+                expect(previousEntry.state, entryPath).to.equal('disabled');
+            }
+        });
+    }
 });
 
 describe('EventHub validation tests', () => {
@@ -593,7 +676,7 @@ describe('EventHub validation tests', () => {
 describe('EventHub telemetry override merge', () => {
     // Windows declares only its platform-specific telemetry entries in its override; the build
     // must merge in the base event-hub entries so the platform does not drift as base entries change.
-    const windowsConfig = latestConfigs.find((c) => c.name === 'v5/windows-config.json');
+    const windowsConfig = latestConfigs.find((c) => c.name === `${latestVersion}/windows-config.json`);
     const telemetry = windowsConfig?.body?.features?.eventHub?.settings?.telemetry || {};
     const baseTelemetry = readJsoncFile('./features/event-hub.json').settings.telemetry;
 
@@ -611,7 +694,7 @@ describe('EventHub telemetry override merge', () => {
 describe('webInterferenceDetection interferenceTypes override merge', () => {
     // Android declares only its platform-specific interference types in its override; the build
     // must merge in the base types so the platform does not drift as base types change.
-    const androidConfig = latestConfigs.find((c) => c.name === 'v5/android-config.json');
+    const androidConfig = latestConfigs.find((c) => c.name === `${latestVersion}/android-config.json`);
     const interferenceTypes = androidConfig?.body?.features?.webInterferenceDetection?.settings?.interferenceTypes || {};
     const baseInterferenceTypes = readJsoncFile('./features/web-interference-detection.json').settings.interferenceTypes;
 

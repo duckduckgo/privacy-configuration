@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { expect } from 'chai';
+import { CURRENT_CONFIG_VERSION } from '../constants.js';
 
 function loadJSON(pathFromRoot) {
     return JSON.parse(fs.readFileSync(path.join(import.meta.dirname, '..', pathFromRoot), 'utf-8'));
@@ -20,7 +21,7 @@ describe('Build output validation', () => {
     describe('unprotected temporary merge', () => {
         const extractDomains = (exception) => exception.domain;
         const override = loadJSON('overrides/extension-override.json');
-        const config = loadJSON('generated/v5/extension-config.json');
+        const config = loadJSON(`generated/v${CURRENT_CONFIG_VERSION}/extension-config.json`);
 
         [
             'content-blocking',

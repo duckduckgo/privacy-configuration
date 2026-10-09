@@ -38,6 +38,7 @@ export type SubFeature<VersionType, SettingsType = Record<string, string>> = {
     }[];
     cohorts?: Cohort[];
     minSupportedVersion?: VersionType;
+    maxSupportedVersion?: VersionType;
 };
 
 export type Feature<
@@ -53,6 +54,7 @@ export type Feature<
     features?: SubFeatures;
     hash: string;
     minSupportedVersion?: VersionType;
+    maxSupportedVersion?: VersionType;
 };
 
 type ConditionBlock = {

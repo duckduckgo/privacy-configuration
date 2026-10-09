@@ -35,10 +35,12 @@ Reference tests: [privacy-reference-tests](https://github.com/duckduckgo/privacy
       - `domain`: top level URL
       - `reason`: [removed from [v4](https://app.asana.com/1/137249556945/project/1200890834746050/task/1205680646032200?focus=true) onwards and should not be relied upon] the reason for the exception
     - `minSupportedVersion`: Minimum platform version for which this feature should be enabled. (Android uses numbers, others use strings)
+    - `maxSupportedVersion`: Maximum platform version for which this feature should be enabled, inclusive. Same format as `minSupportedVersion`. Added in v6.
     - `features`: Some features have sub-features.
       - `state`: same as parent features.
           - ⚠️ unclear if a disabled feature should make a sub-feature disabled (Android/Extensions does not but iOS/macOS and Windows does).
       - `minSupportedVersion`: same as parent features.
+      - `maxSupportedVersion`: same as parent features.
       - `description`: optional and non function to describe the sub feature.
       - `rollout`: They can also support progressive rollout which are described here: ✓ NetP: Feature Flag Incremental Rollouts
           - [Windows] rollout applies separately to enabled/preview states. More info here: [Add a feature flag via Remote Config](https://app.asana.com/1/137249556945/project/1208736637614995/task/1207579150090376?focus=true)
