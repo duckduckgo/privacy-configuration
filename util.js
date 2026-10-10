@@ -153,6 +153,21 @@ export function mergeInterferenceTypes(base, override) {
 }
 
 /**
+ * Merge a platform's dbp revokedBundleSigningKeys overrides onto the base.
+ *
+ * Revocations are permanent, so a platform override can add keys but never drop base ones.
+ * A key present in both is kept once.
+ *
+ * @param {string[]} base - base revoked key hashes
+ * @param {string[]} override - platform override revoked key hashes
+ */
+export function mergeRevokedBundleSigningKeys(base, override) {
+    return [
+        ...new Set(base.concat(override)),
+    ];
+}
+
+/**
  * Traverse the input (JSON data) and ensure any "reason" fields are strings in the output.
  *
  * This allows specifying reasons as an array of strings, and converts these to

@@ -711,6 +711,22 @@ describe('webInterferenceDetection interferenceTypes override merge', () => {
     });
 });
 
+describe('dbp revokedBundleSigningKeys override merge', () => {
+    // Windows overrides other dbp settings; the build must still merge in the base revoked keys
+    // so no platform can drop a revocation.
+    const windowsConfig = latestConfigs.find((c) => c.name === 'v5/windows-config.json');
+    const settings = windowsConfig?.body?.features?.dbp?.settings || {};
+    const baseRevokedKeys = readJsoncFile('./features/dbp.json').settings.revokedBundleSigningKeys;
+
+    it('inherits base revoked keys', () => {
+        expect(settings.revokedBundleSigningKeys).to.include.members(baseRevokedKeys);
+    });
+
+    it('keeps windows-specific dbp settings', () => {
+        expect(settings).to.have.property('betaEnding');
+    });
+});
+
 describe('EventHub schema source rules', () => {
     const validate = createValidator('EventHubSettings');
 

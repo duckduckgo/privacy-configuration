@@ -8,6 +8,7 @@ import {
     mergeAllowlistedTrackers,
     mergeEventHubTelemetry,
     mergeInterferenceTypes,
+    mergeRevokedBundleSigningKeys,
     addHashToFeatures,
     stripReasons,
     getBaseFeatureConfigs,
@@ -307,6 +308,17 @@ async function buildPlatforms() {
                             interferenceTypes: mergeInterferenceTypes(
                                 baseSettings.interferenceTypes || {},
                                 overrideSettings.interferenceTypes || {},
+                            ),
+                        };
+                    } else if (key === 'dbp' && platformKey === 'settings') {
+                        const baseSettings = platformConfig.features[key].settings || {};
+                        const overrideSettings = platformOverride.features[key][platformKey];
+                        platformConfig.features[key][platformKey] = {
+                            ...baseSettings,
+                            ...overrideSettings,
+                            revokedBundleSigningKeys: mergeRevokedBundleSigningKeys(
+                                baseSettings.revokedBundleSigningKeys || [],
+                                overrideSettings.revokedBundleSigningKeys || [],
                             ),
                         };
                     } else if ((key === 'clickToLoad' || key === 'clickToPlay') && platformKey === 'settings') {

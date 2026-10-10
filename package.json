@@ -5,8 +5,9 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "npm run build && npm run unit-tests && npm run lint && npm run tsc",
+    "test": "npm run build && npm run unit-tests && npm run check-revoked-bundle-signing-keys && npm run lint && npm run tsc",
     "check-lockfile": "node scripts/check-lockfile.mjs",
+    "check-revoked-bundle-signing-keys": "node scripts/check-revoked-bundle-signing-keys.mjs",
     "lint": "npm run check-lockfile && eslint . && prettier . --check",
     "lint-fix": "npm run check-lockfile && eslint . --fix && prettier . --write",
     "tsc": "tsc",
