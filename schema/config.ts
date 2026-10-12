@@ -42,6 +42,9 @@ import { WebExtensionsConfig } from './features/web-extensions';
 import { AdBlockingExtensionConfig } from './features/ad-blocking-extension';
 import { TabSuspension } from './features/tab-suspension';
 import { ExtensionManagementFeature } from './features/extension-management';
+import { ExtensionsCatalogFeature } from './features/extensions-catalog';
+import { ChromeWebstorePatchingFeature } from './features/chrome-webstore-patching';
+import { PrivacyProFeature } from './features/privacy-pro';
 
 export { WebCompatSettings } from './features/webcompat';
 export { DuckPlayerSettings } from './features/duckplayer';
@@ -61,9 +64,9 @@ export type ExportedSchemas =
     | 'AttributedMetricsFeature';
 
 /**
- * Defines the structure of the built V5 config output as downloaded by clients.
+ * Defines the structure of the built V6 config output as downloaded by clients.
  */
-export type ConfigV5<VersionType> = {
+export type ConfigV6<VersionType> = {
     readme: string;
     version: number;
     features: Record<string, Feature<any, VersionType>> & {
@@ -113,6 +116,9 @@ export type ConfigV5<VersionType> = {
         tabSuspension?: TabSuspension<VersionType>;
         webExtensions?: WebExtensionsConfig<VersionType>;
         extensionManagement?: ExtensionManagementFeature<VersionType>;
+        extensionsCatalog?: ExtensionsCatalogFeature<VersionType>;
+        chromeWebstorePatching?: ChromeWebstorePatchingFeature<VersionType>;
+        privacyPro?: PrivacyProFeature<VersionType>;
     };
     unprotectedTemporary: SiteException[];
 };
@@ -122,7 +128,7 @@ export type ConfigV5<VersionType> = {
  *  - Uses integer version numbers for minSupportedVersion
  *  - Adds 'experimentalVariants' top level property
  */
-export type AndroidCurrentConfig = ConfigV5<number> & {
+export type AndroidCurrentConfig = ConfigV6<number> & {
     experimentalVariants: {
         variants: {
             desc: string;
@@ -139,7 +145,7 @@ export type AndroidCurrentConfig = ConfigV5<number> & {
  * Generic spec: covers mac, iOS, windows and extension configs
  *  - Use string version numbers for minSupportedVersion
  */
-export type CurrentGenericConfig = ConfigV5<string>;
+export type CurrentGenericConfig = ConfigV6<string>;
 
 export type LegacyConfig = CurrentGenericConfig;
 export type LegacyAndroidConfig = AndroidCurrentConfig;

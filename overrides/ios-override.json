@@ -90,7 +90,7 @@
             "state": "enabled"
         },
         "adAttributionReporting": {
-            "state": "disabled",
+            "state": "enabled",
             "minSupportedVersion": "7.146.0",
             "settings": {
                 "includeToken": false
@@ -422,10 +422,37 @@
                     "state": "enabled",
                     "minSupportedVersion": "7.235.0"
                 },
+                "updatedCreateImage": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.239.0"
+                },
+                "contextualAttachMoreTabs": {
+                    "state": "internal",
+                    "minSupportedVersion": "7.240.0",
+                    "settings": {
+                        "aiChatAttachMoreTabsLimit": 3,
+                        "promotionStartDate": "2026-09-28T00:00:00Z"
+                    }
+                },
                 "contextualUnifiedToggleInput": {
                     "state": "enabled",
                     "description": "Contextual Unified Toggle Input (UTI) for Duck.ai",
                     "minSupportedVersion": "7.230.0"
+                },
+                "usageWarnings": {
+                    "state": "enabled",
+                    "description": "Warn users as they approach their daily/weekly Duck.ai limits",
+                    "minSupportedVersion": "7.238.0"
+                },
+                "unifiedToggleInputAttachmentPrivacy": {
+                    "state": "enabled",
+                    "description": "Privacy disclosure shown when an image or file is attached in Duck.ai",
+                    "minSupportedVersion": "7.241.0"
+                },
+                "nativeTermsOfService": {
+                    "state": "enabled",
+                    "description": "Duck.ai Terms of Service disclaimer in the native input, where sending accepts them",
+                    "minSupportedVersion": "7.242.0"
                 },
                 "aiChatAtb": {
                     "state": "enabled",
@@ -443,6 +470,11 @@
                 "iPadDuckAIBarControls": {
                     "state": "enabled",
                     "minSupportedVersion": "7.229.0"
+                },
+                "iPadChromeMenuButton": {
+                    "state": "enabled",
+                    "description": "Single Duck.ai menu button in the iPad tabs bar",
+                    "minSupportedVersion": "7.238.0"
                 },
                 "supportsSyncChatsDeletion": {
                     "state": "enabled",
@@ -820,7 +852,7 @@
                     ]
                 },
                 "tdsNextExperiment015": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "rollout": {
                         "steps": [
                             {
@@ -831,6 +863,33 @@
                     "settings": {
                         "controlUrl": "v5/experiments/202609v1-ios-tds-control.json",
                         "treatmentUrl": "v5/experiments/202609v1-ios-tds-treatment.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "tdsNextExperiment016": {
+                    "state": "disabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "v5/experiments/202609v2-ios-tds-control.json",
+                        "treatmentUrl": "v5/experiments/202609v2-ios-tds-treatment.json"
                     },
                     "cohorts": [
                         {
@@ -1071,6 +1130,59 @@
                             "weight": 1
                         }
                     ]
+                },
+                "contentScopeExperiment7": {
+                    "state": "disabled",
+                    "minSupportedVersion": "7.234.0",
+                    "description": "Adwall detection: rendered-text xpath matching for the generic adwall detectors",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "contentScopeExperiment8": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.234.0",
+                    "description": "Page issue detection: auto-run + fireEvent for the new block page, error page, geoblock, verification, blank page, captcha and adwall detectors, with retuned adwall and video intervals",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
                 }
             }
         },
@@ -1095,10 +1207,6 @@
                 {
                     "domain": "postnl.nl",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4648"
-                },
-                {
-                    "domain": "theguardian.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4985"
                 },
                 {
                     "domain": "mumsnet.com",
@@ -2379,6 +2487,10 @@
                     "state": "enabled",
                     "minSupportedVersion": "7.228.0"
                 },
+                "syncAutoRestore": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.240.1"
+                },
                 "simplifiedSyncSetupExperiment": {
                     "state": "enabled",
                     "minSupportedVersion": "7.219.0",
@@ -2400,6 +2512,14 @@
                 "canShowV2ConnectCode": {
                     "state": "enabled",
                     "minSupportedVersion": "7.225.0"
+                },
+                "canReadUnifiedDeviceList": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.238.0"
+                },
+                "canWriteUnifiedDeviceList": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.238.0"
                 }
             }
         },
@@ -2418,6 +2538,17 @@
             "state": "enabled",
             "settings": {
                 "allowlistedTrackers": {
+                    "amazon-adsystem.com": {
+                        "rules": [
+                            {
+                                "rule": "c.amazon-adsystem.com/aax2/apstag.js",
+                                "domains": [
+                                    "allrecipes.com"
+                                ],
+                                "reason": "allrecipes.com - https://github.com/duckduckgo/privacy-configuration/pull/6014"
+                            }
+                        ]
+                    },
                     "appboycdn.com": {
                         "rules": [
                             {
@@ -2458,12 +2589,14 @@
                                 "domains": [
                                     "solitaired.com",
                                     "uwbadgers.com",
-                                    "asuracomic.net"
+                                    "asuracomic.net",
+                                    "allrecipes.com"
                                 ],
                                 "reason": [
                                     "solitaired.com - https://github.com/duckduckgo/privacy-configuration/pull/2329",
                                     "uwbadgers.com - https://github.com/duckduckgo/privacy-configuration/issues/1593",
-                                    "asuracomic.net - https://github.com/duckduckgo/privacy-configuration/pull/2571"
+                                    "asuracomic.net - https://github.com/duckduckgo/privacy-configuration/pull/2571",
+                                    "allrecipes.com - https://github.com/duckduckgo/privacy-configuration/pull/6014"
                                 ]
                             },
                             {
@@ -2853,6 +2986,7 @@
             "settings": {
                 "windowSizing": "disabled",
                 "navigatorCredentials": "disabled",
+                "passkeyDetection": "disabled",
                 "safariObject": "disabled",
                 "messageHandlers": {
                     "state": "disabled",
@@ -2874,8 +3008,7 @@
                     {
                         "domain": [
                             "www.cbsnews.com",
-                            "myhome.experian.co.uk",
-                            "luna.amazon.com"
+                            "myhome.experian.co.uk"
                         ],
                         "patchSettings": [
                             {
@@ -3088,16 +3221,7 @@
                 },
                 "monthlyFreeTrialExperiment2": {
                     "state": "enabled",
-                    "targets": [
-                        {
-                            "localeCountry": "US"
-                        }
-                    ],
                     "cohorts": [
-                        {
-                            "name": "control",
-                            "weight": 1
-                        },
                         {
                             "name": "treatment",
                             "weight": 1
@@ -3179,9 +3303,31 @@
                     "state": "enabled",
                     "minSupportedVersion": "7.210.0"
                 },
-                "subscriptionPromoForExistingUsers": {
-                    "state": "enabled",
-                    "minSupportedVersion": "7.235.0"
+                "performanceOptimizedPaywalls": {
+                    "state": "disabled",
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ],
+                    "settings": {
+                        "entryPoints": {
+                            "vpn": {
+                                "path": "/subscriptions/new/mobile/vpn"
+                            },
+                            "duckai": {
+                                "path": "/subscriptions/new/mobile/duckai"
+                            },
+                            "pir": {
+                                "path": "/subscriptions/new/mobile/pir"
+                            }
+                        }
+                    }
                 }
             }
         },
@@ -3341,6 +3487,10 @@
                 "promptCooldownInterval": 24
             },
             "features": {
+                "floatingUIiOS27": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.241.0"
+                },
                 "widgetReporting": {
                     "state": "disabled"
                 },
@@ -3369,7 +3519,7 @@
                     }
                 },
                 "productTelemetrySurfaceUsage": {
-                    "state": "disabled",
+                    "state": "enabled",
                     "minSupportedVersion": "7.199.0",
                     "description": "Temporarily gather telemetry around product surfaces being used."
                 },
@@ -3541,7 +3691,7 @@
                     ]
                 },
                 "newTabPageSessionInstrumentation": {
-                    "state": "internal",
+                    "state": "enabled",
                     "minSupportedVersion": "7.233.0",
                     "description": "Wide event measuring Starting Experience Success Rate."
                 },
@@ -3573,6 +3723,14 @@
                 "promoPresentationCoordination": {
                     "state": "enabled",
                     "minSupportedVersion": "7.235.0"
+                },
+                "appRatingPromptCoordination": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.238.0"
+                },
+                "sitePermissions": {
+                    "state": "internal",
+                    "minSupportedVersion": "7.241.0"
                 }
             }
         },
@@ -4038,7 +4196,10 @@
                                 "source": "youtube_adBlocker",
                                 "buckets": {
                                     "0": { "gte": 0, "lt": 1 },
-                                    "1+": { "gte": 1 }
+                                    "1": { "gte": 1, "lt": 2 },
+                                    "2-5": { "gte": 2, "lt": 6 },
+                                    "6-9": { "gte": 6, "lt": 10 },
+                                    "10+": { "gte": 10 }
                                 }
                             },
                             "loginState": {
@@ -4061,7 +4222,10 @@
                                 "source": "youtube_playabilityError",
                                 "buckets": {
                                     "0": { "gte": 0, "lt": 1 },
-                                    "1+": { "gte": 1 }
+                                    "1": { "gte": 1, "lt": 2 },
+                                    "2-5": { "gte": 2, "lt": 6 },
+                                    "6-9": { "gte": 6, "lt": 10 },
+                                    "10+": { "gte": 10 }
                                 }
                             },
                             "loginState": {
@@ -4084,7 +4248,10 @@
                                 "source": "youtube_videoAd",
                                 "buckets": {
                                     "0": { "gte": 0, "lt": 1 },
-                                    "1+": { "gte": 1 }
+                                    "1": { "gte": 1, "lt": 2 },
+                                    "2-5": { "gte": 2, "lt": 6 },
+                                    "6-9": { "gte": 6, "lt": 10 },
+                                    "10+": { "gte": 10 }
                                 }
                             },
                             "loginState": {
@@ -4107,7 +4274,10 @@
                                 "source": "youtube_staticAd",
                                 "buckets": {
                                     "0": { "gte": 0, "lt": 1 },
-                                    "1+": { "gte": 1 }
+                                    "1": { "gte": 1, "lt": 2 },
+                                    "2-5": { "gte": 2, "lt": 6 },
+                                    "6-9": { "gte": 6, "lt": 10 },
+                                    "10+": { "gte": 10 }
                                 }
                             },
                             "loginState": {
@@ -4130,7 +4300,10 @@
                                 "source": "youtube_buffering",
                                 "buckets": {
                                     "0": { "gte": 0, "lt": 1 },
-                                    "1+": { "gte": 1 }
+                                    "1": { "gte": 1, "lt": 2 },
+                                    "2-5": { "gte": 2, "lt": 6 },
+                                    "6-9": { "gte": 6, "lt": 10 },
+                                    "10+": { "gte": 10 }
                                 }
                             },
                             "loginState": {
@@ -4139,6 +4312,22 @@
                                 "dataKey": "loginState"
                             }
                         }
+                    },
+                    "webTelemetry_adwall": {
+                        "state": "enabled",
+                        "trigger": {
+                            "type": "immediate",
+                            "source": "adwall"
+                        },
+                        "parameters": {}
+                    },
+                    "webTelemetry_admiralAdwall": {
+                        "state": "enabled",
+                        "trigger": {
+                            "type": "immediate",
+                            "source": "admiralAdwall"
+                        },
+                        "parameters": {}
                     },
                     "webTelemetry_captcha_recaptcha": {
                         "state": "enabled",
@@ -4169,6 +4358,54 @@
                         "trigger": {
                             "type": "immediate",
                             "source": "captcha_cloudflare"
+                        },
+                        "parameters": {}
+                    },
+                    "webTelemetry_captcha_datadome": {
+                        "state": "enabled",
+                        "trigger": {
+                            "type": "immediate",
+                            "source": "captcha_datadome"
+                        },
+                        "parameters": {}
+                    },
+                    "webTelemetry_captcha_imperva": {
+                        "state": "enabled",
+                        "trigger": {
+                            "type": "immediate",
+                            "source": "captcha_imperva"
+                        },
+                        "parameters": {}
+                    },
+                    "webTelemetry_captcha_arkose": {
+                        "state": "enabled",
+                        "trigger": {
+                            "type": "immediate",
+                            "source": "captcha_arkose"
+                        },
+                        "parameters": {}
+                    },
+                    "webTelemetry_captcha_geetest": {
+                        "state": "enabled",
+                        "trigger": {
+                            "type": "immediate",
+                            "source": "captcha_geetest"
+                        },
+                        "parameters": {}
+                    },
+                    "webTelemetry_captcha_awswaf": {
+                        "state": "enabled",
+                        "trigger": {
+                            "type": "immediate",
+                            "source": "captcha_awswaf"
+                        },
+                        "parameters": {}
+                    },
+                    "webTelemetry_captcha_perimeterx": {
+                        "state": "enabled",
+                        "trigger": {
+                            "type": "immediate",
+                            "source": "captcha_perimeterx"
                         },
                         "parameters": {}
                     },

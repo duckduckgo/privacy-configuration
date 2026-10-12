@@ -219,6 +219,59 @@
                             "weight": 1
                         }
                     ]
+                },
+                "contentScopeExperiment7": {
+                    "state": "disabled",
+                    "minSupportedVersion": "1.204.0",
+                    "description": "Adwall detection: rendered-text xpath matching for the generic adwall detectors",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "contentScopeExperiment8": {
+                    "state": "enabled",
+                    "minSupportedVersion": "1.204.0",
+                    "description": "Page issue detection: auto-run + fireEvent for the new block page, error page, geoblock, verification, blank page, captcha and adwall detectors, with retuned adwall and video intervals",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
                 }
             }
         },
@@ -303,6 +356,195 @@
                 }
             },
             "minSupportedVersion": "1.57.1"
+        },
+        "extensionManagement": {
+            "state": "internal",
+            "exceptions": [],
+            "settings": {
+                "hiddenExtensionIds": [
+                    "keedjhechgegabcjphipjhijlnfonmgj",
+                    "okcoajibinplfaggegimmbffnkinjkod",
+                    "enpepjodeaggcfklejondjcndmmajhnc",
+                    "mhjfbmdgcfjbbpaeojofohoefgiehjai",
+                    "angbnfjncjhdkahaldoipdnholpgogph"
+                ],
+                "disabledExtensionIds": [],
+                "specialBehavior": {
+                    "nngceckbapebfimnlniiiahkandclblb": {
+                        "overridesInternalAutofill": true
+                    },
+                    "aeblfdkhhhdcdjpifhhbdiojplfjncoa": {
+                        "overridesInternalAutofill": true
+                    },
+                    "hdokiejnpimakedhajhdlcegeplioahd": {
+                        "overridesInternalAutofill": true
+                    }
+                },
+                "learnMoreUrl": "https://duckduckgo.com/duckduckgo-help-pages/passwords-autofill/adding-third-party-extensions",
+                "learnMoreUrlRemoteDisable": "https://duckduckgo.com/duckduckgo-help-pages/passwords-autofill/adding-third-party-extensions"
+            },
+            "features": {
+                "isLaunchedExtensions": {
+                    "state": "internal"
+                },
+                "curatedExtensions": {
+                    "state": "enabled",
+                    "settings": {
+                        "catalog": [
+                            {
+                                "id": "nngceckbapebfimnlniiiahkandclblb",
+                                "name": "Bitwarden Password Manager",
+                                "publisher": "Bitwarden Inc.",
+                                "publisherUri": "https://bitwarden.com/",
+                                "iconUri": "https://staticcdn.duckduckgo.com/d5c04536-5379-4709-8d19-d13fdd456ff6/extensions-test/bitwarden-128.png",
+                                "cwsUri": "https://chromewebstore.google.com/detail/bitwarden-password-manage/nngceckbapebfimnlniiiahkandclblb",
+                                "categoryId": "password-manager"
+                            },
+                            {
+                                "id": "aeblfdkhhhdcdjpifhhbdiojplfjncoa",
+                                "name": "1Password – Password Manager",
+                                "publisher": "AgileBits Inc",
+                                "publisherUri": "https://1password.com/",
+                                "iconUri": "https://staticcdn.duckduckgo.com/d5c04536-5379-4709-8d19-d13fdd456ff6/extensions-test/onepassword-128.png",
+                                "cwsUri": "https://chromewebstore.google.com/detail/1password-%E2%80%93-password-mana/aeblfdkhhhdcdjpifhhbdiojplfjncoa",
+                                "categoryId": "password-manager"
+                            },
+                            {
+                                "id": "hdokiejnpimakedhajhdlcegeplioahd",
+                                "name": "LastPass: Free Password Manager",
+                                "publisher": "LastPass",
+                                "publisherUri": "https://lastpass.com/",
+                                "iconUri": "https://staticcdn.duckduckgo.com/d5c04536-5379-4709-8d19-d13fdd456ff6/extensions-test/lastpass-128.png",
+                                "cwsUri": "https://chromewebstore.google.com/detail/lastpass-free-password-ma/hdokiejnpimakedhajhdlcegeplioahd",
+                                "categoryId": "password-manager"
+                            }
+                        ],
+                        "catalogInternal": [
+                            {
+                                "id": "nngceckbapebfimnlniiiahkandclblb",
+                                "name": "Bitwarden Password Manager",
+                                "publisher": "Bitwarden Inc.",
+                                "publisherUri": "https://bitwarden.com/",
+                                "iconUri": "https://staticcdn.duckduckgo.com/d5c04536-5379-4709-8d19-d13fdd456ff6/extensions-test/bitwarden-128.png",
+                                "cwsUri": "https://chromewebstore.google.com/detail/bitwarden-password-manage/nngceckbapebfimnlniiiahkandclblb",
+                                "categoryId": "password-manager"
+                            },
+                            {
+                                "id": "aeblfdkhhhdcdjpifhhbdiojplfjncoa",
+                                "name": "1Password – Password Manager",
+                                "publisher": "AgileBits Inc",
+                                "publisherUri": "https://1password.com/",
+                                "iconUri": "https://staticcdn.duckduckgo.com/d5c04536-5379-4709-8d19-d13fdd456ff6/extensions-test/onepassword-128.png",
+                                "cwsUri": "https://chromewebstore.google.com/detail/1password-%E2%80%93-password-mana/aeblfdkhhhdcdjpifhhbdiojplfjncoa",
+                                "categoryId": "password-manager"
+                            },
+                            {
+                                "id": "hdokiejnpimakedhajhdlcegeplioahd",
+                                "name": "LastPass: Free Password Manager",
+                                "publisher": "LastPass",
+                                "publisherUri": "https://lastpass.com/",
+                                "iconUri": "https://staticcdn.duckduckgo.com/d5c04536-5379-4709-8d19-d13fdd456ff6/extensions-test/lastpass-128.png",
+                                "cwsUri": "https://chromewebstore.google.com/detail/lastpass-free-password-ma/hdokiejnpimakedhajhdlcegeplioahd",
+                                "categoryId": "password-manager"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        "extensionsCatalog": {
+            "state": "internal",
+            "exceptions": [],
+            "features": {
+                "bitwarden": {
+                    "state": "internal",
+                    "settings": {
+                        "id": "nngceckbapebfimnlniiiahkandclblb",
+                        "name": "Bitwarden Password Manager",
+                        "publisher": "Bitwarden Inc.",
+                        "publisherUri": "https://bitwarden.com/",
+                        "iconUri": "https://staticcdn.duckduckgo.com/d5c04536-5379-4709-8d19-d13fdd456ff6/extensions-test/bitwarden-128.png",
+                        "cwsUri": "https://chromewebstore.google.com/detail/bitwarden-password-manage/nngceckbapebfimnlniiiahkandclblb",
+                        "categoryId": "password-manager",
+                        "order": 1
+                    }
+                },
+                "onePassword": {
+                    "state": "internal",
+                    "settings": {
+                        "id": "aeblfdkhhhdcdjpifhhbdiojplfjncoa",
+                        "name": "1Password – Password Manager",
+                        "publisher": "AgileBits Inc",
+                        "publisherUri": "https://1password.com/",
+                        "iconUri": "https://staticcdn.duckduckgo.com/d5c04536-5379-4709-8d19-d13fdd456ff6/extensions-test/onepassword-128.png",
+                        "cwsUri": "https://chromewebstore.google.com/detail/1password-%E2%80%93-password-mana/aeblfdkhhhdcdjpifhhbdiojplfjncoa",
+                        "categoryId": "password-manager",
+                        "order": 2
+                    }
+                },
+                "lastPass": {
+                    "state": "internal",
+                    "settings": {
+                        "id": "hdokiejnpimakedhajhdlcegeplioahd",
+                        "name": "LastPass: Free Password Manager",
+                        "publisher": "LastPass",
+                        "publisherUri": "https://lastpass.com/",
+                        "iconUri": "https://staticcdn.duckduckgo.com/d5c04536-5379-4709-8d19-d13fdd456ff6/extensions-test/lastpass-128.png",
+                        "cwsUri": "https://chromewebstore.google.com/detail/lastpass-free-password-ma/hdokiejnpimakedhajhdlcegeplioahd",
+                        "categoryId": "password-manager",
+                        "order": 3
+                    }
+                }
+            }
+        },
+        "chromeWebstorePatching": {
+            "state": "internal",
+            "exceptions": [],
+            "settings": {
+                "patchWebstore": {
+                    "state": "disabled"
+                },
+                "installButtonSelectors": [
+                    {
+                        "type": "css",
+                        "value": "button[jsname=\"wQO0od\"]"
+                    },
+                    {
+                        "type": "css",
+                        "value": "button[jsname=\"ajZLRd\"]"
+                    },
+                    {
+                        "type": "css",
+                        "value": "button[jscontroller=\"O626Fe\"][aria-describedby]"
+                    }
+                ],
+                "promoSelectors": [
+                    {
+                        "type": "css",
+                        "value": "[jsname=\"v621tc\"]"
+                    },
+                    {
+                        "type": "css",
+                        "value": "div[jscontroller=\"o2G9me\"]"
+                    },
+                    {
+                        "type": "css",
+                        "value": "header[role=\"banner\"] aside"
+                    }
+                ],
+                "domains": [
+                    {
+                        "domain": "chromewebstore.google.com",
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/patchWebstore/state",
+                                "value": "enabled"
+                            }
+                        ]
+                    }
+                ]
+            }
         },
         "messageBridge": {
             "exceptions": [],
@@ -396,6 +638,10 @@
                 "multiplePageContexts": {
                     "state": "enabled",
                     "minSupportedVersion": "1.183.0"
+                },
+                "pdfPageContext": {
+                    "state": "enabled",
+                    "minSupportedVersion": "1.210.0"
                 },
                 "applicationMenuShortcut": {
                     "state": "enabled"
@@ -492,6 +738,16 @@
                 "promptBar": {
                     "state": "enabled",
                     "minSupportedVersion": "1.203.0"
+                },
+                "usageWarnings": {
+                    "state": "enabled",
+                    "description": "Warn users as they approach their daily/weekly Duck.ai limits",
+                    "minSupportedVersion": "1.210.0"
+                },
+                "nativeTermsOfService": {
+                    "state": "enabled",
+                    "description": "Duck.ai Terms of Service disclaimer in the native input, where sending accepts them",
+                    "minSupportedVersion": "1.212.0"
                 }
             },
             "settings": {
@@ -785,7 +1041,7 @@
                     ]
                 },
                 "tdsNextExperiment015": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "rollout": {
                         "steps": [
                             {
@@ -796,6 +1052,33 @@
                     "settings": {
                         "controlUrl": "v6/experiments/202609v1-macos-tds-control.json",
                         "treatmentUrl": "v6/experiments/202609v1-macos-tds-treatment.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "tdsNextExperiment016": {
+                    "state": "disabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "v6/experiments/202609v2-macos-tds-control.json",
+                        "treatmentUrl": "v6/experiments/202609v2-macos-tds-treatment.json"
                     },
                     "cohorts": [
                         {
@@ -927,6 +1210,7 @@
             "settings": {
                 "windowSizing": "enabled",
                 "navigatorCredentials": "enabled",
+                "passkeyDetection": "disabled",
                 "safariObject": "enabled",
                 "webNotifications": {
                     "state": "enabled",
@@ -951,14 +1235,40 @@
                     {
                         "domain": [
                             "www.cbsnews.com",
-                            "myhome.experian.co.uk",
-                            "luna.amazon.com"
+                            "myhome.experian.co.uk"
                         ],
                         "patchSettings": [
                             {
                                 "op": "replace",
                                 "path": "/messageHandlers/state",
                                 "value": "enabled"
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        "apiManipulation": {
+            "state": "enabled",
+            "exceptions": [],
+            "settings": {
+                "apiChanges": {},
+                "domains": [
+                    {
+                        // https://github.com/duckduckgo/privacy-configuration/pull/5863
+                        "domain": "luna.amazon.com",
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/apiChanges/CefSharp",
+                                "value": {
+                                    "type": "descriptor",
+                                    "value": {
+                                        "type": "object",
+                                        "value": {}
+                                    },
+                                    "define": true
+                                }
                             }
                         ]
                     }
@@ -1687,19 +1997,10 @@
                 "keyboard": {
                     "type": "undefined"
                 },
-                "hardwareConcurrency": [
-                    {
-                        "type": "number",
-                        "value": 4
-                    },
-                    {
-                        "type": "number",
-                        "value": 8,
-                        "criteria": {
-                            "arch": "AppleSilicon"
-                        }
-                    }
-                ],
+                "hardwareConcurrency": {
+                    "type": "number",
+                    "value": 8
+                },
                 "deviceMemory": {
                     "type": "undefined"
                 }
@@ -1925,8 +2226,8 @@
                         "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5749"
                     },
                     {
-                        "domain": "chatgpt.com",
-                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5808"
+                        "domain": "spotify.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5910"
                     }
                 ],
                 "webViewDefault": [
@@ -2010,6 +2311,14 @@
                 "canShowV2ConnectCode": {
                     "state": "enabled",
                     "minSupportedVersion": "1.195.0"
+                },
+                "canReadUnifiedDeviceList": {
+                    "state": "enabled",
+                    "minSupportedVersion": "1.208.0"
+                },
+                "canWriteUnifiedDeviceList": {
+                    "state": "enabled",
+                    "minSupportedVersion": "1.208.0"
                 }
             }
         },
@@ -2035,6 +2344,17 @@
         "trackerAllowlist": {
             "settings": {
                 "allowlistedTrackers": {
+                    "amazon-adsystem.com": {
+                        "rules": [
+                            {
+                                "rule": "c.amazon-adsystem.com/aax2/apstag.js",
+                                "domains": [
+                                    "allrecipes.com"
+                                ],
+                                "reason": "allrecipes.com - https://github.com/duckduckgo/privacy-configuration/pull/6014"
+                            }
+                        ]
+                    },
                     "appboycdn.com": {
                         "rules": [
                             {
@@ -2089,12 +2409,14 @@
                                 "domains": [
                                     "solitaired.com",
                                     "uwbadgers.com",
-                                    "asuracomic.net"
+                                    "asuracomic.net",
+                                    "allrecipes.com"
                                 ],
                                 "reason": [
                                     "solitaired.com - https://github.com/duckduckgo/privacy-configuration/pull/2329",
                                     "uwbadgers.com - https://github.com/duckduckgo/privacy-configuration/issues/1593",
-                                    "asuracomic.net - https://github.com/duckduckgo/privacy-configuration/pull/2571"
+                                    "asuracomic.net - https://github.com/duckduckgo/privacy-configuration/pull/2571",
+                                    "allrecipes.com - https://github.com/duckduckgo/privacy-configuration/pull/6014"
                                 ]
                             },
                             {
@@ -2643,6 +2965,20 @@
                             "localeCountry": "US"
                         }
                     ]
+                },
+                "onboardingSubscriptionUpsellExperiment": {
+                    "state": "enabled",
+                    "minSupportedVersion": "1.204.0",
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
                 }
             }
         },
@@ -2812,6 +3148,12 @@
                             },
                             {
                                 "percent": 20
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
                             }
                         ]
                     }
@@ -2842,6 +3184,34 @@
                             }
                         ]
                     }
+                },
+                "onboardingNonBlocking": {
+                    "state": "enabled",
+                    "minSupportedVersion": "1.207.0",
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 0
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 0
+                        }
+                    ]
+                },
+                "onboardingNonBlockingV2": {
+                    "state": "enabled",
+                    "minSupportedVersion": "1.210.0",
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
                 },
                 "onboardingChromeExtension": {
                     "state": "enabled",
@@ -2996,10 +3366,6 @@
                 "newDataImportExperience": {
                     "state": "enabled",
                     "minSupportedVersion": "1.169.0"
-                },
-                "dataDirectoryAccess": {
-                    "state": "enabled",
-                    "minSupportedVersion": "1.206.0"
                 }
             }
         },
@@ -3290,7 +3656,10 @@
                                 "source": "youtube_adBlocker",
                                 "buckets": {
                                     "0": { "gte": 0, "lt": 1 },
-                                    "1+": { "gte": 1 }
+                                    "1": { "gte": 1, "lt": 2 },
+                                    "2-5": { "gte": 2, "lt": 6 },
+                                    "6-9": { "gte": 6, "lt": 10 },
+                                    "10+": { "gte": 10 }
                                 }
                             },
                             "loginState": {
@@ -3313,7 +3682,10 @@
                                 "source": "youtube_playabilityError",
                                 "buckets": {
                                     "0": { "gte": 0, "lt": 1 },
-                                    "1+": { "gte": 1 }
+                                    "1": { "gte": 1, "lt": 2 },
+                                    "2-5": { "gte": 2, "lt": 6 },
+                                    "6-9": { "gte": 6, "lt": 10 },
+                                    "10+": { "gte": 10 }
                                 }
                             },
                             "loginState": {
@@ -3336,7 +3708,10 @@
                                 "source": "youtube_videoAd",
                                 "buckets": {
                                     "0": { "gte": 0, "lt": 1 },
-                                    "1+": { "gte": 1 }
+                                    "1": { "gte": 1, "lt": 2 },
+                                    "2-5": { "gte": 2, "lt": 6 },
+                                    "6-9": { "gte": 6, "lt": 10 },
+                                    "10+": { "gte": 10 }
                                 }
                             },
                             "loginState": {
@@ -3359,7 +3734,10 @@
                                 "source": "youtube_staticAd",
                                 "buckets": {
                                     "0": { "gte": 0, "lt": 1 },
-                                    "1+": { "gte": 1 }
+                                    "1": { "gte": 1, "lt": 2 },
+                                    "2-5": { "gte": 2, "lt": 6 },
+                                    "6-9": { "gte": 6, "lt": 10 },
+                                    "10+": { "gte": 10 }
                                 }
                             },
                             "loginState": {
@@ -3382,7 +3760,10 @@
                                 "source": "youtube_buffering",
                                 "buckets": {
                                     "0": { "gte": 0, "lt": 1 },
-                                    "1+": { "gte": 1 }
+                                    "1": { "gte": 1, "lt": 2 },
+                                    "2-5": { "gte": 2, "lt": 6 },
+                                    "6-9": { "gte": 6, "lt": 10 },
+                                    "10+": { "gte": 10 }
                                 }
                             },
                             "loginState": {
@@ -3391,6 +3772,22 @@
                                 "dataKey": "loginState"
                             }
                         }
+                    },
+                    "webTelemetry_adwall": {
+                        "state": "enabled",
+                        "trigger": {
+                            "type": "immediate",
+                            "source": "adwall"
+                        },
+                        "parameters": {}
+                    },
+                    "webTelemetry_admiralAdwall": {
+                        "state": "enabled",
+                        "trigger": {
+                            "type": "immediate",
+                            "source": "admiralAdwall"
+                        },
+                        "parameters": {}
                     },
                     "webTelemetry_captcha_recaptcha": {
                         "state": "enabled",
@@ -3421,6 +3818,54 @@
                         "trigger": {
                             "type": "immediate",
                             "source": "captcha_cloudflare"
+                        },
+                        "parameters": {}
+                    },
+                    "webTelemetry_captcha_datadome": {
+                        "state": "enabled",
+                        "trigger": {
+                            "type": "immediate",
+                            "source": "captcha_datadome"
+                        },
+                        "parameters": {}
+                    },
+                    "webTelemetry_captcha_imperva": {
+                        "state": "enabled",
+                        "trigger": {
+                            "type": "immediate",
+                            "source": "captcha_imperva"
+                        },
+                        "parameters": {}
+                    },
+                    "webTelemetry_captcha_arkose": {
+                        "state": "enabled",
+                        "trigger": {
+                            "type": "immediate",
+                            "source": "captcha_arkose"
+                        },
+                        "parameters": {}
+                    },
+                    "webTelemetry_captcha_geetest": {
+                        "state": "enabled",
+                        "trigger": {
+                            "type": "immediate",
+                            "source": "captcha_geetest"
+                        },
+                        "parameters": {}
+                    },
+                    "webTelemetry_captcha_awswaf": {
+                        "state": "enabled",
+                        "trigger": {
+                            "type": "immediate",
+                            "source": "captcha_awswaf"
+                        },
+                        "parameters": {}
+                    },
+                    "webTelemetry_captcha_perimeterx": {
+                        "state": "enabled",
+                        "trigger": {
+                            "type": "immediate",
+                            "source": "captcha_perimeterx"
                         },
                         "parameters": {}
                     },

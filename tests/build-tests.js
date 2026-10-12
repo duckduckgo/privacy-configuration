@@ -8,6 +8,7 @@ import {
     mergeInterferenceTypes,
     addHashToFeatures,
 } from '../util.js';
+import { compatFunctions } from '../compatibility.js';
 
 const ta1 = {
     'f1.com': {
@@ -653,5 +654,39 @@ describe('addHashToFeatures', () => {
         testConfig.features.testFeature.settings.setting1 = 456;
         addHashToFeatures(testConfig);
         expect(testConfig.features.testFeature.hash).to.be.equal('91f8efc44dcd8f708619421e045120c4');
+    });
+});
+
+describe('compatFunctions.v5', () => {
+    const config = {
+        features: {
+            capped: { state: 'enabled', maxSupportedVersion: '7.300.0', minSupportedVersion: '7.250.0' },
+            parent: {
+                state: 'enabled',
+                features: {
+                    cappedSub: { state: 'enabled', maxSupportedVersion: '7.300.0' },
+                    plainSub: { state: 'enabled', minSupportedVersion: '7.250.0' },
+                },
+            },
+        },
+    };
+    const v5Config = compatFunctions.v5(config);
+
+    it('disables features that set maxSupportedVersion and removes the key', () => {
+        expect(v5Config.features.capped).to.deep.equal({ state: 'disabled', minSupportedVersion: '7.250.0' });
+    });
+
+    it('disables sub-features that set maxSupportedVersion and removes the key', () => {
+        expect(v5Config.features.parent.state).to.equal('enabled');
+        expect(v5Config.features.parent.features.cappedSub).to.deep.equal({ state: 'disabled' });
+    });
+
+    it('leaves features without maxSupportedVersion unchanged', () => {
+        expect(v5Config.features.parent.features.plainSub).to.deep.equal({ state: 'enabled', minSupportedVersion: '7.250.0' });
+    });
+
+    it('does not modify its input', () => {
+        expect(config.features.capped.state).to.equal('enabled');
+        expect(config.features.capped.maxSupportedVersion).to.equal('7.300.0');
     });
 });

@@ -16,6 +16,13 @@ type SettingsType = {
 // Any subfeatures that have typed `settings` should be defined here.
 // Subfeatures without settings (or just string:string mappings for settings) will be automatically validated.
 type SubFeatures<VersionType> = {
+    contextualAttachMoreTabs?: SubFeature<
+        VersionType,
+        {
+            aiChatAttachMoreTabsLimit: number;
+            promotionStartDate: string;
+        }
+    >;
     keepSession?: SubFeature<
         VersionType,
         {
