@@ -33,9 +33,8 @@
                             "state": "enabled",
                             "when": {
                                 "intervalMs": [
-                                    500,
-                                    1000,
-                                    5000
+                                    3100,
+                                    5100
                                 ]
                             }
                         }
@@ -65,9 +64,8 @@
                             "state": "enabled",
                             "when": {
                                 "intervalMs": [
-                                    500,
-                                    1000,
-                                    5000
+                                    3200,
+                                    5200
                                 ]
                             }
                         }
@@ -94,9 +92,8 @@
                             "state": "enabled",
                             "when": {
                                 "intervalMs": [
-                                    500,
-                                    1000,
-                                    5000
+                                    3300,
+                                    5300
                                 ]
                             }
                         }
@@ -123,9 +120,8 @@
                             "state": "enabled",
                             "when": {
                                 "intervalMs": [
-                                    500,
-                                    1000,
-                                    5000
+                                    3400,
+                                    5400
                                 ]
                             }
                         }
@@ -152,9 +148,8 @@
                             "state": "enabled",
                             "when": {
                                 "intervalMs": [
-                                    500,
-                                    1000,
-                                    5000
+                                    3500,
+                                    5500
                                 ]
                             }
                         }
@@ -181,9 +176,8 @@
                             "state": "enabled",
                             "when": {
                                 "intervalMs": [
-                                    500,
-                                    1000,
-                                    5000
+                                    3600,
+                                    5600
                                 ]
                             }
                         }
@@ -228,7 +222,7 @@
                     }
                 },
                 "keywords_vendor": {
-                    "state": "disabled",
+                    "state": "enabled",
                     "match": {
                         "text": {
                             "pattern": [
@@ -621,7 +615,7 @@
                     }
                 },
                 "cloudflare_challenge_extra": {
-                    "state": "disabled",
+                    "state": "enabled",
                     "match": {
                         "any": [
                             {
@@ -670,7 +664,7 @@
                     }
                 },
                 "cloudflare_access_denied": {
-                    "state": "disabled",
+                    "state": "enabled",
                     "match": {
                         "any": [
                             {
@@ -785,7 +779,7 @@
             },
             "blockPage": {
                 "waf_generic_en": {
-                    "state": "disabled",
+                    "state": "enabled",
                     "match": {
                         "text": {
                             "selector": [
@@ -828,7 +822,7 @@
                     }
                 },
                 "waf_vendors": {
-                    "state": "disabled",
+                    "state": "enabled",
                     "match": {
                         "any": [
                             {
@@ -894,7 +888,7 @@
                     }
                 },
                 "verification_failed_en": {
-                    "state": "disabled",
+                    "state": "enabled",
                     "match": {
                         "text": {
                             "selector": [
@@ -928,7 +922,7 @@
                     }
                 },
                 "vercel_checkpoint": {
-                    "state": "disabled",
+                    "state": "enabled",
                     "match": {
                         "text": {
                             "selector": [
@@ -958,7 +952,7 @@
                     }
                 },
                 "http_forbidden_en": {
-                    "state": "disabled",
+                    "state": "enabled",
                     "match": {
                         "text": {
                             "selector": [
@@ -993,7 +987,7 @@
                     }
                 },
                 "http_rate_limited_en": {
-                    "state": "disabled",
+                    "state": "enabled",
                     "match": {
                         "text": {
                             "selector": [
@@ -1026,7 +1020,7 @@
                     }
                 },
                 "network_security_en": {
-                    "state": "disabled",
+                    "state": "enabled",
                     "match": {
                         "text": {
                             "selector": [
@@ -1057,7 +1051,7 @@
                     }
                 },
                 "title_blocked_en": {
-                    "state": "disabled",
+                    "state": "enabled",
                     "match": {
                         "text": {
                             "selector": [
@@ -1090,7 +1084,7 @@
             },
             "errorPage": {
                 "soft404_phrases_en": {
-                    "state": "disabled",
+                    "state": "enabled",
                     "match": {
                         "text": {
                             "selector": [
@@ -1124,7 +1118,7 @@
                     }
                 },
                 "title_unavailable_en": {
-                    "state": "disabled",
+                    "state": "enabled",
                     "match": {
                         "text": {
                             "selector": [
@@ -1154,7 +1148,7 @@
                     }
                 },
                 "ebay_error_page": {
-                    "state": "disabled",
+                    "state": "enabled",
                     "match": {
                         "text": {
                             "selector": [
@@ -1174,7 +1168,7 @@
             },
             "geoblocks": {
                 "region_block_en": {
-                    "state": "disabled",
+                    "state": "enabled",
                     "match": {
                         "text": {
                             "selector": [
@@ -1210,7 +1204,7 @@
             },
             "verification": {
                 "title_en": {
-                    "state": "disabled",
+                    "state": "enabled",
                     "match": {
                         "text": {
                             "selector": [
@@ -1246,7 +1240,7 @@
             },
             "blankPage": {
                 "no_text_or_title": {
-                    "state": "disabled",
+                    "state": "enabled",
                     "match": {
                         "none": [
                             {
@@ -1401,154 +1395,8 @@
             },
             {
                 "condition": {
-                    "experiment": {
-                        "experimentName": "contentScopeExperiment8",
-                        "cohort": "treatment"
-                    }
-                },
-                "patchSettings": [
-                    {
-                        "op": "replace",
-                        "path": "/detectors/adwalls/generic_en/triggers/auto/when/intervalMs",
-                        "value": [
-                            3100,
-                            5100
-                        ]
-                    },
-                    {
-                        "op": "replace",
-                        "path": "/detectors/adwalls/generic_de/triggers/auto/when/intervalMs",
-                        "value": [
-                            3200,
-                            5200
-                        ]
-                    },
-                    {
-                        "op": "replace",
-                        "path": "/detectors/adwalls/generic_es/triggers/auto/when/intervalMs",
-                        "value": [
-                            3300,
-                            5300
-                        ]
-                    },
-                    {
-                        "op": "replace",
-                        "path": "/detectors/adwalls/generic_it/triggers/auto/when/intervalMs",
-                        "value": [
-                            3400,
-                            5400
-                        ]
-                    },
-                    {
-                        "op": "replace",
-                        "path": "/detectors/adwalls/generic_nl/triggers/auto/when/intervalMs",
-                        "value": [
-                            3500,
-                            5500
-                        ]
-                    },
-                    {
-                        "op": "replace",
-                        "path": "/detectors/adwalls/generic_se/triggers/auto/when/intervalMs",
-                        "value": [
-                            3600,
-                            5600
-                        ]
-                    },
-                    {
-                        "op": "replace",
-                        "path": "/detectors/adwalls/keywords_vendor/state",
-                        "value": "enabled"
-                    },
-                    {
-                        "op": "replace",
-                        "path": "/detectors/captcha/cloudflare_challenge_extra/state",
-                        "value": "enabled"
-                    },
-                    {
-                        "op": "replace",
-                        "path": "/detectors/captcha/cloudflare_access_denied/state",
-                        "value": "enabled"
-                    },
-                    {
-                        "op": "replace",
-                        "path": "/detectors/blockPage/waf_generic_en/state",
-                        "value": "enabled"
-                    },
-                    {
-                        "op": "replace",
-                        "path": "/detectors/blockPage/waf_vendors/state",
-                        "value": "enabled"
-                    },
-                    {
-                        "op": "replace",
-                        "path": "/detectors/blockPage/verification_failed_en/state",
-                        "value": "enabled"
-                    },
-                    {
-                        "op": "replace",
-                        "path": "/detectors/blockPage/vercel_checkpoint/state",
-                        "value": "enabled"
-                    },
-                    {
-                        "op": "replace",
-                        "path": "/detectors/blockPage/http_forbidden_en/state",
-                        "value": "enabled"
-                    },
-                    {
-                        "op": "replace",
-                        "path": "/detectors/blockPage/http_rate_limited_en/state",
-                        "value": "enabled"
-                    },
-                    {
-                        "op": "replace",
-                        "path": "/detectors/blockPage/network_security_en/state",
-                        "value": "enabled"
-                    },
-                    {
-                        "op": "replace",
-                        "path": "/detectors/blockPage/title_blocked_en/state",
-                        "value": "enabled"
-                    },
-                    {
-                        "op": "replace",
-                        "path": "/detectors/errorPage/soft404_phrases_en/state",
-                        "value": "enabled"
-                    },
-                    {
-                        "op": "replace",
-                        "path": "/detectors/errorPage/title_unavailable_en/state",
-                        "value": "enabled"
-                    },
-                    {
-                        "op": "replace",
-                        "path": "/detectors/errorPage/ebay_error_page/state",
-                        "value": "enabled"
-                    },
-                    {
-                        "op": "replace",
-                        "path": "/detectors/geoblocks/region_block_en/state",
-                        "value": "enabled"
-                    },
-                    {
-                        "op": "replace",
-                        "path": "/detectors/verification/title_en/state",
-                        "value": "enabled"
-                    },
-                    {
-                        "op": "replace",
-                        "path": "/detectors/blankPage/no_text_or_title/state",
-                        "value": "enabled"
-                    }
-                ]
-            },
-            {
-                "condition": {
-                    "experiment": {
-                        "experimentName": "contentScopeExperiment8",
-                        "cohort": "treatment"
-                    },
-                    "injectName": "android"
+                    "injectName": "android",
+                    "minSupportedVersion": 52920000
                 },
                 "patchSettings": [
                     {
