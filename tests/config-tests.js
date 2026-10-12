@@ -86,7 +86,7 @@ describe('Config schema tests', () => {
                 const featureNameRegex = /^[a-zA-Z0-9]+$/;
                 for (const featureName of Object.keys(config.body.features)) {
                     expect(featureName).to.match(featureNameRegex);
-                    
+
                     // We can ignore legacy features and their sub-features.
                     if (legacyFeatures.includes(featureName)) {
                         continue;
