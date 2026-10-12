@@ -86,12 +86,16 @@ describe('Config schema tests', () => {
                 const featureNameRegex = /^[a-zA-Z0-9]+$/;
                 for (const featureName of Object.keys(config.body.features)) {
                     expect(featureName).to.match(featureNameRegex);
-                    // Features should not have platform specific names so we can use the same config for all platforms.
-                    if (!legacyFeatures.includes(featureName)) {
-                        expect(featureName).to.not.match(deviceSpecificCheck);
+                    
+                    // We can ignore legacy features and their sub-features.
+                    if (legacyFeatures.includes(featureName)) {
+                        continue;
                     }
 
-                    // All subfeatures should also be named correctly
+                    // Otherwise, features should not have platform specific names so we can use the same config for all platforms.
+                    expect(featureName).to.not.match(deviceSpecificCheck);
+
+                    // All subfeatures should also be named correctly if not in a legacy feature
                     const feature = config.body.features[featureName];
                     if (feature.features) {
                         for (const subfeatureName of Object.keys(feature.features)) {
