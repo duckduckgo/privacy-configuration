@@ -155,6 +155,10 @@ describe('detectorPerf config tests', () => {
         const settings = detectorPerf.settings;
         const webDetectionDetectors = config.body.features?.webDetection?.settings?.detectors ?? {};
         const detectorGroups = enabledDetectorGroups(webDetectionDetectors);
+        // Android's EventHub parser can't take the immediate severe entry (see
+        // the android test below), so severe events go unconsumed there and are
+        // dropped at runtime. The period counters must still be consumed.
+        const isAndroid = config.name.includes('android');
 
         describe(config.name, () => {
             it('threshold edges are positive and strictly ascending', () => {
@@ -197,6 +201,7 @@ describe('detectorPerf config tests', () => {
             it('every emittable event type has an eventHub parameter source', () => {
                 const sources = collectSources(config.body.features?.eventHub?.settings?.telemetry);
                 for (const type of expectedEventTypes(settings, detectorGroups)) {
+                    if (isAndroid && type === 'detectorPerf_severe') continue;
                     expect(sources.has(type)).to.equal(
                         true,
                         `detectorPerf can emit '${type}' but no eventHub telemetry parameter consumes it — ` +
