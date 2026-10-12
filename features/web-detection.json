@@ -33,8 +33,9 @@
                             "state": "enabled",
                             "when": {
                                 "intervalMs": [
-                                    3100,
-                                    5100
+                                    500,
+                                    1000,
+                                    5000
                                 ]
                             }
                         }
@@ -64,8 +65,9 @@
                             "state": "enabled",
                             "when": {
                                 "intervalMs": [
-                                    3200,
-                                    5200
+                                    500,
+                                    1000,
+                                    5000
                                 ]
                             }
                         }
@@ -92,8 +94,9 @@
                             "state": "enabled",
                             "when": {
                                 "intervalMs": [
-                                    3300,
-                                    5300
+                                    500,
+                                    1000,
+                                    5000
                                 ]
                             }
                         }
@@ -120,8 +123,9 @@
                             "state": "enabled",
                             "when": {
                                 "intervalMs": [
-                                    3400,
-                                    5400
+                                    500,
+                                    1000,
+                                    5000
                                 ]
                             }
                         }
@@ -148,8 +152,9 @@
                             "state": "enabled",
                             "when": {
                                 "intervalMs": [
-                                    3500,
-                                    5500
+                                    500,
+                                    1000,
+                                    5000
                                 ]
                             }
                         }
@@ -176,8 +181,9 @@
                             "state": "enabled",
                             "when": {
                                 "intervalMs": [
-                                    3600,
-                                    5600
+                                    500,
+                                    1000,
+                                    5000
                                 ]
                             }
                         }
@@ -222,7 +228,7 @@
                     }
                 },
                 "keywords_vendor": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "match": {
                         "text": {
                             "pattern": [
@@ -615,7 +621,7 @@
                     }
                 },
                 "cloudflare_challenge_extra": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "match": {
                         "any": [
                             {
@@ -664,7 +670,7 @@
                     }
                 },
                 "cloudflare_access_denied": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "match": {
                         "any": [
                             {
@@ -779,7 +785,7 @@
             },
             "blockPage": {
                 "waf_generic_en": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "match": {
                         "text": {
                             "selector": [
@@ -822,7 +828,7 @@
                     }
                 },
                 "waf_vendors": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "match": {
                         "any": [
                             {
@@ -888,7 +894,7 @@
                     }
                 },
                 "verification_failed_en": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "match": {
                         "text": {
                             "selector": [
@@ -922,7 +928,7 @@
                     }
                 },
                 "vercel_checkpoint": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "match": {
                         "text": {
                             "selector": [
@@ -952,7 +958,7 @@
                     }
                 },
                 "http_forbidden_en": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "match": {
                         "text": {
                             "selector": [
@@ -987,7 +993,7 @@
                     }
                 },
                 "http_rate_limited_en": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "match": {
                         "text": {
                             "selector": [
@@ -1020,7 +1026,7 @@
                     }
                 },
                 "network_security_en": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "match": {
                         "text": {
                             "selector": [
@@ -1051,7 +1057,7 @@
                     }
                 },
                 "title_blocked_en": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "match": {
                         "text": {
                             "selector": [
@@ -1084,7 +1090,7 @@
             },
             "errorPage": {
                 "soft404_phrases_en": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "match": {
                         "text": {
                             "selector": [
@@ -1118,7 +1124,7 @@
                     }
                 },
                 "title_unavailable_en": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "match": {
                         "text": {
                             "selector": [
@@ -1148,7 +1154,7 @@
                     }
                 },
                 "ebay_error_page": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "match": {
                         "text": {
                             "selector": [
@@ -1168,7 +1174,7 @@
             },
             "geoblocks": {
                 "region_block_en": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "match": {
                         "text": {
                             "selector": [
@@ -1204,7 +1210,7 @@
             },
             "verification": {
                 "title_en": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "match": {
                         "text": {
                             "selector": [
@@ -1240,7 +1246,7 @@
             },
             "blankPage": {
                 "no_text_or_title": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "match": {
                         "none": [
                             {
@@ -1395,8 +1401,154 @@
             },
             {
                 "condition": {
-                    "injectName": "android",
-                    "minSupportedVersion": 52920000
+                    "experiment": {
+                        "experimentName": "contentScopeExperiment8",
+                        "cohort": "treatment"
+                    }
+                },
+                "patchSettings": [
+                    {
+                        "op": "replace",
+                        "path": "/detectors/adwalls/generic_en/triggers/auto/when/intervalMs",
+                        "value": [
+                            3100,
+                            5100
+                        ]
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/adwalls/generic_de/triggers/auto/when/intervalMs",
+                        "value": [
+                            3200,
+                            5200
+                        ]
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/adwalls/generic_es/triggers/auto/when/intervalMs",
+                        "value": [
+                            3300,
+                            5300
+                        ]
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/adwalls/generic_it/triggers/auto/when/intervalMs",
+                        "value": [
+                            3400,
+                            5400
+                        ]
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/adwalls/generic_nl/triggers/auto/when/intervalMs",
+                        "value": [
+                            3500,
+                            5500
+                        ]
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/adwalls/generic_se/triggers/auto/when/intervalMs",
+                        "value": [
+                            3600,
+                            5600
+                        ]
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/adwalls/keywords_vendor/state",
+                        "value": "enabled"
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/captcha/cloudflare_challenge_extra/state",
+                        "value": "enabled"
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/captcha/cloudflare_access_denied/state",
+                        "value": "enabled"
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/blockPage/waf_generic_en/state",
+                        "value": "enabled"
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/blockPage/waf_vendors/state",
+                        "value": "enabled"
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/blockPage/verification_failed_en/state",
+                        "value": "enabled"
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/blockPage/vercel_checkpoint/state",
+                        "value": "enabled"
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/blockPage/http_forbidden_en/state",
+                        "value": "enabled"
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/blockPage/http_rate_limited_en/state",
+                        "value": "enabled"
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/blockPage/network_security_en/state",
+                        "value": "enabled"
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/blockPage/title_blocked_en/state",
+                        "value": "enabled"
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/errorPage/soft404_phrases_en/state",
+                        "value": "enabled"
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/errorPage/title_unavailable_en/state",
+                        "value": "enabled"
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/errorPage/ebay_error_page/state",
+                        "value": "enabled"
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/geoblocks/region_block_en/state",
+                        "value": "enabled"
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/verification/title_en/state",
+                        "value": "enabled"
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/blankPage/no_text_or_title/state",
+                        "value": "enabled"
+                    }
+                ]
+            },
+            {
+                "condition": {
+                    "experiment": {
+                        "experimentName": "contentScopeExperiment8",
+                        "cohort": "treatment"
+                    },
+                    "injectName": "android"
                 },
                 "patchSettings": [
                     {
