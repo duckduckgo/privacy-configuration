@@ -715,6 +715,21 @@ describe('webInterferenceDetection interferenceTypes override merge', () => {
     });
 });
 
+describe('dbp revokedBundleSigningKeys', () => {
+    // Platform overrides of dbp.settings replace the base settings, so a key revoked in features/dbp.json
+    // must also be copied into any override that sets dbp.settings.
+    const baseRevokedKeys = readJsoncFile('./features/dbp.json').settings.revokedBundleSigningKeys;
+    for (const config of [
+        ...latestConfigs,
+        ...previousConfigs,
+    ]) {
+        it(`${config.name} has exactly the revoked keys in features/dbp.json`, () => {
+            const revokedKeys = config.body.features.dbp?.settings?.revokedBundleSigningKeys || [];
+            expect(revokedKeys).to.have.members(baseRevokedKeys, `${config.name} revokedBundleSigningKeys`);
+        });
+    }
+});
+
 describe('EventHub schema source rules', () => {
     const validate = createValidator('EventHubSettings');
 
