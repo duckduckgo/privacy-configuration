@@ -118,6 +118,17 @@ function enabledDetectorGroups(detectors) {
 }
 
 /**
+ * Detector groups deliberately left without counters. `video` detectors only
+ * auto-run on Android and Windows, where detectorPerf is disabled; on Apple they
+ * run only on demand (e.g. breakage reports), so their counters would almost
+ * always read 0. Their events go unconsumed, which EventHub ignores. Add
+ * counters before enabling detectorPerf on a platform that auto-runs them.
+ */
+const UNCOUNTED_DETECTOR_GROUPS = new Set([
+    'video',
+]);
+
+/**
  * Collect every eventHub source that consumes an event: parameter sources
  * (period counters/data) and immediate trigger sources.
  *
@@ -154,7 +165,7 @@ describe('detectorPerf config tests', () => {
         sawDetectorPerf = true;
         const settings = detectorPerf.settings;
         const webDetectionDetectors = config.body.features?.webDetection?.settings?.detectors ?? {};
-        const detectorGroups = enabledDetectorGroups(webDetectionDetectors);
+        const detectorGroups = enabledDetectorGroups(webDetectionDetectors).filter((name) => !UNCOUNTED_DETECTOR_GROUPS.has(name));
         // Android's EventHub parser can't take the immediate severe entry (see
         // the android test below), so severe events go unconsumed there and are
         // dropped at runtime. The period counters must still be consumed.
