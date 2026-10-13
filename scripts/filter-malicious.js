@@ -3,6 +3,7 @@ import path from 'path';
 import fetch from 'node-fetch';
 import crypto from 'crypto';
 import _ from 'lodash';
+import { CURRENT_CONFIG_VERSION } from '../constants.js';
 
 // Rate limit fetch to 30 requests per second using a promise queue
 // https://thoughtspile.github.io/2018/07/07/rate-limit-promises/
@@ -35,7 +36,7 @@ const slowFetch = rateLimit(fetch, 1000, 30);
 class ConfigProcessor {
     constructor(options = {}) {
         this.apiBaseUrl = options.apiBaseUrl || 'https://duckduckgo.com/api/protection/v2';
-        this.outputPath = options.outputPath || 'generated/v5/';
+        this.outputPath = options.outputPath || `generated/v${CURRENT_CONFIG_VERSION}/`;
         this.inputPath = options.inputPath || 'overrides/';
         this.defaultConfig = options.defaultConfig || 'features/malicious-site-protection.json';
         this.platforms = [
