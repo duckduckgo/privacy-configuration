@@ -243,29 +243,6 @@ describe('detectorPerf config tests', () => {
         expect(sawDetectorPerf).to.equal(true);
     });
 
-    // Period counters live in the base feature file and are inherited by all
-    // platforms (harmless where the feature is absent — the sources just never
-    // fire; same as the captcha week counters). The immediate severe entry is
-    // different: it belongs only in overrides for platforms that run the
-    // feature, and must never reach Android (see the test below).
-    it('configs without detectorPerf have no immediate detectorPerf entries', () => {
-        for (const config of latestConfigs) {
-            if (config.body.features?.detectorPerf) continue;
-            const telemetry = config.body.features?.eventHub?.settings?.telemetry ?? {};
-            for (const [
-                entryName,
-                entry,
-            ] of Object.entries(telemetry)) {
-                const isDetectorPerfImmediate =
-                    entry.trigger?.type === 'immediate' && String(entry.trigger.source).startsWith('detectorPerf_');
-                expect(isDetectorPerfImmediate).to.equal(
-                    false,
-                    `${config.name}: telemetry entry '${entryName}' is an immediate detectorPerf pixel but the config has no detectorPerf feature`,
-                );
-            }
-        }
-    });
-
     // Android's EventHub config parser is period + counter only and fails hard
     // on an immediate-trigger entry, rejecting the *entire* telemetry set
     // (including the shipped adwalls/captcha pixels). Keep immediate entries

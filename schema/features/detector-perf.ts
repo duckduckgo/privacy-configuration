@@ -29,7 +29,7 @@ type DetectorPerfSettings = CSSInjectFeatureSettings<{
     /**
      * Cap on severe (immediate) emissions per frame. Each (detector, kind) pair
      * still fires at most once; the cap bounds fleet-wide pixel volume if a
-     * bad config push makes every detector cross. Client default: 10.
+     * bad config push makes every detector cross.
      */
     maxSeverePerPage?: number;
     /** Generic C-S-S load gate, patched per experiment cohort via conditionalChanges. */
