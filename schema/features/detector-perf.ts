@@ -1,4 +1,4 @@
-import { Feature, CSSInjectFeatureSettings } from '../feature';
+import { Feature, CSSInjectFeatureSettings, FeatureState } from '../feature';
 
 /**
  * Threshold bin edges in milliseconds, ascending. These are discovery bins,
@@ -32,6 +32,8 @@ type DetectorPerfSettings = CSSInjectFeatureSettings<{
      * bad config push makes every detector cross. Client default: 10.
      */
     maxSeverePerPage?: number;
+    /** Generic C-S-S load gate, patched per experiment cohort via conditionalChanges. */
+    additionalCheck?: FeatureState;
 }>;
 
 export type DetectorPerfFeature<VersionType> = Feature<DetectorPerfSettings, VersionType>;

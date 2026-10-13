@@ -274,4 +274,34 @@ describe('detectorPerf config tests', () => {
             }
         }
     });
+
+    // Measurement is gated per cohort through additionalCheck. A condition naming an
+    // experiment or cohort the platform doesn't define never matches, which silently
+    // leaves every user unmeasured instead of failing.
+    it('enabled detectorPerf experiment conditions reference experiments and cohorts defined on the platform', () => {
+        for (const config of latestConfigs) {
+            const detectorPerf = config.body.features?.detectorPerf;
+            if (detectorPerf?.state !== 'enabled') continue;
+            const experiments = config.body.features?.contentScopeExperiments?.features ?? {};
+            for (const change of detectorPerf.settings?.conditionalChanges ?? []) {
+                const blocks = Array.isArray(change.condition)
+                    ? change.condition
+                    : [
+                          change.condition,
+                      ];
+                for (const block of blocks) {
+                    if (!block?.experiment) continue;
+                    const { experimentName, cohort } = block.experiment;
+                    const experiment = experiments[experimentName];
+                    expect(experiment, `${config.name}: detectorPerf references undefined experiment '${experimentName}'`).to.not.equal(
+                        undefined,
+                    );
+                    expect(
+                        (experiment.cohorts ?? []).map((c) => c.name),
+                        `${config.name}: experiment '${experimentName}' has no '${cohort}' cohort`,
+                    ).to.include(cohort);
+                }
+            }
+        }
+    });
 });
