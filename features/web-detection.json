@@ -170,7 +170,7 @@
                     "match": {
                         "text": {
                             "pattern": [
-                                "har du en annonsblockerare igång",
+                                "har du en annonsblockerare ig\u00e5ng",
                                 "avaktivera din annonsblockerare"
                             ],
                             "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]"
@@ -1034,7 +1034,7 @@
                             ],
                             "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
                             "pattern": [
-                                "you(’|')?(ve| have) been blocked by network security"
+                                "you(\u2019|')?(ve| have) been blocked by network security"
                             ]
                         }
                     },
@@ -1089,9 +1089,20 @@
                 },
                 "http_forbidden_en_v2": {
                     "state": "disabled",
-                    "match": {
-                        "any": [
-                            {
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    1000,
+                                    5000
+                                ]
+                            }
+                        }
+                    },
+                    "actions": [
+                        {
+                            "when": {
                                 "text": {
                                     "selector": [
                                         "title",
@@ -1105,7 +1116,69 @@
                                     ]
                                 }
                             },
-                            {
+                            "fireEvent": {
+                                "type": "forbiddenPage",
+                                "data": {
+                                    "route": {
+                                        "value": "wording"
+                                    },
+                                    "status": {
+                                        "value": {
+                                            "if": {
+                                                "test": {
+                                                    "api": {
+                                                        "path": "Reflect.has",
+                                                        "args": [
+                                                            {
+                                                                "api": "PerformanceResourceTiming.prototype"
+                                                            },
+                                                            "responseStatus"
+                                                        ]
+                                                    }
+                                                },
+                                                "then": {
+                                                    "ref": "status"
+                                                },
+                                                "else": "unsupported"
+                                            }
+                                        },
+                                        "buckets": {
+                                            "unsupported": "unsupported",
+                                            "2xx": {
+                                                "gte": 200,
+                                                "lt": 300
+                                            },
+                                            "4xx": {
+                                                "gte": 400,
+                                                "lt": 500
+                                            },
+                                            "5xx": {
+                                                "gte": 500,
+                                                "lt": 600
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "breakageReportData": {
+                                "data": {
+                                    "route": {
+                                        "value": "wording"
+                                    },
+                                    "status": {
+                                        "value": {
+                                            "ref": "status"
+                                        }
+                                    }
+                                }
+                            },
+                            "define": {
+                                "done": true
+                            },
+                            "exit": true
+                        },
+                        {
+                            "when": {
                                 "all": [
                                     {
                                         "text": {
@@ -1120,12 +1193,14 @@
                                         }
                                     },
                                     {
-                                        "api": {
-                                            "path": "performance.getEntriesByType",
-                                            "args": [
-                                                "navigation"
-                                            ],
-                                            "field": "responseStatus"
+                                        "only": {
+                                            "api": {
+                                                "path": "performance.getEntriesByType",
+                                                "args": [
+                                                    "navigation"
+                                                ],
+                                                "field": "responseStatus"
+                                            }
                                         },
                                         "as": "status",
                                         "is": {
@@ -1140,9 +1215,72 @@
                                         }
                                     }
                                 ]
-                            }
-                        ]
-                    },
+                            },
+                            "fireEvent": {
+                                "type": "forbiddenPage",
+                                "data": {
+                                    "route": {
+                                        "value": "bareForbidden"
+                                    },
+                                    "status": {
+                                        "value": {
+                                            "if": {
+                                                "test": {
+                                                    "api": {
+                                                        "path": "Reflect.has",
+                                                        "args": [
+                                                            {
+                                                                "api": "PerformanceResourceTiming.prototype"
+                                                            },
+                                                            "responseStatus"
+                                                        ]
+                                                    }
+                                                },
+                                                "then": {
+                                                    "ref": "status"
+                                                },
+                                                "else": "unsupported"
+                                            }
+                                        },
+                                        "buckets": {
+                                            "unsupported": "unsupported",
+                                            "2xx": {
+                                                "gte": 200,
+                                                "lt": 300
+                                            },
+                                            "4xx": {
+                                                "gte": 400,
+                                                "lt": 500
+                                            },
+                                            "5xx": {
+                                                "gte": 500,
+                                                "lt": 600
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "breakageReportData": {
+                                "data": {
+                                    "route": {
+                                        "value": "bareForbidden"
+                                    },
+                                    "status": {
+                                        "value": {
+                                            "ref": "status"
+                                        }
+                                    }
+                                }
+                            },
+                            "define": {
+                                "done": true
+                            },
+                            "exit": true
+                        }
+                    ]
+                },
+                "http_rate_limited_en_v2": {
+                    "state": "disabled",
                     "triggers": {
                         "auto": {
                             "state": "enabled",
@@ -1154,56 +1292,9 @@
                             }
                         }
                     },
-                    "actions": {
-                        "fireEvent": {
-                            "state": "enabled",
-                            "type": "forbiddenPage",
-                            "data": {
-                                "status": {
-                                    "value": {
-                                        "if": {
-                                            "test": {
-                                                "api": {
-                                                    "path": "Reflect.has",
-                                                    "args": [
-                                                        {
-                                                            "api": "PerformanceResourceTiming.prototype"
-                                                        },
-                                                        "responseStatus"
-                                                    ]
-                                                }
-                                            },
-                                            "then": {
-                                                "ref": "status"
-                                            },
-                                            "else": "unsupported"
-                                        }
-                                    },
-                                    "buckets": {
-                                        "unsupported": "unsupported",
-                                        "2xx": {
-                                            "gte": 200,
-                                            "lt": 300
-                                        },
-                                        "4xx": {
-                                            "gte": 400,
-                                            "lt": 500
-                                        },
-                                        "5xx": {
-                                            "gte": 500,
-                                            "lt": 600
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                "http_rate_limited_en_v2": {
-                    "state": "disabled",
-                    "match": {
-                        "any": [
-                            {
+                    "actions": [
+                        {
+                            "when": {
                                 "text": {
                                     "selector": [
                                         "title",
@@ -1215,7 +1306,69 @@
                                     ]
                                 }
                             },
-                            {
+                            "fireEvent": {
+                                "type": "rateLimitedPage",
+                                "data": {
+                                    "route": {
+                                        "value": "wording"
+                                    },
+                                    "status": {
+                                        "value": {
+                                            "if": {
+                                                "test": {
+                                                    "api": {
+                                                        "path": "Reflect.has",
+                                                        "args": [
+                                                            {
+                                                                "api": "PerformanceResourceTiming.prototype"
+                                                            },
+                                                            "responseStatus"
+                                                        ]
+                                                    }
+                                                },
+                                                "then": {
+                                                    "ref": "status"
+                                                },
+                                                "else": "unsupported"
+                                            }
+                                        },
+                                        "buckets": {
+                                            "unsupported": "unsupported",
+                                            "2xx": {
+                                                "gte": 200,
+                                                "lt": 300
+                                            },
+                                            "4xx": {
+                                                "gte": 400,
+                                                "lt": 500
+                                            },
+                                            "5xx": {
+                                                "gte": 500,
+                                                "lt": 600
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "breakageReportData": {
+                                "data": {
+                                    "route": {
+                                        "value": "wording"
+                                    },
+                                    "status": {
+                                        "value": {
+                                            "ref": "status"
+                                        }
+                                    }
+                                }
+                            },
+                            "define": {
+                                "done": true
+                            },
+                            "exit": true
+                        },
+                        {
+                            "when": {
                                 "all": [
                                     {
                                         "text": {
@@ -1230,12 +1383,14 @@
                                         }
                                     },
                                     {
-                                        "api": {
-                                            "path": "performance.getEntriesByType",
-                                            "args": [
-                                                "navigation"
-                                            ],
-                                            "field": "responseStatus"
+                                        "only": {
+                                            "api": {
+                                                "path": "performance.getEntriesByType",
+                                                "args": [
+                                                    "navigation"
+                                                ],
+                                                "field": "responseStatus"
+                                            }
                                         },
                                         "as": "status",
                                         "is": {
@@ -1250,110 +1405,72 @@
                                         }
                                     }
                                 ]
-                            }
-                        ]
-                    },
-                    "triggers": {
-                        "auto": {
-                            "state": "enabled",
-                            "when": {
-                                "intervalMs": [
-                                    1000,
-                                    5000
-                                ]
-                            }
-                        }
-                    },
-                    "actions": {
-                        "fireEvent": {
-                            "state": "enabled",
-                            "type": "rateLimitedPage",
-                            "data": {
-                                "status": {
-                                    "value": {
-                                        "if": {
-                                            "test": {
-                                                "api": {
-                                                    "path": "Reflect.has",
-                                                    "args": [
-                                                        {
-                                                            "api": "PerformanceResourceTiming.prototype"
-                                                        },
-                                                        "responseStatus"
-                                                    ]
-                                                }
-                                            },
-                                            "then": {
-                                                "ref": "status"
-                                            },
-                                            "else": "unsupported"
-                                        }
+                            },
+                            "fireEvent": {
+                                "type": "rateLimitedPage",
+                                "data": {
+                                    "route": {
+                                        "value": "bareTooManyRequests"
                                     },
-                                    "buckets": {
-                                        "unsupported": "unsupported",
-                                        "2xx": {
-                                            "gte": 200,
-                                            "lt": 300
+                                    "status": {
+                                        "value": {
+                                            "if": {
+                                                "test": {
+                                                    "api": {
+                                                        "path": "Reflect.has",
+                                                        "args": [
+                                                            {
+                                                                "api": "PerformanceResourceTiming.prototype"
+                                                            },
+                                                            "responseStatus"
+                                                        ]
+                                                    }
+                                                },
+                                                "then": {
+                                                    "ref": "status"
+                                                },
+                                                "else": "unsupported"
+                                            }
                                         },
-                                        "4xx": {
-                                            "gte": 400,
-                                            "lt": 500
-                                        },
-                                        "5xx": {
-                                            "gte": 500,
-                                            "lt": 600
+                                        "buckets": {
+                                            "unsupported": "unsupported",
+                                            "2xx": {
+                                                "gte": 200,
+                                                "lt": 300
+                                            },
+                                            "4xx": {
+                                                "gte": 400,
+                                                "lt": 500
+                                            },
+                                            "5xx": {
+                                                "gte": 500,
+                                                "lt": 600
+                                            }
                                         }
                                     }
                                 }
-                            }
+                            },
+                            "breakageReportData": {
+                                "data": {
+                                    "route": {
+                                        "value": "bareTooManyRequests"
+                                    },
+                                    "status": {
+                                        "value": {
+                                            "ref": "status"
+                                        }
+                                    }
+                                }
+                            },
+                            "define": {
+                                "done": true
+                            },
+                            "exit": true
                         }
-                    }
+                    ]
                 },
                 "waf_assets": {
                     "state": "disabled",
-                    "match": {
-                        "all": [
-                            {
-                                "element": {
-                                    "selector": [
-                                        "script[src*='_Inc\\61 psul\\61 _Resource']",
-                                        "img[src*='_Inc\\61 psul\\61 _Resource']",
-                                        "link[href*='cdn.sucuri.net']"
-                                    ],
-                                    "visibility": "any"
-                                }
-                            },
-                            {
-                                "any": [
-                                    {
-                                        "text": {
-                                            "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
-                                            "pattern": [
-                                                "\\S"
-                                            ]
-                                        },
-                                        "using": "length",
-                                        "as": "bodyTextLength",
-                                        "is": {
-                                            "lt": 2000
-                                        }
-                                    },
-                                    {
-                                        "api": {
-                                            "path": "performance.getEntriesByType",
-                                            "args": [
-                                                "navigation"
-                                            ],
-                                            "field": "responseStatus"
-                                        },
-                                        "is": {
-                                            "gte": 400
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
                     "triggers": {
                         "auto": {
                             "state": "enabled",
@@ -1365,36 +1482,152 @@
                             }
                         }
                     },
-                    "actions": {
-                        "fireEvent": {
-                            "state": "enabled",
-                            "type": "wafAssetsPage",
-                            "data": {
-                                "bodyTextLength": {
-                                    "value": {
-                                        "ref": "bodyTextLength"
+                    "actions": [
+                        {
+                            "when": {
+                                "none": [
+                                    {
+                                        "element": {
+                                            "selector": [
+                                                "script[src*='_Inc\\61 psul\\61 _Resource']",
+                                                "img[src*='_Inc\\61 psul\\61 _Resource']",
+                                                "link[href*='cdn.sucuri.net']"
+                                            ],
+                                            "visibility": "any"
+                                        }
+                                    }
+                                ]
+                            },
+                            "exit": true
+                        },
+                        {
+                            "when": {
+                                "text": {
+                                    "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                    "pattern": "\\S"
+                                },
+                                "using": "length",
+                                "as": "bodyTextLength",
+                                "is": {
+                                    "lt": 2000
+                                }
+                            },
+                            "fireEvent": {
+                                "type": "wafAssetsPage",
+                                "data": {
+                                    "route": {
+                                        "value": "littleText"
                                     },
-                                    "buckets": {
-                                        "0-499": {
-                                            "gte": 0,
-                                            "lt": 500
+                                    "bodyTextLength": {
+                                        "value": {
+                                            "ref": "bodyTextLength"
                                         },
-                                        "500-999": {
-                                            "gte": 500,
-                                            "lt": 1000
-                                        },
-                                        "1000-1999": {
-                                            "gte": 1000,
-                                            "lt": 2000
-                                        },
-                                        "2000+": {
-                                            "gte": 2000
+                                        "buckets": {
+                                            "0-499": {
+                                                "gte": 0,
+                                                "lt": 500
+                                            },
+                                            "500-999": {
+                                                "gte": 500,
+                                                "lt": 1000
+                                            },
+                                            "1000-1999": {
+                                                "gte": 1000,
+                                                "lt": 2000
+                                            },
+                                            "2000+": {
+                                                "gte": 2000
+                                            }
                                         }
                                     }
                                 }
-                            }
+                            },
+                            "breakageReportData": {
+                                "data": {
+                                    "route": {
+                                        "value": "littleText"
+                                    },
+                                    "bodyTextLength": {
+                                        "value": {
+                                            "ref": "bodyTextLength"
+                                        }
+                                    }
+                                }
+                            },
+                            "define": {
+                                "done": true
+                            },
+                            "exit": true
+                        },
+                        {
+                            "when": {
+                                "only": {
+                                    "api": {
+                                        "path": "performance.getEntriesByType",
+                                        "args": [
+                                            "navigation"
+                                        ],
+                                        "field": "responseStatus"
+                                    }
+                                },
+                                "as": "status",
+                                "is": {
+                                    "gte": 400
+                                }
+                            },
+                            "fireEvent": {
+                                "type": "wafAssetsPage",
+                                "data": {
+                                    "route": {
+                                        "value": "errorStatus"
+                                    },
+                                    "bodyTextLength": {
+                                        "value": {
+                                            "ref": "bodyTextLength"
+                                        },
+                                        "buckets": {
+                                            "0-499": {
+                                                "gte": 0,
+                                                "lt": 500
+                                            },
+                                            "500-999": {
+                                                "gte": 500,
+                                                "lt": 1000
+                                            },
+                                            "1000-1999": {
+                                                "gte": 1000,
+                                                "lt": 2000
+                                            },
+                                            "2000+": {
+                                                "gte": 2000
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "breakageReportData": {
+                                "data": {
+                                    "route": {
+                                        "value": "errorStatus"
+                                    },
+                                    "status": {
+                                        "value": {
+                                            "ref": "status"
+                                        }
+                                    },
+                                    "bodyTextLength": {
+                                        "value": {
+                                            "ref": "bodyTextLength"
+                                        }
+                                    }
+                                }
+                            },
+                            "define": {
+                                "done": true
+                            },
+                            "exit": true
                         }
-                    }
+                    ]
                 }
             },
             "errorPage": {
@@ -1482,21 +1715,6 @@
                 },
                 "soft404_phrases_count": {
                     "state": "disabled",
-                    "match": {
-                        "text": {
-                            "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
-                            "pattern": [
-                                "access denied",
-                                "page not found",
-                                "404 not found"
-                            ]
-                        },
-                        "using": "length",
-                        "as": "keywordCount",
-                        "is": {
-                            "gte": 1
-                        }
-                    },
                     "triggers": {
                         "auto": {
                             "state": "enabled",
@@ -1508,137 +1726,60 @@
                             }
                         }
                     },
-                    "actions": {
-                        "fireEvent": {
-                            "state": "enabled",
-                            "type": "errorPhraseCount",
-                            "data": {
-                                "keywordCount": {
-                                    "value": {
-                                        "ref": "keywordCount"
-                                    },
-                                    "buckets": {
-                                        "1": 1,
-                                        "2-4": {
-                                            "gte": 2,
-                                            "lt": 5
-                                        },
-                                        "5+": {
-                                            "gte": 5
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                "soft404_features": {
-                    "state": "disabled",
-                    "match": {
-                        "all": [
-                            {
-                                "div": [
-                                    {
-                                        "text": {
-                                            "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
-                                            "pattern": [
-                                                "\\S"
-                                            ]
-                                        },
-                                        "using": "length"
-                                    },
-                                    {
-                                        "api": {
-                                            "path": "performance.getEntriesByType",
-                                            "args": [
-                                                "navigation"
-                                            ],
-                                            "field": "decodedBodySize"
-                                        }
-                                    }
-                                ],
-                                "as": "contentByteRatio",
-                                "is": {
-                                    "lt": 0.15
-                                }
-                            },
-                            {
-                                "any": [
-                                    {
-                                        "element": {
-                                            "selector": "img"
-                                        },
-                                        "using": "length",
-                                        "is": {
-                                            "lt": 2
-                                        }
-                                    },
-                                    {
-                                        "api": {
-                                            "path": "Array.from",
-                                            "args": [
-                                                {
-                                                    "api": {
-                                                        "path": "document.title.matchAll",
-                                                        "args": [
-                                                            "\\S+"
-                                                        ]
-                                                    }
-                                                }
-                                            ]
-                                        },
-                                        "using": "length",
-                                        "is": {
-                                            "lte": 3
-                                        }
-                                    }
-                                ]
-                            },
-                            {
+                    "actions": [
+                        {
+                            "when": {
                                 "text": {
                                     "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
                                     "pattern": [
-                                        "\\b404\\b",
-                                        "\\berror\\b",
-                                        "\\bfound\\b",
-                                        "\\bpage\\b",
-                                        "\\bfile\\b",
-                                        "\\bresource\\b",
-                                        "\\burl\\b",
-                                        "\\baccess denied\\b",
-                                        "\\bforbidden\\b",
-                                        "\\bunavailable\\b",
-                                        "\\bgone\\b",
-                                        "\\bredirect\\b",
-                                        "\\btemporary\\b",
-                                        "\\bpermanent\\b",
-                                        "\\bserver\\b",
-                                        "\\bclient\\b",
-                                        "\\bbrowser\\b",
-                                        "\\bnetwork\\b",
-                                        "\\bdns\\b",
-                                        "\\btypo\\b",
-                                        "\\bmisspelling\\b",
-                                        "\\bstale\\b",
-                                        "\\bbroken\\b",
-                                        "\\bdead\\b",
-                                        "\\bobsolete\\b",
-                                        "\\bexpired\\b",
-                                        "\\binvalid\\b",
-                                        "\\bmalformed\\b",
-                                        "\\bcorrupt\\b",
-                                        "\\bunreachable\\b",
-                                        "\\bdeleted\\b"
+                                        "access denied",
+                                        "page not found",
+                                        "404 not found"
                                     ]
                                 },
                                 "using": "length",
                                 "as": "keywordCount",
                                 "is": {
-                                    "gte": 5
+                                    "gte": 1
                                 }
+                            },
+                            "fireEvent": {
+                                "type": "errorPhraseCount",
+                                "data": {
+                                    "keywordCount": {
+                                        "value": {
+                                            "ref": "keywordCount"
+                                        },
+                                        "buckets": {
+                                            "1": 1,
+                                            "2-4": {
+                                                "gte": 2,
+                                                "lt": 5
+                                            },
+                                            "5+": {
+                                                "gte": 5
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "breakageReportData": {
+                                "data": {
+                                    "keywordCount": {
+                                        "value": {
+                                            "ref": "keywordCount"
+                                        }
+                                    }
+                                }
+                            },
+                            "define": {
+                                "done": true
                             }
-                        ]
-                    },
+                        }
+                    ]
+                },
+                "soft404_features": {
+                    "state": "disabled",
                     "triggers": {
                         "auto": {
                             "state": "enabled",
@@ -1650,115 +1791,250 @@
                             }
                         }
                     },
-                    "actions": {
-                        "fireEvent": {
-                            "state": "enabled",
-                            "type": "soft404Features",
-                            "data": {
-                                "contentByteRatio": {
-                                    "value": {
-                                        "ref": "contentByteRatio"
-                                    },
-                                    "buckets": {
-                                        "0-0.05": {
-                                            "gte": 0,
-                                            "lt": 0.05
-                                        },
-                                        "0.05-0.15": {
-                                            "gte": 0.05,
+                    "actions": [
+                        {
+                            "when": {
+                                "all": [
+                                    {
+                                        "div": [
+                                            {
+                                                "text": {
+                                                    "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                                    "pattern": "\\S"
+                                                },
+                                                "using": "length"
+                                            },
+                                            {
+                                                "api": {
+                                                    "path": "performance.getEntriesByType",
+                                                    "args": [
+                                                        "navigation"
+                                                    ],
+                                                    "field": "decodedBodySize"
+                                                }
+                                            }
+                                        ],
+                                        "as": "contentByteRatio",
+                                        "is": {
                                             "lt": 0.15
                                         }
-                                    }
-                                },
-                                "keywordCount": {
-                                    "value": {
-                                        "ref": "keywordCount"
                                     },
-                                    "buckets": {
-                                        "5-9": {
-                                            "gte": 5,
-                                            "lt": 10
+                                    {
+                                        "any": [
+                                            {
+                                                "element": {
+                                                    "selector": "img"
+                                                },
+                                                "using": "length",
+                                                "is": {
+                                                    "lt": 2
+                                                }
+                                            },
+                                            {
+                                                "api": {
+                                                    "path": "Array.from",
+                                                    "args": [
+                                                        {
+                                                            "api": {
+                                                                "path": "document.title.matchAll",
+                                                                "args": [
+                                                                    "\\S+"
+                                                                ]
+                                                            }
+                                                        }
+                                                    ]
+                                                },
+                                                "using": "length",
+                                                "is": {
+                                                    "lte": 3
+                                                }
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "text": {
+                                            "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                            "pattern": [
+                                                "\\b404\\b",
+                                                "\\berror\\b",
+                                                "\\bfound\\b",
+                                                "\\bpage\\b",
+                                                "\\bfile\\b",
+                                                "\\bresource\\b",
+                                                "\\burl\\b",
+                                                "\\baccess denied\\b",
+                                                "\\bforbidden\\b",
+                                                "\\bunavailable\\b",
+                                                "\\bgone\\b",
+                                                "\\bredirect\\b",
+                                                "\\btemporary\\b",
+                                                "\\bpermanent\\b",
+                                                "\\bserver\\b",
+                                                "\\bclient\\b",
+                                                "\\bbrowser\\b",
+                                                "\\bnetwork\\b",
+                                                "\\bdns\\b",
+                                                "\\btypo\\b",
+                                                "\\bmisspelling\\b",
+                                                "\\bstale\\b",
+                                                "\\bbroken\\b",
+                                                "\\bdead\\b",
+                                                "\\bobsolete\\b",
+                                                "\\bexpired\\b",
+                                                "\\binvalid\\b",
+                                                "\\bmalformed\\b",
+                                                "\\bcorrupt\\b",
+                                                "\\bunreachable\\b",
+                                                "\\bdeleted\\b"
+                                            ]
                                         },
-                                        "10-24": {
-                                            "gte": 10,
-                                            "lt": 25
+                                        "using": "length",
+                                        "as": "keywordCount",
+                                        "is": {
+                                            "gte": 5
+                                        }
+                                    }
+                                ]
+                            },
+                            "fireEvent": {
+                                "type": "soft404Features",
+                                "data": {
+                                    "contentByteRatio": {
+                                        "value": {
+                                            "ref": "contentByteRatio"
                                         },
-                                        "25+": {
-                                            "gte": 25
+                                        "buckets": {
+                                            "0-0.05": {
+                                                "gte": 0,
+                                                "lt": 0.05
+                                            },
+                                            "0.05-0.15": {
+                                                "gte": 0.05,
+                                                "lt": 0.15
+                                            }
+                                        }
+                                    },
+                                    "keywordCount": {
+                                        "value": {
+                                            "ref": "keywordCount"
+                                        },
+                                        "buckets": {
+                                            "5-9": {
+                                                "gte": 5,
+                                                "lt": 10
+                                            },
+                                            "10-24": {
+                                                "gte": 10,
+                                                "lt": 25
+                                            },
+                                            "25+": {
+                                                "gte": 25
+                                            }
                                         }
                                     }
                                 }
+                            },
+                            "breakageReportData": {
+                                "data": {
+                                    "contentByteRatio": {
+                                        "value": {
+                                            "ref": "contentByteRatio"
+                                        }
+                                    },
+                                    "keywordCount": {
+                                        "value": {
+                                            "ref": "keywordCount"
+                                        }
+                                    }
+                                }
+                            },
+                            "define": {
+                                "done": true
                             }
                         }
-                    }
+                    ]
                 },
                 "failure_phrases_small_page": {
                     "state": "disabled",
-                    "match": {
-                        "all": [
-                            {
-                                "text": {
-                                    "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
-                                    "pattern": [
-                                        "something went wrong",
-                                        "temporary error",
-                                        "this is taking longer than"
-                                    ]
-                                }
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    3000,
+                                    10000
+                                ]
+                            }
+                        }
+                    },
+                    "actions": [
+                        {
+                            "when": {
+                                "none": [
+                                    {
+                                        "text": {
+                                            "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                            "pattern": [
+                                                "something went wrong",
+                                                "temporary error",
+                                                "this is taking longer than"
+                                            ]
+                                        }
+                                    }
+                                ]
                             },
-                            {
+                            "exit": true
+                        },
+                        {
+                            "when": {
                                 "text": {
                                     "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
-                                    "pattern": [
-                                        "\\S"
-                                    ]
+                                    "pattern": "\\S"
                                 },
                                 "using": "length",
                                 "as": "bodyTextLength",
                                 "is": {
                                     "lt": 2000
                                 }
-                            }
-                        ]
-                    },
-                    "triggers": {
-                        "auto": {
-                            "state": "enabled",
-                            "when": {
-                                "intervalMs": [
-                                    3000,
-                                    10000
-                                ]
-                            }
-                        }
-                    },
-                    "actions": {
-                        "fireEvent": {
-                            "state": "enabled",
-                            "type": "failurePhrasesSmallPage",
-                            "data": {
-                                "bodyTextLength": {
-                                    "value": {
-                                        "ref": "bodyTextLength"
-                                    },
-                                    "buckets": {
-                                        "0-499": {
-                                            "gte": 0,
-                                            "lt": 500
+                            },
+                            "fireEvent": {
+                                "type": "failurePhrasesSmallPage",
+                                "data": {
+                                    "bodyTextLength": {
+                                        "value": {
+                                            "ref": "bodyTextLength"
                                         },
-                                        "500-999": {
-                                            "gte": 500,
-                                            "lt": 1000
-                                        },
-                                        "1000-1999": {
-                                            "gte": 1000,
-                                            "lt": 2000
+                                        "buckets": {
+                                            "0-499": {
+                                                "gte": 0,
+                                                "lt": 500
+                                            },
+                                            "500-999": {
+                                                "gte": 500,
+                                                "lt": 1000
+                                            },
+                                            "1000-1999": {
+                                                "gte": 1000,
+                                                "lt": 2000
+                                            }
                                         }
                                     }
                                 }
+                            },
+                            "breakageReportData": {
+                                "data": {
+                                    "bodyTextLength": {
+                                        "value": {
+                                            "ref": "bodyTextLength"
+                                        }
+                                    }
+                                }
+                            },
+                            "define": {
+                                "done": true
                             }
                         }
-                    }
+                    ]
                 }
             },
             "geoblocks": {
@@ -1867,63 +2143,6 @@
                 },
                 "app_root_empty": {
                     "state": "disabled",
-                    "match": {
-                        "all": [
-                            {
-                                "element": {
-                                    "selector": [
-                                        "#app",
-                                        "#root",
-                                        "#__next"
-                                    ],
-                                    "visibility": "any"
-                                }
-                            },
-                            {
-                                "api": {
-                                    "path": "performance.getEntriesByType",
-                                    "args": [
-                                        "navigation"
-                                    ],
-                                    "field": "loadEventEnd"
-                                },
-                                "as": "loadEventEnd",
-                                "is": {
-                                    "gt": 0
-                                }
-                            },
-                            {
-                                "api": {
-                                    "path": "performance.now",
-                                    "args": []
-                                },
-                                "is": {
-                                    "gte": {
-                                        "sum": [
-                                            {
-                                                "ref": "loadEventEnd"
-                                            },
-                                            3000
-                                        ]
-                                    }
-                                }
-                            },
-                            {
-                                "none": [
-                                    {
-                                        "element": {
-                                            "selector": [
-                                                "#app",
-                                                "#root",
-                                                "#__next"
-                                            ],
-                                            "visibility": "content"
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
                     "triggers": {
                         "auto": {
                             "state": "enabled",
@@ -1935,88 +2154,173 @@
                             }
                         }
                     },
-                    "actions": {
-                        "fireEvent": {
-                            "state": "enabled",
-                            "type": "appRootEmpty",
-                            "data": {
-                                "loadEventEnd": {
-                                    "value": {
-                                        "ref": "loadEventEnd"
-                                    },
-                                    "buckets": {
-                                        "0-3s": {
-                                            "gt": 0,
-                                            "lt": 3000
-                                        },
-                                        "3-8s": {
-                                            "gte": 3000,
-                                            "lt": 8000
-                                        },
-                                        "8s+": {
-                                            "gte": 8000
+                    "actions": [
+                        {
+                            "when": {
+                                "none": [
+                                    {
+                                        "element": {
+                                            "selector": [
+                                                "#app",
+                                                "#root",
+                                                "#__next"
+                                            ],
+                                            "visibility": "any"
                                         }
                                     }
-                                },
-                                "failedScripts": {
-                                    "value": {
-                                        "if": {
-                                            "test": {
-                                                "api": {
-                                                    "path": "Reflect.has",
-                                                    "args": [
-                                                        {
-                                                            "api": "PerformanceResourceTiming.prototype"
-                                                        },
-                                                        "responseStatus"
-                                                    ]
-                                                }
-                                            },
-                                            "then": {
-                                                "api": {
-                                                    "path": "performance.getEntriesByType",
-                                                    "args": [
-                                                        "resource"
-                                                    ],
-                                                    "where": {
-                                                        "initiatorType": "script",
-                                                        "responseStatus": {
-                                                            "gte": 400
-                                                        }
+                                ]
+                            },
+                            "define": {
+                                "done": true
+                            },
+                            "exit": true
+                        },
+                        {
+                            "when": {
+                                "none": [
+                                    {
+                                        "all": [
+                                            {
+                                                "only": {
+                                                    "api": {
+                                                        "path": "performance.getEntriesByType",
+                                                        "args": [
+                                                            "navigation"
+                                                        ],
+                                                        "field": "loadEventEnd"
                                                     }
                                                 },
-                                                "using": "length"
+                                                "as": "loadEventEnd",
+                                                "is": {
+                                                    "gt": 0
+                                                }
                                             },
-                                            "else": "unsupported"
+                                            {
+                                                "api": {
+                                                    "path": "performance.now",
+                                                    "args": []
+                                                },
+                                                "is": {
+                                                    "gte": {
+                                                        "sum": [
+                                                            {
+                                                                "ref": "loadEventEnd"
+                                                            },
+                                                            3000
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            "exit": true
+                        },
+                        {
+                            "when": {
+                                "element": {
+                                    "selector": [
+                                        "#app",
+                                        "#root",
+                                        "#__next"
+                                    ],
+                                    "visibility": "content"
+                                }
+                            },
+                            "define": {
+                                "done": true
+                            },
+                            "exit": true
+                        },
+                        {
+                            "fireEvent": {
+                                "type": "appRootEmpty",
+                                "data": {
+                                    "loadEventEnd": {
+                                        "value": {
+                                            "ref": "loadEventEnd"
+                                        },
+                                        "buckets": {
+                                            "0-3s": {
+                                                "gt": 0,
+                                                "lt": 3000
+                                            },
+                                            "3-8s": {
+                                                "gte": 3000,
+                                                "lt": 8000
+                                            },
+                                            "8s+": {
+                                                "gte": 8000
+                                            }
                                         }
                                     },
-                                    "buckets": {
-                                        "unsupported": "unsupported",
-                                        "0": 0,
-                                        "1": 1,
-                                        "2+": {
-                                            "gte": 2
+                                    "failedScripts": {
+                                        "value": {
+                                            "if": {
+                                                "test": {
+                                                    "api": {
+                                                        "path": "Reflect.has",
+                                                        "args": [
+                                                            {
+                                                                "api": "PerformanceResourceTiming.prototype"
+                                                            },
+                                                            "responseStatus"
+                                                        ]
+                                                    }
+                                                },
+                                                "then": {
+                                                    "api": {
+                                                        "path": "performance.getEntriesByType",
+                                                        "args": [
+                                                            "resource"
+                                                        ],
+                                                        "where": {
+                                                            "initiatorType": "script",
+                                                            "responseStatus": {
+                                                                "gte": 400
+                                                            }
+                                                        }
+                                                    },
+                                                    "using": "length"
+                                                },
+                                                "else": "unsupported"
+                                            },
+                                            "as": "failedScripts"
+                                        },
+                                        "buckets": {
+                                            "unsupported": "unsupported",
+                                            "0": 0,
+                                            "1": 1,
+                                            "2+": {
+                                                "gte": 2
+                                            }
                                         }
                                     }
                                 }
+                            },
+                            "breakageReportData": {
+                                "data": {
+                                    "loadEventEnd": {
+                                        "value": {
+                                            "ref": "loadEventEnd"
+                                        }
+                                    },
+                                    "failedScripts": {
+                                        "value": {
+                                            "ref": "failedScripts"
+                                        }
+                                    }
+                                }
+                            },
+                            "define": {
+                                "done": true
                             }
                         }
-                    }
+                    ]
                 },
                 "no_text_or_title_v2": {
                     "state": "disabled",
-                    "match": {
-                        "none": [
-                            {
-                                "text": {
-                                    "xpath": "//title/text() | //body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
-                                    "pattern": [
-                                        "\\S"
-                                    ]
-                                }
-                            }
-                        ]
-                    },
                     "triggers": {
                         "auto": {
                             "state": "enabled",
@@ -2027,230 +2331,248 @@
                             }
                         }
                     },
-                    "actions": {
-                        "fireEvent": {
-                            "state": "enabled",
-                            "type": "noTextOrTitle",
-                            "data": {
-                                "bodySize": {
-                                    "value": {
-                                        "api": {
-                                            "path": "performance.getEntriesByType",
-                                            "args": [
-                                                "navigation"
-                                            ],
-                                            "field": "decodedBodySize"
-                                        }
-                                    },
-                                    "buckets": {
-                                        "0": 0,
-                                        "under1KB": {
-                                            "gt": 0,
-                                            "lt": 1024
-                                        },
-                                        "1-100KB": {
-                                            "gte": 1024,
-                                            "lt": 102400
-                                        },
-                                        "100KB+": {
-                                            "gte": 102400
+                    "actions": [
+                        {
+                            "when": {
+                                "none": [
+                                    {
+                                        "text": {
+                                            "xpath": "//title/text() | //body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                            "pattern": [
+                                                "\\S"
+                                            ]
                                         }
                                     }
-                                },
-                                "media": {
-                                    "value": {
-                                        "element": {
-                                            "selector": [
-                                                "img",
-                                                "video",
-                                                "canvas",
-                                                "svg",
-                                                "iframe"
-                                            ]
+                                ]
+                            },
+                            "fireEvent": {
+                                "type": "noTextOrTitle",
+                                "data": {
+                                    "bodySize": {
+                                        "value": {
+                                            "only": {
+                                                "api": {
+                                                    "path": "performance.getEntriesByType",
+                                                    "args": [
+                                                        "navigation"
+                                                    ],
+                                                    "field": "decodedBodySize"
+                                                }
+                                            },
+                                            "as": "bodySize"
                                         },
-                                        "using": "length"
+                                        "buckets": {
+                                            "0": 0,
+                                            "under1KB": {
+                                                "gt": 0,
+                                                "lt": 1024
+                                            },
+                                            "1-100KB": {
+                                                "gte": 1024,
+                                                "lt": 102400
+                                            },
+                                            "100KB+": {
+                                                "gte": 102400
+                                            }
+                                        }
                                     },
-                                    "buckets": {
-                                        "0": 0,
-                                        "1-4": {
-                                            "gte": 1,
-                                            "lt": 5
+                                    "media": {
+                                        "value": {
+                                            "element": {
+                                                "selector": [
+                                                    "img",
+                                                    "video",
+                                                    "canvas",
+                                                    "svg",
+                                                    "iframe"
+                                                ]
+                                            },
+                                            "using": "length",
+                                            "as": "media"
                                         },
-                                        "5+": {
-                                            "gte": 5
+                                        "buckets": {
+                                            "0": 0,
+                                            "1-4": {
+                                                "gte": 1,
+                                                "lt": 5
+                                            },
+                                            "5+": {
+                                                "gte": 5
+                                            }
                                         }
                                     }
                                 }
+                            },
+                            "breakageReportData": {
+                                "data": {
+                                    "bodySize": {
+                                        "value": {
+                                            "ref": "bodySize"
+                                        }
+                                    },
+                                    "media": {
+                                        "value": {
+                                            "ref": "media"
+                                        }
+                                    }
+                                }
+                            },
+                            "define": {
+                                "done": true
                             }
                         }
-                    }
+                    ]
                 }
             },
             "pageLoad": {
-                "slow_load": {
-                    "state": "disabled",
-                    "match": {
-                        "if": {
-                            "test": {
-                                "api": {
-                                    "path": "performance.getEntriesByType",
-                                    "args": [
-                                        "navigation"
-                                    ],
-                                    "field": "loadEventEnd"
-                                },
-                                "as": "loadEventEnd",
-                                "is": {
-                                    "gt": 0
-                                }
-                            },
-                            "then": {
-                                "ref": "loadEventEnd",
-                                "is": {
-                                    "gte": 8000
-                                }
-                            },
-                            "else": {
-                                "api": {
-                                    "path": "performance.now",
-                                    "args": []
-                                },
-                                "is": {
-                                    "gte": 15000
-                                }
-                            }
-                        }
-                    },
-                    "triggers": {
-                        "auto": {
-                            "state": "enabled",
-                            "when": {
-                                "intervalMs": [
-                                    10000,
-                                    16000
-                                ]
-                            }
-                        }
-                    },
-                    "actions": {
-                        "fireEvent": {
-                            "state": "enabled",
-                            "type": "slowPageLoad",
-                            "data": {
-                                "loadEventEnd": {
-                                    "value": {
-                                        "ref": "loadEventEnd"
-                                    },
-                                    "buckets": {
-                                        "loading": 0,
-                                        "8-15s": {
-                                            "gte": 8000,
-                                            "lt": 15000
-                                        },
-                                        "15s+": {
-                                            "gte": 15000
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
                 "load_time": {
                     "state": "disabled",
-                    "match": {
-                        "api": {
-                            "path": "performance.getEntriesByType",
-                            "args": [
-                                "navigation"
-                            ],
-                            "field": "loadEventEnd"
-                        },
-                        "as": "loadEventEnd",
-                        "is": {}
-                    },
                     "triggers": {
                         "auto": {
                             "state": "enabled",
                             "when": {
                                 "intervalMs": [
-                                    10000
+                                    3000,
+                                    8000,
+                                    15000
                                 ]
                             }
                         }
                     },
-                    "actions": {
-                        "fireEvent": {
-                            "state": "enabled",
-                            "type": "pageLoadTime",
-                            "data": {
-                                "loadEventEnd": {
-                                    "value": {
-                                        "ref": "loadEventEnd"
+                    "actions": [
+                        {
+                            "breakageReportData": {
+                                "data": {
+                                    "loadEventEnd": {
+                                        "value": {
+                                            "only": {
+                                                "api": {
+                                                    "path": "performance.getEntriesByType",
+                                                    "args": [
+                                                        "navigation"
+                                                    ],
+                                                    "field": "loadEventEnd"
+                                                }
+                                            },
+                                            "as": "loadEventEnd"
+                                        }
                                     },
-                                    "buckets": {
-                                        "loading": 0,
-                                        "0-3s": {
-                                            "gt": 0,
-                                            "lt": 3000
+                                    "elapsed": {
+                                        "value": {
+                                            "api": {
+                                                "path": "performance.now",
+                                                "args": []
+                                            },
+                                            "as": "elapsed"
+                                        }
+                                    },
+                                    "navigationType": {
+                                        "value": {
+                                            "only": {
+                                                "api": {
+                                                    "path": "performance.getEntriesByType",
+                                                    "args": [
+                                                        "navigation"
+                                                    ],
+                                                    "field": "type"
+                                                }
+                                            },
+                                            "as": "navigationType"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "when": {
+                                "all": [
+                                    {
+                                        "ref": "loadEventEnd",
+                                        "is": 0
+                                    },
+                                    {
+                                        "ref": "elapsed",
+                                        "is": {
+                                            "lt": 15000
+                                        }
+                                    }
+                                ]
+                            },
+                            "exit": true
+                        },
+                        {
+                            "when": {
+                                "none": [
+                                    {
+                                        "ref": "sent",
+                                        "is": true
+                                    }
+                                ]
+                            },
+                            "fireEvent": {
+                                "type": "pageLoadTime",
+                                "data": {
+                                    "loadEventEnd": {
+                                        "value": {
+                                            "ref": "loadEventEnd"
                                         },
-                                        "3-5s": {
-                                            "gte": 3000,
-                                            "lt": 5000
+                                        "buckets": {
+                                            "loading": 0,
+                                            "0-3s": {
+                                                "gt": 0,
+                                                "lt": 3000
+                                            },
+                                            "3-5s": {
+                                                "gte": 3000,
+                                                "lt": 5000
+                                            },
+                                            "5-8s": {
+                                                "gte": 5000,
+                                                "lt": 8000
+                                            },
+                                            "8-15s": {
+                                                "gte": 8000,
+                                                "lt": 15000
+                                            },
+                                            "15s+": {
+                                                "gte": 15000
+                                            }
+                                        }
+                                    },
+                                    "navigationType": {
+                                        "value": {
+                                            "ref": "navigationType"
                                         },
-                                        "5-8s": {
-                                            "gte": 5000,
-                                            "lt": 8000
-                                        },
-                                        "8s+": {
-                                            "gte": 8000
+                                        "when": [
+                                            "navigate",
+                                            "reload",
+                                            "back_forward"
+                                        ]
+                                    }
+                                }
+                            },
+                            "define": {
+                                "sent": true
+                            }
+                        },
+                        {
+                            "define": {
+                                "done": {
+                                    "expr": {
+                                        "ref": "loadEventEnd",
+                                        "is": {
+                                            "gt": 0
                                         }
                                     }
                                 }
                             }
                         }
-                    }
+                    ]
                 }
             },
             "styleBreakage": {
                 "missing_styles_or_fonts": {
                     "state": "disabled",
-                    "match": {
-                        "any": [
-                            {
-                                "api": {
-                                    "path": "performance.getEntriesByType",
-                                    "args": [
-                                        "resource"
-                                    ],
-                                    "where": {
-                                        "initiatorType": "link",
-                                        "responseStatus": {
-                                            "gte": 400
-                                        }
-                                    }
-                                },
-                                "using": "length",
-                                "as": "failedStylesheets",
-                                "is": {
-                                    "gt": 0
-                                }
-                            },
-                            {
-                                "api": {
-                                    "path": "document.fonts",
-                                    "where": {
-                                        "status": "error"
-                                    }
-                                },
-                                "using": "length",
-                                "as": "failedFontFaces",
-                                "is": {
-                                    "gt": 0
-                                }
-                            }
-                        ]
-                    },
                     "triggers": {
                         "auto": {
                             "state": "enabled",
@@ -2261,85 +2583,123 @@
                             }
                         }
                     },
-                    "actions": {
-                        "fireEvent": {
-                            "state": "enabled",
-                            "type": "stylesMissing",
-                            "data": {
-                                "failedStylesheets": {
-                                    "value": {
-                                        "if": {
-                                            "test": {
-                                                "api": {
-                                                    "path": "Reflect.has",
-                                                    "args": [
-                                                        {
-                                                            "api": "PerformanceResourceTiming.prototype"
-                                                        },
-                                                        "responseStatus"
-                                                    ]
+                    "actions": [
+                        {
+                            "when": {
+                                "any": [
+                                    {
+                                        "api": {
+                                            "path": "performance.getEntriesByType",
+                                            "args": [
+                                                "resource"
+                                            ],
+                                            "where": {
+                                                "initiatorType": "link",
+                                                "responseStatus": {
+                                                    "gte": 400
                                                 }
-                                            },
-                                            "then": {
-                                                "ref": "failedStylesheets"
-                                            },
-                                            "else": "unsupported"
+                                            }
+                                        },
+                                        "using": "length",
+                                        "as": "failedStylesheets",
+                                        "is": {
+                                            "gt": 0
                                         }
                                     },
-                                    "buckets": {
-                                        "unsupported": "unsupported",
-                                        "0": 0,
-                                        "1": 1,
-                                        "2-4": {
-                                            "gte": 2,
-                                            "lt": 5
+                                    {
+                                        "api": {
+                                            "path": "document.fonts",
+                                            "where": {
+                                                "status": "error"
+                                            }
                                         },
-                                        "5+": {
-                                            "gte": 5
+                                        "using": "length",
+                                        "as": "failedFontFaces",
+                                        "is": {
+                                            "gt": 0
                                         }
                                     }
-                                },
-                                "failedFontFaces": {
-                                    "value": {
-                                        "ref": "failedFontFaces"
-                                    },
-                                    "buckets": {
-                                        "0": 0,
-                                        "1": 1,
-                                        "2-4": {
-                                            "gte": 2,
-                                            "lt": 5
+                                ]
+                            },
+                            "fireEvent": {
+                                "type": "stylesMissing",
+                                "data": {
+                                    "failedStylesheets": {
+                                        "value": {
+                                            "if": {
+                                                "test": {
+                                                    "api": {
+                                                        "path": "Reflect.has",
+                                                        "args": [
+                                                            {
+                                                                "api": "PerformanceResourceTiming.prototype"
+                                                            },
+                                                            "responseStatus"
+                                                        ]
+                                                    }
+                                                },
+                                                "then": {
+                                                    "ref": "failedStylesheets"
+                                                },
+                                                "else": "unsupported"
+                                            },
+                                            "as": "failedStylesheetsReported"
                                         },
-                                        "5+": {
-                                            "gte": 5
+                                        "buckets": {
+                                            "unsupported": "unsupported",
+                                            "0": 0,
+                                            "1": 1,
+                                            "2-4": {
+                                                "gte": 2,
+                                                "lt": 5
+                                            },
+                                            "5+": {
+                                                "gte": 5
+                                            }
+                                        }
+                                    },
+                                    "failedFontFaces": {
+                                        "value": {
+                                            "ref": "failedFontFaces"
+                                        },
+                                        "buckets": {
+                                            "0": 0,
+                                            "1": 1,
+                                            "2-4": {
+                                                "gte": 2,
+                                                "lt": 5
+                                            },
+                                            "5+": {
+                                                "gte": 5
+                                            }
                                         }
                                     }
                                 }
+                            },
+                            "breakageReportData": {
+                                "data": {
+                                    "failedStylesheets": {
+                                        "value": {
+                                            "ref": "failedStylesheetsReported"
+                                        }
+                                    },
+                                    "failedFontFaces": {
+                                        "value": {
+                                            "ref": "failedFontFaces"
+                                        }
+                                    }
+                                }
+                            },
+                            "define": {
+                                "done": true
                             }
                         }
-                    }
+                    ]
                 }
             },
             "imageBreakage": {
                 "broken_images": {
                     "state": "disabled",
-                    "match": {
-                        "element": {
-                            "selector": "img",
-                            "where": {
-                                "complete": true,
-                                "naturalWidth": 0,
-                                "currentSrc.length": {
-                                    "gt": 0
-                                }
-                            }
-                        },
-                        "using": "length",
-                        "as": "brokenImages",
-                        "is": {
-                            "gte": 1
-                        }
-                    },
                     "triggers": {
                         "auto": {
                             "state": "enabled",
@@ -2350,113 +2710,112 @@
                             }
                         }
                     },
-                    "actions": {
-                        "fireEvent": {
-                            "state": "enabled",
-                            "type": "brokenImages",
-                            "data": {
-                                "brokenImages": {
-                                    "value": {
-                                        "ref": "brokenImages"
-                                    },
-                                    "buckets": {
-                                        "1": 1,
-                                        "2-4": {
-                                            "gte": 2,
-                                            "lt": 5
-                                        },
-                                        "5-9": {
-                                            "gte": 5,
-                                            "lt": 10
-                                        },
-                                        "10+": {
-                                            "gte": 10
+                    "actions": [
+                        {
+                            "when": {
+                                "element": {
+                                    "selector": "img",
+                                    "where": {
+                                        "complete": true,
+                                        "naturalWidth": 0,
+                                        "currentSrc.length": {
+                                            "gt": 0
                                         }
                                     }
                                 },
-                                "brokenShare": {
-                                    "value": {
-                                        "div": [
-                                            {
-                                                "ref": "brokenImages"
+                                "using": "length",
+                                "as": "brokenImages",
+                                "is": {
+                                    "gte": 1
+                                }
+                            },
+                            "fireEvent": {
+                                "type": "brokenImages",
+                                "data": {
+                                    "brokenImages": {
+                                        "value": {
+                                            "ref": "brokenImages"
+                                        },
+                                        "buckets": {
+                                            "1": 1,
+                                            "2-4": {
+                                                "gte": 2,
+                                                "lt": 5
                                             },
-                                            {
-                                                "element": {
-                                                    "selector": "img"
-                                                },
-                                                "using": "length"
+                                            "5-9": {
+                                                "gte": 5,
+                                                "lt": 10
+                                            },
+                                            "10+": {
+                                                "gte": 10
                                             }
-                                        ]
+                                        }
                                     },
-                                    "buckets": {
-                                        "under10": {
-                                            "gte": 0,
-                                            "lt": 0.1
+                                    "brokenShare": {
+                                        "value": {
+                                            "div": [
+                                                {
+                                                    "ref": "brokenImages"
+                                                },
+                                                {
+                                                    "element": {
+                                                        "selector": "img"
+                                                    },
+                                                    "using": "length",
+                                                    "as": "images"
+                                                }
+                                            ],
+                                            "as": "brokenShare"
                                         },
-                                        "10-50": {
-                                            "gte": 0.1,
-                                            "lt": 0.5
-                                        },
-                                        "50-90": {
-                                            "gte": 0.5,
-                                            "lt": 0.9
-                                        },
-                                        "90+": {
-                                            "gte": 0.9
+                                        "buckets": {
+                                            "under10": {
+                                                "gte": 0,
+                                                "lt": 0.1
+                                            },
+                                            "10-50": {
+                                                "gte": 0.1,
+                                                "lt": 0.5
+                                            },
+                                            "50-90": {
+                                                "gte": 0.5,
+                                                "lt": 0.9
+                                            },
+                                            "90+": {
+                                                "gte": 0.9
+                                            }
                                         }
                                     }
                                 }
+                            },
+                            "breakageReportData": {
+                                "data": {
+                                    "brokenImages": {
+                                        "value": {
+                                            "ref": "brokenImages"
+                                        }
+                                    },
+                                    "images": {
+                                        "value": {
+                                            "ref": "images"
+                                        }
+                                    },
+                                    "brokenShare": {
+                                        "value": {
+                                            "ref": "brokenShare"
+                                        }
+                                    }
+                                }
+                            },
+                            "define": {
+                                "done": true
                             }
                         }
-                    }
+                    ]
                 }
             },
             "regionBreakage": {
                 "comments_empty": {
                     "state": "disabled",
-                    "match": {
-                        "all": [
-                            {
-                                "element": {
-                                    "selector": [
-                                        "#comments"
-                                    ]
-                                },
-                                "as": "comments"
-                            },
-                            {
-                                "none": {
-                                    "text": {
-                                        "xpath": ".//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
-                                        "pattern": [
-                                            "\\S"
-                                        ],
-                                        "root": {
-                                            "ref": "comments"
-                                        }
-                                    }
-                                }
-                            },
-                            {
-                                "element": {
-                                    "selector": "img",
-                                    "where": {
-                                        "complete": true,
-                                        "naturalWidth": {
-                                            "gt": 0
-                                        }
-                                    },
-                                    "root": {
-                                        "ref": "comments"
-                                    }
-                                },
-                                "using": "length",
-                                "is": {
-                                    "lt": 1
-                                }
-                            }
-                        ]
-                    },
                     "triggers": {
                         "breakageReport": {
                             "runConditions": {
@@ -2467,18 +2826,42 @@
                             }
                         }
                     },
-                    "actions": {
-                        "breakageReportData": {
-                            "state": "enabled",
-                            "data": {
-                                "brokenImages": {
-                                    "value": {
+                    "actions": [
+                        {
+                            "when": {
+                                "none": [
+                                    {
+                                        "element": {
+                                            "selector": [
+                                                "#comments"
+                                            ]
+                                        },
+                                        "as": "comments"
+                                    }
+                                ]
+                            },
+                            "exit": true
+                        },
+                        {
+                            "when": {
+                                "all": [
+                                    {
+                                        "none": {
+                                            "text": {
+                                                "xpath": ".//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                                "pattern": "\\S",
+                                                "root": {
+                                                    "ref": "comments"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    {
                                         "element": {
                                             "selector": "img",
                                             "where": {
                                                 "complete": true,
-                                                "naturalWidth": 0,
-                                                "currentSrc.length": {
+                                                "naturalWidth": {
                                                     "gt": 0
                                                 }
                                             },
@@ -2486,18 +2869,51 @@
                                                 "ref": "comments"
                                             }
                                         },
-                                        "using": "length"
+                                        "using": "length",
+                                        "is": {
+                                            "lt": 1
+                                        }
+                                    }
+                                ]
+                            },
+                            "breakageReportData": {
+                                "data": {
+                                    "region": {
+                                        "value": "empty"
                                     },
-                                    "buckets": {
-                                        "0": 0,
-                                        "1+": {
-                                            "gte": 1
+                                    "brokenImages": {
+                                        "value": {
+                                            "element": {
+                                                "selector": "img",
+                                                "where": {
+                                                    "complete": true,
+                                                    "naturalWidth": 0,
+                                                    "currentSrc.length": {
+                                                        "gt": 0
+                                                    }
+                                                },
+                                                "root": {
+                                                    "ref": "comments"
+                                                }
+                                            },
+                                            "using": "length"
                                         }
                                     }
                                 }
-                            }
+                            },
+                            "exit": true
+                        },
+                        {
+                            "breakageReportData": {
+                                "data": {
+                                    "region": {
+                                        "value": "filled"
+                                    }
+                                }
+                            },
+                            "exit": true
                         }
-                    }
+                    ]
                 }
             }
         },

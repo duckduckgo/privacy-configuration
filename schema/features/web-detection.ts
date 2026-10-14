@@ -205,7 +205,39 @@ export type PayloadField = {
 /** Payload key to field. Keys match `^[a-zA-Z][a-zA-Z0-9_]*$` and are never `nativeData`. */
 export type PayloadSpec = Record<Name, PayloadField>;
 
-type Actions = Partial<{
+/**
+ * One action item. Items are evaluated in array order on each run: an item runs when its `when`
+ * holds or it has no `when`, and then sends its `fireEvent`, writes its `breakageReportData`, stores
+ * its `define` values and applies its `exit`. An item holds at least one key other than `when`.
+ */
+export type ActionItem = {
+    /** An expression in boolean position. */
+    when?: Expr;
+    /** Sends a `webEvent` of `type`, with the payload. */
+    fireEvent?: {
+        type: string;
+        data?: PayloadSpec;
+    };
+    /** Writes the detector's entry in breakage reports, merging `data` into it. */
+    breakageReportData?: {
+        data?: PayloadSpec;
+    };
+    /**
+     * Stores each value for the detector's later items and runs, read with `ref`. `done` is reserved:
+     * a detector whose `done` holds `true` when a run ends runs no more in the frame.
+     */
+    define?: Record<Name, Expr>;
+    /** Ends the run. */
+    exit?: true;
+};
+
+export type DetectorConfig = {
+    state?: FeatureState;
+    triggers?: Triggers;
+    actions: ActionItem[];
+};
+
+type LegacyActions = Partial<{
     breakageReportData: ActionBase & { data?: PayloadSpec };
     fireEvent: ActionBase & {
         type: string;
@@ -213,14 +245,18 @@ type Actions = Partial<{
     };
 }>;
 
-export type DetectorConfig = {
+/**
+ * The shape clients read before action lists: `match`, and actions that run when it holds. Literal
+ * config keeps it for those clients, and gated patches move each detector to a `DetectorConfig`.
+ */
+export type LegacyDetectorConfig = {
     state?: FeatureState;
     match: Expr;
     triggers?: Triggers;
-    actions?: Actions;
+    actions?: LegacyActions;
 };
 
-type DetectorGroup = Record<string, DetectorConfig>;
+type DetectorGroup = Record<string, DetectorConfig | LegacyDetectorConfig>;
 
 export type WebDetectionSettings = CSSInjectFeatureSettings<{
     detectors?: Record<string, DetectorGroup>;

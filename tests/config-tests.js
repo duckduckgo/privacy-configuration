@@ -742,58 +742,131 @@ describe('Web detection detector schema', () => {
 
     it('accepts self, with a path or a body, and {} for the bound value', () => {
         const detector = {
-            match: {
-                ...images,
-                using: {
-                    api: {
-                        path: 'Math.max.apply',
-                        args: [
-                            null,
-                            { self: {} },
-                        ],
+            actions: [
+                {
+                    exit: true,
+                    when: {
+                        ...images,
+                        using: {
+                            api: {
+                                path: 'Math.max.apply',
+                                args: [
+                                    null,
+                                    { self: {} },
+                                ],
+                            },
+                        },
+                        is: { gt: { self: 'length' } },
                     },
                 },
-                is: { gt: { self: 'length' } },
-            },
+            ],
         };
         expect(validate(detector), formatErrors(validate.errors)).to.equal(true);
     });
 
     it('accepts using as an expression over self', () => {
         const detector = {
-            match: {
-                api: 'document',
-                using: {
-                    div: [
-                        { self: 'title.length' },
-                        { self: { path: 'fonts.size' } },
-                    ],
+            actions: [
+                {
+                    exit: true,
+                    when: {
+                        api: 'document',
+                        using: {
+                            div: [
+                                { self: 'title.length' },
+                                { self: { path: 'fonts.size' } },
+                            ],
+                        },
+                        is: { gt: 0 },
+                    },
                 },
-                is: { gt: 0 },
-            },
+            ],
         };
         expect(validate(detector), formatErrors(validate.errors)).to.equal(true);
     });
 
     it('accepts self in the arguments of a field expression', () => {
         const detector = {
-            match: {
-                element: {
-                    selector: 'img',
-                    field: {
-                        api: {
-                            path: 'Math.min',
-                            args: [
-                                { self: 'naturalWidth' },
-                                2000,
-                            ],
+            actions: [
+                {
+                    exit: true,
+                    when: {
+                        element: {
+                            selector: 'img',
+                            field: {
+                                api: {
+                                    path: 'Math.min',
+                                    args: [
+                                        { self: 'naturalWidth' },
+                                        2000,
+                                    ],
+                                },
+                            },
                         },
+                        is: {},
                     },
                 },
-                is: {},
-            },
+            ],
         };
         expect(validate(detector), formatErrors(validate.errors)).to.equal(true);
+    });
+
+    it('accepts items with conditions, payloads, define and exit', () => {
+        const detector = {
+            state: 'disabled',
+            actions: [
+                {
+                    when: {
+                        none: [
+                            { ...images, using: 'length', as: 'n', is: { gt: 0 } },
+                        ],
+                    },
+                    exit: true,
+                },
+                { breakageReportData: { data: { n: { value: { ref: 'n' } } } } },
+                {
+                    when: { ref: 'n', is: { gte: 3 } },
+                    fireEvent: { type: 'manyImages', data: { n: { value: { ref: 'n' }, buckets: { '3+': { gte: 3 } } } } },
+                    define: { done: true },
+                },
+            ],
+        };
+        expect(validate(detector), formatErrors(validate.errors)).to.equal(true);
+    });
+
+    it('rejects `match` and an `actions` object on a detector with items', () => {
+        expect(
+            validate({
+                match: images,
+                actions: [
+                    { exit: true },
+                ],
+            }),
+        ).to.equal(false);
+        expect(validate({ actions: { fireEvent: { type: 'a' } } })).to.equal(false);
+    });
+
+    it('rejects an unknown item key and `state` on an action', () => {
+        expect(
+            validate({
+                actions: [
+                    { when: images, stop: true },
+                ],
+            }),
+        ).to.equal(false);
+        expect(
+            validate({
+                actions: [
+                    { fireEvent: { type: 'a', state: 'enabled' } },
+                ],
+            }),
+        ).to.equal(false);
+    });
+
+    it('accepts the shape before action lists as a legacy detector', () => {
+        const validateLegacy = createValidator('LegacyDetectorConfig');
+        const detector = { match: images, actions: { fireEvent: { state: 'enabled', type: 'a' } } };
+        expect(validateLegacy(detector), formatErrors(validateLegacy.errors)).to.equal(true);
     });
 });
 

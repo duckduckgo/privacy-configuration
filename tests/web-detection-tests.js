@@ -113,6 +113,30 @@ const PAYLOAD_FIELD_KEYS = [
     'buckets',
 ];
 
+/** Keys of a detector with an action list. */
+const DETECTOR_KEYS = [
+    'state',
+    'triggers',
+    'actions',
+];
+
+/** Keys of an action item. */
+const ITEM_KEYS = [
+    'when',
+    'fireEvent',
+    'breakageReportData',
+    'define',
+    'exit',
+];
+
+/** The item keys that act: an item holds at least one. */
+const ACTION_KEYS = [
+    'fireEvent',
+    'breakageReportData',
+    'define',
+    'exit',
+];
+
 /**
  * Every name an `api` may read: each prefix of the `path`, and the path joined by `.` to each
  * name a `field` path or a predicate reads from its items or values. A `method` is called
@@ -521,33 +545,63 @@ function forEachFieldSource(field, path, cb) {
 }
 
 /**
- * Invoke `cb` for every source in a detector's match tree and payloads.
+ * Invoke `cb` for every source in a payload spec: its values, `when`s and buckets.
+ *
+ * @param {unknown} data
+ * @param {string} path
+ * @param {(key: string, body: unknown, path: string) => void} cb
+ */
+function forEachPayloadSource(data, path, cb) {
+    if (!isPlainObject(data)) return;
+    for (const [
+        key,
+        field,
+    ] of Object.entries(data)) {
+        if (!isPlainObject(field)) continue;
+        const fieldPath = `${path}.${key}`;
+        forEachSource(field.value, `${fieldPath}.value`, cb);
+        forEachPredicateSource(field.when, 'value', `${fieldPath}.when`, cb);
+        if (!isPlainObject(field.buckets)) continue;
+        for (const [
+            name,
+            bucket,
+        ] of Object.entries(field.buckets)) {
+            forEachPredicateSource(bucket, 'value', `${fieldPath}.buckets.${name}`, cb);
+        }
+    }
+}
+
+/**
+ * Invoke `cb` for every source in a detector: each item's `when`, payloads and `define` values, or in
+ * the legacy shape, the match tree and payloads.
  *
  * @param {Record<string, any>} detector
  * @param {string} path
  * @param {(key: string, body: unknown, path: string) => void} cb
  */
 function forEachDetectorSource(detector, path, cb) {
+    if (Array.isArray(detector.actions)) {
+        detector.actions.forEach((/** @type {unknown} */ item, /** @type {number} */ index) => {
+            if (!isPlainObject(item)) return;
+            const itemPath = `${path}.actions[${index}]`;
+            forEachSource(item.when, `${itemPath}.when`, cb);
+            for (const action of PAYLOAD_ACTIONS) {
+                if (isPlainObject(item[action])) forEachPayloadSource(item[action].data, `${itemPath}.${action}.data`, cb);
+            }
+            if (isPlainObject(item.define)) {
+                for (const [
+                    name,
+                    value,
+                ] of Object.entries(item.define)) {
+                    forEachSource(value, `${itemPath}.define.${name}`, cb);
+                }
+            }
+        });
+        return;
+    }
     forEachSource(detector.match, `${path}.match`, cb);
     for (const action of PAYLOAD_ACTIONS) {
-        const data = detector.actions?.[action]?.data;
-        if (!isPlainObject(data)) continue;
-        for (const [
-            key,
-            field,
-        ] of Object.entries(data)) {
-            if (!isPlainObject(field)) continue;
-            const fieldPath = `${path}.actions.${action}.data.${key}`;
-            forEachSource(field.value, `${fieldPath}.value`, cb);
-            forEachPredicateSource(field.when, 'value', `${fieldPath}.when`, cb);
-            if (!isPlainObject(field.buckets)) continue;
-            for (const [
-                name,
-                bucket,
-            ] of Object.entries(field.buckets)) {
-                forEachPredicateSource(bucket, 'value', `${fieldPath}.buckets.${name}`, cb);
-            }
-        }
+        forEachPayloadSource(detector.actions?.[action]?.data, `${path}.actions.${action}.data`, cb);
     }
 }
 
@@ -565,7 +619,7 @@ function forEachTextCondition(node, path, cb) {
 }
 
 /**
- * Invoke `cb` for every `text` body in a detector's match tree and payloads.
+ * Invoke `cb` for every `text` body in a detector's conditions, payloads and `define` values.
  *
  * @param {Record<string, any>} detector
  * @param {string} path
@@ -1086,6 +1140,7 @@ function describeInterfaces(interfaces) {
  *   perItem?: boolean,
  *   perItemBranch?: boolean,
  *   noneAbove?: boolean,
+ *   item?: number,
  * }} Scope
  *
  * `branch` lists the `if` branches around the expression. `topOperand` is the index of the
@@ -1094,7 +1149,9 @@ function describeInterfaces(interfaces) {
  * `self` reads a value per item: inside `where` and `field`, and inside a `using` beside an
  * expression that reads such a `self`. `perItemBranch` is set inside the branches of an `if` that
  * reads one. `noneAbove` is set under a `none` anywhere above, in the match tree or a predicate:
- * `where` clears `underNone` for its own comparisons, and keeps `noneAbove`.
+ * `where` clears `underNone` for its own comparisons, and keeps `noneAbove`. `item` is the index of
+ * the action item holding the expression, in a detector with an action list. `inMatch` is set in a
+ * condition: `match`, an item's `when`, or a `define` value.
  */
 
 /**
@@ -1106,14 +1163,18 @@ function describeInterfaces(interfaces) {
  *   names: Map<string, { node: Record<string, any>, path: string, branch: string[] }>,
  *   dependencies: Map<string, Set<string>>,
  *   refs: { name: string, path: string, branch: string[], inMatch: boolean }[],
- *   rooted: { root: unknown, path: string, needsGuard: boolean, inMatch: boolean, topOperand: number | null, owner: string | undefined }[],
+ *   rooted: { root: unknown, path: string, needsGuard: boolean, inMatch: boolean, topOperand: number | null, owner: string | undefined, item: number | undefined }[],
  *   refMemo: Map<string, { errors: string[], type: StaticType }>,
  *   refFailures: { name: string, position: Position, path: string, errors: string[] }[],
  *   resolving: Set<string>,
+ *   defined: Set<string>,
  * }} Context
  *
  * `functionApis` holds the expressions whose `api` may read a method as a function: `args`
  * entries.
+ *
+ * `defined` holds the names an action list's `define`s give. A `ref` to one reads the stored value,
+ * whose type config does not show.
  *
  * A detector is walked twice. `collect` indexes the `as` names and the refs between them, and
  * `check` reports every error. `dry` checks a ref's target in the ref's position, reporting into
@@ -1462,7 +1523,11 @@ function checkExpr(node, position, scope, ctx, path) {
             ];
             if (ctx.mode === 'collect') {
                 const existing = ctx.names.get(name);
-                if (existing) ctx.structuralErrors.push(`${path}: \`as\` "${name}" is already used at ${existing.path}`);
+                if (name === 'done')
+                    ctx.structuralErrors.push(`${path}: \`as\` "done": the name is reserved, and given only by \`define\``);
+                else if (ctx.defined.has(name))
+                    ctx.structuralErrors.push(`${path}: \`as\` "${name}" is also given by \`define\`, and a name is one or the other`);
+                else if (existing) ctx.structuralErrors.push(`${path}: \`as\` "${name}" is already used at ${existing.path}`);
                 else ctx.names.set(name, { node, path, branch: scope.branch });
             }
         }
@@ -1696,6 +1761,8 @@ function checkExprKey(key, body, position, scope, ctx, path, owner, holder) {
                 fail(ctx, path, `\`ref\` ${JSON.stringify(body)} does not match ${NAME_PATTERN}`);
                 return UNKNOWN;
             }
+            // A `define`d name reads the value its latest `define` stored: no edge, and no type
+            if (ctx.defined.has(body)) return UNKNOWN;
             if (ctx.mode === 'collect') {
                 for (const name of scope.owners) {
                     const deps = ctx.dependencies.get(name) ?? new Set();
@@ -1880,6 +1947,7 @@ function checkConditionSource(key, branch, position, scope, ctx, path, owner) {
                     inMatch: scope.inMatch,
                     topOperand: scope.topOperand,
                     owner,
+                    item: scope.item,
                 });
             }
         }
@@ -2530,8 +2598,9 @@ function checkOperators(predicate, subject, scope, ctx, path) {
  * @param {unknown} data
  * @param {Context} ctx
  * @param {string} path
+ * @param {Scope} [scope] - the payload scope, with the index of its action item
  */
-function checkPayloadSpec(data, ctx, path) {
+function checkPayloadSpec(data, ctx, path, scope = PAYLOAD_SCOPE) {
     if (!isPlainObject(data)) {
         fail(ctx, path, '`data` maps payload keys to fields');
         return;
@@ -2554,7 +2623,7 @@ function checkPayloadSpec(data, ctx, path) {
             fail(ctx, fieldPath, 'a payload field needs `value`');
             continue;
         }
-        const type = checkExpr(field.value, 'value', PAYLOAD_SCOPE, ctx, `${fieldPath}.value`);
+        const type = checkExpr(field.value, 'value', scope, ctx, `${fieldPath}.value`);
         if (type.list === 'selected' && !('buckets' in field))
             fail(
                 ctx,
@@ -2563,7 +2632,7 @@ function checkPayloadSpec(data, ctx, path) {
             );
         if ('when' in field) {
             const whenPath = `${fieldPath}.when`;
-            checkPredicate(field.when, 'value', predicateSubject(type, field.when, ctx, whenPath), PAYLOAD_SCOPE, ctx, whenPath);
+            checkPredicate(field.when, 'value', predicateSubject(type, field.when, ctx, whenPath), scope, ctx, whenPath);
         }
         if ('buckets' in field) checkBuckets(field.buckets, type, ctx, `${fieldPath}.buckets`);
     }
@@ -2785,7 +2854,7 @@ function checkBranchRefs(ctx) {
             fail(
                 ctx,
                 ref.path,
-                `\`ref\` "${ref.name}" in match reads an expression inside the \`if\` branch ${outside[0]} from outside it`,
+                `\`ref\` "${ref.name}" in a condition reads an expression inside the \`if\` branch ${outside[0]} from outside it`,
             );
     }
 }
@@ -2840,19 +2909,129 @@ function checkRootGuards(detector, path, ctx) {
 }
 
 /**
- * Check a detector's match tree and payloads against the expression, predicate and payload rules.
+ * The guard check of an action list. A guard is the `as` of an operand of the top-level `all` of the
+ * item's own `when`, ahead of the operand holding the rooted expression when that is in the `when`
+ * too, or the `as` of an operand of `none` in an earlier `{"when": {"none": [...]}, "exit": true}`
+ * item. A guard carries `is` unless it is an `element` or `text` source.
+ *
+ * @param {Record<string, any>[]} items - every item, or none when an item is not an object
+ * @param {string} path
+ * @param {Context} ctx
+ */
+function checkListRootGuards(items, path, ctx) {
+    /**
+     * @param {unknown} when
+     * @param {'all' | 'none'} key
+     * @returns {Map<string, { node: Record<string, any>, index: number }>}
+     */
+    const namedOperands = (when, key) => {
+        const named = new Map();
+        if (!isPlainObject(when) || expressionKeysOf(when).join() !== key || 'is' in when || 'using' in when) return named;
+        asArray(when[key]).forEach((operand, index) => {
+            if (isPlainObject(operand) && typeof operand.as === 'string') named.set(operand.as, { node: operand, index });
+        });
+        return named;
+    };
+    const referenced = new Set(ctx.refs.map((ref) => ref.name));
+
+    for (const rooted of ctx.rooted) {
+        if (rooted.item === undefined || !items[rooted.item]) continue;
+        if (!rooted.needsGuard && !(rooted.owner && referenced.has(rooted.owner))) continue;
+        const itemIndex = rooted.item;
+        const itemPath = `${path}.actions[${itemIndex}]`;
+        const inWhen = rooted.path.startsWith(`${itemPath}.when`);
+        const own = namedOperands(items[itemIndex].when, 'all');
+        asArray(rooted.root).forEach((entry, index) => {
+            if (isBoundItem(entry)) return;
+            const entryPath = Array.isArray(rooted.root) ? `${rooted.path}.root[${index}]` : `${rooted.path}.root`;
+            const name = isPlainObject(entry) && Object.keys(entry).join() === 'ref' ? entry.ref : undefined;
+            /** @type {{ node: Record<string, any>, path: string } | undefined} */
+            let guard;
+            if (typeof name === 'string') {
+                const operand = own.get(name);
+                if (operand && (!inWhen || (rooted.topOperand !== null && operand.index < rooted.topOperand)))
+                    guard = { node: operand.node, path: `${itemPath}.when.all[${operand.index}]` };
+                for (let earlier = 0; !guard && earlier < itemIndex; earlier++) {
+                    if (items[earlier].exit !== true) continue;
+                    const gated = namedOperands(items[earlier].when, 'none').get(name);
+                    if (gated) guard = { node: gated.node, path: `${path}.actions[${earlier}].when.none[${gated.index}]` };
+                }
+            }
+            if (!guard) {
+                fail(
+                    ctx,
+                    entryPath,
+                    "`root` needs a guard: each root's expression, named with `as`, as an earlier operand of the top-level `all` of the item's `when`, or of `none` in an earlier `exit` gate, and the root a `ref` to it",
+                );
+                return;
+            }
+            const keys = expressionKeysOf(guard.node);
+            const isSource = keys.length === 1 && (keys[0] === 'element' || keys[0] === 'text');
+            if (!isSource && !('is' in guard.node)) {
+                fail(
+                    ctx,
+                    guard.path,
+                    `the guard "${name}" is not an \`element\` or \`text\` source, so it carries \`is\`, such as "is": {"type": "object"}`,
+                );
+            }
+        });
+    }
+}
+
+/**
+ * Warnings on `fireEvent` items that send their event on every run: in a detector that never
+ * defines `done`, an item no name it `define`s guards. A guard is a `ref` to that name in the
+ * item's own `when`, or in the `when` of an earlier item holding `exit`.
  *
  * @param {Record<string, any>} detector
  * @param {string} path
- * @returns {string[]} the errors, empty when the detector is valid
+ * @returns {string[]}
  */
-function validateDetector(detector, path) {
-    /** @type {Context} */
-    const ctx = {
+function repeatedEventWarnings(detector, path) {
+    if (!Array.isArray(detector.actions)) return [];
+    const items = detector.actions.filter(isPlainObject);
+    if (items.some((item) => isPlainObject(item.define) && 'done' in item.define)) return [];
+    /**
+     * @param {unknown} node
+     * @param {Set<string>} found
+     * @returns {Set<string>}
+     */
+    const refsIn = (node, found = new Set()) => {
+        if (Array.isArray(node)) node.forEach((entry) => refsIn(entry, found));
+        else if (isPlainObject(node)) {
+            if (typeof node.ref === 'string') found.add(node.ref);
+            Object.values(node).forEach((value) => refsIn(value, found));
+        }
+        return found;
+    };
+    /** @type {string[]} */
+    const warnings = [];
+    /** @type {Set<string>} */
+    const gateRefs = new Set();
+    items.forEach((item, index) => {
+        if ('fireEvent' in item) {
+            const names = isPlainObject(item.define) ? Object.keys(item.define) : [];
+            const own = refsIn(item.when);
+            if (!names.some((name) => own.has(name) || gateRefs.has(name)))
+                warnings.push(
+                    `${path}.actions[${index}]: fireEvent sends its event on every run, since the detector never defines \`done\` and no name the item defines guards it`,
+                );
+        }
+        if (item.exit === true) refsIn(item.when, gateRefs);
+    });
+    return warnings;
+}
+
+/**
+ * @param {string[]} structuralErrors
+ * @returns {Context}
+ */
+function newContext(structuralErrors = []) {
+    return {
         mode: 'collect',
         errors: [],
         functionApis: new WeakSet(),
-        structuralErrors: [],
+        structuralErrors,
         names: new Map(),
         dependencies: new Map(),
         refs: [],
@@ -2860,22 +3039,39 @@ function validateDetector(detector, path) {
         refMemo: new Map(),
         resolving: new Set(),
         refFailures: [],
+        defined: new Set(),
     };
-    const walk = () => {
-        checkExpr(detector.match, 'boolean', MATCH_SCOPE, ctx, `${path}.match`);
-        for (const action of PAYLOAD_ACTIONS) {
-            const data = detector.actions?.[action]?.data;
-            if (data !== undefined) checkPayloadSpec(data, ctx, `${path}.actions.${action}.data`);
-        }
-    };
+}
 
+/**
+ * Check a detector against the expression, predicate and payload rules: an action list, or the
+ * legacy shape of `match` and an `actions` object.
+ *
+ * @param {Record<string, any>} detector
+ * @param {string} path
+ * @returns {string[]} the errors, empty when the detector is valid
+ */
+function validateDetector(detector, path) {
+    if (isPlainObject(detector) && Array.isArray(detector.actions)) return validateListDetector(detector, path);
+    return validateLegacyDetector(detector, path);
+}
+
+/**
+ * Walk a detector twice, `collect` then `check`, and gather the errors.
+ *
+ * @param {Context} ctx
+ * @param {() => void} walk
+ * @param {() => void} checkGuards
+ * @returns {string[]}
+ */
+function runChecks(ctx, walk, checkGuards) {
     walk();
     checkRefCycles(ctx);
     ctx.mode = 'check';
     ctx.errors = [];
     walk();
     checkBranchRefs(ctx);
-    checkRootGuards(detector, path, ctx);
+    checkGuards();
     const reported = new Set(ctx.errors);
     for (const failure of ctx.refFailures) {
         const added = failure.errors.find((error) => !reported.has(error));
@@ -2892,6 +3088,132 @@ function validateDetector(detector, path) {
             ...ctx.errors,
         ]),
     ];
+}
+
+/**
+ * The legacy shape: `match`, and an `actions` object whose actions run when it holds.
+ *
+ * @param {Record<string, any>} detector
+ * @param {string} path
+ * @returns {string[]}
+ */
+function validateLegacyDetector(detector, path) {
+    const ctx = newContext();
+    return runChecks(
+        ctx,
+        () => {
+            checkExpr(detector.match, 'boolean', MATCH_SCOPE, ctx, `${path}.match`);
+            for (const action of PAYLOAD_ACTIONS) {
+                const data = detector.actions?.[action]?.data;
+                if (data !== undefined) checkPayloadSpec(data, ctx, `${path}.actions.${action}.data`);
+            }
+        },
+        () => checkRootGuards(detector, path, ctx),
+    );
+}
+
+/**
+ * Item shapes, which the client rejects as parse errors.
+ *
+ * @param {Record<string, any>} detector
+ * @param {string} path
+ * @param {Set<string>} defined - filled with the names the items' `define`s give
+ * @returns {string[]}
+ */
+function itemShapeErrors(detector, path, defined) {
+    /** @type {string[]} */
+    const errors = [];
+    for (const key of Object.keys(detector)) {
+        if (!DETECTOR_KEYS.includes(key)) errors.push(`${path}: unknown detector key "${key}" beside an action list`);
+    }
+    detector.actions.forEach((/** @type {unknown} */ item, /** @type {number} */ index) => {
+        const itemPath = `${path}.actions[${index}]`;
+        if (!isPlainObject(item)) {
+            errors.push(`${itemPath}: an item is an object`);
+            return;
+        }
+        for (const key of Object.keys(item)) {
+            if (!ITEM_KEYS.includes(key)) errors.push(`${itemPath}: unknown item key "${key}"`);
+        }
+        if (!ACTION_KEYS.some((key) => key in item))
+            errors.push(`${itemPath}: an item holds at least one of ${ACTION_KEYS.map((key) => `\`${key}\``).join(', ')}`);
+        if ('exit' in item && item.exit !== true) errors.push(`${itemPath}.exit: \`exit\` takes \`true\``);
+        if ('fireEvent' in item) {
+            const fireEvent = item.fireEvent;
+            if (!isPlainObject(fireEvent)) errors.push(`${itemPath}.fireEvent: \`fireEvent\` takes an object`);
+            else {
+                for (const key of Object.keys(fireEvent)) {
+                    if (key !== 'type' && key !== 'data') errors.push(`${itemPath}.fireEvent: unknown key "${key}"`);
+                }
+                if (typeof fireEvent.type !== 'string') errors.push(`${itemPath}.fireEvent.type: \`type\` takes a string`);
+            }
+        }
+        if ('breakageReportData' in item) {
+            const breakageReportData = item.breakageReportData;
+            if (!isPlainObject(breakageReportData)) errors.push(`${itemPath}.breakageReportData: \`breakageReportData\` takes an object`);
+            else {
+                for (const key of Object.keys(breakageReportData)) {
+                    if (key !== 'data') errors.push(`${itemPath}.breakageReportData: unknown key "${key}"`);
+                }
+            }
+        }
+        if ('define' in item) {
+            const define = item.define;
+            if (!isPlainObject(define) || Object.keys(define).length === 0) {
+                errors.push(`${itemPath}.define: \`define\` takes an object of at least one name`);
+                return;
+            }
+            for (const name of Object.keys(define)) {
+                if (!NAME_PATTERN.test(name)) errors.push(`${itemPath}.define.${name}: name does not match ${NAME_PATTERN}`);
+                defined.add(name);
+            }
+        }
+    });
+    return errors;
+}
+
+/**
+ * An action list: each item's `when` in boolean position, its payloads, and its `define` values,
+ * `done` in boolean position, in one name scope.
+ *
+ * @param {Record<string, any>} detector
+ * @param {string} path
+ * @returns {string[]}
+ */
+function validateListDetector(detector, path) {
+    const ctx = newContext();
+    ctx.structuralErrors.push(...itemShapeErrors(detector, path, ctx.defined));
+    const items = detector.actions.filter(isPlainObject);
+    return runChecks(
+        ctx,
+        () => {
+            detector.actions.forEach((/** @type {unknown} */ item, /** @type {number} */ index) => {
+                if (!isPlainObject(item)) return;
+                const itemPath = `${path}.actions[${index}]`;
+                if ('when' in item) checkExpr(item.when, 'boolean', { ...MATCH_SCOPE, item: index }, ctx, `${itemPath}.when`);
+                for (const action of PAYLOAD_ACTIONS) {
+                    const data = isPlainObject(item[action]) ? item[action].data : undefined;
+                    if (data !== undefined) checkPayloadSpec(data, ctx, `${itemPath}.${action}.data`, { ...PAYLOAD_SCOPE, item: index });
+                }
+                if (isPlainObject(item.define)) {
+                    for (const [
+                        name,
+                        value,
+                    ] of Object.entries(item.define)) {
+                        // `done` ends the detector only on `true`, so config gives it a boolean
+                        checkExpr(
+                            value,
+                            name === 'done' ? 'boolean' : 'value',
+                            { ...MATCH_SCOPE, matchRoot: false, item: index },
+                            ctx,
+                            `${itemPath}.define.${name}`,
+                        );
+                    }
+                }
+            });
+        },
+        () => checkListRootGuards(items.length === detector.actions.length ? detector.actions : [], path, ctx),
+    );
 }
 
 /**
@@ -2976,6 +3298,130 @@ function forEachPatchedDetector(webDetection, cb) {
     }
 }
 
+/**
+ * The clients of each generated config, and the first app version whose C-S-S reads action lists.
+ * Each version mirrors the `minSupportedVersion` of the migration entry in the platform override,
+ * which moves every legacy detector to an action list. Both are placeholders no client reaches
+ * until the app release carrying that C-S-S is known.
+ *
+ * @type {Array<{ configs: RegExp, injectNames: string[], version: number | string }>}
+ */
+const LIST_SHAPE_CLIENTS = [
+    {
+        configs: /^v5\/android-config\.json$/,
+        injectNames: [
+            'android',
+            'android-adsjs',
+        ],
+        version: 99990000,
+    },
+    {
+        configs: /^v5\/windows-config\.json$/,
+        injectNames: [
+            'windows',
+        ],
+        version: '999.0.0',
+    },
+    {
+        configs: /^v5\/(ios|macos)-config\.json$/,
+        injectNames: [
+            'apple',
+            'apple-isolated',
+        ],
+        version: '999.0.0',
+    },
+    {
+        configs: /^v5\/extension(-[a-z0-9]+)?-config\.json$/,
+        injectNames: [
+            'chrome-mv3',
+            'chrome',
+            'firefox',
+        ],
+        version: '9999.1.1',
+    },
+];
+
+/**
+ * Compare app versions as C-S-S does: numbers numerically, strings by dotted components.
+ *
+ * @param {number | string} a
+ * @param {number | string} b
+ * @returns {number | undefined} negative, 0 or positive; undefined when the kinds differ
+ */
+function compareVersions(a, b) {
+    if (typeof a !== typeof b) return undefined;
+    if (typeof a === 'number' && typeof b === 'number') return a - b;
+    const left = String(a).split('.').map(Number);
+    const right = String(b).split('.').map(Number);
+    for (let index = 0; index < Math.max(left.length, right.length); index++) {
+        const difference = (left[index] ?? 0) - (right[index] ?? 0);
+        if (difference !== 0) return difference;
+    }
+    return 0;
+}
+
+/**
+ * The detectors a client sees once `conditionalChanges` apply: each entry applies when one of its
+ * condition blocks holds. `injectName` and the version keys are decided by the client, and every
+ * other key by `others`.
+ *
+ * @param {Record<string, any>} settings - webDetection settings
+ * @param {string[]} injectNames
+ * @param {number | string} version
+ * @param {boolean} others - whether condition keys a client's platform and version do not decide hold
+ * @returns {Record<string, Record<string, any>>}
+ */
+function clientDetectors(settings, injectNames, version, others) {
+    /**
+     * @param {Record<string, any>} block
+     */
+    const holds = (block) =>
+        Object.entries(block).every(
+            ([
+                key,
+                value,
+            ]) => {
+                if (key === 'injectName') return injectNames.includes(value);
+                if (key === 'minSupportedVersion') return (compareVersions(version, value) ?? -1) >= 0;
+                if (key === 'maxSupportedVersion') return (compareVersions(version, value) ?? 1) <= 0;
+                return others;
+            },
+        );
+    let view = { detectors: settings.detectors };
+    for (const entry of settings.conditionalChanges ?? []) {
+        if (asArray(entry.condition).some(holds)) view = /** @type {any} */ (immutableJSONPatch(view, entry.patchSettings));
+    }
+    return view.detectors ?? {};
+}
+
+/**
+ * The versions to simulate a config's clients at: the list gate, a version below every threshold,
+ * and each version a condition names.
+ *
+ * @param {Record<string, any>} settings
+ * @param {number | string} gate
+ * @returns {Array<number | string>}
+ */
+function clientVersions(settings, gate) {
+    const versions = new Set([
+        gate,
+        typeof gate === 'number' ? 0 : '0.0.0',
+    ]);
+    for (const entry of settings.conditionalChanges ?? []) {
+        for (const block of asArray(entry.condition)) {
+            for (const key of [
+                'minSupportedVersion',
+                'maxSupportedVersion',
+            ]) {
+                if (key in block && typeof block[key] === typeof gate) versions.add(block[key]);
+            }
+        }
+    }
+    return [
+        ...versions,
+    ];
+}
+
 // Features whose subfeatures may declare experiment metrics that consume events
 // (see tests/experiment-metrics-tests.js).
 const METRIC_PARENTS = [
@@ -3010,6 +3456,30 @@ function eventHubConsumers(configBody) {
         }
     }
     return consumers;
+}
+
+/**
+ * The event types a detector's `fireEvent` actions send.
+ *
+ * @param {Record<string, any>} detector
+ * @returns {string[]}
+ */
+function fireEventTypes(detector) {
+    if (Array.isArray(detector.actions)) {
+        return detector.actions.flatMap((/** @type {any} */ item) =>
+            typeof item?.fireEvent?.type === 'string'
+                ? [
+                      item.fireEvent.type,
+                  ]
+                : [],
+        );
+    }
+    const type = detector.actions?.fireEvent?.type;
+    return typeof type === 'string'
+        ? [
+              type,
+          ]
+        : [];
 }
 
 /** `temp_` types are placeholders for detectors whose eventHub telemetry is not defined yet (for example, during experiments) */
@@ -3051,6 +3521,68 @@ describe('webDetection config tests', () => {
         });
     });
 
+    describe('client views', () => {
+        for (const config of latestConfigs) {
+            const settings = config.body.features?.webDetection?.settings;
+            const clients = LIST_SHAPE_CLIENTS.find((entry) => entry.configs.test(config.name));
+            if (!settings?.detectors || !clients) continue;
+            describe(config.name, () => {
+                for (const version of clientVersions(settings, clients.version)) {
+                    const lists = (compareVersions(version, clients.version) ?? -1) >= 0;
+                    it(`at ${version}, every ${lists ? 'detector is an action list' : 'enabled detector is in the legacy shape'}`, () => {
+                        /** @type {string[]} */
+                        const errors = [];
+                        for (const others of [
+                            true,
+                            false,
+                        ]) {
+                            const detectors = clientDetectors(settings, clients.injectNames, version, others);
+                            for (const [
+                                groupName,
+                                group,
+                            ] of Object.entries(detectors)) {
+                                for (const [
+                                    detectorId,
+                                    detector,
+                                ] of Object.entries(group)) {
+                                    const path = `detectors.${groupName}.${detectorId}`;
+                                    const isList = Array.isArray(detector.actions) && !('match' in detector);
+                                    if (lists && !isList) errors.push(`${path}: a client reading action lists sees the legacy shape`);
+                                    if (lists && isList) errors.push(...validateListDetector(detector, path));
+                                    if (!lists && isList && detector.state !== 'disabled')
+                                        errors.push(
+                                            `${path}: a client before action lists sees an enabled action list, which it matches on every page; author it with "state": "disabled" and enable it only for clients at or above ${clients.version}`,
+                                        );
+                                }
+                            }
+                        }
+                        const unique = [
+                            ...new Set(errors),
+                        ];
+                        expect(unique, unique.join('\n')).to.deep.equal([]);
+                    });
+                }
+
+                it('warns on events sent on every run', () => {
+                    const detectors = clientDetectors(settings, clients.injectNames, clients.version, true);
+                    for (const [
+                        groupName,
+                        group,
+                    ] of Object.entries(detectors)) {
+                        for (const [
+                            detectorId,
+                            detector,
+                        ] of Object.entries(group)) {
+                            for (const warning of repeatedEventWarnings(detector, `${config.name} detectors.${groupName}.${detectorId}`)) {
+                                console.warn(`warning: ${warning}`);
+                            }
+                        }
+                    }
+                });
+            });
+        }
+    });
+
     describe('naming validation', () => {
         forEachWebDetectionConfig(({ configName, detectors }) => {
             describe(configName, () => {
@@ -3079,14 +3611,15 @@ describe('webDetection config tests', () => {
                      * @param {string} detectorPath
                      */
                     const check = (detector, detectorPath) => {
-                        const type = detector.actions?.fireEvent?.type;
-                        if (type === undefined || type.startsWith(TEMP_EVENT_TYPE_PREFIX)) return;
-                        expect(knownConsumers.has(type)).to.equal(
-                            true,
-                            `Detector '${detectorPath}' fires event type '${type}' but no eventHub parameter source, immediate trigger source or experiment metric event consumes '${type}' (known consumers: ${[
-                                ...knownConsumers,
-                            ].join(', ')})`,
-                        );
+                        for (const type of fireEventTypes(detector)) {
+                            if (type.startsWith(TEMP_EVENT_TYPE_PREFIX)) continue;
+                            expect(knownConsumers.has(type)).to.equal(
+                                true,
+                                `Detector '${detectorPath}' fires event type '${type}' but no eventHub parameter source, immediate trigger source or experiment metric event consumes '${type}' (known consumers: ${[
+                                    ...knownConsumers,
+                                ].join(', ')})`,
+                            );
+                        }
                     };
                     for (const [
                         groupName,
@@ -3550,6 +4083,347 @@ describe('webDetection config tests', () => {
 
         it('does not mistake xpathConfig for an xpath value', () => {
             expect(check({ op: 'replace', path: '/detectors/g/d/match/text/xpathConfig', value: { chunkSize: 8192 } })).to.not.throw();
+        });
+    });
+
+    describe('validateListDetector (self-test)', () => {
+        /**
+         * @param {unknown[]} actions
+         * @param {Record<string, unknown>} [rest]
+         */
+        const errorsOf = (actions, rest = {}) => validateDetector({ ...rest, actions }, '$');
+
+        /**
+         * @param {unknown[]} actions
+         */
+        const expectValid = (actions) => {
+            const errors = errorsOf(actions);
+            expect(errors, errors.join('\n')).to.deep.equal([]);
+        };
+
+        /**
+         * @param {string} fragment
+         * @param {unknown[]} actions
+         * @param {Record<string, unknown>} [rest]
+         */
+        const expectError = (fragment, actions, rest) => {
+            const errors = errorsOf(actions, rest);
+            expect(
+                errors.some((error) => error.includes(fragment)),
+                `expected an error containing ${JSON.stringify(fragment)}, got:\n${errors.join('\n') || '(none)'}`,
+            ).to.equal(true);
+        };
+
+        const imgCount = { element: { selector: 'img' }, using: 'length' };
+
+        it('passes a first-match chain over a gate, with breakage data and per-bucket events', () => {
+            expectValid([
+                {
+                    when: {
+                        none: [
+                            { ...imgCount, as: 'n', is: { gt: 0 } },
+                        ],
+                    },
+                    exit: true,
+                },
+                { breakageReportData: { data: { n: { value: { ref: 'n' } } } } },
+                { when: { ref: 'n', is: { lt: 3 } }, fireEvent: { type: 'few' }, define: { done: true }, exit: true },
+                { fireEvent: { type: 'many' }, define: { done: true }, exit: true },
+            ]);
+        });
+
+        it('rejects shapes the client does not parse', () => {
+            expectError(
+                'unknown detector key "match"',
+                [
+                    { exit: true },
+                ],
+                { match: true },
+            );
+            expectError('unknown item key "stop"', [
+                { when: true, stop: true },
+            ]);
+            expectError('an item holds at least one of', [
+                { when: true },
+            ]);
+            expectError('`exit` takes `true`', [
+                { exit: false },
+            ]);
+            expectError('unknown key "state"', [
+                { fireEvent: { type: 'a', state: 'enabled' } },
+            ]);
+            expectError('`type` takes a string', [
+                { fireEvent: {} },
+            ]);
+            expectError('unknown key "state"', [
+                { breakageReportData: { state: 'enabled' } },
+            ]);
+            expectError('`define` takes an object of at least one name', [
+                { define: {} },
+            ]);
+            expectError('does not match', [
+                { define: { '1x': 1 } },
+            ]);
+        });
+
+        it('reads a defined name through `ref`, and rejects a name both defined and given by `as`', () => {
+            expectValid([
+                {
+                    when: {
+                        none: [
+                            { ref: 'sent', is: true },
+                        ],
+                    },
+                    fireEvent: { type: 'a' },
+                    define: { sent: true },
+                },
+            ]);
+            expectError('a name is one or the other', [
+                { when: { ...imgCount, as: 'n', is: { gt: 0 } }, define: { n: 1 } },
+            ]);
+            expectError('the name is reserved', [
+                { when: { ...imgCount, as: 'done', is: { gt: 0 } }, exit: true },
+            ]);
+        });
+
+        it('takes `done` as a boolean, and other `define` values in value position', () => {
+            expectValid([
+                { define: { done: { expr: { ...imgCount, is: { gt: 0 } } }, n: imgCount } },
+            ]);
+            expectError('A number fills value, number position, not boolean position', [
+                { define: { done: 5 } },
+            ]);
+        });
+
+        it('checks each `when`, payload and `define` value as an expression', () => {
+            expectError('unknown expression key "pageFeature"', [
+                { when: { pageFeature: 'x' }, exit: true },
+            ]);
+            expectError('unknown expression key "pageFeature"', [
+                { define: { x: { pageFeature: 'x' } } },
+            ]);
+            expectError('payload key "nativeData" is reserved', [
+                { fireEvent: { type: 'a', data: { nativeData: { value: 1 } } } },
+            ]);
+        });
+
+        describe('root guards', () => {
+            const comments = { element: { selector: '#comments' }, as: 'comments' };
+            const rooted = { text: { pattern: '\\S', root: { ref: 'comments' } }, using: 'length', is: { gt: 0 } };
+
+            it("passes a guard in an earlier exit gate, or ahead in the item's own `all`", () => {
+                expectValid([
+                    {
+                        when: {
+                            none: [
+                                comments,
+                            ],
+                        },
+                        exit: true,
+                    },
+                    {
+                        when: {
+                            none: [
+                                rooted,
+                            ],
+                        },
+                        fireEvent: { type: 'a' },
+                        define: { done: true },
+                    },
+                ]);
+                expectValid([
+                    {
+                        when: {
+                            all: [
+                                comments,
+                                {
+                                    none: [
+                                        rooted,
+                                    ],
+                                },
+                            ],
+                        },
+                        fireEvent: { type: 'a' },
+                        define: { done: true },
+                    },
+                ]);
+            });
+
+            it('rejects a guard behind the rooted expression, in a later item, or in a gate without `exit`', () => {
+                expectError('`root` needs a guard', [
+                    {
+                        when: {
+                            all: [
+                                {
+                                    none: [
+                                        rooted,
+                                    ],
+                                },
+                                comments,
+                            ],
+                        },
+                        fireEvent: { type: 'a' },
+                        define: { done: true },
+                    },
+                ]);
+                expectError('`root` needs a guard', [
+                    {
+                        when: {
+                            none: [
+                                rooted,
+                            ],
+                        },
+                        fireEvent: { type: 'a' },
+                        define: { done: true },
+                    },
+                    {
+                        when: {
+                            none: [
+                                comments,
+                            ],
+                        },
+                        exit: true,
+                    },
+                ]);
+                expectError('`root` needs a guard', [
+                    {
+                        when: {
+                            none: [
+                                comments,
+                            ],
+                        },
+                        fireEvent: { type: 'b' },
+                    },
+                    {
+                        when: {
+                            none: [
+                                rooted,
+                            ],
+                        },
+                        fireEvent: { type: 'a' },
+                        define: { done: true },
+                    },
+                ]);
+            });
+        });
+
+        describe('repeated events', () => {
+            /**
+             * @param {unknown[]} actions
+             */
+            const warningsOf = (actions) => repeatedEventWarnings({ actions }, '$');
+
+            it('warns on an unguarded event in a detector that never defines `done`', () => {
+                expect(
+                    warningsOf([
+                        { when: imgCount, fireEvent: { type: 'a' } },
+                    ]).length,
+                ).to.equal(1);
+            });
+
+            it('passes a detector that defines `done`, and an event a name it defines guards', () => {
+                expect(
+                    warningsOf([
+                        { fireEvent: { type: 'a' }, define: { done: true } },
+                    ]),
+                ).to.deep.equal([]);
+                expect(
+                    warningsOf([
+                        {
+                            when: {
+                                none: [
+                                    { ref: 'sent', is: true },
+                                ],
+                            },
+                            fireEvent: { type: 'a' },
+                            define: { sent: true },
+                        },
+                    ]),
+                ).to.deep.equal([]);
+                expect(
+                    warningsOf([
+                        { when: { ref: 'sent', is: true }, exit: true },
+                        { fireEvent: { type: 'a' }, define: { sent: true } },
+                    ]),
+                ).to.deep.equal([]);
+            });
+        });
+
+        describe('client views', () => {
+            const settings = {
+                detectors: { g: { d: { match: true } } },
+                conditionalChanges: [
+                    {
+                        condition: { injectName: 'android', minSupportedVersion: 10 },
+                        patchSettings: [
+                            { op: 'add', path: '/detectors/g/d/state', value: 'disabled' },
+                        ],
+                    },
+                    {
+                        condition: { experiment: { experimentName: 'x', cohort: 'y' } },
+                        patchSettings: [
+                            { op: 'add', path: '/detectors/g/d/triggers', value: {} },
+                        ],
+                    },
+                ],
+            };
+
+            it('applies an entry when its platform and version hold, and other keys as given', () => {
+                expect(
+                    clientDetectors(
+                        settings,
+                        [
+                            'android',
+                        ],
+                        10,
+                        false,
+                    ).g.d,
+                ).to.deep.equal({ match: true, state: 'disabled' });
+                expect(
+                    clientDetectors(
+                        settings,
+                        [
+                            'android',
+                        ],
+                        9,
+                        false,
+                    ).g.d,
+                ).to.deep.equal({ match: true });
+                expect(
+                    clientDetectors(
+                        settings,
+                        [
+                            'windows',
+                        ],
+                        10,
+                        true,
+                    ).g.d,
+                ).to.deep.equal({ match: true, triggers: {} });
+            });
+
+            it('compares numbers numerically and strings by component, and no other mix', () => {
+                expect(compareVersions('1.10.0', '1.9.0')).to.be.greaterThan(0);
+                expect(compareVersions(52720000, 52700000)).to.be.greaterThan(0);
+                expect(compareVersions('1.0.0', 1)).to.equal(undefined);
+            });
+
+            it('lists the event type of every item', () => {
+                expect(
+                    fireEventTypes({
+                        actions: [
+                            { fireEvent: { type: 'a' } },
+                            { exit: true },
+                            { fireEvent: { type: 'b' } },
+                        ],
+                    }),
+                ).to.deep.equal([
+                    'a',
+                    'b',
+                ]);
+                expect(fireEventTypes({ match: true, actions: { fireEvent: { type: 'c' } } })).to.deep.equal([
+                    'c',
+                ]);
+            });
         });
     });
 
