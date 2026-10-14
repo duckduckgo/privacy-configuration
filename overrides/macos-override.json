@@ -244,6 +244,34 @@
                             "weight": 1
                         }
                     ]
+                },
+                "contentScopeExperiment8": {
+                    "state": "enabled",
+                    "minSupportedVersion": "1.204.0",
+                    "description": "Page issue detection: auto-run + fireEvent for the new block page, error page, geoblock, verification, blank page, captcha and adwall detectors, with retuned adwall and video intervals",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
                 }
             }
         },
@@ -328,6 +356,195 @@
                 }
             },
             "minSupportedVersion": "1.57.1"
+        },
+        "extensionManagement": {
+            "state": "internal",
+            "exceptions": [],
+            "settings": {
+                "hiddenExtensionIds": [
+                    "keedjhechgegabcjphipjhijlnfonmgj",
+                    "okcoajibinplfaggegimmbffnkinjkod",
+                    "enpepjodeaggcfklejondjcndmmajhnc",
+                    "mhjfbmdgcfjbbpaeojofohoefgiehjai",
+                    "angbnfjncjhdkahaldoipdnholpgogph"
+                ],
+                "disabledExtensionIds": [],
+                "specialBehavior": {
+                    "nngceckbapebfimnlniiiahkandclblb": {
+                        "overridesInternalAutofill": true
+                    },
+                    "aeblfdkhhhdcdjpifhhbdiojplfjncoa": {
+                        "overridesInternalAutofill": true
+                    },
+                    "hdokiejnpimakedhajhdlcegeplioahd": {
+                        "overridesInternalAutofill": true
+                    }
+                },
+                "learnMoreUrl": "https://duckduckgo.com/duckduckgo-help-pages/passwords-autofill/adding-third-party-extensions",
+                "learnMoreUrlRemoteDisable": "https://duckduckgo.com/duckduckgo-help-pages/passwords-autofill/adding-third-party-extensions"
+            },
+            "features": {
+                "isLaunchedExtensions": {
+                    "state": "internal"
+                },
+                "curatedExtensions": {
+                    "state": "enabled",
+                    "settings": {
+                        "catalog": [
+                            {
+                                "id": "nngceckbapebfimnlniiiahkandclblb",
+                                "name": "Bitwarden Password Manager",
+                                "publisher": "Bitwarden Inc.",
+                                "publisherUri": "https://bitwarden.com/",
+                                "iconUri": "https://staticcdn.duckduckgo.com/d5c04536-5379-4709-8d19-d13fdd456ff6/extensions-test/bitwarden-128.png",
+                                "cwsUri": "https://chromewebstore.google.com/detail/bitwarden-password-manage/nngceckbapebfimnlniiiahkandclblb",
+                                "categoryId": "password-manager"
+                            },
+                            {
+                                "id": "aeblfdkhhhdcdjpifhhbdiojplfjncoa",
+                                "name": "1Password – Password Manager",
+                                "publisher": "AgileBits Inc",
+                                "publisherUri": "https://1password.com/",
+                                "iconUri": "https://staticcdn.duckduckgo.com/d5c04536-5379-4709-8d19-d13fdd456ff6/extensions-test/onepassword-128.png",
+                                "cwsUri": "https://chromewebstore.google.com/detail/1password-%E2%80%93-password-mana/aeblfdkhhhdcdjpifhhbdiojplfjncoa",
+                                "categoryId": "password-manager"
+                            },
+                            {
+                                "id": "hdokiejnpimakedhajhdlcegeplioahd",
+                                "name": "LastPass: Free Password Manager",
+                                "publisher": "LastPass",
+                                "publisherUri": "https://lastpass.com/",
+                                "iconUri": "https://staticcdn.duckduckgo.com/d5c04536-5379-4709-8d19-d13fdd456ff6/extensions-test/lastpass-128.png",
+                                "cwsUri": "https://chromewebstore.google.com/detail/lastpass-free-password-ma/hdokiejnpimakedhajhdlcegeplioahd",
+                                "categoryId": "password-manager"
+                            }
+                        ],
+                        "catalogInternal": [
+                            {
+                                "id": "nngceckbapebfimnlniiiahkandclblb",
+                                "name": "Bitwarden Password Manager",
+                                "publisher": "Bitwarden Inc.",
+                                "publisherUri": "https://bitwarden.com/",
+                                "iconUri": "https://staticcdn.duckduckgo.com/d5c04536-5379-4709-8d19-d13fdd456ff6/extensions-test/bitwarden-128.png",
+                                "cwsUri": "https://chromewebstore.google.com/detail/bitwarden-password-manage/nngceckbapebfimnlniiiahkandclblb",
+                                "categoryId": "password-manager"
+                            },
+                            {
+                                "id": "aeblfdkhhhdcdjpifhhbdiojplfjncoa",
+                                "name": "1Password – Password Manager",
+                                "publisher": "AgileBits Inc",
+                                "publisherUri": "https://1password.com/",
+                                "iconUri": "https://staticcdn.duckduckgo.com/d5c04536-5379-4709-8d19-d13fdd456ff6/extensions-test/onepassword-128.png",
+                                "cwsUri": "https://chromewebstore.google.com/detail/1password-%E2%80%93-password-mana/aeblfdkhhhdcdjpifhhbdiojplfjncoa",
+                                "categoryId": "password-manager"
+                            },
+                            {
+                                "id": "hdokiejnpimakedhajhdlcegeplioahd",
+                                "name": "LastPass: Free Password Manager",
+                                "publisher": "LastPass",
+                                "publisherUri": "https://lastpass.com/",
+                                "iconUri": "https://staticcdn.duckduckgo.com/d5c04536-5379-4709-8d19-d13fdd456ff6/extensions-test/lastpass-128.png",
+                                "cwsUri": "https://chromewebstore.google.com/detail/lastpass-free-password-ma/hdokiejnpimakedhajhdlcegeplioahd",
+                                "categoryId": "password-manager"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        "extensionsCatalog": {
+            "state": "internal",
+            "exceptions": [],
+            "features": {
+                "bitwarden": {
+                    "state": "internal",
+                    "settings": {
+                        "id": "nngceckbapebfimnlniiiahkandclblb",
+                        "name": "Bitwarden Password Manager",
+                        "publisher": "Bitwarden Inc.",
+                        "publisherUri": "https://bitwarden.com/",
+                        "iconUri": "https://staticcdn.duckduckgo.com/d5c04536-5379-4709-8d19-d13fdd456ff6/extensions-test/bitwarden-128.png",
+                        "cwsUri": "https://chromewebstore.google.com/detail/bitwarden-password-manage/nngceckbapebfimnlniiiahkandclblb",
+                        "categoryId": "password-manager",
+                        "order": 1
+                    }
+                },
+                "onePassword": {
+                    "state": "internal",
+                    "settings": {
+                        "id": "aeblfdkhhhdcdjpifhhbdiojplfjncoa",
+                        "name": "1Password – Password Manager",
+                        "publisher": "AgileBits Inc",
+                        "publisherUri": "https://1password.com/",
+                        "iconUri": "https://staticcdn.duckduckgo.com/d5c04536-5379-4709-8d19-d13fdd456ff6/extensions-test/onepassword-128.png",
+                        "cwsUri": "https://chromewebstore.google.com/detail/1password-%E2%80%93-password-mana/aeblfdkhhhdcdjpifhhbdiojplfjncoa",
+                        "categoryId": "password-manager",
+                        "order": 2
+                    }
+                },
+                "lastPass": {
+                    "state": "internal",
+                    "settings": {
+                        "id": "hdokiejnpimakedhajhdlcegeplioahd",
+                        "name": "LastPass: Free Password Manager",
+                        "publisher": "LastPass",
+                        "publisherUri": "https://lastpass.com/",
+                        "iconUri": "https://staticcdn.duckduckgo.com/d5c04536-5379-4709-8d19-d13fdd456ff6/extensions-test/lastpass-128.png",
+                        "cwsUri": "https://chromewebstore.google.com/detail/lastpass-free-password-ma/hdokiejnpimakedhajhdlcegeplioahd",
+                        "categoryId": "password-manager",
+                        "order": 3
+                    }
+                }
+            }
+        },
+        "chromeWebstorePatching": {
+            "state": "internal",
+            "exceptions": [],
+            "settings": {
+                "patchWebstore": {
+                    "state": "disabled"
+                },
+                "installButtonSelectors": [
+                    {
+                        "type": "css",
+                        "value": "button[jsname=\"wQO0od\"]"
+                    },
+                    {
+                        "type": "css",
+                        "value": "button[jsname=\"ajZLRd\"]"
+                    },
+                    {
+                        "type": "css",
+                        "value": "button[jscontroller=\"O626Fe\"][aria-describedby]"
+                    }
+                ],
+                "promoSelectors": [
+                    {
+                        "type": "css",
+                        "value": "[jsname=\"v621tc\"]"
+                    },
+                    {
+                        "type": "css",
+                        "value": "div[jscontroller=\"o2G9me\"]"
+                    },
+                    {
+                        "type": "css",
+                        "value": "header[role=\"banner\"] aside"
+                    }
+                ],
+                "domains": [
+                    {
+                        "domain": "chromewebstore.google.com",
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/patchWebstore/state",
+                                "value": "enabled"
+                            }
+                        ]
+                    }
+                ]
+            }
         },
         "messageBridge": {
             "exceptions": [],
@@ -423,7 +640,8 @@
                     "minSupportedVersion": "1.183.0"
                 },
                 "pdfPageContext": {
-                    "state": "disabled"
+                    "state": "enabled",
+                    "minSupportedVersion": "1.210.0"
                 },
                 "applicationMenuShortcut": {
                     "state": "enabled"
@@ -525,6 +743,11 @@
                     "state": "enabled",
                     "description": "Warn users as they approach their daily/weekly Duck.ai limits",
                     "minSupportedVersion": "1.210.0"
+                },
+                "nativeTermsOfService": {
+                    "state": "enabled",
+                    "description": "Duck.ai Terms of Service disclaimer in the native input, where sending accepts them",
+                    "minSupportedVersion": "1.212.0"
                 }
             },
             "settings": {
@@ -1774,19 +1997,10 @@
                 "keyboard": {
                     "type": "undefined"
                 },
-                "hardwareConcurrency": [
-                    {
-                        "type": "number",
-                        "value": 4
-                    },
-                    {
-                        "type": "number",
-                        "value": 8,
-                        "criteria": {
-                            "arch": "AppleSilicon"
-                        }
-                    }
-                ],
+                "hardwareConcurrency": {
+                    "type": "number",
+                    "value": 8
+                },
                 "deviceMemory": {
                     "type": "undefined"
                 }

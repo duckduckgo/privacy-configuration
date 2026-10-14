@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import fs from 'fs';
 import platforms from '../platforms.js';
+import { CURRENT_CONFIG_VERSION } from '../constants.js';
 import { readJsoncFile } from '../util.js';
 
 /**
@@ -846,7 +847,7 @@ describe('tracker-allowlist-validator', () => {
 
         for (const platform of platformOutput) {
             it(`has no override-introduced violations in ${platform}`, () => {
-                const config = JSON.parse(fs.readFileSync(`./generated/v5/${platform}-config.json`, 'utf-8'));
+                const config = JSON.parse(fs.readFileSync(`./generated/v${CURRENT_CONFIG_VERSION}/${platform}-config.json`, 'utf-8'));
                 const allowlistedTrackers = config.features?.trackerAllowlist?.settings?.allowlistedTrackers;
                 if (!allowlistedTrackers) return;
 

@@ -1313,6 +1313,9 @@
                     "state": "enabled",
                     "minSupportedVersion": "0.130.0"
                 },
+                "launcherPromo": {
+                    "state": "disabled"
+                },
                 "omnibarAiChat": {
                     "state": "enabled",
                     "minSupportedVersion": "0.130.0"
@@ -1397,7 +1400,8 @@
                     "minSupportedVersion": "0.155.0"
                 },
                 "updatedCreateImage": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.176.0"
                 },
                 "omnibarWebSearch": {
                     "state": "enabled",
@@ -1466,13 +1470,16 @@
                     "minSupportedVersion": "0.158.0"
                 },
                 "sidebarAttachMoreTabs": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.175.0"
                 },
                 "omnibarAttachMoreTabs": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.175.0"
                 },
                 "ntpAttachMoreTabs": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.175.0"
                 },
                 "onboardingToggleAffectsNtpAndDdg": {
                     "state": "enabled",
@@ -1497,6 +1504,25 @@
                 "ntpUsageLimits": {
                     "state": "enabled",
                     "minSupportedVersion": "0.175.0"
+                },
+                "attachmentPrivacyDisclosure": {
+                    "state": "internal"
+                },
+                "omnibarScreenshot": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.176.0"
+                },
+                "ntpScreenshot": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.176.0"
+                },
+                "pasteImages": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.176.0"
+                },
+                "ntpPasteImages": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.176.0"
                 }
             },
             "minSupportedVersion": "0.100.0",
@@ -2338,12 +2364,7 @@
                     }
                 }
             },
-            "exceptions": [
-                {
-                    "domain": "ynab.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4196"
-                }
-            ]
+            "exceptions": []
         },
         "contentScopeScriptInjection": {
             "state": "enabled",
@@ -4912,24 +4933,24 @@
                     "state": "enabled"
                 },
                 "extensionTabHandling": {
-                    "state": "preview",
-                    "minSupportedVersion": "0.174.0"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.175.0"
                 },
                 "chromeWebStore": {
-                    "state": "preview",
-                    "minSupportedVersion": "0.174.0"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.175.0"
                 },
                 "allowExtensionsUpdate": {
-                    "state": "preview",
-                    "minSupportedVersion": "0.174.0"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.175.0"
                 },
                 "chromiumUserAgentBrand": {
-                    "state": "preview",
-                    "minSupportedVersion": "0.174.0"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.175.0"
                 },
                 "blockExtensionsOnInternalOrigins": {
-                    "state": "preview",
-                    "minSupportedVersion": "0.174.0"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.175.0"
                 },
                 "allowRetriesForServiceWorkerTimeouts": {
                     "state": "enabled",
@@ -5178,7 +5199,7 @@
             "minSupportedVersion": "0.148.0",
             "exceptions": [],
             "settings": {
-                "extensionUrl": "https://staticcdn.duckduckgo.com/extensions/content-blocker/content-blocker-extension-2026.10.1.crx"
+                "extensionUrl": "https://staticcdn.duckduckgo.com/extensions/content-blocker/content-blocker-extension-2026.10.13.crx"
             },
             "features": {
                 "onboardingEnabled": {
@@ -5281,6 +5302,17 @@
                 "toastNotifications": {
                     "state": "enabled",
                     "minSupportedVersion": "0.129.0"
+                },
+                "inContextInstructions": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.176.0"
+                },
+                "inContextInstructionsExperiment": {
+                    "state": "enabled",
+                    "cohorts": [
+                        { "name": "control", "weight": 1 },
+                        { "name": "instructions", "weight": 1 }
+                    ]
                 }
             }
         },
@@ -5779,24 +5811,24 @@
             }
         },
         "extensions": {
-            "state": "preview",
-            "minSupportedVersion": "0.174.0",
+            "state": "enabled",
+            "minSupportedVersion": "0.176.0",
             "exceptions": [],
             "features": {
                 "extensionPages": {
-                    "state": "preview"
+                    "state": "enabled"
                 },
                 "extensionContextMenus": {
-                    "state": "preview"
+                    "state": "enabled"
                 },
                 "extensionActionButtons": {
-                    "state": "preview"
+                    "state": "enabled"
                 }
             }
         },
         "extensionManagement": {
-            "state": "preview",
-            "minSupportedVersion": "0.174.0",
+            "state": "enabled",
+            "minSupportedVersion": "0.176.0",
             "exceptions": [],
             "settings": {
                 "hiddenExtensionIds": [
@@ -5823,8 +5855,8 @@
             },
             "features": {
                 "isLaunchedExtensions": {
-                    "state": "preview",
-                    "minSupportedVersion": "0.174.0"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.176.0"
                 },
                 "curatedExtensions": {
                     "state": "enabled",
@@ -5891,9 +5923,56 @@
                 }
             }
         },
+        "extensionsCatalog": {
+            "state": "enabled",
+            "minSupportedVersion": "0.176.0",
+            "exceptions": [],
+            "features": {
+                "bitwarden": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.176.0",
+                    "settings": {
+                        "id": "nngceckbapebfimnlniiiahkandclblb",
+                        "name": "Bitwarden Password Manager",
+                        "publisher": "Bitwarden Inc.",
+                        "publisherUri": "https://bitwarden.com/",
+                        "iconUri": "https://staticcdn.duckduckgo.com/d5c04536-5379-4709-8d19-d13fdd456ff6/extensions-test/bitwarden-128.png",
+                        "cwsUri": "https://chromewebstore.google.com/detail/bitwarden-password-manage/nngceckbapebfimnlniiiahkandclblb",
+                        "categoryId": "password-manager",
+                        "order": 1
+                    }
+                },
+                "onePassword": {
+                    "state": "preview",
+                    "settings": {
+                        "id": "aeblfdkhhhdcdjpifhhbdiojplfjncoa",
+                        "name": "1Password – Password Manager",
+                        "publisher": "AgileBits Inc",
+                        "publisherUri": "https://1password.com/",
+                        "iconUri": "https://staticcdn.duckduckgo.com/d5c04536-5379-4709-8d19-d13fdd456ff6/extensions-test/onepassword-128.png",
+                        "cwsUri": "https://chromewebstore.google.com/detail/1password-%E2%80%93-password-mana/aeblfdkhhhdcdjpifhhbdiojplfjncoa",
+                        "categoryId": "password-manager",
+                        "order": 2
+                    }
+                },
+                "lastPass": {
+                    "state": "preview",
+                    "settings": {
+                        "id": "hdokiejnpimakedhajhdlcegeplioahd",
+                        "name": "LastPass: Free Password Manager",
+                        "publisher": "LastPass",
+                        "publisherUri": "https://lastpass.com/",
+                        "iconUri": "https://staticcdn.duckduckgo.com/d5c04536-5379-4709-8d19-d13fdd456ff6/extensions-test/lastpass-128.png",
+                        "cwsUri": "https://chromewebstore.google.com/detail/lastpass-free-password-ma/hdokiejnpimakedhajhdlcegeplioahd",
+                        "categoryId": "password-manager",
+                        "order": 3
+                    }
+                }
+            }
+        },
         "chromeWebstorePatching": {
-            "state": "preview",
-            "minSupportedVersion": "0.174.0",
+            "state": "enabled",
+            "minSupportedVersion": "0.175.0",
             "exceptions": [],
             "settings": {
                 "patchWebstore": {
@@ -6247,7 +6326,6 @@
                                 "template": "counter",
                                 "source": "video_unavailable",
                                 "buckets": {
-                                    "0": { "gte": 0, "lt": 1 },
                                     "1": { "gte": 1, "lt": 2 },
                                     "2-3": { "gte": 2, "lt": 4 },
                                     "4-7": { "gte": 4, "lt": 8 },
@@ -6271,7 +6349,6 @@
                                 "template": "counter",
                                 "source": "video_unavailable",
                                 "buckets": {
-                                    "0": { "gte": 0, "lt": 1 },
                                     "1": { "gte": 1, "lt": 2 },
                                     "2-3": { "gte": 2, "lt": 4 },
                                     "4-7": { "gte": 4, "lt": 8 },
@@ -6482,6 +6559,10 @@
             "features": {
                 "instantSuggestions": {
                     "state": "disabled"
+                },
+                "improvedInstantSuggestions": {
+                    "state": "internal",
+                    "minSupportedVersion": "0.177.0"
                 },
                 "addressBarOverlay": {
                     "minSupportedVersion": "0.164.0",

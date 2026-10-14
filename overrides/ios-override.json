@@ -90,7 +90,7 @@
             "state": "enabled"
         },
         "adAttributionReporting": {
-            "state": "disabled",
+            "state": "enabled",
             "minSupportedVersion": "7.146.0",
             "settings": {
                 "includeToken": false
@@ -443,6 +443,16 @@
                     "state": "enabled",
                     "description": "Warn users as they approach their daily/weekly Duck.ai limits",
                     "minSupportedVersion": "7.238.0"
+                },
+                "unifiedToggleInputAttachmentPrivacy": {
+                    "state": "enabled",
+                    "description": "Privacy disclosure shown when an image or file is attached in Duck.ai",
+                    "minSupportedVersion": "7.241.0"
+                },
+                "nativeTermsOfService": {
+                    "state": "enabled",
+                    "description": "Duck.ai Terms of Service disclaimer in the native input, where sending accepts them",
+                    "minSupportedVersion": "7.242.0"
                 },
                 "aiChatAtb": {
                     "state": "enabled",
@@ -1127,6 +1137,34 @@
                     "description": "Adwall detection: rendered-text xpath matching for the generic adwall detectors",
                     "rollout": {
                         "steps": [
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "contentScopeExperiment8": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.234.0",
+                    "description": "Page issue detection: auto-run + fireEvent for the new block page, error page, geoblock, verification, blank page, captcha and adwall detectors, with retuned adwall and video intervals",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            },
                             {
                                 "percent": 25
                             },
@@ -2449,6 +2487,10 @@
                     "state": "enabled",
                     "minSupportedVersion": "7.228.0"
                 },
+                "syncAutoRestore": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.240.1"
+                },
                 "simplifiedSyncSetupExperiment": {
                     "state": "enabled",
                     "minSupportedVersion": "7.219.0",
@@ -2805,21 +2847,36 @@
                             {
                                 "rule": "www.google.com/measurement/1p-conversion",
                                 "domains": [
+                                    "allrecipes.com",
                                     "architecturaldesigns.com",
-                                    "furniturerow.com",
-                                    "printerval.com",
-                                    "iseehair.com",
-                                    "generation.org",
-                                    "poshmark.com",
-                                    "partselect.com",
-                                    "golfavenue.ca",
-                                    "petsuppliesplus.com",
-                                    "myenneagramtest.org",
                                     "arcteryx.com",
+                                    "bhg.com",
+                                    "byrdie.com",
+                                    "foodandwine.com",
+                                    "furniturerow.com",
+                                    "generation.org",
+                                    "golfavenue.ca",
+                                    "health.com",
+                                    "homedepot.com",
+                                    "instyle.com",
+                                    "iseehair.com",
+                                    "myenneagramtest.org",
+                                    "parents.com",
+                                    "partselect.com",
+                                    "people.com",
+                                    "petsuppliesplus.com",
+                                    "poshmark.com",
+                                    "printerval.com",
+                                    "realsimple.com",
+                                    "thespruce.com",
                                     "topsecretrecipes.com",
-                                    "homedepot.com"
+                                    "travelandleisure.com",
+                                    "verywellhealth.com"
                                 ],
-                                "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5632"
+                                "reason": [
+                                    "architecturaldesigns.com - https://github.com/duckduckgo/privacy-configuration/pull/5632",
+                                    "Selected Dotdash properties - https://github.com/duckduckgo/privacy-configuration/pull/6080"
+                                ]
                             }
                         ]
                     },
@@ -3169,16 +3226,7 @@
                 },
                 "monthlyFreeTrialExperiment2": {
                     "state": "enabled",
-                    "targets": [
-                        {
-                            "localeCountry": "US"
-                        }
-                    ],
                     "cohorts": [
-                        {
-                            "name": "control",
-                            "weight": 1
-                        },
                         {
                             "name": "treatment",
                             "weight": 1
@@ -3444,6 +3492,17 @@
                 "promptCooldownInterval": 24
             },
             "features": {
+                "floatingUIiOS27": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.241.0",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 50
+                            }
+                        ]
+                    }
+                },
                 "widgetReporting": {
                     "state": "disabled"
                 },
@@ -3547,6 +3606,10 @@
                         "idleThresholdSeconds": 1800
                     }
                 },
+                "alwaysShowKeyboardOnNewTabPage": {
+                    "state": "internal",
+                    "minSupportedVersion": "7.242.0"
+                },
                 "defaultExistingIPhoneUsersToNewTabAfterIdle": {
                     "state": "enabled",
                     "minSupportedVersion": "7.220.0",
@@ -3649,7 +3712,7 @@
                     "description": "Wide event measuring Starting Experience Success Rate."
                 },
                 "onboardingFlowByDownloadReasonExperiment": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": "7.235.0",
                     "description": "NA Experiment: tailor the onboarding flow based on the user's download reason. `settings` provides the fallback AI model list for the model-picker step when the /models API is unavailable.",
                     "settings": {
@@ -3682,7 +3745,7 @@
                     "minSupportedVersion": "7.238.0"
                 },
                 "sitePermissions": {
-                    "state": "internal",
+                    "state": "enabled",
                     "minSupportedVersion": "7.241.0"
                 }
             }

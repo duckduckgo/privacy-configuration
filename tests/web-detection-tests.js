@@ -2,6 +2,7 @@ import { expect } from 'chai';
 import fs from 'fs';
 import xpath from 'xpath';
 import platforms from '../platforms.js';
+import { CURRENT_CONFIG_VERSION } from '../constants.js';
 
 const OPERATOR_KEYS = [
     'any',
@@ -304,8 +305,8 @@ const platformOutput = platforms.map((item) => item.replace('browsers/', 'extens
 
 const latestConfigs = platformOutput.map((plat) => {
     return {
-        name: `v5/${plat}-config.json`,
-        body: JSON.parse(fs.readFileSync(`./generated/v5/${plat}-config.json`)),
+        name: `v${CURRENT_CONFIG_VERSION}/${plat}-config.json`,
+        body: JSON.parse(fs.readFileSync(`./generated/v${CURRENT_CONFIG_VERSION}/${plat}-config.json`)),
     };
 });
 
@@ -400,6 +401,8 @@ describe('webDetection config tests', () => {
     });
 
     describe('eventHub cross-reference', () => {
+        const TEMP_EVENT_TYPE_PREFIX = 'temp_';
+
         // Features whose subfeatures may declare experiment metrics that consume events
         // (see tests/experiment-metrics-tests.js).
         const METRIC_PARENTS = [
@@ -439,6 +442,8 @@ describe('webDetection config tests', () => {
                         ] of Object.entries(groupDetectors)) {
                             const type = detector.actions?.fireEvent?.type;
                             if (type === undefined) continue;
+                            // `temp_` types are placeholders for detectors whose eventHub telemetry is not defined yet (for example, during experiments)
+                            if (type.startsWith(TEMP_EVENT_TYPE_PREFIX)) continue;
                             expect(knownConsumers.has(type)).to.equal(
                                 true,
                                 `Detector '${groupName}.${detectorName}' fires event type '${type}' but no eventHub parameter source or experiment metric event consumes '${type}' (known consumers: ${[

@@ -17,7 +17,7 @@ type ExtensionManagementSettings = {
 };
 
 // One entry in the curated extensions catalog
-type CuratedExtension = {
+export type CuratedExtension = {
     id: string;
     name: string;
     publisher: string;

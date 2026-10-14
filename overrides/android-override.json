@@ -27,6 +27,36 @@
                 }
             }
         },
+        "customTabs": {
+            "exceptions": [],
+            "state": "enabled",
+            "features": {
+                "closeTabAfterTrustedCallerNavigation": {
+                    "state": "enabled"
+                },
+                "handleTrustedCallers": {
+                    "state": "enabled"
+                }
+            }
+        },
+        "credentialExchange": {
+            "exceptions": [],
+            "state": "enabled",
+            "minSupportedVersion": 52980000,
+            "features": {
+                "canImportPasswords": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52980000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 50
+                            }
+                        ]
+                    }
+                }
+            }
+        },
         "adClickAttribution": {
             "state": "enabled",
             "features": {
@@ -1011,6 +1041,22 @@
                 "sendDuckAiSessionWideEvent": {
                     "state": "enabled",
                     "minSupportedVersion": 52950000
+                },
+                "duckAiUsageWarnings": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52970000
+                },
+                "nativeDuckAiSidebar": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52970000
+                },
+                "duckAiTextSelectionAction": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52970000
+                },
+                "contextualMenuAllChats": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52960000
                 }
             }
         },
@@ -1134,7 +1180,7 @@
                 },
                 "cookiePopUpOptInPrompt": {
                     "state": "enabled",
-                    "minSupportedVersion": 52950000,
+                    "minSupportedVersion": 52960000,
                     "rollout": {
                         "steps": [
                             {
@@ -1142,6 +1188,9 @@
                             },
                             {
                                 "percent": 7
+                            },
+                            {
+                                "percent": 100
                             }
                         ]
                     }
@@ -2061,6 +2110,20 @@
                 },
                 "sendSanitizedStackTraces": {
                     "state": "enabled"
+                },
+                "passkeySupport": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52970000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
                 }
             }
         },
@@ -2464,6 +2527,16 @@
                             }
                         ]
                     }
+                }
+            }
+        },
+        "androidNativeCrash": {
+            "state": "enabled",
+            "exceptions": [],
+            "features": {
+                "useCrashpad": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52971000
                 }
             }
         },
@@ -3370,7 +3443,7 @@
             "minSupportedVersion": 52701000,
             "exceptions": [],
             "settings": {
-                "detachedWebViewCount": 10
+                "detachedWebViewCount": 20
             },
             "features": {
                 "pirBeta": {
@@ -3589,6 +3662,9 @@
                             },
                             {
                                 "percent": 25
+                            },
+                            {
+                                "percent": 100
                             }
                         ]
                     }
@@ -4536,6 +4612,9 @@
                             }
                         }
                     }
+                },
+                "subscriptionConcurrentExperiments": {
+                    "state": "enabled"
                 }
             }
         },
@@ -5262,6 +5341,34 @@
                             "weight": 1
                         }
                     ]
+                },
+                "contentScopeExperiment8": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52920000,
+                    "description": "Page issue detection: auto-run + fireEvent for the new block page, error page, geoblock, verification, blank page, captcha and adwall detectors, with retuned adwall and video intervals",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
                 }
             }
         },
@@ -5614,7 +5721,6 @@
                                 "template": "counter",
                                 "source": "video_unavailable",
                                 "buckets": {
-                                    "0": { "gte": 0, "lt": 1 },
                                     "1": { "gte": 1, "lt": 2 },
                                     "2-3": { "gte": 2, "lt": 4 },
                                     "4-7": { "gte": 4, "lt": 8 },
@@ -5638,7 +5744,6 @@
                                 "template": "counter",
                                 "source": "video_unavailable",
                                 "buckets": {
-                                    "0": { "gte": 0, "lt": 1 },
                                     "1": { "gte": 1, "lt": 2 },
                                     "2-3": { "gte": 2, "lt": 4 },
                                     "4-7": { "gte": 4, "lt": 8 },
@@ -5946,6 +6051,11 @@
                     }
                 }
             }
+        },
+        "appRatingPromptModal": {
+            "state": "enabled",
+            "minSupportedVersion": 52960000,
+            "exceptions": []
         }
     },
     "unprotectedTemporary": [],

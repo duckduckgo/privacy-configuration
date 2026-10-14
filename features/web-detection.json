@@ -226,6 +226,34 @@
                             "type": "admiralAdwall"
                         }
                     }
+                },
+                "keywords_vendor": {
+                    "state": "disabled",
+                    "match": {
+                        "text": {
+                            "pattern": [
+                                "pagefair",
+                                "fuckadblock"
+                            ]
+                        }
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    3000,
+                                    5000
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        "fireEvent": {
+                            "state": "enabled",
+                            "type": "adwall"
+                        }
+                    }
                 }
             },
             "captcha": {
@@ -591,6 +619,100 @@
                             "type": "captcha_other"
                         }
                     }
+                },
+                "cloudflare_challenge_extra": {
+                    "state": "disabled",
+                    "match": {
+                        "any": [
+                            {
+                                "element": {
+                                    "selector": [
+                                        "#cf-ch\\61 llenge-running",
+                                        "#cf-please-wait",
+                                        "#ch\\61 llenge-spinner",
+                                        "#trk_jsch\\61 l_js",
+                                        ".ray_id",
+                                        "#ch\\61 llenge-form[action*='__cf_chl_f_tk=']",
+                                        "#ch\\61 llenge-form[action*='__cf_chl_rt_tk=']"
+                                    ],
+                                    "visibility": "content"
+                                }
+                            },
+                            {
+                                "text": {
+                                    "selector": [
+                                        "title"
+                                    ],
+                                    "pattern": [
+                                        "^just a moment",
+                                        "^ddos-guard$"
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    1000,
+                                    5000
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        "fireEvent": {
+                            "state": "enabled",
+                            "type": "temp_wd_challenge"
+                        }
+                    }
+                },
+                "cloudflare_access_denied": {
+                    "state": "disabled",
+                    "match": {
+                        "any": [
+                            {
+                                "element": {
+                                    "selector": [
+                                        "div.cf-error-title span.cf-code-label span",
+                                        "#cf-error-details div.cf-error-overview h1",
+                                        "span.cf-error-code"
+                                    ],
+                                    "visibility": "content"
+                                }
+                            },
+                            {
+                                "text": {
+                                    "selector": [
+                                        "title"
+                                    ],
+                                    "pattern": [
+                                        "^access denied$",
+                                        "^attention required! \\| cloudflare"
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    1000,
+                                    5000
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        "fireEvent": {
+                            "state": "enabled",
+                            "type": "temp_wd_blockPage"
+                        }
+                    }
                 }
             },
             "commentsDisabled": {
@@ -657,6 +779,500 @@
                                 "Continue without disabling",
                                 "Continue without supporting"
                             ]
+                        }
+                    }
+                }
+            },
+            "blockPage": {
+                "waf_generic_en": {
+                    "state": "disabled",
+                    "match": {
+                        "text": {
+                            "selector": [
+                                "title",
+                                "h1"
+                            ],
+                            "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                            "pattern": [
+                                "the requested url was rejected",
+                                "please consult with your administrator",
+                                "your support id is",
+                                "unauthorized request blocked",
+                                "dotdefender blocked your request",
+                                "this error was generated by mod.?security",
+                                "request forbidden by administrative rules",
+                                "incapsula incident id",
+                                "denied because we believe you are using automation tools",
+                                "your request was blocked by cloudbric",
+                                "our system thinks you might be a robot!",
+                                "\\b18\\.[0-9a-f]{8}.1[0-9]{9}\\.[0-9a-f]{7}\\b"
+                            ]
+                        }
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    3700,
+                                    5700
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        "fireEvent": {
+                            "state": "enabled",
+                            "type": "temp_wd_blockPage"
+                        }
+                    }
+                },
+                "waf_vendors": {
+                    "state": "disabled",
+                    "match": {
+                        "any": [
+                            {
+                                "text": {
+                                    "selector": [
+                                        "title"
+                                    ],
+                                    "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                    "pattern": [
+                                        "cloudflare_error_",
+                                        "incapsula incident id",
+                                        "access denied - sucuri website firewall",
+                                        "you don.t have permission to access"
+                                    ]
+                                }
+                            },
+                            {
+                                "element": {
+                                    "selector": [
+                                        "#distilC\\61 ptchaForm"
+                                    ],
+                                    "visibility": "content"
+                                }
+                            },
+                            {
+                                "all": [
+                                    {
+                                        "text": {
+                                            "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                            "pattern": [
+                                                "request blocked"
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "text": {
+                                            "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                            "pattern": [
+                                                "generated by cloudfront"
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    3800,
+                                    5800
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        "fireEvent": {
+                            "state": "enabled",
+                            "type": "temp_wd_blockPage"
+                        }
+                    }
+                },
+                "verification_failed_en": {
+                    "state": "disabled",
+                    "match": {
+                        "text": {
+                            "selector": [
+                                "title"
+                            ],
+                            "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                            "pattern": [
+                                "(failed to|could not|unable to|cannot) verif(y|ication)[^.]{0,20}(browser|device)",
+                                "(browser|device) verification (was )?(blocked|failed)",
+                                "verification could not be completed",
+                                "verification failed\\.?\\s*(please\\s+)?try again"
+                            ]
+                        }
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    3900,
+                                    10900
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        "fireEvent": {
+                            "state": "enabled",
+                            "type": "temp_wd_blockPage"
+                        }
+                    }
+                },
+                "vercel_checkpoint": {
+                    "state": "disabled",
+                    "match": {
+                        "text": {
+                            "selector": [
+                                "title"
+                            ],
+                            "pattern": [
+                                "^vercel security checkpoint$"
+                            ]
+                        }
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    1000,
+                                    5000
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        "fireEvent": {
+                            "state": "enabled",
+                            "type": "temp_wd_blockPage"
+                        }
+                    }
+                },
+                "http_forbidden_en": {
+                    "state": "disabled",
+                    "match": {
+                        "text": {
+                            "selector": [
+                                "title",
+                                "h1"
+                            ],
+                            "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                            "pattern": [
+                                "\\b403\\b[^.]{0,40}forbidden",
+                                "^\\s*forbidden\\b",
+                                "forbidden[^.]{0,30}\\b403\\b",
+                                "access is denied"
+                            ]
+                        }
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    4000,
+                                    6000
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        "fireEvent": {
+                            "state": "enabled",
+                            "type": "temp_wd_blockPage"
+                        }
+                    }
+                },
+                "http_rate_limited_en": {
+                    "state": "disabled",
+                    "match": {
+                        "text": {
+                            "selector": [
+                                "title",
+                                "h1"
+                            ],
+                            "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                            "pattern": [
+                                "\\b429\\b[^.]{0,30}too many requests",
+                                "too many requests"
+                            ]
+                        }
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    4100,
+                                    6100
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        "fireEvent": {
+                            "state": "enabled",
+                            "type": "temp_wd_blockPage"
+                        }
+                    }
+                },
+                "network_security_en": {
+                    "state": "disabled",
+                    "match": {
+                        "text": {
+                            "selector": [
+                                "title"
+                            ],
+                            "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                            "pattern": [
+                                "you(’|')?(ve| have) been blocked by network security"
+                            ]
+                        }
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    4200,
+                                    6200
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        "fireEvent": {
+                            "state": "enabled",
+                            "type": "temp_wd_blockPage"
+                        }
+                    }
+                },
+                "title_blocked_en": {
+                    "state": "disabled",
+                    "match": {
+                        "text": {
+                            "selector": [
+                                "title"
+                            ],
+                            "pattern": [
+                                "the url you requested has been blocked",
+                                "^\\s*(this )?domain has been seized\\s*$|^\\s*seized\\s*$"
+                            ]
+                        }
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    1000,
+                                    5000
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        "fireEvent": {
+                            "state": "enabled",
+                            "type": "temp_wd_blockPage"
+                        }
+                    }
+                }
+            },
+            "errorPage": {
+                "soft404_phrases_en": {
+                    "state": "disabled",
+                    "match": {
+                        "text": {
+                            "selector": [
+                                "title",
+                                "h1"
+                            ],
+                            "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                            "pattern": [
+                                "access denied",
+                                "page not found",
+                                "404 not found"
+                            ]
+                        }
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    4300,
+                                    6300
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        "fireEvent": {
+                            "state": "enabled",
+                            "type": "temp_wd_errorPage"
+                        }
+                    }
+                },
+                "title_unavailable_en": {
+                    "state": "disabled",
+                    "match": {
+                        "text": {
+                            "selector": [
+                                "title"
+                            ],
+                            "pattern": [
+                                "^\\s*website temporarily unavailable\\s*$"
+                            ]
+                        }
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    1000,
+                                    5000
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        "fireEvent": {
+                            "state": "enabled",
+                            "type": "temp_wd_errorPage"
+                        }
+                    }
+                },
+                "ebay_error_page": {
+                    "state": "disabled",
+                    "match": {
+                        "text": {
+                            "selector": [
+                                "title"
+                            ],
+                            "pattern": [
+                                "^\\s*error page \\| ebay\\s*$"
+                            ]
+                        }
+                    },
+                    "actions": {
+                        "breakageReportData": {
+                            "state": "enabled"
+                        }
+                    }
+                }
+            },
+            "geoblocks": {
+                "region_block_en": {
+                    "state": "disabled",
+                    "match": {
+                        "text": {
+                            "selector": [
+                                "title"
+                            ],
+                            "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                            "pattern": [
+                                "streaming is not available in your area",
+                                "this page is currently unavailable in your region",
+                                "this content is unavailable in your country",
+                                "is not available in your region"
+                            ]
+                        }
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    4400,
+                                    6400
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        "fireEvent": {
+                            "state": "enabled",
+                            "type": "temp_wd_geoblock"
+                        }
+                    }
+                }
+            },
+            "verification": {
+                "title_en": {
+                    "state": "disabled",
+                    "match": {
+                        "text": {
+                            "selector": [
+                                "title"
+                            ],
+                            "pattern": [
+                                "^\\s*human verification\\s*$",
+                                "^\\s*verifying device\\s*$",
+                                "^\\s*security verification\\s*$",
+                                "\\bsecurity check\\s*$",
+                                "^\\s*check bot verification\\s*$"
+                            ]
+                        }
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    1000,
+                                    5000
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        "fireEvent": {
+                            "state": "enabled",
+                            "type": "temp_wd_challenge"
+                        }
+                    }
+                }
+            },
+            "blankPage": {
+                "no_text_or_title": {
+                    "state": "disabled",
+                    "match": {
+                        "none": [
+                            {
+                                "text": {
+                                    "xpath": "//title/text() | //body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                    "pattern": [
+                                        "\\S"
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    6500
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        "fireEvent": {
+                            "state": "enabled",
+                            "type": "temp_wd_blankPage"
                         }
                     }
                 }
@@ -778,6 +1394,208 @@
                             "fireEvent": {
                                 "state": "enabled",
                                 "type": "video_blocked"
+                            }
+                        }
+                    }
+                ]
+            },
+            {
+                "condition": {
+                    "experiment": {
+                        "experimentName": "contentScopeExperiment8",
+                        "cohort": "treatment"
+                    }
+                },
+                "patchSettings": [
+                    {
+                        "op": "replace",
+                        "path": "/detectors/adwalls/generic_en/triggers/auto/when/intervalMs",
+                        "value": [
+                            3100,
+                            5100
+                        ]
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/adwalls/generic_de/triggers/auto/when/intervalMs",
+                        "value": [
+                            3200,
+                            5200
+                        ]
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/adwalls/generic_es/triggers/auto/when/intervalMs",
+                        "value": [
+                            3300,
+                            5300
+                        ]
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/adwalls/generic_it/triggers/auto/when/intervalMs",
+                        "value": [
+                            3400,
+                            5400
+                        ]
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/adwalls/generic_nl/triggers/auto/when/intervalMs",
+                        "value": [
+                            3500,
+                            5500
+                        ]
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/adwalls/generic_se/triggers/auto/when/intervalMs",
+                        "value": [
+                            3600,
+                            5600
+                        ]
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/adwalls/keywords_vendor/state",
+                        "value": "enabled"
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/captcha/cloudflare_challenge_extra/state",
+                        "value": "enabled"
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/captcha/cloudflare_access_denied/state",
+                        "value": "enabled"
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/blockPage/waf_generic_en/state",
+                        "value": "enabled"
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/blockPage/waf_vendors/state",
+                        "value": "enabled"
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/blockPage/verification_failed_en/state",
+                        "value": "enabled"
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/blockPage/vercel_checkpoint/state",
+                        "value": "enabled"
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/blockPage/http_forbidden_en/state",
+                        "value": "enabled"
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/blockPage/http_rate_limited_en/state",
+                        "value": "enabled"
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/blockPage/network_security_en/state",
+                        "value": "enabled"
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/blockPage/title_blocked_en/state",
+                        "value": "enabled"
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/errorPage/soft404_phrases_en/state",
+                        "value": "enabled"
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/errorPage/title_unavailable_en/state",
+                        "value": "enabled"
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/errorPage/ebay_error_page/state",
+                        "value": "enabled"
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/geoblocks/region_block_en/state",
+                        "value": "enabled"
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/verification/title_en/state",
+                        "value": "enabled"
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/blankPage/no_text_or_title/state",
+                        "value": "enabled"
+                    }
+                ]
+            },
+            {
+                "condition": {
+                    "experiment": {
+                        "experimentName": "contentScopeExperiment8",
+                        "cohort": "treatment"
+                    },
+                    "injectName": "android"
+                },
+                "patchSettings": [
+                    {
+                        "op": "add",
+                        "path": "/detectors/video/error/triggers",
+                        "value": {
+                            "auto": {
+                                "state": "enabled",
+                                "when": {
+                                    "intervalMs": [
+                                        3000,
+                                        5000,
+                                        10000
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/video/unavailable/triggers",
+                        "value": {
+                            "auto": {
+                                "state": "enabled",
+                                "when": {
+                                    "intervalMs": [
+                                        3000,
+                                        5000,
+                                        10000
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/video/blocked/triggers",
+                        "value": {
+                            "auto": {
+                                "state": "enabled",
+                                "when": {
+                                    "intervalMs": [
+                                        3000,
+                                        5000,
+                                        10000
+                                    ]
+                                }
                             }
                         }
                     }
