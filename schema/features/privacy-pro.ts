@@ -24,7 +24,8 @@ interface PerfPaywallSubFeature<VersionType> extends SubFeature<VersionType, Per
 // Add more privacy-pro subfeatures here
 type SubFeatures<VersionType> = {
     performanceOptimizedPaywalls?: PerfPaywallSubFeature<VersionType>;
-    subscriptionWebFunnelOrigins?: SubFeature<
+    // Product funnel-step identifiers only: never add an ad-campaign or marketing-attribution origin.
+    subscriptionRemoteFunnelOrigins?: SubFeature<
         VersionType,
         {
             funnelOriginAllowlist: string[];
