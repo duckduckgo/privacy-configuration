@@ -3173,18 +3173,47 @@ function itemShapeErrors(detector, path, defined) {
 }
 
 /**
- * An action list: each item's `when` in boolean position, its payloads, and its `define` values,
- * `done` in boolean position, in one name scope.
+ * An action list: each item's `when` in boolean position, its payloads, and its `define` values in
+ * value position, in one name scope.
  *
  * @param {Record<string, any>} detector
  * @param {string} path
  * @returns {string[]}
  */
 function validateListDetector(detector, path) {
+    return checkListDetector(detector, path).errors;
+}
+
+/**
+ * Warnings on a `done` that config shows is never `true`: a value of another type, or a selected
+ * list, which `define` stores as an array.
+ *
+ * @param {Record<string, any>} detector
+ * @param {string} path
+ * @returns {string[]}
+ */
+function doneTypeWarnings(detector, path) {
+    if (!Array.isArray(detector.actions)) return [];
+    return checkListDetector(detector, path)
+        .doneTypes.filter(({ type }) => type.list === 'selected' || !allows(type, 'boolean'))
+        .map(
+            ({ type, path: donePath }) =>
+                `${donePath}: \`done\` is ${describeType(type)}, never \`true\`, so the detector never ends; give it a boolean, such as a test with \`is\``,
+        );
+}
+
+/**
+ * @param {Record<string, any>} detector
+ * @param {string} path
+ * @returns {{ errors: string[], doneTypes: Array<{ type: StaticType, path: string }> }}
+ */
+function checkListDetector(detector, path) {
     const ctx = newContext();
     ctx.structuralErrors.push(...itemShapeErrors(detector, path, ctx.defined));
     const items = detector.actions.filter(isPlainObject);
-    return runChecks(
+    /** @type {Array<{ type: StaticType, path: string }>} */
+    const doneTypes = [];
+    const errors = runChecks(
         ctx,
         () => {
             detector.actions.forEach((/** @type {unknown} */ item, /** @type {number} */ index) => {
@@ -3200,20 +3229,16 @@ function validateListDetector(detector, path) {
                         name,
                         value,
                     ] of Object.entries(item.define)) {
-                        // `done` ends the detector only on `true`, so config gives it a boolean
-                        checkExpr(
-                            value,
-                            name === 'done' ? 'boolean' : 'value',
-                            { ...MATCH_SCOPE, matchRoot: false, item: index },
-                            ctx,
-                            `${itemPath}.define.${name}`,
-                        );
+                        const definePath = `${itemPath}.define.${name}`;
+                        const type = checkExpr(value, 'value', { ...MATCH_SCOPE, matchRoot: false, item: index }, ctx, definePath);
+                        if (name === 'done' && ctx.mode === 'check') doneTypes.push({ type, path: definePath });
                     }
                 }
             });
         },
         () => checkListRootGuards(items.length === detector.actions.length ? detector.actions : [], path, ctx),
     );
+    return { errors, doneTypes };
 }
 
 /**
@@ -3574,6 +3599,23 @@ describe('webDetection config tests', () => {
                             detector,
                         ] of Object.entries(group)) {
                             for (const warning of repeatedEventWarnings(detector, `${config.name} detectors.${groupName}.${detectorId}`)) {
+                                console.warn(`warning: ${warning}`);
+                            }
+                        }
+                    }
+                });
+
+                it('warns on a `done` that is never `true`', () => {
+                    const detectors = clientDetectors(settings, clients.injectNames, clients.version, true);
+                    for (const [
+                        groupName,
+                        group,
+                    ] of Object.entries(detectors)) {
+                        for (const [
+                            detectorId,
+                            detector,
+                        ] of Object.entries(group)) {
+                            for (const warning of doneTypeWarnings(detector, `${config.name} detectors.${groupName}.${detectorId}`)) {
                                 console.warn(`warning: ${warning}`);
                             }
                         }
@@ -4186,11 +4228,11 @@ describe('webDetection config tests', () => {
             ]);
         });
 
-        it('takes `done` as a boolean, and other `define` values in value position', () => {
+        it('takes every `define` value in value position, `done` included', () => {
             expectValid([
                 { define: { done: { ...imgCount, is: { gt: 0 } }, n: imgCount, enough: { ...imgCount, is: { gte: 2 } } } },
             ]);
-            expectError('A number fills value, number position, not boolean position', [
+            expectValid([
                 { define: { done: 5 } },
             ]);
         });
@@ -4346,6 +4388,44 @@ describe('webDetection config tests', () => {
                         { fireEvent: { type: 'a' }, define: { sent: true } },
                     ]),
                 ).to.deep.equal([]);
+            });
+        });
+
+        describe('`done` types', () => {
+            /**
+             * @param {unknown} done
+             */
+            const warningsOf = (done) =>
+                doneTypeWarnings(
+                    {
+                        actions: [
+                            { define: { done } },
+                        ],
+                    },
+                    '$',
+                );
+
+            it('warns on a `done` that config shows is not a boolean, or is a selected list', () => {
+                expect(warningsOf(5)).to.deep.equal([
+                    '$.actions[0].define.done: `done` is number, never `true`, so the detector never ends; give it a boolean, such as a test with `is`',
+                ]);
+                expect(
+                    warningsOf({
+                        sum: [
+                            1,
+                            2,
+                        ],
+                    }).length,
+                ).to.equal(1);
+                expect(warningsOf(imgCount).length).to.equal(1);
+                expect(warningsOf({ element: { selector: 'img' } }).length).to.equal(1);
+            });
+
+            it('passes a boolean, a test, `any` and an `api` config does not type', () => {
+                expect(warningsOf(true)).to.deep.equal([]);
+                expect(warningsOf({ ...imgCount, is: { gt: 0 } })).to.deep.equal([]);
+                expect(warningsOf({ any: { element: { selector: 'img' } } })).to.deep.equal([]);
+                expect(warningsOf({ api: 'document.hidden' })).to.deep.equal([]);
             });
         });
 
