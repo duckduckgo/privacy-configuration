@@ -24,6 +24,12 @@ interface PerfPaywallSubFeature<VersionType> extends SubFeature<VersionType, Per
 // Add more privacy-pro subfeatures here
 type SubFeatures<VersionType> = {
     performanceOptimizedPaywalls?: PerfPaywallSubFeature<VersionType>;
+    subscriptionWebFunnelOrigins?: SubFeature<
+        VersionType,
+        {
+            funnelOriginAllowlist: string[];
+        }
+    >;
 };
 
 export type PrivacyProFeature<VersionType> = Feature<any, VersionType, SubFeatures<VersionType> & Record<string, SubFeature<VersionType>>>;
