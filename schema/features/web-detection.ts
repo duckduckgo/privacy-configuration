@@ -79,7 +79,10 @@ type Modifiers = {
     using?: string | UsingBody | ExprObject;
     /** Names the expression's value for `ref` and payloads. Unique within the detector. */
     as?: Name;
-    /** Tests the value, giving a boolean. Only in boolean position, on one expression key, or several beside `using`. */
+    /**
+     * Tests the value, giving a boolean. In boolean or value position, on one expression key, or several
+     * beside `using`. `as` beside it names the value tested.
+     */
     is?: Predicate;
 };
 
@@ -170,7 +173,7 @@ type ExprKeys = {
     api: string | ApiBody;
     /** Reads from the value the innermost `using`, `where` or `field` binds. A string is short for `{ path }`. */
     self: string | SelfBody;
-    /** Its operand's value, so modifiers stack. */
+    /** Its operand's value, so modifiers stack. With `is` on the operand, `as` beside `expr` names the boolean. */
     expr: Expr;
     only: Expr;
     sum: Operands;

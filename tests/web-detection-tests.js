@@ -1501,8 +1501,8 @@ function checkExpr(node, position, scope, ctx, path) {
         return UNKNOWN;
     }
     const hasIs = 'is' in node;
-    if (hasIs && position !== 'boolean')
-        fail(ctx, path, `\`is\` gives a boolean, so it sits in boolean position, not ${position} position`);
+    if (hasIs && position !== 'boolean' && position !== 'value')
+        fail(ctx, path, `\`is\` gives a boolean, so it sits in boolean or value position, not ${position} position`);
     if (exprKeys.length > 1 && !hasUsing && (hasIs || (position !== 'boolean' && position !== 'value'))) {
         fail(
             ctx,
@@ -1611,7 +1611,7 @@ function checkExprKey(key, body, position, scope, ctx, path, owner, holder) {
             return checkApi(selfBody, position, scope, ctx, path, scope.bound, false, true);
         }
         case 'expr':
-            // Its operand's value in its own position. An operand with `is` gives a boolean
+            // Its operand's value in its own position. An operand with `is` gives a boolean, which `as` beside `expr` names
             if (isPlainObject(body) && 'is' in body) {
                 expectPosition(ctx, path, '`expr` over `is`', position, [
                     'boolean',
@@ -4188,7 +4188,7 @@ describe('webDetection config tests', () => {
 
         it('takes `done` as a boolean, and other `define` values in value position', () => {
             expectValid([
-                { define: { done: { expr: { ...imgCount, is: { gt: 0 } } }, n: imgCount } },
+                { define: { done: { ...imgCount, is: { gt: 0 } }, n: imgCount, enough: { ...imgCount, is: { gte: 2 } } } },
             ]);
             expectError('A number fills value, number position, not boolean position', [
                 { define: { done: 5 } },
@@ -4620,8 +4620,14 @@ describe('webDetection config tests', () => {
                 expectError('several expression keys', { text: { pattern: 'a' }, element: { selector: 'img' }, is: {} });
             });
 
-            it('rejects `is` outside boolean position', () => {
-                expectError('`is` gives a boolean', true, { a: { value: { ...img, using: 'length', is: { gt: 0 } } } });
+            it('places `is` in boolean and value position', () => {
+                expectValid(true, { a: { value: { ...img, using: 'length', is: { gt: 0 } } } });
+                expectError('`is` gives a boolean', {
+                    sum: [
+                        { ...img, using: 'length', is: { gt: 0 } },
+                    ],
+                    is: 1,
+                });
             });
 
             it('checks `div` takes two operands', () => {
@@ -5920,7 +5926,7 @@ describe('webDetection config tests', () => {
                     { expr: { ...img, using: 'length', is: { gte: 2 } }, as: 'enoughImages' },
                     { enough: { value: { ref: 'enoughImages' } } },
                 );
-                expectValid(true, { enough: { value: { expr: { ...img, using: 'length', is: { gte: 2 } } } } });
+                expectValid(true, { enough: { value: { ...img, using: 'length', is: { gte: 2 } } } });
                 expectError('`expr` over `is` fills', {
                     sum: [
                         { expr: { ...img, using: 'length', is: { gte: 2 } } },
