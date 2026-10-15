@@ -6099,7 +6099,7 @@ describe('webDetection config tests', () => {
             it('checks payload keys', () => {
                 expectValid(true, { brokenImages: { value: imgCount } });
                 expectError('reserved', true, { nativeData: { value: imgCount } });
-                expectError('does not match', true, { _errors: { value: imgCount } });
+                expectError('does not match', true, { _internal: { value: imgCount } });
                 expectError('does not match', true, { '2x': { value: imgCount } });
                 expectError('needs `value`', true, { a: { buckets: { x: 1 } } });
             });

@@ -199,9 +199,12 @@ export type Expr = number | boolean | string | null | ExprObject | Expr[];
 export type PayloadField = {
     /** An expression in value position. */
     value: Expr;
-    /** The value is sent only when this holds. */
+    /** The value is sent only when this holds. With `fails`, it decides on a failed read. */
     when?: Predicate;
-    /** Bucket name to predicate. The first that holds, in key order, is sent instead of the value. */
+    /**
+     * Bucket name to predicate. The first that holds, in key order, is sent instead of the value. A
+     * bucket with `fails` names a failed read.
+     */
     buckets?: Record<string, Predicate>;
 };
 
@@ -211,7 +214,9 @@ export type PayloadSpec = Record<Name, PayloadField>;
 /**
  * One action item. Items are evaluated in array order on each run: an item runs when its `when`
  * holds or it has no `when`, and then sends its `fireEvent`, writes its `breakageReportData`, stores
- * its `define` values and applies its `exit`. An item holds at least one key other than `when`.
+ * its `define` values and applies its `exit`. A failure no `fails` handles, in `when`, a payload or a
+ * `define` value, ends the run, and is recorded in the detector's breakage entry. An item holds at
+ * least one key other than `when`.
  */
 export type ActionItem = {
     /** An expression in boolean position. */
