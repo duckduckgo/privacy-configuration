@@ -86,8 +86,8 @@ type Modifiers = {
     is?: Predicate;
 };
 
-/** An expression in value position, or a JS array of entries. */
-type Arg = Expr | Arg[];
+/** An expression in value position. `args` is a JS array of its entries' values, and `{ expr: [...] }` builds an inner array. */
+type Arg = Expr;
 
 /** A string is short for `{ path }`, and `args` calls the last name in `path`. An expression reads with `self` bound to the item or value. */
 type FieldRead =
@@ -111,6 +111,8 @@ type PredicateReserved = {
 
 type PredicateOperators = {
     eq?: Expr;
+    /** Holds when the value `===` one of the entries. An entry giving a list contributes each item. */
+    in?: MaybeArray<Expr>;
     lt?: Expr;
     lte?: Expr;
     gt?: Expr;
@@ -126,7 +128,8 @@ type PredicateOperators = {
  */
 type PredicateObject = PredicateReserved & PredicateOperators & { [path: string]: Predicate | Expr | FieldRead | undefined };
 
-export type Predicate = string | number | boolean | null | Predicate[] | PredicateObject;
+/** An array is not a predicate: `in` tests for one of several values, and `any` for one of several predicates. */
+export type Predicate = string | number | boolean | null | PredicateObject;
 
 type Root = {
     /**
@@ -173,8 +176,11 @@ type ExprKeys = {
     api: string | ApiBody;
     /** Reads from the value the innermost `using`, `where` or `field` binds. A string is short for `{ path }`. */
     self: string | SelfBody;
-    /** Its operand's value, so modifiers stack. With `is` on the operand, `as` beside `expr` names the boolean. */
-    expr: Expr;
+    /**
+     * Its operand's value, so modifiers stack. With `is` on the operand, `as` beside `expr` names the boolean.
+     * Over an array, a list of the entries' values.
+     */
+    expr: Expr | Expr[];
     only: Expr;
     sum: Operands;
     mul: Operands;
@@ -192,9 +198,10 @@ type ExprKeys = {
 /**
  * One expression key is that expression; several are their AND, in boolean or value position,
  * and never beside `is`. Placement and types are checked by the parser and CI, not by these types.
+ * An array is never an expression: the key holding it decides what it means.
  */
 export type ExprObject = Partial<ExprKeys> & Modifiers;
-export type Expr = number | boolean | string | null | ExprObject | Expr[];
+export type Expr = number | boolean | string | null | ExprObject;
 
 export type PayloadField = {
     /** An expression in value position. */

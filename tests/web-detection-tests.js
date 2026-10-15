@@ -97,6 +97,7 @@ const COMPARISON_OPERATORS = [
 /** Operator names at value level. At item level they are property paths. */
 const VALUE_OPERATORS = [
     'eq',
+    'in',
     ...COMPARISON_OPERATORS,
     'fails',
     'type',
@@ -527,6 +528,10 @@ function forEachPredicateSource(predicate, level, path, cb) {
             forEachFieldSource(value, childPath, cb);
         } else if (level === 'value' && VALUE_OPERATORS.includes(key)) {
             if (key === 'eq' || COMPARISON_OPERATORS.includes(key)) forEachSource(value, childPath, cb);
+            if (key === 'in')
+                asArray(value).forEach((entry, index) =>
+                    forEachSource(entry, Array.isArray(value) ? `${childPath}[${index}]` : childPath, cb),
+                );
         } else {
             forEachPredicateSource(value, 'value', childPath, cb);
         }
@@ -1333,6 +1338,7 @@ function predicateReadsOuterSelf(predicate, level) {
             if (key === 'field') return false;
             if (key === 'is') return predicateReadsOuterSelf(value, 'value');
             if (level === 'value' && (key === 'eq' || COMPARISON_OPERATORS.includes(key))) return readsOuterSelf(value);
+            if (level === 'value' && key === 'in') return asArray(value).some(readsOuterSelf);
             if (level === 'value' && VALUE_OPERATORS.includes(key)) return false;
             return predicateReadsOuterSelf(value, 'value');
         },
@@ -1381,7 +1387,8 @@ function providesValues(node, single, ctx, seen = new Set()) {
             return hasField || single === 'number';
         }
         case 'expr':
-            return providesValues(body, single, ctx, seen);
+            // Over an array, a list
+            return Array.isArray(body) || providesValues(body, single, ctx, seen);
         case 'ref': {
             const target = typeof body === 'string' && !seen.has(body) ? ctx.names.get(body) : undefined;
             return target
@@ -1402,8 +1409,8 @@ function providesValues(node, single, ctx, seen = new Set()) {
 }
 
 /**
- * Whether a predicate compares the value: a literal, `eq`, `lt`, `lte`, `gt` or `gte` at its top
- * level or in its `any`, `all`, `none` or array entries. A selected list under such a predicate
+ * Whether a predicate compares the value: a literal, `eq`, `in`, `lt`, `lte`, `gt` or `gte` at its top
+ * level or in its `any`, `all` or `none` entries. A selected list under such a predicate
  * gives its one item, and under any other the list, as an array. Mirrors `scalar` in C-S-S
  * predicates.js.
  *
@@ -1412,11 +1419,11 @@ function providesValues(node, single, ctx, seen = new Set()) {
  */
 function isScalarPredicate(predicate) {
     if (isLiteral(predicate)) return true;
-    if (Array.isArray(predicate)) return predicate.some(isScalarPredicate);
     if (!isPlainObject(predicate)) return false;
     return Object.keys(predicate).some(
         (key) =>
             key === 'eq' ||
+            key === 'in' ||
             COMPARISON_OPERATORS.includes(key) ||
             (OPERATOR_KEYS.includes(key) && asArray(predicate[key]).some(isScalarPredicate)),
     );
@@ -1472,12 +1479,9 @@ function checkExpr(node, position, scope, ctx, path) {
         return type;
     }
     if (Array.isArray(node)) {
-        expectPosition(ctx, path, 'An array, the OR of its entries,', position, [
-            'boolean',
-            'value',
-        ]);
-        node.forEach((entry, index) => checkExpr(entry, 'boolean', child(scope), ctx, `${path}[${index}]`));
-        return typeOf('boolean');
+        // The key holding an array decides what it means, and an array is never an expression
+        fail(ctx, path, 'an array is not an expression: `{"expr": [...]}` gives a list, and `{"any": [...]}` an OR');
+        return UNKNOWN;
     }
     if (!isPlainObject(node)) {
         fail(ctx, path, `${JSON.stringify(node)} is not an expression`);
@@ -1611,6 +1615,19 @@ function checkExprKey(key, body, position, scope, ctx, path, owner, holder) {
             return checkApi(selfBody, position, scope, ctx, path, scope.bound, false, true);
         }
         case 'expr':
+            if (Array.isArray(body)) {
+                // A list of the entries' values, typed as a selected list is, so `length`, `at` and `apply`
+                // read it. It stays a list: never one number, nor a boolean
+                expectPosition(ctx, path, '`expr` over an array, a list,', position, [
+                    'value',
+                    'list',
+                    'spread',
+                    'root',
+                ]);
+                const entries = body.map((entry, index) => checkExpr(entry, 'value', child(scope), ctx, `${path}.expr[${index}]`));
+                const item = entries.length ? mergeTypes(entries.map(itemOf)) : UNKNOWN;
+                return position === 'spread' ? item : { ...item, list: 'selected' };
+            }
             // Its operand's value in its own position. An operand with `is` gives a boolean, which `as` beside `expr` names
             if (isPlainObject(body) && 'is' in body) {
                 expectPosition(ctx, path, '`expr` over `is`', position, [
@@ -2196,7 +2213,8 @@ function checkArgs(args, scope, ctx, path) {
 }
 
 /**
- * An `args` entry: an expression in value position, or an array of entries.
+ * An `args` entry: an expression in value position. `{"expr": [...]}` builds an inner array, typed as
+ * a list of its entries, as `apply` and `concat` read it.
  *
  * @param {unknown} arg
  * @param {Scope} scope
@@ -2205,17 +2223,12 @@ function checkArgs(args, scope, ctx, path) {
  * @returns {StaticType}
  */
 function checkArg(arg, scope, ctx, path) {
-    if (Array.isArray(arg)) {
-        // An array is typed as a list of its entries, as `apply` and `concat` read it
-        const entries = arg.map((entry, index) => checkArg(entry, scope, ctx, `${path}[${index}]`));
-        return { ...(entries.length ? mergeTypes(entries.map(itemOf)) : UNKNOWN), list: 'maybe' };
-    }
     if (isPlainObject(arg) && 'api' in arg) ctx.functionApis.add(arg);
     return checkExpr(arg, 'value', child(scope), ctx, path);
 }
 
 /**
- * Whether an `apply` list is one config shows is a list: a selected list, an array in `args`, or
+ * Whether an `apply` list is one config shows is a list: a selected list, `{"expr": [...]}`, or
  * `Array.from`, `Array.of` or `concat` over one. `apply` over any other value, such as `null` or
  * a `FontFaceSet`, passes no arguments.
  *
@@ -2224,7 +2237,7 @@ function checkArg(arg, scope, ctx, path) {
  * @returns {boolean}
  */
 function isApplyList(arg, type) {
-    if (Array.isArray(arg) || type?.list !== undefined) return true;
+    if (type?.list !== undefined) return true;
     if (!isPlainObject(arg)) return false;
     const body = apiBody(arg.api);
     if (!isPlainObject(body) || typeof body.path !== 'string') return false;
@@ -2245,7 +2258,7 @@ function isApplyList(arg, type) {
 function checkCallArgs(apiPath, args, argTypes, ctx, path) {
     const isApply = apiPath.endsWith('.apply');
     if (isApply && !isApplyList(args[1], argTypes[1])) {
-        fail(ctx, `${path}[1]`, '`apply` takes its arguments as a selected list, an array in `args`, or `Array.from` or `concat` over one');
+        fail(ctx, `${path}[1]`, '`apply` takes its arguments as a selected list, `{"expr": [...]}`, or `Array.from` or `concat` over one');
     }
     if (apiPath === 'JSON.parse' && typeof args[0] === 'string') {
         try {
@@ -2480,7 +2493,11 @@ function checkPredicate(predicate, level, subject, scope, ctx, path) {
     )
         return;
     if (Array.isArray(predicate)) {
-        predicate.forEach((entry, index) => checkPredicate(entry, level, subject, scope, ctx, `${path}[${index}]`));
+        fail(
+            ctx,
+            path,
+            'an array is not a predicate: `{"in": [...]}` tests for one of several values, and `{"any": [...]}` one of several predicates',
+        );
         return;
     }
     if (!isPlainObject(predicate)) {
@@ -2530,6 +2547,12 @@ function checkOperators(predicate, subject, scope, ctx, path) {
     const has = (key) => Object.hasOwn(predicate, key);
 
     if (has('eq')) checkExpr(predicate.eq, 'value', child(scope), ctx, `${path}.eq`);
+    if (has('in')) {
+        // Each entry a value, an entry giving a list contributing each item
+        asArray(predicate.in).forEach((entry, index) =>
+            checkExpr(entry, 'value', child(scope), ctx, Array.isArray(predicate.in) ? `${path}.in[${index}]` : `${path}.in`),
+        );
+    }
     const comparisons = COMPARISON_OPERATORS.filter(has);
     for (const key of comparisons) checkExpr(predicate[key], 'number', child(scope), ctx, `${path}.${key}`);
 
@@ -2659,7 +2682,7 @@ function isLiteral(value) {
 }
 
 /**
- * The values a bucket holds for, when its predicate is a literal, an array of literals or
+ * The values a bucket holds for, when its predicate is a literal, `in` over literals or
  * comparisons against literals. Null for any other predicate, which the overlap check skips.
  *
  * @param {unknown} predicate
@@ -2681,16 +2704,13 @@ function simpleBucketSet(predicate) {
                 predicate,
             ],
         };
-    if (Array.isArray(predicate)) {
-        const sets = predicate.map(simpleBucketSet);
-        if (!predicate.every(isLiteral)) return null;
-        return {
-            intervals: sets.flatMap((set) => set?.intervals ?? []),
-            points: sets.flatMap((set) => set?.points ?? []),
-        };
-    }
     if (!isPlainObject(predicate)) return null;
     const keys = Object.keys(predicate);
+    if (keys.length === 1 && keys[0] === 'in') {
+        const entries = asArray(predicate.in);
+        if (!entries.every(isLiteral)) return null;
+        return { intervals: [], points: entries };
+    }
     if (!keys.length || !keys.every((key) => key === 'eq' || COMPARISON_OPERATORS.includes(key))) return null;
     if (keys.length === 1 && keys[0] === 'eq' && isLiteral(predicate.eq)) return simpleBucketSet(predicate.eq);
     if (!keys.every((key) => typeof predicate[key] === 'number')) return null;
@@ -4594,7 +4614,7 @@ describe('webDetection config tests', () => {
         });
 
         describe('shape', () => {
-            it('passes the shipped forms: leaves, legacy blocks, arrays and boolean literals', () => {
+            it('passes the shipped forms: leaves, legacy blocks and boolean literals', () => {
                 expectValid({ text: { pattern: 'foo' } });
                 expectValid({
                     text: {
@@ -4621,15 +4641,264 @@ describe('webDetection config tests', () => {
                         ],
                     },
                 });
-                expectValid([
-                    { text: { pattern: 'a' } },
-                    { element: { selector: '.x', visibility: 'visible' } },
-                ]);
+                expectValid({
+                    any: [
+                        { text: { pattern: 'a' } },
+                        { element: { selector: '.x', visibility: 'visible' } },
+                    ],
+                });
                 expectValid({
                     any: [
                         true,
                         false,
                     ],
+                });
+            });
+
+            it('rejects an array as an expression, in every position', () => {
+                const notExpression = 'an array is not an expression';
+                expectError(notExpression, [
+                    { text: { pattern: 'a' } },
+                    { element: { selector: '.x', visibility: 'visible' } },
+                ]);
+                expectError(notExpression, {
+                    all: [
+                        { text: { pattern: 'a' } },
+                        [
+                            true,
+                            false,
+                        ],
+                    ],
+                });
+                expectError(notExpression, {
+                    if: {
+                        test: [
+                            true,
+                        ],
+                        then: true,
+                        else: false,
+                    },
+                });
+                expectError(notExpression, {
+                    api: { path: 'document.title' },
+                    is: {
+                        eq: [
+                            'a',
+                        ],
+                    },
+                });
+                expectError(notExpression, true, {
+                    a: {
+                        value: [
+                            1,
+                            2,
+                        ],
+                    },
+                });
+                expectError(notExpression, {
+                    api: {
+                        path: 'Array.of',
+                        args: [
+                            [
+                                1,
+                            ],
+                        ],
+                    },
+                    is: {},
+                });
+            });
+
+            it('takes a list through `expr`, which stays a list', () => {
+                expectValid({
+                    any: {
+                        expr: [
+                            true,
+                            { text: { pattern: 'a' }, is: { length: { gt: 0 } } },
+                        ],
+                    },
+                });
+                expectValid({
+                    sum: {
+                        expr: [
+                            1,
+                            2,
+                        ],
+                    },
+                    is: 3,
+                });
+                expectValid({
+                    sum: [
+                        {
+                            expr: [
+                                1,
+                                2,
+                            ],
+                        },
+                        3,
+                    ],
+                    is: 6,
+                });
+                expectValid({
+                    only: {
+                        expr: [
+                            'a',
+                        ],
+                    },
+                    is: 'a',
+                });
+                expectValid({
+                    expr: [
+                        1,
+                        2,
+                    ],
+                    using: 'length',
+                    is: 2,
+                });
+                expectValid({
+                    api: {
+                        path: 'Math.max.apply',
+                        args: [
+                            null,
+                            {
+                                expr: [
+                                    1,
+                                    2,
+                                ],
+                            },
+                        ],
+                    },
+                    is: 2,
+                });
+                expectError('`expr` over an array, a list, fills', {
+                    expr: [
+                        true,
+                    ],
+                });
+                expectError('`expr` over an array, a list, fills', {
+                    div: [
+                        {
+                            expr: [
+                                6,
+                            ],
+                        },
+                        2,
+                    ],
+                    is: 3,
+                });
+            });
+
+            it('rejects an array as a predicate, which `in` and `any` replace', () => {
+                const notPredicate = 'an array is not a predicate';
+                const title = { api: { path: 'document.title' } };
+                expectError(notPredicate, {
+                    ...title,
+                    is: [
+                        'a',
+                        'b',
+                    ],
+                });
+                expectError(notPredicate, {
+                    element: {
+                        selector: 'img',
+                        where: [
+                            { complete: true },
+                        ],
+                    },
+                });
+                expectError(notPredicate, {
+                    element: {
+                        selector: 'img',
+                        where: {
+                            currentSrc: [
+                                'a',
+                                'b',
+                            ],
+                        },
+                    },
+                });
+                expectError(notPredicate, true, {
+                    a: {
+                        value: title,
+                        when: [
+                            'a',
+                            'b',
+                        ],
+                    },
+                });
+                expectValid({
+                    ...title,
+                    is: {
+                        in: [
+                            'a',
+                            'b',
+                        ],
+                    },
+                });
+                expectValid({ ...title, is: { in: 'a' } });
+                expectValid({
+                    ...title,
+                    is: {
+                        in: {
+                            expr: [
+                                'a',
+                                'b',
+                            ],
+                        },
+                    },
+                });
+                expectValid({
+                    ...title,
+                    is: {
+                        none: {
+                            in: [
+                                'a',
+                                'b',
+                            ],
+                        },
+                    },
+                });
+                expectValid({
+                    element: {
+                        selector: 'img',
+                        where: {
+                            currentSrc: {
+                                in: [
+                                    'a',
+                                    'b',
+                                ],
+                            },
+                        },
+                    },
+                });
+                expectValid(true, {
+                    a: {
+                        value: title,
+                        when: {
+                            in: [
+                                'a',
+                                'b',
+                            ],
+                        },
+                    },
+                });
+                // Each entry is an expression in value position
+                expectError('"document.cookie", which is not in API_ALLOWLIST', {
+                    ...title,
+                    is: {
+                        in: [
+                            { api: { path: 'document.cookie' } },
+                        ],
+                    },
+                });
+                expectError('an array is not an expression', {
+                    ...title,
+                    is: {
+                        in: [
+                            [
+                                'a',
+                            ],
+                        ],
+                    },
                 });
             });
 
@@ -4856,9 +5125,11 @@ describe('webDetection config tests', () => {
 
             it('takes string and null literals in value position only', () => {
                 expectError('A string fills', 'x');
-                expectError('`null` fills', [
-                    null,
-                ]);
+                expectError('`null` fills', {
+                    any: [
+                        null,
+                    ],
+                });
                 expectError('A string fills', {
                     sum: [
                         'x',
@@ -4886,12 +5157,6 @@ describe('webDetection config tests', () => {
                                 img,
                             ],
                         },
-                    },
-                    or: {
-                        value: [
-                            text,
-                            img,
-                        ],
                     },
                     always: { value: true },
                 });
@@ -5102,10 +5367,12 @@ describe('webDetection config tests', () => {
                     is: { gt: 0 },
                 });
                 expectValid({
-                    ...maxOf([
-                        1,
-                        { ...img, using: 'length' },
-                    ]),
+                    ...maxOf({
+                        expr: [
+                            1,
+                            { ...img, using: 'length' },
+                        ],
+                    }),
                     is: { gt: 0 },
                 });
                 expectValid({
@@ -5532,7 +5799,8 @@ describe('webDetection config tests', () => {
                         ],
                     }),
                 );
-                expectValid(
+                expectError(
+                    'an array is not a predicate',
                     items('input', [
                         { self: 'checked', is: true },
                         { type: 'checkbox' },
@@ -6062,7 +6330,7 @@ describe('webDetection config tests', () => {
                     },
                 });
                 expectError('at least one entry', { element: { selector: 'img', root: [] } });
-                expectError('An array, the OR of its entries,', {
+                expectError('an array is not an expression', {
                     element: {
                         selector: 'img',
                         root: [
@@ -6114,10 +6382,12 @@ describe('webDetection config tests', () => {
                     a: {
                         value: { api: { path: 'document.readyState' } },
                         buckets: {
-                            early: [
-                                'loading',
-                                'interactive',
-                            ],
+                            early: {
+                                in: [
+                                    'loading',
+                                    'interactive',
+                                ],
+                            },
                             mid: 'interactive',
                         },
                     },
@@ -6133,9 +6403,11 @@ describe('webDetection config tests', () => {
                     a: {
                         value: title,
                         buckets: {
-                            s: [
-                                true,
-                            ],
+                            s: {
+                                in: [
+                                    true,
+                                ],
+                            },
                             n: { gte: 1 },
                         },
                     },
