@@ -26,6 +26,7 @@ import { ClientBrandHintFeature } from './features/client-brand-hint';
 import { PreserveHeaderOrderFeature } from './features/preserve-header-order';
 import { Taskbar } from './features/taskbar';
 import { AppHealth } from './features/appHealth';
+import { DetectorPerfFeature } from './features/detector-perf';
 import { ElementHidingFeature } from './features/element-hiding';
 import { EventHubFeature } from './features/event-hub';
 import { ContentScopeExperimentsFeature, TdsExperimentsFeature } from './features/experiment-metrics';
@@ -106,6 +107,7 @@ export type ConfigV6<VersionType> = {
         blockList?: TdsExperimentsFeature<VersionType>;
         contentBlocking?: TdsExperimentsFeature<VersionType>;
         contentScopeExperiments?: ContentScopeExperimentsFeature<VersionType>;
+        detectorPerf?: DetectorPerfFeature<VersionType>;
         elementHiding?: ElementHidingFeature<VersionType>;
         eventHub?: EventHubFeature<VersionType>;
         requestBlocklist?: RequestBlocklistFeature<VersionType>;

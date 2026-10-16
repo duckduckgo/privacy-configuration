@@ -659,6 +659,908 @@
                         }
                     }
                 }
+            },
+            "webTelemetry_detectorPerf_day": {
+                "state": "enabled",
+                "trigger": {
+                    "period": {
+                        "days": 1
+                    }
+                },
+                "parameters": {
+                    "pagesMeasured": {
+                        "template": "counter",
+                        "source": "detectorPerf_measured",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "adwallsRan": {
+                        "template": "counter",
+                        "source": "detectorPerf_adwalls_ran",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "adwallsFailed": {
+                        "template": "counter",
+                        "source": "detectorPerf_adwalls_failed",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "adwallsOver8": {
+                        "template": "counter",
+                        "source": "detectorPerf_adwalls_over8ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "adwallsOver16": {
+                        "template": "counter",
+                        "source": "detectorPerf_adwalls_over16ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "adwallsOver50": {
+                        "template": "counter",
+                        "source": "detectorPerf_adwalls_over50ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "adwallsOver150": {
+                        "template": "counter",
+                        "source": "detectorPerf_adwalls_over150ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "adwallsTotalOver50": {
+                        "template": "counter",
+                        "source": "detectorPerf_adwalls_total_over50ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "adwallsTotalOver100": {
+                        "template": "counter",
+                        "source": "detectorPerf_adwalls_total_over100ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "adwallsTotalOver250": {
+                        "template": "counter",
+                        "source": "detectorPerf_adwalls_total_over250ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "adwallsTotalOver500": {
+                        "template": "counter",
+                        "source": "detectorPerf_adwalls_total_over500ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "captchaRan": {
+                        "template": "counter",
+                        "source": "detectorPerf_captcha_ran",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "captchaFailed": {
+                        "template": "counter",
+                        "source": "detectorPerf_captcha_failed",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "captchaOver8": {
+                        "template": "counter",
+                        "source": "detectorPerf_captcha_over8ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "captchaOver16": {
+                        "template": "counter",
+                        "source": "detectorPerf_captcha_over16ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "captchaOver50": {
+                        "template": "counter",
+                        "source": "detectorPerf_captcha_over50ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "captchaOver150": {
+                        "template": "counter",
+                        "source": "detectorPerf_captcha_over150ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "captchaTotalOver50": {
+                        "template": "counter",
+                        "source": "detectorPerf_captcha_total_over50ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "captchaTotalOver100": {
+                        "template": "counter",
+                        "source": "detectorPerf_captcha_total_over100ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "captchaTotalOver250": {
+                        "template": "counter",
+                        "source": "detectorPerf_captcha_total_over250ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "captchaTotalOver500": {
+                        "template": "counter",
+                        "source": "detectorPerf_captcha_total_over500ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "commentsDisabledRan": {
+                        "template": "counter",
+                        "source": "detectorPerf_commentsDisabled_ran",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "commentsDisabledFailed": {
+                        "template": "counter",
+                        "source": "detectorPerf_commentsDisabled_failed",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "commentsDisabledOver8": {
+                        "template": "counter",
+                        "source": "detectorPerf_commentsDisabled_over8ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "commentsDisabledOver16": {
+                        "template": "counter",
+                        "source": "detectorPerf_commentsDisabled_over16ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "commentsDisabledOver50": {
+                        "template": "counter",
+                        "source": "detectorPerf_commentsDisabled_over50ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "commentsDisabledOver150": {
+                        "template": "counter",
+                        "source": "detectorPerf_commentsDisabled_over150ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "commentsDisabledTotalOver50": {
+                        "template": "counter",
+                        "source": "detectorPerf_commentsDisabled_total_over50ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "commentsDisabledTotalOver100": {
+                        "template": "counter",
+                        "source": "detectorPerf_commentsDisabled_total_over100ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "commentsDisabledTotalOver250": {
+                        "template": "counter",
+                        "source": "detectorPerf_commentsDisabled_total_over250ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "commentsDisabledTotalOver500": {
+                        "template": "counter",
+                        "source": "detectorPerf_commentsDisabled_total_over500ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "otherRan": {
+                        "template": "counter",
+                        "source": "detectorPerf_other_ran",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "otherFailed": {
+                        "template": "counter",
+                        "source": "detectorPerf_other_failed",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "otherOver8": {
+                        "template": "counter",
+                        "source": "detectorPerf_other_over8ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "otherOver16": {
+                        "template": "counter",
+                        "source": "detectorPerf_other_over16ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "otherOver50": {
+                        "template": "counter",
+                        "source": "detectorPerf_other_over50ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "otherOver150": {
+                        "template": "counter",
+                        "source": "detectorPerf_other_over150ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "otherTotalOver50": {
+                        "template": "counter",
+                        "source": "detectorPerf_other_total_over50ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "otherTotalOver100": {
+                        "template": "counter",
+                        "source": "detectorPerf_other_total_over100ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "otherTotalOver250": {
+                        "template": "counter",
+                        "source": "detectorPerf_other_total_over250ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "otherTotalOver500": {
+                        "template": "counter",
+                        "source": "detectorPerf_other_total_over500ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "combinedOver100": {
+                        "template": "counter",
+                        "source": "detectorPerf_combined_over100ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "combinedOver250": {
+                        "template": "counter",
+                        "source": "detectorPerf_combined_over250ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "combinedOver500": {
+                        "template": "counter",
+                        "source": "detectorPerf_combined_over500ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    }
+                }
+            },
+            "webTelemetry_detectorPerf_week": {
+                "state": "enabled",
+                "trigger": {
+                    "period": {
+                        "days": 7
+                    }
+                },
+                "parameters": {
+                    "pagesMeasured": {
+                        "template": "counter",
+                        "source": "detectorPerf_measured",
+                        "buckets": {
+                            "0": { "gte": 0, "lt": 1 },
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "adwallsRan": {
+                        "template": "counter",
+                        "source": "detectorPerf_adwalls_ran",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "adwallsFailed": {
+                        "template": "counter",
+                        "source": "detectorPerf_adwalls_failed",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "adwallsOver8": {
+                        "template": "counter",
+                        "source": "detectorPerf_adwalls_over8ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "adwallsOver16": {
+                        "template": "counter",
+                        "source": "detectorPerf_adwalls_over16ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "adwallsOver50": {
+                        "template": "counter",
+                        "source": "detectorPerf_adwalls_over50ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "adwallsOver150": {
+                        "template": "counter",
+                        "source": "detectorPerf_adwalls_over150ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "adwallsTotalOver50": {
+                        "template": "counter",
+                        "source": "detectorPerf_adwalls_total_over50ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "adwallsTotalOver100": {
+                        "template": "counter",
+                        "source": "detectorPerf_adwalls_total_over100ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "adwallsTotalOver250": {
+                        "template": "counter",
+                        "source": "detectorPerf_adwalls_total_over250ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "adwallsTotalOver500": {
+                        "template": "counter",
+                        "source": "detectorPerf_adwalls_total_over500ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "captchaRan": {
+                        "template": "counter",
+                        "source": "detectorPerf_captcha_ran",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "captchaFailed": {
+                        "template": "counter",
+                        "source": "detectorPerf_captcha_failed",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "captchaOver8": {
+                        "template": "counter",
+                        "source": "detectorPerf_captcha_over8ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "captchaOver16": {
+                        "template": "counter",
+                        "source": "detectorPerf_captcha_over16ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "captchaOver50": {
+                        "template": "counter",
+                        "source": "detectorPerf_captcha_over50ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "captchaOver150": {
+                        "template": "counter",
+                        "source": "detectorPerf_captcha_over150ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "captchaTotalOver50": {
+                        "template": "counter",
+                        "source": "detectorPerf_captcha_total_over50ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "captchaTotalOver100": {
+                        "template": "counter",
+                        "source": "detectorPerf_captcha_total_over100ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "captchaTotalOver250": {
+                        "template": "counter",
+                        "source": "detectorPerf_captcha_total_over250ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "captchaTotalOver500": {
+                        "template": "counter",
+                        "source": "detectorPerf_captcha_total_over500ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "commentsDisabledRan": {
+                        "template": "counter",
+                        "source": "detectorPerf_commentsDisabled_ran",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "commentsDisabledFailed": {
+                        "template": "counter",
+                        "source": "detectorPerf_commentsDisabled_failed",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "commentsDisabledOver8": {
+                        "template": "counter",
+                        "source": "detectorPerf_commentsDisabled_over8ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "commentsDisabledOver16": {
+                        "template": "counter",
+                        "source": "detectorPerf_commentsDisabled_over16ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "commentsDisabledOver50": {
+                        "template": "counter",
+                        "source": "detectorPerf_commentsDisabled_over50ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "commentsDisabledOver150": {
+                        "template": "counter",
+                        "source": "detectorPerf_commentsDisabled_over150ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "commentsDisabledTotalOver50": {
+                        "template": "counter",
+                        "source": "detectorPerf_commentsDisabled_total_over50ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "commentsDisabledTotalOver100": {
+                        "template": "counter",
+                        "source": "detectorPerf_commentsDisabled_total_over100ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "commentsDisabledTotalOver250": {
+                        "template": "counter",
+                        "source": "detectorPerf_commentsDisabled_total_over250ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "commentsDisabledTotalOver500": {
+                        "template": "counter",
+                        "source": "detectorPerf_commentsDisabled_total_over500ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "otherRan": {
+                        "template": "counter",
+                        "source": "detectorPerf_other_ran",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "otherFailed": {
+                        "template": "counter",
+                        "source": "detectorPerf_other_failed",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "otherOver8": {
+                        "template": "counter",
+                        "source": "detectorPerf_other_over8ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "otherOver16": {
+                        "template": "counter",
+                        "source": "detectorPerf_other_over16ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "otherOver50": {
+                        "template": "counter",
+                        "source": "detectorPerf_other_over50ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "otherOver150": {
+                        "template": "counter",
+                        "source": "detectorPerf_other_over150ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "otherTotalOver50": {
+                        "template": "counter",
+                        "source": "detectorPerf_other_total_over50ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "otherTotalOver100": {
+                        "template": "counter",
+                        "source": "detectorPerf_other_total_over100ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "otherTotalOver250": {
+                        "template": "counter",
+                        "source": "detectorPerf_other_total_over250ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "otherTotalOver500": {
+                        "template": "counter",
+                        "source": "detectorPerf_other_total_over500ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "combinedOver100": {
+                        "template": "counter",
+                        "source": "detectorPerf_combined_over100ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "combinedOver250": {
+                        "template": "counter",
+                        "source": "detectorPerf_combined_over250ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    },
+                    "combinedOver500": {
+                        "template": "counter",
+                        "source": "detectorPerf_combined_over500ms",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-7": { "gte": 2, "lt": 8 },
+                            "8-39": { "gte": 8, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    }
+                }
             }
         }
     }
