@@ -1235,25 +1235,6 @@
                                         "value": {
                                             "ref": "route"
                                         }
-                                    },
-                                    "status": {
-                                        "value": {
-                                            "if": {
-                                                "api": {
-                                                    "path": "Reflect.has",
-                                                    "args": [
-                                                        {
-                                                            "api": "PerformanceResourceTiming.prototype"
-                                                        },
-                                                        "responseStatus"
-                                                    ]
-                                                }
-                                            },
-                                            "then": {
-                                                "ref": "status"
-                                            },
-                                            "else": "unsupported"
-                                        }
                                     }
                                 }
                             }
@@ -1514,25 +1495,6 @@
                                         "value": {
                                             "ref": "route"
                                         }
-                                    },
-                                    "status": {
-                                        "value": {
-                                            "if": {
-                                                "api": {
-                                                    "path": "Reflect.has",
-                                                    "args": [
-                                                        {
-                                                            "api": "PerformanceResourceTiming.prototype"
-                                                        },
-                                                        "responseStatus"
-                                                    ]
-                                                }
-                                            },
-                                            "then": {
-                                                "ref": "status"
-                                            },
-                                            "else": "unsupported"
-                                        }
                                     }
                                 }
                             }
@@ -1741,11 +1703,6 @@
                                     "data": {
                                         "route": {
                                             "value": "errorStatus"
-                                        },
-                                        "status": {
-                                            "value": {
-                                                "ref": "status"
-                                            }
                                         },
                                         "bodyTextLength": {
                                             "value": {
@@ -2700,11 +2657,6 @@
                             {
                                 "breakageReportData": {
                                     "data": {
-                                        "loadEventEnd": {
-                                            "value": {
-                                                "ref": "loadEventEnd"
-                                            }
-                                        },
                                         "failedScripts": {
                                             "value": {
                                                 "ref": "failedScripts"
@@ -2864,11 +2816,6 @@
                         {
                             "breakageReportData": {
                                 "data": {
-                                    "bodySize": {
-                                        "value": {
-                                            "ref": "bodySize"
-                                        }
-                                    },
                                     "media": {
                                         "value": {
                                             "ref": "media"
@@ -3038,32 +2985,6 @@
                                 }
                             },
                             {
-                                "breakageReportData": {
-                                    "data": {
-                                        "loadEventEnd": {
-                                            "value": {
-                                                "ref": "loadEventEnd"
-                                            }
-                                        },
-                                        "elapsed": {
-                                            "value": {
-                                                "ref": "elapsed"
-                                            }
-                                        },
-                                        "navigationType": {
-                                            "value": {
-                                                "ref": "navigationType"
-                                            }
-                                        },
-                                        "hiddenDuringLoad": {
-                                            "value": {
-                                                "ref": "hiddenDuringLoad"
-                                            }
-                                        }
-                                    }
-                                }
-                            },
-                            {
                                 "if": {
                                     "all": [
                                         {
@@ -3187,6 +3108,9 @@
                                         }
                                     },
                                     {
+                                        "breakageReportData": {}
+                                    },
+                                    {
                                         "define": {
                                             "this.sent": true
                                         }
@@ -3205,6 +3129,165 @@
                             }
                         ]
                     }
+                },
+                "navigation": {
+                    "state": "disabled",
+                    "triggers": {
+                        "breakageReport": {
+                            "state": "enabled",
+                            "runConditions": {
+                                "context": {
+                                    "top": true
+                                }
+                            }
+                        }
+                    },
+                    "actions": [
+                        {
+                            "define": {
+                                "loadEventEnd": {
+                                    "only": {
+                                        "api": {
+                                            "path": "performance.getEntriesByType",
+                                            "args": [
+                                                "navigation"
+                                            ],
+                                            "field": "loadEventEnd"
+                                        }
+                                    }
+                                },
+                                "elapsed": {
+                                    "api": {
+                                        "path": "performance.now",
+                                        "args": []
+                                    }
+                                },
+                                "navigationType": {
+                                    "only": {
+                                        "api": {
+                                            "path": "performance.getEntriesByType",
+                                            "args": [
+                                                "navigation"
+                                            ],
+                                            "field": "type"
+                                        }
+                                    }
+                                },
+                                "hiddenDuringLoad": {
+                                    "if": {
+                                        "api": {
+                                            "path": "PerformanceObserver.supportedEntryTypes.includes",
+                                            "args": [
+                                                "visibility-state"
+                                            ]
+                                        }
+                                    },
+                                    "then": {
+                                        "api": {
+                                            "path": "performance.getEntriesByName",
+                                            "args": [
+                                                "hidden",
+                                                "visibility-state"
+                                            ],
+                                            "where": {
+                                                "startTime": {
+                                                    "lt": {
+                                                        "if": {
+                                                            "ref": "loadEventEnd",
+                                                            "is": 0
+                                                        },
+                                                        "then": {
+                                                            "ref": "elapsed"
+                                                        },
+                                                        "else": {
+                                                            "ref": "loadEventEnd"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "using": "length",
+                                        "is": {
+                                            "gt": 0
+                                        }
+                                    },
+                                    "else": "unsupported"
+                                },
+                                "status": {
+                                    "only": {
+                                        "api": {
+                                            "path": "performance.getEntriesByType",
+                                            "args": [
+                                                "navigation"
+                                            ],
+                                            "field": "responseStatus"
+                                        }
+                                    }
+                                },
+                                "bodySize": {
+                                    "only": {
+                                        "api": {
+                                            "path": "performance.getEntriesByType",
+                                            "args": [
+                                                "navigation"
+                                            ],
+                                            "field": "decodedBodySize"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "breakageReportData": {
+                                "data": {
+                                    "loadEventEnd": {
+                                        "value": {
+                                            "ref": "loadEventEnd"
+                                        }
+                                    },
+                                    "elapsed": {
+                                        "value": {
+                                            "ref": "elapsed"
+                                        }
+                                    },
+                                    "navigationType": {
+                                        "value": {
+                                            "ref": "navigationType"
+                                        }
+                                    },
+                                    "hiddenDuringLoad": {
+                                        "value": {
+                                            "ref": "hiddenDuringLoad"
+                                        }
+                                    },
+                                    "status": {
+                                        "value": {
+                                            "if": {
+                                                "api": {
+                                                    "path": "Reflect.has",
+                                                    "args": [
+                                                        {
+                                                            "api": "PerformanceResourceTiming.prototype"
+                                                        },
+                                                        "responseStatus"
+                                                    ]
+                                                }
+                                            },
+                                            "then": {
+                                                "ref": "status"
+                                            },
+                                            "else": "unsupported"
+                                        }
+                                    },
+                                    "bodySize": {
+                                        "value": {
+                                            "ref": "bodySize"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ]
                 }
             },
             "styleBreakage": {
@@ -3345,11 +3428,6 @@
                                     "unappliedStylesheets": {
                                         "value": {
                                             "ref": "unappliedStylesheets"
-                                        }
-                                    },
-                                    "loadEventEnd": {
-                                        "value": {
-                                            "ref": "loadEventEnd"
                                         }
                                     }
                                 }
