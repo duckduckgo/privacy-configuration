@@ -1364,6 +1364,21 @@
                         "conditionalChanges": [
                             {
                                 "condition": [
+                                    { "domain": "account.greenbacktaxservices.com" }
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "form[action*=\"AppLogin\"] input[type=\"password\"]",
+                                            "type": "credentials.password.current"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "condition": [
                                     { "domain": "www.aestheticcity.academy" }
                                 ],
                                 "patchSettings": [
