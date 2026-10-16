@@ -4,6 +4,7 @@ import fetch from 'node-fetch';
 import {
     addCnameEntriesToAllowlist,
     collapseEventHubTelemetryPeriods,
+    sequenceWebDetectionActions,
     inlineReasonArrays,
     mergeAllowlistedTrackers,
     mergeEventHubTelemetry,
@@ -395,6 +396,10 @@ async function buildPlatforms() {
         // Clients read eventHub periods as integer seconds; collapse any authored unit object
         // (days/hours/minutes) to seconds so period pixels are not silently dropped.
         collapseEventHubTelemetryPeriods(platformConfig);
+
+        if (platform === 'ios' || platform === 'macos') {
+            sequenceWebDetectionActions(platformConfig);
+        }
 
         platformConfigs[platform] = platformConfig;
 
