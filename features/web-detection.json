@@ -1334,28 +1334,6 @@
                                     {
                                         "ref": "status",
                                         "is": {
-                                            "gte": 200,
-                                            "lt": 300
-                                        }
-                                    }
-                                ]
-                            },
-                            "then": {
-                                "fireEvent": {
-                                    "type": "forbiddenPage_bareForbidden_status2xx"
-                                }
-                            }
-                        },
-                        {
-                            "if": {
-                                "all": [
-                                    {
-                                        "ref": "route",
-                                        "is": "bareForbidden"
-                                    },
-                                    {
-                                        "ref": "status",
-                                        "is": {
                                             "gte": 400,
                                             "lt": 500
                                         }
@@ -1635,28 +1613,6 @@
                                     {
                                         "ref": "status",
                                         "is": {
-                                            "gte": 200,
-                                            "lt": 300
-                                        }
-                                    }
-                                ]
-                            },
-                            "then": {
-                                "fireEvent": {
-                                    "type": "rateLimitedPage_bareTooManyRequests_status2xx"
-                                }
-                            }
-                        },
-                        {
-                            "if": {
-                                "all": [
-                                    {
-                                        "ref": "route",
-                                        "is": "bareTooManyRequests"
-                                    },
-                                    {
-                                        "ref": "status",
-                                        "is": {
                                             "gte": 400,
                                             "lt": 500
                                         }
@@ -1772,19 +1728,24 @@
                         },
                         {
                             "if": {
-                                "ref": "bodyTextLength",
+                                "ref": "status",
                                 "is": {
-                                    "lt": 2000
+                                    "gte": 400
                                 }
                             },
                             "then": {
                                 "define": {
-                                    "route": "littleText"
+                                    "route": "errorStatus"
                                 },
                                 "breakageReportData": {
                                     "data": {
                                         "route": {
-                                            "value": "littleText"
+                                            "value": "errorStatus"
+                                        },
+                                        "status": {
+                                            "value": {
+                                                "ref": "status"
+                                            }
                                         },
                                         "bodyTextLength": {
                                             "value": {
@@ -1796,24 +1757,19 @@
                             },
                             "else": {
                                 "if": {
-                                    "ref": "status",
+                                    "ref": "bodyTextLength",
                                     "is": {
-                                        "gte": 400
+                                        "lt": 2000
                                     }
                                 },
                                 "then": {
                                     "define": {
-                                        "route": "errorStatus"
+                                        "route": "littleText"
                                     },
                                     "breakageReportData": {
                                         "data": {
                                             "route": {
-                                                "value": "errorStatus"
-                                            },
-                                            "status": {
-                                                "value": {
-                                                    "ref": "status"
-                                                }
+                                                "value": "littleText"
                                             },
                                             "bodyTextLength": {
                                                 "value": {
@@ -3295,6 +3251,16 @@
                                 "is": {
                                     "gt": 0
                                 }
+                            },
+                            {
+                                "element": {
+                                    "selector": "link[rel~='stylesheet']:not([disabled])",
+                                    "where": {
+                                        "sheet": {
+                                            "type": "null"
+                                        }
+                                    }
+                                }
                             }
                         ]
                     },
@@ -3391,16 +3357,25 @@
                         },
                         {
                             "if": {
-                                "ref": "failedStylesheets",
-                                "is": {
-                                    "type": "number",
-                                    "gte": 1
-                                }
+                                "all": [
+                                    {
+                                        "ref": "unappliedStylesheets",
+                                        "is": {
+                                            "gte": 1
+                                        }
+                                    },
+                                    {
+                                        "ref": "loadEventEnd",
+                                        "is": {
+                                            "gt": 0
+                                        }
+                                    }
+                                ]
                             },
                             "then": [
                                 {
                                     "if": {
-                                        "ref": "failedStylesheets",
+                                        "ref": "unappliedStylesheets",
                                         "is": 1
                                     },
                                     "then": {
@@ -3411,7 +3386,7 @@
                                 },
                                 {
                                     "if": {
-                                        "ref": "failedStylesheets",
+                                        "ref": "unappliedStylesheets",
                                         "is": {
                                             "gte": 2,
                                             "lt": 5
@@ -3425,7 +3400,7 @@
                                 },
                                 {
                                     "if": {
-                                        "ref": "failedStylesheets",
+                                        "ref": "unappliedStylesheets",
                                         "is": {
                                             "gte": 5
                                         }
@@ -3541,6 +3516,12 @@
                                             "naturalWidth": 0,
                                             "currentSrc.length": {
                                                 "gt": 0
+                                            },
+                                            "width": {
+                                                "gte": 16
+                                            },
+                                            "height": {
+                                                "gte": 16
                                             }
                                         }
                                     },
@@ -3661,13 +3642,13 @@
                                     "if": {
                                         "ref": "brokenShare",
                                         "is": {
-                                            "gte": 0,
-                                            "lt": 0.1
+                                            "gte": 0.1,
+                                            "lt": 0.25
                                         }
                                     },
                                     "then": {
                                         "fireEvent": {
-                                            "type": "brokenImages_shareUnder10"
+                                            "type": "brokenImages_share10to25"
                                         }
                                     }
                                 },
@@ -3675,13 +3656,13 @@
                                     "if": {
                                         "ref": "brokenShare",
                                         "is": {
-                                            "gte": 0.1,
+                                            "gte": 0.25,
                                             "lt": 0.5
                                         }
                                     },
                                     "then": {
                                         "fireEvent": {
-                                            "type": "brokenImages_share10to50"
+                                            "type": "brokenImages_share25to50"
                                         }
                                     }
                                 },
