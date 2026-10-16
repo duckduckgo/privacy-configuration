@@ -67,22 +67,20 @@ export type MatchConditionSingle = {
     [K in keyof ConditionTypes]?: ConditionBranch<ConditionTypes[K]>;
 };
 
-/** `^[a-zA-Z][a-zA-Z0-9_]*$` */
+/** `^(this\.)?[a-zA-Z][a-zA-Z0-9_]*$`: a run name, or with `this.` a detector name. */
 type Name = string;
 
-/** Keys that sit beside an expression key, applied in the order `using`, `as`, `is`. */
+/** `^[a-zA-Z][a-zA-Z0-9_]*$`, never `nativeData`. */
+type PayloadKey = string;
+
+/** Keys that sit beside an expression key, applied in the order `using`, `is`. */
 type Modifiers = {
     /**
      * An expression over the expression's value, which `self` reads. A path or an `api` body is short
-     * for a `self` with that body. `"length"` on a list reads only as many items as its tests need.
+     * for a `self` with that body. `"length"` on a list is the number of its items.
      */
     using?: string | UsingBody | ExprObject;
-    /** Names the expression's value for `ref` and payloads. Unique within the detector. */
-    as?: Name;
-    /**
-     * Tests the value, giving a boolean. In boolean or value position, on one expression key, or several
-     * beside `using`. `as` beside it names the value tested.
-     */
+    /** Tests the value, giving a boolean. In boolean or value position, on one expression key, or several beside `using`. */
     is?: Predicate;
 };
 
@@ -176,10 +174,7 @@ type ExprKeys = {
     api: string | ApiBody;
     /** Reads from the value the innermost `using`, `where` or `field` binds. A string is short for `{ path }`. */
     self: string | SelfBody;
-    /**
-     * Its operand's value, so modifiers stack. With `is` on the operand, `as` beside `expr` names the boolean.
-     * Over an array, a list of the entries' values.
-     */
+    /** Its operand's value, so modifiers stack. Over an array, a list of the entries' values. */
     expr: Expr | Expr[];
     only: Expr;
     sum: Operands;
@@ -188,11 +183,19 @@ type ExprKeys = {
         Expr,
         Expr,
     ];
-    if: { test: Expr; then: Expr; else: Expr };
+    /** The condition, in boolean position. `then` and `else` sit beside it. */
+    if: Expr;
     any: Operands;
     all: Operands;
     none: Operands;
+    /** The binding of a name at the time of the read, or `undefined` when unbound. */
     ref: Name;
+};
+
+/** The branches of `if`, valid only beside it. The value of the branch taken, or `undefined` with no branch taken. */
+type Branches = {
+    then?: Body;
+    else?: Body;
 };
 
 /**
@@ -200,8 +203,30 @@ type ExprKeys = {
  * and never beside `is`. Placement and types are checked by the parser and CI, not by these types.
  * An array is never an expression: the key holding it decides what it means.
  */
-export type ExprObject = Partial<ExprKeys> & Modifiers;
-export type Expr = number | boolean | string | null | ExprObject;
+export type ExprObject = Partial<ExprKeys> & Modifiers & Branches;
+
+/**
+ * One or more action keys, run in the order config lists them, never beside an expression key or a
+ * modifier. An action gives `undefined`, in value position only.
+ */
+export type ActionObject = Partial<{
+    /** Sends a `webEvent` of `type`, with the payload. */
+    fireEvent: {
+        type: string;
+        data?: PayloadSpec;
+    };
+    /** Writes the detector's entry in breakage reports, merging `data` into it. */
+    breakageReportData: {
+        data?: PayloadSpec;
+    };
+    /** Binds each name to its value, in the order config lists them. `x` lasts for the run, `this.x` for the detector in its frame. */
+    define: Record<Name, Expr>;
+}>;
+
+export type Expr = number | boolean | string | null | ExprObject | ActionObject;
+
+/** An expression, or a sequence of them evaluated in order, giving the last one's value. */
+export type Body = Expr | Expr[];
 
 export type PayloadField = {
     /** An expression in value position. */
@@ -215,41 +240,20 @@ export type PayloadField = {
     buckets?: Record<string, Predicate>;
 };
 
-/** Payload key to field. Keys match `^[a-zA-Z][a-zA-Z0-9_]*$` and are never `nativeData`. */
-export type PayloadSpec = Record<Name, PayloadField>;
+/** Payload key to field. */
+export type PayloadSpec = Record<PayloadKey, PayloadField>;
 
 /**
- * One action item. Items are evaluated in array order on each run: an item runs when its `when`
- * holds or it has no `when`, and then sends its `fireEvent`, writes its `breakageReportData`, stores
- * its `define` values and applies its `exit`. A failure no `fails` handles, in `when`, a payload or a
- * `define` value, ends the run, and is recorded in the detector's breakage entry. An item holds at
- * least one key other than `when`.
+ * Each run evaluates `match`, then `actions` when it holds or is absent. A `match` that holds makes
+ * the detector done, and it runs no more in the frame. A failure no `fails` handles ends the run, and
+ * is recorded in the detector's breakage entry under its config path.
  */
-export type ActionItem = {
-    /** An expression in boolean position. */
-    when?: Expr;
-    /** Sends a `webEvent` of `type`, with the payload. */
-    fireEvent?: {
-        type: string;
-        data?: PayloadSpec;
-    };
-    /** Writes the detector's entry in breakage reports, merging `data` into it. */
-    breakageReportData?: {
-        data?: PayloadSpec;
-    };
-    /**
-     * Stores each value for the detector's later items and runs, read with `ref`. `done` is reserved:
-     * a detector whose `done` holds `true` when a run ends runs no more in the frame.
-     */
-    define?: Record<Name, Expr>;
-    /** Ends the run. */
-    exit?: true;
-};
-
 export type DetectorConfig = {
     state?: FeatureState;
     triggers?: Triggers;
-    actions: ActionItem[];
+    /** An expression in boolean position, reading the page only. */
+    match?: Expr;
+    actions: Body;
 };
 
 type LegacyActions = Partial<{
@@ -261,8 +265,9 @@ type LegacyActions = Partial<{
 }>;
 
 /**
- * The shape clients read before action lists: `match`, and actions that run when it holds. Literal
- * config keeps it for those clients, and gated patches move each detector to a `DetectorConfig`.
+ * The shape clients read before `actions` expressions: `match`, and actions with `state` that run when
+ * it holds. Literal config keeps it for those clients, and gated patches move each detector to a
+ * `DetectorConfig`.
  */
 export type LegacyDetectorConfig = {
     state?: FeatureState;

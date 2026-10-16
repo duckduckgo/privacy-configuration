@@ -1,5 +1,6 @@
 import { expect } from 'chai';
 import fs from 'fs';
+import { isDeepStrictEqual } from 'node:util';
 import { immutableJSONPatch } from 'immutable-json-patch';
 import xpath from 'xpath';
 import platforms from '../platforms.js';
@@ -13,8 +14,11 @@ const OPERATOR_KEYS = [
     'none',
 ];
 
-/** `as` names, payload keys, and group and detector names. */
+/** Payload keys, and group and detector names. */
 const NAME_PATTERN = /^[a-zA-Z][a-zA-Z0-9_]*$/;
+
+/** Names `define` binds: a run name, or with `this.` a detector name. */
+const DEFINE_NAME_PATTERN = /^(this\.)?[a-zA-Z][a-zA-Z0-9_]*$/;
 
 const SOURCE_KEYS = [
     'element',
@@ -35,11 +39,16 @@ const EXPRESSION_KEYS = [
     'ref',
 ];
 
-/** In the order they apply: `using` binds `self` to the expression's value, `as` names the result and `is` tests it. */
+/** In the order they apply: `using` binds `self` to the expression's value, and `is` tests the result. */
 const MODIFIER_KEYS = [
     'using',
-    'as',
     'is',
+];
+
+/** Keys valid only beside `if`. */
+const BRANCH_KEYS = [
+    'then',
+    'else',
 ];
 
 const BODY_KEYS = {
@@ -114,28 +123,18 @@ const PAYLOAD_FIELD_KEYS = [
     'buckets',
 ];
 
-/** Keys of a detector with an action list. */
+/** Keys of a detector. */
 const DETECTOR_KEYS = [
     'state',
     'triggers',
+    'match',
     'actions',
 ];
 
-/** Keys of an action item. */
-const ITEM_KEYS = [
-    'when',
-    'fireEvent',
-    'breakageReportData',
-    'define',
-    'exit',
-];
-
-/** The item keys that act: an item holds at least one. */
+/** The keys that make an object an action. */
 const ACTION_KEYS = [
-    'fireEvent',
-    'breakageReportData',
+    ...PAYLOAD_ACTIONS,
     'define',
-    'exit',
 ];
 
 /**
@@ -162,6 +161,9 @@ const API_ALLOWLIST = {
     Number: 'property',
     'Number.isFinite': 'method',
     'Number.isNaN': 'method',
+    PerformanceObserver: 'property',
+    'PerformanceObserver.supportedEntryTypes': 'property',
+    'PerformanceObserver.supportedEntryTypes.includes': 'method',
     PerformanceResourceTiming: 'property',
     'PerformanceResourceTiming.prototype': 'property',
     Reflect: 'property',
@@ -479,14 +481,17 @@ function forEachSource(node, path, cb) {
                 if ('where' in value) forEachPredicateSource(value.where, 'item', `${childPath}.where`, cb);
                 if ('field' in value) forEachFieldSource(value.field, `${childPath}.field`, cb);
             }
-        } else if (key === 'if') {
+        } else if (BRANCH_KEYS.includes(key)) {
+            forEachSource(value, childPath, cb);
+        } else if (PAYLOAD_ACTIONS.includes(key)) {
+            if (isPlainObject(value)) forEachPayloadSource(value.data, `${childPath}.data`, cb);
+        } else if (key === 'define') {
             if (!isPlainObject(value)) continue;
-            for (const branch of [
-                'test',
-                'then',
-                'else',
-            ]) {
-                forEachSource(value[branch], `${childPath}.${branch}`, cb);
+            for (const [
+                name,
+                defined,
+            ] of Object.entries(value)) {
+                forEachSource(defined, `${childPath}.${name}`, cb);
             }
         } else if (key === 'is') {
             forEachPredicateSource(value, 'value', childPath, cb);
@@ -577,37 +582,16 @@ function forEachPayloadSource(data, path, cb) {
 }
 
 /**
- * Invoke `cb` for every source in a detector: each item's `when`, payloads and `define` values, or in
- * the legacy shape, the match tree and payloads.
+ * Invoke `cb` for every source in a detector: its `match`, and its `actions` with their payloads and
+ * `define` values, in every branch and sequence.
  *
  * @param {Record<string, any>} detector
  * @param {string} path
  * @param {(key: string, body: unknown, path: string) => void} cb
  */
 function forEachDetectorSource(detector, path, cb) {
-    if (Array.isArray(detector.actions)) {
-        detector.actions.forEach((/** @type {unknown} */ item, /** @type {number} */ index) => {
-            if (!isPlainObject(item)) return;
-            const itemPath = `${path}.actions[${index}]`;
-            forEachSource(item.when, `${itemPath}.when`, cb);
-            for (const action of PAYLOAD_ACTIONS) {
-                if (isPlainObject(item[action])) forEachPayloadSource(item[action].data, `${itemPath}.${action}.data`, cb);
-            }
-            if (isPlainObject(item.define)) {
-                for (const [
-                    name,
-                    value,
-                ] of Object.entries(item.define)) {
-                    forEachSource(value, `${itemPath}.define.${name}`, cb);
-                }
-            }
-        });
-        return;
-    }
     forEachSource(detector.match, `${path}.match`, cb);
-    for (const action of PAYLOAD_ACTIONS) {
-        forEachPayloadSource(detector.actions?.[action]?.data, `${path}.actions.${action}.data`, cb);
-    }
+    forEachSource(detector.actions, `${path}.actions`, cb);
 }
 
 /**
@@ -781,6 +765,7 @@ function forEachWebDetectionConfig(cb) {
  *   customElement?: boolean,
  *   apiPaths?: string[],
  *   list?: 'selected' | 'maybe',
+ *   leaf?: boolean,
  *   nonNumericStrings?: boolean,
  * }} StaticType
  *
@@ -793,6 +778,9 @@ function forEachWebDetectionConfig(cb) {
  * `list` marks a selected list, and the other keys then describe its items. `selected` is what
  * `element`, `text` and `api` with `where` give. `maybe` is a value that is a selected list on
  * some pages or branches only: an `api` with `field`, or an `if` with one list branch.
+ *
+ * `leaf` marks the selected list of `element` without `field` or `text`, the condition leaf, which
+ * in boolean position holds when it has an item.
  *
  * `nonNumericStrings` is set when every string the value can be is a literal that converts to
  * NaN, such as `"unsupported"`, so a comparison on it is false.
@@ -856,6 +844,7 @@ function mergeTypes(list) {
     if (merged.types && withStrings.length && withStrings.every((entry) => entry.nonNumericStrings)) merged.nonNumericStrings = true;
     if (list.length && list.every((entry) => entry.list === 'selected')) merged.list = 'selected';
     else if (list.some((entry) => entry.list !== undefined)) merged.list = 'maybe';
+    if (list.length && list.every((entry) => entry.leaf)) merged.leaf = true;
     return merged;
 }
 
@@ -866,6 +855,7 @@ function mergeTypes(list) {
 function itemOf(type) {
     const item = { ...type };
     delete item.list;
+    delete item.leaf;
     return item;
 }
 
@@ -1137,60 +1127,51 @@ function describeInterfaces(interfaces) {
  * @typedef {{
  *   inMatch: boolean,
  *   underNone: boolean,
- *   branch: string[],
- *   topOperand: number | null,
- *   matchRoot: boolean,
- *   owners: string[],
+ *   conditionRoot: boolean,
+ *   guards: unknown[],
  *   bound?: StaticType,
  *   perItem?: boolean,
- *   perItemBranch?: boolean,
  *   noneAbove?: boolean,
- *   item?: number,
  * }} Scope
  *
- * `branch` lists the `if` branches around the expression. `topOperand` is the index of the
- * operand of match's top-level `all` holding it. `owners` lists the `as` names around it.
- * `bound` is the type `self` reads, set inside `using`, `where` and `field`. `perItem` is set where
- * `self` reads a value per item: inside `where` and `field`, and inside a `using` beside an
- * expression that reads such a `self`. `perItemBranch` is set inside the branches of an `if` that
- * reads one. `noneAbove` is set under a `none` anywhere above, in the match tree or a predicate:
- * `where` clears `underNone` for its own comparisons, and keeps `noneAbove`. `item` is the index of
- * the action item holding the expression, in a detector with an action list. `inMatch` is set in a
- * condition: `match`, an item's `when`, or a `define` value.
+ * `inMatch` is set in `match`. `conditionRoot` is set at the top of a condition, `match` or the
+ * condition of an `if`, whose top-level `all` operands guard each other. `guards` are the expressions
+ * guarding a scoped `element` or `text`: the operands of that `all`, and the condition of each
+ * enclosing `if` with the operands of its top-level `all`. `bound` is the type `self` reads, set inside
+ * `using`, `where` and `field`. `perItem` is set where `self` reads a value per item: inside `where`
+ * and `field`, and inside a `using` beside an expression that reads such a `self`. `noneAbove` is set
+ * under a `none` anywhere above, in a condition or a predicate: `where` clears `underNone` for its own
+ * comparisons, and keeps `noneAbove`.
  */
 
 /**
  * @typedef {{
- *   mode: 'collect' | 'check' | 'dry',
+ *   mode: 'collect' | 'check',
  *   errors: string[],
  *   functionApis: WeakSet<object>,
  *   structuralErrors: string[],
- *   names: Map<string, { node: Record<string, any>, path: string, branch: string[] }>,
- *   dependencies: Map<string, Set<string>>,
- *   refs: { name: string, path: string, branch: string[], inMatch: boolean }[],
- *   rooted: { root: unknown, path: string, needsGuard: boolean, inMatch: boolean, topOperand: number | null, owner: string | undefined, item: number | undefined }[],
- *   refMemo: Map<string, { errors: string[], type: StaticType }>,
- *   refFailures: { name: string, position: Position, path: string, errors: string[] }[],
- *   resolving: Set<string>,
- *   defined: Set<string>,
+ *   hasMatch: boolean,
+ *   runNames: Map<string, StaticType>,
+ *   detectorNames: Map<string, StaticType>,
+ *   collected: Map<string, StaticType>,
  * }} Context
  *
  * `functionApis` holds the expressions whose `api` may read a method as a function: `args`
  * entries.
  *
- * `defined` holds the names an action list's `define`s give. A `ref` to one reads the stored value,
- * whose type config does not show.
+ * `runNames` holds the run names a `define` may have bound at the point of the walk, with the type
+ * of each value that can be bound. `detectorNames` holds the type of each detector name, from every
+ * `define` of it in the detector, which the `collect` walk gathers into `collected`.
  *
- * A detector is walked twice. `collect` indexes the `as` names and the refs between them, and
- * `check` reports every error. `dry` checks a ref's target in the ref's position, reporting into
- * a scratch list.
+ * A detector is walked twice: `collect` gathers the detector names' types, and `check` reports every
+ * error.
  */
 
 /** @type {Scope} */
-const MATCH_SCOPE = { inMatch: true, underNone: false, branch: [], topOperand: null, matchRoot: true, owners: [] };
+const MATCH_SCOPE = { inMatch: true, underNone: false, conditionRoot: true, guards: [] };
 
 /** @type {Scope} */
-const PAYLOAD_SCOPE = { inMatch: false, underNone: false, branch: [], topOperand: null, matchRoot: false, owners: [] };
+const PAYLOAD_SCOPE = { inMatch: false, underNone: false, conditionRoot: false, guards: [] };
 
 /**
  * @param {Context} ctx
@@ -1206,7 +1187,7 @@ function fail(ctx, path, message) {
  * @returns {Scope}
  */
 function child(scope) {
-    return scope.matchRoot ? { ...scope, matchRoot: false } : scope;
+    return scope.conditionRoot ? { ...scope, conditionRoot: false } : scope;
 }
 
 /**
@@ -1254,7 +1235,7 @@ function isBoundItem(entry) {
 }
 
 /**
- * The expression an `as` names: its value, without the `is` test.
+ * An expression's value, without its `is` test.
  *
  * @param {Record<string, any>} node
  * @returns {Record<string, any>}
@@ -1264,7 +1245,7 @@ function valueNode(node) {
         Object.entries(node).filter(
             ([
                 key,
-            ]) => key !== 'as' && key !== 'is',
+            ]) => key !== 'is',
         ),
     );
 }
@@ -1301,19 +1282,10 @@ function readsOuterSelf(node) {
                     });
                     return reads;
                 }
-                case 'if':
-                    return (
-                        isPlainObject(value) &&
-                        [
-                            'test',
-                            'then',
-                            'else',
-                        ].some((branch) => readsOuterSelf(value[branch]))
-                    );
                 case 'ref':
                     return false;
                 default:
-                    return EXPRESSION_KEYS.includes(key) && readsOuterSelf(value);
+                    return (EXPRESSION_KEYS.includes(key) || BRANCH_KEYS.includes(key)) && readsOuterSelf(value);
             }
         },
     );
@@ -1358,16 +1330,16 @@ function bindItem(scope, type) {
 
 /**
  * Whether an operand of `any`, `all`, `none`, `sum` or `mul` is in spread position,
- * contributing each item of a list: a source, or a ref or `expr` over one. Under `any`, `all` and `none`,
- * `element` without `field` and `text` are presence leaves, booleans.
+ * contributing each item of a list: a source, a ref to a name bound to a list, or an `expr` over one.
+ * Under `any`, `all` and `none`, `element` without `field` and `text`, and a name bound to one, are
+ * presence leaves, booleans.
  *
  * @param {unknown} node
  * @param {'number' | 'boolean'} single - the position of an operand that is not spread
  * @param {Context} ctx
- * @param {Set<string>} [seen]
  * @returns {boolean}
  */
-function providesValues(node, single, ctx, seen = new Set()) {
+function providesValues(node, single, ctx) {
     if (!isPlainObject(node) || 'is' in node) return false;
     // `using` reads one value from the expression beside it
     if ('using' in node) return false;
@@ -1388,20 +1360,10 @@ function providesValues(node, single, ctx, seen = new Set()) {
         }
         case 'expr':
             // Over an array, a list
-            return Array.isArray(body) || providesValues(body, single, ctx, seen);
+            return Array.isArray(body) || providesValues(body, single, ctx);
         case 'ref': {
-            const target = typeof body === 'string' && !seen.has(body) ? ctx.names.get(body) : undefined;
-            return target
-                ? providesValues(
-                      valueNode(target.node),
-                      single,
-                      ctx,
-                      new Set([
-                          ...seen,
-                          body,
-                      ]),
-                  )
-                : false;
+            const type = typeof body === 'string' ? nameType(body, ctx) : undefined;
+            return type?.list !== undefined && !(type.leaf && single === 'boolean');
         }
         default:
             return false;
@@ -1489,8 +1451,11 @@ function checkExpr(node, position, scope, ctx, path) {
     }
 
     const keys = Object.keys(node);
+    if (keys.some((key) => ACTION_KEYS.includes(key))) return checkActions(node, position, scope, ctx, path);
     for (const key of keys) {
-        if (!EXPRESSION_KEYS.includes(key) && !MODIFIER_KEYS.includes(key)) fail(ctx, path, `unknown expression key "${key}"`);
+        if (BRANCH_KEYS.includes(key)) {
+            if (!('if' in node)) fail(ctx, `${path}.${key}`, `\`${key}\` sits beside \`if\` only`);
+        } else if (!EXPRESSION_KEYS.includes(key) && !MODIFIER_KEYS.includes(key)) fail(ctx, path, `unknown expression key "${key}"`);
     }
     const exprKeys = expressionKeysOf(node);
     const hasUsing = 'using' in node;
@@ -1504,6 +1469,7 @@ function checkExpr(node, position, scope, ctx, path) {
         );
         return UNKNOWN;
     }
+    if ('if' in node && exprKeys.length > 1) fail(ctx, path, '`if` takes no other expression key beside it');
     const hasIs = 'is' in node;
     if (hasIs && position !== 'boolean' && position !== 'value')
         fail(ctx, path, `\`is\` gives a boolean, so it sits in boolean or value position, not ${position} position`);
@@ -1515,41 +1481,6 @@ function checkExpr(node, position, scope, ctx, path) {
         );
     }
 
-    let owners = scope.owners;
-    if ('as' in node) {
-        const name = node.as;
-        if (typeof name !== 'string' || !NAME_PATTERN.test(name)) {
-            fail(ctx, path, `\`as\` ${JSON.stringify(name)} does not match ${NAME_PATTERN}`);
-        } else {
-            owners = [
-                ...owners,
-                name,
-            ];
-            if (ctx.mode === 'collect') {
-                const existing = ctx.names.get(name);
-                if (name === 'done')
-                    ctx.structuralErrors.push(`${path}: \`as\` "done": the name is reserved, and given only by \`define\``);
-                else if (ctx.defined.has(name))
-                    ctx.structuralErrors.push(`${path}: \`as\` "${name}" is also given by \`define\`, and a name is one or the other`);
-                else if (existing) ctx.structuralErrors.push(`${path}: \`as\` "${name}" is already used at ${existing.path}`);
-                else ctx.names.set(name, { node, path, branch: scope.branch });
-            }
-        }
-    }
-
-    if ('as' in node) {
-        const named = Object.fromEntries(
-            Object.entries(node).filter(
-                ([
-                    key,
-                ]) => key !== 'as',
-            ),
-        );
-        if (scope.perItemBranch || (scope.perItem && readsOuterSelf(named)))
-            fail(ctx, path, '`as` names one value per run, and this expression reads `self` per item');
-    }
-
-    const inner = { ...scope, owners };
     // With `is`, the expression computes a value for the predicate
     const valuePosition = hasIs ? 'value' : position;
     // With `using`, the expression keys give the value `using` reads from
@@ -1557,11 +1488,10 @@ function checkExpr(node, position, scope, ctx, path) {
     /** @type {StaticType} */
     let type;
     if (exprKeys.length > 1) {
-        for (const key of exprKeys) checkExprKey(key, node[key], 'boolean', child(inner), ctx, `${path}.${key}`, undefined);
+        for (const key of exprKeys) checkExprKey(key, node[key], 'boolean', child(scope), ctx, `${path}.${key}`);
         type = typeOf('boolean');
     } else {
-        const owner = typeof node.as === 'string' && !hasUsing ? node.as : undefined;
-        type = checkExprKey(exprKeys[0], node[exprKeys[0]], keyPosition, inner, ctx, `${path}.${exprKeys[0]}`, owner, node);
+        type = checkExprKey(exprKeys[0], node[exprKeys[0]], keyPosition, scope, ctx, `${path}.${exprKeys[0]}`, node);
     }
     if (hasUsing) {
         const root = Object.fromEntries(
@@ -1570,15 +1500,251 @@ function checkExpr(node, position, scope, ctx, path) {
                 node[key],
             ]),
         );
-        const usingScope = { ...inner, bound: type, perItem: scope.perItem === true && readsOuterSelf(root) };
+        const usingScope = { ...scope, bound: type, perItem: scope.perItem === true && readsOuterSelf(root) };
         type = checkUsing(node.using, type, valuePosition, usingScope, ctx, path);
     }
     if (hasIs) {
-        // `as` names the value, not the test, so a ref to it from the test is no cycle
         checkPredicate(node.is, 'value', predicateSubject(type, node.is, ctx, `${path}.is`), child(scope), ctx, `${path}.is`);
         return typeOf('boolean');
     }
     return type;
+}
+
+/**
+ * The body of `actions`, `then` or `else`: an expression, or a sequence of them, whose last element
+ * takes the position and the others value position.
+ *
+ * @param {unknown} node
+ * @param {Position} position
+ * @param {Scope} scope
+ * @param {Context} ctx
+ * @param {string} path
+ * @returns {StaticType}
+ */
+function checkBody(node, position, scope, ctx, path) {
+    if (!Array.isArray(node)) return checkExpr(node, position, scope, ctx, path);
+    if (node.length === 0) {
+        fail(ctx, path, 'a sequence holds at least one element');
+        return UNKNOWN;
+    }
+    /** @type {StaticType} */
+    let type = UNKNOWN;
+    node.forEach((element, index) => {
+        type = checkExpr(element, index === node.length - 1 ? position : 'value', scope, ctx, `${path}[${index}]`);
+    });
+    return type;
+}
+
+/**
+ * An object of action keys, run in config order. An action gives `undefined`, in value position only.
+ *
+ * @param {Record<string, any>} node
+ * @param {Position} position
+ * @param {Scope} scope
+ * @param {Context} ctx
+ * @param {string} path
+ * @returns {StaticType}
+ */
+function checkActions(node, position, scope, ctx, path) {
+    if (scope.inMatch) fail(ctx, path, '`match` reads the page only, and holds no action');
+    if (position !== 'value') fail(ctx, path, `an action gives \`undefined\`, so it sits in value position only, not ${position} position`);
+    for (const [
+        key,
+        body,
+    ] of Object.entries(node)) {
+        const actionPath = `${path}.${key}`;
+        if (!ACTION_KEYS.includes(key)) {
+            fail(ctx, actionPath, `an action sits beside no expression key or modifier, and "${key}" is not an action`);
+            continue;
+        }
+        if (key === 'define') {
+            checkDefine(body, scope, ctx, actionPath);
+            continue;
+        }
+        if (!isPlainObject(body)) {
+            fail(ctx, actionPath, `\`${key}\` takes an object`);
+            continue;
+        }
+        for (const bodyKey of Object.keys(body)) {
+            if (bodyKey !== 'data' && !(key === 'fireEvent' && bodyKey === 'type')) fail(ctx, actionPath, `unknown key "${bodyKey}"`);
+        }
+        if (key === 'fireEvent' && typeof body.type !== 'string') fail(ctx, `${actionPath}.type`, '`type` takes a string');
+        if ('data' in body) checkPayloadSpec(body.data, ctx, `${actionPath}.data`, child(scope));
+    }
+    return typeOf('undefined');
+}
+
+/**
+ * `define`: each value in value position, bound before the next is computed.
+ *
+ * @param {unknown} define
+ * @param {Scope} scope
+ * @param {Context} ctx
+ * @param {string} path
+ */
+function checkDefine(define, scope, ctx, path) {
+    if (!isPlainObject(define) || Object.keys(define).length === 0) {
+        fail(ctx, path, '`define` takes an object of at least one name');
+        return;
+    }
+    for (const [
+        name,
+        value,
+    ] of Object.entries(define)) {
+        const namePath = `${path}.${name}`;
+        if (!DEFINE_NAME_PATTERN.test(name)) fail(ctx, namePath, `name does not match ${DEFINE_NAME_PATTERN}`);
+        // The top-level `all` of a bound value guards its operands, as a condition's does
+        const type = checkExpr(value, 'value', { ...scope, conditionRoot: true }, ctx, namePath);
+        if (name.startsWith('this.')) {
+            if (ctx.hasMatch)
+                fail(ctx, namePath, `a detector with \`match\` runs \`actions\` once, so it binds no detector name: "${name}"`);
+            const earlier = ctx.collected.get(name);
+            ctx.collected.set(
+                name,
+                earlier
+                    ? mergeTypes([
+                          earlier,
+                          type,
+                      ])
+                    : type,
+            );
+        } else {
+            ctx.runNames.set(name, type);
+        }
+    }
+}
+
+/**
+ * The type of a name at this point of the walk: a run name a `define` may have bound, or a detector
+ * name a `define` in the detector binds. `undefined` when neither.
+ *
+ * @param {string} name
+ * @param {Context} ctx
+ * @returns {StaticType | undefined}
+ */
+function nameType(name, ctx) {
+    return name.startsWith('this.') ? ctx.detectorNames.get(name) : ctx.runNames.get(name);
+}
+
+/**
+ * Check a name's type in the position a `ref` reads it in: the condition leaf holds in boolean
+ * position when it has an item, and a selected list gives its one item in number position.
+ *
+ * @param {StaticType} type
+ * @param {Position} position
+ * @param {Context} ctx
+ * @param {string} path
+ * @returns {StaticType}
+ */
+function refType(type, position, ctx, path) {
+    if (position === 'boolean') {
+        if (type.list === 'selected' && type.leaf) return typeOf('boolean');
+        if (type.list !== undefined) fail(ctx, path, 'boolean position takes a boolean, and the name is bound to a list');
+        else if (!allows(type, 'boolean'))
+            fail(ctx, path, `boolean position takes a boolean, and config types the name as ${describeType(type)}`);
+        return typeOf('boolean');
+    }
+    if (
+        position === 'list' &&
+        type.list === undefined &&
+        type.types !== null &&
+        !type.types.includes('array') &&
+        !type.types.includes('object')
+    )
+        fail(ctx, path, `list position takes a list, and config types the name as ${describeType(type)}`);
+    return sourceType(itemOf(type), type.list, position, ctx, path);
+}
+
+/**
+ * The expressions a condition makes guards for what it holds: the condition, and the operands of its
+ * top-level `all`.
+ *
+ * @param {unknown} condition
+ * @returns {unknown[]}
+ */
+function guardsOf(condition) {
+    if (isPlainObject(condition) && expressionKeysOf(condition).join() === 'all' && !('is' in condition) && !('using' in condition))
+        return asArray(condition.all);
+    return [
+        condition,
+    ];
+}
+
+/**
+ * Check each entry of a scoped expression's `root` has a guard, so an absent region is not read as an
+ * empty one. In `actions`, the entry is a `ref` to a bound name, and the guard a `ref` to it, with
+ * `is` unless the name is bound to an `element` or `text` source. In `match`, the guard repeats the
+ * entry, with `is` unless it is an `element` or `text` source.
+ *
+ * @param {unknown} root
+ * @param {Scope} scope
+ * @param {Context} ctx
+ * @param {string} path - the path of the body holding `root`
+ */
+function checkRootGuard(root, scope, ctx, path) {
+    asArray(root).forEach((entry, index) => {
+        if (isBoundItem(entry)) return;
+        const entryPath = Array.isArray(root) ? `${path}.root[${index}]` : `${path}.root`;
+        if (scope.inMatch) {
+            const guard = scope.guards.find((candidate) => isPlainObject(candidate) && isDeepStrictEqual(valueNode(candidate), entry));
+            if (!guard) {
+                fail(
+                    ctx,
+                    entryPath,
+                    "`root` needs a guard: the root's expression as an operand of the top-level `all` of the condition reading it, or in the condition of an enclosing `if`",
+                );
+                return;
+            }
+            if (!isConditionLeaf(entry) && !('is' in /** @type {Record<string, any>} */ (guard)))
+                fail(
+                    ctx,
+                    entryPath,
+                    'the guard of this root is not an `element` or `text` source, so it carries `is`, such as "is": {"type": "object"}',
+                );
+            return;
+        }
+        const name = isPlainObject(entry) && Object.keys(entry).join() === 'ref' ? entry.ref : undefined;
+        const guard =
+            typeof name === 'string'
+                ? scope.guards.find(
+                      (candidate) =>
+                          isPlainObject(candidate) &&
+                          candidate.ref === name &&
+                          Object.keys(candidate).every((key) => key === 'ref' || key === 'is'),
+                  )
+                : undefined;
+        if (!guard) {
+            fail(
+                ctx,
+                entryPath,
+                '`root` needs a guard: the root a `ref` to a name bound with `define`, and a `ref` to it as an operand of the top-level `all` of the condition reading it, or in the condition of an enclosing `if`',
+            );
+            return;
+        }
+        if (!('is' in /** @type {Record<string, any>} */ (guard)) && !nameType(/** @type {string} */ (name), ctx)?.leaf)
+            fail(
+                ctx,
+                entryPath,
+                `the guard "${name}" is not bound to an \`element\` or \`text\` source, so it carries \`is\`, such as "is": {"type": "object"}`,
+            );
+    });
+}
+
+/**
+ * Whether an expression is the condition leaf: `element` without `field`, or `text`.
+ *
+ * @param {unknown} node
+ * @returns {boolean}
+ */
+function isConditionLeaf(node) {
+    if (!isPlainObject(node) || 'using' in node || 'is' in node) return false;
+    const keys = expressionKeysOf(node);
+    if (keys.length !== 1 || (keys[0] !== 'element' && keys[0] !== 'text')) return false;
+    let hasField = false;
+    forEachTextLeaf(node[keys[0]], '', (leaf) => {
+        hasField ||= 'field' in leaf;
+    });
+    return !hasField;
 }
 
 /**
@@ -1588,15 +1754,14 @@ function checkExpr(node, position, scope, ctx, path) {
  * @param {Scope} scope
  * @param {Context} ctx
  * @param {string} path
- * @param {string | undefined} owner - the `as` beside the key
- * @param {Record<string, unknown>} [holder] - the expression object holding the key
+ * @param {Record<string, any>} [holder] - the expression object holding the key
  * @returns {StaticType}
  */
-function checkExprKey(key, body, position, scope, ctx, path, owner, holder) {
+function checkExprKey(key, body, position, scope, ctx, path, holder) {
     switch (key) {
         case 'element':
         case 'text':
-            return checkConditionSource(key, body, position, scope, ctx, path, owner);
+            return checkConditionSource(key, body, position, scope, ctx, path);
         case 'api':
             return checkApi(apiBody(body), position, scope, ctx, path, undefined, holder !== undefined && ctx.functionApis.has(holder));
         case 'self': {
@@ -1624,11 +1789,11 @@ function checkExprKey(key, body, position, scope, ctx, path, owner, holder) {
                     'spread',
                     'root',
                 ]);
-                const entries = body.map((entry, index) => checkExpr(entry, 'value', child(scope), ctx, `${path}.expr[${index}]`));
+                const entries = body.map((entry, index) => checkExpr(entry, 'value', child(scope), ctx, `${path}[${index}]`));
                 const item = entries.length ? mergeTypes(entries.map(itemOf)) : UNKNOWN;
                 return position === 'spread' ? item : { ...item, list: 'selected' };
             }
-            // Its operand's value in its own position. An operand with `is` gives a boolean, which `as` beside `expr` names
+            // Its operand's value in its own position. An operand with `is` gives a boolean
             if (isPlainObject(body) && 'is' in body) {
                 expectPosition(ctx, path, '`expr` over `is`', position, [
                     'boolean',
@@ -1699,14 +1864,23 @@ function checkExprKey(key, body, position, scope, ctx, path, owner, holder) {
                 'boolean',
                 'value',
             ]);
-            asArray(body).forEach((operand, index) => {
+            const operands = asArray(body);
+            // The operands of a condition's top-level `all` guard each other
+            const guards =
+                scope.conditionRoot && key === 'all'
+                    ? [
+                          ...scope.guards,
+                          ...operands,
+                      ]
+                    : scope.guards;
+            operands.forEach((operand, index) => {
                 const operandPath = Array.isArray(body) ? `${path}[${index}]` : path;
                 /** @type {Scope} */
                 const operandScope = {
                     ...child(scope),
                     underNone: scope.underNone || key === 'none',
                     noneAbove: scope.noneAbove || key === 'none',
-                    topOperand: scope.matchRoot && key === 'all' ? index : scope.topOperand,
+                    guards,
                 };
                 if (providesValues(operand, 'boolean', ctx)) {
                     const type = checkExpr(operand, 'spread', operandScope, ctx, operandPath);
@@ -1725,111 +1899,78 @@ function checkExprKey(key, body, position, scope, ctx, path, owner, holder) {
                 'number',
                 'root',
             ]);
-            if (!isPlainObject(body)) {
-                fail(ctx, path, '`if` takes a body of `test`, `then` and `else`');
-                return UNKNOWN;
-            }
-            const keys = Object.keys(body);
-            const missing = [
-                'test',
-                'then',
-                'else',
-            ].filter((k) => !keys.includes(k));
-            const extra = keys.filter(
-                (k) =>
-                    ![
-                        'test',
-                        'then',
-                        'else',
-                    ].includes(k),
-            );
-            if (missing.length || extra.length)
+            const branches = holder ?? {};
+            const base = path.slice(0, -'.if'.length);
+            if (!('then' in branches)) fail(ctx, path, '`if` needs `then`');
+            if (!('else' in branches) && position !== 'value')
                 fail(
                     ctx,
                     path,
-                    `\`if\` takes exactly \`test\`, \`then\` and \`else\` (missing [${missing.join(', ')}], extra [${extra.join(', ')}])`,
+                    `\`if\` without \`else\` gives \`undefined\` when its condition does not hold, so it fills value position only, not ${position} position`,
                 );
-            const inner = child(scope);
-            checkExpr(body.test, 'boolean', inner, ctx, `${path}.test`);
-            const perItemBranch = scope.perItemBranch === true || (scope.perItem === true && readsOuterSelf({ if: body }));
-            const branches = [
-                'then',
-                'else',
-            ].map((branch) =>
-                checkExpr(
-                    body[branch],
-                    position,
-                    {
-                        ...inner,
-                        perItemBranch,
-                        branch: [
-                            ...scope.branch,
-                            `${path}.${branch}`,
-                        ],
-                    },
-                    ctx,
-                    `${path}.${branch}`,
-                ),
-            );
-            return mergeTypes(branches);
+            checkExpr(body, 'boolean', { ...child(scope), conditionRoot: true }, ctx, path);
+            /** @type {Scope} */
+            const branchScope = {
+                ...child(scope),
+                guards: [
+                    ...scope.guards,
+                    ...guardsOf(body),
+                ],
+            };
+            // A run name bound in one branch may be bound after the `if`, with the type each branch binds
+            const before = new Map(ctx.runNames);
+            const thenType = 'then' in branches ? checkBody(branches.then, position, branchScope, ctx, `${base}.then`) : UNKNOWN;
+            const afterThen = ctx.runNames;
+            ctx.runNames = new Map(before);
+            const elseType =
+                'else' in branches ? checkBody(branches.else, position, branchScope, ctx, `${base}.else`) : typeOf('undefined');
+            for (const [
+                name,
+                type,
+            ] of afterThen) {
+                const other = ctx.runNames.get(name);
+                ctx.runNames.set(
+                    name,
+                    other && other !== type
+                        ? mergeTypes([
+                              type,
+                              other,
+                          ])
+                        : type,
+                );
+            }
+            return mergeTypes([
+                thenType,
+                elseType,
+            ]);
         }
         case 'ref': {
-            if (typeof body !== 'string' || !NAME_PATTERN.test(body)) {
-                fail(ctx, path, `\`ref\` ${JSON.stringify(body)} does not match ${NAME_PATTERN}`);
+            if (typeof body !== 'string' || !DEFINE_NAME_PATTERN.test(body)) {
+                fail(ctx, path, `\`ref\` ${JSON.stringify(body)} does not match ${DEFINE_NAME_PATTERN}`);
                 return UNKNOWN;
             }
-            // A `define`d name reads the value its latest `define` stored: no edge, and no type
-            if (ctx.defined.has(body)) return UNKNOWN;
-            if (ctx.mode === 'collect') {
-                for (const name of scope.owners) {
-                    const deps = ctx.dependencies.get(name) ?? new Set();
-                    deps.add(body);
-                    ctx.dependencies.set(name, deps);
-                }
+            if (scope.inMatch) {
+                fail(ctx, path, '`match` reads the page only, and holds no `ref`');
                 return UNKNOWN;
             }
-            if (ctx.mode === 'check') ctx.refs.push({ name: body, path, branch: scope.branch, inMatch: scope.inMatch });
-            return resolveRef(body, position, ctx, path);
+            if (body.startsWith('this.') && ctx.hasMatch)
+                fail(ctx, path, `a detector with \`match\` runs \`actions\` once, so it reads no detector name: "${body}"`);
+            const type = nameType(body, ctx);
+            if (!type) {
+                fail(
+                    ctx,
+                    path,
+                    body.startsWith('this.')
+                        ? `\`ref\` "${body}" reads a detector name no \`define\` in the detector binds`
+                        : `\`ref\` "${body}" reads a run name no \`define\` binds before it in evaluation order`,
+                );
+                return UNKNOWN;
+            }
+            return refType(type, position, ctx, path);
         }
         default:
             return UNKNOWN;
     }
-}
-
-/**
- * Check a ref's target fills the ref's position, and return its type.
- *
- * @param {string} name
- * @param {Position} position
- * @param {Context} ctx
- * @param {string} path
- * @returns {StaticType}
- */
-function resolveRef(name, position, ctx, path) {
-    const target = ctx.names.get(name);
-    if (!target) {
-        fail(ctx, path, `\`ref\` "${name}" names no expression in this detector`);
-        return UNKNOWN;
-    }
-    // A cycle is reported once, from the collect pass
-    if (ctx.resolving.has(name)) return UNKNOWN;
-    const key = `${name}|${position}`;
-    let result = ctx.refMemo.get(key);
-    if (!result) {
-        ctx.resolving.add(name);
-        /** @type {Context} */
-        const dry = { ...ctx, mode: 'dry', errors: [] };
-        const type = checkExpr(valueNode(target.node), position, PAYLOAD_SCOPE, dry, target.path);
-        ctx.resolving.delete(name);
-        result = { errors: dry.errors, type };
-        ctx.refMemo.set(key, result);
-    }
-    if (result.errors.length) {
-        // Reported once the walk ends, and only for errors the target does not give in its own position
-        if (ctx.mode === 'check') ctx.refFailures.push({ name, position, path, errors: result.errors });
-        else fail(ctx, path, `\`ref\` "${name}" is read in ${position} position, which its target does not fill: ${result.errors[0]}`);
-    }
-    return result.type;
 }
 
 /**
@@ -1898,10 +2039,9 @@ function expectStrings(value, ctx, path, what) {
  * @param {Scope} scope
  * @param {Context} ctx
  * @param {string} path
- * @param {string | undefined} owner
  * @returns {StaticType}
  */
-function checkConditionSource(key, branch, position, scope, ctx, path, owner) {
+function checkConditionSource(key, branch, position, scope, ctx, path) {
     const bodies = collectBodies(branch, position, ctx, path);
     const withField = bodies.filter(({ body }) => 'field' in body).length;
     if (withField && withField !== bodies.length) fail(ctx, path, 'every body of one `element` source has `field`, or none does');
@@ -1956,22 +2096,15 @@ function checkConditionSource(key, branch, position, scope, ctx, path, owner) {
         if ('root' in body) {
             const rootPath = `${bodyPath}.root`;
             const valid = checkRoot(body.root, child(scope), ctx, rootPath);
-            if (valid && ctx.mode === 'check') {
-                ctx.rooted.push({
-                    root: body.root,
-                    path: bodyPath,
-                    needsGuard: position !== 'boolean' || !scope.inMatch || scope.underNone || scope.noneAbove === true || underNone,
-                    inMatch: scope.inMatch,
-                    topOperand: scope.topOperand,
-                    owner,
-                    item: scope.item,
-                });
-            }
+            // Read only in boolean position with no `none` above it, an empty scope does not hold
+            const needsGuard = position !== 'boolean' || scope.underNone || scope.noneAbove === true || underNone;
+            if (valid && needsGuard) checkRootGuard(body.root, scope, ctx, bodyPath);
         }
     }
 
     if (position === 'boolean') return typeOf('boolean');
-    return sourceType(mergeTypes(valueTypes), 'selected', position, ctx, path);
+    const type = sourceType(mergeTypes(valueTypes), 'selected', position, ctx, path);
+    return type.list === 'selected' && !hasField ? { ...type, leaf: true } : type;
 }
 
 /**
@@ -2816,264 +2949,135 @@ function checkBuckets(buckets, type, ctx, path) {
 }
 
 /**
- * Report each cycle of refs once.
+ * Every name a `ref` reads in an expression or body.
  *
- * @param {Context} ctx
+ * @param {unknown} node
+ * @param {Set<string>} [found]
+ * @returns {Set<string>}
  */
-function checkRefCycles(ctx) {
-    /** @type {Map<string, 'visiting' | 'done'>} */
-    const state = new Map();
-    const reported = new Set();
-    /**
-     * @param {string} name
-     * @param {string[]} stack
-     */
-    const visit = (name, stack) => {
-        if (state.get(name) === 'done') return;
-        if (state.get(name) === 'visiting') {
-            const cycle = [
-                ...stack.slice(stack.indexOf(name)),
-                name,
-            ];
-            const key = [
-                ...new Set(cycle),
-            ]
-                .sort()
-                .join(',');
-            if (!reported.has(key)) {
-                reported.add(key);
-                ctx.structuralErrors.push(`${ctx.names.get(name)?.path}: refs form a cycle: ${cycle.join(' -> ')}`);
-            }
-            return;
-        }
-        state.set(name, 'visiting');
-        for (const dependency of ctx.dependencies.get(name) ?? []) {
-            if (ctx.names.has(dependency))
-                visit(dependency, [
-                    ...stack,
-                    name,
-                ]);
-        }
-        state.set(name, 'done');
-    };
-    for (const name of ctx.names.keys()) visit(name, []);
-}
-
-/**
- * A ref in match into an `if` branch from outside that branch reads an expression that may never
- * be read.
- *
- * @param {Context} ctx
- */
-function checkBranchRefs(ctx) {
-    for (const ref of ctx.refs) {
-        const target = ctx.names.get(ref.name);
-        if (!ref.inMatch || !target) continue;
-        const outside = target.branch.filter((branch) => !ref.branch.includes(branch));
-        if (outside.length)
-            fail(
-                ctx,
-                ref.path,
-                `\`ref\` "${ref.name}" in a condition reads an expression inside the \`if\` branch ${outside[0]} from outside it`,
-            );
+function refsIn(node, found = new Set()) {
+    if (Array.isArray(node)) node.forEach((entry) => refsIn(entry, found));
+    else if (isPlainObject(node)) {
+        if (typeof node.ref === 'string') found.add(node.ref);
+        Object.values(node).forEach((value) => refsIn(value, found));
     }
+    return found;
 }
 
 /**
- * A rooted `element` or `text` read anywhere but in boolean position with no `none` above it needs
- * a guard. Each entry of its `root` other than `{"self": {}}` is a `ref` to an earlier operand of
- * match's top-level `all`, which carries `is` unless it is an `element` or `text` source.
+ * Whether a body holds a `define` of the name.
  *
- * @param {Record<string, any>} detector
- * @param {string} path
- * @param {Context} ctx
+ * @param {unknown} node
+ * @param {string} name
+ * @returns {boolean}
  */
-function checkRootGuards(detector, path, ctx) {
-    const match = detector.match;
-    const topAll = isPlainObject(match) && expressionKeysOf(match).join() === 'all' ? asArray(match.all) : [];
-    /** @type {Map<string, number>} */
-    const guards = new Map();
-    topAll.forEach((operand, index) => {
-        if (isPlainObject(operand) && typeof operand.as === 'string') guards.set(operand.as, index);
-    });
-    const referenced = new Set(ctx.refs.map((ref) => ref.name));
-
-    for (const rooted of ctx.rooted) {
-        if (!rooted.needsGuard && !(rooted.owner && referenced.has(rooted.owner))) continue;
-        asArray(rooted.root).forEach((entry, index) => {
-            if (isBoundItem(entry)) return;
-            const entryPath = Array.isArray(rooted.root) ? `${rooted.path}.root[${index}]` : `${rooted.path}.root`;
-            const name = isPlainObject(entry) && Object.keys(entry).join() === 'ref' ? entry.ref : undefined;
-            const guardIndex = typeof name === 'string' ? guards.get(name) : undefined;
-            const ahead = guardIndex !== undefined && (!rooted.inMatch || (rooted.topOperand !== null && guardIndex < rooted.topOperand));
-            if (!ahead) {
-                fail(
-                    ctx,
-                    entryPath,
-                    `\`root\` needs a guard: each root's expression, named with \`as\`, as an earlier operand of ${path}.match's top-level \`all\`, and the root a \`ref\` to it`,
-                );
-                return;
-            }
-            const guard = topAll[guardIndex];
-            const keys = expressionKeysOf(guard);
-            const isSource = keys.length === 1 && (keys[0] === 'element' || keys[0] === 'text');
-            if (!isSource && !('is' in guard)) {
-                fail(
-                    ctx,
-                    `${path}.match.all[${guardIndex}]`,
-                    `the guard "${name}" is not an \`element\` or \`text\` source, so it carries \`is\`, such as "is": {"type": "object"}`,
-                );
-            }
-        });
-    }
+function definesName(node, name) {
+    if (Array.isArray(node)) return node.some((entry) => definesName(entry, name));
+    if (!isPlainObject(node)) return false;
+    if (isPlainObject(node.define) && name in node.define) return true;
+    return Object.values(node).some((value) => definesName(value, name));
 }
 
 /**
- * The guard check of an action list. A guard is the `as` of an operand of the top-level `all` of the
- * item's own `when`, ahead of the operand holding the rooted expression when that is in the `when`
- * too, or the `as` of an operand of `none` in an earlier `{"when": {"none": [...]}, "exit": true}`
- * item. A guard carries `is` unless it is an `element` or `text` source.
- *
- * @param {Record<string, any>[]} items - every item, or none when an item is not an object
- * @param {string} path
- * @param {Context} ctx
- */
-function checkListRootGuards(items, path, ctx) {
-    /**
-     * @param {unknown} when
-     * @param {'all' | 'none'} key
-     * @returns {Map<string, { node: Record<string, any>, index: number }>}
-     */
-    const namedOperands = (when, key) => {
-        const named = new Map();
-        if (!isPlainObject(when) || expressionKeysOf(when).join() !== key || 'is' in when || 'using' in when) return named;
-        asArray(when[key]).forEach((operand, index) => {
-            if (isPlainObject(operand) && typeof operand.as === 'string') named.set(operand.as, { node: operand, index });
-        });
-        return named;
-    };
-    const referenced = new Set(ctx.refs.map((ref) => ref.name));
-
-    for (const rooted of ctx.rooted) {
-        if (rooted.item === undefined || !items[rooted.item]) continue;
-        if (!rooted.needsGuard && !(rooted.owner && referenced.has(rooted.owner))) continue;
-        const itemIndex = rooted.item;
-        const itemPath = `${path}.actions[${itemIndex}]`;
-        const inWhen = rooted.path.startsWith(`${itemPath}.when`);
-        const own = namedOperands(items[itemIndex].when, 'all');
-        asArray(rooted.root).forEach((entry, index) => {
-            if (isBoundItem(entry)) return;
-            const entryPath = Array.isArray(rooted.root) ? `${rooted.path}.root[${index}]` : `${rooted.path}.root`;
-            const name = isPlainObject(entry) && Object.keys(entry).join() === 'ref' ? entry.ref : undefined;
-            /** @type {{ node: Record<string, any>, path: string } | undefined} */
-            let guard;
-            if (typeof name === 'string') {
-                const operand = own.get(name);
-                if (operand && (!inWhen || (rooted.topOperand !== null && operand.index < rooted.topOperand)))
-                    guard = { node: operand.node, path: `${itemPath}.when.all[${operand.index}]` };
-                for (let earlier = 0; !guard && earlier < itemIndex; earlier++) {
-                    if (items[earlier].exit !== true) continue;
-                    const gated = namedOperands(items[earlier].when, 'none').get(name);
-                    if (gated) guard = { node: gated.node, path: `${path}.actions[${earlier}].when.none[${gated.index}]` };
-                }
-            }
-            if (!guard) {
-                fail(
-                    ctx,
-                    entryPath,
-                    "`root` needs a guard: each root's expression, named with `as`, as an earlier operand of the top-level `all` of the item's `when`, or of `none` in an earlier `exit` gate, and the root a `ref` to it",
-                );
-                return;
-            }
-            const keys = expressionKeysOf(guard.node);
-            const isSource = keys.length === 1 && (keys[0] === 'element' || keys[0] === 'text');
-            if (!isSource && !('is' in guard.node)) {
-                fail(
-                    ctx,
-                    guard.path,
-                    `the guard "${name}" is not an \`element\` or \`text\` source, so it carries \`is\`, such as "is": {"type": "object"}`,
-                );
-            }
-        });
-    }
-}
-
-/**
- * Warnings on `fireEvent` items that send their event on every run: in a detector that never
- * defines `done`, an item no name it `define`s guards. A guard is a `ref` to that name in the
- * item's own `when`, or in the `when` of an earlier item holding `exit`.
+ * Warnings on a `fireEvent` that sends its event on every run: in a detector with no `match`, one no
+ * enclosing `if` guards by testing a detector name that a `define` in that `if`'s branch binds.
  *
  * @param {Record<string, any>} detector
  * @param {string} path
  * @returns {string[]}
  */
 function repeatedEventWarnings(detector, path) {
-    if (!Array.isArray(detector.actions)) return [];
-    const items = detector.actions.filter(isPlainObject);
-    if (items.some((item) => isPlainObject(item.define) && 'done' in item.define)) return [];
-    /**
-     * @param {unknown} node
-     * @param {Set<string>} found
-     * @returns {Set<string>}
-     */
-    const refsIn = (node, found = new Set()) => {
-        if (Array.isArray(node)) node.forEach((entry) => refsIn(entry, found));
-        else if (isPlainObject(node)) {
-            if (typeof node.ref === 'string') found.add(node.ref);
-            Object.values(node).forEach((value) => refsIn(value, found));
-        }
-        return found;
-    };
+    if (!isPlainObject(detector) || 'match' in detector || isLegacyDetector(detector)) return [];
     /** @type {string[]} */
     const warnings = [];
-    /** @type {Set<string>} */
-    const gateRefs = new Set();
-    items.forEach((item, index) => {
-        if ('fireEvent' in item) {
-            const names = isPlainObject(item.define) ? Object.keys(item.define) : [];
-            const own = refsIn(item.when);
-            if (!names.some((name) => own.has(name) || gateRefs.has(name)))
-                warnings.push(
-                    `${path}.actions[${index}]: fireEvent sends its event on every run, since the detector never defines \`done\` and no name the item defines guards it`,
-                );
+    /**
+     * @param {unknown} node
+     * @param {string} nodePath
+     * @param {Array<{ names: string[], branch: unknown }>} guards - each enclosing `if` branch, with the detector names its condition reads
+     */
+    const visit = (node, nodePath, guards) => {
+        if (Array.isArray(node)) {
+            node.forEach((entry, index) => visit(entry, `${nodePath}[${index}]`, guards));
+            return;
         }
-        if (item.exit === true) refsIn(item.when, gateRefs);
-    });
+        if (!isPlainObject(node)) return;
+        if ('fireEvent' in node && !guards.some(({ names, branch }) => names.some((name) => definesName(branch, name))))
+            warnings.push(
+                `${nodePath}.fireEvent: sends its event on every run, since the detector has no \`match\` and no enclosing \`if\` tests a detector name its branch binds`,
+            );
+        if ('if' in node) {
+            const names = [
+                ...refsIn(node.if),
+            ].filter((name) => name.startsWith('this.'));
+            for (const branch of BRANCH_KEYS) {
+                if (branch in node)
+                    visit(node[branch], `${nodePath}.${branch}`, [
+                        ...guards,
+                        { names, branch: node[branch] },
+                    ]);
+            }
+            return;
+        }
+        for (const [
+            key,
+            value,
+        ] of Object.entries(node)) {
+            if (key !== 'fireEvent') visit(value, `${nodePath}.${key}`, guards);
+        }
+    };
+    visit(detector.actions, `${path}.actions`, []);
     return warnings;
 }
 
 /**
- * @param {string[]} structuralErrors
  * @returns {Context}
  */
-function newContext(structuralErrors = []) {
+function newContext() {
     return {
         mode: 'collect',
         errors: [],
         functionApis: new WeakSet(),
-        structuralErrors,
-        names: new Map(),
-        dependencies: new Map(),
-        refs: [],
-        rooted: [],
-        refMemo: new Map(),
-        resolving: new Set(),
-        refFailures: [],
-        defined: new Set(),
+        structuralErrors: [],
+        hasMatch: false,
+        runNames: new Map(),
+        detectorNames: new Map(),
+        collected: new Map(),
     };
 }
 
 /**
- * Check a detector against the expression, predicate and payload rules: an action list, or the
- * legacy shape of `match` and an `actions` object.
+ * Whether a detector is in the shape clients before this release read: `match`, and an `actions`
+ * object whose actions carry `state`, or no `actions`.
+ *
+ * @param {unknown} detector
+ * @returns {boolean}
+ */
+function isLegacyDetector(detector) {
+    if (!isPlainObject(detector)) return false;
+    if (!('actions' in detector)) return 'match' in detector;
+    const actions = detector.actions;
+    return (
+        isPlainObject(actions) &&
+        Object.keys(actions).length > 0 &&
+        Object.entries(actions).every(
+            ([
+                key,
+                body,
+            ]) => PAYLOAD_ACTIONS.includes(key) && isPlainObject(body) && 'state' in body,
+        )
+    );
+}
+
+/**
+ * Check a detector against the expression, predicate and payload rules: `match` and `actions`, or the
+ * legacy shape.
  *
  * @param {Record<string, any>} detector
  * @param {string} path
  * @returns {string[]} the errors, empty when the detector is valid
  */
 function validateDetector(detector, path) {
-    if (isPlainObject(detector) && Array.isArray(detector.actions)) return validateListDetector(detector, path);
-    return validateLegacyDetector(detector, path);
+    return isLegacyDetector(detector) ? validateLegacyDetector(detector, path) : validateActionsDetector(detector, path);
 }
 
 /**
@@ -3081,33 +3085,46 @@ function validateDetector(detector, path) {
  *
  * @param {Context} ctx
  * @param {() => void} walk
- * @param {() => void} checkGuards
  * @returns {string[]}
  */
-function runChecks(ctx, walk, checkGuards) {
+function runChecks(ctx, walk) {
     walk();
-    checkRefCycles(ctx);
     ctx.mode = 'check';
     ctx.errors = [];
+    ctx.runNames = new Map();
+    ctx.detectorNames = ctx.collected;
     walk();
-    checkBranchRefs(ctx);
-    checkGuards();
-    const reported = new Set(ctx.errors);
-    for (const failure of ctx.refFailures) {
-        const added = failure.errors.find((error) => !reported.has(error));
-        if (added)
-            fail(
-                ctx,
-                failure.path,
-                `\`ref\` "${failure.name}" is read in ${failure.position} position, which its target does not fill: ${added}`,
-            );
-    }
     return [
         ...new Set([
             ...ctx.structuralErrors,
             ...ctx.errors,
         ]),
     ];
+}
+
+/**
+ * A detector of this release: `match` in boolean position, and `actions` as an expression or a
+ * sequence.
+ *
+ * @param {Record<string, any>} detector
+ * @param {string} path
+ * @returns {string[]}
+ */
+function validateActionsDetector(detector, path) {
+    if (!isPlainObject(detector))
+        return [
+            `${path}: a detector is an object`,
+        ];
+    const ctx = newContext();
+    for (const key of Object.keys(detector)) {
+        if (!DETECTOR_KEYS.includes(key)) ctx.structuralErrors.push(`${path}: unknown detector key "${key}"`);
+    }
+    if (!('actions' in detector)) ctx.structuralErrors.push(`${path}: a detector needs \`actions\``);
+    ctx.hasMatch = 'match' in detector;
+    return runChecks(ctx, () => {
+        if ('match' in detector) checkExpr(detector.match, 'boolean', MATCH_SCOPE, ctx, `${path}.match`);
+        if ('actions' in detector) checkBody(detector.actions, 'value', PAYLOAD_SCOPE, ctx, `${path}.actions`);
+    });
 }
 
 /**
@@ -3119,146 +3136,41 @@ function runChecks(ctx, walk, checkGuards) {
  */
 function validateLegacyDetector(detector, path) {
     const ctx = newContext();
-    return runChecks(
-        ctx,
-        () => {
-            checkExpr(detector.match, 'boolean', MATCH_SCOPE, ctx, `${path}.match`);
-            for (const action of PAYLOAD_ACTIONS) {
-                const data = detector.actions?.[action]?.data;
-                if (data !== undefined) checkPayloadSpec(data, ctx, `${path}.actions.${action}.data`);
-            }
-        },
-        () => checkRootGuards(detector, path, ctx),
-    );
-}
-
-/**
- * Item shapes, which the client rejects as parse errors.
- *
- * @param {Record<string, any>} detector
- * @param {string} path
- * @param {Set<string>} defined - filled with the names the items' `define`s give
- * @returns {string[]}
- */
-function itemShapeErrors(detector, path, defined) {
-    /** @type {string[]} */
-    const errors = [];
-    for (const key of Object.keys(detector)) {
-        if (!DETECTOR_KEYS.includes(key)) errors.push(`${path}: unknown detector key "${key}" beside an action list`);
-    }
-    detector.actions.forEach((/** @type {unknown} */ item, /** @type {number} */ index) => {
-        const itemPath = `${path}.actions[${index}]`;
-        if (!isPlainObject(item)) {
-            errors.push(`${itemPath}: an item is an object`);
-            return;
-        }
-        for (const key of Object.keys(item)) {
-            if (!ITEM_KEYS.includes(key)) errors.push(`${itemPath}: unknown item key "${key}"`);
-        }
-        if (!ACTION_KEYS.some((key) => key in item))
-            errors.push(`${itemPath}: an item holds at least one of ${ACTION_KEYS.map((key) => `\`${key}\``).join(', ')}`);
-        if ('exit' in item && item.exit !== true) errors.push(`${itemPath}.exit: \`exit\` takes \`true\``);
-        if ('fireEvent' in item) {
-            const fireEvent = item.fireEvent;
-            if (!isPlainObject(fireEvent)) errors.push(`${itemPath}.fireEvent: \`fireEvent\` takes an object`);
-            else {
-                for (const key of Object.keys(fireEvent)) {
-                    if (key !== 'type' && key !== 'data') errors.push(`${itemPath}.fireEvent: unknown key "${key}"`);
-                }
-                if (typeof fireEvent.type !== 'string') errors.push(`${itemPath}.fireEvent.type: \`type\` takes a string`);
-            }
-        }
-        if ('breakageReportData' in item) {
-            const breakageReportData = item.breakageReportData;
-            if (!isPlainObject(breakageReportData)) errors.push(`${itemPath}.breakageReportData: \`breakageReportData\` takes an object`);
-            else {
-                for (const key of Object.keys(breakageReportData)) {
-                    if (key !== 'data') errors.push(`${itemPath}.breakageReportData: unknown key "${key}"`);
-                }
-            }
-        }
-        if ('define' in item) {
-            const define = item.define;
-            if (!isPlainObject(define) || Object.keys(define).length === 0) {
-                errors.push(`${itemPath}.define: \`define\` takes an object of at least one name`);
-                return;
-            }
-            for (const name of Object.keys(define)) {
-                if (!NAME_PATTERN.test(name)) errors.push(`${itemPath}.define.${name}: name does not match ${NAME_PATTERN}`);
-                defined.add(name);
-            }
+    ctx.hasMatch = true;
+    ctx.structuralErrors.push(...shippedMatchErrors(detector.match, `${path}.match`));
+    return runChecks(ctx, () => {
+        checkExpr(detector.match, 'boolean', MATCH_SCOPE, ctx, `${path}.match`);
+        for (const action of PAYLOAD_ACTIONS) {
+            const data = detector.actions?.[action]?.data;
+            if (data !== undefined) checkPayloadSpec(data, ctx, `${path}.actions.${action}.data`);
         }
     });
-    return errors;
 }
 
 /**
- * An action list: each item's `when` in boolean position, its payloads, and its `define` values in
- * value position, in one name scope.
+ * A legacy `match` holds `text`, `element`, `any`, `all` and `none` only. This release evaluates every
+ * operand of `any` and `all`, so an operand that can fail or error decides a `match` the shipped
+ * evaluator decided before reaching it.
  *
- * @param {Record<string, any>} detector
+ * @param {unknown} node
  * @param {string} path
  * @returns {string[]}
  */
-function validateListDetector(detector, path) {
-    return checkListDetector(detector, path).errors;
-}
-
-/**
- * Warnings on a `done` that config shows is never `true`: a value of another type, or a selected
- * list, which `define` stores as an array.
- *
- * @param {Record<string, any>} detector
- * @param {string} path
- * @returns {string[]}
- */
-function doneTypeWarnings(detector, path) {
-    if (!Array.isArray(detector.actions)) return [];
-    return checkListDetector(detector, path)
-        .doneTypes.filter(({ type }) => type.list === 'selected' || !allows(type, 'boolean'))
-        .map(
-            ({ type, path: donePath }) =>
-                `${donePath}: \`done\` is ${describeType(type)}, never \`true\`, so the detector never ends; give it a boolean, such as a test with \`is\``,
-        );
-}
-
-/**
- * @param {Record<string, any>} detector
- * @param {string} path
- * @returns {{ errors: string[], doneTypes: Array<{ type: StaticType, path: string }> }}
- */
-function checkListDetector(detector, path) {
-    const ctx = newContext();
-    ctx.structuralErrors.push(...itemShapeErrors(detector, path, ctx.defined));
-    const items = detector.actions.filter(isPlainObject);
-    /** @type {Array<{ type: StaticType, path: string }>} */
-    const doneTypes = [];
-    const errors = runChecks(
-        ctx,
-        () => {
-            detector.actions.forEach((/** @type {unknown} */ item, /** @type {number} */ index) => {
-                if (!isPlainObject(item)) return;
-                const itemPath = `${path}.actions[${index}]`;
-                if ('when' in item) checkExpr(item.when, 'boolean', { ...MATCH_SCOPE, item: index }, ctx, `${itemPath}.when`);
-                for (const action of PAYLOAD_ACTIONS) {
-                    const data = isPlainObject(item[action]) ? item[action].data : undefined;
-                    if (data !== undefined) checkPayloadSpec(data, ctx, `${itemPath}.${action}.data`, { ...PAYLOAD_SCOPE, item: index });
-                }
-                if (isPlainObject(item.define)) {
-                    for (const [
-                        name,
-                        value,
-                    ] of Object.entries(item.define)) {
-                        const definePath = `${itemPath}.define.${name}`;
-                        const type = checkExpr(value, 'value', { ...MATCH_SCOPE, matchRoot: false, item: index }, ctx, definePath);
-                        if (name === 'done' && ctx.mode === 'check') doneTypes.push({ type, path: definePath });
-                    }
-                }
-            });
+function shippedMatchErrors(node, path) {
+    if (Array.isArray(node)) return node.flatMap((entry, index) => shippedMatchErrors(entry, `${path}[${index}]`));
+    if (!isPlainObject(node)) return [];
+    return Object.entries(node).flatMap(
+        ([
+            key,
+            value,
+        ]) => {
+            if (key === 'text' || key === 'element') return [];
+            if (OPERATOR_KEYS.includes(key)) return shippedMatchErrors(value, `${path}.${key}`);
+            return [
+                `${path}.${key}: a legacy \`match\` holds \`text\`, \`element\`, \`any\`, \`all\` and \`none\` only, since this release evaluates every operand the shipped evaluator stopped before`,
+            ];
         },
-        () => checkListRootGuards(items.length === detector.actions.length ? detector.actions : [], path, ctx),
     );
-    return { errors, doneTypes };
 }
 
 /**
@@ -3344,14 +3256,14 @@ function forEachPatchedDetector(webDetection, cb) {
 }
 
 /**
- * The clients of each generated config, and the first app version whose C-S-S reads action lists.
- * Each version mirrors the `minSupportedVersion` of the migration entry in the platform override,
- * which moves every legacy detector to an action list. Both are placeholders no client reaches
- * until the app release carrying that C-S-S is known.
+ * The clients of each generated config, and the first app version carrying this release. Each
+ * version mirrors the `minSupportedVersion` of the migration entry in the platform override, which
+ * moves every legacy detector to this release's shape. Both are placeholders no client reaches until
+ * the app release carrying that C-S-S is known.
  *
  * @type {Array<{ configs: RegExp, injectNames: string[], version: number | string }>}
  */
-const LIST_SHAPE_CLIENTS = [
+const CLIENT_RELEASES = [
     {
         configs: /^v5\/android-config\.json$/,
         injectNames: [
@@ -3504,27 +3416,28 @@ function eventHubConsumers(configBody) {
 }
 
 /**
- * The event types a detector's `fireEvent` actions send.
+ * The event types a detector's `fireEvent` actions send, wherever they sit in `actions`.
  *
  * @param {Record<string, any>} detector
  * @returns {string[]}
  */
 function fireEventTypes(detector) {
-    if (Array.isArray(detector.actions)) {
-        return detector.actions.flatMap((/** @type {any} */ item) =>
-            typeof item?.fireEvent?.type === 'string'
-                ? [
-                      item.fireEvent.type,
-                  ]
-                : [],
-        );
-    }
-    const type = detector.actions?.fireEvent?.type;
-    return typeof type === 'string'
-        ? [
-              type,
-          ]
-        : [];
+    /** @type {string[]} */
+    const types = [];
+    /**
+     * @param {unknown} node
+     */
+    const visit = (node) => {
+        if (Array.isArray(node)) node.forEach(visit);
+        else if (isPlainObject(node)) {
+            if (isPlainObject(node.fireEvent) && typeof node.fireEvent.type === 'string') types.push(node.fireEvent.type);
+            Object.values(node).forEach(visit);
+        }
+    };
+    visit(detector.actions);
+    return [
+        ...new Set(types),
+    ];
 }
 
 /** `temp_` types are placeholders for detectors whose eventHub telemetry is not defined yet (for example, during experiments) */
@@ -3569,12 +3482,12 @@ describe('webDetection config tests', () => {
     describe('client views', () => {
         for (const config of latestConfigs) {
             const settings = config.body.features?.webDetection?.settings;
-            const clients = LIST_SHAPE_CLIENTS.find((entry) => entry.configs.test(config.name));
+            const clients = CLIENT_RELEASES.find((entry) => entry.configs.test(config.name));
             if (!settings?.detectors || !clients) continue;
             describe(config.name, () => {
                 for (const version of clientVersions(settings, clients.version)) {
-                    const lists = (compareVersions(version, clients.version) ?? -1) >= 0;
-                    it(`at ${version}, every ${lists ? 'detector is an action list' : 'enabled detector is in the legacy shape'}`, () => {
+                    const current = (compareVersions(version, clients.version) ?? -1) >= 0;
+                    it(`at ${version}, every ${current ? 'detector parses under this release' : 'enabled detector is in the legacy shape'}`, () => {
                         /** @type {string[]} */
                         const errors = [];
                         for (const others of [
@@ -3591,12 +3504,13 @@ describe('webDetection config tests', () => {
                                     detector,
                                 ] of Object.entries(group)) {
                                     const path = `detectors.${groupName}.${detectorId}`;
-                                    const isList = Array.isArray(detector.actions) && !('match' in detector);
-                                    if (lists && !isList) errors.push(`${path}: a client reading action lists sees the legacy shape`);
-                                    if (lists && isList) errors.push(...validateListDetector(detector, path));
-                                    if (!lists && isList && detector.state !== 'disabled')
+                                    const legacy = isLegacyDetector(detector);
+                                    if (current && legacy)
+                                        errors.push(`${path}: a client of this release sees the legacy shape, which it does not parse`);
+                                    if (current && !legacy) errors.push(...validateActionsDetector(detector, path));
+                                    if (!current && !legacy && detector.state !== 'disabled')
                                         errors.push(
-                                            `${path}: a client before action lists sees an enabled action list, which it matches on every page; author it with "state": "disabled" and enable it only for clients at or above ${clients.version}`,
+                                            `${path}: a client before this release sees an enabled detector in this release's shape, whose new keys it does not read; author it with "state": "disabled" and enable it only for clients at or above ${clients.version}`,
                                         );
                                 }
                             }
@@ -3619,23 +3533,6 @@ describe('webDetection config tests', () => {
                             detector,
                         ] of Object.entries(group)) {
                             for (const warning of repeatedEventWarnings(detector, `${config.name} detectors.${groupName}.${detectorId}`)) {
-                                console.warn(`warning: ${warning}`);
-                            }
-                        }
-                    }
-                });
-
-                it('warns on a `done` that is never `true`', () => {
-                    const detectors = clientDetectors(settings, clients.injectNames, clients.version, true);
-                    for (const [
-                        groupName,
-                        group,
-                    ] of Object.entries(detectors)) {
-                        for (const [
-                            detectorId,
-                            detector,
-                        ] of Object.entries(group)) {
-                            for (const warning of doneTypeWarnings(detector, `${config.name} detectors.${groupName}.${detectorId}`)) {
                                 console.warn(`warning: ${warning}`);
                             }
                         }
@@ -3894,11 +3791,9 @@ describe('webDetection config tests', () => {
                 all: [
                     { text: { pattern: 'a' }, using: 'length', is: { gte: 1 } },
                     {
-                        if: {
-                            test: { text: { pattern: 'b' } },
-                            then: { text: { pattern: 'c' }, using: 'length' },
-                            else: { text: { pattern: 'd' }, using: 'length' },
-                        },
+                        if: { text: { pattern: 'b' } },
+                        then: { text: { pattern: 'c' }, using: 'length' },
+                        else: { text: { pattern: 'd' }, using: 'length' },
                         is: { gt: { text: { pattern: 'e' }, using: 'length' } },
                     },
                     {
@@ -3925,7 +3820,7 @@ describe('webDetection config tests', () => {
                     {
                         element: {
                             selector: 'p',
-                            root: { if: { test: { text: { pattern: 'b' } }, then: { ref: 'x' }, else: { ref: 'y' } } },
+                            root: { if: { text: { pattern: 'b' } }, then: { ref: 'x' }, else: { ref: 'y' } },
                         },
                         using: 'length',
                     },
@@ -4148,28 +4043,26 @@ describe('webDetection config tests', () => {
         });
     });
 
-    describe('validateListDetector (self-test)', () => {
+    describe('validateDetector, match and actions (self-test)', () => {
         /**
-         * @param {unknown[]} actions
-         * @param {Record<string, unknown>} [rest]
+         * @param {Record<string, unknown>} detector
          */
-        const errorsOf = (actions, rest = {}) => validateDetector({ ...rest, actions }, '$');
+        const errorsOf = (detector) => validateDetector(detector, '$');
 
         /**
-         * @param {unknown[]} actions
+         * @param {Record<string, unknown>} detector
          */
-        const expectValid = (actions) => {
-            const errors = errorsOf(actions);
+        const expectValid = (detector) => {
+            const errors = errorsOf(detector);
             expect(errors, errors.join('\n')).to.deep.equal([]);
         };
 
         /**
          * @param {string} fragment
-         * @param {unknown[]} actions
-         * @param {Record<string, unknown>} [rest]
+         * @param {Record<string, unknown>} detector
          */
-        const expectError = (fragment, actions, rest) => {
-            const errors = errorsOf(actions, rest);
+        const expectError = (fragment, detector) => {
+            const errors = errorsOf(detector);
             expect(
                 errors.some((error) => error.includes(fragment)),
                 `expected an error containing ${JSON.stringify(fragment)}, got:\n${errors.join('\n') || '(none)'}`,
@@ -4178,274 +4071,343 @@ describe('webDetection config tests', () => {
 
         const imgCount = { element: { selector: 'img' }, using: 'length' };
 
-        it('passes a first-match chain over a gate, with breakage data and per-bucket events', () => {
-            expectValid([
-                {
-                    when: {
+        it('passes a detector that detects once, with several actions in one object', () => {
+            expectValid({
+                match: { ...imgCount, is: { gte: 5 } },
+                actions: [
+                    { define: { n: imgCount } },
+                    { fireEvent: { type: 'manyImages' }, breakageReportData: { data: { n: { value: { ref: 'n' } } } } },
+                ],
+            });
+        });
+
+        it('passes a measurement sending its event once, finished by a detector name', () => {
+            expectValid({
+                actions: {
+                    if: {
                         none: [
-                            { ...imgCount, as: 'n', is: { gt: 0 } },
+                            { ref: 'this.finished', is: true },
                         ],
                     },
-                    exit: true,
+                    then: [
+                        { define: { n: imgCount } },
+                        { breakageReportData: { data: { n: { value: { ref: 'n' } } } } },
+                        {
+                            if: {
+                                all: [
+                                    { ref: 'n', is: { gte: 3 } },
+                                    {
+                                        none: [
+                                            { ref: 'this.sent', is: true },
+                                        ],
+                                    },
+                                ],
+                            },
+                            then: [
+                                { fireEvent: { type: 'manyImages' } },
+                                { define: { 'this.sent': true } },
+                            ],
+                        },
+                        { define: { 'this.finished': { ref: 'n', is: { gt: 0 } } } },
+                    ],
                 },
-                { breakageReportData: { data: { n: { value: { ref: 'n' } } } } },
-                { when: { ref: 'n', is: { lt: 3 } }, fireEvent: { type: 'few' }, define: { done: true }, exit: true },
-                { fireEvent: { type: 'many' }, define: { done: true }, exit: true },
-            ]);
+            });
         });
 
         it('rejects shapes the client does not parse', () => {
-            expectError(
-                'unknown detector key "match"',
-                [
-                    { exit: true },
-                ],
-                { match: true },
-            );
-            expectError('unknown item key "stop"', [
-                { when: true, stop: true },
-            ]);
-            expectError('an item holds at least one of', [
-                { when: true },
-            ]);
-            expectError('`exit` takes `true`', [
-                { exit: false },
-            ]);
-            expectError('unknown key "state"', [
-                { fireEvent: { type: 'a', state: 'enabled' } },
-            ]);
-            expectError('`type` takes a string', [
-                { fireEvent: {} },
-            ]);
-            expectError('unknown key "state"', [
-                { breakageReportData: { state: 'enabled' } },
-            ]);
-            expectError('`define` takes an object of at least one name', [
-                { define: {} },
-            ]);
-            expectError('does not match', [
-                { define: { '1x': 1 } },
-            ]);
-        });
-
-        it('reads a defined name through `ref`, and rejects a name both defined and given by `as`', () => {
-            expectValid([
-                {
-                    when: {
-                        none: [
-                            { ref: 'sent', is: true },
-                        ],
-                    },
-                    fireEvent: { type: 'a' },
-                    define: { sent: true },
+            expectError('unknown detector key "items"', { items: [], actions: { breakageReportData: {} } });
+            expectError('a detector needs `actions`', { state: 'disabled', triggers: {} });
+            expectError('"api" is not an action', { actions: { fireEvent: { type: 'a' }, api: 'document' } });
+            expectError('sits in value position only, not boolean position', {
+                match: {
+                    all: [
+                        { element: { selector: 'p' } },
+                        { define: { x: 1 } },
+                    ],
                 },
-            ]);
-            expectError('a name is one or the other', [
-                { when: { ...imgCount, as: 'n', is: { gt: 0 } }, define: { n: 1 } },
-            ]);
-            expectError('the name is reserved', [
-                { when: { ...imgCount, as: 'done', is: { gt: 0 } }, exit: true },
-            ]);
-        });
-
-        it('takes every `define` value in value position, `done` included', () => {
-            expectValid([
-                { define: { done: { ...imgCount, is: { gt: 0 } }, n: imgCount, enough: { ...imgCount, is: { gte: 2 } } } },
-            ]);
-            expectValid([
-                { define: { done: 5 } },
-            ]);
-        });
-
-        it('checks each `when`, payload and `define` value as an expression', () => {
-            expectError('unknown expression key "pageFeature"', [
-                { when: { pageFeature: 'x' }, exit: true },
-            ]);
-            expectError('unknown expression key "pageFeature"', [
-                { define: { x: { pageFeature: 'x' } } },
-            ]);
-            expectError('payload key "nativeData" is reserved', [
-                { fireEvent: { type: 'a', data: { nativeData: { value: 1 } } } },
-            ]);
-        });
-
-        describe('root guards', () => {
-            const comments = { element: { selector: '#comments' }, as: 'comments' };
-            const rooted = { text: { pattern: '\\S', root: { ref: 'comments' } }, using: 'length', is: { gt: 0 } };
-
-            it("passes a guard in an earlier exit gate, or ahead in the item's own `all`", () => {
-                expectValid([
-                    {
-                        when: {
-                            none: [
-                                comments,
-                            ],
-                        },
-                        exit: true,
-                    },
-                    {
-                        when: {
-                            none: [
-                                rooted,
-                            ],
-                        },
-                        fireEvent: { type: 'a' },
-                        define: { done: true },
-                    },
-                ]);
-                expectValid([
-                    {
-                        when: {
-                            all: [
-                                comments,
-                                {
-                                    none: [
-                                        rooted,
-                                    ],
-                                },
-                            ],
-                        },
-                        fireEvent: { type: 'a' },
-                        define: { done: true },
-                    },
-                ]);
+                actions: { breakageReportData: {} },
             });
-
-            it('rejects a guard behind the rooted expression, in a later item, or in a gate without `exit`', () => {
-                expectError('`root` needs a guard', [
-                    {
-                        when: {
-                            all: [
-                                {
-                                    none: [
-                                        rooted,
-                                    ],
-                                },
-                                comments,
-                            ],
-                        },
-                        fireEvent: { type: 'a' },
-                        define: { done: true },
-                    },
-                ]);
-                expectError('`root` needs a guard', [
-                    {
-                        when: {
-                            none: [
-                                rooted,
-                            ],
-                        },
-                        fireEvent: { type: 'a' },
-                        define: { done: true },
-                    },
-                    {
-                        when: {
-                            none: [
-                                comments,
-                            ],
-                        },
-                        exit: true,
-                    },
-                ]);
-                expectError('`root` needs a guard', [
-                    {
-                        when: {
-                            none: [
-                                comments,
-                            ],
-                        },
-                        fireEvent: { type: 'b' },
-                    },
-                    {
-                        when: {
-                            none: [
-                                rooted,
-                            ],
-                        },
-                        fireEvent: { type: 'a' },
-                        define: { done: true },
-                    },
-                ]);
+            expectError('an array is not an expression', {
+                actions: [
+                    [
+                        { breakageReportData: {} },
+                    ],
+                ],
             });
+            expectError('a sequence holds at least one element', { actions: [] });
+            expectError('`then` sits beside `if` only', { actions: { then: { breakageReportData: {} } } });
+            expectError('`if` needs `then`', { actions: { if: true, else: { breakageReportData: {} } } });
+            expectError('`if` takes no other expression key', { actions: { if: true, then: 1, api: 'document' } });
+            expectError('fills value position only, not boolean position', {
+                match: { if: true, then: true },
+                actions: { breakageReportData: {} },
+            });
+            expectError('name does not match', { actions: { define: { 'that.x': 1 } } });
+            expectError('unknown key "state"', {
+                match: true,
+                actions: { breakageReportData: { data: {} }, fireEvent: { type: 'a', state: 'enabled' } },
+            });
+        });
+
+        it('rejects an action, a ref and a detector name in a detector with match', () => {
+            expectError('holds no action', { match: { expr: { define: { x: 1 } } }, actions: { breakageReportData: {} } });
+            expectError('holds no `ref`', { match: { ref: 'x' }, actions: { breakageReportData: {} } });
+            expectError('binds no detector name', { match: true, actions: { define: { 'this.x': 1 } } });
+            expectError('reads no detector name', { match: true, actions: { define: { x: { ref: 'this.x' } } } });
+        });
+
+        it('rejects a run name read before a define binds it, and passes one bound in an earlier branch', () => {
+            expectError('reads a run name no `define` binds before it', {
+                actions: [
+                    { define: { y: { ref: 'x' } } },
+                    { define: { x: 1 } },
+                ],
+            });
+            expectError('reads a run name no `define` binds before it', { actions: { define: { y: { ref: 'y' } } } });
+            expectValid({ actions: { define: { x: 1, y: { ref: 'x' } } } });
+            expectValid({
+                actions: [
+                    { if: { ...imgCount, is: 0 }, then: { define: { x: 1 } } },
+                    { breakageReportData: { data: { x: { value: { ref: 'x' } } } } },
+                ],
+            });
+            expectError('reads a run name no `define` binds before it', {
+                actions: [
+                    { if: { ref: 'x', is: 1 }, then: { define: { x: 1 } } },
+                ],
+            });
+        });
+
+        it('passes a detector name read before its define, and rejects one no define binds', () => {
+            expectValid({
+                actions: {
+                    define: {
+                        'this.count': {
+                            if: { ref: 'this.count', is: { type: 'undefined' } },
+                            then: 1,
+                            else: {
+                                sum: [
+                                    { ref: 'this.count' },
+                                    1,
+                                ],
+                            },
+                        },
+                    },
+                },
+            });
+            expectError('reads a detector name no `define` in the detector binds', {
+                actions: { define: { x: { ref: 'this.never', is: true } } },
+            });
+        });
+
+        it('types a ref by the defines that can bind it', () => {
+            expectError('number position takes a number', {
+                actions: [
+                    { define: { x: 'unsupported' } },
+                    {
+                        define: {
+                            y: {
+                                sum: [
+                                    { ref: 'x' },
+                                ],
+                            },
+                        },
+                    },
+                ],
+            });
+            expectValid({
+                actions: [
+                    { define: { x: { element: { selector: 'p' } } } },
+                    { if: { ref: 'x' }, then: { breakageReportData: {} } },
+                ],
+            });
+            expectError('the name is bound to a list', {
+                actions: [
+                    { define: { x: { element: { selector: 'img', field: 'naturalWidth' } } } },
+                    { if: { ref: 'x' }, then: { breakageReportData: {} } },
+                ],
+            });
+            expectValid({
+                actions: [
+                    { define: { x: { element: { selector: 'p' } } } },
+                    {
+                        define: {
+                            has: {
+                                all: [
+                                    { ref: 'x' },
+                                    true,
+                                ],
+                            },
+                        },
+                    },
+                ],
+            });
+        });
+
+        it('requires a root guard in actions: a ref to the bound root in an enclosing condition', () => {
+            const scoped = { element: { selector: 'img', root: { ref: 'region' } }, using: 'length' };
+            expectValid({
+                actions: [
+                    { define: { region: { element: { selector: '#comments' } } } },
+                    { if: { ref: 'region' }, then: { breakageReportData: { data: { n: { value: scoped } } } } },
+                ],
+            });
+            expectValid({
+                actions: [
+                    { define: { region: { element: { selector: '#comments' } } } },
+                    {
+                        define: {
+                            empty: {
+                                all: [
+                                    { ref: 'region' },
+                                    { ...scoped, is: 0 },
+                                ],
+                            },
+                        },
+                    },
+                ],
+            });
+            expectError('`root` needs a guard', {
+                actions: [
+                    { define: { region: { element: { selector: '#comments' } } } },
+                    { breakageReportData: { data: { n: { value: scoped } } } },
+                ],
+            });
+            expectError('`root` needs a guard', {
+                actions: {
+                    if: true,
+                    then: {
+                        breakageReportData: {
+                            data: { n: { value: { element: { selector: 'img', root: '#comments' }, using: 'length' } } },
+                        },
+                    },
+                },
+            });
+            const shadow = { only: { element: { selector: 'x-widget' } }, using: 'shadowRoot' };
+            expectError('carries `is`', {
+                actions: [
+                    { define: { region: shadow } },
+                    { if: { ref: 'region' }, then: { breakageReportData: { data: { n: { value: scoped } } } } },
+                ],
+            });
+            expectValid({
+                actions: [
+                    { define: { region: shadow } },
+                    { if: { ref: 'region', is: { type: 'object' } }, then: { breakageReportData: { data: { n: { value: scoped } } } } },
+                ],
+            });
+        });
+
+        it('requires a root guard in match: the root expression repeated in the same condition', () => {
+            const region = { element: { selector: '#comments' } };
+            const empty = { element: { selector: 'img', root: region }, using: 'length', is: 0 };
+            expectValid({
+                match: {
+                    all: [
+                        region,
+                        empty,
+                    ],
+                },
+                actions: { breakageReportData: {} },
+            });
+            expectValid({ match: { if: region, then: empty, else: false }, actions: { breakageReportData: {} } });
+            expectError('`root` needs a guard', { match: empty, actions: { breakageReportData: {} } });
+            expectError('`root` needs a guard', {
+                match: {
+                    all: [
+                        { element: { selector: '#other' } },
+                        empty,
+                    ],
+                },
+                actions: { breakageReportData: {} },
+            });
+            expectValid({ match: { element: { selector: 'img', root: region } }, actions: { breakageReportData: {} } });
         });
 
         describe('repeated events', () => {
             /**
-             * @param {unknown[]} actions
+             * @param {Record<string, unknown>} detector
              */
-            const warningsOf = (actions) => repeatedEventWarnings({ actions }, '$');
+            const warningsOf = (detector) => repeatedEventWarnings(detector, '$');
 
-            it('warns on an unguarded event in a detector that never defines `done`', () => {
+            it('warns on an event in a detector with no match that no detector name guards', () => {
+                expect(warningsOf({ actions: { fireEvent: { type: 'a' } } }).length).to.equal(1);
+                expect(warningsOf({ actions: { if: { ref: 'n', is: 1 }, then: { fireEvent: { type: 'a' } } } }).length).to.equal(1);
                 expect(
-                    warningsOf([
-                        { when: imgCount, fireEvent: { type: 'a' } },
-                    ]).length,
+                    warningsOf({
+                        actions: {
+                            if: {
+                                none: [
+                                    { ref: 'this.sent', is: true },
+                                ],
+                            },
+                            then: { fireEvent: { type: 'a' } },
+                        },
+                    }).length,
                 ).to.equal(1);
             });
 
-            it('passes a detector that defines `done`, and an event a name it defines guards', () => {
+            it('passes an event guarded by a detector name its branch binds, and any event in a detector with match', () => {
                 expect(
-                    warningsOf([
-                        { fireEvent: { type: 'a' }, define: { done: true } },
-                    ]),
-                ).to.deep.equal([]);
-                expect(
-                    warningsOf([
-                        {
-                            when: {
+                    warningsOf({
+                        actions: {
+                            if: {
                                 none: [
-                                    { ref: 'sent', is: true },
+                                    { ref: 'this.sent', is: true },
                                 ],
                             },
-                            fireEvent: { type: 'a' },
-                            define: { sent: true },
+                            then: [
+                                { fireEvent: { type: 'a' } },
+                                { define: { 'this.sent': true } },
+                            ],
                         },
-                    ]),
+                    }),
                 ).to.deep.equal([]);
-                expect(
-                    warningsOf([
-                        { when: { ref: 'sent', is: true }, exit: true },
-                        { fireEvent: { type: 'a' }, define: { sent: true } },
-                    ]),
-                ).to.deep.equal([]);
+                expect(warningsOf({ match: true, actions: { fireEvent: { type: 'a' } } })).to.deep.equal([]);
             });
         });
 
-        describe('`done` types', () => {
-            /**
-             * @param {unknown} done
-             */
-            const warningsOf = (done) =>
-                doneTypeWarnings(
-                    {
+        describe('the legacy shape', () => {
+            it('tells the legacy shape from this release', () => {
+                expect(isLegacyDetector({ match: true })).to.equal(true);
+                expect(isLegacyDetector({ match: true, actions: { fireEvent: { state: 'enabled', type: 'a' } } })).to.equal(true);
+                expect(isLegacyDetector({ match: true, actions: { fireEvent: { type: 'a' } } })).to.equal(false);
+                expect(
+                    isLegacyDetector({
                         actions: [
-                            { define: { done } },
+                            { breakageReportData: {} },
                         ],
+                    }),
+                ).to.equal(false);
+            });
+
+            it('rejects a legacy match holding an operand that can fail or error', () => {
+                const errors = validateDetector(
+                    {
+                        match: {
+                            any: [
+                                { text: { pattern: 'a' } },
+                                { api: 'document.hidden' },
+                            ],
+                        },
+                        actions: { fireEvent: { state: 'enabled', type: 'a' } },
                     },
                     '$',
                 );
-
-            it('warns on a `done` that config shows is not a boolean, or is a selected list', () => {
-                expect(warningsOf(5)).to.deep.equal([
-                    '$.actions[0].define.done: `done` is number, never `true`, so the detector never ends; give it a boolean, such as a test with `is`',
-                ]);
+                expect(errors.some((error) => error.includes('a legacy `match` holds'))).to.equal(true);
                 expect(
-                    warningsOf({
-                        sum: [
-                            1,
-                            2,
-                        ],
-                    }).length,
-                ).to.equal(1);
-                expect(warningsOf(imgCount).length).to.equal(1);
-                expect(warningsOf({ element: { selector: 'img' } }).length).to.equal(1);
-            });
-
-            it('passes a boolean, a test, `any` and an `api` config does not type', () => {
-                expect(warningsOf(true)).to.deep.equal([]);
-                expect(warningsOf({ ...imgCount, is: { gt: 0 } })).to.deep.equal([]);
-                expect(warningsOf({ any: { element: { selector: 'img' } } })).to.deep.equal([]);
-                expect(warningsOf({ api: 'document.hidden' })).to.deep.equal([]);
+                    validateDetector(
+                        {
+                            match: {
+                                all: [
+                                    { text: { pattern: 'a' } },
+                                    { element: { selector: 'p' } },
+                                ],
+                            },
+                        },
+                        '$',
+                    ),
+                ).to.deep.equal([]);
             });
         });
 
@@ -4507,21 +4469,27 @@ describe('webDetection config tests', () => {
                 expect(compareVersions('1.0.0', 1)).to.equal(undefined);
             });
 
-            it('lists the event type of every item', () => {
+            it('lists the event type of every fireEvent, in branches and sequences', () => {
                 expect(
                     fireEventTypes({
                         actions: [
                             { fireEvent: { type: 'a' } },
-                            { exit: true },
-                            { fireEvent: { type: 'b' } },
+                            {
+                                if: true,
+                                then: [
+                                    { fireEvent: { type: 'b' } },
+                                ],
+                                else: { if: false, then: { fireEvent: { type: 'c' } } },
+                            },
                         ],
                     }),
                 ).to.deep.equal([
                     'a',
                     'b',
-                ]);
-                expect(fireEventTypes({ match: true, actions: { fireEvent: { type: 'c' } } })).to.deep.equal([
                     'c',
+                ]);
+                expect(fireEventTypes({ match: true, actions: { fireEvent: { state: 'enabled', type: 'd' } } })).to.deep.equal([
+                    'd',
                 ]);
             });
         });
@@ -4533,7 +4501,7 @@ describe('webDetection config tests', () => {
          * @param {Record<string, unknown>} [data]
          */
         const errorsOf = (match, data) =>
-            validateDetector({ match, ...(data ? { actions: { fireEvent: { type: 't', data } } } : {}) }, '$');
+            validateDetector({ match, actions: data ? { fireEvent: { type: 't', data } } : { breakageReportData: {} } }, '$');
 
         /**
          * @param {unknown} match
@@ -4557,6 +4525,26 @@ describe('webDetection config tests', () => {
             ).to.equal(true);
         };
 
+        /**
+         * @param {unknown} actions
+         */
+        const expectActionsValid = (actions) => {
+            const errors = validateDetector({ actions }, '$');
+            expect(errors, errors.join('\n')).to.deep.equal([]);
+        };
+
+        /**
+         * @param {string} fragment - text one of the errors contains
+         * @param {unknown} actions
+         */
+        const expectActionsError = (fragment, actions) => {
+            const errors = validateDetector({ actions }, '$');
+            expect(
+                errors.some((error) => error.includes(fragment)),
+                `expected an error containing ${JSON.stringify(fragment)}, got:\n${errors.join('\n') || '(none)'}`,
+            ).to.equal(true);
+        };
+
         const img = { element: { selector: 'img' } };
         const imgCount = { ...img, using: 'length' };
         const loadEventEnd = {
@@ -4570,15 +4558,15 @@ describe('webDetection config tests', () => {
         };
         const now = { api: { path: 'performance.now', args: [] } };
         const title = { api: { path: 'document.title' } };
+        /** A region, which guards a source rooted at it when `match` repeats it */
         const guard = {
             element: {
                 selector: [
                     '#comments',
                 ],
             },
-            as: 'comments',
         };
-        const rootedImages = { element: { selector: 'img', root: { ref: 'comments' } }, using: 'length' };
+        const rootedImages = { element: { selector: 'img', root: guard }, using: 'length' };
         const text = { text: { pattern: 'a' } };
 
         /**
@@ -4671,13 +4659,11 @@ describe('webDetection config tests', () => {
                     ],
                 });
                 expectError(notExpression, {
-                    if: {
-                        test: [
-                            true,
-                        ],
-                        then: true,
-                        else: false,
-                    },
+                    if: [
+                        true,
+                    ],
+                    then: true,
+                    else: false,
                 });
                 expectError(notExpression, {
                     api: { path: 'document.title' },
@@ -4998,10 +4984,17 @@ describe('webDetection config tests', () => {
                 expectError('two operands', { div: now, is: { gt: 0 } });
             });
 
-            it('checks `if` has exactly `test`, `then` and `else`', () => {
-                expectValid({ if: { test: true, then: 1, else: 2 }, is: 1 });
-                expectError('missing [else]', { if: { test: true, then: 1 }, is: 1 });
-                expectError('extra [otherwise]', { if: { test: true, then: 1, else: 2, otherwise: 3 }, is: 1 });
+            it('checks `if` has `then`, and `else` outside value position', () => {
+                expectValid({ if: true, then: 1, else: 2, is: 1 });
+                expectValid({ if: true, then: 1, is: 1 });
+                expectError('fills value position only, not number position', {
+                    sum: [
+                        { if: true, then: 1 },
+                    ],
+                    is: 1,
+                });
+                expectError('`if` needs `then`', { if: true, else: 2, is: 1 });
+                expectError('unknown expression key "otherwise"', { if: true, then: 1, else: 2, otherwise: 3, is: 1 });
             });
 
             it('rejects `catch`', () => {
@@ -5021,93 +5014,49 @@ describe('webDetection config tests', () => {
         });
 
         describe('names', () => {
-            it('rejects a duplicate `as`, in match or payloads', () => {
-                expectError('already used', {
-                    all: [
-                        { ...imgCount, as: 'images', is: { gt: 0 } },
-                        { ...imgCount, as: 'images', is: { lt: 9 } },
-                    ],
-                });
-                expectError('already used', { ...imgCount, as: 'images', is: { gt: 0 } }, { a: { value: { ...imgCount, as: 'images' } } });
+            it('rejects a define or ref not matching the name pattern', () => {
+                expectActionsError('does not match', { define: { '1images': imgCount } });
+                expectActionsError('does not match', { define: { x: { ref: 'not-a-name' } } });
             });
 
-            it('rejects an `as` or `ref` not matching the name pattern', () => {
-                expectError('does not match', { ...imgCount, as: '1images', is: { gt: 0 } });
-                expectError('does not match', { ref: 'not-a-name', is: 0 });
-            });
-
-            it('rejects an unresolved ref', () => {
-                expectError('names no expression', { ref: 'missing', is: 0 });
-            });
-
-            it('rejects a cycle of refs', () => {
-                expectError('cycle', {
-                    sum: [
-                        { ref: 'a' },
-                        1,
-                    ],
-                    as: 'a',
-                    is: { gt: 0 },
-                });
-                expectError('cycle', {
-                    all: [
-                        {
+            it('rejects a ref to a run name no define binds before it', () => {
+                expectActionsError('reads a run name no `define` binds before it', { define: { x: { ref: 'missing' } } });
+                expectActionsError('reads a run name no `define` binds before it', {
+                    define: {
+                        a: {
                             sum: [
-                                now,
-                                { ref: 'b' },
-                            ],
-                            as: 'a',
-                            is: { gt: 0 },
-                        },
-                        {
-                            div: [
                                 { ref: 'a' },
                                 1,
                             ],
-                            as: 'b',
-                            is: { gt: 0 },
                         },
-                    ],
-                });
-            });
-
-            it('rejects a ref in match into an `if` branch from outside it', () => {
-                const ifExpr = { if: { test: { ...imgCount, is: { gt: 0 } }, then: { ...imgCount, as: 'inner' }, else: 0 }, is: { gt: 0 } };
-                expectError('from outside it', {
-                    all: [
-                        ifExpr,
-                        { ref: 'inner', is: { gt: 1 } },
-                    ],
-                });
-                expectValid({
-                    if: {
-                        test: true,
-                        then: {
-                            all: [
-                                { ...imgCount, as: 'inner', is: { gt: 0 } },
-                                { ref: 'inner', is: { lt: 5 } },
-                            ],
-                        },
-                        else: false,
                     },
                 });
-                expectValid(ifExpr, { inner: { value: { ref: 'inner' } } });
+                expectActionsValid({
+                    define: {
+                        a: imgCount,
+                        b: {
+                            sum: [
+                                { ref: 'a' },
+                                1,
+                            ],
+                        },
+                    },
+                });
             });
 
             it('reads a ref in the ref’s own position', () => {
-                expectValid({ ...img, as: 'images' }, { images: { value: { ref: 'images', using: 'length' } } });
-                expectValid({
-                    all: [
-                        { ...imgCount, as: 'images', is: { gte: 5 } },
-                        { ref: 'images', is: { gte: 5 } },
-                    ],
-                });
-                expectError('which its target does not fill', {
-                    all: [
-                        { ...imgCount, as: 'images', is: { gte: 5 } },
-                        { ref: 'images' },
-                    ],
-                });
+                expectActionsValid([
+                    { define: { images: img } },
+                    { fireEvent: { type: 't', data: { images: { value: { ref: 'images', using: 'length' } } } } },
+                ]);
+                expectActionsValid([
+                    { define: { images: imgCount } },
+                    { define: { many: { ref: 'images', is: { gte: 5 } } } },
+                ]);
+                expectActionsError('boolean position takes a boolean, and config types the name as number', [
+                    { define: { images: imgCount } },
+                    { if: { ref: 'images' }, then: { breakageReportData: {} } },
+                ]);
             });
         });
 
@@ -5140,8 +5089,8 @@ describe('webDetection config tests', () => {
                 expectError('A string fills', { only: 'x', is: 1 });
                 expectError('A string fills', { element: { selector: 'p' }, using: 'length', is: { gt: 'x' } });
                 expectValid(true, {
-                    word: { value: { if: { test: true, then: 'yes', else: 'no' } } },
-                    state: { value: { if: { test: false, then: 'x', else: null } } },
+                    word: { value: { if: true, then: 'yes', else: 'no' } },
+                    state: { value: { if: false, then: 'x', else: null } },
                 });
                 expectValid({ api: { path: 'document.readyState' }, is: { eq: { api: { path: 'document.readyState' } } } });
             });
@@ -5167,8 +5116,14 @@ describe('webDetection config tests', () => {
 
             it('rejects a selected list in a payload without buckets', () => {
                 expectError('sent through `buckets`', true, { matched: { value: text } });
-                expectError('sent through `buckets`', { ...img, as: 'images' }, { image: { value: { ref: 'images' } } });
-                expectValid({ ...img, as: 'images' }, { image: { value: { ref: 'images', using: 'length' } } });
+                expectActionsError('sent through `buckets`', [
+                    { define: { images: img } },
+                    { fireEvent: { type: 't', data: { image: { value: { ref: 'images' } } } } },
+                ]);
+                expectActionsValid([
+                    { define: { images: img } },
+                    { fireEvent: { type: 't', data: { image: { value: { ref: 'images', using: 'length' } } } } },
+                ]);
                 expectValid(true, { width: { value: fieldOf('img', 'naturalWidth'), buckets: { wide: { gt: 100 } } } });
             });
 
@@ -5241,7 +5196,7 @@ describe('webDetection config tests', () => {
                 });
                 expectError('`using` `length` fills', { only: imgCount, is: { gt: 0 } });
                 expectError('A number fills', { only: 1, is: 0 });
-                expectError('`if` fills', { only: { if: { test: true, then: img, else: img } }, is: 0 });
+                expectError('`if` fills', { only: { if: true, then: img, else: img }, is: 0 });
                 expectError('`only` fills', { only: img });
                 expectError('number position takes a number, and config types the value as string', {
                     div: [
@@ -5375,21 +5330,23 @@ describe('webDetection config tests', () => {
                     }),
                     is: { gt: 0 },
                 });
-                expectValid({
-                    all: [
-                        { ...imgCount, as: 'images', is: { gt: 0 } },
-                        {
-                            api: {
-                                path: 'Math.max',
-                                args: [
-                                    { ref: 'images' },
-                                    1,
-                                ],
+                expectActionsValid([
+                    { define: { images: imgCount } },
+                    {
+                        define: {
+                            most: {
+                                api: {
+                                    path: 'Math.max',
+                                    args: [
+                                        { ref: 'images' },
+                                        1,
+                                    ],
+                                },
+                                is: { gt: 0 },
                             },
-                            is: { gt: 0 },
                         },
-                    ],
-                });
+                    },
+                ]);
                 expectError('`apply` takes its arguments as a selected list', { ...maxOf(5), is: {} });
                 expectError('`apply` takes its arguments as a selected list', { ...maxOf({ api: { path: 'document.title' } }), is: {} });
                 expectError('`Math.max` takes numbers, and config types the value as string', { ...maxOf(fieldOf('img', 'src')), is: {} });
@@ -5527,34 +5484,74 @@ describe('webDetection config tests', () => {
         });
 
         describe('`root` guard', () => {
-            it('passes a guard ahead of the scoped expression', () => {
-                expectValid(
-                    {
-                        all: [
-                            guard,
-                            { ...rootedImages, is: { lt: 1 } },
-                        ],
-                    },
-                    { images: { value: rootedImages } },
-                );
+            it('passes a guard in match repeating the root, in the same top-level `all` or an enclosing `if`', () => {
                 expectValid({
                     all: [
-                        { element: { selector: '#comments', visibility: 'visible', where: { hidden: false } }, as: 'comments' },
+                        guard,
                         { ...rootedImages, is: { lt: 1 } },
+                    ],
+                });
+                expectValid({
+                    all: [
+                        { ...rootedImages, is: { lt: 1 } },
+                        guard,
+                    ],
+                });
+                expectValid({ if: guard, then: { ...rootedImages, is: { lt: 1 } }, else: false });
+                expectValid({
+                    all: [
+                        { element: { selector: '#comments', visibility: 'visible', where: { hidden: false } } },
+                        {
+                            element: {
+                                selector: 'img',
+                                root: { element: { selector: '#comments', visibility: 'visible', where: { hidden: false } } },
+                            },
+                            using: 'length',
+                            is: { lt: 1 },
+                        },
                     ],
                 });
             });
 
+            it('passes a guard in actions: a `ref` to the bound root', () => {
+                const scoped = { element: { selector: 'img', root: { ref: 'comments' } }, using: 'length' };
+                expectActionsValid([
+                    { define: { comments: guard } },
+                    { if: { ref: 'comments' }, then: { breakageReportData: { data: { images: { value: scoped } } } } },
+                ]);
+                expectActionsValid([
+                    { define: { comments: guard } },
+                    {
+                        define: {
+                            empty: {
+                                all: [
+                                    { ref: 'comments' },
+                                    { ...scoped, is: 0 },
+                                ],
+                            },
+                        },
+                    },
+                ]);
+                expectActionsError('needs a guard', [
+                    { define: { comments: guard } },
+                    { breakageReportData: { data: { images: { value: scoped } } } },
+                ]);
+                expectActionsError('needs a guard', {
+                    if: guard,
+                    then: { breakageReportData: { data: { images: { value: rootedImages } } } },
+                });
+            });
+
             it('checks each entry of an array root for a guard', () => {
-                const sidebar = { element: { selector: '#sidebar' }, as: 'sidebar' };
+                const sidebar = { element: { selector: '#sidebar' } };
                 const scoped = (/** @type {unknown} */ root) => ({ element: { selector: 'img', root }, using: 'length', is: { lt: 1 } });
                 expectValid({
                     all: [
                         guard,
                         sidebar,
                         scoped([
-                            { ref: 'comments' },
-                            { ref: 'sidebar' },
+                            guard,
+                            sidebar,
                         ]),
                     ],
                 });
@@ -5562,7 +5559,7 @@ describe('webDetection config tests', () => {
                     all: [
                         guard,
                         scoped([
-                            { ref: 'comments' },
+                            guard,
                             '#sidebar',
                         ]),
                     ],
@@ -5581,7 +5578,7 @@ describe('webDetection config tests', () => {
                 expectValid({ element: { selector: 'img', root: { element: { selector: '#comments' } } } });
             });
 
-            it('rejects a scoped expression with no guard, or a guard behind it', () => {
+            it('rejects a scoped expression with no guard, or a guard elsewhere', () => {
                 expectError('needs a guard', {
                     all: [
                         { element: { selector: 'img', root: '#comments' }, using: 'length', is: { lt: 1 } },
@@ -5589,13 +5586,7 @@ describe('webDetection config tests', () => {
                 });
                 expectError('needs a guard', {
                     all: [
-                        { element: { selector: 'img', root: { element: { selector: '#comments' } } }, using: 'length', is: { lt: 1 } },
-                    ],
-                });
-                expectError('needs a guard', {
-                    all: [
                         { ...rootedImages, is: { lt: 1 } },
-                        guard,
                     ],
                 });
                 expectError('needs a guard', {
@@ -5604,14 +5595,10 @@ describe('webDetection config tests', () => {
                         { ...rootedImages, is: { lt: 1 } },
                     ],
                 });
-                expectError(
-                    'needs a guard',
-                    { ...guard, as: 'region' },
-                    { images: { value: { element: { selector: 'img', root: '#comments' }, using: 'length' } } },
-                );
+                expectError('needs a guard', guard, { images: { value: rootedImages } });
             });
 
-            it('rejects a scoped leaf under `none`, or read through a ref, with no guard', () => {
+            it('rejects a scoped leaf under `none` with no guard', () => {
                 expectError('needs a guard', {
                     none: [
                         {
@@ -5624,19 +5611,6 @@ describe('webDetection config tests', () => {
                         },
                     ],
                 });
-                expectError(
-                    'needs a guard',
-                    {
-                        element: {
-                            selector: 'img',
-                            root: [
-                                '#comments',
-                            ],
-                        },
-                        as: 'images',
-                    },
-                    { n: { value: { ref: 'images', using: 'length' } } },
-                );
             });
 
             it('rejects a scoped leaf in `where` with a `none` above it, in the match tree or the predicate, with no guard', () => {
@@ -5649,8 +5623,8 @@ describe('webDetection config tests', () => {
             });
 
             it('requires `is` on a guard that is not an `element` or `text` source', () => {
-                const shadowRoot = { only: { element: { selector: 'my-widget' } }, using: 'shadowRoot', as: 'shadow' };
-                const shadowImages = { element: { selector: 'img', root: { ref: 'shadow' } }, using: 'length', is: { lt: 1 } };
+                const shadowRoot = { only: { element: { selector: 'my-widget' } }, using: 'shadowRoot' };
+                const shadowImages = { element: { selector: 'img', root: shadowRoot }, using: 'length', is: { lt: 1 } };
                 expectError('carries `is`', {
                     all: [
                         shadowRoot,
@@ -6014,43 +5988,10 @@ describe('webDetection config tests', () => {
                 expectError('`self` reads from `using`, `where` or `field`', true, { x: { value: { self: {} } } });
             });
 
-            it('rejects `as` on an expression reading `self` per item, and inside the branches of an `if` reading one', () => {
-                expectError('`as` names one value per run', items('img', { naturalWidth: { gt: { self: 'naturalHeight', as: 'h' } } }));
-                expectError(
-                    '`as` names one value per run',
-                    items('img', {
-                        naturalWidth: {
-                            gt: {
-                                if: {
-                                    test: { self: 'complete' },
-                                    then: {
-                                        sum: [
-                                            1,
-                                        ],
-                                        as: 'one',
-                                    },
-                                    else: 2,
-                                },
-                            },
-                        },
-                    }),
-                );
-                expectValid(
-                    items('img', {
-                        naturalWidth: {
-                            gt: {
-                                sum: [
-                                    1,
-                                ],
-                                as: 'one',
-                            },
-                        },
-                    }),
-                );
+            it('rejects `as`', () => {
+                expectError('unknown expression key "as"', items('img', { naturalWidth: { gt: { self: 'naturalHeight', as: 'h' } } }));
             });
-        });
 
-        describe('`using`', () => {
             const navigation = {
                 api: {
                     path: 'performance.getEntriesByType',
@@ -6061,12 +6002,10 @@ describe('webDetection config tests', () => {
             };
 
             it('names a path `using` reads by the name of the expression beside it, through `ref` and `only`', () => {
-                expectValid({
-                    all: [
-                        { only: navigation, as: 'navigation', is: { type: 'object' } },
-                        { ref: 'navigation', using: 'loadEventEnd', is: { gt: 0 } },
-                    ],
-                });
+                expectActionsValid([
+                    { define: { navigation: { only: navigation } } },
+                    { define: { ended: { ref: 'navigation', using: 'loadEventEnd', is: { gt: 0 } } } },
+                ]);
                 expectValid({ only: navigation, using: 'responseStatus', is: { gte: 400 } });
                 expectError('"performance.getEntriesByType.name", which is not in API_ALLOWLIST', {
                     only: navigation,
@@ -6152,7 +6091,9 @@ describe('webDetection config tests', () => {
             it('checks what `using` reads under each name the expression beside it may have', () => {
                 const document = { api: { path: 'document' } };
                 expectValid({
-                    if: { test: true, then: document, else: document },
+                    if: true,
+                    then: document,
+                    else: document,
                     using: 'title',
                     is: { type: 'string' },
                 });
@@ -6177,20 +6118,18 @@ describe('webDetection config tests', () => {
                         },
                     },
                 };
-                const entry = { if: { test: { api: { path: 'document.hidden' } }, then: byType, else: byName } };
+                const entry = { if: { api: { path: 'document.hidden' } }, then: byType, else: byName };
                 expectError('"performance.getEntriesByType.startTime", which is not in API_ALLOWLIST', {
                     ...entry,
                     using: 'startTime',
                     is: { gt: 0 },
                 });
-                expectError('"performance.getEntriesByName.duration", which is not in API_ALLOWLIST', {
-                    all: [
-                        { ...entry, as: 'entry', is: {} },
-                        { ref: 'entry', using: 'duration', is: { gt: 0 } },
-                    ],
-                });
+                expectActionsError('"performance.getEntriesByName.duration", which is not in API_ALLOWLIST', [
+                    { define: { entry } },
+                    { define: { long: { ref: 'entry', using: 'duration', is: { gt: 0 } } } },
+                ]);
                 const image = { only: { element: { selector: 'img' } } };
-                const either = { if: { test: true, then: image, else: document } };
+                const either = { if: true, then: image, else: document };
                 expectValid({ ...either, using: 'title', is: { type: 'string' } });
                 expectError('"document.naturalWidth", which is not in API_ALLOWLIST', {
                     ...either,
@@ -6207,7 +6146,7 @@ describe('webDetection config tests', () => {
 
             it('takes a path, or an `api` body without `root`, beside an expression', () => {
                 expectValid({ api: { path: 'document' }, using: 'fonts', is: { type: 'object' } });
-                expectValid({ api: { path: 'document' }, using: { path: 'fonts', where: { status: 'error' } }, as: 'failed', is: {} });
+                expectValid({ api: { path: 'document' }, using: { path: 'fonts', where: { status: 'error' } }, is: {} });
                 expectError('`using` reads from an expression', { using: 'length', is: 1 });
                 expectError('`using` takes a path', { ...img, using: 1, is: {} });
                 expectError('unknown source body key "root"', {
@@ -6233,7 +6172,6 @@ describe('webDetection config tests', () => {
                             { self: 'duration' },
                         ],
                     },
-                    as: 'ratio',
                     is: { gt: 0 },
                 });
                 expectValid({ ...img, using: { self: 'length' }, is: { gte: 5 } });
@@ -6248,32 +6186,40 @@ describe('webDetection config tests', () => {
                 });
             });
 
-            it('applies `using`, then `as`, then `is`', () => {
-                expectValid({ ...img, using: 'length', as: 'images', is: { gte: 5 } }, { images: { value: { ref: 'images' } } });
-                expectError(
-                    'a selected list is sent through `buckets`',
-                    { ...img, as: 'images' },
-                    { images: { value: { ref: 'images' } } },
-                );
+            it('applies `using`, then `is`', () => {
+                expectValid({ ...img, using: 'length', is: { gte: 5 } });
+                expectActionsValid([
+                    { define: { images: { ...img, using: 'length' } } },
+                    { fireEvent: { type: 't', data: { images: { value: { ref: 'images' } } } } },
+                ]);
+                expectActionsError('a selected list is sent through `buckets`', [
+                    { define: { images: img } },
+                    { fireEvent: { type: 't', data: { images: { value: { ref: 'images' } } } } },
+                ]);
             });
         });
 
         describe('`expr`', () => {
-            it('names a value and what `using` reads from it', () => {
-                expectValid(
-                    { expr: { ...img, as: 'imageElements' }, using: 'length', as: 'imageCount', is: { gte: 2 } },
+            it('binds a value, and what `using` reads from it', () => {
+                expectActionsValid([
+                    { define: { imageElements: img, imageCount: { ref: 'imageElements', using: 'length' } } },
                     {
-                        imageCount: { value: { ref: 'imageCount' } },
-                        imageElements: { value: { ref: 'imageElements' }, buckets: { two: { length: 2 } } },
+                        fireEvent: {
+                            type: 't',
+                            data: {
+                                imageCount: { value: { ref: 'imageCount' } },
+                                imageElements: { value: { ref: 'imageElements' }, buckets: { two: { length: 2 } } },
+                            },
+                        },
                     },
-                );
+                ]);
             });
 
-            it('names the boolean an `is` inside it gives', () => {
-                expectValid(
-                    { expr: { ...img, using: 'length', is: { gte: 2 } }, as: 'enoughImages' },
-                    { enough: { value: { ref: 'enoughImages' } } },
-                );
+            it('gives the boolean an `is` inside it gives', () => {
+                expectActionsValid([
+                    { define: { enoughImages: { expr: { ...img, using: 'length', is: { gte: 2 } } } } },
+                    { fireEvent: { type: 't', data: { enough: { value: { ref: 'enoughImages' } } } } },
+                ]);
                 expectValid(true, { enough: { value: { ...img, using: 'length', is: { gte: 2 } } } });
                 expectError('`expr` over `is` fills', {
                     sum: [
@@ -6343,27 +6289,26 @@ describe('webDetection config tests', () => {
                 expectError('config types it as number', { element: { selector: 'img', root: imgCount } });
             });
 
-            it('collects names, refs and cycles inside roots', () => {
-                expectValid({
-                    all: [
-                        { element: { selector: 'img', root: { element: { selector: '#a' }, as: 'region' } } },
-                        { ref: 'region' },
-                    ],
+            it('checks names inside roots', () => {
+                expectActionsValid([
+                    { define: { region: { element: { selector: '#a' } } } },
+                    {
+                        define: {
+                            has: {
+                                all: [
+                                    { ref: 'region' },
+                                    { element: { selector: 'img', root: { ref: 'region' } } },
+                                ],
+                            },
+                        },
+                    },
+                ]);
+                expectActionsError('reads a run name no `define` binds', {
+                    define: { n: { element: { selector: 'img', root: { ref: 'missing' } } } },
                 });
-                expectError('names no expression', { element: { selector: 'img', root: { ref: 'missing' } } });
-                expectError('names no expression', { ref: 'missing', using: 'length', is: {} });
-                expectError('cycle', { element: { selector: 'img', root: { ref: 'images' } }, as: 'images' });
-                expectError('cycle', { ref: 'widths', using: 'length', as: 'widths', is: {} });
-                expectError('from outside it', {
-                    all: [
-                        { if: { test: true, then: { element: { selector: '#a' }, as: 'inner' }, else: false } },
-                        { element: { selector: 'img', root: { ref: 'inner' } } },
-                    ],
-                });
+                expectActionsError('reads a run name no `define` binds', { define: { widths: { ref: 'widths', using: 'length' } } });
             });
-        });
 
-        describe('payloads', () => {
             it('checks payload keys', () => {
                 expectValid(true, { brokenImages: { value: imgCount } });
                 expectError('reserved', true, { nativeData: { value: imgCount } });
@@ -6432,18 +6377,16 @@ describe('webDetection config tests', () => {
                  */
                 const engineGuarded = (then, otherwise) => ({
                     if: {
-                        test: {
-                            api: {
-                                path: 'Reflect.has',
-                                args: [
-                                    { api: 'PerformanceResourceTiming.prototype' },
-                                    'responseStatus',
-                                ],
-                            },
+                        api: {
+                            path: 'Reflect.has',
+                            args: [
+                                { api: 'PerformanceResourceTiming.prototype' },
+                                'responseStatus',
+                            ],
                         },
-                        then,
-                        else: otherwise,
                     },
+                    then,
+                    else: otherwise,
                 });
                 const buckets = { unsupported: 'unsupported', 0: 0, '1+': { gte: 1 } };
                 expectValid(true, { a: { value: engineGuarded(imgCount, 'unsupported'), buckets } });

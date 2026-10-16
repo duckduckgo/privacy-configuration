@@ -668,18 +668,44 @@
                     }
                 },
                 "parameters": {
-                    "count": {
+                    "loadLoading": {
                         "template": "counter",
-                        "source": "pageLoadTime",
+                        "source": "pageLoadTime_loadLoading",
                         "buckets": {
-                            "0": { "gte": 0, "lt": 1 },
-                            "1": { "gte": 1, "lt": 2 },
-                            "2-3": { "gte": 2, "lt": 4 },
-                            "4-7": { "gte": 4, "lt": 8 },
-                            "8-14": { "gte": 8, "lt": 15 },
-                            "15-20": { "gte": 15, "lt": 21 },
-                            "21-39": { "gte": 21, "lt": 40 },
-                            "40+": { "gte": 40 }
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "load8to15s": {
+                        "template": "counter",
+                        "source": "pageLoadTime_load8to15s",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "load15sPlus": {
+                        "template": "counter",
+                        "source": "pageLoadTime_load15sPlus",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "slowReload": {
+                        "template": "counter",
+                        "source": "pageLoadTime_slowReload",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
                         }
                     }
                 }
@@ -692,18 +718,34 @@
                     }
                 },
                 "parameters": {
-                    "count": {
+                    "count1": {
                         "template": "counter",
-                        "source": "errorPhraseCount",
+                        "source": "errorPhraseCount_count1",
                         "buckets": {
-                            "0": { "gte": 0, "lt": 1 },
-                            "1": { "gte": 1, "lt": 2 },
-                            "2-3": { "gte": 2, "lt": 4 },
-                            "4-7": { "gte": 4, "lt": 8 },
-                            "8-14": { "gte": 8, "lt": 15 },
-                            "15-20": { "gte": 15, "lt": 21 },
-                            "21-39": { "gte": 21, "lt": 40 },
-                            "40+": { "gte": 40 }
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "count2to4": {
+                        "template": "counter",
+                        "source": "errorPhraseCount_count2to4",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "count5Plus": {
+                        "template": "counter",
+                        "source": "errorPhraseCount_count5Plus",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
                         }
                     }
                 }
@@ -716,18 +758,34 @@
                     }
                 },
                 "parameters": {
-                    "count": {
+                    "keywords5to9": {
                         "template": "counter",
-                        "source": "soft404Features",
+                        "source": "soft404Features_keywords5to9",
                         "buckets": {
-                            "0": { "gte": 0, "lt": 1 },
-                            "1": { "gte": 1, "lt": 2 },
-                            "2-3": { "gte": 2, "lt": 4 },
-                            "4-7": { "gte": 4, "lt": 8 },
-                            "8-14": { "gte": 8, "lt": 15 },
-                            "15-20": { "gte": 15, "lt": 21 },
-                            "21-39": { "gte": 21, "lt": 40 },
-                            "40+": { "gte": 40 }
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "keywords10to24": {
+                        "template": "counter",
+                        "source": "soft404Features_keywords10to24",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "keywords25Plus": {
+                        "template": "counter",
+                        "source": "soft404Features_keywords25Plus",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
                         }
                     }
                 }
@@ -740,18 +798,34 @@
                     }
                 },
                 "parameters": {
-                    "count": {
+                    "text0to499": {
                         "template": "counter",
-                        "source": "failurePhrasesSmallPage",
+                        "source": "failurePhrasesSmallPage_text0to499",
                         "buckets": {
-                            "0": { "gte": 0, "lt": 1 },
-                            "1": { "gte": 1, "lt": 2 },
-                            "2-3": { "gte": 2, "lt": 4 },
-                            "4-7": { "gte": 4, "lt": 8 },
-                            "8-14": { "gte": 8, "lt": 15 },
-                            "15-20": { "gte": 15, "lt": 21 },
-                            "21-39": { "gte": 21, "lt": 40 },
-                            "40+": { "gte": 40 }
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "text500to999": {
+                        "template": "counter",
+                        "source": "failurePhrasesSmallPage_text500to999",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "text1000to1999": {
+                        "template": "counter",
+                        "source": "failurePhrasesSmallPage_text1000to1999",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
                         }
                     }
                 }
@@ -764,18 +838,34 @@
                     }
                 },
                 "parameters": {
-                    "count": {
+                    "sheets1": {
                         "template": "counter",
-                        "source": "stylesMissing",
+                        "source": "stylesMissing_sheets1",
                         "buckets": {
-                            "0": { "gte": 0, "lt": 1 },
-                            "1": { "gte": 1, "lt": 2 },
-                            "2-3": { "gte": 2, "lt": 4 },
-                            "4-7": { "gte": 4, "lt": 8 },
-                            "8-14": { "gte": 8, "lt": 15 },
-                            "15-20": { "gte": 15, "lt": 21 },
-                            "21-39": { "gte": 21, "lt": 40 },
-                            "40+": { "gte": 40 }
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "sheets2to4": {
+                        "template": "counter",
+                        "source": "stylesMissing_sheets2to4",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "sheets5Plus": {
+                        "template": "counter",
+                        "source": "stylesMissing_sheets5Plus",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
                         }
                     }
                 }
@@ -788,18 +878,84 @@
                     }
                 },
                 "parameters": {
-                    "count": {
+                    "count1": {
                         "template": "counter",
-                        "source": "brokenImages",
+                        "source": "brokenImages_count1",
                         "buckets": {
-                            "0": { "gte": 0, "lt": 1 },
-                            "1": { "gte": 1, "lt": 2 },
-                            "2-3": { "gte": 2, "lt": 4 },
-                            "4-7": { "gte": 4, "lt": 8 },
-                            "8-14": { "gte": 8, "lt": 15 },
-                            "15-20": { "gte": 15, "lt": 21 },
-                            "21-39": { "gte": 21, "lt": 40 },
-                            "40+": { "gte": 40 }
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "count2to4": {
+                        "template": "counter",
+                        "source": "brokenImages_count2to4",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "count5to9": {
+                        "template": "counter",
+                        "source": "brokenImages_count5to9",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "count10Plus": {
+                        "template": "counter",
+                        "source": "brokenImages_count10Plus",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "shareUnder10": {
+                        "template": "counter",
+                        "source": "brokenImages_shareUnder10",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "share10to50": {
+                        "template": "counter",
+                        "source": "brokenImages_share10to50",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "share50to90": {
+                        "template": "counter",
+                        "source": "brokenImages_share50to90",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "share90Plus": {
+                        "template": "counter",
+                        "source": "brokenImages_share90Plus",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
                         }
                     }
                 }
@@ -812,18 +968,64 @@
                     }
                 },
                 "parameters": {
-                    "count": {
+                    "wording_status2xx": {
                         "template": "counter",
-                        "source": "forbiddenPage",
+                        "source": "forbiddenPage_wording_status2xx",
                         "buckets": {
-                            "0": { "gte": 0, "lt": 1 },
-                            "1": { "gte": 1, "lt": 2 },
-                            "2-3": { "gte": 2, "lt": 4 },
-                            "4-7": { "gte": 4, "lt": 8 },
-                            "8-14": { "gte": 8, "lt": 15 },
-                            "15-20": { "gte": 15, "lt": 21 },
-                            "21-39": { "gte": 21, "lt": 40 },
-                            "40+": { "gte": 40 }
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "wording_status4xx": {
+                        "template": "counter",
+                        "source": "forbiddenPage_wording_status4xx",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "wording_status5xx": {
+                        "template": "counter",
+                        "source": "forbiddenPage_wording_status5xx",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "bareForbidden_status2xx": {
+                        "template": "counter",
+                        "source": "forbiddenPage_bareForbidden_status2xx",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "bareForbidden_status4xx": {
+                        "template": "counter",
+                        "source": "forbiddenPage_bareForbidden_status4xx",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "bareForbidden_status5xx": {
+                        "template": "counter",
+                        "source": "forbiddenPage_bareForbidden_status5xx",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
                         }
                     }
                 }
@@ -836,18 +1038,64 @@
                     }
                 },
                 "parameters": {
-                    "count": {
+                    "wording_status2xx": {
                         "template": "counter",
-                        "source": "rateLimitedPage",
+                        "source": "rateLimitedPage_wording_status2xx",
                         "buckets": {
-                            "0": { "gte": 0, "lt": 1 },
-                            "1": { "gte": 1, "lt": 2 },
-                            "2-3": { "gte": 2, "lt": 4 },
-                            "4-7": { "gte": 4, "lt": 8 },
-                            "8-14": { "gte": 8, "lt": 15 },
-                            "15-20": { "gte": 15, "lt": 21 },
-                            "21-39": { "gte": 21, "lt": 40 },
-                            "40+": { "gte": 40 }
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "wording_status4xx": {
+                        "template": "counter",
+                        "source": "rateLimitedPage_wording_status4xx",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "wording_status5xx": {
+                        "template": "counter",
+                        "source": "rateLimitedPage_wording_status5xx",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "bareTooManyRequests_status2xx": {
+                        "template": "counter",
+                        "source": "rateLimitedPage_bareTooManyRequests_status2xx",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "bareTooManyRequests_status4xx": {
+                        "template": "counter",
+                        "source": "rateLimitedPage_bareTooManyRequests_status4xx",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "bareTooManyRequests_status5xx": {
+                        "template": "counter",
+                        "source": "rateLimitedPage_bareTooManyRequests_status5xx",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
                         }
                     }
                 }
@@ -860,18 +1108,54 @@
                     }
                 },
                 "parameters": {
-                    "count": {
+                    "littleText_text0to499": {
                         "template": "counter",
-                        "source": "wafAssetsPage",
+                        "source": "wafAssetsPage_littleText_text0to499",
                         "buckets": {
-                            "0": { "gte": 0, "lt": 1 },
-                            "1": { "gte": 1, "lt": 2 },
-                            "2-3": { "gte": 2, "lt": 4 },
-                            "4-7": { "gte": 4, "lt": 8 },
-                            "8-14": { "gte": 8, "lt": 15 },
-                            "15-20": { "gte": 15, "lt": 21 },
-                            "21-39": { "gte": 21, "lt": 40 },
-                            "40+": { "gte": 40 }
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "errorStatus_text0to499": {
+                        "template": "counter",
+                        "source": "wafAssetsPage_errorStatus_text0to499",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "errorStatus_text500to999": {
+                        "template": "counter",
+                        "source": "wafAssetsPage_errorStatus_text500to999",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "errorStatus_text1000to1999": {
+                        "template": "counter",
+                        "source": "wafAssetsPage_errorStatus_text1000to1999",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "errorStatus_text2000Plus": {
+                        "template": "counter",
+                        "source": "wafAssetsPage_errorStatus_text2000Plus",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
                         }
                     }
                 }
@@ -884,18 +1168,64 @@
                     }
                 },
                 "parameters": {
-                    "count": {
+                    "load0to3s": {
                         "template": "counter",
-                        "source": "appRootEmpty",
+                        "source": "appRootEmpty_load0to3s",
                         "buckets": {
-                            "0": { "gte": 0, "lt": 1 },
-                            "1": { "gte": 1, "lt": 2 },
-                            "2-3": { "gte": 2, "lt": 4 },
-                            "4-7": { "gte": 4, "lt": 8 },
-                            "8-14": { "gte": 8, "lt": 15 },
-                            "15-20": { "gte": 15, "lt": 21 },
-                            "21-39": { "gte": 21, "lt": 40 },
-                            "40+": { "gte": 40 }
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "load3to8s": {
+                        "template": "counter",
+                        "source": "appRootEmpty_load3to8s",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "load8sPlus": {
+                        "template": "counter",
+                        "source": "appRootEmpty_load8sPlus",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "scripts0": {
+                        "template": "counter",
+                        "source": "appRootEmpty_scripts0",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "scripts1": {
+                        "template": "counter",
+                        "source": "appRootEmpty_scripts1",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "scripts2Plus": {
+                        "template": "counter",
+                        "source": "appRootEmpty_scripts2Plus",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
                         }
                     }
                 }
@@ -908,18 +1238,44 @@
                     }
                 },
                 "parameters": {
-                    "count": {
+                    "size0": {
                         "template": "counter",
-                        "source": "noTextOrTitle",
+                        "source": "noTextOrTitle_size0",
                         "buckets": {
-                            "0": { "gte": 0, "lt": 1 },
-                            "1": { "gte": 1, "lt": 2 },
-                            "2-3": { "gte": 2, "lt": 4 },
-                            "4-7": { "gte": 4, "lt": 8 },
-                            "8-14": { "gte": 8, "lt": 15 },
-                            "15-20": { "gte": 15, "lt": 21 },
-                            "21-39": { "gte": 21, "lt": 40 },
-                            "40+": { "gte": 40 }
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "sizeUnder1KB": {
+                        "template": "counter",
+                        "source": "noTextOrTitle_sizeUnder1KB",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "size1to100KB": {
+                        "template": "counter",
+                        "source": "noTextOrTitle_size1to100KB",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "size100KBPlus": {
+                        "template": "counter",
+                        "source": "noTextOrTitle_size100KBPlus",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
                         }
                     }
                 }
