@@ -1,0 +1,297 @@
+import { expect } from 'chai';
+import fs from 'fs';
+import platforms from '../platforms.js';
+
+const platformOutput = platforms.map((item) => item.replace('browsers/', 'extension-'));
+
+const latestConfigs = platformOutput.map((plat) => {
+    return {
+        name: `v5/${plat}-config.json`,
+        body: JSON.parse(fs.readFileSync(`./generated/v5/${plat}-config.json`)),
+    };
+});
+
+/**
+ * Assert a threshold list is usable as bin edges: positive finite numbers in
+ * strictly ascending order. Clients fall back to code defaults on malformed
+ * values, silently ignoring the config — so a bad value fails the build here.
+ *
+ * @param {unknown} edges
+ * @param {string} path - used in error messages
+ */
+function assertThresholdEdges(edges, path) {
+    expect(Array.isArray(edges), `${path}: expected an array, got ${JSON.stringify(edges)}`).to.equal(true);
+    const values = /** @type {unknown[]} */ (edges);
+    expect(values.length, `${path}: expected at least one edge`).to.be.greaterThan(0);
+    for (const [
+        index,
+        edge,
+    ] of values.entries()) {
+        expect(
+            typeof edge === 'number' && Number.isFinite(edge) && edge > 0,
+            `${path}[${index}]: expected a positive finite number, got ${JSON.stringify(edge)}`,
+        ).to.equal(true);
+    }
+    for (let i = 1; i < values.length; i++) {
+        expect(
+            Number(values[i]) > Number(values[i - 1]),
+            `${path}: edges must be strictly ascending, got ${JSON.stringify(values)}`,
+        ).to.equal(true);
+    }
+}
+
+/**
+ * Assert a severe cutoff is valid and selects at least one measured edge.
+ *
+ * @param {unknown} cutoff
+ * @param {unknown} edges
+ * @param {string} path
+ */
+function assertSevereCutoff(cutoff, edges, path) {
+    expect(
+        typeof cutoff === 'number' && Number.isFinite(cutoff) && cutoff > 0,
+        `${path}: expected a positive finite number, got ${JSON.stringify(cutoff)}`,
+    ).to.equal(true);
+    expect(
+        /** @type {unknown[]} */ (edges).some((edge) => Number(edge) >= Number(cutoff)),
+        `${path}: expected at least one configured threshold edge at or above ${cutoff}`,
+    ).to.equal(true);
+}
+
+/**
+ * Compute every event type the C-S-S detectorPerf feature can emit under the
+ * given settings. Mirrors the naming scheme in
+ * content-scope-scripts/injected/src/features/detector-perf.js.
+ *
+ * @param {Record<string, any>} settings
+ * @param {string[]} detectorGroups
+ * @returns {Set<string>}
+ */
+function expectedEventTypes(settings, detectorGroups) {
+    const defaults = settings.defaults ?? {};
+    const overrides = settings.detectorOverrides ?? {};
+    const types = new Set([
+        'detectorPerf_measured',
+        // Immediate severe event: fired when a configured severe edge is
+        // crossed, consumed by an immediate-trigger pixel that forwards the
+        // data payload (detector, kind, thresholdMs).
+        'detectorPerf_severe',
+    ]);
+    for (const name of detectorGroups) {
+        types.add(`detectorPerf_${name}_ran`);
+        types.add(`detectorPerf_${name}_failed`);
+        const single = overrides[name]?.singleRunThresholdsMs ?? defaults.singleRunThresholdsMs ?? [];
+        const total = overrides[name]?.totalPerPageThresholdsMs ?? defaults.totalPerPageThresholdsMs ?? [];
+        for (const edge of single) {
+            types.add(`detectorPerf_${name}_over${edge}ms`);
+        }
+        for (const edge of total) {
+            types.add(`detectorPerf_${name}_total_over${edge}ms`);
+        }
+    }
+    for (const edge of settings.combinedThresholdsMs ?? []) {
+        types.add(`detectorPerf_combined_over${edge}ms`);
+    }
+    return types;
+}
+
+/**
+ * Return Web Detection groups containing at least one enabled detector.
+ * Detector state defaults to enabled in C-S-S.
+ *
+ * @param {Record<string, Record<string, any>>} detectors
+ * @returns {string[]}
+ */
+function enabledDetectorGroups(detectors) {
+    return Object.entries(detectors)
+        .filter(
+            ([
+                ,
+                groupDetectors,
+            ]) => Object.values(groupDetectors).some((detector) => (detector.state ?? 'enabled') === 'enabled'),
+        )
+        .map(
+            ([
+                groupName,
+            ]) => groupName,
+        );
+}
+
+/**
+ * Detector groups with hand-written eventHub counters. Other groups (e.g. video,
+ * or groups an experiment enables) emit events that nothing consumes, which
+ * EventHub ignores, until the counters are generated from the detector config
+ * instead of maintained by hand.
+ */
+const COUNTED_DETECTOR_GROUPS = new Set([
+    'adwalls',
+    'captcha',
+    'commentsDisabled',
+    'other',
+]);
+
+/**
+ * Collect every eventHub source that consumes an event: parameter sources
+ * (period counters/data) and immediate trigger sources.
+ *
+ * @param {Record<string, any> | undefined} telemetry
+ * @returns {Map<string, string[]>} source → telemetry entry names
+ */
+function collectSources(telemetry) {
+    const sources = new Map();
+    for (const [
+        entryName,
+        entry,
+    ] of Object.entries(telemetry ?? {})) {
+        if (entry.trigger?.type === 'immediate' && entry.trigger.source) {
+            const entries = sources.get(entry.trigger.source) ?? [];
+            entries.push(entryName);
+            sources.set(entry.trigger.source, entries);
+        }
+        for (const param of Object.values(entry.parameters ?? {})) {
+            if (!param.source) continue;
+            const entries = sources.get(param.source) ?? [];
+            entries.push(entryName);
+            sources.set(param.source, entries);
+        }
+    }
+    return sources;
+}
+
+describe('detectorPerf config tests', () => {
+    let sawDetectorPerf = false;
+
+    for (const config of latestConfigs) {
+        const detectorPerf = config.body.features?.detectorPerf;
+        if (!detectorPerf?.settings) continue;
+        sawDetectorPerf = true;
+        const settings = detectorPerf.settings;
+        const webDetectionDetectors = config.body.features?.webDetection?.settings?.detectors ?? {};
+        const detectorGroups = enabledDetectorGroups(webDetectionDetectors).filter((name) => COUNTED_DETECTOR_GROUPS.has(name));
+        // Android's EventHub parser can't take the immediate severe entry (see
+        // the android test below), so severe events go unconsumed there and are
+        // dropped at runtime. The period counters must still be consumed.
+        const isAndroid = config.name.includes('android');
+
+        describe(config.name, () => {
+            it('threshold edges are positive and strictly ascending', () => {
+                assertThresholdEdges(settings.defaults?.singleRunThresholdsMs, 'defaults/singleRunThresholdsMs');
+                assertThresholdEdges(settings.defaults?.totalPerPageThresholdsMs, 'defaults/totalPerPageThresholdsMs');
+                assertThresholdEdges(settings.combinedThresholdsMs, 'combinedThresholdsMs');
+                if (settings.singleRunSevereThresholdMs !== undefined) {
+                    assertSevereCutoff(
+                        settings.singleRunSevereThresholdMs,
+                        settings.defaults?.singleRunThresholdsMs,
+                        'singleRunSevereThresholdMs',
+                    );
+                }
+                if (settings.totalPerPageSevereThresholdMs !== undefined) {
+                    assertSevereCutoff(
+                        settings.totalPerPageSevereThresholdMs,
+                        settings.defaults?.totalPerPageThresholdsMs,
+                        'totalPerPageSevereThresholdMs',
+                    );
+                }
+                if (settings.combinedSevereThresholdMs !== undefined) {
+                    assertSevereCutoff(settings.combinedSevereThresholdMs, settings.combinedThresholdsMs, 'combinedSevereThresholdMs');
+                }
+                for (const [
+                    name,
+                    override,
+                ] of Object.entries(settings.detectorOverrides ?? {})) {
+                    expect(Object.hasOwn(webDetectionDetectors, name), `detectorOverrides/${name}: unknown Web Detection group`).to.equal(
+                        true,
+                    );
+                    if (override.singleRunThresholdsMs !== undefined) {
+                        assertThresholdEdges(override.singleRunThresholdsMs, `detectorOverrides/${name}/singleRunThresholdsMs`);
+                    }
+                    if (override.totalPerPageThresholdsMs !== undefined) {
+                        assertThresholdEdges(override.totalPerPageThresholdsMs, `detectorOverrides/${name}/totalPerPageThresholdsMs`);
+                    }
+                }
+            });
+
+            it('every emittable event type has an eventHub parameter source', () => {
+                const sources = collectSources(config.body.features?.eventHub?.settings?.telemetry);
+                for (const type of expectedEventTypes(settings, detectorGroups)) {
+                    if (isAndroid && type === 'detectorPerf_severe') continue;
+                    expect(sources.has(type)).to.equal(
+                        true,
+                        `detectorPerf can emit '${type}' but no eventHub telemetry parameter consumes it — ` +
+                            `add matching parameters to features/event-hub.json or remove the threshold edge`,
+                    );
+                }
+            });
+
+            it('every detectorPerf eventHub source is an emittable event type (no stale entries)', () => {
+                const sources = collectSources(config.body.features?.eventHub?.settings?.telemetry);
+                const expected = expectedEventTypes(settings, detectorGroups);
+                for (const [
+                    source,
+                    entryNames,
+                ] of sources) {
+                    if (!source.startsWith('detectorPerf_')) continue;
+                    expect(expected.has(source)).to.equal(
+                        true,
+                        `eventHub entries [${entryNames.join(', ')}] consume '${source}' but detectorPerf can no longer emit it — ` +
+                            `update the eventHub parameters to match the configured threshold edges`,
+                    );
+                }
+            });
+        });
+    }
+
+    it('exercises at least one config with detectorPerf (sanity)', () => {
+        expect(sawDetectorPerf).to.equal(true);
+    });
+
+    // Android's EventHub config parser is period + counter only and fails hard
+    // on an immediate-trigger entry, rejecting the *entire* telemetry set
+    // (including the shipped adwalls/captcha pixels). Keep immediate entries
+    // out of Android configs until the parser is entry-tolerant.
+    it('android configs contain no immediate-trigger telemetry entries', () => {
+        for (const config of latestConfigs) {
+            if (!config.name.includes('android')) continue;
+            const telemetry = config.body.features?.eventHub?.settings?.telemetry ?? {};
+            for (const [
+                entryName,
+                entry,
+            ] of Object.entries(telemetry)) {
+                expect(entry.trigger?.type).to.not.equal(
+                    'immediate',
+                    `${config.name}: telemetry entry '${entryName}' uses an immediate trigger, which Android's EventHub parser rejects wholesale`,
+                );
+            }
+        }
+    });
+
+    // Measurement is gated per cohort through additionalCheck. A condition naming an
+    // experiment or cohort the platform doesn't define never matches, which silently
+    // leaves every user unmeasured instead of failing.
+    it('enabled detectorPerf experiment conditions reference experiments and cohorts defined on the platform', () => {
+        for (const config of latestConfigs) {
+            const detectorPerf = config.body.features?.detectorPerf;
+            if (detectorPerf?.state !== 'enabled') continue;
+            const experiments = config.body.features?.contentScopeExperiments?.features ?? {};
+            for (const change of detectorPerf.settings?.conditionalChanges ?? []) {
+                const blocks = Array.isArray(change.condition)
+                    ? change.condition
+                    : [
+                          change.condition,
+                      ];
+                for (const block of blocks) {
+                    if (!block?.experiment) continue;
+                    const { experimentName, cohort } = block.experiment;
+                    const experiment = experiments[experimentName];
+                    expect(experiment, `${config.name}: detectorPerf references undefined experiment '${experimentName}'`).to.not.equal(
+                        undefined,
+                    );
+                    expect(
+                        (experiment.cohorts ?? []).map((c) => c.name),
+                        `${config.name}: experiment '${experimentName}' has no '${cohort}' cohort`,
+                    ).to.include(cohort);
+                }
+            }
+        }
+    });
+});
