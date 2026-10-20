@@ -782,6 +782,20 @@
                             },
                             {
                                 "text": {
+                                    "pattern": [
+                                        "something went wrong",
+                                        "an? (unexpected |unknown |internal )?error (has )?occurred",
+                                        "(couldn.?t|could not|were unable to) (sign|log) you in",
+                                        "(sign|log)[ -]?in (attempt )?(failed|unsuccessful)",
+                                        "(experiencing|having) (some )?technical (difficulties|issues|problems)",
+                                        "a (problem|technical error) (has )?occurred",
+                                        "oops[\\s\\S]{0,40}(try again|refresh)",
+                                        "(a|some|temporary) technical (issues?|difficult(y|ies)|problems?|errors?)"
+                                    ]
+                                }
+                            },
+                            {
+                                "text": {
                                     "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript) and not(ancestor::*[@hidden]) and not(ancestor::*[@aria-hidden='true']) and not(ancestor::*[contains(translate(@style,' ',''),'display:none')]) and not(ancestor::*[contains(translate(@style,' ',''),'visibility:hidden')])]",
                                     "pattern": [
                                         "something went wrong",
@@ -842,6 +856,20 @@
                             },
                             {
                                 "text": {
+                                    "pattern": [
+                                        "browser (has|have) cookies (disabled|blocked|turned off)",
+                                        "(looks like|seems that|seems like|appears that) (your )?cookies (are|have been) (disabled|blocked|turned off)",
+                                        "cookies (are|is) (disabled|blocked|not enabled|turned off) (in|on|for) (your|this) browser",
+                                        "cookies (must|need to|have to) be (enabled|allowed|turned on)",
+                                        "please (enable|turn on|allow) cookies",
+                                        "enable cookies (in|on|for) (your|this) browser",
+                                        "requires? (browser |third.party )?cookies to be (enabled|allowed)",
+                                        "browser (does ?n.?t|does not|do ?n.?t|do not) (accept|allow|support) cookies"
+                                    ]
+                                }
+                            },
+                            {
+                                "text": {
                                     "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript) and not(ancestor::*[@hidden]) and not(ancestor::*[@aria-hidden='true']) and not(ancestor::*[contains(translate(@style,' ',''),'display:none')]) and not(ancestor::*[contains(translate(@style,' ',''),'visibility:hidden')])]",
                                     "pattern": [
                                         "browser (has|have) cookies (disabled|blocked|turned off)",
@@ -871,6 +899,20 @@
                             {
                                 "element": {
                                     "selector": "input[type='password']"
+                                }
+                            },
+                            {
+                                "text": {
+                                    "pattern": [
+                                        "browser[\\s\\S]{0,25}(is |are )?(not|no longer) supported",
+                                        "unsupported browser",
+                                        "browser (is )?(not compatible|incompatible)",
+                                        "incompatible browser",
+                                        "please (update|upgrade) your browser",
+                                        "your browser is (out of date|outdated|too old)",
+                                        "browser (is |are )?(currently )?unsupported",
+                                        "browser update (is )?required"
+                                    ]
                                 }
                             },
                             {
