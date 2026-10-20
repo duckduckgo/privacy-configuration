@@ -1,4 +1,4 @@
-import { Feature } from '../feature';
+import { ConditionBlockOrArray, Feature } from '../feature';
 
 type ElementHidingValue = {
     property: string;
@@ -25,6 +25,8 @@ type ElementHidingRule = ElementHidingRuleHide | ElementHidingRuleModify | Eleme
 
 type ElementHidingDomain = {
     domain: string | string[];
+    // When present, replaces `domain` for matching, so it must include the domain itself.
+    condition?: ConditionBlockOrArray;
     rules: ElementHidingRule[];
 };
 
