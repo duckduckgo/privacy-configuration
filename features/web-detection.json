@@ -33,9 +33,8 @@
                             "state": "enabled",
                             "when": {
                                 "intervalMs": [
-                                    500,
-                                    1000,
-                                    5000
+                                    3100,
+                                    5100
                                 ]
                             }
                         }
@@ -65,9 +64,8 @@
                             "state": "enabled",
                             "when": {
                                 "intervalMs": [
-                                    500,
-                                    1000,
-                                    5000
+                                    3200,
+                                    5200
                                 ]
                             }
                         }
@@ -94,9 +92,8 @@
                             "state": "enabled",
                             "when": {
                                 "intervalMs": [
-                                    500,
-                                    1000,
-                                    5000
+                                    3300,
+                                    5300
                                 ]
                             }
                         }
@@ -123,9 +120,8 @@
                             "state": "enabled",
                             "when": {
                                 "intervalMs": [
-                                    500,
-                                    1000,
-                                    5000
+                                    3400,
+                                    5400
                                 ]
                             }
                         }
@@ -152,9 +148,8 @@
                             "state": "enabled",
                             "when": {
                                 "intervalMs": [
-                                    500,
-                                    1000,
-                                    5000
+                                    3500,
+                                    5500
                                 ]
                             }
                         }
@@ -181,9 +176,8 @@
                             "state": "enabled",
                             "when": {
                                 "intervalMs": [
-                                    500,
-                                    1000,
-                                    5000
+                                    3600,
+                                    5600
                                 ]
                             }
                         }
@@ -251,7 +245,7 @@
                     "actions": {
                         "fireEvent": {
                             "state": "enabled",
-                            "type": "adwall"
+                            "type": "adwall_vendor"
                         }
                     }
                 }
@@ -665,7 +659,7 @@
                     "actions": {
                         "fireEvent": {
                             "state": "enabled",
-                            "type": "temp_wd_challenge"
+                            "type": "challenge_cloudflare"
                         }
                     }
                 },
@@ -710,7 +704,7 @@
                     "actions": {
                         "fireEvent": {
                             "state": "enabled",
-                            "type": "temp_wd_blockPage"
+                            "type": "blockPage_cloudflare"
                         }
                     }
                 }
@@ -738,12 +732,35 @@
                                 "unexpected error.*\\[3001/6001\\]"
                             ]
                         }
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "disabled",
+                            "when": {
+                                "intervalMs": [
+                                    4600,
+                                    6600,
+                                    10600
+                                ]
+                            }
+                        }
                     }
                 },
                 "placeholder": {
                     "match": {
                         "text": {
                             "pattern": "video loading"
+                        }
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "disabled",
+                            "when": {
+                                "intervalMs": [
+                                    6900,
+                                    11000
+                                ]
+                            }
                         }
                     }
                 },
@@ -756,6 +773,18 @@
                                 "n.est pas disponible dans (votre pays|le pays)"
                             ]
                         }
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "disabled",
+                            "when": {
+                                "intervalMs": [
+                                    4700,
+                                    6700,
+                                    10700
+                                ]
+                            }
+                        }
                     }
                 },
                 "blocked": {
@@ -766,6 +795,18 @@
                                 "to (watch|view|play) (this|the) video,? (please )?(disable|turn off|deactivate)",
                                 "(video|player) (is )?(unavailable|blocked) (with|while using) an ad ?block(er)?"
                             ]
+                        }
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "disabled",
+                            "when": {
+                                "intervalMs": [
+                                    4800,
+                                    6800,
+                                    10800
+                                ]
+                            }
                         }
                     }
                 }
@@ -993,7 +1034,7 @@
                     "actions": {
                         "fireEvent": {
                             "state": "enabled",
-                            "type": "temp_wd_blockPage"
+                            "type": "blockPage_generic"
                         }
                     }
                 },
@@ -1059,7 +1100,7 @@
                     "actions": {
                         "fireEvent": {
                             "state": "enabled",
-                            "type": "temp_wd_blockPage"
+                            "type": "blockPage_vendor"
                         }
                     }
                 },
@@ -1093,7 +1134,7 @@
                     "actions": {
                         "fireEvent": {
                             "state": "enabled",
-                            "type": "temp_wd_blockPage"
+                            "type": "blockPage_verificationfailed"
                         }
                     }
                 },
@@ -1123,7 +1164,7 @@
                     "actions": {
                         "fireEvent": {
                             "state": "enabled",
-                            "type": "temp_wd_blockPage"
+                            "type": "blockPage_vercel"
                         }
                     }
                 },
@@ -1158,7 +1199,7 @@
                     "actions": {
                         "fireEvent": {
                             "state": "enabled",
-                            "type": "temp_wd_blockPage"
+                            "type": "blockPage_forbidden"
                         }
                     }
                 },
@@ -1191,7 +1232,7 @@
                     "actions": {
                         "fireEvent": {
                             "state": "enabled",
-                            "type": "temp_wd_blockPage"
+                            "type": "blockPage_toomanyrequests"
                         }
                     }
                 },
@@ -1222,7 +1263,7 @@
                     "actions": {
                         "fireEvent": {
                             "state": "enabled",
-                            "type": "temp_wd_blockPage"
+                            "type": "blockPage_networksecurity"
                         }
                     }
                 },
@@ -1253,7 +1294,7 @@
                     "actions": {
                         "fireEvent": {
                             "state": "enabled",
-                            "type": "temp_wd_blockPage"
+                            "type": "blockPage_title"
                         }
                     }
                 }
@@ -1289,7 +1330,7 @@
                     "actions": {
                         "fireEvent": {
                             "state": "enabled",
-                            "type": "temp_wd_errorPage"
+                            "type": "errorPage_soft404"
                         }
                     }
                 },
@@ -1319,7 +1360,7 @@
                     "actions": {
                         "fireEvent": {
                             "state": "enabled",
-                            "type": "temp_wd_errorPage"
+                            "type": "errorPage_unavailable"
                         }
                     }
                 },
@@ -1373,7 +1414,7 @@
                     "actions": {
                         "fireEvent": {
                             "state": "enabled",
-                            "type": "temp_wd_geoblock"
+                            "type": "geoblock"
                         }
                     }
                 }
@@ -1409,7 +1450,7 @@
                     "actions": {
                         "fireEvent": {
                             "state": "enabled",
-                            "type": "temp_wd_challenge"
+                            "type": "challenge_generic"
                         }
                     }
                 }
@@ -1442,7 +1483,7 @@
                     "actions": {
                         "fireEvent": {
                             "state": "enabled",
-                            "type": "temp_wd_blankPage"
+                            "type": "blankPage_empty"
                         }
                     }
                 }
@@ -1462,21 +1503,9 @@
                 ],
                 "patchSettings": [
                     {
-                        "op": "add",
-                        "path": "/detectors/video/error/triggers",
-                        "value": {
-                            "auto": {
-                                "state": "enabled",
-                                "when": {
-                                    "intervalMs": [
-                                        500,
-                                        1000,
-                                        5000,
-                                        10000
-                                    ]
-                                }
-                            }
-                        }
+                        "op": "replace",
+                        "path": "/detectors/video/error/triggers/auto/state",
+                        "value": "enabled"
                     },
                     {
                         "op": "add",
@@ -1489,19 +1518,9 @@
                         }
                     },
                     {
-                        "op": "add",
-                        "path": "/detectors/video/placeholder/triggers",
-                        "value": {
-                            "auto": {
-                                "state": "enabled",
-                                "when": {
-                                    "intervalMs": [
-                                        5000,
-                                        10000
-                                    ]
-                                }
-                            }
-                        }
+                        "op": "replace",
+                        "path": "/detectors/video/placeholder/triggers/auto/state",
+                        "value": "enabled"
                     },
                     {
                         "op": "add",
@@ -1514,21 +1533,9 @@
                         }
                     },
                     {
-                        "op": "add",
-                        "path": "/detectors/video/unavailable/triggers",
-                        "value": {
-                            "auto": {
-                                "state": "enabled",
-                                "when": {
-                                    "intervalMs": [
-                                        500,
-                                        1000,
-                                        5000,
-                                        10000
-                                    ]
-                                }
-                            }
-                        }
+                        "op": "replace",
+                        "path": "/detectors/video/unavailable/triggers/auto/state",
+                        "value": "enabled"
                     },
                     {
                         "op": "add",
@@ -1541,21 +1548,9 @@
                         }
                     },
                     {
-                        "op": "add",
-                        "path": "/detectors/video/blocked/triggers",
-                        "value": {
-                            "auto": {
-                                "state": "enabled",
-                                "when": {
-                                    "intervalMs": [
-                                        500,
-                                        1000,
-                                        5000,
-                                        10000
-                                    ]
-                                }
-                            }
-                        }
+                        "op": "replace",
+                        "path": "/detectors/video/blocked/triggers/auto/state",
+                        "value": "enabled"
                     },
                     {
                         "op": "add",
@@ -1693,61 +1688,34 @@
                 ]
             },
             {
-                "condition": {
-                    "experiment": {
-                        "experimentName": "contentScopeExperiment8",
-                        "cohort": "treatment"
+                "condition": [
+                    {
+                        "injectName": "android",
+                        "minSupportedVersion": 52920000
+                    },
+                    // macOS. macOS and iOS share apple-isolated and both report string versions, so the cap keeps iOS 7.x out.
+                    {
+                        "injectName": "apple-isolated",
+                        "minSupportedVersion": "1.204.0",
+                        "maxSupportedVersion": "1.9999.0"
+                    },
+                    // iOS
+                    {
+                        "injectName": "apple-isolated",
+                        "minSupportedVersion": "7.234.0"
+                    },
+                    {
+                        "injectName": "windows",
+                        "minSupportedVersion": "0.171.0"
+                    },
+                    {
+                        "injectName": "chrome-mv3"
+                    },
+                    {
+                        "injectName": "firefox"
                     }
-                },
+                ],
                 "patchSettings": [
-                    {
-                        "op": "replace",
-                        "path": "/detectors/adwalls/generic_en/triggers/auto/when/intervalMs",
-                        "value": [
-                            3100,
-                            5100
-                        ]
-                    },
-                    {
-                        "op": "replace",
-                        "path": "/detectors/adwalls/generic_de/triggers/auto/when/intervalMs",
-                        "value": [
-                            3200,
-                            5200
-                        ]
-                    },
-                    {
-                        "op": "replace",
-                        "path": "/detectors/adwalls/generic_es/triggers/auto/when/intervalMs",
-                        "value": [
-                            3300,
-                            5300
-                        ]
-                    },
-                    {
-                        "op": "replace",
-                        "path": "/detectors/adwalls/generic_it/triggers/auto/when/intervalMs",
-                        "value": [
-                            3400,
-                            5400
-                        ]
-                    },
-                    {
-                        "op": "replace",
-                        "path": "/detectors/adwalls/generic_nl/triggers/auto/when/intervalMs",
-                        "value": [
-                            3500,
-                            5500
-                        ]
-                    },
-                    {
-                        "op": "replace",
-                        "path": "/detectors/adwalls/generic_se/triggers/auto/when/intervalMs",
-                        "value": [
-                            3600,
-                            5600
-                        ]
-                    },
                     {
                         "op": "replace",
                         "path": "/detectors/adwalls/keywords_vendor/state",
@@ -1832,65 +1800,6 @@
                         "op": "replace",
                         "path": "/detectors/blankPage/no_text_or_title/state",
                         "value": "enabled"
-                    }
-                ]
-            },
-            {
-                "condition": {
-                    "experiment": {
-                        "experimentName": "contentScopeExperiment8",
-                        "cohort": "treatment"
-                    },
-                    "injectName": "android"
-                },
-                "patchSettings": [
-                    {
-                        "op": "add",
-                        "path": "/detectors/video/error/triggers",
-                        "value": {
-                            "auto": {
-                                "state": "enabled",
-                                "when": {
-                                    "intervalMs": [
-                                        3000,
-                                        5000,
-                                        10000
-                                    ]
-                                }
-                            }
-                        }
-                    },
-                    {
-                        "op": "add",
-                        "path": "/detectors/video/unavailable/triggers",
-                        "value": {
-                            "auto": {
-                                "state": "enabled",
-                                "when": {
-                                    "intervalMs": [
-                                        3000,
-                                        5000,
-                                        10000
-                                    ]
-                                }
-                            }
-                        }
-                    },
-                    {
-                        "op": "add",
-                        "path": "/detectors/video/blocked/triggers",
-                        "value": {
-                            "auto": {
-                                "state": "enabled",
-                                "when": {
-                                    "intervalMs": [
-                                        3000,
-                                        5000,
-                                        10000
-                                    ]
-                                }
-                            }
-                        }
                     }
                 ]
             }

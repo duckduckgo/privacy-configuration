@@ -660,6 +660,374 @@
                     }
                 }
             },
+            "webTelemetry_challenge_cloudflare_day": {
+                "state": "enabled",
+                "trigger": {
+                    "period": {
+                        "days": 1
+                    }
+                },
+                "parameters": {
+                    "count": {
+                        "template": "counter",
+                        "source": "challenge_cloudflare",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-3": { "gte": 2, "lt": 4 },
+                            "4-7": { "gte": 4, "lt": 8 },
+                            "8-14": { "gte": 8, "lt": 15 },
+                            "15-20": { "gte": 15, "lt": 21 },
+                            "21-39": { "gte": 21, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    }
+                }
+            },
+            "webTelemetry_challenge_generic_day": {
+                "state": "enabled",
+                "trigger": {
+                    "period": {
+                        "days": 1
+                    }
+                },
+                "parameters": {
+                    "count": {
+                        "template": "counter",
+                        "source": "challenge_generic",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-3": { "gte": 2, "lt": 4 },
+                            "4-7": { "gte": 4, "lt": 8 },
+                            "8-14": { "gte": 8, "lt": 15 },
+                            "15-20": { "gte": 15, "lt": 21 },
+                            "21-39": { "gte": 21, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    }
+                }
+            },
+            "webTelemetry_blockPage_cloudflare_day": {
+                "state": "enabled",
+                "trigger": {
+                    "period": {
+                        "days": 1
+                    }
+                },
+                "parameters": {
+                    "count": {
+                        "template": "counter",
+                        "source": "blockPage_cloudflare",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-3": { "gte": 2, "lt": 4 },
+                            "4-7": { "gte": 4, "lt": 8 },
+                            "8-14": { "gte": 8, "lt": 15 },
+                            "15-20": { "gte": 15, "lt": 21 },
+                            "21-39": { "gte": 21, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    }
+                }
+            },
+            "webTelemetry_blockPage_generic_day": {
+                "state": "enabled",
+                "trigger": {
+                    "period": {
+                        "days": 1
+                    }
+                },
+                "parameters": {
+                    "count": {
+                        "template": "counter",
+                        "source": "blockPage_generic",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-3": { "gte": 2, "lt": 4 },
+                            "4-7": { "gte": 4, "lt": 8 },
+                            "8-14": { "gte": 8, "lt": 15 },
+                            "15-20": { "gte": 15, "lt": 21 },
+                            "21-39": { "gte": 21, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    }
+                }
+            },
+            "webTelemetry_blockPage_vendor_day": {
+                "state": "enabled",
+                "trigger": {
+                    "period": {
+                        "days": 1
+                    }
+                },
+                "parameters": {
+                    "count": {
+                        "template": "counter",
+                        "source": "blockPage_vendor",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-3": { "gte": 2, "lt": 4 },
+                            "4-7": { "gte": 4, "lt": 8 },
+                            "8-14": { "gte": 8, "lt": 15 },
+                            "15-20": { "gte": 15, "lt": 21 },
+                            "21-39": { "gte": 21, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    }
+                }
+            },
+            "webTelemetry_blockPage_verificationfailed_day": {
+                "state": "enabled",
+                "trigger": {
+                    "period": {
+                        "days": 1
+                    }
+                },
+                "parameters": {
+                    "count": {
+                        "template": "counter",
+                        "source": "blockPage_verificationfailed",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-3": { "gte": 2, "lt": 4 },
+                            "4-7": { "gte": 4, "lt": 8 },
+                            "8-14": { "gte": 8, "lt": 15 },
+                            "15-20": { "gte": 15, "lt": 21 },
+                            "21-39": { "gte": 21, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    }
+                }
+            },
+            "webTelemetry_blockPage_vercel_day": {
+                "state": "enabled",
+                "trigger": {
+                    "period": {
+                        "days": 1
+                    }
+                },
+                "parameters": {
+                    "count": {
+                        "template": "counter",
+                        "source": "blockPage_vercel",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-3": { "gte": 2, "lt": 4 },
+                            "4-7": { "gte": 4, "lt": 8 },
+                            "8-14": { "gte": 8, "lt": 15 },
+                            "15-20": { "gte": 15, "lt": 21 },
+                            "21-39": { "gte": 21, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    }
+                }
+            },
+            "webTelemetry_blockPage_toomanyrequests_day": {
+                "state": "enabled",
+                "trigger": {
+                    "period": {
+                        "days": 1
+                    }
+                },
+                "parameters": {
+                    "count": {
+                        "template": "counter",
+                        "source": "blockPage_toomanyrequests",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-3": { "gte": 2, "lt": 4 },
+                            "4-7": { "gte": 4, "lt": 8 },
+                            "8-14": { "gte": 8, "lt": 15 },
+                            "15-20": { "gte": 15, "lt": 21 },
+                            "21-39": { "gte": 21, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    }
+                }
+            },
+            "webTelemetry_blockPage_networksecurity_day": {
+                "state": "enabled",
+                "trigger": {
+                    "period": {
+                        "days": 1
+                    }
+                },
+                "parameters": {
+                    "count": {
+                        "template": "counter",
+                        "source": "blockPage_networksecurity",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-3": { "gte": 2, "lt": 4 },
+                            "4-7": { "gte": 4, "lt": 8 },
+                            "8-14": { "gte": 8, "lt": 15 },
+                            "15-20": { "gte": 15, "lt": 21 },
+                            "21-39": { "gte": 21, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    }
+                }
+            },
+            "webTelemetry_blockPage_title_day": {
+                "state": "enabled",
+                "trigger": {
+                    "period": {
+                        "days": 1
+                    }
+                },
+                "parameters": {
+                    "count": {
+                        "template": "counter",
+                        "source": "blockPage_title",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-3": { "gte": 2, "lt": 4 },
+                            "4-7": { "gte": 4, "lt": 8 },
+                            "8-14": { "gte": 8, "lt": 15 },
+                            "15-20": { "gte": 15, "lt": 21 },
+                            "21-39": { "gte": 21, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    }
+                }
+            },
+            "webTelemetry_blockPage_forbidden_day": {
+                "state": "enabled",
+                "trigger": {
+                    "period": {
+                        "days": 1
+                    }
+                },
+                "parameters": {
+                    "count": {
+                        "template": "counter",
+                        "source": "blockPage_forbidden",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-3": { "gte": 2, "lt": 4 },
+                            "4-7": { "gte": 4, "lt": 8 },
+                            "8-14": { "gte": 8, "lt": 15 },
+                            "15-20": { "gte": 15, "lt": 21 },
+                            "21-39": { "gte": 21, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    }
+                }
+            },
+            "webTelemetry_errorPage_unavailable_day": {
+                "state": "enabled",
+                "trigger": {
+                    "period": {
+                        "days": 1
+                    }
+                },
+                "parameters": {
+                    "count": {
+                        "template": "counter",
+                        "source": "errorPage_unavailable",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-3": { "gte": 2, "lt": 4 },
+                            "4-7": { "gte": 4, "lt": 8 },
+                            "8-14": { "gte": 8, "lt": 15 },
+                            "15-20": { "gte": 15, "lt": 21 },
+                            "21-39": { "gte": 21, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    }
+                }
+            },
+            "webTelemetry_errorPage_soft404_day": {
+                "state": "enabled",
+                "trigger": {
+                    "period": {
+                        "days": 1
+                    }
+                },
+                "parameters": {
+                    "count": {
+                        "template": "counter",
+                        "source": "errorPage_soft404",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-3": { "gte": 2, "lt": 4 },
+                            "4-7": { "gte": 4, "lt": 8 },
+                            "8-14": { "gte": 8, "lt": 15 },
+                            "15-20": { "gte": 15, "lt": 21 },
+                            "21-39": { "gte": 21, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    }
+                }
+            },
+            "webTelemetry_geoblock_day": {
+                "state": "enabled",
+                "trigger": {
+                    "period": {
+                        "days": 1
+                    }
+                },
+                "parameters": {
+                    "count": {
+                        "template": "counter",
+                        "source": "geoblock",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-3": { "gte": 2, "lt": 4 },
+                            "4-7": { "gte": 4, "lt": 8 },
+                            "8-14": { "gte": 8, "lt": 15 },
+                            "15-20": { "gte": 15, "lt": 21 },
+                            "21-39": { "gte": 21, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    }
+                }
+            },
+            "webTelemetry_blankPage_empty_day": {
+                "state": "enabled",
+                "trigger": {
+                    "period": {
+                        "days": 1
+                    }
+                },
+                "parameters": {
+                    "count": {
+                        "template": "counter",
+                        "source": "blankPage_empty",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-3": { "gte": 2, "lt": 4 },
+                            "4-7": { "gte": 4, "lt": 8 },
+                            "8-14": { "gte": 8, "lt": 15 },
+                            "15-20": { "gte": 15, "lt": 21 },
+                            "21-39": { "gte": 21, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    }
+                }
+            },
+            "webTelemetry_adwall_vendor_day": {
+                "state": "enabled",
+                "trigger": {
+                    "period": {
+                        "days": 1
+                    }
+                },
+                "parameters": {
+                    "count": {
+                        "template": "counter",
+                        "source": "adwall_vendor",
+                        "buckets": {
+                            "1": { "gte": 1, "lt": 2 },
+                            "2-3": { "gte": 2, "lt": 4 },
+                            "4-7": { "gte": 4, "lt": 8 },
+                            "8-14": { "gte": 8, "lt": 15 },
+                            "15-20": { "gte": 15, "lt": 21 },
+                            "21-39": { "gte": 21, "lt": 40 },
+                            "40+": { "gte": 40 }
+                        }
+                    }
+                }
+            },
             "webTelemetry_detectorPerf_day": {
                 "state": "enabled",
                 "trigger": {
