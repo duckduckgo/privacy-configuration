@@ -732,12 +732,35 @@
                                 "unexpected error.*\\[3001/6001\\]"
                             ]
                         }
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "disabled",
+                            "when": {
+                                "intervalMs": [
+                                    4600,
+                                    6600,
+                                    10600
+                                ]
+                            }
+                        }
                     }
                 },
                 "placeholder": {
                     "match": {
                         "text": {
                             "pattern": "video loading"
+                        }
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "disabled",
+                            "when": {
+                                "intervalMs": [
+                                    6900,
+                                    11000
+                                ]
+                            }
                         }
                     }
                 },
@@ -750,6 +773,18 @@
                                 "n.est pas disponible dans (votre pays|le pays)"
                             ]
                         }
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "disabled",
+                            "when": {
+                                "intervalMs": [
+                                    4700,
+                                    6700,
+                                    10700
+                                ]
+                            }
+                        }
                     }
                 },
                 "blocked": {
@@ -760,6 +795,18 @@
                                 "to (watch|view|play) (this|the) video,? (please )?(disable|turn off|deactivate)",
                                 "(video|player) (is )?(unavailable|blocked) (with|while using) an ad ?block(er)?"
                             ]
+                        }
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "disabled",
+                            "when": {
+                                "intervalMs": [
+                                    4800,
+                                    6800,
+                                    10800
+                                ]
+                            }
                         }
                     }
                 }
@@ -1274,138 +1321,21 @@
         },
         "conditionalChanges": [
             {
-                "condition": {
-                    "injectName": "android",
-                    "minSupportedVersion": 52720000
-                },
-                "patchSettings": [
+                "condition": [
                     {
-                        "op": "add",
-                        "path": "/detectors/video/error/triggers",
-                        "value": {
-                            "auto": {
-                                "state": "enabled",
-                                "when": {
-                                    "intervalMs": [
-                                        3000,
-                                        5000,
-                                        10000
-                                    ]
-                                }
-                            }
-                        }
+                        "injectName": "android",
+                        "minSupportedVersion": 52720000
                     },
                     {
-                        "op": "add",
-                        "path": "/detectors/video/error/actions",
-                        "value": {
-                            "fireEvent": {
-                                "state": "enabled",
-                                "type": "video_error"
-                            }
-                        }
-                    },
-                    {
-                        "op": "add",
-                        "path": "/detectors/video/placeholder/triggers",
-                        "value": {
-                            "auto": {
-                                "state": "enabled",
-                                "when": {
-                                    "intervalMs": [
-                                        5000,
-                                        10000
-                                    ]
-                                }
-                            }
-                        }
-                    },
-                    {
-                        "op": "add",
-                        "path": "/detectors/video/placeholder/actions",
-                        "value": {
-                            "fireEvent": {
-                                "state": "enabled",
-                                "type": "video_placeholder"
-                            }
-                        }
-                    },
-                    {
-                        "op": "add",
-                        "path": "/detectors/video/unavailable/triggers",
-                        "value": {
-                            "auto": {
-                                "state": "enabled",
-                                "when": {
-                                    "intervalMs": [
-                                        3000,
-                                        5000,
-                                        10000
-                                    ]
-                                }
-                            }
-                        }
-                    },
-                    {
-                        "op": "add",
-                        "path": "/detectors/video/unavailable/actions",
-                        "value": {
-                            "fireEvent": {
-                                "state": "enabled",
-                                "type": "video_unavailable"
-                            }
-                        }
-                    },
-                    {
-                        "op": "add",
-                        "path": "/detectors/video/blocked/triggers",
-                        "value": {
-                            "auto": {
-                                "state": "enabled",
-                                "when": {
-                                    "intervalMs": [
-                                        3000,
-                                        5000,
-                                        10000
-                                    ]
-                                }
-                            }
-                        }
-                    },
-                    {
-                        "op": "add",
-                        "path": "/detectors/video/blocked/actions",
-                        "value": {
-                            "fireEvent": {
-                                "state": "enabled",
-                                "type": "video_blocked"
-                            }
-                        }
+                        "injectName": "windows",
+                        "minSupportedVersion": "0.162.0"
                     }
-                ]
-            },
-            {
-                "condition": {
-                    "injectName": "windows",
-                    "minSupportedVersion": "0.162.0"
-                },
+                ],
                 "patchSettings": [
                     {
-                        "op": "add",
-                        "path": "/detectors/video/error/triggers",
-                        "value": {
-                            "auto": {
-                                "state": "enabled",
-                                "when": {
-                                    "intervalMs": [
-                                        500,
-                                        1000,
-                                        5000,
-                                        10000
-                                    ]
-                                }
-                            }
-                        }
+                        "op": "replace",
+                        "path": "/detectors/video/error/triggers/auto/state",
+                        "value": "enabled"
                     },
                     {
                         "op": "add",
@@ -1418,19 +1348,9 @@
                         }
                     },
                     {
-                        "op": "add",
-                        "path": "/detectors/video/placeholder/triggers",
-                        "value": {
-                            "auto": {
-                                "state": "enabled",
-                                "when": {
-                                    "intervalMs": [
-                                        5000,
-                                        10000
-                                    ]
-                                }
-                            }
-                        }
+                        "op": "replace",
+                        "path": "/detectors/video/placeholder/triggers/auto/state",
+                        "value": "enabled"
                     },
                     {
                         "op": "add",
@@ -1443,21 +1363,9 @@
                         }
                     },
                     {
-                        "op": "add",
-                        "path": "/detectors/video/unavailable/triggers",
-                        "value": {
-                            "auto": {
-                                "state": "enabled",
-                                "when": {
-                                    "intervalMs": [
-                                        500,
-                                        1000,
-                                        5000,
-                                        10000
-                                    ]
-                                }
-                            }
-                        }
+                        "op": "replace",
+                        "path": "/detectors/video/unavailable/triggers/auto/state",
+                        "value": "enabled"
                     },
                     {
                         "op": "add",
@@ -1470,21 +1378,9 @@
                         }
                     },
                     {
-                        "op": "add",
-                        "path": "/detectors/video/blocked/triggers",
-                        "value": {
-                            "auto": {
-                                "state": "enabled",
-                                "when": {
-                                    "intervalMs": [
-                                        500,
-                                        1000,
-                                        5000,
-                                        10000
-                                    ]
-                                }
-                            }
-                        }
+                        "op": "replace",
+                        "path": "/detectors/video/blocked/triggers/auto/state",
+                        "value": "enabled"
                     },
                     {
                         "op": "add",
