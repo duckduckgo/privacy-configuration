@@ -661,7 +661,7 @@
                 }
             },
             "webTelemetry_pageLoadTime_day": {
-                "state": "disabled",
+                "state": "enabled",
                 "trigger": {
                     "period": {
                         "days": 1
@@ -711,7 +711,7 @@
                 }
             },
             "webTelemetry_errorPhraseCount_day": {
-                "state": "disabled",
+                "state": "enabled",
                 "trigger": {
                     "period": {
                         "days": 1
@@ -751,7 +751,7 @@
                 }
             },
             "webTelemetry_soft404Features_day": {
-                "state": "disabled",
+                "state": "enabled",
                 "trigger": {
                     "period": {
                         "days": 1
@@ -791,7 +791,7 @@
                 }
             },
             "webTelemetry_failurePhrasesSmallPage_day": {
-                "state": "disabled",
+                "state": "enabled",
                 "trigger": {
                     "period": {
                         "days": 1
@@ -831,7 +831,7 @@
                 }
             },
             "webTelemetry_stylesMissing_day": {
-                "state": "disabled",
+                "state": "enabled",
                 "trigger": {
                     "period": {
                         "days": 1
@@ -871,7 +871,7 @@
                 }
             },
             "webTelemetry_brokenImages_day": {
-                "state": "disabled",
+                "state": "enabled",
                 "trigger": {
                     "period": {
                         "days": 1
@@ -961,7 +961,7 @@
                 }
             },
             "webTelemetry_forbiddenPage_day": {
-                "state": "disabled",
+                "state": "enabled",
                 "trigger": {
                     "period": {
                         "days": 1
@@ -1021,7 +1021,7 @@
                 }
             },
             "webTelemetry_rateLimitedPage_day": {
-                "state": "disabled",
+                "state": "enabled",
                 "trigger": {
                     "period": {
                         "days": 1
@@ -1081,7 +1081,7 @@
                 }
             },
             "webTelemetry_wafAssetsPage_day": {
-                "state": "disabled",
+                "state": "enabled",
                 "trigger": {
                     "period": {
                         "days": 1
@@ -1141,7 +1141,7 @@
                 }
             },
             "webTelemetry_appRootEmpty_day": {
-                "state": "disabled",
+                "state": "enabled",
                 "trigger": {
                     "period": {
                         "days": 1
@@ -1211,7 +1211,7 @@
                 }
             },
             "webTelemetry_noTextOrTitle_day": {
-                "state": "disabled",
+                "state": "enabled",
                 "trigger": {
                     "period": {
                         "days": 1
@@ -1251,6 +1251,436 @@
                     "size100KBPlus": {
                         "template": "counter",
                         "source": "noTextOrTitle_size100KBPlus",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    }
+                }
+            },
+            "webTelemetry_noContentfulPaint_day": {
+                "state": "enabled",
+                "trigger": {
+                    "period": {
+                        "days": 1
+                    }
+                },
+                "parameters": {
+                    "load0to3s": {
+                        "template": "counter",
+                        "source": "noContentfulPaint_load0to3s",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "load3to8s": {
+                        "template": "counter",
+                        "source": "noContentfulPaint_load3to8s",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "load8sPlus": {
+                        "template": "counter",
+                        "source": "noContentfulPaint_load8sPlus",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "firstPaintNone": {
+                        "template": "counter",
+                        "source": "noContentfulPaint_firstPaintNone",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "firstPaintPainted": {
+                        "template": "counter",
+                        "source": "noContentfulPaint_firstPaintPainted",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    }
+                }
+            },
+            "webTelemetry_viewportEmpty_day": {
+                "state": "enabled",
+                "trigger": {
+                    "period": {
+                        "days": 1
+                    }
+                },
+                "parameters": {
+                    "empty": {
+                        "template": "counter",
+                        "source": "viewportEmpty_empty",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    }
+                }
+            },
+            "webTelemetry_slowFirstInput_day": {
+                "state": "enabled",
+                "trigger": {
+                    "period": {
+                        "days": 1
+                    }
+                },
+                "parameters": {
+                    "delay300to999": {
+                        "template": "counter",
+                        "source": "slowFirstInput_delay300to999",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "delay1to3s": {
+                        "template": "counter",
+                        "source": "slowFirstInput_delay1to3s",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "delay3sPlus": {
+                        "template": "counter",
+                        "source": "slowFirstInput_delay3sPlus",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "durationUnder500": {
+                        "template": "counter",
+                        "source": "slowFirstInput_durationUnder500",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "duration500to999": {
+                        "template": "counter",
+                        "source": "slowFirstInput_duration500to999",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "duration1to3s": {
+                        "template": "counter",
+                        "source": "slowFirstInput_duration1to3s",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "duration3sPlus": {
+                        "template": "counter",
+                        "source": "slowFirstInput_duration3sPlus",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    }
+                }
+            },
+            "webTelemetry_failedSubresources_day": {
+                "state": "enabled",
+                "trigger": {
+                    "period": {
+                        "days": 1
+                    }
+                },
+                "parameters": {
+                    "scripts1": {
+                        "template": "counter",
+                        "source": "failedSubresources_scripts1",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "scripts2to4": {
+                        "template": "counter",
+                        "source": "failedSubresources_scripts2to4",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "scripts5Plus": {
+                        "template": "counter",
+                        "source": "failedSubresources_scripts5Plus",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "styles1": {
+                        "template": "counter",
+                        "source": "failedSubresources_styles1",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "styles2to4": {
+                        "template": "counter",
+                        "source": "failedSubresources_styles2to4",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "styles5Plus": {
+                        "template": "counter",
+                        "source": "failedSubresources_styles5Plus",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "images1": {
+                        "template": "counter",
+                        "source": "failedSubresources_images1",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "images2to4": {
+                        "template": "counter",
+                        "source": "failedSubresources_images2to4",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "images5Plus": {
+                        "template": "counter",
+                        "source": "failedSubresources_images5Plus",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    }
+                }
+            },
+            "webTelemetry_vercelCheckpoint_day": {
+                "state": "enabled",
+                "trigger": {
+                    "period": {
+                        "days": 1
+                    }
+                },
+                "parameters": {
+                    "cleared_shown8sPlus": {
+                        "template": "counter",
+                        "source": "vercelCheckpoint_cleared_shown8sPlus",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "held": {
+                        "template": "counter",
+                        "source": "vercelCheckpoint_held",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    }
+                }
+            },
+            "webTelemetry_challenge_day": {
+                "state": "enabled",
+                "trigger": {
+                    "period": {
+                        "days": 1
+                    }
+                },
+                "parameters": {
+                    "status2xx": {
+                        "template": "counter",
+                        "source": "challenge_status2xx",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "status4xx": {
+                        "template": "counter",
+                        "source": "challenge_status4xx",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "status5xx": {
+                        "template": "counter",
+                        "source": "challenge_status5xx",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "text0to499": {
+                        "template": "counter",
+                        "source": "challenge_text0to499",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "text500to1999": {
+                        "template": "counter",
+                        "source": "challenge_text500to1999",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "text2000Plus": {
+                        "template": "counter",
+                        "source": "challenge_text2000Plus",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    }
+                }
+            },
+            "webTelemetry_blockPage_day": {
+                "state": "enabled",
+                "trigger": {
+                    "period": {
+                        "days": 1
+                    }
+                },
+                "parameters": {
+                    "status2xx": {
+                        "template": "counter",
+                        "source": "blockPage_status2xx",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "status4xx": {
+                        "template": "counter",
+                        "source": "blockPage_status4xx",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "status5xx": {
+                        "template": "counter",
+                        "source": "blockPage_status5xx",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "text0to499": {
+                        "template": "counter",
+                        "source": "blockPage_text0to499",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "text500to1999": {
+                        "template": "counter",
+                        "source": "blockPage_text500to1999",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "text2000Plus": {
+                        "template": "counter",
+                        "source": "blockPage_text2000Plus",
                         "buckets": {
                             "1-2": { "gte": 1, "lt": 3 },
                             "3-9": { "gte": 3, "lt": 10 },
