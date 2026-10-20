@@ -1188,6 +1188,28 @@
                             "weight": 1
                         }
                     ]
+                },
+                "contentScopeExperiment9": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.240.0",
+                    "description": "Detector performance monitoring: treatment measures Web Detection detector execution time (detectorPerf); control does not",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
                 }
             }
         },
@@ -1325,6 +1347,21 @@
                         "formBoundarySelector": "",
                         "failsafeSettings": {},
                         "conditionalChanges": [
+                            {
+                                "condition": [
+                                    { "domain": "account.greenbacktaxservices.com" }
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "form[action*=\"AppLogin\"] input[type=\"password\"]",
+                                            "type": "credentials.password.current"
+                                        }
+                                    }
+                                ]
+                            },
                             {
                                 "condition": [
                                     { "domain": "www.aestheticcity.academy" }
@@ -3612,8 +3649,15 @@
                     }
                 },
                 "alwaysShowKeyboardOnNewTabPage": {
-                    "state": "internal",
-                    "minSupportedVersion": "7.242.0"
+                    "state": "enabled",
+                    "minSupportedVersion": "7.242.0",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            }
+                        ]
+                    }
                 },
                 "newTabPageRedesign": {
                     "state": "internal",
@@ -4199,6 +4243,9 @@
                 }
             }
         },
+        "detectorPerf": {
+            "state": "enabled"
+        },
         "webDetection": {
             "state": "enabled",
             "minSupportedVersion": "7.214.0"
@@ -4441,6 +4488,27 @@
                             "source": "captcha_other"
                         },
                         "parameters": {}
+                    },
+                    "detectorPerf_severe": {
+                        "state": "enabled",
+                        "trigger": {
+                            "type": "immediate",
+                            "source": "detectorPerf_severe"
+                        },
+                        "parameters": {
+                            "kind": {
+                                "template": "data",
+                                "dataKey": "kind"
+                            },
+                            "detector": {
+                                "template": "data",
+                                "dataKey": "detector"
+                            },
+                            "thresholdMs": {
+                                "template": "data",
+                                "dataKey": "thresholdMs"
+                            }
+                        }
                     }
                 }
             }
