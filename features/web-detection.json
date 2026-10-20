@@ -782,41 +782,45 @@
                             },
                             {
                                 "text": {
-                                    "all": {
-                                        "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript) and not(ancestor::*[@hidden]) and not(ancestor::*[@aria-hidden='true']) and not(ancestor::*[contains(translate(@style,' ',''),'display:none')]) and not(ancestor::*[contains(translate(@style,' ',''),'visibility:hidden')])]",
-                                        "pattern": [
-                                            "something went wrong",
-                                            "an? (unexpected |unknown |internal )?error (has )?occurred",
-                                            "(couldn.?t|could not|were unable to) (sign|log) you in",
-                                            "(sign|log)[ -]?in (attempt )?(failed|unsuccessful)",
-                                            "(experiencing|having) (some )?technical (difficulties|issues|problems)",
-                                            "a (problem|technical error) (has )?occurred",
-                                            "oops[\\s\\S]{0,40}(try again|refresh)",
-                                            "(a|some|temporary) technical (issues?|difficult(y|ies)|problems?|errors?)"
-                                        ]
-                                    },
-                                    "none": {
-                                        "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript) and not(ancestor::*[@hidden]) and not(ancestor::*[@aria-hidden='true']) and not(ancestor::*[contains(translate(@style,' ',''),'display:none')]) and not(ancestor::*[contains(translate(@style,' ',''),'visibility:hidden')])]",
-                                        "pattern": [
-                                            "(incorrect|wrong|invalid|unrecogni[sz]ed) (e-?mail|user ?name|user ?id|password|credentials|login|phone|code|pin)",
-                                            "(e-?mail|user ?name|user ?id|password|credentials|code|combination)( you entered)? (is|are|was|were) (incorrect|wrong|invalid|not (correct|valid|recogni[sz]ed))",
-                                            "check your (e-?mail( address)?|user ?name|password|phone( number)?) (and|or) (your )?(e-?mail( address)?|user ?name|password|phone( number)?)",
-                                            "check your (credentials|details|login|sign.?in)",
-                                            "account (has been |is )?(locked|suspended|disabled)",
-                                            "too many (failed |sign.?in |log.?in )?(attempts|tries|requests)",
-                                            "(does ?n.?t|did ?n.?t|does not|did not) match our records",
-                                            "(could ?n.?t|could not|can.?t|cannot) find (your|an|that) account",
-                                            "no (user|account)( was)? found",
-                                            "(user|account) (was )?not found",
-                                            "(login |log.?in |sign.?in )?(information|info|details)( you entered)? (is|are|was|were) (incorrect|wrong|invalid|not (correct|valid))",
-                                            "(didn.?t|did not|could ?n.?t|could not|can.?t|cannot) recogni[sz]e (that|this|your|the) [^.]{0,30}(account|e-?mail|user ?name|password|credentials)",
-                                            "(incorrect|wrong|invalid|expired) (verification|security|one.time|sign.?in|login|access) code",
-                                            "(could ?n.?t|could not|unable to|can.?t|cannot) verify (this|that|the|your) code",
-                                            "code (has )?expired",
-                                            "try again with a new code"
-                                        ]
-                                    }
+                                    "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript) and not(ancestor::*[@hidden]) and not(ancestor::*[@aria-hidden='true']) and not(ancestor::*[contains(translate(@style,' ',''),'display:none')]) and not(ancestor::*[contains(translate(@style,' ',''),'visibility:hidden')])]",
+                                    "pattern": [
+                                        "something went wrong",
+                                        "an? (unexpected |unknown |internal )?error (has )?occurred",
+                                        "(couldn.?t|could not|were unable to) (sign|log) you in",
+                                        "(sign|log)[ -]?in (attempt )?(failed|unsuccessful)",
+                                        "(experiencing|having) (some )?technical (difficulties|issues|problems)",
+                                        "a (problem|technical error) (has )?occurred",
+                                        "oops[\\s\\S]{0,40}(try again|refresh)",
+                                        "(a|some|temporary) technical (issues?|difficult(y|ies)|problems?|errors?)"
+                                    ]
                                 }
+                            },
+                            {
+                                "none": [
+                                    {
+                                        "text": {
+                                            "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript) and not(ancestor::*[@hidden]) and not(ancestor::*[@aria-hidden='true']) and not(ancestor::*[contains(translate(@style,' ',''),'display:none')]) and not(ancestor::*[contains(translate(@style,' ',''),'visibility:hidden')])]",
+                                            "pattern": [
+                                                "(incorrect|wrong|invalid|unrecogni[sz]ed) (e-?mail|user ?name|user ?id|password|credentials|login|phone|code|pin)",
+                                                "(e-?mail|user ?name|user ?id|password|credentials|code|combination)( you entered)? (is|are|was|were) (incorrect|wrong|invalid|not (correct|valid|recogni[sz]ed))",
+                                                "check your (e-?mail( address)?|user ?name|password|phone( number)?) (and|or) (your )?(e-?mail( address)?|user ?name|password|phone( number)?)",
+                                                "check your (credentials|details|login|sign.?in)",
+                                                "account (has been |is )?(locked|suspended|disabled)",
+                                                "too many (failed |sign.?in |log.?in )?(attempts|tries|requests)",
+                                                "(does ?n.?t|did ?n.?t|does not|did not) match our records",
+                                                "(could ?n.?t|could not|can.?t|cannot) find (your|an|that) account",
+                                                "no (user|account)( was)? found",
+                                                "(user|account) (was )?not found",
+                                                "(login |log.?in |sign.?in )?(information|info|details)( you entered)? (is|are|was|were) (incorrect|wrong|invalid|not (correct|valid))",
+                                                "(didn.?t|did not|could ?n.?t|could not|can.?t|cannot) recogni[sz]e (that|this|your|the) [^.]{0,30}(account|e-?mail|user ?name|password|credentials)",
+                                                "(incorrect|wrong|invalid|expired) (verification|security|one.time|sign.?in|login|access) code",
+                                                "(could ?n.?t|could not|unable to|can.?t|cannot) verify (this|that|the|your) code",
+                                                "code (has )?expired",
+                                                "try again with a new code"
+                                            ]
+                                        }
+                                    }
+                                ]
                             },
                             {
                                 "element": {
@@ -825,7 +829,7 @@
                                 }
                             }
                         ]
-                    }
+                    }                    
                 },
                 "cookies": {
                     "state": "disabled",
