@@ -1,4 +1,4 @@
-import { ConditionBlockOrArray, Feature } from '../feature';
+import { ConditionBlock, Feature } from '../feature';
 
 type ElementHidingValue = {
     property: string;
@@ -23,12 +23,22 @@ type ElementHidingRuleWithoutSelector = {
 
 type ElementHidingRule = ElementHidingRuleHide | ElementHidingRuleModify | ElementHidingRuleWithoutSelector;
 
-type ElementHidingDomain = {
-    domain: string | string[];
-    // When present, replaces `domain` for matching, so it must include the domain itself.
-    condition?: ConditionBlockOrArray;
-    rules: ElementHidingRule[];
-};
+// Every block names a domain: a condition without one matches every site.
+type DomainConditionBlock = ConditionBlock & { domain: string };
+
+type DomainCondition = DomainConditionBlock | DomainConditionBlock[];
+
+// When present, `condition` replaces `domain` for matching.
+type ElementHidingDomain =
+    | {
+          domain: string | string[];
+          condition?: DomainCondition;
+          rules: ElementHidingRule[];
+      }
+    | {
+          condition: DomainCondition;
+          rules: ElementHidingRule[];
+      };
 
 type StyleTagException = {
     domain: string;
