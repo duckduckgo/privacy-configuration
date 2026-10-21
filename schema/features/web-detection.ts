@@ -18,10 +18,6 @@ type Triggers = Partial<{
     auto: AutoTrigger;
 }>;
 
-type ActionBase = {
-    state?: FeatureState;
-};
-
 export type ConditionBranch<Final> = ConditionNode<Final> | ConditionNode<Final>[];
 
 type ConditionOperator = 'any' | 'all' | 'none';
@@ -257,15 +253,15 @@ export type DetectorConfig = {
 };
 
 type LegacyActions = Partial<{
-    breakageReportData: ActionBase & { data?: PayloadSpec };
-    fireEvent: ActionBase & {
+    breakageReportData: { data?: PayloadSpec };
+    fireEvent: {
         type: string;
         data?: PayloadSpec;
     };
 }>;
 
 /**
- * The shape clients read before `actions` expressions: `match`, and actions with `state` that run when
+ * The shape clients read before `actions` expressions: `match`, and an object of actions that run when
  * it holds. Literal config keeps it for those clients, and gated patches move each detector to a
  * `DetectorConfig`.
  */

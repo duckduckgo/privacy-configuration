@@ -2988,7 +2988,7 @@ function definesName(node, name) {
  * @returns {string[]}
  */
 function repeatedEventWarnings(detector, path) {
-    if (!isPlainObject(detector) || 'match' in detector || isLegacyDetector(detector)) return [];
+    if (!isPlainObject(detector) || 'match' in detector) return [];
     /** @type {string[]} */
     const warnings = [];
     /**
@@ -3048,14 +3048,14 @@ function newContext() {
 
 /**
  * Whether a detector is in the shape clients before this release read: `match`, and an `actions`
- * object whose actions carry `state`, or no `actions`.
+ * object holding `fireEvent` and `breakageReportData` only, or no `actions`.
  *
  * @param {unknown} detector
  * @returns {boolean}
  */
 function isLegacyDetector(detector) {
-    if (!isPlainObject(detector)) return false;
-    if (!('actions' in detector)) return 'match' in detector;
+    if (!isPlainObject(detector) || !('match' in detector)) return false;
+    if (!('actions' in detector)) return true;
     const actions = detector.actions;
     return (
         isPlainObject(actions) &&
@@ -3064,21 +3064,23 @@ function isLegacyDetector(detector) {
             ([
                 key,
                 body,
-            ]) => PAYLOAD_ACTIONS.includes(key) && isPlainObject(body) && 'state' in body,
+            ]) => PAYLOAD_ACTIONS.includes(key) && isPlainObject(body),
         )
     );
 }
 
 /**
- * Check a detector against the expression, predicate and payload rules: `match` and `actions`, or the
- * legacy shape.
+ * Check a detector against the expression, predicate and payload rules: `match` and `actions`, or a
+ * legacy `match` with no `actions`.
  *
  * @param {Record<string, any>} detector
  * @param {string} path
  * @returns {string[]} the errors, empty when the detector is valid
  */
 function validateDetector(detector, path) {
-    return isLegacyDetector(detector) ? validateLegacyDetector(detector, path) : validateActionsDetector(detector, path);
+    return isPlainObject(detector) && 'match' in detector && !('actions' in detector)
+        ? validateLegacyDetector(detector, path)
+        : validateActionsDetector(detector, path);
 }
 
 /**
@@ -3129,7 +3131,8 @@ function validateActionsDetector(detector, path) {
 }
 
 /**
- * The legacy shape: `match`, and an `actions` object whose actions run when it holds.
+ * The legacy shape with no `actions`: `match` only, which sends breakage report data when it holds.
+ * One with an `actions` object of `fireEvent` and `breakageReportData` parses in this release too.
  *
  * @param {Record<string, any>} detector
  * @param {string} path
@@ -3139,13 +3142,7 @@ function validateLegacyDetector(detector, path) {
     const ctx = newContext();
     ctx.hasMatch = true;
     ctx.structuralErrors.push(...shippedMatchErrors(detector.match, `${path}.match`));
-    return runChecks(ctx, () => {
-        checkExpr(detector.match, 'boolean', MATCH_SCOPE, ctx, `${path}.match`);
-        for (const action of PAYLOAD_ACTIONS) {
-            const data = detector.actions?.[action]?.data;
-            if (data !== undefined) checkPayloadSpec(data, ctx, `${path}.actions.${action}.data`);
-        }
-    });
+    return runChecks(ctx, () => checkExpr(detector.match, 'boolean', MATCH_SCOPE, ctx, `${path}.match`));
 }
 
 /**
@@ -3505,14 +3502,13 @@ describe('webDetection config tests', () => {
                                     detector,
                                 ] of Object.entries(group)) {
                                     const path = `detectors.${groupName}.${detectorId}`;
-                                    const legacy = isLegacyDetector(detector);
-                                    if (current && legacy)
-                                        errors.push(`${path}: a client of this release sees the legacy shape, which it does not parse`);
-                                    if (current && !legacy) errors.push(...validateActionsDetector(detector, path));
-                                    if (!current && !legacy && detector.state !== 'disabled')
+                                    if (current) errors.push(...validateActionsDetector(detector, path));
+                                    if (current || detector.state === 'disabled') continue;
+                                    if (!isLegacyDetector(detector))
                                         errors.push(
                                             `${path}: a client before this release sees an enabled detector in this release's shape, whose new keys it does not read; author it with "state": "disabled" and enable it only for clients at or above ${clients.version}`,
                                         );
+                                    else errors.push(...shippedMatchErrors(detector.match, `${path}.match`));
                                 }
                             }
                         }
@@ -3612,7 +3608,7 @@ describe('webDetection config tests', () => {
                         settings: {
                             detectors: {
                                 g: {
-                                    once: { match: true, actions: { fireEvent: { type: 'a' }, breakageReportData: {} } },
+                                    once: { match: true, actions: { fireEvent: { type: 'a' }, define: { b: 1 } } },
                                     list: {
                                         actions: [
                                             { define: { x: 1, y: { ref: 'x' } } },
@@ -3623,7 +3619,7 @@ describe('webDetection config tests', () => {
                                             },
                                         ],
                                     },
-                                    legacy: { match: true, actions: { fireEvent: { state: 'enabled', type: 'c' } } },
+                                    legacy: { match: true, actions: { fireEvent: { type: 'c' }, breakageReportData: {} } },
                                 },
                             },
                             conditionalChanges: [
@@ -3647,7 +3643,7 @@ describe('webDetection config tests', () => {
             const settings = config.features.webDetection.settings;
             expect(settings.detectors.g.once.actions).to.deep.equal([
                 { fireEvent: { type: 'a' } },
-                { breakageReportData: {} },
+                { define: { b: 1 } },
             ]);
             expect(settings.detectors.g.list.actions).to.deep.equal([
                 { define: { x: 1 } },
@@ -3661,7 +3657,7 @@ describe('webDetection config tests', () => {
                     else: { breakageReportData: {} },
                 },
             ]);
-            expect(settings.detectors.g.legacy.actions).to.deep.equal({ fireEvent: { state: 'enabled', type: 'c' } });
+            expect(settings.detectors.g.legacy.actions).to.deep.equal({ fireEvent: { type: 'c' }, breakageReportData: {} });
             expect(settings.conditionalChanges[0].patchSettings[0].value).to.deep.equal({
                 actions: [
                     { define: { a: 1 } },
@@ -4503,8 +4499,8 @@ describe('webDetection config tests', () => {
         describe('the legacy shape', () => {
             it('tells the legacy shape from this release', () => {
                 expect(isLegacyDetector({ match: true })).to.equal(true);
-                expect(isLegacyDetector({ match: true, actions: { fireEvent: { state: 'enabled', type: 'a' } } })).to.equal(true);
-                expect(isLegacyDetector({ match: true, actions: { fireEvent: { type: 'a' } } })).to.equal(false);
+                expect(isLegacyDetector({ match: true, actions: { fireEvent: { type: 'a' } } })).to.equal(true);
+                expect(isLegacyDetector({ match: true, actions: { fireEvent: { type: 'a' }, define: { b: 1 } } })).to.equal(false);
                 expect(
                     isLegacyDetector({
                         actions: [
@@ -4523,7 +4519,6 @@ describe('webDetection config tests', () => {
                                 { api: 'document.hidden' },
                             ],
                         },
-                        actions: { fireEvent: { state: 'enabled', type: 'a' } },
                     },
                     '$',
                 );
@@ -4621,7 +4616,7 @@ describe('webDetection config tests', () => {
                     'b',
                     'c',
                 ]);
-                expect(fireEventTypes({ match: true, actions: { fireEvent: { state: 'enabled', type: 'd' } } })).to.deep.equal([
+                expect(fireEventTypes({ match: true, actions: { fireEvent: { type: 'd' } } })).to.deep.equal([
                     'd',
                 ]);
             });

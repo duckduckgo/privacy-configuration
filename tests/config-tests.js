@@ -841,11 +841,13 @@ describe('Web detection detector schema', () => {
         expect(validate({ actions: { fireEvent: { type: 'a', state: 'enabled' } } })).to.equal(false);
     });
 
-    it('accepts the shipped shape as a legacy detector only', () => {
+    it('accepts the shipped shape as a legacy detector, and as this release with `actions`', () => {
         const validateLegacy = createValidator('LegacyDetectorConfig');
-        const detector = { match: images, actions: { fireEvent: { state: 'enabled', type: 'a' } } };
+        const detector = { match: images, actions: { fireEvent: { type: 'a' } } };
         expect(validateLegacy(detector), formatErrors(validateLegacy.errors)).to.equal(true);
-        expect(validate(detector)).to.equal(false);
+        expect(validate(detector), formatErrors(validate.errors)).to.equal(true);
+        expect(validateLegacy({ match: images })).to.equal(true);
+        expect(validateLegacy({ match: images, actions: { fireEvent: { state: 'enabled', type: 'a' } } })).to.equal(false);
     });
 });
 

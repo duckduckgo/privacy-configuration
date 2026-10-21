@@ -240,16 +240,18 @@ function isPlainObject(value) {
 }
 
 /**
- * Whether a webDetection detector is in the shape clients before `actions` expressions read: an
- * `actions` object whose actions carry `state`, or no `actions`.
+ * Whether a webDetection detector is in the shape clients before `actions` expressions read: `match`,
+ * and an `actions` object holding `fireEvent` and `breakageReportData` only, or no `actions`. Their
+ * order does not matter, so such an object is left as it is.
  *
  * @param {unknown} detector
  * @returns {boolean}
  */
 function isLegacyDetector(detector) {
-    if (!isPlainObject(detector)) return false;
+    if (!isPlainObject(detector) || !('match' in detector)) return false;
     if (!('actions' in detector)) return true;
-    return isPlainObject(detector.actions) && Object.values(detector.actions).some((body) => isPlainObject(body) && 'state' in body);
+    const keys = isPlainObject(detector.actions) ? Object.keys(detector.actions) : [];
+    return keys.length > 0 && keys.every((key) => key === 'fireEvent' || key === 'breakageReportData');
 }
 
 /**
