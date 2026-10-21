@@ -380,6 +380,27 @@ describe('EventHub validation tests', () => {
                 }
             });
 
+            // A client skips an immediate trigger name it does not parse, dropping the pixel. Apple
+            // parses only `immediate_v2`, which the build emits; Windows parses only `immediate`.
+            const unparsedImmediateType = {
+                'ios-config.json': 'immediate',
+                'macos-config.json': 'immediate',
+                'windows-config.json': 'immediate_v2',
+            }[config.name.split('/').pop() ?? ''];
+            if (unparsedImmediateType) {
+                it(`immediate triggers must not use '${unparsedImmediateType}', which this platform skips`, () => {
+                    for (const [
+                        name,
+                        entry,
+                    ] of Object.entries(telemetry)) {
+                        expect(entry.trigger.type).to.not.equal(
+                            unparsedImmediateType,
+                            `Telemetry '${name}' uses trigger.type '${unparsedImmediateType}', which this platform skips`,
+                        );
+                    }
+                });
+            }
+
             it('each telemetry entry declares a parameters object, and non-immediate entries have at least one', () => {
                 for (const [
                     name,

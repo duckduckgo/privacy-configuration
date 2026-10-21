@@ -8,6 +8,7 @@ import {
     mergeAllowlistedTrackers,
     mergeEventHubTelemetry,
     mergeInterferenceTypes,
+    renameEventHubImmediateTriggers,
     addHashToFeatures,
     stripReasons,
     getBaseFeatureConfigs,
@@ -381,6 +382,8 @@ async function buildPlatforms() {
         // Clients read eventHub periods as integer seconds; collapse any authored unit object
         // (days/hours/minutes) to seconds so period pixels are not silently dropped.
         collapseEventHubTelemetryPeriods(platformConfig);
+        // Authors write `immediate`; emit the immediate trigger name this platform parses.
+        renameEventHubImmediateTriggers(platformConfig, platform);
 
         platformConfigs[platform] = platformConfig;
 

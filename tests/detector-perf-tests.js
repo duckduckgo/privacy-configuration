@@ -4,6 +4,12 @@ import platforms from '../platforms.js';
 
 const platformOutput = platforms.map((item) => item.replace('browsers/', 'extension-'));
 
+// Generated configs carry `immediate` or, for platforms that parse only that name, `immediate_v2`.
+const IMMEDIATE_TRIGGER_TYPES = [
+    'immediate',
+    'immediate_v2',
+];
+
 const latestConfigs = platformOutput.map((plat) => {
     return {
         name: `v5/${plat}-config.json`,
@@ -143,7 +149,7 @@ function collectSources(telemetry) {
         entryName,
         entry,
     ] of Object.entries(telemetry ?? {})) {
-        if (entry.trigger?.type === 'immediate' && entry.trigger.source) {
+        if (IMMEDIATE_TRIGGER_TYPES.includes(entry.trigger?.type) && entry.trigger.source) {
             const entries = sources.get(entry.trigger.source) ?? [];
             entries.push(entryName);
             sources.set(entry.trigger.source, entries);
@@ -257,8 +263,8 @@ describe('detectorPerf config tests', () => {
                 entryName,
                 entry,
             ] of Object.entries(telemetry)) {
-                expect(entry.trigger?.type).to.not.equal(
-                    'immediate',
+                expect(entry.trigger?.type).to.not.be.oneOf(
+                    IMMEDIATE_TRIGGER_TYPES,
                     `${config.name}: telemetry entry '${entryName}' uses an immediate trigger, which Android's EventHub parser rejects wholesale`,
                 );
             }
