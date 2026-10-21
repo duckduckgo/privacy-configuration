@@ -33,6 +33,7 @@ import { EventHubFeature } from './features/event-hub';
 import { ContentScopeExperimentsFeature, TdsExperimentsFeature } from './features/experiment-metrics';
 import { RequestBlocklistFeature } from './features/request-blocklist';
 import { UaChBrandsFeature } from './features/ua-ch-brands';
+import { TrackerProtectionFeature } from './features/tracker-protection';
 import { UrlPredictorFeature } from './features/url-predictor';
 import { WebDetectionFeature } from './features/web-detection';
 import { WebEventsFeature } from './features/web-events';
@@ -113,6 +114,7 @@ export type ConfigV6<VersionType> = {
         elementHiding?: ElementHidingFeature<VersionType>;
         eventHub?: EventHubFeature<VersionType>;
         requestBlocklist?: RequestBlocklistFeature<VersionType>;
+        trackerProtection?: TrackerProtectionFeature<VersionType>;
         uaChBrands?: UaChBrandsFeature<VersionType>;
         urlPredictor?: UrlPredictorFeature<VersionType>;
         webInterferenceDetection?: WebInterferenceDetectionFeature<VersionType>;
