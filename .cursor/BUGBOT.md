@@ -71,6 +71,23 @@ Clients snapshot or anchor metric state at enrollment, and users enroll as soon 
 
 If a PR modifies a `webDetection` detector (its `match`, `triggers`, or `actions.fireEvent`) whose `fireEvent.type` is referenced as the `event` of a metric in an experiment that is currently `enabled` with cohorts, warn on the PR: the change applies to both cohorts equally so the A/B comparison survives, but the metric's meaning steps mid-experiment and analysis needs to know the date. This is a **warning**, not a block — ask the author to confirm the experiment owner is aware.
 
+## Web Detection Feature Validation
+
+### References
+
+- **Rule File**: `.cursor/rules/web-detection.mdc`
+- **Tests**: `tests/web-detection-tests.js`
+
+### Detector Performance and Gating
+
+Warn (do not block) when a PR:
+
+- gives an `auto` trigger an `intervalMs` value another detector already uses
+- has a `text` condition with `xpath` and no plain `text` pattern before it in the `all` list
+- puts `visibility: "visible"` before a `text` condition
+- adds an `apple-isolated` 1.x condition without `maxSupportedVersion`
+- enables a new `fireEvent` detector for all users without an experiment
+
 ## Custom User Agent / Client Hints Validation
 
 ### References
