@@ -668,9 +668,9 @@
                     }
                 },
                 "parameters": {
-                    "loadLoading": {
+                    "loadLoadingAfter15s": {
                         "template": "counter",
-                        "source": "pageLoadTime_loadLoading",
+                        "source": "pageLoadTime_loadLoadingAfter15s",
                         "buckets": {
                             "1-2": { "gte": 1, "lt": 3 },
                             "3-9": { "gte": 3, "lt": 10 },
@@ -698,9 +698,29 @@
                             "30+": { "gte": 30 }
                         }
                     },
-                    "slowReload": {
+                    "slowReloadLoadingAfter15s": {
                         "template": "counter",
-                        "source": "pageLoadTime_slowReload",
+                        "source": "pageLoadTime_slowReloadLoadingAfter15s",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "slowReload8to15s": {
+                        "template": "counter",
+                        "source": "pageLoadTime_slowReload8to15s",
+                        "buckets": {
+                            "1-2": { "gte": 1, "lt": 3 },
+                            "3-9": { "gte": 3, "lt": 10 },
+                            "10-29": { "gte": 10, "lt": 30 },
+                            "30+": { "gte": 30 }
+                        }
+                    },
+                    "slowReload15sPlus": {
+                        "template": "counter",
+                        "source": "pageLoadTime_slowReload15sPlus",
                         "buckets": {
                             "1-2": { "gte": 1, "lt": 3 },
                             "3-9": { "gte": 3, "lt": 10 },
@@ -1328,9 +1348,9 @@
                     }
                 },
                 "parameters": {
-                    "empty": {
+                    "empty8of9": {
                         "template": "counter",
-                        "source": "viewportEmpty_empty",
+                        "source": "viewportEmpty_empty8of9",
                         "buckets": {
                             "1-2": { "gte": 1, "lt": 3 },
                             "3-9": { "gte": 3, "lt": 10 },
@@ -1538,9 +1558,9 @@
                             "30+": { "gte": 30 }
                         }
                     },
-                    "held": {
+                    "held8s": {
                         "template": "counter",
-                        "source": "vercelCheckpoint_held",
+                        "source": "vercelCheckpoint_held8s",
                         "buckets": {
                             "1-2": { "gte": 1, "lt": 3 },
                             "3-9": { "gte": 3, "lt": 10 },

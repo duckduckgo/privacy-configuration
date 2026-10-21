@@ -3065,7 +3065,7 @@
                                         },
                                         "then": {
                                             "fireEvent": {
-                                                "type": "pageLoadTime_loadLoading"
+                                                "type": "pageLoadTime_loadLoadingAfter15s"
                                             }
                                         }
                                     },
@@ -3098,12 +3098,63 @@
                                     },
                                     {
                                         "if": {
-                                            "ref": "navigationType",
-                                            "is": "reload"
+                                            "all": [
+                                                {
+                                                    "ref": "navigationType",
+                                                    "is": "reload"
+                                                },
+                                                {
+                                                    "ref": "loadEventEnd",
+                                                    "is": 0
+                                                }
+                                            ]
                                         },
                                         "then": {
                                             "fireEvent": {
-                                                "type": "pageLoadTime_slowReload"
+                                                "type": "pageLoadTime_slowReloadLoadingAfter15s"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "if": {
+                                            "all": [
+                                                {
+                                                    "ref": "navigationType",
+                                                    "is": "reload"
+                                                },
+                                                {
+                                                    "ref": "loadEventEnd",
+                                                    "is": {
+                                                        "gte": 8000,
+                                                        "lt": 15000
+                                                    }
+                                                }
+                                            ]
+                                        },
+                                        "then": {
+                                            "fireEvent": {
+                                                "type": "pageLoadTime_slowReload8to15s"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "if": {
+                                            "all": [
+                                                {
+                                                    "ref": "navigationType",
+                                                    "is": "reload"
+                                                },
+                                                {
+                                                    "ref": "loadEventEnd",
+                                                    "is": {
+                                                        "gte": 15000
+                                                    }
+                                                }
+                                            ]
+                                        },
+                                        "then": {
+                                            "fireEvent": {
+                                                "type": "pageLoadTime_slowReload15sPlus"
                                             }
                                         }
                                     },
