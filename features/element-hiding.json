@@ -1,0 +1,4918 @@
+{
+    "_meta": {
+        "description": "Hide empty ad slots."
+    },
+    "exceptions": [
+        {
+            "domain": "duckduckgo.com",
+            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1236"
+        },
+        {
+            "domain": "duck.co",
+            "reason": "Element hiding is targeting the ad badge on dev instances as they are not under the duckduckgo.com domain anymore"
+        },
+        {
+            "domain": "gmx.net",
+            "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3638"
+        },
+        {
+            "domain": "web.de",
+            "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3638"
+        }
+    ],
+    "settings": {
+        "useStrictHideStyleTag": true,
+        "rules": [
+            {
+                "selector": "[id*='gpt-']",
+                "type": "hide-empty"
+            },
+            {
+                "selector": "[class*='gpt-']",
+                "type": "closest-empty"
+            },
+            {
+                "selector": "[class*='dfp-']",
+                "type": "hide-empty"
+            },
+            {
+                "selector": "[id*='dfp-']",
+                "type": "hide-empty"
+            },
+            {
+                "selector": "[id*='dfp_']",
+                "type": "closest-empty"
+            },
+            {
+                "selector": "[id*='google_ads_iframe']",
+                "type": "hide"
+            },
+            {
+                "selector": "#google_ads",
+                "type": "hide-empty"
+            },
+            {
+                "selector": ".adsbygoogle",
+                "type": "hide-empty"
+            },
+            {
+                "selector": "[id*='taboola-']",
+                "type": "hide"
+            },
+            {
+                "selector": ".taboolaHeight",
+                "type": "hide"
+            },
+            {
+                "selector": ".taboola-placeholder",
+                "type": "hide"
+            },
+            {
+                "selector": ".adHolder",
+                "type": "closest-empty"
+            },
+            {
+                "selector": ".adplaceholder",
+                "type": "hide-empty"
+            },
+            {
+                "selector": ".ad-placeholder",
+                "type": "hide-empty"
+            },
+            {
+                "selector": "[class*='ad_unit']",
+                "type": "closest-empty"
+            },
+            {
+                "selector": "[class^='adunit']",
+                "type": "hide-empty"
+            },
+            {
+                "selector": ".ad-unit",
+                "type": "hide-empty"
+            },
+            {
+                "selector": ".ad-unit-wrapper",
+                "type": "hide-empty"
+            },
+            {
+                "selector": ".column-ad",
+                "type": "hide-empty"
+            },
+            {
+                "selector": ".wide-ad",
+                "type": "hide-empty"
+            },
+            {
+                "selector": ".ad",
+                "type": "hide-empty"
+            },
+            {
+                "selector": ".AD",
+                "type": "hide-empty"
+            },
+            {
+                "selector": ".ad-adhesion",
+                "type": "hide-empty"
+            },
+            {
+                "selector": ".Ad--empty",
+                "type": "hide-empty"
+            },
+            {
+                "selector": "[class^='ad-content']",
+                "type": "hide-empty"
+            },
+            {
+                "selector": "[class*='ad-slot_']",
+                "type": "hide-empty"
+            },
+            {
+                "selector": "[class*='_ad-slot']",
+                "type": "hide-empty"
+            },
+            {
+                "selector": ".ad-block",
+                "type": "hide-empty"
+            },
+            {
+                "selector": ".adBox",
+                "type": "hide-empty"
+            },
+            {
+                "selector": ".apexAd",
+                "type": "hide-empty"
+            },
+            {
+                "selector": ".ad-placement",
+                "type": "hide-empty"
+            },
+            {
+                "selector": ".ad-leaderboard",
+                "type": "closest-empty"
+            },
+            {
+                "selector": ".leaderboard",
+                "type": "closest-empty"
+            },
+            {
+                "selector": "#leaderboard",
+                "type": "closest-empty"
+            },
+            {
+                "selector": "#leaderboard-container",
+                "type": "hide-empty"
+            },
+            {
+                "selector": ".leaderboard_wrapper",
+                "type": "hide-empty"
+            },
+            {
+                "selector": ".banner-leaderboard",
+                "type": "hide-empty"
+            },
+            {
+                "selector": ".top-banner",
+                "type": "hide-empty"
+            },
+            {
+                "selector": "#top-banner",
+                "type": "hide-empty"
+            },
+            {
+                "selector": "#topBanner",
+                "type": "hide-empty"
+            },
+            {
+                "selector": ".top-ad",
+                "type": "hide-empty"
+            },
+            {
+                "selector": "#top-ad",
+                "type": "hide"
+            },
+            {
+                "selector": "#topAd",
+                "type": "hide-empty"
+            },
+            {
+                "selector": "#topad",
+                "type": "hide-empty"
+            },
+            {
+                "selector": ".ad-banner-container",
+                "type": "hide-empty"
+            },
+            {
+                "selector": "#banner_ad",
+                "type": "hide-empty"
+            },
+            {
+                "selector": "[class*='bannerAd']",
+                "type": "hide-empty"
+            },
+            {
+                "selector": ".banner-placeholder",
+                "type": "hide-empty"
+            },
+            {
+                "selector": ".header-ads",
+                "type": "hide-empty"
+            },
+            {
+                "selector": ".header-ad-slot",
+                "type": "hide-empty"
+            },
+            {
+                "selector": "#credential_picker_container",
+                "type": "hide"
+            },
+            {
+                "selector": "#credentials-picker-container",
+                "type": "hide"
+            },
+            {
+                "selector": "#credential_picker_iframe",
+                "type": "hide"
+            },
+            {
+                "selector": "#onetap_google_intermediate_iframe",
+                "type": "hide"
+            },
+            {
+                "selector": "[id*='google-one-tap-iframe']",
+                "type": "hide"
+            },
+            {
+                "selector": "#google-one-tap-popup-container",
+                "type": "hide"
+            },
+            {
+                "selector": ".google-one-tap__module",
+                "type": "hide"
+            },
+            {
+                "selector": ".google-one-tap-modal-div",
+                "type": "hide"
+            },
+            {
+                "selector": ".google-one-tap",
+                "type": "hide-empty"
+            },
+            {
+                "selector": ".ad_container",
+                "type": "closest-empty"
+            },
+            {
+                "selector": ".ad-container--leaderboard",
+                "type": "hide-empty"
+            },
+            {
+                "selector": ".ads_container",
+                "type": "hide-empty"
+            },
+            {
+                "selector": ".ad__container",
+                "type": "closest-empty"
+            },
+            {
+                "selector": "[class^='ad-container']",
+                "type": "hide-empty"
+            },
+            {
+                "selector": "[class*='-ad-container']",
+                "type": "hide-empty"
+            },
+            {
+                "selector": ".adcontainer",
+                "type": "closest-empty"
+            },
+            {
+                "selector": ".adContainer",
+                "type": "hide-empty"
+            },
+            {
+                "selector": ".ad-current",
+                "type": "hide-empty"
+            },
+            {
+                "selector": ".ad-frame",
+                "type": "hide-empty"
+            },
+            {
+                "selector": ".advertisement",
+                "type": "closest-empty"
+            },
+            {
+                "selector": "[class*='advert-']",
+                "type": "hide-empty"
+            },
+            {
+                "selector": "[id*='advert-']",
+                "type": "hide-empty"
+            },
+            {
+                "selector": "[aria-label='advertisement']",
+                "type": "hide-empty"
+            },
+            {
+                "selector": ".inline-ad",
+                "type": "closest-empty"
+            },
+            {
+                "selector": ".ads__inline",
+                "type": "closest-empty"
+            },
+            {
+                "selector": ".ads__native",
+                "type": "closest-empty"
+            },
+            {
+                "selector": ".fixed-slots",
+                "type": "hide-empty"
+            },
+            {
+                "selector": ".ad-slot",
+                "type": "closest-empty"
+            },
+            {
+                "selector": "#ad-top",
+                "type": "hide-empty"
+            },
+            {
+                "selector": "#ad-wrap",
+                "type": "hide-empty"
+            },
+            {
+                "selector": ".ad-wrap",
+                "type": "closest-empty"
+            },
+            {
+                "selector": ".ad-wrapper",
+                "type": "closest-empty"
+            },
+            {
+                "selector": ".ads-wrapper",
+                "type": "closest-empty"
+            },
+            {
+                "selector": "[class^='adWrapper']",
+                "type": "closest-empty"
+            },
+            {
+                "selector": "[class*='container--ads']",
+                "type": "hide-empty"
+            },
+            {
+                "selector": "[class*='page-ad']",
+                "type": "hide-empty"
+            },
+            {
+                "selector": "[class*='module__ad']",
+                "type": "hide-empty"
+            },
+            {
+                "selector": "[class*='advertising']",
+                "type": "hide-empty"
+            },
+            {
+                "selector": "[class*='AdvertisingSlot']",
+                "type": "hide-empty"
+            },
+            {
+                "selector": "[class*='AdSlot']",
+                "type": "hide-empty"
+            },
+            {
+                "selector": "[class*='werbung']",
+                "type": "hide-empty"
+            },
+            {
+                "selector": "[class*='am-bazaar-ad']",
+                "type": "hide-empty"
+            },
+            {
+                "selector": ".adBanner",
+                "type": "hide-empty"
+            },
+            {
+                "selector": ".adModule",
+                "type": "hide-empty"
+            },
+            {
+                "selector": "[class^='Display_displayAd']",
+                "type": "hide-empty"
+            },
+            {
+                "selector": "[class^='Display_displayAd']",
+                "type": "hide-empty"
+            },
+            {
+                "selector": "#premium_ddb_0",
+                "type": "hide-empty"
+            },
+            {
+                "selector": "[class*='ad-zone']",
+                "type": "hide-empty"
+            },
+            {
+                "selector": "[data-adunitpath]",
+                "type": "closest-empty"
+            },
+            {
+                "selector": "[data-targeting]",
+                "type": "closest-empty"
+            },
+            {
+                "selector": "[data-ad-placeholder]",
+                "type": "closest-empty"
+            },
+            {
+                "selector": "[data-ad]",
+                "type": "hide-empty"
+            },
+            {
+                "selector": ".instream_ad",
+                "type": "hide-empty"
+            },
+            {
+                "selector": ".adthrive:not([id^=\"cls-video-container\"])",
+                "type": "hide-empty"
+            },
+            {
+                "selector": ".adthrive-ad",
+                "type": "hide-empty"
+            },
+            {
+                "selector": ".adthrive-content",
+                "type": "hide-empty"
+            },
+            {
+                "selector": ".adthrive-auto-injected-player-container",
+                "type": "hide"
+            },
+            {
+                "selector": ".adthrive[id^=\"cls-video-container\"]:has(.adthrive-auto-injected-player-container)",
+                "type": "hide"
+            },
+            {
+                "selector": ".arc-ad-wrapper",
+                "type": "hide-empty"
+            },
+            {
+                "selector": ".dmpu-ad",
+                "type": "hide-empty"
+            },
+            {
+                "selector": "#bfad-slot",
+                "type": "hide-empty"
+            },
+            {
+                "selector": ".ezoic-ad",
+                "type": "hide-empty"
+            },
+            {
+                "selector": ".ezo_ad",
+                "type": "hide-empty"
+            },
+            {
+                "selector": "[data-ez-ph-id]",
+                "type": "hide-empty"
+            },
+            {
+                "selector": "#amp_floatingAdDiv",
+                "type": "hide"
+            },
+            {
+                "selector": ".bordeaux-slot",
+                "type": "closest-empty"
+            },
+            {
+                "selector": ".bordeaux-anchored-container",
+                "type": "hide-empty"
+            },
+            {
+                "selector": ".rightAd",
+                "type": "hide-empty"
+            },
+            {
+                "selector": ".sponsored-slot",
+                "type": "hide-empty"
+            },
+            {
+                "selector": "#ez-content-blocker-container",
+                "type": "hide"
+            },
+            {
+                "selector": ".m-balloon-header--ad",
+                "type": "hide-empty"
+            },
+            {
+                "selector": ".m-in-content-ad-row",
+                "type": "hide-empty"
+            },
+            {
+                "selector": ".clsy-c-advsection",
+                "type": "hide-empty"
+            },
+            {
+                "selector": "[class^='DisplayAdvert']",
+                "type": "closest-empty"
+            }
+        ],
+        "styleTagExceptions": [
+            {
+                "domain": "github.com",
+                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1058"
+            },
+            {
+                "domain": "pocketbook.digital",
+                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1365"
+            },
+            {
+                "domain": "bsrzepin.pl",
+                "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2821"
+            }
+        ],
+        "hideTimeouts": [
+            0,
+            100,
+            300,
+            500,
+            1000,
+            1500,
+            2000,
+            3000,
+            5000
+        ],
+        "unhideTimeouts": [
+            1250,
+            2250,
+            3250,
+            5250
+        ],
+        "mediaAndFormSelectors": "video,canvas,embed,object,audio,map,form,input,textarea,select,option",
+        "adLabelStrings": [
+            "ad",
+            "advert",
+            "advert10",
+            "advertisement",
+            "advertisementadvertisement",
+            "advertisementadvertisementadvertisement",
+            "advertisementadvertisementadvertisementadvertisement",
+            "advertisements",
+            "advertisment",
+            "advertisementclose",
+            "advertisementcontinue reading the main story",
+            "advertisement\ncontinue reading the main story",
+            "advertisement\n\ncontinue reading the main story",
+            "advertisement - continue reading below",
+            "advertisement\n\nhide ad",
+            "advertisementhide ad",
+            "advertisementskip advertisement",
+            "advertisement - scroll to continue",
+            "advertisement · scroll to continue",
+            "advertisement - story continues below",
+            "advertising",
+            "advertising\nskip ad",
+            "advertising\nskip ad\nskip ad\nskip ad",
+            "ad feedback",
+            "annonse",
+            "anzeige",
+            "close",
+            "close ad",
+            "close this ad",
+            "content continues below",
+            "x",
+            "_",
+            "sponsor message",
+            "sponsored",
+            "sponsorisé",
+            "story continues below advertisement",
+            "story continues below advertisementadvertisement",
+            "oglas",
+            "publicité",
+            "publicidade",
+            "- publicidade -",
+            "reklama",
+            "skip ad",
+            "skip advertisement",
+            "sponsored news",
+            "continue reading the main story",
+            "this advertisement has not loaded yet, but your article continues below.",
+            "story continues below\nthis advertisement has not loaded yet, but your article continues below.",
+            "upgrade to flickr pro to hide these ads",
+            "video of the day"
+        ],
+        "domains": [
+            {
+                "domain": "10minutemail.com",
+                "rules": [
+                    {
+                        "selector": "#secondary_ads",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "#vi-smartbanner",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "3bmeteo.com",
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    },
+                    {
+                        "selector": "#admasthead",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "#ads_container",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "404media.co",
+                "rules": [
+                    {
+                        "selector": ".ad-fixed__wrapper",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".post-hero__ad",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".ad-sidebar",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "9gag.com",
+                "rules": [
+                    {
+                        "selector": ".billboard",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".inline-ad-container",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".salt-section",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "#top-adhesion",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "aarp.org",
+                "rules": [
+                    {
+                        "selector": "[class*='AdBlock__container___']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "abc.es",
+                "rules": [
+                    {
+                        "selector": ".voc-advertising",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "abcnews.go.com",
+                "rules": [
+                    {
+                        "selector": ".navigation",
+                        "type": "modify-style",
+                        "values": [
+                            {
+                                "property": "top",
+                                "value": "0px"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "domain": "accuweather.com",
+                "rules": [
+                    {
+                        "selector": ".glacier-ad",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "#connatix",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".adhesion-header",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".header-placeholder.has-alerts.has-adhesion",
+                        "type": "modify-style",
+                        "values": [
+                            {
+                                "property": "height",
+                                "value": "76px"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "domain": "acidadeon.com",
+                "rules": [
+                    {
+                        "selector": "[class*='mrf-adv']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[class*='td-block']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "advocate.com",
+                "rules": [
+                    {
+                        "selector": "[class*='ad_leaderboard_wrap']",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": "[class*='ad-tag']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".ad_tag",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "allgemeine-zeitung.de",
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    },
+                    {
+                        "selector": ".adSlot",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".adBorder",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".nativeAd",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "allrecipes.com",
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    },
+                    {
+                        "selector": "[id^='mm-ads-']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "amateurphotographer.com",
+                "rules": [
+                    {
+                        "selector": ".header-ad",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".post-content-ad",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".side-ad",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "androidauthority.com",
+                "rules": [
+                    {
+                        "selector": "div[data-ad-type]",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "androidpolice.com",
+                "rules": [
+                    {
+                        "selector": "[class*='ad-zone']",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "aol.com",
+                "rules": [
+                    {
+                        "selector": ".m-gam__container",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "apnews.com",
+                "rules": [
+                    {
+                        "selector": ".proper-dynamic-insertion",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": ".Page-header-leaderboardAd",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".SovrnAd",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".FreeStar",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "apple.com",
+                "rules": [
+                    {
+                        "selector": ".rf-paymentoptions-image",
+                        "type": "modify-style",
+                        "values": [
+                            {
+                                "property": "background-image",
+                                "value": "none"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "domain": "astrologyanswers.com",
+                "rules": [
+                    {
+                        "selector": ".astro-entity-placement",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "asuracomic.net",
+                "rules": [
+                    {
+                        "selector": ".h12container",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "autoby.jp",
+                "rules": [
+                    {
+                        "selector": ".ad-center",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "avito.ru",
+                "rules": [
+                    {
+                        "selector": "[class*='advert-mimicry-block']",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "backpacker.com",
+                "rules": [
+                    {
+                        "selector": ".prestitial-ad",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "bbc.com",
+                "rules": [
+                    {
+                        "selector": ".dotcom-ad",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": ".leaderboard-ad-placeholder",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "bestbuy.com",
+                "rules": [
+                    {
+                        "selector": "#credential_picker_container",
+                        "type": "override"
+                    },
+                    {
+                        "selector": ".shop-display-ad",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".row.full-bleed-row",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "beverfood.com",
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    },
+                    {
+                        "selector": ".adsbygoogle",
+                        "type": "override"
+                    }
+                ]
+            },
+            {
+                "condition": {
+                    "domain": "bhg.com",
+                    "injectName": "apple"
+                },
+                "rules": [
+                    {
+                        "selector": ".min-h-screen",
+                        "type": "modify-style",
+                        "values": [
+                            {
+                                "property": "min-height",
+                                "value": "100dvh"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "domain": "bild.de",
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    },
+                    {
+                        "selector": "[id^='mrec']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "#superbanner",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "bizjournals.com",
+                "rules": [
+                    {
+                        "selector": ".adwrap",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "bjs.com",
+                "rules": [
+                    {
+                        "selector": "[data-cnstrc-recommendations][data-cnstrc-num-results='0']",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "blackhatworld.com",
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    }
+                ]
+            },
+            {
+                "domain": "bleacherreport.com",
+                "rules": [
+                    {
+                        "selector": ".br-ad-renderer",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".br-ad-wrapper",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "bleedcubbieblue.com",
+                "rules": [
+                    {
+                        "selector": "[class*='ad_unit']",
+                        "type": "override"
+                    }
+                ]
+            },
+            {
+                "domain": "blick.ch",
+                "rules": [
+                    {
+                        "selector": "[id*='appnexus-placement-']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "bloomberg.com",
+                "rules": [
+                    {
+                        "selector": ".unsupported-browser-notification-container",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": "[class^='FullWidthAd']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[data-testid='sparkle-ad']",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "bloomberglaw.com",
+                "rules": [
+                    {
+                        "selector": "[class^='HeaderAdSpot_']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "boardgamegeek.com",
+                "rules": [
+                    {
+                        "selector": "gg-home-leaderboard-ad",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "gg-leaderboard-lg-ad",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "gg-support-leaderboard-ad",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "gg-post-inline-ad",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[hide-ad-block]",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "bostonglobe.com",
+                "rules": [
+                    {
+                        "selector": ".arc_ad",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "business-standard.com",
+                "rules": [
+                    {
+                        "selector": ".advertisement-bg",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "businessinsider.com",
+                "rules": [
+                    {
+                        "selector": ".in-post-sticky",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".subnav-ad-layout",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "canalrcn.com",
+                "rules": [
+                    {
+                        "selector": ".pauta-en-vivo-mobile",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "capitaloneshopping.com",
+                "rules": [
+                    {
+                        "selector": "[class*='_install-shopping-cta_']",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".extension-modal",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".install-banner",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "carandclassic.com",
+                "rules": [
+                    {
+                        "selector": "[id*='advert-']",
+                        "type": "override"
+                    }
+                ]
+            },
+            {
+                "domain": "cbc.ca",
+                "rules": [
+                    {
+                        "selector": ".ad-risingstar-container",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".bigBoxContainer",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".stickyRailAd",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "cbssports.com",
+                "rules": [
+                    {
+                        "selector": ".leaderboard-wrap",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".skybox-top-wrapper",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".fixed-skybox-placeholder",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "chase.com",
+                "rules": [
+                    {
+                        "selector": ".browserupdate",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "cleartax.in",
+                "rules": [
+                    {
+                        "selector": "#credential_picker_container",
+                        "type": "override"
+                    }
+                ]
+            },
+            {
+                "domain": "clevelandclinic.org",
+                "rules": [
+                    {
+                        "selector": "[data-identity='adhesive-ad']",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": "[data-identity='billboard-ad']",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": "[data-identity='leaderboard-ad']",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": "[data-identity='sticky-leaderboard-ad']",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": "[data-identity='leaderboard-ad-page-header-placeholder']",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "cnbc.com",
+                "rules": [
+                    {
+                        "selector": ".TopBanner-container",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "cnn.com",
+                "rules": [
+                    {
+                        "selector": ".ad-slot-wrapper",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "coindesk.com",
+                "rules": [
+                    {
+                        "selector": ".animate-shimmer",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": "[data-freestar-ad='true']",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": "[class*='--ad-height']",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "coingecko.com",
+                "rules": [
+                    {
+                        "selector": "[data-target='ads.banner']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "comicbook.com",
+                "rules": [
+                    {
+                        "selector": "body:not(.skybox-loaded)>header",
+                        "type": "modify-style",
+                        "values": [
+                            {
+                                "property": "top",
+                                "value": "0px"
+                            }
+                        ]
+                    },
+                    {
+                        "selector": "body.pcm-public:not(.skybox-loaded)",
+                        "type": "modify-style",
+                        "values": [
+                            {
+                                "property": "margin-top",
+                                "value": "90px"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "domain": "cookingclassy.com",
+                "rules": [
+                    {
+                        "selector": ".adthrive",
+                        "type": "override"
+                    }
+                ]
+            },
+            {
+                "domain": "corriere.it",
+                "rules": [
+                    {
+                        "selector": "[id^='rcsad_']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".bck-adv",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "cricbuzz.com",
+                "rules": [
+                    {
+                        "selector": "#main-header.top-12",
+                        "type": "modify-style",
+                        "values": [
+                            {
+                                "property": "top",
+                                "value": "0rem"
+                            }
+                        ]
+                    },
+                    {
+                        "selector": "#main-nav.top-24",
+                        "type": "modify-style",
+                        "values": [
+                            {
+                                "property": "top",
+                                "value": "3rem"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "domain": "ctvnews.ca",
+                "rules": [
+                    {
+                        "selector": "[class*='-ads-custom']",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "cubbyathome.com",
+                "rules": [
+                    {
+                        "selector": ".PostDesktopStickyFooter",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "dailyboulder.com",
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    },
+                    {
+                        "selector": ".site-access-popup",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".site-access-inner",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".top-site-ad",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "dailyherald.com",
+                "rules": [
+                    {
+                        "selector": ".instoryAdBlock",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "dailymail.co.uk",
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    },
+                    {
+                        "selector": "[class*='dmg-ads']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".mol-ads-label-container",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": "#stickyAdsContainer",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "dailymotion.com",
+                "rules": [
+                    {
+                        "selector": "[class^='DisplayAd']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "dallasnews.com",
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    },
+                    {
+                        "selector": "[class^='dmnc_features-ads']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".adhesiveAdWrapper",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[data-cy='Ad']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[data-cy='InstreamPlayer']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".bg-neutral-grey-4.items-center",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "deseret.com",
+                "rules": [
+                    {
+                        "selector": "[data-targeting]",
+                        "type": "override"
+                    }
+                ]
+            },
+            {
+                "domain": "dexerto.com",
+                "rules": [
+                    {
+                        "selector": "#leaderboard-top-adhesion",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": "[data-cy='Ad']",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": "[data-cy='VidazooPlayer']",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "digitaltrends.com",
+                "rules": [
+                    {
+                        "selector": ".b-connatix",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".dtads-location",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "doodle.com",
+                "rules": [
+                    {
+                        "selector": "[data-testid*='ads-layout-placement']",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": "#sticky-footer-ads",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": "[class^='jupiter-placement-sticky-header-module']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[class^='jupiter-placement-middle-module']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[class^='jupiter-placement-sticky-footer-module']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".layout_sticky-slot-content__ExtEH",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "dpreview.com",
+                "rules": [
+                    {
+                        "selector": ".ad-wrapper",
+                        "type": "override"
+                    }
+                ]
+            },
+            {
+                "domain": "drugs.com",
+                "rules": [
+                    {
+                        "selector": ".topbanner-wrap",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".display-ad-leaderboard",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".display-ad-wrapper",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".display-ad-wrap",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[id*='ddc-sidebox-ad-stacked-wrap']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "e-chords.com",
+                "rules": [
+                    {
+                        "selector": ".adscifra",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".banner",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "#banner",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": [
+                    "ebay.com",
+                    "ebay.ca",
+                    "ebay.co.uk",
+                    "ebay.de",
+                    "ebay.fr",
+                    "ebay.com.au"
+                ],
+                "rules": [
+                    {
+                        "selector": "#g-yolo-overlay-holder",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": [
+                    "ebay-kleinanzeigen.de",
+                    "kleinanzeigen.de"
+                ],
+                "rules": [
+                    {
+                        "selector": "[data-liberty-position-name]",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".bannerplacement-fullwidth",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".bannerplacement-sticky",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "economist.com",
+                "rules": [
+                    {
+                        "selector": "[class^='adComponent']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "ekstrabladet.dk",
+                "rules": [
+                    {
+                        "selector": "[id^='ebbanner_wrapper_']",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "elpais.com",
+                "rules": [
+                    {
+                        "selector": ".obne_ob",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "eniro.se",
+                "rules": [
+                    {
+                        "selector": "#page .e-banner.e-embed-aware",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "eonline.com",
+                "rules": [
+                    {
+                        "selector": "[class*='mps-']",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "eporner.com",
+                "rules": [
+                    {
+                        "selector": "#admobiletop",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "essentiallysports.com",
+                "rules": [
+                    {
+                        "selector": ".es-ad-space-container",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "eurogamer.net",
+                "rules": [
+                    {
+                        "selector": "#sticky_leaderboard",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".primis_wrapper",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".autoad",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "examiner.com.au",
+                "rules": [
+                    {
+                        "selector": "[class*='flex items']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".hidden",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "express.de",
+                "rules": [
+                    {
+                        "selector": ".dm-slot",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "express.co.uk",
+                "rules": [
+                    {
+                        "selector": ".superbanner",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "#ad-vip-article",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".taboola-above-article",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": "#taboola-ad",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".viafoura-standalone-mpu",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "expressnews.com",
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    }
+                ]
+            },
+            {
+                "domain": "facebook.com",
+                "rules": [
+                    {
+                        "selector": ".xnw9j1v:has(div > a[href='https://www.facebook.com/help/597429858389632/'])",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "fandom.com",
+                "rules": [
+                    {
+                        "selector": ".top-ads-container",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "findagrave.com",
+                "rules": [
+                    {
+                        "selector": ".ad__slot--wrapper",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "flickr.com",
+                "rules": [
+                    {
+                        "selector": ".feed-b",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[class*='-ad-container']",
+                        "type": "override"
+                    }
+                ]
+            },
+            {
+                "condition": {
+                    "domain": "flowkey.com",
+                    "injectName": "apple"
+                },
+                "rules": [
+                    {
+                        "selector": ".css-1g1rvlj",
+                        "type": "modify-style",
+                        "values": [
+                            {
+                                "property": "height",
+                                "value": "100dvh"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "domain": "focus.de",
+                "rules": [
+                    {
+                        "selector": "[id*='M_CONTENTAD']",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": "[id*='M_TRSCT_hor']",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": "[id*='M_FLYCPT_hor']",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": "#tfm_admanagerTeaser",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": ".cls_slot_xxoutstreamxx",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "foodnetwork.co.uk",
+                "rules": [
+                    {
+                        "selector": ".bg-bodyBg",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".module--ad-module-primary",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "#mtf-1",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": "#btf-1",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "forbes.com",
+                "rules": [
+                    {
+                        "selector": "fbs-ad",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": ".top-ad-container",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".vestpocket",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "fortune.com",
+                "rules": [
+                    {
+                        "selector": "[id*='Leaderboard']",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": "[id*='RightRailFlex']",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": "[id*='InStream']",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "foxnews.com",
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    },
+                    {
+                        "selector": ".vendor-unit",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".pre-content",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[class*='rr-ad-']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".ad-h-250",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".sticky-pre-header",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".adhesion-ad",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".sticky-pre-header-inner",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".site-header",
+                        "type": "modify-style",
+                        "values": [
+                            {
+                                "property": "min-height",
+                                "value": "50px"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "domain": "gamingbible.com",
+                "rules": [
+                    {
+                        "selector": "[class*='Advert']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "gap.com",
+                "rules": [
+                    {
+                        "selector": ".ONhome1-recs",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".ONhome1-recs",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "gardenersworld.com",
+                "rules": [
+                    {
+                        "selector": ".stitcher-ad--dai-placeholder",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "gbnews.com",
+                "rules": [
+                    {
+                        "selector": ".video-inbody",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".ad--billboard",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".ad--placeholder",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".stiky_sky",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": "[position='sticky_banner']",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".ad-inbody",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "genius.com",
+                "rules": [
+                    {
+                        "selector": "[class^='DfpAd']",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": "[class*='PrimisPlayer__Container']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[class*='InreadContainer__Container']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "getpocket.com",
+                "rules": [
+                    {
+                        "selector": "[class*='syndication-ad']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "ghacks.net",
+                "rules": [
+                    {
+                        "selector": ".box-banner",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[id^='ghacks_ad_code']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "gizmodo.com",
+                "rules": [
+                    {
+                        "selector": ".banner-top",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": ".od-wrapper",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".widget_keleops-ad",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[id^='optidigital-adslot-Billboard']",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "globo.com",
+                "rules": [
+                    {
+                        "selector": "banner-ad",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": [
+                    "google.ca",
+                    "google.com",
+                    "google.de",
+                    "google.dk",
+                    "google.es",
+                    "google.fr",
+                    "google.ie",
+                    "google.it",
+                    "google.nl",
+                    "google.pl",
+                    "google.se",
+                    "google.com.au",
+                    "google.com.br",
+                    "google.com.mx",
+                    "google.co.in",
+                    "google.co.jp",
+                    "google.co.nz",
+                    "google.co.uk"
+                ],
+                "rules": [
+                    {
+                        "selector": "div:has(> iframe[src*='prid=190'])",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": "div:has(> iframe[src='about:blank'][name='callout'])",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": "[aria-labelledby='promo-header']",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": "div:has(> [aria-labelledby='promo_label_id'])",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": "div[role='banner']:has(div > a[href='https://support.google.com/a/answer/33864']):not([aria-label=\"Menu bar\"])",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "gute-garne.de",
+                "rules": [
+                    {
+                        "selector": ".ad",
+                        "type": "override"
+                    }
+                ]
+            },
+            {
+                "domain": "guard.io",
+                "rules": [
+                    {
+                        "selector": "#credential_picker_container",
+                        "type": "override"
+                    }
+                ]
+            },
+            {
+                "domain": "handleidingen.com",
+                "rules": [
+                    {
+                        "selector": ".ad-container",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "harpygee.com",
+                "rules": [
+                    {
+                        "selector": "#leaderboard",
+                        "type": "override"
+                    }
+                ]
+            },
+            {
+                "domain": "healthline.com",
+                "rules": [
+                    {
+                        "selector": "[data-testid='header-leaderboard']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[data-testid='sticky-inline-ad']",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": "[data-ad='true']",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "hindustantimes.com",
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    },
+                    {
+                        "selector": ".desktopAd",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[id^='adslotLazy']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[class^='adMinHeight']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "historicaerials.com",
+                "rules": [
+                    {
+                        "selector": "[id^='div-gpt-ad-']",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "howstuffworks.com",
+                "rules": [
+                    {
+                        "selector": ".leaderboard-banner",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".ad-container",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".ad-inline",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "#ad-wrap-mobadhesion",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "huffingtonpost.fr",
+                "rules": [
+                    {
+                        "selector": ".ads-inreadArticle",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "huffpost.com",
+                "rules": [
+                    {
+                        "selector": ".connatix-player",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": ".ad-container",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".bottom-right-sticky-container",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".video-container",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "idahonews.com",
+                "rules": [
+                    {
+                        "selector": "[class*='DisplayAd_']",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": "[class*='AdBlock__']",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": "[class*='Taboola']",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": "[class*='openwebAd']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[class*='PrimisMidArticle']",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "ieee.org",
+                "rules": [
+                    {
+                        "selector": ".top-leader-container",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[class*='rblad-ieee_']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "ilfattoquotidiano.it",
+                "rules": [
+                    {
+                        "selector": "[class*='adv']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "iltalehti.fi",
+                "rules": [
+                    {
+                        "type": "override",
+                        "selector": ".ad"
+                    }
+                ]
+            },
+            {
+                "domain": "indeed.com",
+                "rules": [
+                    {
+                        "selector": ".google-Only-Modal",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "independent.co.uk",
+                "rules": [
+                    {
+                        "selector": "#partners",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "#top-banner-wrapper",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[data-mpu1=true]",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[data-ad-unit-path]",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": "#stickyFooterRoot",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".sc-toncsa-0",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "indiatimes.com",
+                "rules": [
+                    {
+                        "selector": ".ad-cls",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "._3JJMX",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".paisa-wrapper",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".mPws3.d_jsH",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "._MxBD",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".mgid_second_mrec_parent",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "indy100.com",
+                "rules": [
+                    {
+                        "selector": "[id*='thirdparty']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "inews.co.uk",
+                "rules": [
+                    {
+                        "selector": ".inews__advert",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": ".inews__post-section__leaderboard-ad",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "insider.com",
+                "rules": [
+                    {
+                        "selector": ".in-post-sticky",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".subnav-ad-layout",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "investing.com",
+                "rules": [
+                    {
+                        "selector": ".dfpVideo",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".adDrawer",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "#hpAdVideo",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[advertisementtext='Advertisement']",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "jakdojade.pl",
+                "rules": [
+                    {
+                        "selector": ".ad-wrapper",
+                        "type": "override"
+                    }
+                ]
+            },
+            {
+                "domain": "japantimes.co.jp",
+                "rules": [
+                    {
+                        "selector": "#header_ad_id",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".DisplayAd",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "joemonster.org",
+                "rules": [
+                    {
+                        "selector": ".right-column-rectangle-advert",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "#rightSky",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".rectangleAdvert",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "kamus.net",
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    },
+                    {
+                        "selector": "ins.adsbygoogle",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "kabutan.jp",
+                "rules": [
+                    {
+                        "selector": "[id^=div-gpt-ad-]",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "kbb.com",
+                "rules": [
+                    {
+                        "selector": "#contentFor_kbbAdsSimplifiedNativeAd",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "kentonline.co.uk",
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    },
+                    {
+                        "selector": "[id*='p_mpu']",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": "[id*='p_dmp']",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "kleinezeitung.at",
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    },
+                    {
+                        "selector": "[class*='adblocker-intercept']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "komputerswiat.pl",
+                "rules": [
+                    {
+                        "selector": "[class*='extraList']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[class*='placeholder']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "koreatimes.co.kr",
+                "rules": [
+                    {
+                        "selector": "[data-ad-position]",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "kutv.com",
+                "rules": [
+                    {
+                        "selector": "[class*='adBeforeContent']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "la7.it",
+                "rules": [
+                    {
+                        "selector": "#site-message-overlay",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "leboncoin.fr",
+                "rules": [
+                    {
+                        "selector": "#lht-space-ad",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[class*='styles__ad']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "lemonde.fr",
+                "rules": [
+                    {
+                        "selector": ".dfp__container",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "lifehacker.com",
+                "rules": [
+                    {
+                        "selector": ".zmgad-full-width",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "livebeaches.com",
+                "rules": [
+                    {
+                        "selector": "[class*='random-ad']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "livemint.com",
+                "rules": [
+                    {
+                        "selector": "#adfreeDeskSpace",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "#dekBudgetAd",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "livescore.com",
+                "rules": [
+                    {
+                        "selector": "#header-ads-holder",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "livesport.com",
+                "rules": [
+                    {
+                        "selector": "#header-ads-holder",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "livestrong.com",
+                "rules": [
+                    {
+                        "selector": ".component-ar-horizontal-bar-ad",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".component-article-section-votd-container-outer",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".inline-ad",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".component-header-sticky-ad",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "lowes.com",
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    },
+                    {
+                        "selector": "[class*='__GAMWrapper-']",
+                        "type": "override"
+                    },
+                    {
+                        "selector": ".gam-wrapper",
+                        "type": "override"
+                    }
+                ]
+            },
+            {
+                "domain": "macrumors.com",
+                "rules": [
+                    {
+                        "selector": ".tertiary",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[class*='sidebarblock']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "mail.com",
+                "rules": [
+                    {
+                        "selector": ".primis",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "mantan-web.jp",
+                "rules": [
+                    {
+                        "selector": "center > div",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".ad-rec",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".conteiner__head",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "marketwatch.com",
+                "rules": [
+                    {
+                        "selector": ".j-ad",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "mashable.com",
+                "rules": [
+                    {
+                        "selector": ".zmgad-full-width",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "merriam-webster.com",
+                "rules": [
+                    {
+                        "selector": "#mw-ad-slot-fixed-footer",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "messenger.com",
+                "rules": [
+                    {
+                        "selector": ".xw7yly9.xktsk01:has(div > a[href='https://www.facebook.com/help/messenger-app/597429858389632/'])",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "metro.co.uk",
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    },
+                    {
+                        "selector": ".ad-slot-container",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "mini2.com",
+                "rules": [
+                    {
+                        "selector": "[id^='RightRail_']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".primis-wrapper",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "minkabu.jp",
+                "rules": [
+                    {
+                        "selector": ".ad",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": "div#side_navi > div:has(> div > div.ad)",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "mirror.co.uk",
+                "rules": [
+                    {
+                        "selector": "#comments-standalone-mpu",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "modernhoney.com",
+                "rules": [
+                    {
+                        "selector": ".adthrive",
+                        "type": "override"
+                    },
+                    {
+                        "selector": ".adthrive-footer",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "motortrend.com",
+                "rules": [
+                    {
+                        "selector": "[id*='AboveNavAd']",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": "._11KmK",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".AtFxB",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "moviewalker.jp",
+                "rules": [
+                    {
+                        "selector": "#mw_all_bb_gam",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": "#mw_all_1r_gam",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "mumsnet.com",
+                "rules": [
+                    {
+                        "selector": "[data-v-app]",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[data-id^='feed-ad-']",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": "[class*='advertisement']",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "n1info.si",
+                "rules": [
+                    {
+                        "selector": "[class*='banner-placeholder']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "n4g.com",
+                "rules": [
+                    {
+                        "selector": ".top-ads-container-outer",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": ".f-item-ad",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": ".f-item-ad-inhouse",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": "[class^='sp-backdrop-info']",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "nasdaq.com",
+                "rules": [
+                    {
+                        "selector": "[class^='ads__midpage']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[class^='ads__right-rail']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".atf_mobile-scroll-ad",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "nature.com",
+                "rules": [
+                    {
+                        "selector": ".c-ad",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "navitime.co.jp",
+                "rules": [
+                    {
+                        "selector": "#pfx_interstitial",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "nbcsports.com",
+                "rules": [
+                    {
+                        "selector": ".block-mps",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "#nbcsports-leaderboard",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "ncaa.com",
+                "rules": [
+                    {
+                        "selector": ".mobile-persistent-bottom",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "ndtvprofit.com",
+                "rules": [
+                    {
+                        "selector": "[class*='ad-with-placeholder']",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": "[class*='ad-wrapper']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "nerdist.com",
+                "rules": [
+                    {
+                        "selector": ".kskdCls",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "newatlas.com",
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    },
+                    {
+                        "selector": ".OcelotAdModule",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[id*='desktop_article_']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[id*='mobile_article_']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[id*='native_index_desktop_']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "news.de",
+                "rules": [
+                    {
+                        "selector": "[class*='-ad']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "div[id^='news_content_']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "newser.com",
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    },
+                    {
+                        "selector": ".RightRailAds",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "#headerAdSection",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "#FreeStarVideoAdContainer",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": "[id^='div-insticator-ad']",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": "#divMobileHeaderAd",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": "#divImageAd",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": ".divNColAdRepeating",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "newsmax.com",
+                "rules": [
+                    {
+                        "selector": ".DFPad",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "northwichguardian.co.uk",
+                "rules": [
+                    {
+                        "selector": ".ad-sticky",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[data-uses-js='dfp-top-ad-fixed']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "nytimes.com",
+                "rules": [
+                    {
+                        "selector": "#top-wrapper",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "#bottom-wrapper",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "#mid1-wrapper",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "#mid2-wrapper",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "#mid3-wrapper",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "#mktg-wrapper",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".e1xxpj0j1",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[id*='story-ad']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[data-testid='StandardAd']",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": ".pz-ad-box",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[class*='Ad-module_adContainer__']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "observador.pt",
+                "rules": [
+                    {
+                        "selector": ".obs-ad-placeholder",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "obsev.com",
+                "rules": [
+                    {
+                        "selector": ".my-10",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[class^='Ad_ad']",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "oceanofcompressed.xyz",
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    },
+                    {
+                        "selector": "#sticky-ads",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "ojogo.pt",
+                "rules": [
+                    {
+                        "selector": "[class^='pub-slot-']",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "on.cc",
+                "rules": [
+                    {
+                        "selector": "#mOverLay-container",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".lrec",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "orange.fr",
+                "rules": [
+                    {
+                        "selector": ".tag-rm",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "ouest-france.fr",
+                "rules": [
+                    {
+                        "selector": "[id*='pub_banniere']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[id*='pub_pave']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "outsideonline.com",
+                "rules": [
+                    {
+                        "selector": ".o-ad",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".l-main",
+                        "type": "modify-style",
+                        "values": [
+                            {
+                                "property": "margin-top",
+                                "value": "0vh"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "domain": "paypal.com",
+                "rules": [
+                    {
+                        "selector": "#gslFrame",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "pcgamesn.com",
+                "rules": [
+                    {
+                        "selector": ".static_mpu_wrap",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "#nn_astro_wrapper",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".ad-nextpage",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".legion_primiswrapper",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".nn_mobile_mpu_wrapper",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".nn-sticky",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "petapixel.com",
+                "rules": [
+                    {
+                        "selector": ".banners",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "#ppvideoadvertisement",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "peterboroughtoday.co.uk",
+                "rules": [
+                    {
+                        "selector": ".mpu-item",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": "[class*='AdContainer']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "polygon.com",
+                "rules": [
+                    {
+                        "selector": "[class*='ad_unit']",
+                        "type": "override"
+                    },
+                    {
+                        "selector": "[id*='gpt-']",
+                        "type": "override"
+                    },
+                    {
+                        "selector": ".m-ad",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "popsci.com",
+                "rules": [
+                    {
+                        "selector": ".mtc-unit-prefill-container",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".ad-slot-wrapper",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "post-gazette.com",
+                "rules": [
+                    {
+                        "selector": "[data-dfpads-position]",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "prajwaldesai.com",
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    }
+                ]
+            },
+            {
+                "domain": "primagames.com",
+                "rules": [
+                    {
+                        "selector": ".primis-player",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[data-freestar-ad]",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "psypost.com",
+                "rules": [
+                    {
+                        "selector": ".jeg_midbar",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "publico.es",
+                "rules": [
+                    {
+                        "selector": ".pb-ads",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "#sc_intxt_container",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "quizlet.com",
+                "rules": [
+                    {
+                        "selector": "#targetDiv-setpage_billboard",
+                        "type": "modify-style",
+                        "values": [
+                            {
+                                "property": "height",
+                                "value": "0px"
+                            },
+                            {
+                                "property": "min-height",
+                                "value": "0px"
+                            }
+                        ]
+                    },
+                    {
+                        "selector": ".SetPageTerms-embeddedDesktopAdWrapper",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "qz.com",
+                "rules": [
+                    {
+                        "selector": "#marquee-ad",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": ".js_sticky-top-ad",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".js_sticky-footer",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "#leftrail_dynamic_ad_wrapper",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "#splashy-ad-container-top",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".ad-mobile",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "rawstory.com",
+                "rules": [
+                    {
+                        "selector": ".container_proper-ad-unit",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".controlled_via_ad_manager",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".mgid_3x2",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".proper-ad-unit",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": "[id^='rc-widget-']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "#story-top-ad",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "realtor.com",
+                "rules": [
+                    {
+                        "selector": ".ad-wrapper",
+                        "type": "override"
+                    },
+                    {
+                        "selector": ".lb1-ad",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".ads_container",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "reddit.com",
+                "rules": [
+                    {
+                        "selector": "._233XfOVq91N_ugGQDBb_OT",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": "._2vPrb00OnreVznxQ-SNql9",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": "[devicetype=\"desktop\"] .grid:not([style='filter: blur(4px);']) ~ shreddit-experience-tree:not([active-experiences='[\"nsfw_bypassable\"]'])",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": "shreddit-experience-tree[active-experiences*=\"app_selector\"], .XPromoBlockingModal, .XPromoInFeed, .xPromoAppStoreFooter, #configured-xpromo-blocking_xpromo_nsfw_blocking, #configured-xpromo-unrated_block, .configured-xpromo-full-screen, .configured-xpromo-bottom-sheet, #xpromo-bottom-sheet[aria-label*=\"See Reddit in...\"], #xpromo-bottom-sheet[aria-label*=\"See this post in...\"], .AppSelectorModal__body, .XPromoBottomBar, [bundlename=\"bottom_bar_xpromo\"], [data-testid=\"bottom-sheet-upsell-wrapper\"], [slot=\"use-app\"], bottom-bar[app-link-params], xpromo-app-selector, .mobile-web-redirect-bar, .upsell_banner",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": "html[device='mobile'] body, html[device='tablet'] body",
+                        "type": "modify-style",
+                        "values": [
+                            {
+                                "property": "overflow-y",
+                                "value": "auto"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "domain": "refinery29.com",
+                "rules": [
+                    {
+                        "selector": ".section-ad",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "researchgate.net",
+                "rules": [
+                    {
+                        "selector": ".js-lite-sticky-target",
+                        "type": "modify-style",
+                        "values": [
+                            {
+                                "property": "top",
+                                "value": "0px"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "domain": "reuters.com",
+                "rules": [
+                    {
+                        "selector": "[data-testid='ResponsiveAdSlot']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "app.rippling.com",
+                "rules": [
+                    {
+                        "selector": "body",
+                        "type": "modify-style",
+                        "values": [
+                            {
+                                "property": "height",
+                                "value": "auto"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "domain": "rumble.com",
+                "rules": [
+                    {
+                        "selector": "[id^='rumble-ad']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "runnersworld.com",
+                "rules": [
+                    {
+                        "selector": ".ad-disclaimer",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "salon.com",
+                "rules": [
+                    {
+                        "selector": ".fc-ab-root",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "sciencenews.org",
+                "rules": [
+                    {
+                        "selector": "[class*='ad-block']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "scmp.com",
+                "rules": [
+                    {
+                        "selector": "[class*='ad-slot-container']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".top-ad",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".advertisement--mobile",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".bottom-ad",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".article-list__inline-ad",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".page-container__mobile-native-ad",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".ad-area",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[data-qa='AdSlot-Container']",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "semafor.com",
+                "rules": [
+                    {
+                        "selector": "[class*='adMargin']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[class*='adHeaderMargin']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "sfchronicle.com",
+                "rules": [
+                    {
+                        "selector": "[class*='belowMastheadWrapper']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "shattovet.com",
+                "rules": [
+                    {
+                        "selector": "[class*='advertising']",
+                        "type": "override"
+                    }
+                ]
+            },
+            {
+                "domain": "si.com",
+                "rules": [
+                    {
+                        "selector": ".m-ad",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": ".m-header-ad",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "signupgenius.com",
+                "rules": [
+                    {
+                        "selector": ".mktg",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "skysports.com",
+                "rules": [
+                    {
+                        "selector": "[data-format='leaderboard']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "slate.com",
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    },
+                    {
+                        "selector": ".slate-ad",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".top-ad",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "snopes.com",
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    }
+                ]
+            },
+            {
+                "domain": "soranews24.com",
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    }
+                ]
+            },
+            {
+                "domain": "spanishdict.com",
+                "rules": [
+                    {
+                        "selector": "[id*='adSide']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[id*='adTop']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[id*='adMiddle']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "spankbang.com",
+                "rules": [
+                    {
+                        "selector": ".ptgncdn_holder",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "speedweek.com",
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    },
+                    {
+                        "selector": "[style^='--ad-placeholder-width']",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "sportbible.com",
+                "rules": [
+                    {
+                        "selector": "[class*='Advert']",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "startpagina.nl",
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    },
+                    {
+                        "selector": ".ad-widget",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "statesman.com",
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    }
+                ]
+            },
+            {
+                "domain": "takealot.com",
+                "rules": [
+                    {
+                        "selector": "[class*='ad-slot_']",
+                        "type": "override"
+                    }
+                ]
+            },
+            {
+                "domain": "target.com",
+                "rules": [
+                    {
+                        "selector": "[class^='styles__PubAdWrapper']",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": "[data-test='sponsored-text']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[id^='btf-']",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "techrepublic.com",
+                "rules": [
+                    {
+                        "selector": "#nav-ad",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "#leader-plus-top",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "#sticky-bottom",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "techwalla.com",
+                "rules": [
+                    {
+                        "selector": ".component-header-sticky-ad",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": ".component-article-section-votd-wrapper",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "theatlantic.com",
+                "rules": [
+                    {
+                        "selector": "[class*='ArticleInjector']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "theepochtimes.com",
+                "rules": [
+                    {
+                        "selector": ".eet-ad",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "thegatewaypundit.com",
+                "rules": [
+                    {
+                        "selector": ".code-block",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "thehour.com",
+                "rules": [
+                    {
+                        "selector": ".belowMastheadWrapper",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "thehindu.com",
+                "rules": [
+                    {
+                        "selector": "#articledivrec",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "thekitchn.com",
+                "rules": [
+                    {
+                        "selector": ".Post__ad",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".PostDesktopStickyFooter",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".MobileStickyBanner",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".PostBundle__above",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".ProductGrid__adWrapper",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".Post__openWebSlot",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "theregister.com",
+                "rules": [
+                    {
+                        "selector": ".adun",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "thetimes.co.uk",
+                "rules": [
+                    {
+                        "selector": "#ad-header",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": ".Section-ad",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[class*='responsive__NativeAd']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "thetvdb.com",
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    },
+                    {
+                        "selector": "[data-aa-adunit]",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": "[data-adpath]",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "thewindowsclub.com",
+                "rules": [
+                    {
+                        "selector": ".adtester-container",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "thewordfinder.com",
+                "rules": [
+                    {
+                        "selector": "[id*='adngin']",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "thingiverse.com",
+                "rules": [
+                    {
+                        "selector": "[class*='AdCard__']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "timesofmalta.com",
+                "rules": [
+                    {
+                        "selector": "[class*='Advert']",
+                        "type": "modify-style",
+                        "values": [
+                            {
+                                "property": "display",
+                                "value": "none"
+                            }
+                        ]
+                    },
+                    {
+                        "selector": "#ad-banner",
+                        "type": "modify-style",
+                        "values": [
+                            {
+                                "property": "display",
+                                "value": "none"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "domain": "tinybeans.com",
+                "rules": [
+                    {
+                        "selector": ".tb-ad",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "toledoblade.com",
+                "rules": [
+                    {
+                        "selector": "[data-dfpads-position]",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "tripadvisor.ca",
+                "rules": [
+                    {
+                        "selector": "#tripGoogleOnetapContainer",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".ZkqhQ",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".mxEhR",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "tripadvisor.de",
+                "rules": [
+                    {
+                        "selector": "#tripGoogleOnetapContainer",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".ZkqhQ",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".mxEhR",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "tripadvisor.co.uk",
+                "rules": [
+                    {
+                        "selector": "#tripGoogleOnetapContainer",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".ZkqhQ",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".mxEhR",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "tripadvisor.com",
+                "rules": [
+                    {
+                        "selector": "#tripGoogleOnetapContainer",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".ZkqhQ",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".mxEhR",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "tripadvisor.fr",
+                "rules": [
+                    {
+                        "selector": "#tripGoogleOnetapContainer",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".ZkqhQ",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".mxEhR",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "tumblr.com",
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    }
+                ]
+            },
+            {
+                "domain": "tvtropes.org",
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    }
+                ]
+            },
+            {
+                "domain": "ultraboardgames.com",
+                "rules": [
+                    {
+                        "selector": ".ezoic-adpicker-ad, .ezoic-ad",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "uol.com.br",
+                "rules": [
+                    {
+                        "selector": ".model-base-bnr",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "upi.com",
+                "rules": [
+                    {
+                        "selector": ".playwire-ad-unit",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "usnews.com",
+                "rules": [
+                    {
+                        "selector": "[class^='Ad__Container-']",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": "#ac-lre-player",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "vice.com",
+                "rules": [
+                    {
+                        "selector": ".adph",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".vice-ad__container",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".fixed-slot",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "vinted.fr",
+                "rules": [
+                    {
+                        "selector": ".ad-container--leaderboard",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "washingtonpost.com",
+                "rules": [
+                    {
+                        "selector": "wp-ad",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": "#leaderboard-wrapper",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".outbrain-wrapper",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "westernjournal.com",
+                "rules": [
+                    {
+                        "selector": ".sponsor",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "whitakerfuneralhome.com",
+                "rules": [
+                    {
+                        "selector": ".top-banner",
+                        "type": "override"
+                    }
+                ]
+            },
+            {
+                "domain": "winnipegfreepress.com",
+                "rules": [
+                    {
+                        "selector": ".article-ad",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "wiwo.de",
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    },
+                    {
+                        "selector": ".top-ad-container",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "woot.com",
+                "rules": [
+                    {
+                        "selector": "[data-test-ui*='advertisementLeaderboard']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "wsj.com",
+                "rules": [
+                    {
+                        "selector": "#cx-what-to-read-next",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": "[class*='WSJTheme--adWrapper']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "wunderground.com",
+                "rules": [
+                    {
+                        "selector": ".pane-wu-fullscreenweather-ad-box-atf",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "wykop.pl",
+                "rules": [
+                    {
+                        "selector": ".pub-slot-wrapper",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "yahoo.com",
+                "rules": [
+                    {
+                        "selector": ".darla",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": "[data-content='Advertisement']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "#YDC-Lead-Stack",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "#topAd",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "#neoLeadAdMobile",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".caas-da",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".gam-placeholder",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": "[class*='sdaContainer']",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": "#sda-Horizon-viewer",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[id*='mrt-node-Lead']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[id*='mrt-node-Secondary']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[id*='rrvkqH1']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".ad-container",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "ul.flex > li.relative",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[data-pw='top-center-ad']",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": "[id^='sda-WFPAD-'], .native-ad-item, .stream-ad",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "gazeta.pl",
+                "rules": [
+                    {
+                        "selector": "[class*='DFP-']",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": "[id*='banC']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".indexPremium__adv",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "nfl.com",
+                "rules": [
+                    {
+                        "selector": "[class*='adv-block']",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "usatoday.com",
+                "rules": [
+                    {
+                        "selector": "[aria-label='advertisement']",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": ".gnt_tb",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".gnt_flp",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[class*='HomeCategory__adWrapper']",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": "[class^='HomeTemplate__afterCategoryAd']",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "uzone.id",
+                "rules": [
+                    {
+                        "selector": "[class^='box-ads']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[class^='section-ads']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".parallax-container",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "div:has(.react-parallax)",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": "[id^=div-gpt-ad-]",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "walkerplus.com",
+                "rules": [
+                    {
+                        "selector": "[id='pfx_interstitial']",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "washingtontimes.com",
+                "rules": [
+                    {
+                        "selector": ".connatixcontainer",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": "[id*='cxense-']",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "xatakamovil.com",
+                "rules": [
+                    {
+                        "selector": "#stories_container",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "xfinity.com",
+                "rules": [
+                    {
+                        "selector": ".f-gpc-flyout",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".f-gpc-banner",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "xhamster.com",
+                "rules": [
+                    {
+                        "selector": "#credential_picker_container",
+                        "type": "override"
+                    }
+                ]
+            },
+            {
+                "domain": "youtube.com",
+                "rules": [
+                    {
+                        "selector": "ytm-promoted-sparkles-web-renderer",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": "ytd-in-feed-ad-layout-renderer",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": "#toast:has(> #text-container > yt-formatted-string#text.yt-notification-action-renderer)",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "zillow.com",
+                "rules": [
+                    {
+                        "selector": "[data-testid$='-ad']",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "first-party.site",
+                "rules": [
+                    {
+                        "selector": ".hide-test",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".hide-empty-test",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".closest-empty-test",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": "[class^='ad-container']",
+                        "type": "override"
+                    }
+                ]
+            },
+            {
+                "domain": "privacy-test-pages.site",
+                "rules": [
+                    {
+                        "selector": ".hide-test",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".hide-empty-test",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".closest-empty-test",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": "[class^='ad-container']",
+                        "type": "override"
+                    }
+                ]
+            },
+            {
+                "domain": "wideopencountry.com",
+                "rules": [
+                    {
+                        "selector": ".entry-ad",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "tdpri.com",
+                "rules": [
+                    {
+                        "selector": "[data-aa-adunit]",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "ukutabs.com",
+                "rules": [
+                    {
+                        "selector": ".wpb_wrapper",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "aucfree.com",
+                "rules": [
+                    {
+                        "selector": "#pcarticle_bb",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "seriouseats.com",
+                "rules": [
+                    {
+                        "selector": "[class*='mm-ads-leaderboard']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "inside-games.jp",
+                "rules": [
+                    {
+                        "selector": ".header-ad",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "tradera.com",
+                "rules": [
+                    {
+                        "selector": ".ad-slot-container",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "techxplore.com",
+                "rules": [
+                    {
+                        "selector": ".ads-placeholder-250",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".article-banner",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".article-sidebar-banner",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "thedrive.com",
+                "rules": [
+                    {
+                        "selector": "#pw-top-right-sidebar-aib",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "worldfootball.net",
+                "rules": [
+                    {
+                        "selector": ".wfb-ad",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "elespanol.com",
+                "rules": [
+                    {
+                        "selector": ".stickycontainer",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "autoexpress.co.uk",
+                "rules": [
+                    {
+                        "selector": ".polaris__below-header-ad-wrapper,.polaris__ad",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "airlive.net",
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    },
+                    {
+                        "selector": "ins.adsbygoogle",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "sfchronicle.com",
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    },
+                    {
+                        "selector": "[data-block-type='ad']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[class*='belowMastheadWrapper']",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "tenforums.com",
+                "rules": [
+                    {
+                        "selector": ".chill",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "elevenforum.com",
+                "rules": [
+                    {
+                        "selector": ".gads",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "windowsforum.com",
+                "rules": [
+                    {
+                        "selector": "#adsense-wrapper",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "exblog.jp",
+                "rules": [
+                    {
+                        "selector": "#gpt_pc_blog_overlay",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "#gpt_pc_blog_header",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "ameblo.jp",
+                "rules": [
+                    {
+                        "selector": ".subAdBannerArea",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "._2dsoQeNf",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "drivespark.com",
+                "rules": [
+                    {
+                        "selector": ".oiad",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": "[class^='headerMain-ad']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".oi-adblock",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".vuukle-ads",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "presse-citron.net",
+                "rules": [
+                    {
+                        "selector": ".od-wrapper",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".banner",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "pc-builds.com",
+                "rules": [
+                    {
+                        "selector": ".mon-holder",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "moz.de",
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    },
+                    {
+                        "selector": ".u-adSlot--superbanner",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "01net.com",
+                "rules": [
+                    {
+                        "type": "hide-empty",
+                        "selector": ".od-wrapper"
+                    },
+                    {
+                        "type": "hide-empty",
+                        "selector": "div[data-openweb-ad]"
+                    }
+                ]
+            },
+            {
+                "domain": "msn.com",
+                "rules": [
+                    {
+                        "type": "hide-empty",
+                        "selector": ".consumption-page-banner-ad"
+                    },
+                    {
+                        "type": "hide",
+                        "selector": "views-promo-card:first-of-type"
+                    }
+                ]
+            },
+            {
+                "domain": "okdiario.com",
+                "rules": [
+                    {
+                        "type": "hide-empty",
+                        "selector": ".publicidad"
+                    },
+                    {
+                        "type": "hide-empty",
+                        "selector": ".ad-slot-ph"
+                    },
+                    {
+                        "type": "hide-empty",
+                        "selector": ".catfish-space"
+                    }
+                ]
+            },
+            {
+                "domain": "n-tv.de",
+                "rules": [
+                    {
+                        "type": "hide-empty",
+                        "selector": "[class^='Ada_wrapper']"
+                    }
+                ]
+            },
+            {
+                "domain": [
+                    "yakimaherald.com",
+                    "union-bulletin.com"
+                ],
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    },
+                    {
+                        "selector": "[id*='google_ads_iframe']",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".tnt-ads",
+                        "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "pornhub.com",
+                "rules": [
+                    {
+                        "selector": "#cookieBanner.cbShort",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": [
+                    "belfastlive.co.uk",
+                    "birminghammail.co.uk",
+                    "cheshire-live.co.uk",
+                    "corkbeo.ie",
+                    "cornwalllive.com",
+                    "coventrytelegraph.net",
+                    "dailypost.co.uk",
+                    "dailyrecord.co.uk",
+                    "dailystar.co.uk",
+                    "derbytelegraph.co.uk",
+                    "devonlive.com",
+                    "dublinlive.ie",
+                    "edinburghlive.co.uk",
+                    "essexlive.news",
+                    "examinerlive.co.uk",
+                    "gazettelive.co.uk",
+                    "getsurrey.co.uk",
+                    "grimsbytelegraph.co.uk",
+                    "hulldailymail.co.uk",
+                    "insider.co.uk",
+                    "irishmirror.ie",
+                    "kentlive.news",
+                    "lancs.live",
+                    "lincolnshirelive.co.uk",
+                    "liverpoolecho.co.uk",
+                    "manchestereveningnews.co.uk",
+                    "mylondon.news",
+                    "nottinghampost.com",
+                    "somersetlive.co.uk",
+                    "stokesentinel.co.uk",
+                    "walesonline.co.uk"
+                ],
+                "rules": [
+                    {
+                        "selector": "[data-tmdatatrack='non-content-unit'], .vf3-conversations-list__promo",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".sticky ~ header",
+                        "type": "modify-style",
+                        "values": [
+                            {
+                                "property": "top",
+                                "value": "0"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}

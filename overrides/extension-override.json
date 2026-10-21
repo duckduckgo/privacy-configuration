@@ -1,0 +1,262 @@
+{
+    "features": {
+        "autoconsent": {
+            "state": "disabled",
+            "settings": {
+                "disabledCMPs": [],
+                "filterlistExceptions": []
+            }
+        },
+        "autofill": {
+            "state": "enabled"
+        },
+        "incontextSignup": {
+            "state": "enabled",
+            "minSupportedVersion": "2023.3.28.1",
+            "settings": {
+                "installedDays": 21
+            }
+        },
+        "cookie": {
+            "state": "enabled",
+            "minSupportedVersion": "2022.6.1",
+            "exceptions": [
+                {
+                    "domain": "soundcloud.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1440"
+                },
+                {
+                    "domain": "disneyplus.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1622"
+                },
+                {
+                    "domain": "legalandgeneral.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2491"
+                },
+                {
+                    "domain": "cnbc.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4151"
+                }
+            ]
+        },
+        "referrer": {
+            "state": "enabled"
+        },
+        "trackingCookies3p": {
+            "state": "enabled"
+        },
+        "trackingCookies1p": {
+            "state": "enabled"
+        },
+        "elementHiding": {
+            "state": "enabled"
+        },
+        "fingerprintingCanvas": {
+            "state": "enabled",
+            "settings": {
+                "webGl": "enabled",
+                "additionalEnabledCheck": "disabled",
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "experiment": { "experimentName": "fingerprintingCanvasAdditionalEnabledCheck", "cohort": "treatment" }
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/additionalEnabledCheck",
+                                "value": "enabled"
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        "fingerprintingAudio": {
+            "state": "disabled"
+        },
+        "fingerprintingTemporaryStorage": {
+            "state": "enabled"
+        },
+        "fingerprintingScreenSize": {
+            "state": "enabled"
+        },
+        "fingerprintingHardware": {
+            "state": "enabled",
+            "settings": {
+                "keyboard": {
+                    "type": "undefined"
+                },
+                "hardwareConcurrency": [
+                    {
+                        "type": "number",
+                        "value": 4
+                    },
+                    {
+                        "type": "number",
+                        "value": 8,
+                        "criteria": {
+                            "arch": "AppleSilicon"
+                        }
+                    }
+                ],
+                "deviceMemory": {
+                    "type": "number",
+                    "value": 8
+                }
+            },
+            "exceptions": [
+                {
+                    "domain": "flysas.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1347"
+                },
+                {
+                    "domain": "sas.dk",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1347"
+                },
+                {
+                    "domain": "whatsapp.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3889"
+                }
+            ]
+        },
+        "fingerprintingBattery": {
+            "state": "enabled"
+        },
+        "gpc": {
+            "state": "enabled"
+        },
+        "googleRejected": {
+            "state": "enabled"
+        },
+        "navigatorInterface": {
+            "state": "enabled"
+        },
+        "trackingParameters": {
+            "state": "enabled",
+            "minSupportedVersion": "2023.5.23"
+        },
+        "ampLinks": {
+            "state": "enabled"
+        },
+        "serviceworkerInitiatedRequests": {
+            "state": "enabled"
+        },
+        "exceptionHandler": {
+            "state": "enabled"
+        },
+        "trackerAllowlist": {
+            "settings": {
+                "allowlistedTrackers": {
+                    "criteo.net": {
+                        "rules": [
+                            {
+                                "rule": "static.criteo.net/js/ld/publishertag.js",
+                                "domains": [
+                                    "wp.pl"
+                                ],
+                                "reason": "Adwall appears which reappears when dismissed. The adwall prevents interaction with the page."
+                            },
+                            {
+                                "rule": "static.criteo.net/js/ld/publishertag.prebid.js",
+                                "domains": [
+                                    "wp.pl"
+                                ],
+                                "reason": "Adwall appears which reappears when dismissed. The adwall prevents interaction with the page."
+                            }
+                        ]
+                    },
+                    "facebook.net": {
+                        "rules": [
+                            {
+                                "rule": "connect.facebook.net/en_US/fbevents.js",
+                                "domains": [
+                                    "wp.pl"
+                                ],
+                                "reason": "Adwall appears which reappears when dismissed. The adwall prevents interaction with the page."
+                            }
+                        ]
+                    },
+                    "gemius.pl": {
+                        "rules": [
+                            {
+                                "rule": "wp.hit.gemius.pl/xgemius.js",
+                                "domains": [
+                                    "wp.pl"
+                                ],
+                                "reason": "Adwall appears which reappears when dismissed. The adwall prevents interaction with the page."
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        "webCompat": {
+            "state": "disabled"
+        },
+        "breakageReporting": {
+            "state": "enabled"
+        },
+        "contentScopeExperiments": {
+            "state": "enabled",
+            "features": {
+                "fingerprintingCanvasAdditionalEnabledCheck": {
+                    "state": "enabled",
+                    "minSupportedVersion": "2025.7.23",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        { "name": "control", "weight": 1 },
+                        { "name": "treatment", "weight": 1 }
+                    ]
+                }
+            }
+        },
+        "requestBlocklist": {
+            "state": "enabled"
+        },
+        "webDetection": {
+            "state": "enabled",
+            "minSupportedVersion": "2026.10.6"
+        },
+        "webInterferenceDetection": {
+            "state": "enabled"
+        }
+    },
+    "unprotectedTemporary": [
+        {
+            "domain": "localhost",
+            "reason": "Protections are disabled on localhost pages"
+        },
+        {
+            "domain": "127.0.0.1",
+            "reason": "Protections are disabled on localhost pages"
+        },
+        {
+            "domain": "::1",
+            "reason": "Protections are disabled on localhost pages"
+        },
+        {
+            "domain": "livenation.com",
+            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1053"
+        },
+        {
+            "domain": "ticketmaster.com",
+            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/794"
+        }
+    ]
+}

@@ -1,0 +1,58 @@
+import Ajv from 'ajv';
+import schemaGenerator from 'ts-json-schema-generator';
+const ajv = new Ajv({ allowUnionTypes: true });
+
+function createGenerator() {
+    try {
+        return schemaGenerator.createGenerator({
+            path: './schema/config.ts',
+            tsconfig: './tsconfig.json',
+        });
+    } catch (e) {
+        console.error(e.diagnostic);
+        throw e;
+    }
+}
+
+/**
+ * Generate the JSONSchema for the named TS type
+ * @param {import('../schema/config').ExportedSchemas} schemaName
+ */
+export function getSchema(schemaName) {
+    return createGenerator().createSchema(schemaName);
+}
+
+/**
+ * Generate a validator for checking JSON objects against the named TS type
+ * @param {import('../schema/config').ExportedSchemas} schemaName
+ */
+export function createValidator(schemaName) {
+    return ajv.compile(getSchema(schemaName));
+}
+
+function formatParams(params) {
+    if (params) {
+        return Object.entries(params)
+            .map(
+                ([
+                    key,
+                    value,
+                ]) => `${key}: ${value}`,
+            )
+            .join(',\n');
+    }
+    return '';
+}
+
+export function formatErrors(errors) {
+    if (!Array.isArray(errors)) {
+        return '';
+    }
+
+    return errors
+        .map((item) => {
+            const params = formatParams(item.params);
+            return params ? `${item.instancePath}: ${params} - ${item.message}` : `${item.instancePath}: ${item.message}`;
+        })
+        .join(', ');
+}

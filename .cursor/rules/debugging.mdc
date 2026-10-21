@@ -1,0 +1,71 @@
+---
+description: Debugging steps for remote config and privacy configuration
+alwaysApply: false
+---
+
+# Rule: Remote Config Debugging
+
+## Overview
+When working with remote config or privacy configuration, always validate that the configuration version and structure are correct.
+
+## Config Version Validation
+
+**Always verify that the config version matches what you expect.**
+
+### Critical: Required Field Updates
+
+**When updating config, you MUST update both:**
+- **Version**: Bump the version number - clients ignore updates without version changes
+- **Hash**: Update the hash field - clients ignore updates without hash changes
+
+**Required fields:**
+- **unprotectedTemporary**: Required by ContentScopeScripts and Autofill - must be included in the config
+
+Without bumping both `version` and `hash`, clients will ignore the update even if other fields change.
+
+### What to Check
+- **Config version**: Ensure the version number in the loaded config matches what you expect
+- **Config hash**: Verify the hash field has been updated to match the new config content
+- **unprotectedTemporary**: Confirm this field is present (required by ContentScopeScripts and Autofill)
+- **Remote config source**: Verify the config is being fetched from the expected endpoint
+- **Cache state**: If using cached config, verify it's not stale and the version has updated
+
+### Common Config Issues
+
+#### Config Not Updating
+- **Most common cause**: Version and/or hash were not updated - clients ignore unchanged version/hash
+- Check cache expiration settings
+- Verify config version has changed
+- Verify config hash has changed
+- Ensure remote config endpoint is accessible
+- Check for network errors in DevTools
+
+#### Config Structure Errors
+- Validate JSON structure
+- Check for missing required fields (especially `unprotectedTemporary`)
+- Verify feature settings format
+
+### Validating Config Structure
+
+**Best practice: Use the tooling to validate your config changes.**
+
+1. **Build config with tooling**: Check out the codebase and build a config file using the project's tooling to produce a valid output. This ensures:
+   - Required fields are included (version, hash, unprotectedTemporary, etc.)
+   - JSON structure is correct
+   - Feature settings are properly formatted
+
+2. **Draft a PR**: Consider drafting a PR for the config changes. The automation will:
+   - Validate the config structure
+   - Generate a test link for you to verify the changes
+   - Catch common issues before deployment
+
+This approach catches validation errors early and ensures the config will be accepted by clients.
+
+## Config Processing and Feature Enablement
+
+For debugging how the config is processed and how features are enabled/disabled, see:
+
+**[content-scope-scripts/injected/docs/build-and-troubleshooting.md](https://github.com/duckduckgo/content-scope-scripts/blob/main/injected/docs/build-and-troubleshooting.md#config-and-platform-parameters-validation)** - Config and Platform Parameters Validation section:
+- Using `processConfig` breakpoint to inspect config state
+- Platform parameters validation
+- Feature enablement debugging

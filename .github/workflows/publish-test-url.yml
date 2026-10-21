@@ -1,0 +1,127 @@
+name: Publish Test URL
+
+on:
+    pull_request:
+        types: [opened, synchronize, reopened, closed]
+
+jobs:
+    publish-config:
+        if: github.event.action != 'closed' && github.event.pull_request.user.login != 'dependabot[bot]'
+        runs-on: ubuntu-latest
+        concurrency:
+            group: preview-pages-branch
+            cancel-in-progress: false
+        steps:
+            - name: Post pending comment
+              id: pending_comment
+              uses: peter-evans/create-or-update-comment@v5
+              with:
+                  token: ${{ secrets.GITHUB_TOKEN }}
+                  repository: ${{ github.repository }}
+                  issue-number: ${{ github.event.pull_request.number }}
+                  edit-mode: replace
+                  body: |
+                      🔗 **Preview Config for PR #${{ github.event.pull_request.number }}**
+
+                      ⏳ Building and publishing preview config...
+
+            - name: Checkout the repository
+              uses: actions/checkout@v6
+            - name: Use Node.js
+              uses: actions/setup-node@v6
+              with:
+                  node-version-file: .nvmrc
+            - name: Install dependencies
+              run: npm ci
+            - name: build
+              run: npm run build
+
+            - name: Checkout preview-pages branch
+              uses: actions/checkout@v6
+              with:
+                  ref: preview-pages
+                  path: pages-branch
+                  token: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Copy PR content into pages branch
+              run: |
+                  PR_DIR="pr-${{ github.event.pull_request.number }}"
+                  TARGET_DIR="pages-branch/$PR_DIR"
+                  rm -rf "$TARGET_DIR"
+                  mkdir -p "$TARGET_DIR"
+                  cp -r generated/* "$TARGET_DIR"
+                  cd pages-branch
+                  git config user.name "github-actions"
+                  git config user.email "actions@github.com"
+                  git add .
+                  git commit -m "Publish config for PR #${{ github.event.pull_request.number }}" || echo "No changes to commit"
+                  git push origin preview-pages
+
+            - name: Generate preview links
+              id: generate_preview_links
+              run: |
+                  PR_NUMBER=${{ github.event.pull_request.number || 'unknown' }}
+                  PREVIEW_LINKS=$(find generated/v5 -type f | while read -r file; do
+                    RELATIVE_PATH=${file#generated/v5/}
+                    echo "- [${RELATIVE_PATH}](https://${{ github.repository_owner }}.github.io/$(basename "${{ github.repository }}")/pr-${PR_NUMBER}/v5/${RELATIVE_PATH})"
+                  done)
+                  LAST_UPDATED=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
+                  echo "preview_links<<EOF" >> $GITHUB_OUTPUT
+                  echo "$PREVIEW_LINKS" >> $GITHUB_OUTPUT
+                  echo "EOF" >> $GITHUB_OUTPUT
+                  echo "last_updated=$LAST_UPDATED" >> $GITHUB_OUTPUT
+
+            - name: Update comment with preview links
+              uses: peter-evans/create-or-update-comment@v5
+              with:
+                  token: ${{ secrets.GITHUB_TOKEN }}
+                  repository: ${{ github.repository }}
+                  comment-id: ${{ steps.pending_comment.outputs.comment-id }}
+                  edit-mode: replace
+                  body: |
+                      🔗 **Preview Config for PR #${{ github.event.pull_request.number }}**
+
+                      ${{ steps.generate_preview_links.outputs.preview_links }}
+
+                      _Last updated: ${{ steps.generate_preview_links.outputs.last_updated }}_
+
+            - name: Update comment on failure
+              if: failure()
+              uses: peter-evans/create-or-update-comment@v5
+              with:
+                  token: ${{ secrets.GITHUB_TOKEN }}
+                  repository: ${{ github.repository }}
+                  comment-id: ${{ steps.pending_comment.outputs.comment-id }}
+                  edit-mode: replace
+                  body: |
+                      🔗 **Preview Config for PR #${{ github.event.pull_request.number }}**
+
+                      ❌ Failed to build or publish preview config. Check the [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details.
+
+    cleanup-preview:
+        if: github.event.action == 'closed' && github.event.pull_request.user.login != 'dependabot[bot]'
+        runs-on: ubuntu-latest
+        concurrency:
+            group: preview-pages-branch
+            cancel-in-progress: false
+        steps:
+            - name: Checkout preview-pages branch
+              uses: actions/checkout@v6
+              with:
+                  ref: preview-pages
+                  token: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Remove PR preview directory
+              run: |
+                  PR_DIR="pr-${{ github.event.pull_request.number }}"
+                  if [ -d "$PR_DIR" ]; then
+                    rm -rf "$PR_DIR"
+                    git config user.name "github-actions"
+                    git config user.email "actions@github.com"
+                    git add .
+                    git commit -m "Cleanup preview for PR #${{ github.event.pull_request.number }}" || echo "No changes to commit"
+                    git push origin preview-pages
+                    echo "Removed preview directory: $PR_DIR"
+                  else
+                    echo "Preview directory not found: $PR_DIR"
+                  fi

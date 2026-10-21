@@ -1,0 +1,66 @@
+{
+    "_meta": {
+        "description": "Request blocking rules necessary to fix website breakage. Note: Tracker request blocking is handled elsewhere."
+    },
+    "state": "disabled",
+    "settings": {
+        "blockedRequests": {
+            "privacy-test-pages.site": {
+                "rules": [
+                    {
+                        "rule": "privacy-test-pages.site/privacy-protections/request-blocklist/*?block=true",
+                        "domains": [
+                            "privacy-test-pages.site"
+                        ],
+                        "reason": "Testing rule for the privacy test page, see https://privacy-test-pages.site/privacy-protections/request-blocklist/"
+                    }
+                ]
+            },
+            "third-party.site": {
+                "rules": [
+                    {
+                        "rule": "third-party.site/privacy-protections/request-blocklist/*?block=true",
+                        "domains": [
+                            "privacy-test-pages.site"
+                        ],
+                        "reason": "Testing rule for the privacy test page, see https://privacy-test-pages.site/privacy-protections/request-blocklist/"
+                    }
+                ]
+            },
+            "config-factory.com": {
+                "rules": [
+                    {
+                        "rule": "config-factory.com",
+                        "domains": [
+                            "<all>"
+                        ],
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5644"
+                    }
+                ]
+            },
+            "content-settings.com": {
+                "rules": [
+                    {
+                        "rule": "content-settings.com",
+                        "domains": [
+                            "<all>"
+                        ],
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5644"
+                    }
+                ]
+            },
+            "site-config.com": {
+                "rules": [
+                    {
+                        "rule": "site-config.com",
+                        "domains": [
+                            "<all>"
+                        ],
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5644"
+                    }
+                ]
+            }
+        }
+    },
+    "exceptions": []
+}

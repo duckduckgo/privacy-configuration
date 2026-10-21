@@ -1,0 +1,53 @@
+---
+alwaysApply: false
+description: Review user-agent and client-hint mitigations
+globs: overrides/windows-override.json, overrides/android-override.json, overrides/ios-override.json, overrides/macos-override.json, schema/features/client-brand-hint.ts, schema/features/custom-user-agent.ts, schema/features/ua-ch-brands.ts
+---
+
+## Custom User Agent / Client Hints Validation
+
+For changes touching `customUserAgent`, `clientBrandHint`, or `uaChBrands`, treat inconsistent HTTP headers and JS-visible values as high risk. Conflicting bot signals can be worse than no mitigation.
+
+Bugbot should flag these unless the PR description explains the intended behavior.
+
+### All platforms
+- Mismatched domain coverage across related mitigations (`example.com`, `www.`, `m.`, auth subdomains).
+- Schema changes that allow new UA/client-hint settings without config examples or tests covering header and JS consistency.
+
+### macOS
+macOS uses a custom UA by default that should closely match Safari with `Ddg/<safariVersion>` appended.
+
+- Prefer `customUserAgent.settings.defaultSites` to remove DuckDuckGo UA branding and present Safari.
+- Flag `webViewDefault` changes unless the PR description says the WebView UA is intended.
+- Flag `customUserAgent.exceptions`; do not use it for new mitigations.
+
+### iOS
+iOS uses a custom UA by default that should closely match Safari with `Ddg/<safariVersion>` appended.
+
+- To present Safari, require both `customUserAgent.settings.ddgFixedSites` and `customUserAgent.settings.omitApplicationSites` for the same domains.
+- Flag `omitApplicationSites` without `ddgFixedSites`; it only removes legacy `DuckDuckGo/7`, not `Ddg/<safariVersion>`.
+- Flag `ddgFixedSites` without `omitApplicationSites`; it can leave legacy custom client branding.
+- Flag `ddgDefaultSites` and `omitVersionSites`; do not use them for new mitigations.
+- Flag `exceptions` unless the PR description says the WebView default UA is intended and why Safari-like UA is not.
+- Flag `closestUserAgent` unless the PR description says `ddgFixedSites` is unsuitable.
+- Flag `safariVersionMappings` or `useUpdatedSafariVersions` changes without checking affected custom-UA site lists.
+
+### Android
+Android does not use a custom UA by default; the default UA should match Chrome. Android customizes client-hint branding instead.
+
+- To make client-hint branding look like Chrome, use `clientBrandHint.settings.domains` with `brand: "CHROME"`.
+- Flag `clientBrandHint` changes without validating the default UA still matches the intended Chrome/WebView identity.
+- Flag new `customUserAgent.exceptions` unless the PR description says the WebView default UA is intended.
+- Flag `ddgFixedUserAgent`, `closestUserAgent`, `omitApplicationSites`, and `omitVersionSites`; these are legacy and should not be used for new mitigations.
+
+### Windows
+Windows does not use a custom UA by default; the default UA should match Chrome. Windows customizes client-hint branding instead.
+
+- `customUserAgent.settings.userAgentOverrides` supports `{ "domain": "example.com", "pathRegex": ".*", "userAgent": "..." }`.
+- For Sec-CH-UA mitigations, require matching JS UA-CH behavior (`navigator.userAgentData.brands`, `fullVersionList`) unless the PR description says JS UA-CH is irrelevant; for UA string changes, require checking `navigator.userAgent`.
+- Flag domains added to both `customUserAgent.settings.omitClientHintMutations` and `clientBrandHint.settings.domains`; omission sends generic Chromium/GREASE and conflicts with brand override intent.
+- Flag Windows client-hint domain disparities. `uaChBrands` conditions use eTLD+1, while `clientBrandHint` and `omitClientHintMutations` entries are more granular; `example.com` alone only covers the naked domain there, so flag if no subdomains are specified in the PR description or the mitigation.
+- Always flag granular or duplicate Windows `uaChBrands` conditions such as both `example.com` and `www.example.com`. Prefer one `uaChBrands` condition per eTLD+1; keep subdomain coverage in `clientBrandHint` or `omitClientHintMutations`. Fix is recommended but not necessarily merge-blocking, unless it causes header/JS coverage to diverge.
+- If `omitClientHintMutations` disables header branding for a domain, require matching `uaChBrands` behavior for that domain, usually by disabling the feature for the condition.
+- If `clientBrandHint.settings.domains` replaces the header brand, require matching `uaChBrands.settings.conditionalChanges[].patchSettings` with `path: "/brandName"` and the same domain set.
+- Flag `customUserAgent.settings.userAgentOverrides` or `features.userAgentStrategies` changes that alter browser family/version without matching client-hint header and JS behavior.

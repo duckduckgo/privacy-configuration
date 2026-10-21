@@ -1,0 +1,67 @@
+{
+    "_meta": {
+        "description": "Restriction of 1st party cookies and 3rd party cookie blocking"
+    },
+    "settings": {
+        "trackerCookie": "enabled",
+        "nonTrackerCookie": "disabled",
+        "excludedCookieDomains": [
+            {
+                "domain": "accounts.google.com",
+                "reason": "On some Google sign-in flows, there is an error after entering username and proceeding: 'Your browser has cookies disabled. Make sure that your cookies are enabled and try again.'"
+            },
+            {
+                "domain": "pay.google.com",
+                "reason": "After sign-in for Google Pay flows, there is repeated flickering and a loading spinner, preventing the flow from proceeding."
+            },
+            {
+                "domain": "payments.google.com",
+                "reason": "After sign-in for Google Pay flows (after flickering is resolved), blocking this causes the loading spinner to spin indefinitely, and the payment flow cannot proceed."
+            },
+            {
+                "domain": "docs.google.com",
+                "reason": "Embedded Google docs get into redirect loop if signed into a Google account"
+            }
+        ],
+        "firstPartyTrackerCookiePolicy": {
+            "threshold": 86400,
+            "maxAge": 86400
+        },
+        "firstPartyCookiePolicy": {
+            "threshold": 604800,
+            "maxAge": 604800
+        },
+        "thirdPartyCookieNames": [
+            "user_id",
+            "__Secure-3PAPISID",
+            "SAPISID",
+            "APISID"
+        ]
+    },
+    "exceptions": [
+        {
+            "domain": "nespresso.com",
+            "reason": "Clicking 'Continue' after filling out details for account creation yields an error."
+        },
+        {
+            "domain": "optout.aboutads.info",
+            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1377"
+        },
+        {
+            "domain": "optout.networkadvertising.org",
+            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1377"
+        },
+        {
+            "domain": "news.ti.com",
+            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1677"
+        },
+        {
+            "domain": "instructure.com",
+            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/2212"
+        },
+        {
+            "domain": "duckduckgo.com",
+            "reason": "Prevent expiry of SERP settings"
+        }
+    ]
+}

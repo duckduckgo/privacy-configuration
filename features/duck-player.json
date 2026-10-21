@@ -1,0 +1,121 @@
+{
+    "_meta": {
+        "description": "Private YouTube video player used by our macOS browser, allowing users to watch YouTube videos without personalized ads and preventing viewing activity from influencing users' YouTube recommendations."
+    },
+    "exceptions": [],
+    "features": {
+        "pip": {
+            "state": "disabled"
+        },
+        "autoplay": {
+            "state": "disabled"
+        },
+        "openInNewTab": {
+            "state": "disabled"
+        },
+        "customError": {
+            "state": "disabled"
+        },
+        "nativeUI": {
+            "state": "disabled"
+        }
+    },
+    "settings": {
+        "tryDuckPlayerLink": "https://www.youtube.com/watch?v=yKWIA-Pys4c",
+        "duckPlayerDisabledHelpPageLink": null,
+        "youtubePath": "watch",
+        "youtubeEmbedUrl": "youtube-nocookie.com",
+        "youTubeUrl": "youtube.com",
+        "youTubeReferrerHeaders": [
+            "Referer"
+        ],
+        "youTubeReferrerQueryParams": [
+            "embeds_referring_euri"
+        ],
+        "youTubeVideoIDQueryParam": "v",
+        "overlays": {
+            "youtube": {
+                "state": "disabled",
+                "selectors": {
+                    "thumbLink": "a[href^='/watch']",
+                    "excludedRegions": [
+                        "#playlist",
+                        "ytd-movie-renderer",
+                        "ytd-grid-movie-renderer"
+                    ],
+                    "videoElement": "[full-bleed-player] #player-full-bleed-container video, #player video",
+                    "videoElementContainer": "[full-bleed-player] #player-full-bleed-container .html5-video-player, #player .html5-video-player",
+                    "hoverExcluded": [],
+                    "clickExcluded": [
+                        "ytd-thumbnail-overlay-toggle-button-renderer"
+                    ],
+                    "allowedEventTargets": [
+                        ".ytp-inline-preview-scrim",
+                        ".ytd-video-preview",
+                        "#thumbnail-container",
+                        "#video-title-link",
+                        "#video-title",
+                        "video.video-stream.html5-main-video"
+                    ],
+                    "drawerContainer": "body"
+                },
+                "thumbnailOverlays": {
+                    "state": "enabled"
+                },
+                "clickInterception": {
+                    "state": "enabled"
+                },
+                "videoOverlays": {
+                    "state": "enabled"
+                },
+                "videoDrawer": {
+                    "state": "disabled"
+                },
+                "bufferingFeedback": {
+                    "state": "disabled"
+                },
+                "fullscreenGuard": {
+                    "state": "disabled"
+                }
+            },
+            "serpProxy": {
+                "state": "disabled"
+            }
+        },
+        "domains": [
+            {
+                "domain": "www.youtube.com",
+                "patchSettings": [
+                    {
+                        "op": "replace",
+                        "path": "/overlays/youtube/state",
+                        "value": "enabled"
+                    }
+                ]
+            },
+            {
+                "domain": [
+                    "duckduckgo.com",
+                    "duck.co"
+                ],
+                "patchSettings": [
+                    {
+                        "op": "replace",
+                        "path": "/overlays/serpProxy/state",
+                        "value": "enabled"
+                    }
+                ]
+            },
+            {
+                "domain": "m.youtube.com",
+                "patchSettings": [
+                    {
+                        "op": "replace",
+                        "path": "/overlays/youtube/state",
+                        "value": "enabled"
+                    }
+                ]
+            }
+        ]
+    }
+}

@@ -1,0 +1,42 @@
+name: Auto Assign Assignees as Reviewers
+
+on:
+    pull_request:
+        types: [opened, ready_for_review, reopened, synchronize, assigned, unassigned]
+
+jobs:
+    assign-and-request-review:
+        runs-on: ubuntu-latest
+
+        permissions:
+            pull-requests: write
+
+        steps:
+            - name: Checkout repo
+              uses: actions/checkout@v6
+
+            - name: Get PR details
+              id: pr
+              uses: actions/github-script@v9
+              with:
+                  script: |
+                      const pr = await github.rest.pulls.get({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        pull_number: context.payload.pull_request.number,
+                      });
+
+                      const author = pr.data.user?.login;
+                      const assignees = pr.data.assignees
+                        .map(a => a.login)
+                        // Don't request a review from the PR author (can be rejected by GitHub and is noise either way).
+                        .filter(login => login && login !== author);
+
+                      if (assignees.length > 0) {
+                        await github.rest.pulls.requestReviewers({
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          pull_number: context.payload.pull_request.number,
+                          reviewers: assignees
+                        });
+                      }

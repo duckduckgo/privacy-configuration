@@ -1,0 +1,46 @@
+{
+    "_meta": {
+        "description": "Rewrite AMP links to safer alternatives."
+    },
+    "exceptions": [
+        {
+            "domain": "asana.com",
+            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1674"
+        },
+        {
+            "domain": "freecodecamp.org",
+            "reason": "Clicking 'get started' reloads the page and does not progress to the login page."
+        },
+        {
+            "domain": "www.audiosciencereview.com",
+            "reason": "Pages on the site end up in redirect loops in Firefox."
+        },
+        {
+            "domain": "thehustle.co",
+            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1460"
+        }
+    ],
+    "settings": {
+        "deepExtractionEnabled": true,
+        "deepExtractionTimeout": 1500,
+        "linkFormats": [
+            "^https?:\\/\\/(?:w{3}\\.)?google\\.\\S{2,}\\/amp\\/s\\/(\\S+)$",
+            "^https?:\\/\\/\\S+ampproject\\.org\\/\\S\\/s\\/(\\S+)$"
+        ],
+        "keywords": [
+            "amp=",
+            "=amp",
+            "&amp",
+            "amp&",
+            "/amp",
+            "amp/",
+            ".amp",
+            "amp.",
+            "%amp",
+            "amp%",
+            "_amp",
+            "amp_",
+            "?amp"
+        ]
+    }
+}
