@@ -11,6 +11,10 @@ This repository contains the privacy configuration files used by DuckDuckGo's Ap
 - Using tooling to build and validate config
 - PR automation for test links
 
+## Web Detection
+
+Before adding or updating a detector in `features/web-detection.json`, read `.cursor/rules/web-detection.mdc`.
+
 ## Key Concepts
 
 - **Features**: Files in `features/` directory control privacy protection enable/disable
