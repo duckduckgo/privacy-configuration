@@ -1,0 +1,43 @@
+---
+globs: features/web-detection.json,features/event-hub.json,overrides/**/*.json
+alwaysApply: false
+description: Rules for adding or changing web detection detectors and the EventHub counters they feed.
+---
+
+# Web detection detectors
+
+## Match conditions
+
+`all` stops at the first failing condition. Order it cheapest first:
+
+1. `element` without `visibility`
+2. `text` with `pattern` only (one pass over `textContent`)
+3. `text` with `xpath` (skips script and hidden text, but walks every text node)
+4. `none` exclusions
+5. `element` with `visibility: "visible"` (forces layout)
+
+```json
+"all": [
+    { "element": { "selector": "input[type='password']" } },
+    { "text": { "pattern": ["…"] } },
+    { "text": { "xpath": "…", "pattern": ["…"] } },
+    { "none": [{ "text": { "xpath": "…", "pattern": ["…"] } }] },
+    { "element": { "selector": "input[type='password']", "visibility": "visible" } }
+]
+```
+
+XPath cannot see text hidden by a stylesheet class. Avoid patterns that also match consent or help text, such as "you do not accept cookies".
+
+## Timers
+
+Detectors that share an `intervalMs` value run in the same task. Give each detector its own values (for example 1100, 7100 ms and 1200, 7200 ms) that no other detector in this file or the overrides uses.
+
+## Gates and events
+
+- `apple-isolated` is both iOS and macOS. Cap macOS conditions with `maxSupportedVersion` (for example `"1.999.999"`), and add a `//` comment naming each condition's platform.
+- Every `fireEvent.type` needs an `event-hub.json` source or an experiment metric. CI checks this.
+- Android rejects telemetry that contains an immediate trigger. Put immediate pixels in the iOS, macOS and Windows overrides.
+
+## Open pull requests
+
+If `main` changes this file, rebase rather than merging `main` in. `auto_respond` replays each commit with `rebase -X theirs` and fails on an older conflict.
