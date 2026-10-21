@@ -811,6 +811,176 @@
                     }
                 }
             },
+            "login": {
+                "error": {
+                    "state": "disabled",
+                    "match": {
+                        "all": [
+                            {
+                                "element": {
+                                    "selector": "input[type='password']"
+                                }
+                            },
+                            {
+                                "text": {
+                                    "pattern": [
+                                        "something went wrong",
+                                        "an? (unexpected |unknown |internal )?error (has )?occurred",
+                                        "(couldn.?t|could not|were unable to) (sign|log) you in",
+                                        "(sign|log)[ -]?in (attempt )?(failed|unsuccessful)",
+                                        "(experiencing|having) (some )?technical (difficulties|issues|problems)",
+                                        "a (problem|technical error) (has )?occurred",
+                                        "oops[\\s\\S]{0,40}(try again|refresh)",
+                                        "(a|some|temporary) technical (issues?|difficult(y|ies)|problems?|errors?)"
+                                    ]
+                                }
+                            },
+                            {
+                                "text": {
+                                    "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript) and not(ancestor::*[@hidden]) and not(ancestor::*[@aria-hidden='true']) and not(ancestor::*[contains(translate(@style,' ',''),'display:none')]) and not(ancestor::*[contains(translate(@style,' ',''),'visibility:hidden')])]",
+                                    "pattern": [
+                                        "something went wrong",
+                                        "an? (unexpected |unknown |internal )?error (has )?occurred",
+                                        "(couldn.?t|could not|were unable to) (sign|log) you in",
+                                        "(sign|log)[ -]?in (attempt )?(failed|unsuccessful)",
+                                        "(experiencing|having) (some )?technical (difficulties|issues|problems)",
+                                        "a (problem|technical error) (has )?occurred",
+                                        "oops[\\s\\S]{0,40}(try again|refresh)",
+                                        "(a|some|temporary) technical (issues?|difficult(y|ies)|problems?|errors?)"
+                                    ]
+                                }
+                            },
+                            {
+                                "none": [
+                                    {
+                                        "text": {
+                                            "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript) and not(ancestor::*[@hidden]) and not(ancestor::*[@aria-hidden='true']) and not(ancestor::*[contains(translate(@style,' ',''),'display:none')]) and not(ancestor::*[contains(translate(@style,' ',''),'visibility:hidden')])]",
+                                            "pattern": [
+                                                "(incorrect|wrong|invalid|unrecogni[sz]ed) (e-?mail|user ?name|user ?id|password|credentials|login|phone|code|pin)",
+                                                "(e-?mail|user ?name|user ?id|password|credentials|code|combination)( you entered)? (is|are|was|were) (incorrect|wrong|invalid|not (correct|valid|recogni[sz]ed))",
+                                                "check your (e-?mail( address)?|user ?name|password|phone( number)?) (and|or) (your )?(e-?mail( address)?|user ?name|password|phone( number)?)",
+                                                "check your (credentials|details|login|sign.?in)",
+                                                "account (has been |is )?(locked|suspended|disabled)",
+                                                "too many (failed |sign.?in |log.?in )?(attempts|tries|requests)",
+                                                "(does ?n.?t|did ?n.?t|does not|did not) match our records",
+                                                "(could ?n.?t|could not|can.?t|cannot) find (your|an|that) account",
+                                                "no (user|account)( was)? found",
+                                                "(user|account) (was )?not found",
+                                                "(login |log.?in |sign.?in )?(information|info|details)( you entered)? (is|are|was|were) (incorrect|wrong|invalid|not (correct|valid))",
+                                                "(didn.?t|did not|could ?n.?t|could not|can.?t|cannot) recogni[sz]e (that|this|your|the) [^.]{0,30}(account|e-?mail|user ?name|password|credentials)",
+                                                "(incorrect|wrong|invalid|expired) (verification|security|one.time|sign.?in|login|access) code",
+                                                "(could ?n.?t|could not|unable to|can.?t|cannot) verify (this|that|the|your) code",
+                                                "code (has )?expired",
+                                                "try again with a new code"
+                                            ]
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "element": {
+                                    "selector": "input[type='password']",
+                                    "visibility": "visible"
+                                }
+                            }
+                        ]
+                    }
+                },
+                "cookies": {
+                    "state": "disabled",
+                    "match": {
+                        "all": [
+                            {
+                                "element": {
+                                    "selector": "input[type='password']"
+                                }
+                            },
+                            {
+                                "text": {
+                                    "pattern": [
+                                        "browser (has|have) cookies (disabled|blocked|turned off)",
+                                        "(looks like|seems that|seems like|appears that) (your )?cookies (are|have been) (disabled|blocked|turned off)",
+                                        "cookies (are|is) (disabled|blocked|not enabled|turned off) (in|on|for) (your|this) browser",
+                                        "cookies (must|need to|have to) be (enabled|allowed|turned on)",
+                                        "please (enable|turn on|allow) cookies",
+                                        "enable cookies (in|on|for) (your|this) browser",
+                                        "requires? (browser |third.party )?cookies to be (enabled|allowed)",
+                                        "browser (does ?n.?t|does not|do ?n.?t|do not) (accept|allow|support) cookies"
+                                    ]
+                                }
+                            },
+                            {
+                                "text": {
+                                    "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript) and not(ancestor::*[@hidden]) and not(ancestor::*[@aria-hidden='true']) and not(ancestor::*[contains(translate(@style,' ',''),'display:none')]) and not(ancestor::*[contains(translate(@style,' ',''),'visibility:hidden')])]",
+                                    "pattern": [
+                                        "browser (has|have) cookies (disabled|blocked|turned off)",
+                                        "(looks like|seems that|seems like|appears that) (your )?cookies (are|have been) (disabled|blocked|turned off)",
+                                        "cookies (are|is) (disabled|blocked|not enabled|turned off) (in|on|for) (your|this) browser",
+                                        "cookies (must|need to|have to) be (enabled|allowed|turned on)",
+                                        "please (enable|turn on|allow) cookies",
+                                        "enable cookies (in|on|for) (your|this) browser",
+                                        "requires? (browser |third.party )?cookies to be (enabled|allowed)",
+                                        "browser (does ?n.?t|does not|do ?n.?t|do not) (accept|allow|support) cookies"
+                                    ]
+                                }
+                            },
+                            {
+                                "element": {
+                                    "selector": "input[type='password']",
+                                    "visibility": "visible"
+                                }
+                            }
+                        ]
+                    }
+                },
+                "browser": {
+                    "state": "disabled",
+                    "match": {
+                        "all": [
+                            {
+                                "element": {
+                                    "selector": "input[type='password']"
+                                }
+                            },
+                            {
+                                "text": {
+                                    "pattern": [
+                                        "browser[\\s\\S]{0,25}(is |are )?(not|no longer) supported",
+                                        "unsupported browser",
+                                        "browser (is )?(not compatible|incompatible)",
+                                        "incompatible browser",
+                                        "please (update|upgrade) your browser",
+                                        "your browser is (out of date|outdated|too old)",
+                                        "browser (is |are )?(currently )?unsupported",
+                                        "browser update (is )?required"
+                                    ]
+                                }
+                            },
+                            {
+                                "text": {
+                                    "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript) and not(ancestor::*[@hidden]) and not(ancestor::*[@aria-hidden='true']) and not(ancestor::*[contains(translate(@style,' ',''),'display:none')]) and not(ancestor::*[contains(translate(@style,' ',''),'visibility:hidden')])]",
+                                    "pattern": [
+                                        "browser[\\s\\S]{0,25}(is |are )?(not|no longer) supported",
+                                        "unsupported browser",
+                                        "browser (is )?(not compatible|incompatible)",
+                                        "incompatible browser",
+                                        "please (update|upgrade) your browser",
+                                        "your browser is (out of date|outdated|too old)",
+                                        "browser (is |are )?(currently )?unsupported",
+                                        "browser update (is )?required"
+                                    ]
+                                }
+                            },
+                            {
+                                "element": {
+                                    "selector": "input[type='password']",
+                                    "visibility": "visible"
+                                }
+                            }
+                        ]
+                    }
+                }
+            },
             "other": {
                 "dismissible_en": {
                     "match": {
@@ -1389,6 +1559,129 @@
                             "fireEvent": {
                                 "state": "enabled",
                                 "type": "video_blocked"
+                            }
+                        }
+                    }
+                ]
+            },
+            {
+                "condition": [
+                    {
+                        "injectName": "android",
+                        "minSupportedVersion": 52920000
+                    },
+                    {
+                        "injectName": "windows",
+                        "minSupportedVersion": "0.171.0"
+                    },
+                    {
+                        "injectName": "apple-isolated",
+                        "minSupportedVersion": "7.234.0"
+                    },
+                    {
+                        // macOS only: cap at 1.x to filter out iOS.
+                        "injectName": "apple-isolated",
+                        "minSupportedVersion": "1.204.0",
+                        "maxSupportedVersion": "1.999.999"
+                    }
+                ],
+                "patchSettings": [
+                    {
+                        "op": "replace",
+                        "path": "/detectors/login/error/state",
+                        "value": "enabled"
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/login/error/triggers",
+                        "value": {
+                            "auto": {
+                                "state": "enabled",
+                                "when": {
+                                    "intervalMs": [
+                                        1100,
+                                        7100,
+                                        11100,
+                                        15100,
+                                        20100
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/login/error/actions",
+                        "value": {
+                            "fireEvent": {
+                                "state": "enabled",
+                                "type": "login_error"
+                            }
+                        }
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/login/cookies/state",
+                        "value": "enabled"
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/login/cookies/triggers",
+                        "value": {
+                            "auto": {
+                                "state": "enabled",
+                                "when": {
+                                    "intervalMs": [
+                                        1200,
+                                        7200,
+                                        11200,
+                                        15200,
+                                        20200
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/login/cookies/actions",
+                        "value": {
+                            "fireEvent": {
+                                "state": "enabled",
+                                "type": "login_cookies"
+                            }
+                        }
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/login/browser/state",
+                        "value": "enabled"
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/login/browser/triggers",
+                        "value": {
+                            "auto": {
+                                "state": "enabled",
+                                "when": {
+                                    "intervalMs": [
+                                        1300,
+                                        7300,
+                                        11300,
+                                        15300,
+                                        20300
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/login/browser/actions",
+                        "value": {
+                            "fireEvent": {
+                                "state": "enabled",
+                                "type": "login_browser"
                             }
                         }
                     }
