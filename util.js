@@ -240,21 +240,6 @@ function isPlainObject(value) {
 }
 
 /**
- * Whether a webDetection detector is in the shape clients before `actions` expressions read: `match`,
- * and an `actions` object holding `fireEvent` and `breakageReportData` only, or no `actions`. Their
- * order does not matter, so such an object is left as it is.
- *
- * @param {unknown} detector
- * @returns {boolean}
- */
-function isLegacyDetector(detector) {
-    if (!isPlainObject(detector) || !('match' in detector)) return false;
-    if (!('actions' in detector)) return true;
-    const keys = isPlainObject(detector.actions) ? Object.keys(detector.actions) : [];
-    return keys.length > 0 && keys.every((key) => key === 'fireEvent' || key === 'breakageReportData');
-}
-
-/**
  * The actions of one object as single-key objects, in config order, a `define` of several names as
  * one `define` per name; any other value as itself.
  *
@@ -327,7 +312,7 @@ function sequenceExpression(node) {
  * @returns {unknown}
  */
 function sequenceDetector(detector) {
-    if (isLegacyDetector(detector) || !isPlainObject(detector)) return detector;
+    if (!isPlainObject(detector) || !('actions' in detector)) return detector;
     return { ...detector, actions: sequenceBody(detector.actions) };
 }
 

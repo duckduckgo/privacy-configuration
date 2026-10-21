@@ -252,27 +252,7 @@ export type DetectorConfig = {
     actions: Body;
 };
 
-type LegacyActions = Partial<{
-    breakageReportData: { data?: PayloadSpec };
-    fireEvent: {
-        type: string;
-        data?: PayloadSpec;
-    };
-}>;
-
-/**
- * The shape clients read before `actions` expressions: `match`, and an object of actions that run when
- * it holds. Literal config keeps it for those clients, and gated patches move each detector to a
- * `DetectorConfig`.
- */
-export type LegacyDetectorConfig = {
-    state?: FeatureState;
-    match: Expr;
-    triggers?: Triggers;
-    actions?: LegacyActions;
-};
-
-type DetectorGroup = Record<string, DetectorConfig | LegacyDetectorConfig>;
+type DetectorGroup = Record<string, DetectorConfig>;
 
 export type WebDetectionSettings = CSSInjectFeatureSettings<{
     detectors?: Record<string, DetectorGroup>;
