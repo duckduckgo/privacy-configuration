@@ -3113,11 +3113,45 @@
             "minSupportedVersion": "7.224.0",
             "settings": {
                 "firstContentfulPaint": "disabled",
-                "expandedPerformanceMetricsOnLoad": "enabled"
+                "expandedPerformanceMetricsOnLoad": "enabled",
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "context": {
+                                "frame": true
+                            }
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/additionalCheck",
+                                "value": "disabled"
+                            }
+                        ]
+                    }
+                ]
             }
         },
         "breakageReporting": {
-            "state": "enabled"
+            "state": "enabled",
+            "settings": {
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "context": {
+                                "frame": true
+                            }
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/additionalCheck",
+                                "value": "disabled"
+                            }
+                        ]
+                    }
+                ]
+            }
         },
         "windowsWaitlist": {
             "state": "enabled"
@@ -3947,6 +3981,20 @@
                                 "value": "shreddit-comments-page-ad"
                             }
                         ]
+                    },
+                    {
+                        "condition": {
+                            "context": {
+                                "frame": true
+                            }
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/additionalCheck",
+                                "value": "disabled"
+                            }
+                        ]
                     }
                 ],
                 "aiPageContextBlocklist": {
@@ -4178,12 +4226,46 @@
                             "buffering": true
                         }
                     }
-                }
+                },
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "context": {
+                                "frame": true
+                            }
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/additionalCheck",
+                                "value": "disabled"
+                            }
+                        ]
+                    }
+                ]
             }
         },
         "webEvents": {
             "state": "enabled",
-            "minSupportedVersion": "7.219.0"
+            "minSupportedVersion": "7.219.0",
+            "settings": {
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "context": {
+                                "frame": true
+                            }
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/additionalCheck",
+                                "value": "disabled"
+                            }
+                        ]
+                    }
+                ]
+            }
         },
         "hover": {
             "state": "disabled"
