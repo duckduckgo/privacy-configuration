@@ -102,41 +102,6 @@ function expectedEventTypes(settings, detectorGroups) {
 }
 
 /**
- * Return Web Detection groups containing at least one enabled detector.
- * Detector state defaults to enabled in C-S-S.
- *
- * @param {Record<string, Record<string, any>>} detectors
- * @returns {string[]}
- */
-function enabledDetectorGroups(detectors) {
-    return Object.entries(detectors)
-        .filter(
-            ([
-                ,
-                groupDetectors,
-            ]) => Object.values(groupDetectors).some((detector) => (detector.state ?? 'enabled') === 'enabled'),
-        )
-        .map(
-            ([
-                groupName,
-            ]) => groupName,
-        );
-}
-
-/**
- * Detector groups with hand-written eventHub counters. Other groups (e.g. video,
- * or groups an experiment enables) emit events that nothing consumes, which
- * EventHub ignores, until the counters are generated from the detector config
- * instead of maintained by hand.
- */
-const COUNTED_DETECTOR_GROUPS = new Set([
-    'adwalls',
-    'captcha',
-    'commentsDisabled',
-    'other',
-]);
-
-/**
  * Collect every eventHub source that consumes an event: parameter sources
  * (period counters/data) and immediate trigger sources.
  *
@@ -173,7 +138,9 @@ describe('detectorPerf config tests', () => {
         sawDetectorPerf = true;
         const settings = detectorPerf.settings;
         const webDetectionDetectors = config.body.features?.webDetection?.settings?.detectors ?? {};
-        const detectorGroups = enabledDetectorGroups(webDetectionDetectors).filter((name) => COUNTED_DETECTOR_GROUPS.has(name));
+        // Every declared group, enabled or not: conditionalChanges and experiments
+        // enable detectors at runtime, after the config is generated.
+        const detectorGroups = Object.keys(webDetectionDetectors);
         // Android's EventHub parser can't take the immediate severe entry (see
         // the android test below), so severe events go unconsumed there and are
         // dropped at runtime. The period counters must still be consumed.
