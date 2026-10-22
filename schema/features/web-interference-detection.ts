@@ -57,6 +57,7 @@ type YoutubeAdsDetector = {
 };
 
 type WebInterferenceDetectionSettings = CSSInjectFeatureSettings<{
+    additionalCheck?: FeatureState;
     autoRunDelayMs?: number;
     interferenceTypes?: {
         botDetection?: Record<string, BotDetector>;
