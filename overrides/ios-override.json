@@ -1,5 +1,60 @@
 {
     "features": {
+        "browserUiLock": {
+            "state": "enabled",
+            "minSupportedVersion": "7.245.0",
+            "exceptions": [],
+            "settings": {
+                "overflowTypes": [
+                    "hidden",
+                    "clip"
+                ],
+                "conditionalChanges": [
+                    {
+                        "condition": [
+                            {
+                                "urlPattern": "https://www.nytimes.com/games/*"
+                            }
+                        ],
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/isLockedPage",
+                                "value": "enabled"
+                            }
+                        ]
+                    },
+                    {
+                        "condition": [
+                            {
+                                "urlPattern": "https://www.merriam-webster.com/games/*"
+                            }
+                        ],
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/isLockedPage",
+                                "value": "enabled"
+                            }
+                        ]
+                    },
+                    {
+                        "condition": [
+                            {
+                                "urlPattern": "https://m.youtube.com/shorts/*"
+                            }
+                        ],
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/isLockedPage",
+                                "value": "enabled"
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
         "attributedMetrics": {
             "state": "enabled",
             "minSupportedVersion": "7.198.0",
