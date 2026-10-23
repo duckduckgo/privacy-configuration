@@ -364,6 +364,41 @@ export function sequenceWebDetectionActions(config) {
     }
 }
 
+// The immediate trigger name each platform parses, where it differs from the authored `immediate`.
+// Apple renamed the trigger to `immediate_v2` when web events began de-duplicating at the hub, and
+// skips entries still carrying `immediate`.
+const IMMEDIATE_TRIGGER_TYPE_BY_PLATFORM = {
+    ios: 'immediate_v2',
+    macos: 'immediate_v2',
+};
+
+/**
+ * Rewrite each eventHub telemetry entry's `immediate` trigger type to the name the platform parses.
+ *
+ * Authors write `immediate` for every platform. A client skips a trigger type it does not parse, so
+ * an authored `immediate` reaching a platform that only parses `immediate_v2` would silently drop
+ * the pixel. Other trigger types pass through unchanged.
+ *
+ * Mutates the config in place; no-ops when the feature or telemetry is absent, or the platform
+ * parses `immediate`.
+ *
+ * @param {object} config - a fully-merged platform config
+ * @param {string} platform - the platform the config is built for
+ */
+export function renameEventHubImmediateTriggers(config, platform) {
+    const telemetry = config?.features?.eventHub?.settings?.telemetry;
+    const immediateType = IMMEDIATE_TRIGGER_TYPE_BY_PLATFORM[platform];
+    if (!telemetry || !immediateType) {
+        return;
+    }
+
+    for (const entry of Object.values(telemetry)) {
+        if (entry?.trigger?.type === 'immediate') {
+            entry.trigger.type = immediateType;
+        }
+    }
+}
+
 /**
  * All domains that may map to the given cnameTarget.
  */

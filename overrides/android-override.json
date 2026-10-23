@@ -36,6 +36,14 @@
                 },
                 "handleTrustedCallers": {
                     "state": "enabled"
+                },
+                "handleTrustedCallersNonHttpLinks": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52990000
+                },
+                "handleTrustedCallersWhenAppLinksDisabled": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52990000
                 }
             }
         },
@@ -51,6 +59,9 @@
                         "steps": [
                             {
                                 "percent": 50
+                            },
+                            {
+                                "percent": 100
                             }
                         ]
                     }
@@ -484,6 +495,20 @@
         },
         "sitePermissionsDialogRedesign": {
             "state": "enabled",
+            "features": {
+                "singleTabBurnClearing": {
+                    "minSupportedVersion": 52981000,
+                    "state": "enabled"
+                },
+                "permissionSettingsRedesign": {
+                    "minSupportedVersion": 52981000,
+                    "state": "enabled"
+                },
+                "explicitPermissionsOnly": {
+                    "minSupportedVersion": 52981000,
+                    "state": "enabled"
+                }
+            },
             "exceptions": []
         },
         "eme": {
@@ -949,6 +974,10 @@
                     "state": "enabled",
                     "minSupportedVersion": 52780000
                 },
+                "homepageChatSuggestions": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52990000
+                },
                 "duckAiVoiceEntryPoint": {
                     "state": "enabled",
                     "minSupportedVersion": 52780000
@@ -1284,6 +1313,21 @@
                         "formBoundarySelector": "",
                         "failsafeSettings": {},
                         "conditionalChanges": [
+                            {
+                                "condition": [
+                                    { "domain": "account.greenbacktaxservices.com" }
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "form[action*=\"AppLogin\"] input[type=\"password\"]",
+                                            "type": "credentials.password.current"
+                                        }
+                                    }
+                                ]
+                            },
                             {
                                 "condition": [
                                     { "domain": "www.aestheticcity.academy" }
@@ -2460,6 +2504,9 @@
                         "steps": [
                             {
                                 "percent": 5
+                            },
+                            {
+                                "percent": 100
                             }
                         ]
                     }
@@ -4666,6 +4713,10 @@
                     "state": "enabled",
                     "minSupportedVersion": 52860000
                 },
+                "contextualOnboardingTimeLimit": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52990000
+                },
                 "onboardingDuckAiExperimentMay26": {
                     "state": "enabled",
                     "minSupportedVersion": 52790000,
@@ -4825,6 +4876,14 @@
                 "tabMaxReuseDistancePixel": {
                     "state": "enabled",
                     "minSupportedVersion": 52960000
+                },
+                "duckAiChatsMenu": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52990000
+                },
+                "duckAiPlusMenuUpdate": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52990000
                 }
             }
         },
@@ -5347,7 +5406,7 @@
                     ]
                 },
                 "contentScopeExperiment8": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": 52920000,
                     "description": "Page issue detection: auto-run + fireEvent for the new block page, error page, geoblock, verification, blank page, captcha and adwall detectors, with retuned adwall and video intervals",
                     "rollout": {
@@ -5477,12 +5536,12 @@
             }
         },
         "productSurfaceTelemetry": {
-            "state": "enabled",
+            "state": "disabled",
             "exceptions": [],
             "minSupportedVersion": 52920000,
             "features": {
                 "enableTelemetry": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": 52920000
                 }
             }
@@ -5634,6 +5693,9 @@
                     }
                 ]
             }
+        },
+        "detectorPerf": {
+            "state": "disabled"
         },
         "webDetection": {
             "state": "enabled",

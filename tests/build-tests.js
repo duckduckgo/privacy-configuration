@@ -6,6 +6,7 @@ import {
     mergeAllowlistedTrackers,
     mergeEventHubTelemetry,
     mergeInterferenceTypes,
+    renameEventHubImmediateTriggers,
     addHashToFeatures,
 } from '../util.js';
 import { compatFunctions } from '../compatibility.js';
@@ -269,6 +270,51 @@ describe('mergeEventHubTelemetry', () => {
     it('returns base entries unchanged when the override is empty', () => {
         const base = { base_pixel_day: baseEntry('base') };
         expect(mergeEventHubTelemetry(base, {})).to.deep.equal(base);
+    });
+});
+
+describe('renameEventHubImmediateTriggers', () => {
+    const configWith = (telemetry) => ({ features: { eventHub: { state: 'enabled', settings: { telemetry } } } });
+    const immediateEntry = (type) => ({ state: 'enabled', trigger: { type, source: 'adwall' }, parameters: {} });
+    const periodEntry = () => ({
+        state: 'enabled',
+        trigger: { period: { seconds: 86400 } },
+        parameters: { count: { template: 'counter', source: 'adwall', buckets: { 0: { gte: 0 } } } },
+    });
+
+    for (const platform of [
+        'ios',
+        'macos',
+    ]) {
+        it(`rewrites immediate to immediate_v2 for ${platform}`, () => {
+            const config = configWith({ pixel_immediate: immediateEntry('immediate') });
+            renameEventHubImmediateTriggers(config, platform);
+            expect(config.features.eventHub.settings.telemetry.pixel_immediate).to.deep.equal(immediateEntry('immediate_v2'));
+        });
+    }
+
+    for (const platform of [
+        'windows',
+        'android',
+    ]) {
+        it(`leaves immediate unchanged for ${platform}`, () => {
+            const config = configWith({ pixel_immediate: immediateEntry('immediate') });
+            renameEventHubImmediateTriggers(config, platform);
+            expect(config).to.deep.equal(configWith({ pixel_immediate: immediateEntry('immediate') }));
+        });
+    }
+
+    it('leaves period entries unchanged', () => {
+        const config = configWith({ pixel_day: periodEntry() });
+        renameEventHubImmediateTriggers(config, 'ios');
+        expect(config).to.deep.equal(configWith({ pixel_day: periodEntry() }));
+    });
+
+    it('no-ops when the config has no eventHub telemetry', () => {
+        const config = { features: { eventHub: { state: 'enabled' } } };
+        renameEventHubImmediateTriggers(config, 'ios');
+        expect(config).to.deep.equal({ features: { eventHub: { state: 'enabled' } } });
+        expect(() => renameEventHubImmediateTriggers({ features: {} }, 'ios')).to.not.throw();
     });
 });
 

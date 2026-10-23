@@ -33,9 +33,8 @@
                             "state": "enabled",
                             "when": {
                                 "intervalMs": [
-                                    500,
-                                    1000,
-                                    5000
+                                    3100,
+                                    5100
                                 ]
                             }
                         }
@@ -64,9 +63,8 @@
                             "state": "enabled",
                             "when": {
                                 "intervalMs": [
-                                    500,
-                                    1000,
-                                    5000
+                                    3200,
+                                    5200
                                 ]
                             }
                         }
@@ -92,9 +90,8 @@
                             "state": "enabled",
                             "when": {
                                 "intervalMs": [
-                                    500,
-                                    1000,
-                                    5000
+                                    3300,
+                                    5300
                                 ]
                             }
                         }
@@ -120,9 +117,8 @@
                             "state": "enabled",
                             "when": {
                                 "intervalMs": [
-                                    500,
-                                    1000,
-                                    5000
+                                    3400,
+                                    5400
                                 ]
                             }
                         }
@@ -148,9 +144,8 @@
                             "state": "enabled",
                             "when": {
                                 "intervalMs": [
-                                    500,
-                                    1000,
-                                    5000
+                                    3500,
+                                    5500
                                 ]
                             }
                         }
@@ -176,9 +171,8 @@
                             "state": "enabled",
                             "when": {
                                 "intervalMs": [
-                                    500,
-                                    1000,
-                                    5000
+                                    3600,
+                                    5600
                                 ]
                             }
                         }
@@ -243,7 +237,7 @@
                     },
                     "actions": {
                         "fireEvent": {
-                            "type": "adwall"
+                            "type": "adwall_vendor"
                         }
                     }
                 }
@@ -645,7 +639,7 @@
                     },
                     "actions": {
                         "fireEvent": {
-                            "type": "temp_wd_challenge"
+                            "type": "challenge_cloudflare"
                         }
                     }
                 },
@@ -689,7 +683,7 @@
                     },
                     "actions": {
                         "fireEvent": {
-                            "type": "temp_wd_blockPage"
+                            "type": "blockPage_cloudflare"
                         }
                     }
                 }
@@ -721,6 +715,18 @@
                             ]
                         }
                     },
+                    "triggers": {
+                        "auto": {
+                            "state": "disabled",
+                            "when": {
+                                "intervalMs": [
+                                    4600,
+                                    6600,
+                                    10600
+                                ]
+                            }
+                        }
+                    },
                     "actions": {
                         "breakageReportData": {}
                     }
@@ -729,6 +735,17 @@
                     "match": {
                         "text": {
                             "pattern": "video loading"
+                        }
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "disabled",
+                            "when": {
+                                "intervalMs": [
+                                    6900,
+                                    11000
+                                ]
+                            }
                         }
                     },
                     "actions": {
@@ -745,6 +762,18 @@
                             ]
                         }
                     },
+                    "triggers": {
+                        "auto": {
+                            "state": "disabled",
+                            "when": {
+                                "intervalMs": [
+                                    4700,
+                                    6700,
+                                    10700
+                                ]
+                            }
+                        }
+                    },
                     "actions": {
                         "breakageReportData": {}
                     }
@@ -758,6 +787,197 @@
                                 "(video|player) (is )?(unavailable|blocked) (with|while using) an ad ?block(er)?"
                             ]
                         }
+                    },
+                    "triggers": {
+                        "auto": {
+                            "state": "disabled",
+                            "when": {
+                                "intervalMs": [
+                                    4800,
+                                    6800,
+                                    10800
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        "breakageReportData": {}
+                    }
+                }
+            },
+            "login": {
+                "error": {
+                    "state": "disabled",
+                    "match": {
+                        "all": [
+                            {
+                                "element": {
+                                    "selector": "input[type='password']"
+                                }
+                            },
+                            {
+                                "text": {
+                                    "pattern": [
+                                        "something went wrong",
+                                        "an? (unexpected |unknown |internal )?error (has )?occurred",
+                                        "(couldn.?t|could not|were unable to) (sign|log) you in",
+                                        "(sign|log)[ -]?in (attempt )?(failed|unsuccessful)",
+                                        "(experiencing|having) (some )?technical (difficulties|issues|problems)",
+                                        "a (problem|technical error) (has )?occurred",
+                                        "oops[\\s\\S]{0,40}(try again|refresh)",
+                                        "(a|some|temporary) technical (issues?|difficult(y|ies)|problems?|errors?)"
+                                    ]
+                                }
+                            },
+                            {
+                                "text": {
+                                    "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript) and not(ancestor::*[@hidden]) and not(ancestor::*[@aria-hidden='true']) and not(ancestor::*[contains(translate(@style,' ',''),'display:none')]) and not(ancestor::*[contains(translate(@style,' ',''),'visibility:hidden')])]",
+                                    "pattern": [
+                                        "something went wrong",
+                                        "an? (unexpected |unknown |internal )?error (has )?occurred",
+                                        "(couldn.?t|could not|were unable to) (sign|log) you in",
+                                        "(sign|log)[ -]?in (attempt )?(failed|unsuccessful)",
+                                        "(experiencing|having) (some )?technical (difficulties|issues|problems)",
+                                        "a (problem|technical error) (has )?occurred",
+                                        "oops[\\s\\S]{0,40}(try again|refresh)",
+                                        "(a|some|temporary) technical (issues?|difficult(y|ies)|problems?|errors?)"
+                                    ]
+                                }
+                            },
+                            {
+                                "none": [
+                                    {
+                                        "text": {
+                                            "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript) and not(ancestor::*[@hidden]) and not(ancestor::*[@aria-hidden='true']) and not(ancestor::*[contains(translate(@style,' ',''),'display:none')]) and not(ancestor::*[contains(translate(@style,' ',''),'visibility:hidden')])]",
+                                            "pattern": [
+                                                "(incorrect|wrong|invalid|unrecogni[sz]ed) (e-?mail|user ?name|user ?id|password|credentials|login|phone|code|pin)",
+                                                "(e-?mail|user ?name|user ?id|password|credentials|code|combination)( you entered)? (is|are|was|were) (incorrect|wrong|invalid|not (correct|valid|recogni[sz]ed))",
+                                                "check your (e-?mail( address)?|user ?name|password|phone( number)?) (and|or) (your )?(e-?mail( address)?|user ?name|password|phone( number)?)",
+                                                "check your (credentials|details|login|sign.?in)",
+                                                "account (has been |is )?(locked|suspended|disabled)",
+                                                "too many (failed |sign.?in |log.?in )?(attempts|tries|requests)",
+                                                "(does ?n.?t|did ?n.?t|does not|did not) match our records",
+                                                "(could ?n.?t|could not|can.?t|cannot) find (your|an|that) account",
+                                                "no (user|account)( was)? found",
+                                                "(user|account) (was )?not found",
+                                                "(login |log.?in |sign.?in )?(information|info|details)( you entered)? (is|are|was|were) (incorrect|wrong|invalid|not (correct|valid))",
+                                                "(didn.?t|did not|could ?n.?t|could not|can.?t|cannot) recogni[sz]e (that|this|your|the) [^.]{0,30}(account|e-?mail|user ?name|password|credentials)",
+                                                "(incorrect|wrong|invalid|expired) (verification|security|one.time|sign.?in|login|access) code",
+                                                "(could ?n.?t|could not|unable to|can.?t|cannot) verify (this|that|the|your) code",
+                                                "code (has )?expired",
+                                                "try again with a new code"
+                                            ]
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "element": {
+                                    "selector": "input[type='password']",
+                                    "visibility": "visible"
+                                }
+                            }
+                        ]
+                    },
+                    "actions": {
+                        "breakageReportData": {}
+                    }
+                },
+                "cookies": {
+                    "state": "disabled",
+                    "match": {
+                        "all": [
+                            {
+                                "element": {
+                                    "selector": "input[type='password']"
+                                }
+                            },
+                            {
+                                "text": {
+                                    "pattern": [
+                                        "browser (has|have) cookies (disabled|blocked|turned off)",
+                                        "(looks like|seems that|seems like|appears that) (your )?cookies (are|have been) (disabled|blocked|turned off)",
+                                        "cookies (are|is) (disabled|blocked|not enabled|turned off) (in|on|for) (your|this) browser",
+                                        "cookies (must|need to|have to) be (enabled|allowed|turned on)",
+                                        "please (enable|turn on|allow) cookies",
+                                        "enable cookies (in|on|for) (your|this) browser",
+                                        "requires? (browser |third.party )?cookies to be (enabled|allowed)",
+                                        "browser (does ?n.?t|does not|do ?n.?t|do not) (accept|allow|support) cookies"
+                                    ]
+                                }
+                            },
+                            {
+                                "text": {
+                                    "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript) and not(ancestor::*[@hidden]) and not(ancestor::*[@aria-hidden='true']) and not(ancestor::*[contains(translate(@style,' ',''),'display:none')]) and not(ancestor::*[contains(translate(@style,' ',''),'visibility:hidden')])]",
+                                    "pattern": [
+                                        "browser (has|have) cookies (disabled|blocked|turned off)",
+                                        "(looks like|seems that|seems like|appears that) (your )?cookies (are|have been) (disabled|blocked|turned off)",
+                                        "cookies (are|is) (disabled|blocked|not enabled|turned off) (in|on|for) (your|this) browser",
+                                        "cookies (must|need to|have to) be (enabled|allowed|turned on)",
+                                        "please (enable|turn on|allow) cookies",
+                                        "enable cookies (in|on|for) (your|this) browser",
+                                        "requires? (browser |third.party )?cookies to be (enabled|allowed)",
+                                        "browser (does ?n.?t|does not|do ?n.?t|do not) (accept|allow|support) cookies"
+                                    ]
+                                }
+                            },
+                            {
+                                "element": {
+                                    "selector": "input[type='password']",
+                                    "visibility": "visible"
+                                }
+                            }
+                        ]
+                    },
+                    "actions": {
+                        "breakageReportData": {}
+                    }
+                },
+                "browser": {
+                    "state": "disabled",
+                    "match": {
+                        "all": [
+                            {
+                                "element": {
+                                    "selector": "input[type='password']"
+                                }
+                            },
+                            {
+                                "text": {
+                                    "pattern": [
+                                        "browser[\\s\\S]{0,25}(is |are )?(not|no longer) supported",
+                                        "unsupported browser",
+                                        "browser (is )?(not compatible|incompatible)",
+                                        "incompatible browser",
+                                        "please (update|upgrade) your browser",
+                                        "your browser is (out of date|outdated|too old)",
+                                        "browser (is |are )?(currently )?unsupported",
+                                        "browser update (is )?required"
+                                    ]
+                                }
+                            },
+                            {
+                                "text": {
+                                    "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript) and not(ancestor::*[@hidden]) and not(ancestor::*[@aria-hidden='true']) and not(ancestor::*[contains(translate(@style,' ',''),'display:none')]) and not(ancestor::*[contains(translate(@style,' ',''),'visibility:hidden')])]",
+                                    "pattern": [
+                                        "browser[\\s\\S]{0,25}(is |are )?(not|no longer) supported",
+                                        "unsupported browser",
+                                        "browser (is )?(not compatible|incompatible)",
+                                        "incompatible browser",
+                                        "please (update|upgrade) your browser",
+                                        "your browser is (out of date|outdated|too old)",
+                                        "browser (is |are )?(currently )?unsupported",
+                                        "browser update (is )?required"
+                                    ]
+                                }
+                            },
+                            {
+                                "element": {
+                                    "selector": "input[type='password']",
+                                    "visibility": "visible"
+                                }
+                            }
+                        ]
                     },
                     "actions": {
                         "breakageReportData": {}
@@ -819,7 +1039,7 @@
                     },
                     "actions": {
                         "fireEvent": {
-                            "type": "temp_wd_blockPage"
+                            "type": "blockPage_generic"
                         }
                     }
                 },
@@ -884,7 +1104,7 @@
                     },
                     "actions": {
                         "fireEvent": {
-                            "type": "temp_wd_blockPage"
+                            "type": "blockPage_vendor"
                         }
                     }
                 },
@@ -917,7 +1137,7 @@
                     },
                     "actions": {
                         "fireEvent": {
-                            "type": "temp_wd_blockPage"
+                            "type": "blockPage_verificationfailed"
                         }
                     }
                 },
@@ -946,7 +1166,7 @@
                     },
                     "actions": {
                         "fireEvent": {
-                            "type": "temp_wd_blockPage"
+                            "type": "blockPage_vercel"
                         }
                     }
                 },
@@ -980,7 +1200,7 @@
                     },
                     "actions": {
                         "fireEvent": {
-                            "type": "temp_wd_blockPage"
+                            "type": "blockPage_forbidden"
                         }
                     }
                 },
@@ -1012,7 +1232,7 @@
                     },
                     "actions": {
                         "fireEvent": {
-                            "type": "temp_wd_blockPage"
+                            "type": "blockPage_toomanyrequests"
                         }
                     }
                 },
@@ -1042,7 +1262,7 @@
                     },
                     "actions": {
                         "fireEvent": {
-                            "type": "temp_wd_blockPage"
+                            "type": "blockPage_networksecurity"
                         }
                     }
                 },
@@ -1072,7 +1292,7 @@
                     },
                     "actions": {
                         "fireEvent": {
-                            "type": "temp_wd_blockPage"
+                            "type": "blockPage_title"
                         }
                     }
                 },
@@ -1876,7 +2096,7 @@
                     },
                     "actions": {
                         "fireEvent": {
-                            "type": "temp_wd_errorPage"
+                            "type": "errorPage_soft404"
                         }
                     }
                 },
@@ -1905,7 +2125,7 @@
                     },
                     "actions": {
                         "fireEvent": {
-                            "type": "temp_wd_errorPage"
+                            "type": "errorPage_unavailable"
                         }
                     }
                 },
@@ -2411,7 +2631,7 @@
                     },
                     "actions": {
                         "fireEvent": {
-                            "type": "temp_wd_geoblock"
+                            "type": "geoblock"
                         }
                     }
                 }
@@ -2446,7 +2666,7 @@
                     },
                     "actions": {
                         "fireEvent": {
-                            "type": "temp_wd_challenge"
+                            "type": "challenge_generic"
                         }
                     }
                 }
@@ -2478,7 +2698,7 @@
                     },
                     "actions": {
                         "fireEvent": {
-                            "type": "temp_wd_blankPage"
+                            "type": "blankPage_empty"
                         }
                     }
                 },
@@ -3928,21 +4148,9 @@
                 ],
                 "patchSettings": [
                     {
-                        "op": "add",
-                        "path": "/detectors/video/error/triggers",
-                        "value": {
-                            "auto": {
-                                "state": "enabled",
-                                "when": {
-                                    "intervalMs": [
-                                        500,
-                                        1000,
-                                        5000,
-                                        10000
-                                    ]
-                                }
-                            }
-                        }
+                        "op": "replace",
+                        "path": "/detectors/video/error/triggers/auto/state",
+                        "value": "enabled"
                     },
                     {
                         "op": "add",
@@ -3954,19 +4162,9 @@
                         }
                     },
                     {
-                        "op": "add",
-                        "path": "/detectors/video/placeholder/triggers",
-                        "value": {
-                            "auto": {
-                                "state": "enabled",
-                                "when": {
-                                    "intervalMs": [
-                                        5000,
-                                        10000
-                                    ]
-                                }
-                            }
-                        }
+                        "op": "replace",
+                        "path": "/detectors/video/placeholder/triggers/auto/state",
+                        "value": "enabled"
                     },
                     {
                         "op": "add",
@@ -3978,21 +4176,9 @@
                         }
                     },
                     {
-                        "op": "add",
-                        "path": "/detectors/video/unavailable/triggers",
-                        "value": {
-                            "auto": {
-                                "state": "enabled",
-                                "when": {
-                                    "intervalMs": [
-                                        500,
-                                        1000,
-                                        5000,
-                                        10000
-                                    ]
-                                }
-                            }
-                        }
+                        "op": "replace",
+                        "path": "/detectors/video/unavailable/triggers/auto/state",
+                        "value": "enabled"
                     },
                     {
                         "op": "add",
@@ -4004,21 +4190,9 @@
                         }
                     },
                     {
-                        "op": "add",
-                        "path": "/detectors/video/blocked/triggers",
-                        "value": {
-                            "auto": {
-                                "state": "enabled",
-                                "when": {
-                                    "intervalMs": [
-                                        500,
-                                        1000,
-                                        5000,
-                                        10000
-                                    ]
-                                }
-                            }
-                        }
+                        "op": "replace",
+                        "path": "/detectors/video/blocked/triggers/auto/state",
+                        "value": "enabled"
                     },
                     {
                         "op": "add",
@@ -4032,61 +4206,154 @@
                 ]
             },
             {
-                "condition": {
-                    "experiment": {
-                        "experimentName": "contentScopeExperiment8",
-                        "cohort": "treatment"
+                "condition": [
+                    {
+                        "injectName": "android",
+                        "minSupportedVersion": 52920000
+                    },
+                    {
+                        "injectName": "windows",
+                        "minSupportedVersion": "0.171.0"
+                    },
+                    {
+                        "injectName": "apple-isolated",
+                        "minSupportedVersion": "7.234.0"
+                    },
+                    {
+                        // macOS only: cap at 1.x to filter out iOS.
+                        "injectName": "apple-isolated",
+                        "minSupportedVersion": "1.204.0",
+                        "maxSupportedVersion": "1.999.999"
                     }
-                },
+                ],
                 "patchSettings": [
                     {
                         "op": "replace",
-                        "path": "/detectors/adwalls/generic_en/triggers/auto/when/intervalMs",
-                        "value": [
-                            3100,
-                            5100
-                        ]
+                        "path": "/detectors/login/error/state",
+                        "value": "enabled"
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/login/error/triggers",
+                        "value": {
+                            "auto": {
+                                "state": "enabled",
+                                "when": {
+                                    "intervalMs": [
+                                        1100,
+                                        7100,
+                                        11100,
+                                        15100,
+                                        20100
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/login/error/actions",
+                        "value": {
+                            "fireEvent": {
+                                "type": "login_error"
+                            }
+                        }
                     },
                     {
                         "op": "replace",
-                        "path": "/detectors/adwalls/generic_de/triggers/auto/when/intervalMs",
-                        "value": [
-                            3200,
-                            5200
-                        ]
+                        "path": "/detectors/login/cookies/state",
+                        "value": "enabled"
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/login/cookies/triggers",
+                        "value": {
+                            "auto": {
+                                "state": "enabled",
+                                "when": {
+                                    "intervalMs": [
+                                        1200,
+                                        7200,
+                                        11200,
+                                        15200,
+                                        20200
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/login/cookies/actions",
+                        "value": {
+                            "fireEvent": {
+                                "type": "login_cookies"
+                            }
+                        }
                     },
                     {
                         "op": "replace",
-                        "path": "/detectors/adwalls/generic_es/triggers/auto/when/intervalMs",
-                        "value": [
-                            3300,
-                            5300
-                        ]
+                        "path": "/detectors/login/browser/state",
+                        "value": "enabled"
                     },
                     {
-                        "op": "replace",
-                        "path": "/detectors/adwalls/generic_it/triggers/auto/when/intervalMs",
-                        "value": [
-                            3400,
-                            5400
-                        ]
+                        "op": "add",
+                        "path": "/detectors/login/browser/triggers",
+                        "value": {
+                            "auto": {
+                                "state": "enabled",
+                                "when": {
+                                    "intervalMs": [
+                                        1300,
+                                        7300,
+                                        11300,
+                                        15300,
+                                        20300
+                                    ]
+                                }
+                            }
+                        }
                     },
                     {
-                        "op": "replace",
-                        "path": "/detectors/adwalls/generic_nl/triggers/auto/when/intervalMs",
-                        "value": [
-                            3500,
-                            5500
-                        ]
+                        "op": "add",
+                        "path": "/detectors/login/browser/actions",
+                        "value": {
+                            "fireEvent": {
+                                "type": "login_browser"
+                            }
+                        }
+                    }
+                ]
+            },
+            {
+                "condition": [
+                    {
+                        "injectName": "android",
+                        "minSupportedVersion": 52920000
+                    },
+                    // macOS. macOS and iOS share apple-isolated and both report string versions, so the cap keeps iOS 7.x out.
+                    {
+                        "injectName": "apple-isolated",
+                        "minSupportedVersion": "1.204.0",
+                        "maxSupportedVersion": "1.9999.0"
+                    },
+                    // iOS
+                    {
+                        "injectName": "apple-isolated",
+                        "minSupportedVersion": "7.234.0"
                     },
                     {
-                        "op": "replace",
-                        "path": "/detectors/adwalls/generic_se/triggers/auto/when/intervalMs",
-                        "value": [
-                            3600,
-                            5600
-                        ]
+                        "injectName": "windows",
+                        "minSupportedVersion": "0.171.0"
                     },
+                    {
+                        "injectName": "chrome-mv3"
+                    },
+                    {
+                        "injectName": "firefox"
+                    }
+                ],
+                "patchSettings": [
                     {
                         "op": "replace",
                         "path": "/detectors/adwalls/keywords_vendor/state",
@@ -4171,65 +4438,6 @@
                         "op": "replace",
                         "path": "/detectors/blankPage/no_text_or_title/state",
                         "value": "enabled"
-                    }
-                ]
-            },
-            {
-                "condition": {
-                    "experiment": {
-                        "experimentName": "contentScopeExperiment8",
-                        "cohort": "treatment"
-                    },
-                    "injectName": "android"
-                },
-                "patchSettings": [
-                    {
-                        "op": "add",
-                        "path": "/detectors/video/error/triggers",
-                        "value": {
-                            "auto": {
-                                "state": "enabled",
-                                "when": {
-                                    "intervalMs": [
-                                        3000,
-                                        5000,
-                                        10000
-                                    ]
-                                }
-                            }
-                        }
-                    },
-                    {
-                        "op": "add",
-                        "path": "/detectors/video/unavailable/triggers",
-                        "value": {
-                            "auto": {
-                                "state": "enabled",
-                                "when": {
-                                    "intervalMs": [
-                                        3000,
-                                        5000,
-                                        10000
-                                    ]
-                                }
-                            }
-                        }
-                    },
-                    {
-                        "op": "add",
-                        "path": "/detectors/video/blocked/triggers",
-                        "value": {
-                            "auto": {
-                                "state": "enabled",
-                                "when": {
-                                    "intervalMs": [
-                                        3000,
-                                        5000,
-                                        10000
-                                    ]
-                                }
-                            }
-                        }
                     }
                 ]
             }

@@ -281,6 +281,10 @@
                     "state": "enabled",
                     "minSupportedVersion": "7.217.0"
                 },
+                "homepageChatSuggestions": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.242.0"
+                },
                 "nativeStoragePathMigration": {
                     "state": "enabled",
                     "minSupportedVersion": "7.222.0",
@@ -1162,7 +1166,7 @@
                     ]
                 },
                 "contentScopeExperiment8": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": "7.234.0",
                     "description": "Page issue detection: auto-run + fireEvent for the new block page, error page, geoblock, verification, blank page, captcha and adwall detectors, with retuned adwall and video intervals",
                     "rollout": {
@@ -1175,6 +1179,28 @@
                             },
                             {
                                 "percent": 100
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "contentScopeExperiment9": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.240.0",
+                    "description": "Detector performance monitoring: treatment measures Web Detection detector execution time (detectorPerf); control does not",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
                             }
                         ]
                     },
@@ -1325,6 +1351,21 @@
                         "formBoundarySelector": "",
                         "failsafeSettings": {},
                         "conditionalChanges": [
+                            {
+                                "condition": [
+                                    { "domain": "account.greenbacktaxservices.com" }
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "form[action*=\"AppLogin\"] input[type=\"password\"]",
+                                            "type": "credentials.password.current"
+                                        }
+                                    }
+                                ]
+                            },
                             {
                                 "condition": [
                                     { "domain": "www.aestheticcity.academy" }
@@ -2215,6 +2256,10 @@
                     {
                         "domain": "hulu.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5327"
+                    },
+                    {
+                        "domain": "onehome.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/6239"
                     }
                 ],
                 "ddgDefaultSites": [
@@ -2450,6 +2495,10 @@
                     {
                         "domain": "hulu.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5327"
+                    },
+                    {
+                        "domain": "onehome.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/6239"
                     }
                 ],
                 "omitVersionSites": []
@@ -2476,6 +2525,10 @@
                 },
                 "exchangeKeysToSyncWithAnotherDevice": {
                     "state": "enabled"
+                },
+                "canUseExchangeV2Point1": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.242.0"
                 },
                 "syncSetupBarcodeIsUrlBased": {
                     "state": "enabled"
@@ -3068,11 +3121,45 @@
             "minSupportedVersion": "7.224.0",
             "settings": {
                 "firstContentfulPaint": "disabled",
-                "expandedPerformanceMetricsOnLoad": "enabled"
+                "expandedPerformanceMetricsOnLoad": "enabled",
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "context": {
+                                "frame": true
+                            }
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/additionalCheck",
+                                "value": "disabled"
+                            }
+                        ]
+                    }
+                ]
             }
         },
         "breakageReporting": {
-            "state": "enabled"
+            "state": "enabled",
+            "settings": {
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "context": {
+                                "frame": true
+                            }
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/additionalCheck",
+                                "value": "disabled"
+                            }
+                        ]
+                    }
+                ]
+            }
         },
         "windowsWaitlist": {
             "state": "enabled"
@@ -3536,7 +3623,7 @@
                     }
                 },
                 "productTelemetrySurfaceUsage": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": "7.199.0",
                     "description": "Temporarily gather telemetry around product surfaces being used."
                 },
@@ -3612,6 +3699,17 @@
                     }
                 },
                 "alwaysShowKeyboardOnNewTabPage": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.242.0",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            }
+                        ]
+                    }
+                },
+                "newTabPageRedesign": {
                     "state": "internal",
                     "minSupportedVersion": "7.242.0"
                 },
@@ -3891,6 +3989,20 @@
                                 "value": "shreddit-comments-page-ad"
                             }
                         ]
+                    },
+                    {
+                        "condition": {
+                            "context": {
+                                "frame": true
+                            }
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/additionalCheck",
+                                "value": "disabled"
+                            }
+                        ]
                     }
                 ],
                 "aiPageContextBlocklist": {
@@ -4122,12 +4234,46 @@
                             "buffering": true
                         }
                     }
-                }
+                },
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "context": {
+                                "frame": true
+                            }
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/additionalCheck",
+                                "value": "disabled"
+                            }
+                        ]
+                    }
+                ]
             }
         },
         "webEvents": {
             "state": "enabled",
-            "minSupportedVersion": "7.219.0"
+            "minSupportedVersion": "7.219.0",
+            "settings": {
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "context": {
+                                "frame": true
+                            }
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/additionalCheck",
+                                "value": "disabled"
+                            }
+                        ]
+                    }
+                ]
+            }
         },
         "hover": {
             "state": "disabled"
@@ -4168,6 +4314,10 @@
                 "embedded": {
                     "state": "enabled",
                     "minSupportedVersion": "7.213.0"
+                },
+                "cpmDiagnosticsRecorder": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.243.0"
                 }
             }
         },
@@ -4194,6 +4344,12 @@
                     }
                 }
             }
+        },
+        "detectorPerf": {
+            "state": "enabled"
+        },
+        "trackerProtection": {
+            "state": "enabled"
         },
         "webDetection": {
             "state": "enabled",
@@ -4646,6 +4802,27 @@
                             "source": "captcha_other"
                         },
                         "parameters": {}
+                    },
+                    "detectorPerf_severe": {
+                        "state": "enabled",
+                        "trigger": {
+                            "type": "immediate",
+                            "source": "detectorPerf_severe"
+                        },
+                        "parameters": {
+                            "kind": {
+                                "template": "data",
+                                "dataKey": "kind"
+                            },
+                            "detector": {
+                                "template": "data",
+                                "dataKey": "detector"
+                            },
+                            "thresholdMs": {
+                                "template": "data",
+                                "dataKey": "thresholdMs"
+                            }
+                        }
                     }
                 }
             }
