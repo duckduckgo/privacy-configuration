@@ -22,7 +22,7 @@ Before proposing a site fix, read the matching rule in `.cursor/rules/`:
 | Request blocklist | `request-blocklist.mdc` |
 | User agent or client hints | `user-agent-client-hints.mdc` |
 
-Files in `features/` and `overrides/` can contain `//` comments, so don't parse them as plain JSON.
+Files in `features/` and `overrides/` are JSONC (JSON with comments). Read them with `readJsoncFile` from `util.js`, not `JSON.parse`.
 
 ## Key Concepts
 
