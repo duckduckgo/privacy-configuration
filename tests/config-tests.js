@@ -4,7 +4,7 @@ import path from 'path';
 import { createValidator, formatErrors } from './schema-validation.js';
 import platforms from './../platforms.js';
 import { immutableJSONPatch } from 'immutable-json-patch';
-import { getBaseFeatureConfigs, readJsoncFile } from '../util.js';
+import { getBaseFeatureConfigs, IMMEDIATE_TRIGGER_TYPE_BY_PLATFORM, readJsoncFile } from '../util.js';
 import { CURRENT_CONFIG_VERSION } from '../constants.js';
 
 const platformOutput = platforms.map((item) => item.replace('browsers/', 'extension-'));
@@ -380,26 +380,29 @@ describe('EventHub validation tests', () => {
                 }
             });
 
-            // A client skips an immediate trigger name it does not parse, dropping the pixel. Apple
-            // parses only `immediate_v2`, which the build emits; Windows parses only `immediate`.
-            const unparsedImmediateType = {
-                'ios-config.json': 'immediate',
-                'macos-config.json': 'immediate',
-                'windows-config.json': 'immediate_v2',
-            }[config.name.split('/').pop() ?? ''];
-            if (unparsedImmediateType) {
-                it(`immediate triggers must not use '${unparsedImmediateType}', which this platform skips`, () => {
+            // Each platform receives immediate entries only under the name it parses, and none where it
+            // parses no immediate name. Keys follow platforms.js, so `extension-chrome` is `browsers/chrome`.
+            const platform = (config.name.split('/').pop() ?? '').replace(/-config\.json$/, '').replace(/^extension-/, 'browsers/');
+            const parsedImmediateType = IMMEDIATE_TRIGGER_TYPE_BY_PLATFORM[platform];
+            it(
+                parsedImmediateType
+                    ? `immediate triggers must use '${parsedImmediateType}', the name this platform parses`
+                    : 'must carry no immediate trigger, as this platform parses none',
+                () => {
                     for (const [
                         name,
                         entry,
                     ] of Object.entries(telemetry)) {
-                        expect(entry.trigger.type).to.not.equal(
-                            unparsedImmediateType,
-                            `Telemetry '${name}' uses trigger.type '${unparsedImmediateType}', which this platform skips`,
+                        if (!isImmediateTriggerType(entry.trigger.type)) continue;
+                        expect(entry.trigger.type).to.equal(
+                            parsedImmediateType,
+                            parsedImmediateType
+                                ? `Telemetry '${name}' uses trigger.type '${entry.trigger.type}', which this platform skips`
+                                : `Telemetry '${name}' has an immediate trigger, which this platform does not parse`,
                         );
                     }
-                });
-            }
+                },
+            );
 
             it('each telemetry entry declares a parameters object, and non-immediate entries have at least one', () => {
                 for (const [
