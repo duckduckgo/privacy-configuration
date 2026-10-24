@@ -225,13 +225,13 @@ export type Expr = number | boolean | string | null | ExprObject | ActionObject;
 export type Body = Expr | Expr[];
 
 export type PayloadField = {
-    /** An expression in value position. */
+    /** An expression in value position, sent as JSON writes it, a list as the array of its items. */
     value: Expr;
     /** The value is sent only when this holds. With `fails`, it decides on a failed read. */
     when?: Predicate;
     /**
      * Bucket name to predicate. The first that holds, in key order, is sent instead of the value. A
-     * bucket with `fails` names a failed read.
+     * bucket with `fails` names a failed read. Every `fireEvent` field has `buckets`, checked by CI.
      */
     buckets?: Record<string, Predicate>;
 };

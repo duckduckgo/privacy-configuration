@@ -1570,7 +1570,8 @@ function checkActions(node, position, scope, ctx, path) {
             if (bodyKey !== 'data' && !(key === 'fireEvent' && bodyKey === 'type')) fail(ctx, actionPath, `unknown key "${bodyKey}"`);
         }
         if (key === 'fireEvent' && typeof body.type !== 'string') fail(ctx, `${actionPath}.type`, '`type` takes a string');
-        if ('data' in body) checkPayloadSpec(body.data, ctx, `${actionPath}.data`, child(scope));
+        if ('data' in body)
+            checkPayloadSpec(body.data, /** @type {'fireEvent' | 'breakageReportData'} */ (key), ctx, `${actionPath}.data`, child(scope));
     }
     return typeOf('undefined');
 }
@@ -2752,12 +2753,16 @@ function checkOperators(predicate, subject, scope, ctx, path) {
 }
 
 /**
+ * Every `fireEvent` field has `buckets`, so an event carries bucket names. A `breakageReportData` value
+ * is sent as JSON writes it.
+ *
  * @param {unknown} data
+ * @param {'fireEvent' | 'breakageReportData'} action
  * @param {Context} ctx
  * @param {string} path
  * @param {Scope} [scope] - the payload scope, with the index of its action item
  */
-function checkPayloadSpec(data, ctx, path, scope = PAYLOAD_SCOPE) {
+function checkPayloadSpec(data, action, ctx, path, scope = PAYLOAD_SCOPE) {
     if (!isPlainObject(data)) {
         fail(ctx, path, '`data` maps payload keys to fields');
         return;
@@ -2781,12 +2786,7 @@ function checkPayloadSpec(data, ctx, path, scope = PAYLOAD_SCOPE) {
             continue;
         }
         const type = checkExpr(field.value, 'value', scope, ctx, `${fieldPath}.value`);
-        if (type.list === 'selected' && !('buckets' in field))
-            fail(
-                ctx,
-                `${fieldPath}.value`,
-                'a selected list is sent through `buckets`, read with `only`, or sent as its length through `using`',
-            );
+        if (action === 'fireEvent' && !('buckets' in field)) fail(ctx, fieldPath, 'a `fireEvent` payload field is sent through `buckets`');
         if ('when' in field) {
             const whenPath = `${fieldPath}.when`;
             checkPredicate(field.when, 'value', predicateSubject(type, field.when, ctx, whenPath), scope, ctx, whenPath);
@@ -4479,8 +4479,7 @@ describe('webDetection config tests', () => {
          * @param {unknown} match
          * @param {Record<string, unknown>} [data]
          */
-        const errorsOf = (match, data) =>
-            validateDetector({ match, actions: data ? { fireEvent: { type: 't', data } } : { breakageReportData: {} } }, '$');
+        const errorsOf = (match, data) => validateDetector({ match, actions: { breakageReportData: data ? { data } : {} } }, '$');
 
         /**
          * @param {unknown} match
@@ -5026,7 +5025,7 @@ describe('webDetection config tests', () => {
             it('reads a ref in the ref’s own position', () => {
                 expectActionsValid([
                     { define: { images: img } },
-                    { fireEvent: { type: 't', data: { images: { value: { ref: 'images', using: 'length' } } } } },
+                    { breakageReportData: { data: { images: { value: { ref: 'images', using: 'length' } } } } },
                 ]);
                 expectActionsValid([
                     { define: { images: imgCount } },
@@ -5093,17 +5092,34 @@ describe('webDetection config tests', () => {
                 expectValid({ only: { element: { selector: 'input' } }, is: { hidden: false } });
             });
 
-            it('rejects a selected list in a payload without buckets', () => {
-                expectError('sent through `buckets`', true, { matched: { value: text } });
-                expectActionsError('sent through `buckets`', [
-                    { define: { images: img } },
-                    { fireEvent: { type: 't', data: { image: { value: { ref: 'images' } } } } },
+            it('rejects a `fireEvent` payload field without buckets, and passes any `breakageReportData` value', () => {
+                const images = { define: { images: img } };
+                for (const value of [
+                    { ref: 'images' },
+                    { ref: 'images', using: 'length' },
+                    true,
+                ]) {
+                    expectActionsError('a `fireEvent` payload field is sent through `buckets`', [
+                        images,
+                        { fireEvent: { type: 't', data: { x: { value } } } },
+                    ]);
+                    expectActionsValid([
+                        images,
+                        { breakageReportData: { data: { x: { value } } } },
+                    ]);
+                }
+                expectActionsValid([
+                    images,
+                    { fireEvent: { type: 't', data: { x: { value: { ref: 'images', using: 'length' }, buckets: { some: { gt: 0 } } } } } },
                 ]);
                 expectActionsValid([
-                    { define: { images: img } },
-                    { fireEvent: { type: 't', data: { image: { value: { ref: 'images', using: 'length' } } } } },
+                    {
+                        fireEvent: {
+                            type: 't',
+                            data: { width: { value: fieldOf('img', 'naturalWidth'), buckets: { wide: { gt: 100 } } } },
+                        },
+                    },
                 ]);
-                expectValid(true, { width: { value: fieldOf('img', 'naturalWidth'), buckets: { wide: { gt: 100 } } } });
             });
 
             it('places `text` and `element` without `field` in list position', () => {
@@ -6169,11 +6185,7 @@ describe('webDetection config tests', () => {
                 expectValid({ ...img, using: 'length', is: { gte: 5 } });
                 expectActionsValid([
                     { define: { images: { ...img, using: 'length' } } },
-                    { fireEvent: { type: 't', data: { images: { value: { ref: 'images' } } } } },
-                ]);
-                expectActionsError('a selected list is sent through `buckets`', [
-                    { define: { images: img } },
-                    { fireEvent: { type: 't', data: { images: { value: { ref: 'images' } } } } },
+                    { breakageReportData: { data: { images: { value: { ref: 'images' } } } } },
                 ]);
             });
         });
@@ -6183,8 +6195,7 @@ describe('webDetection config tests', () => {
                 expectActionsValid([
                     { define: { imageElements: img, imageCount: { ref: 'imageElements', using: 'length' } } },
                     {
-                        fireEvent: {
-                            type: 't',
+                        breakageReportData: {
                             data: {
                                 imageCount: { value: { ref: 'imageCount' } },
                                 imageElements: { value: { ref: 'imageElements' }, buckets: { two: { length: 2 } } },
@@ -6197,7 +6208,7 @@ describe('webDetection config tests', () => {
             it('gives the boolean an `is` inside it gives', () => {
                 expectActionsValid([
                     { define: { enoughImages: { expr: { ...img, using: 'length', is: { gte: 2 } } } } },
-                    { fireEvent: { type: 't', data: { enough: { value: { ref: 'enoughImages' } } } } },
+                    { breakageReportData: { data: { enough: { value: { ref: 'enoughImages' } } } } },
                 ]);
                 expectValid(true, { enough: { value: { ...img, using: 'length', is: { gte: 2 } } } });
                 expectError('`expr` over `is` fills', {
