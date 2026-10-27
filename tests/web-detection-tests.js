@@ -346,6 +346,32 @@ function assertValidXPath(expression, path) {
 }
 
 /**
+ * Whether an XPath expression selects from an absolute path, through any branch of a union or
+ * parentheses, so that it reads from the document whatever its context node. Paths inside
+ * predicates are not selections and are allowed. An expression that does not parse is left to
+ * `assertValidXPath`.
+ *
+ * @param {string} expression
+ * @returns {boolean}
+ */
+function selectsFromDocument(expression) {
+    /** @type {unknown} */
+    let tree;
+    try {
+        tree = xpath.parse(expression).expression.expression;
+    } catch {
+        return false;
+    }
+    /** @param {unknown} node */
+    const absolute = (node) => {
+        if (node instanceof xpath.BarOperation) return absolute(node.lhs) || absolute(node.rhs);
+        if (!(node instanceof xpath.PathExpr)) return false;
+        return node.locationPath?.absolute === true || absolute(node.filter);
+    };
+    return absolute(tree);
+}
+
+/**
  * Compile a pattern source, throwing on a syntax error.
  *
  * @param {string} source
@@ -776,6 +802,7 @@ function forEachWebDetectionConfig(cb) {
  *   nan: boolean,
  *   interfaces?: string[],
  *   customElement?: boolean,
+ *   fragment?: boolean,
  *   apiPaths?: string[],
  *   list?: 'selected' | 'maybe',
  *   leaf?: boolean,
@@ -785,8 +812,10 @@ function forEachWebDetectionConfig(cb) {
  * `types` is null when config does not show the type. `nan` is set when the value can be NaN.
  * `interfaces` names the element interfaces an element value can have, and `customElement` is
  * set when it can also be a custom element, whose page-defined values have names outside the
- * tables. `apiPaths` are the `api` names the value may have been read through, one for each
- * branch that reads a different one, which names read from it extend for the allowlist.
+ * tables. `fragment` is set when the value can be a shadow root or other document fragment, which
+ * browsers refuse as an XPath context node. `apiPaths` are the `api` names the value may have been
+ * read through, one for each branch that reads a different one, which names read from it extend
+ * for the allowlist.
  *
  * `list` marks a selected list, and the other keys then describe its items. `selected` is what
  * `element`, `text` and `api` with `where` give. `maybe` is a value that is a selected list on
@@ -827,11 +856,13 @@ function mergeTypes(list) {
     const apiPaths = new Set();
     let nan = false;
     let customElement = false;
+    let fragment = false;
     for (const entry of list) {
         if (entry.types === null) types = null;
         else if (types) for (const name of entry.types) types.add(name);
         nan ||= entry.nan;
         customElement ||= entry.customElement === true;
+        fragment ||= entry.fragment === true;
         for (const name of entry.interfaces ?? []) interfaces.add(name);
         for (const name of entry.apiPaths ?? []) apiPaths.add(name);
     }
@@ -849,6 +880,7 @@ function mergeTypes(list) {
             ...interfaces,
         ];
     if (customElement) merged.customElement = true;
+    if (fragment) merged.fragment = true;
     if (apiPaths.size)
         merged.apiPaths = [
             ...apiPaths,
@@ -964,6 +996,12 @@ const STRING_IDL_TYPES = [
     'CSSOMString',
 ];
 
+/** Interfaces outside the tables that give `StaticType.fragment`. Their properties are not checked. */
+const FRAGMENT_INTERFACES = [
+    'ShadowRoot',
+    'DocumentFragment',
+];
+
 const ARRAY_IDL_GENERICS = [
     'sequence',
     'FrozenArray',
@@ -1016,6 +1054,8 @@ function typeFromIdl(idlType) {
                 text,
             ],
         };
+    } else if (FRAGMENT_INTERFACES.includes(text)) {
+        result = { ...typeOf('object'), fragment: true };
     } else {
         // An interface outside the tables: its properties are not checked
         result = typeOf('object');
@@ -2080,7 +2120,7 @@ function checkConditionSource(key, branch, position, scope, ctx, path) {
             valueTypes.push(typeOf('string'));
             if ('root' in body && 'xpath' in body) {
                 for (const expression of asArray(body.xpath)) {
-                    if (typeof expression === 'string' && expression.trimStart().startsWith('/')) {
+                    if (typeof expression === 'string' && selectsFromDocument(expression)) {
                         fail(
                             ctx,
                             `${bodyPath}.xpath`,
@@ -2109,7 +2149,7 @@ function checkConditionSource(key, branch, position, scope, ctx, path) {
         }
         if ('root' in body) {
             const rootPath = `${bodyPath}.root`;
-            const valid = checkRoot(body.root, child(scope), ctx, rootPath);
+            const valid = checkRoot(body.root, child(scope), ctx, rootPath, key === 'text' && 'xpath' in body);
             // Read only in boolean position with no `none` above it, an empty scope does not hold
             const needsGuard = position !== 'boolean' || scope.underNone || scope.noneAbove === true || underNone;
             if (valid && needsGuard) checkRootGuard(body.root, scope, ctx, bodyPath);
@@ -2129,14 +2169,17 @@ function checkConditionSource(key, branch, position, scope, ctx, path) {
  * @param {Scope} scope
  * @param {Context} ctx
  * @param {string} path
+ * @param {boolean} readsXPath - the source evaluates XPath expressions from each root
  * @returns {boolean} whether the root has entries
  */
-function checkRoot(root, scope, ctx, path) {
+function checkRoot(root, scope, ctx, path, readsXPath) {
     if (Array.isArray(root) && root.length === 0) {
         fail(ctx, path, '`root` needs at least one entry');
         return false;
     }
-    asArray(root).forEach((entry, index) => checkRootEntry(entry, scope, ctx, Array.isArray(root) ? `${path}[${index}]` : path));
+    asArray(root).forEach((entry, index) =>
+        checkRootEntry(entry, scope, ctx, Array.isArray(root) ? `${path}[${index}]` : path, readsXPath),
+    );
     return true;
 }
 
@@ -2145,8 +2188,9 @@ function checkRoot(root, scope, ctx, path) {
  * @param {Scope} scope
  * @param {Context} ctx
  * @param {string} path
+ * @param {boolean} readsXPath
  */
-function checkRootEntry(entry, scope, ctx, path) {
+function checkRootEntry(entry, scope, ctx, path, readsXPath) {
     if (entry === '') fail(ctx, path, 'a selector root is a non-empty string');
     const type = checkExpr(entry, 'root', scope, ctx, path);
     // `null` and `undefined` are an empty scope. A list's items are nodes
@@ -2163,6 +2207,9 @@ function checkRootEntry(entry, scope, ctx, path) {
               ];
     if (type.types !== null && type.types.some((name) => !allowed.includes(name)))
         fail(ctx, path, `a root gives a selector, a node or a list of nodes, and config types it as ${describeType(type)}`);
+    // The expression is valid, but evaluating it from a shadow root throws `NotSupportedError`
+    if (readsXPath && type.fragment)
+        fail(ctx, path, 'an XPath expression cannot be evaluated from a shadow root; use `selector`, or root at an element inside it');
 }
 
 /**
@@ -5670,6 +5717,33 @@ describe('webDetection config tests', () => {
                         ],
                     },
                 });
+                for (const expression of [
+                    './/a | //b',
+                    '(//a)[1]',
+                    ' //a',
+                ]) {
+                    expectError('starts ".//"', { text: { pattern: 'a', xpath: expression, root: '#comments' } });
+                }
+                expectValid({ text: { pattern: 'a', xpath: './a[count(//b) > 0]', root: '#comments' } });
+            });
+
+            it('rejects an XPath expression evaluated from a shadow root', () => {
+                const shadowRoot = { only: { element: { selector: 'x-widget' } }, using: 'shadowRoot' };
+                expectError('cannot be evaluated from a shadow root', {
+                    text: { pattern: 'a', xpath: './/text()', root: shadowRoot },
+                });
+                expectActionsError('cannot be evaluated from a shadow root', [
+                    { define: { region: shadowRoot } },
+                    {
+                        if: { ref: 'region' },
+                        then: {
+                            if: { text: { pattern: 'a', xpath: './/text()', root: { ref: 'region' } } },
+                            then: { fireEvent: { type: 'x' } },
+                        },
+                    },
+                ]);
+                expectValid({ text: { pattern: 'a', root: shadowRoot } });
+                expectValid({ text: { pattern: 'a', selector: 'p', root: shadowRoot } });
             });
         });
 
