@@ -920,7 +920,7 @@
                     "minSupportedVersion": "1.171.0"
                 },
                 "webViewUserAgent": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": "1.182.0"
                 },
                 "optOutRetryError96Hours": {
@@ -3143,6 +3143,17 @@
                 "hangReporting": {
                     "state": "disabled"
                 },
+                "pageSignals": {
+                    "state": "enabled",
+                    "minSupportedVersion": "1.213.0",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            }
+                        ]
+                    }
+                },
                 "unifiedURLPredictor": {
                     "state": "enabled",
                     "minSupportedVersion": "1.162.0"
@@ -3271,10 +3282,6 @@
                     "state": "enabled",
                     "minSupportedVersion": "1.202.0",
                     "cohorts": [
-                        {
-                            "name": "control",
-                            "weight": 1
-                        },
                         {
                             "name": "treatment",
                             "weight": 1

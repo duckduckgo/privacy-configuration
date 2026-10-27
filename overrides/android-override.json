@@ -998,6 +998,10 @@
                     "state": "enabled",
                     "minSupportedVersion": 52860000
                 },
+                "nativeToSConsent": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52990000
+                },
                 "nativePromptEditing": {
                     "state": "enabled",
                     "minSupportedVersion": 52940000
@@ -2499,7 +2503,7 @@
                 },
                 "sendPageLoadWideEvent": {
                     "state": "enabled",
-                    "minSupportedVersion": 52690000,
+                    "minSupportedVersion": 52980000,
                     "rollout": {
                         "steps": [
                             {
@@ -3324,6 +3328,20 @@
                         "condition": [
                             {
                                 "urlPattern": "https://www.nytimes.com/games/*"
+                            }
+                        ],
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/isLockedPage",
+                                "value": "enabled"
+                            }
+                        ]
+                    },
+                    {
+                        "condition": [
+                            {
+                                "urlPattern": "https://www.merriam-webster.com/games/*"
                             }
                         ],
                         "patchSettings": [
@@ -4478,6 +4496,10 @@
                 {
                     "domain": "id.onfido.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3295"
+                },
+                {
+                    "domain": "store.kaiserpermanente.org",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/6265"
                 }
             ]
         },
@@ -4842,7 +4864,13 @@
             }
         },
         "showOnAppLaunch": {
-            "state": "enabled"
+            "state": "enabled",
+            "features": {
+                "afterInactivitySettingsLayout": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52990000
+                }
+            }
         },
         "tabManager": {
             "state": "enabled",
@@ -4884,6 +4912,10 @@
                 "duckAiPlusMenuUpdate": {
                     "state": "enabled",
                     "minSupportedVersion": 52990000
+                },
+                "richDuckAiGridTabItem": {
+                    "state": "enabled",
+                    "minSupportedVersion": 53000000
                 }
             }
         },
