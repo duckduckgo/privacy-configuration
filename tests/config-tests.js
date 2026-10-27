@@ -759,6 +759,127 @@ describe('dbp revokedBundleSigningKeys', () => {
     }
 });
 
+describe('Web detection detector schema', () => {
+    const validate = createValidator('DetectorConfig');
+    const images = { element: { selector: 'img' } };
+    const report = { breakageReportData: {} };
+
+    it('accepts self, with a path or a body, and {} for the bound value', () => {
+        const detector = {
+            match: {
+                ...images,
+                using: {
+                    api: {
+                        path: 'Math.max.apply',
+                        args: [
+                            null,
+                            { self: {} },
+                        ],
+                    },
+                },
+                is: { gt: { self: 'length' } },
+            },
+            actions: report,
+        };
+        expect(validate(detector), formatErrors(validate.errors)).to.equal(true);
+    });
+
+    it('accepts using as an expression over self', () => {
+        const detector = {
+            match: {
+                api: 'document',
+                using: {
+                    div: [
+                        { self: 'title.length' },
+                        { self: { path: 'fonts.size' } },
+                    ],
+                },
+                is: { gt: 0 },
+            },
+            actions: report,
+        };
+        expect(validate(detector), formatErrors(validate.errors)).to.equal(true);
+    });
+
+    it('accepts self in the arguments of a field expression', () => {
+        const detector = {
+            match: {
+                element: {
+                    selector: 'img',
+                    field: {
+                        api: {
+                            path: 'Math.min',
+                            args: [
+                                { self: 'naturalWidth' },
+                                2000,
+                            ],
+                        },
+                    },
+                },
+                is: {},
+            },
+            actions: report,
+        };
+        expect(validate(detector), formatErrors(validate.errors)).to.equal(true);
+    });
+
+    it('accepts actions as a sequence of expressions: if, define, payloads and detector names', () => {
+        const detector = {
+            state: 'disabled',
+            actions: [
+                { define: { n: { ...images, using: 'length' } } },
+                { breakageReportData: { data: { n: { value: { ref: 'n' } } } } },
+                {
+                    if: {
+                        all: [
+                            { ref: 'n', is: { gte: 3 } },
+                            {
+                                none: [
+                                    { ref: 'this.sent', is: true },
+                                ],
+                            },
+                        ],
+                    },
+                    then: [
+                        { fireEvent: { type: 'manyImages' } },
+                        { define: { 'this.sent': true } },
+                    ],
+                    else: { define: { few: true } },
+                },
+            ],
+        };
+        expect(validate(detector), formatErrors(validate.errors)).to.equal(true);
+    });
+
+    it('accepts `match` with one object of several actions', () => {
+        expect(
+            validate({ match: images, actions: { fireEvent: { type: 'a' }, breakageReportData: {} } }),
+            formatErrors(validate.errors),
+        ).to.equal(true);
+    });
+
+    it('accepts several expression keys beside `using` and `is`', () => {
+        const detector = {
+            match: { ...images, api: 'document.images', using: 'length', is: { gt: 0 } },
+            actions: report,
+        };
+        expect(validate(detector), formatErrors(validate.errors)).to.equal(true);
+    });
+
+    it('accepts `actions` without `match`', () => {
+        expect(validate({ actions: report }), formatErrors(validate.errors)).to.equal(true);
+    });
+
+    it('rejects a detector without `actions`, an unknown key, a key of another kind beside an action, and `state` on an action', () => {
+        expect(validate({ match: images })).to.equal(false);
+        expect(validate({ match: images, actions: report, when: images })).to.equal(false);
+        expect(validate({ actions: { fireEvent: { type: 'a' }, api: 'document' } })).to.equal(false);
+        expect(validate({ actions: { fireEvent: { type: 'a' }, is: true } })).to.equal(false);
+        expect(validate({ actions: { define: { n: 1 }, using: 'length' } })).to.equal(false);
+        expect(validate({ actions: { fireEvent: { type: 'a', state: 'enabled' } } })).to.equal(false);
+    });
+});
+
 describe('EventHub schema source rules', () => {
     const validate = createValidator('EventHubSettings');
 
