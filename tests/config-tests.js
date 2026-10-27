@@ -858,16 +858,25 @@ describe('Web detection detector schema', () => {
         ).to.equal(true);
     });
 
-    it('accepts a detector with `match` only, and with `actions` only', () => {
-        expect(validate({ match: images }), formatErrors(validate.errors)).to.equal(true);
+    it('accepts several expression keys beside `using` and `is`', () => {
+        const detector = {
+            match: { ...images, api: 'document.images', using: 'length', is: { gt: 0 } },
+            actions: report,
+        };
+        expect(validate(detector), formatErrors(validate.errors)).to.equal(true);
+    });
+
+    it('accepts `actions` without `match`', () => {
         expect(validate({ actions: report }), formatErrors(validate.errors)).to.equal(true);
     });
 
-    it('rejects a detector with neither `match` nor `actions`, an unknown key, an action beside an expression key, and `state` on an action', () => {
-        expect(validate({ state: 'enabled' })).to.equal(false);
-        expect(validate({ match: images, when: images })).to.equal(false);
+    it('rejects a detector without `actions`, an unknown key, a key of another kind beside an action, and `state` on an action', () => {
+        expect(validate({ match: images })).to.equal(false);
+        expect(validate({ match: images, actions: report, when: images })).to.equal(false);
         expect(validate({ actions: { fireEvent: { type: 'a' }, api: 'document' } })).to.equal(false);
-        expect(validate({ match: images, actions: { fireEvent: { type: 'a', state: 'enabled' } } })).to.equal(false);
+        expect(validate({ actions: { fireEvent: { type: 'a' }, is: true } })).to.equal(false);
+        expect(validate({ actions: { define: { n: 1 }, using: 'length' } })).to.equal(false);
+        expect(validate({ actions: { fireEvent: { type: 'a', state: 'enabled' } } })).to.equal(false);
     });
 });
 
