@@ -4515,6 +4515,64 @@
                             }
                         }
                     },
+                    "autoconsent_cpmCoverage_day": {
+                        "state": "enabled",
+                        "trigger": {
+                            "period": {
+                                "days": 1
+                            }
+                        },
+                        "parameters": {
+                            "unhandled": {
+                                "template": "counter",
+                                "source": "autoconsent_unhandled",
+                                "buckets": {
+                                    "0": { "gte": 0, "lt": 1 },
+                                    "1-5": { "gte": 1, "lt": 6 },
+                                    "6-10": { "gte": 6, "lt": 11 },
+                                    "11-30": { "gte": 11, "lt": 31 },
+                                    "31+": { "gte": 31 }
+                                }
+                            },
+                            "unhandled_top10k": {
+                                "template": "counter",
+                                "source": "autoconsent_unhandled_top10k",
+                                "buckets": {
+                                    "0": { "gte": 0, "lt": 1 },
+                                    "1-5": { "gte": 1, "lt": 6 },
+                                    "6-10": { "gte": 6, "lt": 11 },
+                                    "11-30": { "gte": 11, "lt": 31 },
+                                    "31+": { "gte": 31 }
+                                }
+                            },
+                            "pages": {
+                                "template": "counter",
+                                "source": "autoconsent_page",
+                                "buckets": {
+                                    "0": { "gte": 0, "lt": 1 },
+                                    "1-9": { "gte": 1, "lt": 10 },
+                                    "10-24": { "gte": 10, "lt": 25 },
+                                    "25-49": { "gte": 25, "lt": 50 },
+                                    "50-99": { "gte": 50, "lt": 100 },
+                                    "100-199": { "gte": 100, "lt": 200 },
+                                    "200+": { "gte": 200 }
+                                }
+                            },
+                            "pages_top10k": {
+                                "template": "counter",
+                                "source": "autoconsent_page_top10k",
+                                "buckets": {
+                                    "0": { "gte": 0, "lt": 1 },
+                                    "1-9": { "gte": 1, "lt": 10 },
+                                    "10-24": { "gte": 10, "lt": 25 },
+                                    "25-49": { "gte": 25, "lt": 50 },
+                                    "50-99": { "gte": 50, "lt": 100 },
+                                    "100-199": { "gte": 100, "lt": 200 },
+                                    "200+": { "gte": 200 }
+                                }
+                            }
+                        }
+                    },
                     "webTelemetry_adwall": {
                         "state": "enabled",
                         "trigger": {
