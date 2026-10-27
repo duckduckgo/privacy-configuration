@@ -2807,6 +2807,9 @@ function checkPayloadSpec(data, action, ctx, path, scope = PAYLOAD_SCOPE) {
     }
 }
 
+/** A bucket name a JS object lists first, in ascending order, whatever order the config writes it in. */
+const INTEGER_NAME = /^(0|[1-9][0-9]*)$/;
+
 /**
  * @typedef {{ lo: number, loIn: boolean, hi: number, hiIn: boolean, strict?: boolean }} Interval
  * @typedef {{ intervals: Interval[], points: unknown[] }} BucketSet
@@ -2948,6 +2951,8 @@ function checkBuckets(buckets, type, ctx, path) {
         predicate,
     ] of Object.entries(buckets)) {
         if (name === '') fail(ctx, path, 'a bucket name is a non-empty string');
+        if (INTEGER_NAME.test(name))
+            fail(ctx, path, `bucket name "${name}" is integer-like, which a JS object lists first in ascending order`);
         const bucketPath = `${path}.${name}`;
         checkPredicate(predicate, 'value', predicateSubject(type, predicate, ctx, bucketPath), PAYLOAD_SCOPE, ctx, bucketPath);
         const set = simpleBucketSet(predicate);
@@ -6320,10 +6325,10 @@ describe('webDetection config tests', () => {
             });
 
             it('checks buckets: at least one, and no overlap among simple predicates', () => {
-                expectValid(true, { a: { value: imgCount, buckets: { 0: 0, '1-2': { gte: 1, lt: 3 }, '3+': { gte: 3 } } } });
+                expectValid(true, { a: { value: imgCount, buckets: { none: 0, '1-2': { gte: 1, lt: 3 }, '3+': { gte: 3 } } } });
                 expectValid(true, { a: { value: loadEventEnd, buckets: { loading: 0, fast: { gt: 0, lt: 3000 } } } });
                 expectError('at least one bucket', true, { a: { value: imgCount, buckets: {} } });
-                expectError('overlap', true, { a: { value: imgCount, buckets: { 0: 0, '0-3': { gte: 0, lt: 3 } } } });
+                expectError('overlap', true, { a: { value: imgCount, buckets: { none: 0, '0-3': { gte: 0, lt: 3 } } } });
                 expectError('overlap', true, { a: { value: imgCount, buckets: { low: { lte: 3 }, high: { gte: 3 } } } });
                 expectError('overlap', true, {
                     a: {
@@ -6340,6 +6345,12 @@ describe('webDetection config tests', () => {
                     },
                 });
                 expectValid(true, { a: { value: title, buckets: { empty: { length: 0 }, any: { length: { gte: 0 } } } } });
+            });
+
+            it('rejects integer-like bucket names, which JS lists first in ascending order', () => {
+                expectError('integer-like', true, { a: { value: imgCount, buckets: { '1+': { gte: 1 }, 0: 0 } } });
+                expectError('integer-like', true, { a: { value: imgCount, buckets: { 12: { gte: 12 } } } });
+                expectValid(true, { a: { value: imgCount, buckets: { '01': 1, '0-3': { gte: 2, lt: 3 }, '-1': -1 } } });
             });
 
             it('checks overlap between a literal and a comparison that converts it', () => {
@@ -6390,7 +6401,7 @@ describe('webDetection config tests', () => {
                     then,
                     else: otherwise,
                 });
-                const buckets = { unsupported: 'unsupported', 0: 0, '1+': { gte: 1 } };
+                const buckets = { unsupported: 'unsupported', none: 0, '1+': { gte: 1 } };
                 expectValid(true, { a: { value: engineGuarded(imgCount, 'unsupported'), buckets } });
                 // "7" and "" convert to numbers, and a string read from the page may too
                 expectError('guard it', true, { a: { value: engineGuarded(imgCount, '7'), buckets: { '1+': { gte: 1 } } } });
