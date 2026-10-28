@@ -1184,6 +1184,7 @@ function describeInterfaces(interfaces) {
  *   guards: unknown[],
  *   bound?: StaticType,
  *   perItem?: boolean,
+ *   inItem?: boolean,
  *   noneAbove?: boolean,
  * }} Scope
  *
@@ -1192,7 +1193,8 @@ function describeInterfaces(interfaces) {
  * guarding a scoped `element` or `text`: the operands of that `all`, and the condition of each
  * enclosing `if` with the operands of its top-level `all`. `bound` is the type `self` reads, set inside
  * `using`, `where` and `field`. `perItem` is set where `self` reads a value per item: inside `where`
- * and `field`, and inside a `using` beside an expression that reads such a `self`. `noneAbove` is set
+ * and `field`, and inside a `using` beside an expression that reads such a `self`. `inItem` is set
+ * anywhere inside a `where` or `field`, where every expression runs once per item. `noneAbove` is set
  * under a `none` anywhere above, in a condition or a predicate: `where` clears `underNone` for its own
  * comparisons, and keeps `noneAbove`.
  */
@@ -1378,7 +1380,7 @@ function predicateReadsOuterSelf(predicate, level) {
  * @returns {Scope}
  */
 function bindItem(scope, type) {
-    return { ...child(scope), bound: type, perItem: true };
+    return { ...child(scope), bound: type, perItem: true, inItem: true };
 }
 
 /**
@@ -1523,6 +1525,17 @@ function checkExpr(node, position, scope, ctx, path) {
         return UNKNOWN;
     }
     if ('if' in node && exprKeys.length > 1) fail(ctx, path, '`if` takes no other expression key beside it');
+    if (scope.inItem) {
+        for (const key of exprKeys) {
+            if (SOURCE_KEYS.includes(key) && !readsOuterSelf({ [key]: node[key] }) && refsIn(node[key]).size === 0) {
+                fail(
+                    ctx,
+                    `${path}.${key}`,
+                    'reads neither `self` nor a `ref`, so it gives every item of the enclosing `where` or `field` the same value: `define` it before',
+                );
+            }
+        }
+    }
     const hasIs = 'is' in node;
     if (hasIs && position !== 'boolean' && position !== 'value')
         fail(ctx, path, `\`is\` gives a boolean, so it sits in boolean or value position, not ${position} position`);
@@ -1614,6 +1627,7 @@ function checkActions(node, position, scope, ctx, path) {
             checkDefine(body, scope, ctx, actionPath);
             continue;
         }
+        if (scope.inItem) fail(ctx, actionPath, `\`${key}\` inside a \`where\` or \`field\` runs once per item: run it outside`);
         if (!isPlainObject(body)) {
             fail(ctx, actionPath, `\`${key}\` takes an object`);
             continue;
@@ -3094,6 +3108,91 @@ function repeatedEventWarnings(detector, path) {
     return warnings;
 }
 
+/** Methods on an element that walk its subtree, or for `closest` its ancestors. */
+const ITEM_WALK_METHODS = [
+    'querySelector',
+    'querySelectorAll',
+    'closest',
+];
+
+/**
+ * Warnings on a walk from each item of a `where` or `field` that no `if` inside it guards: an
+ * `element` or `text` source rooted at the item, or a call of ITEM_WALK_METHODS on it. Matched
+ * elements nest, so each walk covers nodes an enclosing item's walk covers again.
+ *
+ * @param {Record<string, any>} detector
+ * @param {string} path
+ * @returns {string[]}
+ */
+function itemWalkWarnings(detector, path) {
+    if (!isPlainObject(detector)) return [];
+    /** @type {string[]} */
+    const warnings = [];
+    /** @param {string} nodePath */
+    const warn = (nodePath) =>
+        warnings.push(
+            `${nodePath}: walks the page from each item of the enclosing \`where\` or \`field\`, and nested items walk the same nodes again; test something cheaper in an \`if\` first`,
+        );
+    /**
+     * A `field`, `using` or the body of `self`: a path, `{"path", "args"}` or an expression.
+     *
+     * @param {unknown} read
+     * @param {string} readPath
+     * @param {boolean} exposed
+     */
+    const visitRead = (read, readPath, exposed) => {
+        if (isPlainObject(read) && expressionKeysOf(read).length) {
+            visit(read, readPath, true);
+            return;
+        }
+        const body = typeof read === 'string' ? { path: read } : read;
+        if (!isPlainObject(body)) return;
+        if (exposed && typeof body.path === 'string' && ITEM_WALK_METHODS.includes(body.path.split('.')[0])) warn(readPath);
+        visit(body.args, `${readPath}.args`, exposed);
+        visit(body.where, `${readPath}.where`, true);
+        if ('field' in body) visitRead(body.field, `${readPath}.field`, true);
+    };
+    /**
+     * @param {unknown} node
+     * @param {string} nodePath
+     * @param {boolean} exposed - inside a `where` or `field`, with no `if` inside it above
+     */
+    const visit = (node, nodePath, exposed) => {
+        if (Array.isArray(node)) {
+            node.forEach((entry, index) => visit(entry, `${nodePath}[${index}]`, exposed));
+            return;
+        }
+        if (!isPlainObject(node)) return;
+        for (const [
+            key,
+            value,
+        ] of Object.entries(node)) {
+            const childPath = `${nodePath}.${key}`;
+            if (key === 'element' || key === 'text') {
+                forEachTextLeaf(value, childPath, (body, bodyPath) => {
+                    if (exposed && 'root' in body && readsOuterSelf(body.root)) warn(`${bodyPath}.root`);
+                    visit(body.root, `${bodyPath}.root`, exposed);
+                    visit(body.where, `${bodyPath}.where`, true);
+                    if ('field' in body) visitRead(body.field, `${bodyPath}.field`, true);
+                });
+            } else if (key === 'api') {
+                const body = apiBody(value);
+                if (!isPlainObject(body)) continue;
+                visit(body.args, `${childPath}.args`, exposed);
+                visit(body.where, `${childPath}.where`, true);
+                if ('field' in body) visitRead(body.field, `${childPath}.field`, true);
+            } else if (key === 'self' || key === 'field' || key === 'using') {
+                visitRead(value, childPath, exposed);
+            } else {
+                visit(value, childPath, exposed && !BRANCH_KEYS.includes(key));
+            }
+        }
+    };
+    visit(detector.match, `${path}.match`, false);
+    visit(detector.actions, `${path}.actions`, false);
+    return warnings;
+}
+
 /**
  * @returns {Context}
  */
@@ -3477,6 +3576,23 @@ describe('webDetection config tests', () => {
                             detector,
                         ] of Object.entries(group)) {
                             for (const warning of repeatedEventWarnings(detector, `${config.name} detectors.${groupName}.${detectorId}`)) {
+                                console.warn(`warning: ${warning}`);
+                            }
+                        }
+                    }
+                });
+
+                it('warns on walks from each item that no `if` guards', () => {
+                    const detectors = clientDetectors(settings, clients.injectNames, clients.version, true);
+                    for (const [
+                        groupName,
+                        group,
+                    ] of Object.entries(detectors)) {
+                        for (const [
+                            detectorId,
+                            detector,
+                        ] of Object.entries(group)) {
+                            for (const warning of itemWalkWarnings(detector, `${config.name} detectors.${groupName}.${detectorId}`)) {
                                 console.warn(`warning: ${warning}`);
                             }
                         }
@@ -4451,6 +4567,75 @@ describe('webDetection config tests', () => {
                     }),
                 ).to.deep.equal([]);
                 expect(warningsOf({ match: true, actions: { fireEvent: { type: 'a' } } })).to.deep.equal([]);
+            });
+        });
+
+        describe('walks from each item', () => {
+            /**
+             * @param {unknown} where
+             */
+            const walksOf = (where) => itemWalkWarnings({ match: { element: { selector: 'div', where } }, actions: {} }, '$');
+            const words = { text: { pattern: 'consent', root: { self: {} } } };
+            const links = {
+                self: {
+                    path: 'querySelectorAll',
+                    args: [
+                        'a',
+                    ],
+                },
+                using: 'length',
+                is: { gt: 0 },
+            };
+            const positioned = {
+                api: {
+                    path: 'getComputedStyle',
+                    args: [
+                        { self: {} },
+                    ],
+                },
+                using: 'position',
+                is: 'fixed',
+            };
+
+            it('warns on a source rooted at the item, and a call walking from it, with no `if` above it in the `where`', () => {
+                expect(walksOf(words)).to.deep.equal([
+                    '$.match.element.where.text.root: walks the page from each item of the enclosing `where` or `field`, and nested items walk the same nodes again; test something cheaper in an `if` first',
+                ]);
+                expect(
+                    walksOf({
+                        all: [
+                            positioned,
+                            links,
+                        ],
+                    }).length,
+                ).to.equal(1);
+                expect(
+                    walksOf({
+                        field: {
+                            path: 'closest',
+                            args: [
+                                'form',
+                            ],
+                        },
+                        is: { type: 'object' },
+                    }).length,
+                ).to.equal(1);
+            });
+
+            it('passes a walk behind an `if`, and one outside every `where` and `field`', () => {
+                expect(
+                    walksOf({
+                        if: positioned,
+                        then: {
+                            all: [
+                                words,
+                                links,
+                            ],
+                        },
+                        else: false,
+                    }),
+                ).to.deep.equal([]);
+                expect(itemWalkWarnings({ match: { text: { pattern: 'consent', root: 'dialog' } }, actions: {} }, '$')).to.deep.equal([]);
             });
         });
 
@@ -5673,11 +5858,19 @@ describe('webDetection config tests', () => {
             });
 
             it('rejects a scoped leaf in `where` with a `none` above it, in the match tree or the predicate, with no guard', () => {
-                const cardsWithImage = { selector: '.card', where: { element: { selector: 'img', root: '#comments' } } };
+                const comments = {
+                    self: {
+                        path: 'querySelector',
+                        args: [
+                            '.comments',
+                        ],
+                    },
+                };
+                const cardsWithImage = { selector: '.card', where: { element: { selector: 'img', root: comments } } };
                 expectValid({ element: cardsWithImage });
                 expectError('needs a guard', { none: { element: cardsWithImage } });
                 expectError('needs a guard', {
-                    element: { selector: '.card', where: { none: { element: { selector: 'img', root: '#comments' } } } },
+                    element: { selector: '.card', where: { none: { element: { selector: 'img', root: comments } } } },
                 });
             });
 
@@ -5876,6 +6069,66 @@ describe('webDetection config tests', () => {
                 expectError(
                     'needs a guard',
                     items('.card', { element: { selector: 'p', root: { self: 'shadowRoot' } }, using: 'length', is: 0 }),
+                );
+            });
+
+            it('rejects a source in a `where` or `field` reading neither `self` nor a `ref`, which a `define` before computes once', () => {
+                const same = 'reads neither `self` nor a `ref`';
+                const width = { api: 'innerWidth' };
+                expectError(same, items('.card', { element: { selector: 'img' } }));
+                expectError(same, items('.card', { element: { selector: 'img', where: { self: 'complete', is: true } } }));
+                expectError(same, items('img', { naturalWidth: { gt: width } }));
+                expectError(same, { sum: { element: { selector: 'img', field: width } }, is: { gt: 0 } });
+                expectValid(
+                    items('div', {
+                        api: {
+                            path: 'getComputedStyle',
+                            args: [
+                                { self: {} },
+                            ],
+                        },
+                        using: 'position',
+                        is: 'fixed',
+                    }),
+                );
+                expectActionsValid([
+                    { define: { width } },
+                    {
+                        define: {
+                            wide: { element: { selector: 'img', where: { naturalWidth: { gt: { ref: 'width' } } } }, using: 'length' },
+                        },
+                    },
+                ]);
+            });
+
+            it('rejects `fireEvent` and `breakageReportData` in a `where`, which run once per item, and admits `define`', () => {
+                const completeImages = (/** @type {unknown} */ then) => ({
+                    define: {
+                        n: {
+                            element: { selector: 'img', where: { if: { self: 'complete', is: true }, then, else: false } },
+                            using: 'length',
+                        },
+                    },
+                });
+                expectActionsError(
+                    '`fireEvent` inside a `where` or `field` runs once per item',
+                    completeImages([
+                        { fireEvent: { type: 'a' } },
+                        true,
+                    ]),
+                );
+                expectActionsError(
+                    '`breakageReportData` inside a `where` or `field` runs once per item',
+                    completeImages([
+                        { breakageReportData: {} },
+                        true,
+                    ]),
+                );
+                expectActionsValid(
+                    completeImages([
+                        { define: { loaded: { self: 'naturalWidth', is: { gt: 0 } } } },
+                        { ref: 'loaded' },
+                    ]),
                 );
             });
 
