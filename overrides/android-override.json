@@ -36,6 +36,14 @@
                 },
                 "handleTrustedCallers": {
                     "state": "enabled"
+                },
+                "handleTrustedCallersNonHttpLinks": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52990000
+                },
+                "handleTrustedCallersWhenAppLinksDisabled": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52990000
                 }
             }
         },
@@ -51,6 +59,9 @@
                         "steps": [
                             {
                                 "percent": 50
+                            },
+                            {
+                                "percent": 100
                             }
                         ]
                     }
@@ -484,6 +495,20 @@
         },
         "sitePermissionsDialogRedesign": {
             "state": "enabled",
+            "features": {
+                "singleTabBurnClearing": {
+                    "minSupportedVersion": 52981000,
+                    "state": "enabled"
+                },
+                "permissionSettingsRedesign": {
+                    "minSupportedVersion": 52981000,
+                    "state": "enabled"
+                },
+                "explicitPermissionsOnly": {
+                    "minSupportedVersion": 52981000,
+                    "state": "enabled"
+                }
+            },
             "exceptions": []
         },
         "eme": {
@@ -949,6 +974,10 @@
                     "state": "enabled",
                     "minSupportedVersion": 52780000
                 },
+                "homepageChatSuggestions": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52990000
+                },
                 "duckAiVoiceEntryPoint": {
                     "state": "enabled",
                     "minSupportedVersion": 52780000
@@ -968,6 +997,10 @@
                 "nativeChatInput": {
                     "state": "enabled",
                     "minSupportedVersion": 52860000
+                },
+                "nativeToSConsent": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52990000
                 },
                 "nativePromptEditing": {
                     "state": "enabled",
@@ -1132,10 +1165,6 @@
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2790"
                 },
                 {
-                    "domain": "kvb.koeln",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2808"
-                },
-                {
                     "domain": "dresden.de",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5532"
                 }
@@ -1288,6 +1317,21 @@
                         "formBoundarySelector": "",
                         "failsafeSettings": {},
                         "conditionalChanges": [
+                            {
+                                "condition": [
+                                    { "domain": "account.greenbacktaxservices.com" }
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "form[action*=\"AppLogin\"] input[type=\"password\"]",
+                                            "type": "credentials.password.current"
+                                        }
+                                    }
+                                ]
+                            },
                             {
                                 "condition": [
                                     { "domain": "www.aestheticcity.academy" }
@@ -2459,11 +2503,14 @@
                 },
                 "sendPageLoadWideEvent": {
                     "state": "enabled",
-                    "minSupportedVersion": 52690000,
+                    "minSupportedVersion": 52980000,
                     "rollout": {
                         "steps": [
                             {
                                 "percent": 5
+                            },
+                            {
+                                "percent": 100
                             }
                         ]
                     }
@@ -3290,6 +3337,20 @@
                                 "value": "enabled"
                             }
                         ]
+                    },
+                    {
+                        "condition": [
+                            {
+                                "urlPattern": "https://www.merriam-webster.com/games/*"
+                            }
+                        ],
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/isLockedPage",
+                                "value": "enabled"
+                            }
+                        ]
                     }
                 ]
             }
@@ -3495,6 +3556,14 @@
                 "workQueueScheduling": {
                     "state": "enabled",
                     "minSupportedVersion": 52930000
+                },
+                "freemium": {
+                    "state": "internal",
+                    "targets": [
+                        {
+                            "localeCountry": "us"
+                        }
+                    ]
                 }
             }
         },
@@ -4000,7 +4069,7 @@
                 },
                 "optimizeContentScopeMessaging": {
                     "minSupportedVersion": 52920000,
-                    "state": "enabled"
+                    "state": "disabled"
                 },
                 "cacheContentScopeExperiments": {
                     "minSupportedVersion": 52920000,
@@ -4427,6 +4496,10 @@
                 {
                     "domain": "id.onfido.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3295"
+                },
+                {
+                    "domain": "store.kaiserpermanente.org",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/6265"
                 }
             ]
         },
@@ -4615,6 +4688,46 @@
                 },
                 "subscriptionConcurrentExperiments": {
                     "state": "enabled"
+                },
+                "subscriptionOnboardingFreeTrialsOct2026": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52990000,
+                    "targets": [
+                        {
+                            "localeLanguage": "en",
+                            "localeCountry": "us"
+                        }
+                    ],
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "subscriptionOnboardingPaidSubsOct2026": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52990000,
+                    "targets": [
+                        {
+                            "localeLanguage": "en",
+                            "localeCountry": "us"
+                        }
+                    ],
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
                 }
             }
         },
@@ -4661,6 +4774,10 @@
                 "duckAiOnboarding": {
                     "state": "enabled",
                     "minSupportedVersion": 52860000
+                },
+                "contextualOnboardingTimeLimit": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52990000
                 },
                 "onboardingDuckAiExperimentMay26": {
                     "state": "enabled",
@@ -4787,7 +4904,13 @@
             }
         },
         "showOnAppLaunch": {
-            "state": "enabled"
+            "state": "enabled",
+            "features": {
+                "afterInactivitySettingsLayout": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52990000
+                }
+            }
         },
         "tabManager": {
             "state": "enabled",
@@ -4821,6 +4944,18 @@
                 "tabMaxReuseDistancePixel": {
                     "state": "enabled",
                     "minSupportedVersion": 52960000
+                },
+                "duckAiChatsMenu": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52990000
+                },
+                "duckAiPlusMenuUpdate": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52990000
+                },
+                "richDuckAiGridTabItem": {
+                    "state": "enabled",
+                    "minSupportedVersion": 53000000
                 }
             }
         },
@@ -5343,7 +5478,7 @@
                     ]
                 },
                 "contentScopeExperiment8": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": 52920000,
                     "description": "Page issue detection: auto-run + fireEvent for the new block page, error page, geoblock, verification, blank page, captcha and adwall detectors, with retuned adwall and video intervals",
                     "rollout": {
@@ -5473,12 +5608,12 @@
             }
         },
         "productSurfaceTelemetry": {
-            "state": "enabled",
+            "state": "disabled",
             "exceptions": [],
             "minSupportedVersion": 52920000,
             "features": {
                 "enableTelemetry": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": 52920000
                 }
             }
@@ -5630,6 +5765,9 @@
                     }
                 ]
             }
+        },
+        "detectorPerf": {
+            "state": "disabled"
         },
         "webDetection": {
             "state": "enabled",

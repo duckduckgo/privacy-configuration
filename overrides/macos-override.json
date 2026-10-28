@@ -246,7 +246,7 @@
                     ]
                 },
                 "contentScopeExperiment8": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": "1.204.0",
                     "description": "Page issue detection: auto-run + fireEvent for the new block page, error page, geoblock, verification, blank page, captcha and adwall detectors, with retuned adwall and video intervals",
                     "rollout": {
@@ -259,6 +259,28 @@
                             },
                             {
                                 "percent": 100
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "contentScopeExperiment9": {
+                    "state": "enabled",
+                    "minSupportedVersion": "1.210.0",
+                    "description": "Detector performance monitoring: treatment measures Web Detection detector execution time (detectorPerf); control does not",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
                             }
                         ]
                     },
@@ -396,7 +418,7 @@
                                 "name": "Bitwarden Password Manager",
                                 "publisher": "Bitwarden Inc.",
                                 "publisherUri": "https://bitwarden.com/",
-                                "iconUri": "https://staticcdn.duckduckgo.com/d5c04536-5379-4709-8d19-d13fdd456ff6/extensions-test/bitwarden-128.png",
+                                "iconUri": "https://staticcdn.duckduckgo.com/d5c04536-5379-4709-8d19-d13fdd456ff6/extensions/bitwarden-80.png",
                                 "cwsUri": "https://chromewebstore.google.com/detail/bitwarden-password-manage/nngceckbapebfimnlniiiahkandclblb",
                                 "categoryId": "password-manager"
                             },
@@ -405,7 +427,7 @@
                                 "name": "1Password – Password Manager",
                                 "publisher": "AgileBits Inc",
                                 "publisherUri": "https://1password.com/",
-                                "iconUri": "https://staticcdn.duckduckgo.com/d5c04536-5379-4709-8d19-d13fdd456ff6/extensions-test/onepassword-128.png",
+                                "iconUri": "https://staticcdn.duckduckgo.com/d5c04536-5379-4709-8d19-d13fdd456ff6/extensions/onepassword-80.png",
                                 "cwsUri": "https://chromewebstore.google.com/detail/1password-%E2%80%93-password-mana/aeblfdkhhhdcdjpifhhbdiojplfjncoa",
                                 "categoryId": "password-manager"
                             },
@@ -414,7 +436,7 @@
                                 "name": "LastPass: Free Password Manager",
                                 "publisher": "LastPass",
                                 "publisherUri": "https://lastpass.com/",
-                                "iconUri": "https://staticcdn.duckduckgo.com/d5c04536-5379-4709-8d19-d13fdd456ff6/extensions-test/lastpass-128.png",
+                                "iconUri": "https://staticcdn.duckduckgo.com/d5c04536-5379-4709-8d19-d13fdd456ff6/extensions/lastpass-80.png",
                                 "cwsUri": "https://chromewebstore.google.com/detail/lastpass-free-password-ma/hdokiejnpimakedhajhdlcegeplioahd",
                                 "categoryId": "password-manager"
                             }
@@ -425,7 +447,7 @@
                                 "name": "Bitwarden Password Manager",
                                 "publisher": "Bitwarden Inc.",
                                 "publisherUri": "https://bitwarden.com/",
-                                "iconUri": "https://staticcdn.duckduckgo.com/d5c04536-5379-4709-8d19-d13fdd456ff6/extensions-test/bitwarden-128.png",
+                                "iconUri": "https://staticcdn.duckduckgo.com/d5c04536-5379-4709-8d19-d13fdd456ff6/extensions/bitwarden-80.png",
                                 "cwsUri": "https://chromewebstore.google.com/detail/bitwarden-password-manage/nngceckbapebfimnlniiiahkandclblb",
                                 "categoryId": "password-manager"
                             },
@@ -434,7 +456,7 @@
                                 "name": "1Password – Password Manager",
                                 "publisher": "AgileBits Inc",
                                 "publisherUri": "https://1password.com/",
-                                "iconUri": "https://staticcdn.duckduckgo.com/d5c04536-5379-4709-8d19-d13fdd456ff6/extensions-test/onepassword-128.png",
+                                "iconUri": "https://staticcdn.duckduckgo.com/d5c04536-5379-4709-8d19-d13fdd456ff6/extensions/onepassword-80.png",
                                 "cwsUri": "https://chromewebstore.google.com/detail/1password-%E2%80%93-password-mana/aeblfdkhhhdcdjpifhhbdiojplfjncoa",
                                 "categoryId": "password-manager"
                             },
@@ -443,7 +465,7 @@
                                 "name": "LastPass: Free Password Manager",
                                 "publisher": "LastPass",
                                 "publisherUri": "https://lastpass.com/",
-                                "iconUri": "https://staticcdn.duckduckgo.com/d5c04536-5379-4709-8d19-d13fdd456ff6/extensions-test/lastpass-128.png",
+                                "iconUri": "https://staticcdn.duckduckgo.com/d5c04536-5379-4709-8d19-d13fdd456ff6/extensions/lastpass-80.png",
                                 "cwsUri": "https://chromewebstore.google.com/detail/lastpass-free-password-ma/hdokiejnpimakedhajhdlcegeplioahd",
                                 "categoryId": "password-manager"
                             }
@@ -463,7 +485,7 @@
                         "name": "Bitwarden Password Manager",
                         "publisher": "Bitwarden Inc.",
                         "publisherUri": "https://bitwarden.com/",
-                        "iconUri": "https://staticcdn.duckduckgo.com/d5c04536-5379-4709-8d19-d13fdd456ff6/extensions-test/bitwarden-128.png",
+                        "iconUri": "https://staticcdn.duckduckgo.com/d5c04536-5379-4709-8d19-d13fdd456ff6/extensions/bitwarden-80.png",
                         "cwsUri": "https://chromewebstore.google.com/detail/bitwarden-password-manage/nngceckbapebfimnlniiiahkandclblb",
                         "categoryId": "password-manager",
                         "order": 1
@@ -476,7 +498,7 @@
                         "name": "1Password – Password Manager",
                         "publisher": "AgileBits Inc",
                         "publisherUri": "https://1password.com/",
-                        "iconUri": "https://staticcdn.duckduckgo.com/d5c04536-5379-4709-8d19-d13fdd456ff6/extensions-test/onepassword-128.png",
+                        "iconUri": "https://staticcdn.duckduckgo.com/d5c04536-5379-4709-8d19-d13fdd456ff6/extensions/onepassword-80.png",
                         "cwsUri": "https://chromewebstore.google.com/detail/1password-%E2%80%93-password-mana/aeblfdkhhhdcdjpifhhbdiojplfjncoa",
                         "categoryId": "password-manager",
                         "order": 2
@@ -489,10 +511,36 @@
                         "name": "LastPass: Free Password Manager",
                         "publisher": "LastPass",
                         "publisherUri": "https://lastpass.com/",
-                        "iconUri": "https://staticcdn.duckduckgo.com/d5c04536-5379-4709-8d19-d13fdd456ff6/extensions-test/lastpass-128.png",
+                        "iconUri": "https://staticcdn.duckduckgo.com/d5c04536-5379-4709-8d19-d13fdd456ff6/extensions/lastpass-80.png",
                         "cwsUri": "https://chromewebstore.google.com/detail/lastpass-free-password-ma/hdokiejnpimakedhajhdlcegeplioahd",
                         "categoryId": "password-manager",
                         "order": 3
+                    }
+                },
+                "iCloudPasswords": {
+                    "state": "internal",
+                    "settings": {
+                        "id": "pejdijmoenmkgeppbflobdenhhabjlaj",
+                        "name": "[Testing] iCloud Passwords",
+                        "publisher": "Apple Inc.",
+                        "publisherUri": "https://www.apple.com/",
+                        "iconUri": "https://staticcdn.duckduckgo.com/d5c04536-5379-4709-8d19-d13fdd456ff6/extensions/icloudpasswords-80.png",
+                        "cwsUri": "https://chromewebstore.google.com/detail/icloud-passwords/pejdijmoenmkgeppbflobdenhhabjlaj",
+                        "categoryId": "password-manager",
+                        "order": 4
+                    }
+                },
+                "darkReader": {
+                    "state": "internal",
+                    "settings": {
+                        "id": "eimadpbcbfnmbkopoojfekhnkhdbieeh",
+                        "name": "[Testing] Dark Reader",
+                        "publisher": "Dark Reader Ltd",
+                        "publisherUri": "https://darkreader.org/",
+                        "iconUri": "https://staticcdn.duckduckgo.com/d5c04536-5379-4709-8d19-d13fdd456ff6/extensions/darkreader-80.png",
+                        "cwsUri": "https://chromewebstore.google.com/detail/dark-reader/eimadpbcbfnmbkopoojfekhnkhdbieeh",
+                        "categoryId": "accessibility",
+                        "order": 5
                     }
                 }
             }
@@ -669,6 +717,10 @@
                 "nativeDataAccess": {
                     "state": "enabled",
                     "minSupportedVersion": "1.187.0"
+                },
+                "homepageChatSuggestions": {
+                    "state": "enabled",
+                    "minSupportedVersion": "1.212.0"
                 },
                 "sidebar": {
                     "state": "enabled",
@@ -868,7 +920,7 @@
                     "minSupportedVersion": "1.171.0"
                 },
                 "webViewUserAgent": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": "1.182.0"
                 },
                 "optOutRetryError96Hours": {
@@ -1362,6 +1414,21 @@
                         "formBoundarySelector": "",
                         "failsafeSettings": {},
                         "conditionalChanges": [
+                            {
+                                "condition": [
+                                    { "domain": "account.greenbacktaxservices.com" }
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "form[action*=\"AppLogin\"] input[type=\"password\"]",
+                                            "type": "credentials.password.current"
+                                        }
+                                    }
+                                ]
+                            },
                             {
                                 "condition": [
                                     { "domain": "www.aestheticcity.academy" }
@@ -2268,6 +2335,10 @@
                 "exchangeKeysToSyncWithAnotherDevice": {
                     "state": "enabled"
                 },
+                "canUseExchangeV2Point1": {
+                    "state": "enabled",
+                    "minSupportedVersion": "1.212.0"
+                },
                 "syncSetupBarcodeIsUrlBased": {
                     "state": "enabled"
                 },
@@ -2958,10 +3029,6 @@
                     "minSupportedVersion": "1.204.0",
                     "cohorts": [
                         {
-                            "name": "control",
-                            "weight": 1
-                        },
-                        {
                             "name": "treatment",
                             "weight": 1
                         }
@@ -3075,6 +3142,20 @@
             "features": {
                 "hangReporting": {
                     "state": "disabled"
+                },
+                "pageSignals": {
+                    "state": "enabled",
+                    "minSupportedVersion": "1.213.0",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 10
+                            }
+                        ]
+                    }
                 },
                 "unifiedURLPredictor": {
                     "state": "enabled",
@@ -3192,11 +3273,11 @@
                     "cohorts": [
                         {
                             "name": "control",
-                            "weight": 1
+                            "weight": 0
                         },
                         {
                             "name": "treatment",
-                            "weight": 1
+                            "weight": 0
                         }
                     ]
                 },
@@ -3205,17 +3286,13 @@
                     "minSupportedVersion": "1.202.0",
                     "cohorts": [
                         {
-                            "name": "control",
-                            "weight": 1
-                        },
-                        {
                             "name": "treatment",
                             "weight": 1
                         }
                     ]
                 },
                 "newTabPageRebranding": {
-                    "state": "internal",
+                    "state": "enabled",
                     "minSupportedVersion": "1.203.0"
                 }
             }
@@ -3594,6 +3671,10 @@
                 "embedded": {
                     "state": "enabled",
                     "minSupportedVersion": "1.183.0"
+                },
+                "cpmDiagnosticsRecorder": {
+                    "state": "enabled",
+                    "minSupportedVersion": "1.213.0"
                 }
             }
         },
@@ -3620,6 +3701,12 @@
                     }
                 }
             }
+        },
+        "detectorPerf": {
+            "state": "enabled"
+        },
+        "trackerProtection": {
+            "state": "enabled"
         },
         "webDetection": {
             "state": "enabled",
@@ -3863,6 +3950,27 @@
                             "source": "captcha_other"
                         },
                         "parameters": {}
+                    },
+                    "detectorPerf_severe": {
+                        "state": "enabled",
+                        "trigger": {
+                            "type": "immediate",
+                            "source": "detectorPerf_severe"
+                        },
+                        "parameters": {
+                            "kind": {
+                                "template": "data",
+                                "dataKey": "kind"
+                            },
+                            "detector": {
+                                "template": "data",
+                                "dataKey": "detector"
+                            },
+                            "thresholdMs": {
+                                "template": "data",
+                                "dataKey": "thresholdMs"
+                            }
+                        }
                     }
                 }
             }

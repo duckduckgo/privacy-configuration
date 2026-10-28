@@ -746,6 +746,14 @@
                 ]
             },
             {
+                "domain": "adamkempfitness.com",
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    }
+                ]
+            },
+            {
                 "domain": "advocate.com",
                 "rules": [
                     {
@@ -971,6 +979,24 @@
                 ]
             },
             {
+                "condition": {
+                    "domain": "bhg.com",
+                    "injectName": "apple"
+                },
+                "rules": [
+                    {
+                        "selector": ".min-h-screen",
+                        "type": "modify-style",
+                        "values": [
+                            {
+                                "property": "min-height",
+                                "value": "100dvh"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
                 "domain": "bild.de",
                 "rules": [
                     {
@@ -991,6 +1017,15 @@
                 "rules": [
                     {
                         "selector": ".adwrap",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "bjs.com",
+                "rules": [
+                    {
+                        "selector": "[data-cnstrc-recommendations][data-cnstrc-num-results='0']",
                         "type": "closest-empty"
                     }
                 ]
@@ -1791,6 +1826,24 @@
                 ]
             },
             {
+                "condition": {
+                    "domain": "flowkey.com",
+                    "injectName": "apple"
+                },
+                "rules": [
+                    {
+                        "selector": ".css-1g1rvlj",
+                        "type": "modify-style",
+                        "values": [
+                            {
+                                "property": "height",
+                                "value": "100dvh"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
                 "domain": "focus.de",
                 "rules": [
                     {
@@ -2111,19 +2164,19 @@
                 ]
             },
             {
-                "domain": "gute-garne.de",
+                "domain": "guard.io",
                 "rules": [
                     {
-                        "selector": ".ad",
+                        "selector": "#credential_picker_container",
                         "type": "override"
                     }
                 ]
             },
             {
-                "domain": "guard.io",
+                "domain": "gute-garne.de",
                 "rules": [
                     {
-                        "selector": "#credential_picker_container",
+                        "selector": ".ad",
                         "type": "override"
                     }
                 ]
@@ -2184,18 +2237,6 @@
                 ]
             },
             {
-                "domain": "houstonchronicle.com",
-                "rules": [
-                    {
-                        "type": "disable-default"
-                    },
-                    {
-                        "selector": "[id*='google_ads_iframe']",
-                        "type": "hide-empty"
-                    }
-                ]
-            },
-            {
                 "domain": "hindustantimes.com",
                 "rules": [
                     {
@@ -2221,6 +2262,18 @@
                     {
                         "selector": "[id^='div-gpt-ad-']",
                         "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "houstonchronicle.com",
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    },
+                    {
+                        "selector": "[id*='google_ads_iframe']",
+                        "type": "hide-empty"
                     }
                 ]
             },
@@ -3710,6 +3763,17 @@
                 "domain": "sfchronicle.com",
                 "rules": [
                     {
+                        "type": "disable-default"
+                    },
+                    {
+                        "selector": "[class*='belowMastheadWrapper']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[data-block-type='ad']",
+                        "type": "hide-empty"
+                    },
+                    {
                         "selector": "[class*='belowMastheadWrapper']",
                         "type": "hide-empty"
                     }
@@ -4460,11 +4524,11 @@
                         "type": "hide-empty"
                     },
                     {
-                        "selector": "[data-pw='top-center-ad']",
+                        "selector": "[data-pw='top-center-ad'], .cls-ad-top-center",
                         "type": "hide"
                     },
                     {
-                        "selector": "[id^='sda-WFPAD-'], .native-ad-item, .stream-ad",
+                        "selector": "[id^='sda-WFPAD-'], .native-ad-item, .stream-ad, .native-ad, .ad-item",
                         "type": "hide-empty"
                     }
                 ]
@@ -4790,22 +4854,6 @@
                     },
                     {
                         "selector": "ins.adsbygoogle",
-                        "type": "hide-empty"
-                    }
-                ]
-            },
-            {
-                "domain": "sfchronicle.com",
-                "rules": [
-                    {
-                        "type": "disable-default"
-                    },
-                    {
-                        "selector": "[data-block-type='ad']",
-                        "type": "hide-empty"
-                    },
-                    {
-                        "selector": "[class*='belowMastheadWrapper']",
                         "type": "hide-empty"
                     }
                 ]

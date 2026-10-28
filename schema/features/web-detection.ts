@@ -18,17 +18,6 @@ type Triggers = Partial<{
     auto: AutoTrigger;
 }>;
 
-type ActionBase = {
-    state?: FeatureState;
-};
-
-type Actions = Partial<{
-    breakageReportData: ActionBase;
-    fireEvent: ActionBase & {
-        type: string;
-    };
-}>;
-
 export type ConditionBranch<Final> = ConditionNode<Final> | ConditionNode<Final>[];
 
 type ConditionOperator = 'any' | 'all' | 'none';
@@ -74,11 +63,128 @@ export type MatchConditionSingle = {
     [K in keyof ConditionTypes]?: ConditionBranch<ConditionTypes[K]>;
 };
 
+type Name = string;
+
+type PayloadKey = string;
+
+type Modifiers = {
+    using?: string | UsingBody | ExprObject;
+    is?: Predicate;
+};
+
+type Arg = Expr;
+
+type FieldRead =
+    | string
+    | {
+          path: string;
+          args?: Arg[];
+      }
+    | ExprObject;
+
+type TypeName = 'number' | 'string' | 'boolean' | 'null' | 'undefined' | 'array' | 'object';
+
+type PredicateReserved = {
+    any?: MaybeArray<Predicate>;
+    all?: MaybeArray<Predicate>;
+    none?: MaybeArray<Predicate>;
+    field?: FieldRead;
+    is?: Predicate;
+};
+
+type PredicateOperators = {
+    eq?: Expr;
+    in?: MaybeArray<Expr>;
+    lt?: Expr;
+    lte?: Expr;
+    gt?: Expr;
+    gte?: Expr;
+    fails?: boolean;
+    type?: MaybeArray<TypeName>;
+};
+
+type PredicateObject = PredicateReserved & PredicateOperators & { [path: string]: Predicate | Expr | FieldRead | undefined };
+
+export type Predicate = string | number | boolean | null | PredicateObject;
+
+type Root = {
+    root?: MaybeArray<Expr>;
+};
+
+type ItemKeys = {
+    where?: Predicate | Expr;
+    field?: FieldRead;
+};
+
+export type ElementBody = ConditionTypes['element'] & Root & ItemKeys;
+export type TextBody = ConditionTypes['text'] & Root;
+export type ApiBody = {
+    path: string;
+    args?: Arg[];
+} & ItemKeys;
+type UsingBody = ApiBody;
+type SelfBody = {
+    path?: string;
+    args?: Arg[];
+} & ItemKeys;
+
+type Operands = MaybeArray<Expr>;
+
+type ExprKeys = {
+    element: ConditionBranch<ElementBody>;
+    text: ConditionBranch<TextBody>;
+    api: string | ApiBody;
+    self: string | SelfBody;
+    expr: Expr | Expr[];
+    only: Expr;
+    sum: Operands;
+    mul: Operands;
+    div: [
+        Expr,
+        Expr,
+    ];
+    if: Expr;
+    any: Operands;
+    all: Operands;
+    none: Operands;
+    ref: Name;
+};
+
+type Branches = {
+    then?: Body;
+    else?: Body;
+};
+
+export type ExprObject = Partial<ExprKeys> & Modifiers & Branches;
+
+export type ActionObject = Partial<{
+    fireEvent: {
+        type: string;
+        data?: PayloadSpec;
+    };
+    breakageReportData: {
+        data?: PayloadSpec;
+    };
+    define: Record<Name, Expr>;
+}>;
+
+export type Expr = number | boolean | string | null | ExprObject | ActionObject;
+
+export type Body = Expr | Expr[];
+
+export type PayloadField = {
+    value: Expr;
+    when?: Predicate;
+    buckets?: Record<string, Predicate>;
+};
+
+export type PayloadSpec = Record<PayloadKey, PayloadField>;
+
 export type DetectorConfig = {
     state?: FeatureState;
-    match: ConditionBranch<MatchConditionSingle>;
     triggers?: Triggers;
-    actions?: Actions;
+    match?: Expr;
+    actions: Body;
 };
 
 type DetectorGroup = Record<string, DetectorConfig>;
