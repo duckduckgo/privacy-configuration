@@ -1793,6 +1793,20 @@
                         "value": "enabled"
                     }
                 ]
+            },
+            // Browser-internal pages. The macOS tab web view behind a native page (new tab, settings, bookmarks)
+            // loads an empty duck:// document with no title or text. Must stay after the entry that enables the detector
+            {
+                "condition": {
+                    "urlPattern": "duck://*"
+                },
+                "patchSettings": [
+                    {
+                        "op": "replace",
+                        "path": "/detectors/blankPage/no_text_or_title/state",
+                        "value": "disabled"
+                    }
+                ]
             }
         ]
     }
