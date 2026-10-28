@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { clientDetectors, compareVersions, fireEventTypes } from './clients.js';
+import { clientDetectors, compareVersions, fireEventTypes, runsOnBreakageReport, writesBreakageData } from './clients.js';
 import { validateDetector } from './validator/validate.js';
 import { itemWalkWarnings, repeatedEventWarnings } from './validator/warnings.js';
 
@@ -477,6 +477,40 @@ describe('webDetection config tests', () => {
                 expect(fireEventTypes({ match: true, actions: { fireEvent: { type: 'd' } } })).to.deep.equal([
                     'd',
                 ]);
+            });
+
+            it('finds a breakageReportData action in branches and sequences', () => {
+                expect(
+                    writesBreakageData({
+                        actions: [
+                            { define: { x: 1 } },
+                            {
+                                if: true,
+                                then: { fireEvent: { type: 'a' } },
+                                else: [
+                                    { breakageReportData: {} },
+                                ],
+                            },
+                        ],
+                    }),
+                ).to.equal(true);
+                expect(
+                    writesBreakageData({
+                        match: true,
+                        actions: [
+                            { fireEvent: { type: 'a' } },
+                            { define: { x: 1 } },
+                        ],
+                    }),
+                ).to.equal(false);
+            });
+
+            it('runs a detector on a breakage report unless it or its trigger is disabled', () => {
+                expect(runsOnBreakageReport({ match: true, actions: {} })).to.equal(true);
+                expect(runsOnBreakageReport({ state: 'disabled', match: true, actions: {} })).to.equal(false);
+                expect(runsOnBreakageReport({ triggers: { breakageReport: { state: 'disabled' } }, match: true, actions: {} })).to.equal(
+                    false,
+                );
             });
         });
     });

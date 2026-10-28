@@ -10,7 +10,7 @@ import { asArray, isPlainObject } from './validator/walk.js';
  */
 export const CLIENT_RELEASES = [
     {
-        configs: /^v5\/android-config\.json$/,
+        configs: /^v\d+\/android-config\.json$/,
         injectNames: [
             'android',
             'android-adsjs',
@@ -18,14 +18,14 @@ export const CLIENT_RELEASES = [
         version: 99990000,
     },
     {
-        configs: /^v5\/windows-config\.json$/,
+        configs: /^v\d+\/windows-config\.json$/,
         injectNames: [
             'windows',
         ],
         version: '999.0.0',
     },
     {
-        configs: /^v5\/(ios|macos)-config\.json$/,
+        configs: /^v\d+\/(ios|macos)-config\.json$/,
         injectNames: [
             'apple',
             'apple-isolated',
@@ -33,7 +33,7 @@ export const CLIENT_RELEASES = [
         version: '999.0.0',
     },
     {
-        configs: /^v5\/extension(-[a-z0-9]+)?-config\.json$/,
+        configs: /^v\d+\/extension(-[a-z0-9]+)?-config\.json$/,
         injectNames: [
             'chrome-mv3',
             'chrome',
@@ -155,6 +155,37 @@ export function fireEventTypes(detector) {
     return [
         ...new Set(types),
     ];
+}
+
+/**
+ * Whether any `breakageReportData` action sits in a detector's `actions`, in branches and sequences.
+ *
+ * @param {Record<string, any>} detector
+ * @returns {boolean}
+ */
+export function writesBreakageData(detector) {
+    /**
+     * @param {unknown} node
+     * @returns {boolean}
+     */
+    const visit = (node) => {
+        if (Array.isArray(node)) return node.some(visit);
+        if (!isPlainObject(node)) return false;
+        return 'breakageReportData' in node || Object.values(node).some(visit);
+    };
+    return visit(detector.actions);
+}
+
+/**
+ * Whether a breakage report can run the detector: neither the detector nor its `breakageReport`
+ * trigger is disabled. The trigger is enabled when the config omits it, and run conditions only
+ * narrow where it runs.
+ *
+ * @param {Record<string, any>} detector
+ * @returns {boolean}
+ */
+export function runsOnBreakageReport(detector) {
+    return detector.state !== 'disabled' && detector.triggers?.breakageReport?.state !== 'disabled';
 }
 
 /** `temp_` types are placeholders for detectors whose eventHub telemetry is not defined yet (for example, during experiments) */

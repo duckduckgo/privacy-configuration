@@ -1,7 +1,15 @@
 import { expect } from 'chai';
 import { buildTables } from '../../scripts/generate-element-property-tables.mjs';
 import { sequenceWebDetectionActions } from '../../util.js';
-import { CLIENT_RELEASES, TEMP_EVENT_TYPE_PREFIX, clientDetectors, eventHubConsumers, fireEventTypes } from './clients.js';
+import {
+    CLIENT_RELEASES,
+    TEMP_EVENT_TYPE_PREFIX,
+    clientDetectors,
+    eventHubConsumers,
+    fireEventTypes,
+    runsOnBreakageReport,
+    writesBreakageData,
+} from './clients.js';
 import { forEachPatchOperation, forEachPatchedDetector, forEachWebDetectionConfig, latestConfigs } from './configs.js';
 import { ACTION_KEYS, BRANCH_KEYS, EXPRESSION_KEYS, NAME_PATTERN, PROPERTY_TABLES } from './validator/grammar.js';
 import { interfaceProperties, selectorInterfaces } from './validator/types.js';
@@ -69,6 +77,35 @@ describe('webDetection config tests', () => {
                                 detector,
                             ] of Object.entries(group)) {
                                 errors.push(...validateDetector(detector, `detectors.${groupName}.${detectorId}`));
+                            }
+                        }
+                    }
+                    const unique = [
+                        ...new Set(errors),
+                    ];
+                    expect(unique, unique.join('\n')).to.deep.equal([]);
+                });
+
+                it(`at ${clients.version}, every detector a breakage report runs writes breakage data`, () => {
+                    /** @type {string[]} */
+                    const errors = [];
+                    for (const others of [
+                        true,
+                        false,
+                    ]) {
+                        const detectors = clientDetectors(settings, clients.injectNames, clients.version, others);
+                        for (const [
+                            groupName,
+                            group,
+                        ] of Object.entries(detectors)) {
+                            for (const [
+                                detectorId,
+                                detector,
+                            ] of Object.entries(group)) {
+                                if (!runsOnBreakageReport(detector) || writesBreakageData(detector)) continue;
+                                errors.push(
+                                    `detectors.${groupName}.${detectorId}: runs when a breakage report is made, since the \`breakageReport\` trigger is on unless set to "disabled" (on by default), but no \`breakageReportData\` action writes to its breakage entry; add one, or set \`triggers.breakageReport.state\` to "disabled"`,
+                                );
                             }
                         }
                     }
@@ -151,7 +188,7 @@ describe('webDetection config tests', () => {
             return found;
         };
 
-        for (const config of latestConfigs.filter(({ name }) => /^v5\/(ios|macos)-config\.json$/.test(name))) {
+        for (const config of latestConfigs.filter(({ name }) => /^v\d+\/(ios|macos)-config\.json$/.test(name))) {
             it(`${config.name} holds every action of this release's detectors in its own sequence element`, () => {
                 const detectors = config.body.features?.webDetection?.settings?.detectors ?? {};
                 const found = Object.entries(detectors).flatMap(
