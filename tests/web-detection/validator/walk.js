@@ -2,6 +2,7 @@ import {
     BRANCH_KEYS,
     COMPARISON_OPERATORS,
     EXPRESSION_KEYS,
+    ITER_KEYS,
     OPERATOR_KEYS,
     PAYLOAD_ACTIONS,
     SOURCE_KEYS,
@@ -99,6 +100,9 @@ function forEachSource(node, path, cb) {
             }
         } else if (BRANCH_KEYS.includes(key)) {
             forEachSource(value, childPath, cb);
+        } else if (ITER_KEYS.includes(key) && 'iter' in node) {
+            if (key === 'where') forEachPredicateSource(value, 'item', childPath, cb);
+            else forEachFieldSource(value, childPath, cb);
         } else if (PAYLOAD_ACTIONS.includes(key)) {
             if (isPlainObject(value)) forEachPayloadSource(value.data, `${childPath}.data`, cb);
         } else if (key === 'define') {
@@ -334,6 +338,24 @@ export function refsIn(node, found = new Set()) {
     else if (isPlainObject(node)) {
         if (typeof node.ref === 'string') found.add(node.ref);
         Object.values(node).forEach((value) => refsIn(value, found));
+    }
+    return found;
+}
+
+/**
+ * Every run name a `define` binds in an expression or body: names without `this.`.
+ *
+ * @param {unknown} node
+ * @param {Set<string>} [found]
+ * @returns {Set<string>}
+ */
+export function runNamesDefinedIn(node, found = new Set()) {
+    if (Array.isArray(node)) node.forEach((entry) => runNamesDefinedIn(entry, found));
+    else if (isPlainObject(node)) {
+        if (isPlainObject(node.define)) {
+            for (const name of Object.keys(node.define)) if (!name.startsWith('this.')) found.add(name);
+        }
+        Object.values(node).forEach((value) => runNamesDefinedIn(value, found));
     }
     return found;
 }

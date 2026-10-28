@@ -4749,51 +4749,86 @@
                             }
                         }
                     },
-                    "actions": {
+                    "actions": [
+                        // Whitespace, which the text length leaves out
+                        {
+                            "define": {
+                                "ws": {
+                                    "api": {
+                                        "path": "RegExp",
+                                        "args": [
+                                            "\\s+",
+                                            "g"
+                                        ]
+                                    }
+                                }
+                            }
+                        },
                         // Measurement: loaded images, broken images and rendered text length. An image our protections block reads as broken
-                        "breakageReportData": {
-                            "data": {
-                                "loadedImages": {
-                                    "value": {
-                                        "element": {
-                                            "selector": "img",
-                                            "where": {
-                                                "complete": true,
-                                                "naturalWidth": {
-                                                    "gt": 0
+                        {
+                            "breakageReportData": {
+                                "data": {
+                                    "loadedImages": {
+                                        "value": {
+                                            "element": {
+                                                "selector": "img",
+                                                "where": {
+                                                    "complete": true,
+                                                    "naturalWidth": {
+                                                        "gt": 0
+                                                    }
+                                                }
+                                            },
+                                            "using": "length"
+                                        }
+                                    },
+                                    "brokenImages": {
+                                        "value": {
+                                            "element": {
+                                                "selector": "img",
+                                                "where": {
+                                                    "complete": true,
+                                                    "naturalWidth": 0,
+                                                    "currentSrc.length": {
+                                                        "gt": 0
+                                                    }
+                                                }
+                                            },
+                                            "using": "length"
+                                        }
+                                    },
+                                    // Non-whitespace characters, summed over chunks of about 8 KB so no copy of the whole text is kept
+                                    "bodyTextLength": {
+                                        "value": {
+                                            "sum": {
+                                                "iter": {
+                                                    "text": {
+                                                        "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                                        "pattern": "[\\s\\S]+"
+                                                    }
+                                                },
+                                                "field": {
+                                                    "api": {
+                                                        "path": "String.prototype.replace.call",
+                                                        "args": [
+                                                            {
+                                                                "self": {}
+                                                            },
+                                                            {
+                                                                "ref": "ws"
+                                                            },
+                                                            ""
+                                                        ]
+                                                    },
+                                                    "using": "length"
                                                 }
                                             }
-                                        },
-                                        "using": "length"
-                                    }
-                                },
-                                "brokenImages": {
-                                    "value": {
-                                        "element": {
-                                            "selector": "img",
-                                            "where": {
-                                                "complete": true,
-                                                "naturalWidth": 0,
-                                                "currentSrc.length": {
-                                                    "gt": 0
-                                                }
-                                            }
-                                        },
-                                        "using": "length"
-                                    }
-                                },
-                                "bodyTextLength": {
-                                    "value": {
-                                        "text": {
-                                            "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
-                                            "pattern": "\\S"
-                                        },
-                                        "using": "length"
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
+                    ]
                 }
             },
             "consent": {

@@ -34,6 +34,7 @@ export const EXPRESSION_KEYS = [
     'if',
     ...OPERATOR_KEYS,
     'ref',
+    'iter',
 ];
 
 /** In the order they apply: `using` binds `self` to the expression's value, and `is` tests the result. */
@@ -46,6 +47,12 @@ export const MODIFIER_KEYS = [
 export const BRANCH_KEYS = [
     'then',
     'else',
+];
+
+/** Keys valid only beside `iter`, in the order they apply to each item. */
+export const ITER_KEYS = [
+    'where',
+    'field',
 ];
 
 export const BODY_KEYS = {
@@ -165,6 +172,12 @@ export const API_ALLOWLIST = {
     'PerformanceResourceTiming.prototype': 'property',
     Reflect: 'property',
     'Reflect.has': 'method',
+    RegExp: 'method',
+    String: 'property',
+    'String.prototype': 'property',
+    'String.prototype.replace': 'method',
+    'String.prototype.replace.call': 'method',
+    'String.prototype.replace.call.length': 'property',
     document: 'property',
     'document.elementFromPoint': 'method',
     'document.elementFromPoint.matches': 'method',
@@ -216,6 +229,8 @@ export const BUILTIN_RETURN_TYPES = {
     'Number.isFinite': 'boolean',
     'Number.isNaN': 'boolean',
     'Reflect.has': 'boolean',
+    RegExp: 'object',
+    'String.prototype.replace.call': 'string',
 };
 
 /** Names that read the method before them as a function. */

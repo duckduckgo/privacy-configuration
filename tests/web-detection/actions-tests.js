@@ -42,6 +42,127 @@ describe('webDetection config tests', () => {
             });
         });
 
+        it('binds an `iter` as a recipe, which each `ref` reads again, streamed or in full', () => {
+            const widths = { iter: { element: { selector: 'img' } }, field: 'naturalWidth' };
+            expectValid({
+                actions: [
+                    { define: { widths } },
+                    {
+                        breakageReportData: {
+                            data: {
+                                total: { value: { sum: { ref: 'widths' } } },
+                                count: { value: { ref: 'widths', using: 'length' } },
+                                all: { value: { ref: 'widths' } },
+                            },
+                        },
+                    },
+                ],
+            });
+            expectError('the name is bound to an `iter`, which fills value, list, spread and root position, not number position', {
+                actions: [
+                    { define: { widths } },
+                    {
+                        define: {
+                            half: {
+                                div: [
+                                    { ref: 'widths' },
+                                    2,
+                                ],
+                            },
+                        },
+                    },
+                ],
+            });
+            expectError('the name is bound to an `iter`, which fills value, list, spread and root position, not boolean position', {
+                actions: [
+                    { define: { widths } },
+                    { if: { ref: 'widths' }, then: { breakageReportData: {} } },
+                ],
+            });
+            expectError('a detector name outlives the run', { actions: { define: { 'this.widths': widths } } });
+            expectError('where the `self` it reads outside it is not bound', {
+                actions: {
+                    define: {
+                        first: {
+                            only: { element: { selector: 'img' } },
+                            using: {
+                                expr: {
+                                    define: {
+                                        sized: {
+                                            iter: [
+                                                { self: 'naturalWidth' },
+                                            ],
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            });
+        });
+
+        it('passes a value evaluated on its first `ref` and kept by a `define` in the `where` beside an `iter`', () => {
+            const once = {
+                iter: [
+                    { if: { ref: 'lazyCount', is: { type: 'undefined' } }, then: imgCount, else: { ref: 'lazyCount' } },
+                ],
+                where: { expr: { define: { lazyCount: { self: {} } } }, is: { type: 'undefined' } },
+            };
+            expectValid({
+                actions: [
+                    { define: { count: once } },
+                    {
+                        breakageReportData: {
+                            data: {
+                                count: { value: { only: { ref: 'count' } } },
+                                again: { value: { only: { ref: 'count' } } },
+                                kept: { value: { ref: 'lazyCount' } },
+                            },
+                        },
+                    },
+                ],
+            });
+        });
+
+        it('binds a name a `define` in a stage binds for every `ref` after the `iter`', () => {
+            expectValid({
+                actions: [
+                    {
+                        define: {
+                            total: {
+                                sum: {
+                                    iter: [
+                                        1,
+                                        2,
+                                    ],
+                                    where: { expr: { define: { last: { self: {} } } }, is: { type: 'undefined' } },
+                                },
+                            },
+                        },
+                    },
+                    { breakageReportData: { data: { last: { value: { ref: 'last' } } } } },
+                ],
+            });
+            expectError('reads a run name no `define` binds before it', {
+                actions: [
+                    { breakageReportData: { data: { last: { value: { ref: 'last' } } } } },
+                    {
+                        define: {
+                            total: {
+                                sum: {
+                                    iter: [
+                                        1,
+                                    ],
+                                    where: { expr: { define: { last: { self: {} } } }, is: { type: 'undefined' } },
+                                },
+                            },
+                        },
+                    },
+                ],
+            });
+        });
+
         it('passes a measurement sending its event once, finished by a detector name', () => {
             expectValid({
                 actions: {
@@ -378,6 +499,29 @@ describe('webDetection config tests', () => {
                         is: { type: 'object' },
                     }).length,
                 ).to.equal(1);
+            });
+
+            it('warns on a walk from each item in the stages beside `iter`', () => {
+                const walksIn = (stages) =>
+                    itemWalkWarnings({ match: { any: { iter: { element: { selector: 'div' } }, ...stages } }, actions: {} }, '$');
+                expect(walksIn({ where: words })).to.deep.equal([
+                    '$.match.any.where.text.root: walks the page from each item of the enclosing `where` or `field`, and nested items walk the same nodes again; test something cheaper in an `if` first',
+                ]);
+                expect(
+                    walksIn({
+                        field: {
+                            self: {
+                                path: 'querySelectorAll',
+                                args: [
+                                    'a',
+                                ],
+                            },
+                            using: 'length',
+                            is: { gt: 0 },
+                        },
+                    }).length,
+                ).to.equal(1);
+                expect(walksIn({ where: positioned })).to.deep.equal([]);
             });
 
             it('passes a walk behind an `if`, and one outside every `where` and `field`', () => {

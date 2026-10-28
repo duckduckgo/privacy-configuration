@@ -7,6 +7,7 @@ import {
     COMPARISON_OPERATORS,
     DEFINE_NAME_PATTERN,
     EXPRESSION_KEYS,
+    ITER_KEYS,
     MODIFIER_KEYS,
     OPERATOR_KEYS,
     SOURCE_KEYS,
@@ -26,7 +27,7 @@ import {
     selectorNamesCustomElement,
     typeOf,
 } from './types.js';
-import { asArray, expressionKeysOf, forEachTextLeaf, isPlainObject, readsOuterSelf, refsIn } from './walk.js';
+import { asArray, expressionKeysOf, forEachTextLeaf, isPlainObject, readsOuterSelf, refsIn, runNamesDefinedIn } from './walk.js';
 import { selectsFromDocument } from './xpath.js';
 
 /**
@@ -76,8 +77,28 @@ export function bindItem(scope, type) {
 }
 
 /**
+ * Whether an expression is `iter` alone, with or without `where` and `field`: no `using` or `is`.
+ *
+ * @param {unknown} node
+ * @returns {node is Record<string, any>}
+ */
+function isBareIter(node) {
+    return isPlainObject(node) && !('using' in node) && !('is' in node) && expressionKeysOf(node).join() === 'iter';
+}
+
+/**
+ * Whether an `iter` operand is a source alone: `element`, `text` or `api`, with no modifier.
+ *
+ * @param {unknown} node
+ * @returns {boolean}
+ */
+function isSourceExpression(node) {
+    return isPlainObject(node) && Object.keys(node).length === 1 && SOURCE_KEYS.includes(Object.keys(node)[0]);
+}
+
+/**
  * Whether an operand of `any`, `all`, `none`, `sum` or `mul` is in spread position,
- * contributing each item of a list: a source, a ref to a name bound to a list, or an `expr` over one.
+ * contributing each item of a list: a source, an `iter`, a ref to a name bound to a list, or an `expr` over one.
  * Under `any`, `all` and `none`, `element` without `field` and `text`, and a name bound to one, are
  * presence leaves, booleans.
  *
@@ -95,6 +116,7 @@ function providesValues(node, single, ctx) {
     const body = node[keys[0]];
     switch (keys[0]) {
         case 'api':
+        case 'iter':
             return true;
         case 'text':
             return single === 'number';
@@ -202,6 +224,9 @@ export function checkExpr(node, position, scope, ctx, path) {
     for (const key of keys) {
         if (BRANCH_KEYS.includes(key)) {
             if (!('if' in node)) fail(ctx, `${path}.${key}`, `\`${key}\` sits beside \`if\` only`);
+        } else if (ITER_KEYS.includes(key)) {
+            if (!('iter' in node))
+                fail(ctx, `${path}.${key}`, `\`${key}\` sits beside \`iter\`, or in the body of \`element\`, \`api\` or \`self\``);
         } else if (!EXPRESSION_KEYS.includes(key) && !MODIFIER_KEYS.includes(key)) fail(ctx, path, `unknown expression key "${key}"`);
     }
     const exprKeys = expressionKeysOf(node);
@@ -353,8 +378,15 @@ function checkDefine(define, scope, ctx, path) {
     ] of Object.entries(define)) {
         const namePath = `${path}.${name}`;
         if (!DEFINE_NAME_PATTERN.test(name)) fail(ctx, namePath, `name does not match ${DEFINE_NAME_PATTERN}`);
+        // A bound `iter` is a recipe, which each `ref` evaluates again
+        const recipe = isBareIter(value);
+        if (recipe && name.startsWith('this.'))
+            fail(ctx, namePath, 'a detector name outlives the run, and each `ref` to a bound `iter` evaluates it again: bind a run name');
+        if (recipe && readsOuterSelf(value))
+            fail(ctx, namePath, 'each `ref` to a bound `iter` evaluates it again, where the `self` it reads outside it is not bound');
         // The top-level `all` of a bound value guards its operands, as a condition's does
-        const type = checkExpr(value, 'value', { ...scope, conditionRoot: true }, ctx, namePath);
+        const checked = checkExpr(value, 'value', { ...scope, conditionRoot: true }, ctx, namePath);
+        const type = recipe ? { ...checked, recipe: true } : checked;
         if (name.startsWith('this.')) {
             if (ctx.hasMatch)
                 fail(ctx, namePath, `a detector with \`match\` runs \`actions\` once, so it binds no detector name: "${name}"`);
@@ -397,6 +429,10 @@ function nameType(name, ctx) {
  * @returns {StaticType}
  */
 function refType(type, position, ctx, path) {
+    if (type.recipe && (position === 'boolean' || position === 'number')) {
+        fail(ctx, path, `the name is bound to an \`iter\`, which fills value, list, spread and root position, not ${position} position`);
+        return position === 'boolean' ? typeOf('boolean') : UNKNOWN;
+    }
     if (position === 'boolean') {
         if (type.list === 'selected' && type.leaf) return typeOf('boolean');
         if (type.list !== undefined) fail(ctx, path, 'boolean position takes a boolean, and the name is bound to a list');
@@ -583,7 +619,13 @@ function checkExprKey(key, body, position, scope, ctx, path, holder) {
             asArray(body).forEach((operand, index) => {
                 const operandPath = Array.isArray(body) ? `${path}[${index}]` : path;
                 const listed = providesValues(operand, 'number', ctx);
-                const type = checkExpr(operand, listed ? 'spread' : 'number', child(scope), ctx, operandPath);
+                const type = checkExpr(
+                    operand,
+                    listed ? 'spread' : 'number',
+                    { ...child(scope), reader: listed ? 'number' : undefined },
+                    ctx,
+                    operandPath,
+                );
                 if (listed && !allows(type, 'number'))
                     fail(ctx, operandPath, `\`${key}\` takes numbers, and config types the values as ${describeType(type)}`);
                 nan ||= type.nan;
@@ -641,9 +683,10 @@ function checkExprKey(key, body, position, scope, ctx, path, holder) {
                     underNone: scope.underNone || key === 'none',
                     noneAbove: scope.noneAbove || key === 'none',
                     guards,
+                    reader: undefined,
                 };
                 if (providesValues(operand, 'boolean', ctx)) {
-                    const type = checkExpr(operand, 'spread', operandScope, ctx, operandPath);
+                    const type = checkExpr(operand, 'spread', { ...operandScope, reader: 'boolean' }, ctx, operandPath);
                     if (!allows(type, 'boolean'))
                         fail(ctx, operandPath, `\`${key}\` takes booleans, and config types the values as ${describeType(type)}`);
                 } else {
@@ -728,9 +771,63 @@ function checkExprKey(key, body, position, scope, ctx, path, holder) {
             }
             return refType(type, position, ctx, path);
         }
+        case 'iter':
+            return checkIter(body, holder ?? {}, position, scope, ctx, path);
         default:
             return UNKNOWN;
     }
+}
+
+/**
+ * `iter`: the items of a source, or the values of an array of expressions, produced as a reader
+ * pulls them. `where` and then `field` beside it apply to each item. In spread position it streams,
+ * and each entry takes the position the reader gives an operand. In value, list and root position it
+ * is read in full into a list.
+ *
+ * @param {unknown} body
+ * @param {Record<string, any>} holder - the expression object holding `iter`, with its `where` and `field`
+ * @param {Position} position
+ * @param {Scope} scope
+ * @param {Context} ctx
+ * @param {string} path
+ * @returns {StaticType}
+ */
+function checkIter(body, holder, position, scope, ctx, path) {
+    expectPosition(ctx, path, '`iter`', position, [
+        'value',
+        'list',
+        'spread',
+        'root',
+    ]);
+    const base = path.slice(0, -'.iter'.length);
+    /** @type {Scope} */
+    const inner = { ...child(scope), reader: undefined };
+    // A run name a stage binds is unbound when an entry first reads it, and bound on each read after
+    for (const name of runNamesDefinedIn(ITER_KEYS.map((key) => holder[key]))) {
+        if (!ctx.runNames.has(name)) ctx.runNames.set(name, UNKNOWN);
+    }
+    /** @type {StaticType} */
+    let itemType;
+    if (Array.isArray(body)) {
+        const single = position === 'spread' ? scope.reader : undefined;
+        const entryTypes = body.map((entry, index) => {
+            const entryPath = `${path}[${index}]`;
+            if (!single) return itemOf(checkExpr(entry, 'value', inner, ctx, entryPath));
+            // As an operand of the reader: a list entry contributes each item
+            const listed = providesValues(entry, single, ctx);
+            return checkExpr(entry, listed ? 'spread' : single, { ...inner, reader: listed ? single : undefined }, ctx, entryPath);
+        });
+        itemType = entryTypes.length ? mergeTypes(entryTypes) : UNKNOWN;
+    } else if (isSourceExpression(body)) {
+        itemType = itemOf(checkExpr(body, 'list', inner, ctx, path));
+    } else {
+        fail(ctx, path, '`iter` takes a source, `element`, `text` or `api`, or an array of expressions');
+        return UNKNOWN;
+    }
+    if ('where' in holder)
+        checkPredicate(holder.where, 'item', itemType, { ...bindItem(inner, itemType), underNone: false }, ctx, `${base}.where`);
+    const valueType = 'field' in holder ? checkFieldRead(holder.field, itemType, inner, ctx, `${base}.field`) : itemType;
+    return position === 'spread' ? valueType : { ...valueType, list: 'selected' };
 }
 
 /**

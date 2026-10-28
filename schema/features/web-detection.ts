@@ -148,6 +148,7 @@ type ExprKeys = {
     all: Operands;
     none: Operands;
     ref: Name;
+    iter: Expr | Expr[];
 };
 
 type Branches = {
@@ -155,7 +156,10 @@ type Branches = {
     else?: Body;
 };
 
-export type ExprObject = Partial<ExprKeys> & Modifiers & Branches;
+/** Valid beside `iter` only, applied to each item in this order */
+type IterKeys = ItemKeys;
+
+export type ExprObject = Partial<ExprKeys> & Modifiers & Branches & IterKeys;
 
 export type ActionObject = Partial<{
     fireEvent: {

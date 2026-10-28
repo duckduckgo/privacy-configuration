@@ -392,6 +392,44 @@ describe('webDetection config tests', () => {
                 ]);
             });
 
+            it('binds `self` to each item in the stages beside `iter`, where the per-item rule applies', () => {
+                const same = 'reads neither `self` nor a `ref`';
+                expectValid({ sum: { iter: { element: { selector: 'img' } }, field: { self: 'naturalWidth' } }, is: { gt: 0 } });
+                expectValid({
+                    sum: {
+                        iter: [
+                            1,
+                            2,
+                        ],
+                        field: {
+                            sum: [
+                                { self: {} },
+                                1,
+                            ],
+                        },
+                    },
+                    is: { gt: 0 },
+                });
+                expectError(same, { sum: { iter: { element: { selector: 'img' } }, field: imgCount }, is: { gt: 0 } });
+                expectError(same, {
+                    sum: {
+                        iter: [
+                            1,
+                        ],
+                        where: { element: { selector: 'img' } },
+                    },
+                    is: { gt: 0 },
+                });
+                expectError('`self` reads from `using`, `where` or `field`, and none encloses it', {
+                    sum: {
+                        iter: [
+                            { self: {} },
+                        ],
+                    },
+                    is: 0,
+                });
+            });
+
             it('rejects `fireEvent` and `breakageReportData` in a `where`, which run once per item, and admits `define`', () => {
                 const completeImages = (/** @type {unknown} */ then) => ({
                     define: {
