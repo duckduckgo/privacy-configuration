@@ -2,7 +2,7 @@
 
 /**
  * Generates tests/data/element-property-tables.json, the element property tables the
- * webDetection CI checks read (tests/web-detection-tests.js).
+ * webDetection CI checks read (tests/web-detection/validator/grammar.js).
  *
  * For each element interface, and each interface an element interface inherits from, the
  * output lists the attributes it declares, in its partials from every spec and through its
@@ -17,7 +17,7 @@
  *
  * Usage: node scripts/generate-element-property-tables.mjs
  *
- * tests/web-detection-tests.js imports `buildTables` to check the checked-in output is current.
+ * tests/web-detection/config-tests.js imports `buildTables` to check the checked-in output is current.
  */
 
 import { writeFileSync } from 'fs';
