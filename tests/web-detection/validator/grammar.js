@@ -33,12 +33,19 @@ export const EXPRESSION_KEYS = [
     'if',
     ...OPERATOR_KEYS,
     'ref',
+    'iter',
 ];
 
 /** Keys valid only beside `if`. */
 export const BRANCH_KEYS = [
     'then',
     'else',
+];
+
+/** Keys valid only beside `iter`, in the order they apply to each item. */
+export const ITER_KEYS = [
+    'where',
+    'field',
 ];
 
 /** Why a selected list other than the condition leaf is refused as a condition */
@@ -98,6 +105,12 @@ export const API_ALLOWLIST = {
     'PerformanceResourceTiming.prototype': 'property',
     Reflect: 'property',
     'Reflect.has': 'method',
+    RegExp: 'method',
+    String: 'property',
+    'String.prototype': 'property',
+    'String.prototype.replace': 'method',
+    'String.prototype.replace.call': 'method',
+    'String.prototype.replace.call.length': 'property',
     document: 'property',
     'document.fonts': 'property',
     'document.fonts.status': 'property',
@@ -136,6 +149,8 @@ export const BUILTIN_RETURN_TYPES = {
     'Number.isFinite': 'boolean',
     'Number.isNaN': 'boolean',
     'Reflect.has': 'boolean',
+    RegExp: 'object',
+    'String.prototype.replace.call': 'string',
 };
 
 /** Names that read the method before them as a function. */
