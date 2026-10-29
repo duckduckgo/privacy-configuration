@@ -3737,6 +3737,10 @@
                                     15000
                                 ]
                             }
+                        },
+                        // pageLoad.navigation writes this load's values to breakage reports
+                        "breakageReport": {
+                            "state": "disabled"
                         }
                     },
                     "actions": {
@@ -3996,9 +4000,6 @@
                                         }
                                     },
                                     {
-                                        "breakageReportData": {}
-                                    },
-                                    {
                                         "define": {
                                             "this.sent": true
                                         }
@@ -4101,17 +4102,6 @@
                                     },
                                     "else": "unsupported"
                                 },
-                                "status": {
-                                    "only": {
-                                        "api": {
-                                            "path": "performance.getEntriesByType",
-                                            "args": [
-                                                "navigation"
-                                            ],
-                                            "field": "responseStatus"
-                                        }
-                                    }
-                                },
                                 "bodySize": {
                                     "only": {
                                         "api": {
@@ -4146,25 +4136,6 @@
                                     "hiddenDuringLoad": {
                                         "value": {
                                             "ref": "hiddenDuringLoad"
-                                        }
-                                    },
-                                    "status": {
-                                        "value": {
-                                            "if": {
-                                                "api": {
-                                                    "path": "Reflect.has",
-                                                    "args": [
-                                                        {
-                                                            "api": "PerformanceResourceTiming.prototype"
-                                                        },
-                                                        "responseStatus"
-                                                    ]
-                                                }
-                                            },
-                                            "then": {
-                                                "ref": "status"
-                                            },
-                                            "else": "unsupported"
                                         }
                                     },
                                     "bodySize": {
@@ -4511,11 +4482,6 @@
                                     "images": {
                                         "value": {
                                             "ref": "images"
-                                        }
-                                    },
-                                    "brokenShare": {
-                                        "value": {
-                                            "ref": "brokenShare"
                                         }
                                     },
                                     "visibleBrokenImages": {
