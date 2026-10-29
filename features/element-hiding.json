@@ -551,6 +551,32 @@
             3250,
             5250
         ],
+        "conditionalChanges": [
+            {
+                "condition": {
+                    "injectName": "android",
+                    "internal": true
+                },
+                "patchSettings": [
+                    {
+                        "op": "replace",
+                        "path": "/hideTimeouts",
+                        "value": [
+                            0,
+                            100,
+                            500,
+                            1000,
+                            2000
+                        ]
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/unhideTimeouts",
+                        "value": []
+                    }
+                ]
+            }
+        ],
         "mediaAndFormSelectors": "video,canvas,embed,object,audio,map,form,input,textarea,select,option",
         "adLabelStrings": [
             "ad",
