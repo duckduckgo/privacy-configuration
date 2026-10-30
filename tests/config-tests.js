@@ -6,6 +6,7 @@ import platforms from './../platforms.js';
 import { immutableJSONPatch } from 'immutable-json-patch';
 import { getBaseFeatureConfigs, readJsoncFile } from '../util.js';
 import { CURRENT_CONFIG_VERSION } from '../constants.js';
+import { assertValidUrlPattern, forEachConditionBlock } from './url-pattern.js';
 
 const platformOutput = platforms.map((item) => item.replace('browsers/', 'extension-'));
 
@@ -167,6 +168,34 @@ describe('Config schema tests', () => {
                     }
                     if (feature?.settings?.domains) {
                         applyPatchAndValidate(featureName, feature, feature.settings.domains, config);
+                    }
+                }
+            });
+
+            // content-scope-scripts evaluates every condition of a feature's settings as it loads the feature
+            it('All condition urlPatterns should parse', () => {
+                for (const [
+                    featureName,
+                    feature,
+                ] of Object.entries(config.body.features)) {
+                    for (const key of [
+                        'conditionalChanges',
+                        'domains',
+                    ]) {
+                        const entries = feature?.settings?.[key];
+                        if (!Array.isArray(entries)) continue;
+                        for (const [
+                            index,
+                            entry,
+                        ] of entries.entries()) {
+                            forEachConditionBlock(entry?.condition, (block, blockIndex) => {
+                                if (block.urlPattern === undefined) return;
+                                assertValidUrlPattern(
+                                    block.urlPattern,
+                                    `${featureName}.settings.${key}[${index}].condition[${blockIndex}]`,
+                                );
+                            });
+                        }
                     }
                 }
             });
