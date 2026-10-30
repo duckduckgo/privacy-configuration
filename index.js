@@ -9,6 +9,7 @@ import {
     mergeEventHubTelemetry,
     mergeInterferenceTypes,
     renameEventHubImmediateTriggers,
+    arrayWebDetectionBuckets,
     addHashToFeatures,
     stripReasons,
     getBaseFeatureConfigs,
@@ -384,6 +385,8 @@ async function buildPlatforms() {
         collapseEventHubTelemetryPeriods(platformConfig);
         // Authors write `immediate`; emit the immediate trigger name this platform parses.
         renameEventHubImmediateTriggers(platformConfig, platform);
+        // Authors may write webDetection payload buckets as an object; clients read an array.
+        arrayWebDetectionBuckets(platformConfig);
 
         platformConfigs[platform] = platformConfig;
 
