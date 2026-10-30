@@ -301,12 +301,22 @@ describe('webDetection config tests', () => {
                 });
             });
 
-            it('passes an object mixing operator keys with leaf keys at the match level, which ANDs them', () => {
-                expectValid({
+            it('rejects an object mixing operator keys with leaf keys, and passes them under `all`', () => {
+                expectError('an object takes one expression key', {
                     all: [
                         { text: { pattern: 'foo' } },
                     ],
                     text: { pattern: 'bar' },
+                });
+                expectValid({
+                    all: [
+                        {
+                            all: [
+                                { text: { pattern: 'foo' } },
+                            ],
+                        },
+                        { text: { pattern: 'bar' } },
+                    ],
                 });
             });
 
@@ -357,15 +367,36 @@ describe('webDetection config tests', () => {
                 expectError('unknown payload field key', true, { a: { value: 1, bucket: {} } });
             });
 
-            it('places an object of several expression keys, an AND, in boolean and value position, never beside `is`', () => {
-                expectValid(true, { a: { value: { text: { pattern: 'a' }, element: { selector: 'img' } } } });
-                expectError('several expression keys', {
+            it('rejects several expression keys in one object, in every position', () => {
+                const oneKey = 'an object takes one expression key';
+                expectError(oneKey, true, { a: { value: { text: { pattern: 'a' }, element: { selector: 'img' } } } });
+                expectError(oneKey, { text: { pattern: 'a' }, element: { selector: 'img' } });
+                expectError(oneKey, {
+                    any: [
+                        true,
+                    ],
+                    none: [
+                        false,
+                    ],
+                });
+                expectError(oneKey, {
                     sum: [
                         { text: { pattern: 'a' }, element: { selector: 'img' } },
                     ],
                     is: { gt: 0 },
                 });
-                expectError('several expression keys', { text: { pattern: 'a' }, element: { selector: 'img' }, is: {} });
+                expectError(oneKey, { text: { pattern: 'a' }, element: { selector: 'img' }, is: {} });
+                expectError(oneKey, { text: { pattern: 'a' }, element: { selector: 'img' }, using: 'length', is: 1 });
+                expectValid(true, {
+                    a: {
+                        value: {
+                            all: [
+                                { text: { pattern: 'a' } },
+                                { element: { selector: 'img' } },
+                            ],
+                        },
+                    },
+                });
             });
 
             it('places `is` in boolean and value position', () => {

@@ -98,7 +98,7 @@ describe('webDetection config tests', () => {
             expectError('a sequence holds at least one element', { actions: [] });
             expectError('`then` sits beside `if` only', { actions: { then: { breakageReportData: {} } } });
             expectError('`if` needs `then`', { actions: { if: true, else: { breakageReportData: {} } } });
-            expectError('`if` takes no other expression key', { actions: { if: true, then: 1, api: 'document' } });
+            expectError('an object takes one expression key', { actions: { if: true, then: 1, api: 'document' } });
             expectError('fills value position only, not boolean position', {
                 match: { if: true, then: true },
                 actions: { breakageReportData: {} },

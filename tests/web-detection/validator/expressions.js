@@ -216,48 +216,30 @@ export function checkExpr(node, position, scope, ctx, path) {
         );
         return UNKNOWN;
     }
-    if ('if' in node && exprKeys.length > 1) fail(ctx, path, '`if` takes no other expression key beside it');
-    if (scope.inItem) {
-        for (const key of exprKeys) {
-            if (SOURCE_KEYS.includes(key) && !readsOuterSelf({ [key]: node[key] }) && refsIn(node[key]).size === 0) {
-                fail(
-                    ctx,
-                    `${path}.${key}`,
-                    'reads neither `self` nor a `ref`, so it gives every item of the enclosing `where` or `field` the same value: `define` it before',
-                );
-            }
-        }
+    // Clients deliver an object's keys in no guaranteed order, so an object holds one expression
+    if (exprKeys.length > 1) {
+        fail(ctx, path, `an object takes one expression key, and this one has ${exprKeys.join(', ')}: \`{"all": [...]}\` ANDs several`);
+        return UNKNOWN;
+    }
+    const key = exprKeys[0];
+    if (scope.inItem && SOURCE_KEYS.includes(key) && !readsOuterSelf({ [key]: node[key] }) && refsIn(node[key]).size === 0) {
+        fail(
+            ctx,
+            `${path}.${key}`,
+            'reads neither `self` nor a `ref`, so it gives every item of the enclosing `where` or `field` the same value: `define` it before',
+        );
     }
     const hasIs = 'is' in node;
     if (hasIs && position !== 'boolean' && position !== 'value')
         fail(ctx, path, `\`is\` gives a boolean, so it sits in boolean or value position, not ${position} position`);
-    if (exprKeys.length > 1 && !hasUsing && (hasIs || (position !== 'boolean' && position !== 'value'))) {
-        fail(
-            ctx,
-            path,
-            `several expression keys [${exprKeys.join(', ')}] are an AND, which fills boolean and value position and is never beside \`is\``,
-        );
-    }
 
     // With `is`, the expression computes a value for the predicate
     const valuePosition = hasIs ? 'value' : position;
     // With `using`, the expression keys give the value `using` reads from
-    const keyPosition = exprKeys.length > 1 ? 'boolean' : hasUsing ? 'root' : valuePosition;
-    /** @type {StaticType} */
-    let type;
-    if (exprKeys.length > 1) {
-        for (const key of exprKeys) checkExprKey(key, node[key], 'boolean', child(scope), ctx, `${path}.${key}`);
-        type = typeOf('boolean');
-    } else {
-        type = checkExprKey(exprKeys[0], node[exprKeys[0]], keyPosition, scope, ctx, `${path}.${exprKeys[0]}`, node);
-    }
+    const keyPosition = hasUsing ? 'root' : valuePosition;
+    let type = checkExprKey(key, node[key], keyPosition, scope, ctx, `${path}.${key}`, node);
     if (hasUsing) {
-        const root = Object.fromEntries(
-            exprKeys.map((key) => [
-                key,
-                node[key],
-            ]),
-        );
+        const root = { [key]: node[key] };
         const usingScope = { ...scope, bound: type, perItem: scope.perItem === true && readsOuterSelf(root) };
         type = checkUsing(node.using, type, valuePosition, usingScope, ctx, path);
     }
