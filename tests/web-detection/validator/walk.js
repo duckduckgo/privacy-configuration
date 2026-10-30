@@ -187,13 +187,10 @@ function forEachPayloadSource(data, path, cb) {
         const fieldPath = `${path}.${key}`;
         forEachSource(field.value, `${fieldPath}.value`, cb);
         forEachPredicateSource(field.when, 'value', `${fieldPath}.when`, cb);
-        if (!isPlainObject(field.buckets)) continue;
-        for (const [
-            name,
-            bucket,
-        ] of Object.entries(field.buckets)) {
-            forEachPredicateSource(bucket, 'value', `${fieldPath}.buckets.${name}`, cb);
-        }
+        if (!Array.isArray(field.buckets)) continue;
+        field.buckets.forEach((bucket, i) => {
+            if (isPlainObject(bucket)) forEachPredicateSource(bucket.is, 'value', `${fieldPath}.buckets.${i}.is`, cb);
+        });
     }
 }
 

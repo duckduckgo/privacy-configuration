@@ -199,9 +199,6 @@ export function checkPayloadSpec(data, action, ctx, path, scope = PAYLOAD_SCOPE)
     }
 }
 
-/** A bucket name a JS object lists first, in ascending order, whatever order the config writes it in. */
-const INTEGER_NAME = /^(0|[1-9][0-9]*)$/;
-
 /**
  * @typedef {{ lo: number, loIn: boolean, hi: number, hiIn: boolean, strict?: boolean }} Interval
  * @typedef {{ intervals: Interval[], points: unknown[] }} BucketSet
@@ -332,27 +329,36 @@ function bucketSetsOverlap(a, b) {
  * @param {string} path
  */
 function checkBuckets(buckets, type, ctx, path) {
-    if (!isPlainObject(buckets) || Object.keys(buckets).length === 0) {
-        fail(ctx, path, '`buckets` maps at least one bucket name to a predicate');
+    if (!Array.isArray(buckets) || buckets.length === 0) {
+        fail(ctx, path, '`buckets` is an array of at least one `{"name", "is"}` bucket');
         return;
     }
     /** @type {{ name: string, set: BucketSet }[]} */
     const simple = [];
-    for (const [
-        name,
-        predicate,
-    ] of Object.entries(buckets)) {
-        if (name === '') fail(ctx, path, 'a bucket name is a non-empty string');
-        if (INTEGER_NAME.test(name))
-            fail(ctx, path, `bucket name "${name}" is integer-like, which a JS object lists first in ascending order`);
-        const bucketPath = `${path}.${name}`;
-        checkPredicate(predicate, 'value', predicateSubject(type, predicate, ctx, bucketPath), PAYLOAD_SCOPE, ctx, bucketPath);
+    buckets.forEach((bucket, i) => {
+        const bucketPath = `${path}.${i}`;
+        if (!isPlainObject(bucket)) {
+            fail(ctx, bucketPath, 'a bucket is `{"name", "is"}`');
+            return;
+        }
+        for (const key of Object.keys(bucket)) {
+            if (key !== 'name' && key !== 'is') fail(ctx, bucketPath, `unknown bucket key "${key}"`);
+        }
+        const { name, is: predicate } = bucket;
+        if (typeof name !== 'string' || name === '') fail(ctx, `${bucketPath}.name`, 'a bucket name is a non-empty string');
+        if (!('is' in bucket)) {
+            fail(ctx, bucketPath, 'a bucket needs `is`');
+            return;
+        }
+        const isPath = `${bucketPath}.is`;
+        checkPredicate(predicate, 'value', predicateSubject(type, predicate, ctx, isPath), PAYLOAD_SCOPE, ctx, isPath);
         const set = simpleBucketSet(predicate);
-        if (set) simple.push({ name, set });
-    }
+        if (set) simple.push({ name: String(name), set });
+    });
+    // Buckets are tested in array order. Entries sharing a name may overlap
     for (let i = 0; i < simple.length; i++) {
         for (let j = i + 1; j < simple.length; j++) {
-            if (bucketSetsOverlap(simple[i].set, simple[j].set))
+            if (simple[i].name !== simple[j].name && bucketSetsOverlap(simple[i].set, simple[j].set))
                 fail(ctx, path, `buckets "${simple[i].name}" and "${simple[j].name}" overlap`);
         }
     }

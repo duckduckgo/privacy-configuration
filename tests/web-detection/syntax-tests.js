@@ -510,8 +510,18 @@ describe('webDetection config tests', () => {
 
             it('places every source and boolean expression in value position', () => {
                 expectValid(true, {
-                    matched: { value: text, buckets: { some: { length: { gt: 0 } } } },
-                    image: { value: img, buckets: { some: { length: { gt: 0 } } } },
+                    matched: {
+                        value: text,
+                        buckets: [
+                            { name: 'some', is: { length: { gt: 0 } } },
+                        ],
+                    },
+                    image: {
+                        value: img,
+                        buckets: [
+                            { name: 'some', is: { length: { gt: 0 } } },
+                        ],
+                    },
                     either: {
                         value: {
                             any: [
@@ -545,13 +555,32 @@ describe('webDetection config tests', () => {
                 }
                 expectActionsValid([
                     images,
-                    { fireEvent: { type: 't', data: { x: { value: { ref: 'images', using: 'length' }, buckets: { some: { gt: 0 } } } } } },
+                    {
+                        fireEvent: {
+                            type: 't',
+                            data: {
+                                x: {
+                                    value: { ref: 'images', using: 'length' },
+                                    buckets: [
+                                        { name: 'some', is: { gt: 0 } },
+                                    ],
+                                },
+                            },
+                        },
+                    },
                 ]);
                 expectActionsValid([
                     {
                         fireEvent: {
                             type: 't',
-                            data: { width: { value: fieldOf('img', 'naturalWidth'), buckets: { wide: { gt: 100 } } } },
+                            data: {
+                                width: {
+                                    value: fieldOf('img', 'naturalWidth'),
+                                    buckets: [
+                                        { name: 'wide', is: { gt: 100 } },
+                                    ],
+                                },
+                            },
                         },
                     },
                 ]);
@@ -673,9 +702,32 @@ describe('webDetection config tests', () => {
                     is: { length: 2, gt: 0 },
                 });
                 expectError('reads "naturalWidth" on a list', { ...img, is: { naturalWidth: 0 } });
-                expectValid(true, { images: { value: img, buckets: { many: { length: { gte: 5 } } }, when: { length: { gt: 1 } } } });
-                expectError('guard it', true, { images: { value: img, buckets: { many: { length: { gte: 5 } } }, when: { gt: 1 } } });
-                expectError('guard it', true, { sources: { value: fieldOf('img', 'src'), buckets: { long: { gt: 100 } } } });
+                expectValid(true, {
+                    images: {
+                        value: img,
+                        buckets: [
+                            { name: 'many', is: { length: { gte: 5 } } },
+                        ],
+                        when: { length: { gt: 1 } },
+                    },
+                });
+                expectError('guard it', true, {
+                    images: {
+                        value: img,
+                        buckets: [
+                            { name: 'many', is: { length: { gte: 5 } } },
+                        ],
+                        when: { gt: 1 },
+                    },
+                });
+                expectError('guard it', true, {
+                    sources: {
+                        value: fieldOf('img', 'src'),
+                        buckets: [
+                            { name: 'long', is: { gt: 100 } },
+                        ],
+                    },
+                });
             });
 
             it('checks each `field` step suits the type the previous one gives', () => {

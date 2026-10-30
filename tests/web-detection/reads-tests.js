@@ -629,7 +629,12 @@ describe('webDetection config tests', () => {
                         breakageReportData: {
                             data: {
                                 imageCount: { value: { ref: 'imageCount' } },
-                                imageElements: { value: { ref: 'imageElements' }, buckets: { two: { length: 2 } } },
+                                imageElements: {
+                                    value: { ref: 'imageElements' },
+                                    buckets: [
+                                        { name: 'two', is: { length: 2 } },
+                                    ],
+                                },
                             },
                         },
                     },

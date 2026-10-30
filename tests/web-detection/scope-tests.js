@@ -511,65 +511,232 @@ describe('webDetection config tests', () => {
                 expectError('reserved', true, { nativeData: { value: imgCount } });
                 expectError('does not match', true, { _internal: { value: imgCount } });
                 expectError('does not match', true, { '2x': { value: imgCount } });
-                expectError('needs `value`', true, { a: { buckets: { x: 1 } } });
+                expectError('needs `value`', true, {
+                    a: {
+                        buckets: [
+                            { name: 'x', is: 1 },
+                        ],
+                    },
+                });
             });
 
             it('checks buckets: at least one, and no overlap among simple predicates', () => {
-                expectValid(true, { a: { value: imgCount, buckets: { none: 0, '1-2': { gte: 1, lt: 3 }, '3+': { gte: 3 } } } });
-                expectValid(true, { a: { value: loadEventEnd, buckets: { loading: 0, fast: { gt: 0, lt: 3000 } } } });
-                expectError('at least one bucket', true, { a: { value: imgCount, buckets: {} } });
-                expectError('overlap', true, { a: { value: imgCount, buckets: { none: 0, '0-3': { gte: 0, lt: 3 } } } });
-                expectError('overlap', true, { a: { value: imgCount, buckets: { low: { lte: 3 }, high: { gte: 3 } } } });
+                expectValid(true, {
+                    a: {
+                        value: imgCount,
+                        buckets: [
+                            { name: 'none', is: 0 },
+                            { name: '1-2', is: { gte: 1, lt: 3 } },
+                            { name: '3+', is: { gte: 3 } },
+                        ],
+                    },
+                });
+                expectValid(true, {
+                    a: {
+                        value: loadEventEnd,
+                        buckets: [
+                            { name: 'loading', is: 0 },
+                            { name: 'fast', is: { gt: 0, lt: 3000 } },
+                        ],
+                    },
+                });
+                expectError('array of at least one', true, { a: { value: imgCount, buckets: [] } });
+                expectError('overlap', true, {
+                    a: {
+                        value: imgCount,
+                        buckets: [
+                            { name: 'none', is: 0 },
+                            { name: '0-3', is: { gte: 0, lt: 3 } },
+                        ],
+                    },
+                });
+                expectError('overlap', true, {
+                    a: {
+                        value: imgCount,
+                        buckets: [
+                            { name: 'low', is: { lte: 3 } },
+                            { name: 'high', is: { gte: 3 } },
+                        ],
+                    },
+                });
                 expectError('overlap', true, {
                     a: {
                         value: { api: { path: 'document.readyState' } },
-                        buckets: {
-                            early: {
-                                in: [
-                                    'loading',
-                                    'interactive',
-                                ],
+                        buckets: [
+                            {
+                                name: 'early',
+                                is: {
+                                    in: [
+                                        'loading',
+                                        'interactive',
+                                    ],
+                                },
                             },
-                            mid: 'interactive',
-                        },
+                            { name: 'mid', is: 'interactive' },
+                        ],
                     },
                 });
-                expectValid(true, { a: { value: title, buckets: { empty: { length: 0 }, any: { length: { gte: 0 } } } } });
+                expectValid(true, {
+                    a: {
+                        value: title,
+                        buckets: [
+                            { name: 'empty', is: { length: 0 } },
+                            { name: 'any', is: { length: { gte: 0 } } },
+                        ],
+                    },
+                });
             });
 
-            it('rejects integer-like bucket names, which JS lists first in ascending order', () => {
-                expectError('integer-like', true, { a: { value: imgCount, buckets: { '1+': { gte: 1 }, 0: 0 } } });
-                expectError('integer-like', true, { a: { value: imgCount, buckets: { 12: { gte: 12 } } } });
-                expectValid(true, { a: { value: imgCount, buckets: { '01': 1, '0-3': { gte: 2, lt: 3 }, '-1': -1 } } });
+            it('checks the shape of each bucket, and takes any non-empty name', () => {
+                expectError('array of at least one', true, { a: { value: imgCount, buckets: { one: 1 } } });
+                expectError('a bucket is', true, {
+                    a: {
+                        value: imgCount,
+                        buckets: [
+                            1,
+                        ],
+                    },
+                });
+                expectError('non-empty string', true, {
+                    a: {
+                        value: imgCount,
+                        buckets: [
+                            { is: 1 },
+                        ],
+                    },
+                });
+                expectError('non-empty string', true, {
+                    a: {
+                        value: imgCount,
+                        buckets: [
+                            { name: '', is: 1 },
+                        ],
+                    },
+                });
+                expectError('needs `is`', true, {
+                    a: {
+                        value: imgCount,
+                        buckets: [
+                            { name: 'one' },
+                        ],
+                    },
+                });
+                expectError('unknown bucket key "value"', true, {
+                    a: {
+                        value: imgCount,
+                        buckets: [
+                            { name: 'one', is: 1, value: 1 },
+                        ],
+                    },
+                });
+                expectValid(true, {
+                    a: {
+                        value: imgCount,
+                        buckets: [
+                            { name: '0', is: 0 },
+                            { name: '1+', is: { gte: 1 } },
+                        ],
+                    },
+                });
+            });
+
+            it('lets entries sharing a name overlap', () => {
+                expectValid(true, {
+                    a: {
+                        value: imgCount,
+                        buckets: [
+                            { name: 'edge', is: { lt: 2 } },
+                            { name: 'middle', is: { gte: 2, lt: 8 } },
+                            { name: 'edge', is: { gte: 8 } },
+                            { name: 'edge', is: { gte: 100 } },
+                        ],
+                    },
+                });
             });
 
             it('checks overlap between a literal and a comparison that converts it', () => {
                 // Config does not type `document.title`, so its buckets compare without a guard
-                expectError('overlap', true, { a: { value: title, buckets: { none: null, some: { gte: 0 } } } });
-                expectError('overlap', true, { a: { value: title, buckets: { s: '7', n: { gte: 0 } } } });
                 expectError('overlap', true, {
                     a: {
                         value: title,
-                        buckets: {
-                            s: {
-                                in: [
-                                    true,
-                                ],
-                            },
-                            n: { gte: 1 },
-                        },
+                        buckets: [
+                            { name: 'none', is: null },
+                            { name: 'some', is: { gte: 0 } },
+                        ],
                     },
                 });
-                expectValid(true, { a: { value: title, buckets: { s: '7', n: 7 } } });
-                expectValid(true, { a: { value: title, buckets: { none: null, some: { gt: 0 } } } });
-                expectValid(true, { a: { value: title, buckets: { unsupported: 'unsupported', some: { gte: 0 } } } });
+                expectError('overlap', true, {
+                    a: {
+                        value: title,
+                        buckets: [
+                            { name: 's', is: '7' },
+                            { name: 'n', is: { gte: 0 } },
+                        ],
+                    },
+                });
+                expectError('overlap', true, {
+                    a: {
+                        value: title,
+                        buckets: [
+                            {
+                                name: 's',
+                                is: {
+                                    in: [
+                                        true,
+                                    ],
+                                },
+                            },
+                            { name: 'n', is: { gte: 1 } },
+                        ],
+                    },
+                });
                 expectValid(true, {
-                    a: { value: { only: fieldOf('img', 'src') }, buckets: { none: null, some: { type: 'number', gte: 0 } } },
+                    a: {
+                        value: title,
+                        buckets: [
+                            { name: 's', is: '7' },
+                            { name: 'n', is: 7 },
+                        ],
+                    },
+                });
+                expectValid(true, {
+                    a: {
+                        value: title,
+                        buckets: [
+                            { name: 'none', is: null },
+                            { name: 'some', is: { gt: 0 } },
+                        ],
+                    },
+                });
+                expectValid(true, {
+                    a: {
+                        value: title,
+                        buckets: [
+                            { name: 'unsupported', is: 'unsupported' },
+                            { name: 'some', is: { gte: 0 } },
+                        ],
+                    },
+                });
+                expectValid(true, {
+                    a: {
+                        value: { only: fieldOf('img', 'src') },
+                        buckets: [
+                            { name: 'none', is: null },
+                            { name: 'some', is: { type: 'number', gte: 0 } },
+                        ],
+                    },
                 });
             });
 
             it('checks bucket and `when` operators against the value’s type', () => {
-                expectError('guard it', true, { a: { value: { only: fieldOf('img', 'src') }, buckets: { long: { gt: 100 } } } });
+                expectError('guard it', true, {
+                    a: {
+                        value: { only: fieldOf('img', 'src') },
+                        buckets: [
+                            { name: 'long', is: { gt: 100 } },
+                        ],
+                    },
+                });
                 expectError('guard it', true, { a: { value: { only: fieldOf('img', 'src') }, when: { gt: 100 } } });
             });
 
@@ -591,13 +758,36 @@ describe('webDetection config tests', () => {
                     then,
                     else: otherwise,
                 });
-                const buckets = { unsupported: 'unsupported', none: 0, '1+': { gte: 1 } };
+                const buckets = [
+                    { name: 'unsupported', is: 'unsupported' },
+                    { name: 'none', is: 0 },
+                    { name: '1+', is: { gte: 1 } },
+                ];
                 expectValid(true, { a: { value: engineGuarded(imgCount, 'unsupported'), buckets } });
                 // "7" and "" convert to numbers, and a string read from the page may too
-                expectError('guard it', true, { a: { value: engineGuarded(imgCount, '7'), buckets: { '1+': { gte: 1 } } } });
-                expectError('guard it', true, { a: { value: engineGuarded(imgCount, ''), buckets: { '1+': { gte: 1 } } } });
                 expectError('guard it', true, {
-                    a: { value: engineGuarded({ only: fieldOf('img', 'src') }, 'unsupported'), buckets: { '1+': { gte: 1 } } },
+                    a: {
+                        value: engineGuarded(imgCount, '7'),
+                        buckets: [
+                            { name: '1+', is: { gte: 1 } },
+                        ],
+                    },
+                });
+                expectError('guard it', true, {
+                    a: {
+                        value: engineGuarded(imgCount, ''),
+                        buckets: [
+                            { name: '1+', is: { gte: 1 } },
+                        ],
+                    },
+                });
+                expectError('guard it', true, {
+                    a: {
+                        value: engineGuarded({ only: fieldOf('img', 'src') }, 'unsupported'),
+                        buckets: [
+                            { name: '1+', is: { gte: 1 } },
+                        ],
+                    },
                 });
             });
         });

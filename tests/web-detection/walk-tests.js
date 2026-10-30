@@ -134,7 +134,12 @@ describe('webDetection config tests', () => {
                                 value: { text: { pattern: 'a' }, using: 'length' },
                                 when: { gt: { text: { pattern: 'b' }, using: 'length' } },
                             },
-                            c: { value: 1, buckets: { x: { lt: { text: { pattern: 'c' }, using: 'length' } } } },
+                            c: {
+                                value: 1,
+                                buckets: [
+                                    { name: 'x', is: { lt: { text: { pattern: 'c' }, using: 'length' } } },
+                                ],
+                            },
                         },
                     },
                     breakageReportData: { data: { d: { value: { text: { pattern: 'd' }, using: 'length' } } } },
