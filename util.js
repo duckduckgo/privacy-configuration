@@ -419,19 +419,20 @@ function arrayPayloadBuckets(data, path) {
  *
  * @param {unknown} node
  * @param {string} path
+ * @param {string} [key] - the key the value sits under: a payload action's body holds its `data`
  */
-function arrayBucketsUnder(node, path) {
+function arrayBucketsUnder(node, path, key) {
     if (Array.isArray(node)) {
         node.forEach((entry, index) => arrayBucketsUnder(entry, `${path}.${index}`));
         return;
     }
     if (!isJsonObject(node)) return;
+    if (key !== undefined && WEB_DETECTION_PAYLOAD_ACTIONS.includes(key)) arrayPayloadBuckets(node.data, `${path}.data`);
     for (const [
-        key,
+        childKey,
         value,
     ] of Object.entries(node)) {
-        if (WEB_DETECTION_PAYLOAD_ACTIONS.includes(key) && isJsonObject(value)) arrayPayloadBuckets(value.data, `${path}.${key}.data`);
-        arrayBucketsUnder(value, `${path}.${key}`);
+        arrayBucketsUnder(value, `${path}.${childKey}`, childKey);
     }
 }
 
@@ -471,7 +472,7 @@ export function arrayWebDetectionBuckets(config) {
             if (dataIndex !== -1 && rest.length === 0) arrayPayloadBuckets(operation.value, path);
             else if (dataIndex !== -1 && rest.length === 1) arrayFieldBuckets(operation.value, path);
             else if (dataIndex !== -1 && rest.length === 2 && rest[1] === 'buckets') operation.value = bucketArray(operation.value, path);
-            else arrayBucketsUnder(operation.value, path);
+            else arrayBucketsUnder(operation.value, path, segments[segments.length - 1]);
         }
     }
 }

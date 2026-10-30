@@ -791,6 +791,16 @@ describe('arrayWebDetectionBuckets', () => {
                             path: '/detectors/g/d/actions/1/else/breakageReportData/data/n/buckets/0',
                             value: { name: 'zero', is: 0 },
                         },
+                        {
+                            op: 'replace',
+                            path: '/detectors/g/d/actions/1/then/fireEvent',
+                            value: { type: 'c', data: { n: { value: 1, buckets: ranges } } },
+                        },
+                        {
+                            op: 'replace',
+                            path: '/detectors/g/e/actions/breakageReportData',
+                            value: { data: { n: { value: 1, buckets: ranges } } },
+                        },
                     ],
                 },
             ],
@@ -807,6 +817,8 @@ describe('arrayWebDetectionBuckets', () => {
         expect(patches[2].value.buckets).to.deep.equal(rangeArray);
         expect(patches[3].value).to.deep.equal(rangeArray);
         expect(patches[4].value).to.deep.equal({ name: 'zero', is: 0 });
+        expect(patches[5].value.data.n.buckets).to.deep.equal(rangeArray);
+        expect(patches[6].value.data.n.buckets).to.deep.equal(rangeArray);
     });
 
     it('rejects an integer-like name in object buckets, and a patch addressing a bucket by name', () => {
