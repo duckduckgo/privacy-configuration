@@ -3,8 +3,8 @@
         "description": "Element interface attributes and types, and tag to interface maps, for the webDetection CI checks.",
         "generatedBy": "scripts/generate-element-property-tables.mjs",
         "sources": {
-            "@webref/idl": "3.85.1",
-            "@webref/elements": "2.9.1"
+            "@webref/idl": "3.86.0",
+            "@webref/elements": "2.9.2"
         }
     },
     "reservedNameProperties": [
@@ -629,6 +629,7 @@
                 "onformdata": "EventHandlerNonNull?",
                 "ongotpointercapture": "EventHandlerNonNull?",
                 "oninput": "EventHandlerNonNull?",
+                "oninstallresult": "EventHandlerNonNull?",
                 "oninvalid": "EventHandlerNonNull?",
                 "onkeydown": "EventHandlerNonNull?",
                 "onkeypress": "EventHandlerNonNull?",
@@ -934,6 +935,7 @@
                 "formNoValidate": "boolean",
                 "formTarget": "DOMString",
                 "height": "unsigned long",
+                "hspace": "unsigned long",
                 "indeterminate": "boolean",
                 "labels": "NodeList?",
                 "list": "HTMLDataListElement?",
@@ -962,6 +964,7 @@
                 "value": "DOMString",
                 "valueAsDate": "object?",
                 "valueAsNumber": "unrestricted double",
+                "vspace": "unsigned long",
                 "webkitEntries": "FrozenArray<FileSystemEntry>",
                 "webkitdirectory": "boolean",
                 "width": "unsigned long",
@@ -973,9 +976,8 @@
             "properties": {
                 "invalidReason": "DOMString",
                 "isValid": "boolean",
-                "manifest": "USVString?",
-                "manifestId": "USVString?",
-                "oninstallresult": "EventHandlerNonNull?",
+                "manifest": "USVString",
+                "manifestId": "USVString",
                 "onvalidationstatuschange": "EventHandlerNonNull?"
             }
         },
@@ -1277,11 +1279,13 @@
                 "event": "DOMString",
                 "fetchPriority": "DOMString",
                 "htmlFor": "DOMString",
+                "innerText": "(TrustedScript or DOMString)",
                 "integrity": "DOMString",
                 "noModule": "boolean",
                 "referrerPolicy": "DOMString",
-                "src": "USVString",
-                "text": "DOMString",
+                "src": "(TrustedScriptURL or USVString)",
+                "text": "(TrustedScript or DOMString)",
+                "textContent": "(TrustedScript or DOMString)?",
                 "type": "DOMString"
             }
         },
@@ -1590,6 +1594,7 @@
                 "onformdata": "EventHandlerNonNull?",
                 "ongotpointercapture": "EventHandlerNonNull?",
                 "oninput": "EventHandlerNonNull?",
+                "oninstallresult": "EventHandlerNonNull?",
                 "oninvalid": "EventHandlerNonNull?",
                 "onkeydown": "EventHandlerNonNull?",
                 "onkeypress": "EventHandlerNonNull?",
@@ -1808,6 +1813,7 @@
                 "onformdata": "EventHandlerNonNull?",
                 "ongotpointercapture": "EventHandlerNonNull?",
                 "oninput": "EventHandlerNonNull?",
+                "oninstallresult": "EventHandlerNonNull?",
                 "oninvalid": "EventHandlerNonNull?",
                 "onkeydown": "EventHandlerNonNull?",
                 "onkeypress": "EventHandlerNonNull?",
@@ -2229,6 +2235,7 @@
                 "height": "SVGAnimatedLength",
                 "href": "SVGAnimatedString",
                 "preserveAspectRatio": "SVGAnimatedPreserveAspectRatio",
+                "referrerPolicy": "DOMString",
                 "width": "SVGAnimatedLength",
                 "x": "SVGAnimatedLength",
                 "y": "SVGAnimatedLength"
@@ -2384,6 +2391,7 @@
             "properties": {
                 "crossOrigin": "DOMString?",
                 "href": "SVGAnimatedString",
+                "referrerPolicy": "DOMString",
                 "type": "DOMString"
             }
         },
@@ -2438,6 +2446,7 @@
             "properties": {
                 "href": "SVGAnimatedString",
                 "method": "SVGAnimatedEnumeration",
+                "side": "SVGAnimatedEnumeration",
                 "spacing": "SVGAnimatedEnumeration",
                 "startOffset": "SVGAnimatedLength"
             }
