@@ -926,6 +926,28 @@
                 "optOutRetryError96Hours": {
                     "state": "enabled",
                     "minSupportedVersion": "1.196.0"
+                },
+                "challengeSolver": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "enabledBrokers": [
+                            "clustal.org",
+                            "usa-people-search.com"
+                        ],
+                        "autoPassWaitSeconds": 5,
+                        "checkboxOffsetPoints": 20,
+                        "labelText": "Verify you are human"
+                    }
                 }
             },
             "minSupportedVersion": "1.70.0"
