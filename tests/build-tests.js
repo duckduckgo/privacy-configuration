@@ -7,9 +7,9 @@ import {
     mergeEventHubTelemetry,
     mergeInterferenceTypes,
     renameEventHubImmediateTriggers,
-    arrayWebDetectionBuckets,
     addHashToFeatures,
 } from '../util.js';
+import { arrayWebDetectionBuckets } from '../web-detection-util.js';
 import { compatFunctions } from '../compatibility.js';
 
 const ta1 = {

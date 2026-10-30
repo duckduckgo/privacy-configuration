@@ -9,12 +9,12 @@ import {
     mergeEventHubTelemetry,
     mergeInterferenceTypes,
     renameEventHubImmediateTriggers,
-    arrayWebDetectionBuckets,
     addHashToFeatures,
     stripReasons,
     getBaseFeatureConfigs,
     readJsoncFile,
 } from './util.js';
+import { arrayWebDetectionBuckets } from './web-detection-util.js';
 
 import { OVERRIDE_DIR, GENERATED_DIR, LISTS_DIR, BROWSERS_SUBDIR, CURRENT_CONFIG_VERSION, UNPROTECTED_LIST_NAME } from './constants.js';
 
