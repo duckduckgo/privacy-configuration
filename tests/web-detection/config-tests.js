@@ -207,7 +207,7 @@ describe('webDetection config tests', () => {
             });
         }
 
-        it('rewrites several action keys and a define of several names into a sequence (self-test)', () => {
+        it('rewrites several action keys and a define of several names into a sequence, and a patched sequence element into an `if` (self-test)', () => {
             const config = {
                 features: {
                     webDetection: {
@@ -237,6 +237,13 @@ describe('webDetection config tests', () => {
                                             path: '/detectors/g/list/actions',
                                             value: { breakageReportData: {}, fireEvent: { type: 'd' } },
                                         },
+                                        {
+                                            op: 'add',
+                                            path: '/detectors/g/list/actions/1',
+                                            value: { fireEvent: { type: 'e' }, define: { 'this.sent': true } },
+                                        },
+                                        { op: 'replace', path: '/detectors/g/list/actions/1/then/0', value: { define: { a: 1, b: 2 } } },
+                                        { op: 'add', path: '/detectors/g/list/actions/-', value: { fireEvent: { type: 'f' } } },
                                     ],
                                 },
                             ],
@@ -272,6 +279,22 @@ describe('webDetection config tests', () => {
                 { breakageReportData: {} },
                 { fireEvent: { type: 'd' } },
             ]);
+            // A sequence element holds no nested sequence, so several actions take an always-taken `if`
+            expect(settings.conditionalChanges[0].patchSettings[2].value).to.deep.equal({
+                if: true,
+                then: [
+                    { fireEvent: { type: 'e' } },
+                    { define: { 'this.sent': true } },
+                ],
+            });
+            expect(settings.conditionalChanges[0].patchSettings[3].value).to.deep.equal({
+                if: true,
+                then: [
+                    { define: { a: 1 } },
+                    { define: { b: 2 } },
+                ],
+            });
+            expect(settings.conditionalChanges[0].patchSettings[4].value).to.deep.equal({ fireEvent: { type: 'f' } });
         });
     });
 

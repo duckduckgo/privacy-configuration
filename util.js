@@ -231,6 +231,13 @@ const WEB_DETECTION_ACTION_KEYS = [
     'define',
 ];
 
+/** Keys whose value is a body: an expression or a sequence of them. */
+const BODY_KEYS = [
+    'actions',
+    'then',
+    'else',
+];
+
 /**
  * @param {unknown} value
  * @returns {value is Record<string, any>}
@@ -306,6 +313,18 @@ function sequenceExpression(node) {
 }
 
 /**
+ * One element of a sequence, rewritten as `sequenceBody` would splice it. A sequence element holds no
+ * nested sequence, so several actions become an `if` that always takes its `then`, run in order.
+ *
+ * @param {unknown} element
+ * @returns {unknown}
+ */
+function sequenceElement(element) {
+    const elements = splitActions(sequenceExpression(element));
+    return elements.length === 1 ? elements[0] : { if: true, then: elements };
+}
+
+/**
  * A webDetection detector with its `actions` rewritten by `sequenceBody`.
  *
  * @param {unknown} detector
@@ -349,14 +368,10 @@ export function sequenceWebDetectionActions(config) {
                 for (const id of Object.keys(operation.value ?? {})) operation.value[id] = sequenceDetector(operation.value[id]);
             } else if (segments.length === 3) {
                 operation.value = sequenceDetector(operation.value);
-            } else if (
-                [
-                    'actions',
-                    'then',
-                    'else',
-                ].includes(segments[segments.length - 1])
-            ) {
+            } else if (BODY_KEYS.includes(segments[segments.length - 1])) {
                 operation.value = sequenceBody(operation.value);
+            } else if (/^(\d+|-)$/.test(segments[segments.length - 1]) && BODY_KEYS.includes(segments[segments.length - 2])) {
+                operation.value = sequenceElement(operation.value);
             } else {
                 operation.value = sequenceExpression(operation.value);
             }
