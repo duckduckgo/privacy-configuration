@@ -155,7 +155,10 @@ type Branches = {
     else?: Body;
 };
 
-export type ExprObject = Partial<ExprKeys> & Modifiers & Branches;
+/** Clients deliver an object's keys in no guaranteed order, so an object holds one expression key: `{"all": [...]}` ANDs several. */
+type OneExprKey = { [K in keyof ExprKeys]: Pick<ExprKeys, K> }[keyof ExprKeys];
+
+export type ExprObject = OneExprKey & Modifiers & Branches;
 
 export type ActionObject = Partial<{
     fireEvent: {
