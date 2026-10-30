@@ -21,6 +21,23 @@ describe('webDetection config tests', () => {
             ]);
         });
 
+        it('reaches leaves in an `iter` operand and in the stages beside it', () => {
+            const match = {
+                any: {
+                    iter: [
+                        { text: { pattern: 'a' } },
+                    ],
+                    where: { text: { pattern: 'b', root: { self: {} } } },
+                    field: { text: { pattern: 'c', root: { self: {} } } },
+                },
+            };
+            expect(collect(match)).to.deep.equal([
+                'a',
+                'b',
+                'c',
+            ]);
+        });
+
         it('reaches leaves through operator blocks at both levels', () => {
             const match = {
                 all: [

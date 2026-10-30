@@ -50,6 +50,7 @@ const RESERVED_KEYS = [
     'div',
     'if',
     'ref',
+    'iter',
 ];
 
 /** Element specs in @webref/elements, by namespace. SVG 1.1 is left out: SVG 2 and its modules supersede it. */

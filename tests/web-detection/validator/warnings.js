@@ -112,7 +112,11 @@ export function itemWalkWarnings(detector, path) {
             value,
         ] of Object.entries(node)) {
             const childPath = `${nodePath}.${key}`;
-            if (key === 'element' || key === 'text') {
+            if ((key === 'where' || key === 'field') && 'iter' in node) {
+                // The stages beside `iter` run once per item
+                if (key === 'where') visit(value, childPath, true);
+                else visitRead(value, childPath, true);
+            } else if (key === 'element' || key === 'text') {
                 forEachTextLeaf(value, childPath, (body, bodyPath) => {
                     if (exposed && 'root' in body && readsOuterSelf(body.root)) warn(`${bodyPath}.root`);
                     visit(body.root, `${bodyPath}.root`, exposed);

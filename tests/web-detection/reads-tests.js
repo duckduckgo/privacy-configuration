@@ -191,6 +191,49 @@ describe('webDetection config tests', () => {
                 expectError('A string fills', { ...words, is: { lte: 'x' } });
             });
 
+            it('counts non-whitespace characters with `String.prototype.replace` and a `RegExp` bound once', () => {
+                const ws = {
+                    api: {
+                        path: 'RegExp',
+                        args: [
+                            '\\s+',
+                            'g',
+                        ],
+                    },
+                };
+                const stripped = (pattern) => ({
+                    api: {
+                        path: 'String.prototype.replace.call',
+                        args: [
+                            { self: {} },
+                            pattern,
+                            '',
+                        ],
+                    },
+                    using: 'length',
+                });
+                const chars = (pattern) => ({ sum: { iter: { text: { pattern: '[\\s\\S]+' } }, field: stripped(pattern) } });
+                expectActionsValid([
+                    { define: { ws } },
+                    { breakageReportData: { data: { chars: { value: chars({ ref: 'ws' }) } } } },
+                ]);
+                expectActionsError('reads neither `self` nor a `ref`', { breakageReportData: { data: { chars: { value: chars(ws) } } } });
+                expectError('reads the method "String.prototype.replace" without calling it', {
+                    api: { path: 'String.prototype.replace' },
+                    is: {},
+                });
+                expectError('reads the method "RegExp" without calling it', { api: { path: 'RegExp' }, is: {} });
+                expectError('"String.prototype.trim", which is not in API_ALLOWLIST', {
+                    api: {
+                        path: 'String.prototype.trim.call',
+                        args: [
+                            'a',
+                        ],
+                    },
+                    is: 'a',
+                });
+            });
+
             it('reads `length` and indexes on strings', () => {
                 expectValid({ only: text, is: { length: 1 } });
                 expectValid({ only: text, is: { 0: 'a' } });

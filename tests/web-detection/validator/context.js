@@ -13,6 +13,7 @@
  *   perItem?: boolean,
  *   inItem?: boolean,
  *   noneAbove?: boolean,
+ *   reader?: 'number' | 'boolean',
  * }} Scope
  *
  * `inMatch` is set in `match`. `conditionRoot` is set at the top of a condition, `match` or the
@@ -23,7 +24,8 @@
  * and `field`, and inside a `using` beside an expression that reads such a `self`. `inItem` is set
  * anywhere inside a `where` or `field`, where every expression runs once per item. `noneAbove` is set
  * under a `none` anywhere above, in a condition or a predicate: `where` clears `underNone` for its own
- * comparisons, and keeps `noneAbove`.
+ * comparisons, and keeps `noneAbove`. `reader` is set on a spread operand: `number` under `sum` and
+ * `mul`, `boolean` under `any`, `all` and `none`, the position the entries of an `iter` there take.
  */
 
 /**
