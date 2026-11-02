@@ -688,6 +688,287 @@
                     }
                 }
             },
+            // botDetection and fraudDetection write one element per selector: Chromium queries a single selector
+            // several times faster than a selector list holding it
+            "botDetection": {
+                // A Cloudflare Turnstile widget, its script or its global. Breakage reports only
+                "cloudflareTurnstile": {
+                    "state": "disabled",
+                    // Detected: a widget or script element, or the page global. In Apple's isolated world the global reads as absent
+                    "match": {
+                        "any": [
+                            {
+                                "element": {
+                                    "selector": ".cf-turnstile"
+                                }
+                            },
+                            {
+                                "element": {
+                                    "selector": "script[src*=\"challenges.cloudflare.com\"]"
+                                }
+                            },
+                            {
+                                "api": {
+                                    "path": "Reflect.has",
+                                    "args": [
+                                        {
+                                            "api": "window"
+                                        },
+                                        "turnstile"
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    "actions": {
+                        "breakageReportData": {
+                            "data": {
+                                "vendor": {
+                                    "value": "cloudflare"
+                                },
+                                // The widget's state: solved, failed, or null while neither shows
+                                "challengeStatus": {
+                                    "value": {
+                                        "if": {
+                                            "element": {
+                                                "selector": "[data-state=\"success\"]"
+                                            }
+                                        },
+                                        "then": "solved",
+                                        "else": {
+                                            "if": {
+                                                "element": {
+                                                    "selector": "[data-state=\"error\"]"
+                                                }
+                                            },
+                                            "then": "failed",
+                                            "else": null
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                // A Cloudflare challenge page. Breakage reports only
+                "cloudflareChallengePage": {
+                    "state": "disabled",
+                    // Detected: a challenge page element or script, or one of the challenge page's globals
+                    "match": {
+                        "any": [
+                            {
+                                "element": {
+                                    "selector": "#challenge-form"
+                                }
+                            },
+                            {
+                                "element": {
+                                    "selector": ".cf-browser-verification"
+                                }
+                            },
+                            {
+                                "element": {
+                                    "selector": "#cf-wrapper"
+                                }
+                            },
+                            {
+                                "element": {
+                                    "selector": "script[src*=\"challenges.cloudflare.com\"]"
+                                }
+                            },
+                            {
+                                "api": {
+                                    "path": "Reflect.has",
+                                    "args": [
+                                        {
+                                            "api": "window"
+                                        },
+                                        "_cf_chl_opt"
+                                    ]
+                                }
+                            },
+                            {
+                                "api": {
+                                    "path": "Reflect.has",
+                                    "args": [
+                                        {
+                                            "api": "window"
+                                        },
+                                        "__CF$cv$params"
+                                    ]
+                                }
+                            },
+                            {
+                                "api": {
+                                    "path": "Reflect.has",
+                                    "args": [
+                                        {
+                                            "api": "window"
+                                        },
+                                        "cfjsd"
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    "actions": {
+                        "breakageReportData": {
+                            "data": {
+                                "vendor": {
+                                    "value": "cloudflare"
+                                }
+                            }
+                        }
+                    }
+                },
+                // An hCaptcha widget, its script or its global. Breakage reports only
+                "hcaptcha": {
+                    "state": "disabled",
+                    // Detected: a widget or script element, or the page global
+                    "match": {
+                        "any": [
+                            {
+                                "element": {
+                                    "selector": ".h-captcha"
+                                }
+                            },
+                            {
+                                "element": {
+                                    "selector": "[data-hcaptcha-widget-id]"
+                                }
+                            },
+                            {
+                                "element": {
+                                    "selector": "script[src*=\"hcaptcha.com\"]"
+                                }
+                            },
+                            {
+                                "element": {
+                                    "selector": "script[src*=\"assets.hcaptcha.com\"]"
+                                }
+                            },
+                            {
+                                "api": {
+                                    "path": "Reflect.has",
+                                    "args": [
+                                        {
+                                            "api": "window"
+                                        },
+                                        "hcaptcha"
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    "actions": {
+                        "breakageReportData": {
+                            "data": {
+                                "vendor": {
+                                    "value": "hcaptcha"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "fraudDetection": {
+                // A phishing warning on the page. Breakage reports only
+                "phishingWarning": {
+                    "state": "disabled",
+                    // Detected: a visible warning element, or a warning phrase in the body's rendered text
+                    "match": {
+                        "any": [
+                            {
+                                "element": {
+                                    "selector": ".warning-banner",
+                                    "visibility": "visible"
+                                }
+                            },
+                            {
+                                "element": {
+                                    "selector": "#security-alert",
+                                    "visibility": "visible"
+                                }
+                            },
+                            {
+                                "api": {
+                                    "path": "RegExp",
+                                    "args": [
+                                        "suspicious.*activity|unusual.*login|verify.*account",
+                                        "i"
+                                    ]
+                                },
+                                "using": {
+                                    "path": "test",
+                                    "args": [
+                                        {
+                                            "api": "document.body.innerText"
+                                        }
+                                    ]
+                                },
+                                "is": true
+                            }
+                        ]
+                    },
+                    "actions": {
+                        "breakageReportData": {
+                            "data": {
+                                "category": {
+                                    "value": "phishing"
+                                }
+                            }
+                        }
+                    }
+                },
+                // An account suspension notice on the page. Breakage reports only
+                "accountSuspension": {
+                    "state": "disabled",
+                    // Detected: a visible notice element, or a suspension phrase in the body's rendered text
+                    "match": {
+                        "any": [
+                            {
+                                "element": {
+                                    "selector": ".account-suspended",
+                                    "visibility": "visible"
+                                }
+                            },
+                            {
+                                "element": {
+                                    "selector": "#suspension-notice",
+                                    "visibility": "visible"
+                                }
+                            },
+                            {
+                                "api": {
+                                    "path": "RegExp",
+                                    "args": [
+                                        "account.*suspended|access.*restricted",
+                                        "i"
+                                    ]
+                                },
+                                "using": {
+                                    "path": "test",
+                                    "args": [
+                                        {
+                                            "api": "document.body.innerText"
+                                        }
+                                    ]
+                                },
+                                "is": true
+                            }
+                        ]
+                    },
+                    "actions": {
+                        "breakageReportData": {
+                            "data": {
+                                "category": {
+                                    "value": "suspension"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
             "commentsDisabled": {
                 "generic": {
                     "match": {
@@ -7741,6 +8022,73 @@
                                 ]
                             }
                         ]
+                    }
+                ]
+            },
+            // Enables bot and fraud detection on the clients whose C-S-S has no bot and fraud evaluators.
+            // Older clients run those evaluators from webInterferenceDetection
+            {
+                // App versions carrying that C-S-S. The versions are placeholders until that app release is known for each
+                // platform. iOS and macOS share the apple inject names, so their real versions need the range split used above
+                "condition": [
+                    {
+                        "injectName": "android",
+                        "minSupportedVersion": 99990000
+                    },
+                    {
+                        "injectName": "android-adsjs",
+                        "minSupportedVersion": 99990000
+                    },
+                    {
+                        "injectName": "windows",
+                        "minSupportedVersion": "999.0.0"
+                    },
+                    {
+                        "injectName": "apple",
+                        "minSupportedVersion": "999.0.0"
+                    },
+                    {
+                        "injectName": "apple-isolated",
+                        "minSupportedVersion": "999.0.0"
+                    },
+                    {
+                        "injectName": "chrome-mv3",
+                        "minSupportedVersion": "9999.1.1"
+                    },
+                    {
+                        "injectName": "chrome",
+                        "minSupportedVersion": "9999.1.1"
+                    },
+                    {
+                        "injectName": "firefox",
+                        "minSupportedVersion": "9999.1.1"
+                    }
+                ],
+                "patchSettings": [
+                    {
+                        "op": "replace",
+                        "path": "/detectors/botDetection/cloudflareTurnstile/state",
+                        "value": "enabled"
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/botDetection/cloudflareChallengePage/state",
+                        "value": "enabled"
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/botDetection/hcaptcha/state",
+                        "value": "enabled"
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/fraudDetection/phishingWarning/state",
+                        "value": "enabled"
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/fraudDetection/accountSuspension/state",
+                        "value": "enabled"
                     }
                 ]
             }

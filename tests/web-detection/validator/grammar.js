@@ -173,12 +173,15 @@ export const API_ALLOWLIST = {
     Reflect: 'property',
     'Reflect.has': 'method',
     RegExp: 'method',
+    'RegExp.test': 'method',
     String: 'property',
     'String.prototype': 'property',
     'String.prototype.replace': 'method',
     'String.prototype.replace.call': 'method',
     'String.prototype.replace.call.length': 'property',
     document: 'property',
+    'document.body': 'property',
+    'document.body.innerText': 'property',
     'document.elementFromPoint': 'method',
     'document.elementFromPoint.matches': 'method',
     'document.fonts': 'property',
@@ -213,6 +216,7 @@ export const API_ALLOWLIST = {
     'performance.getEntriesByType.startTime': 'property',
     'performance.getEntriesByType.type': 'property',
     'performance.now': 'method',
+    window: 'property',
 };
 
 /**
@@ -230,6 +234,7 @@ export const BUILTIN_RETURN_TYPES = {
     'Number.isNaN': 'boolean',
     'Reflect.has': 'boolean',
     RegExp: 'object',
+    'RegExp.test': 'boolean',
     'String.prototype.replace.call': 'string',
 };
 
