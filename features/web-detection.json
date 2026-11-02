@@ -1794,12 +1794,24 @@
                     }
                 ]
             },
-            // Browser-internal pages. The macOS tab web view behind a native page (new tab, settings, bookmarks)
-            // loads an empty duck:// document with no title or text. Must stay after the entry that enables the detector
+            // Browser-internal pages. The macOS tab web view behind a native page loads an empty duck:// document
+            // with no title or text; these are its hosts. Must stay after the entry that enables the detector.
+            // Evaluated on every settings read in every frame, so it uses domain conditions, which are string comparisons
             {
-                "condition": {
-                    "urlPattern": "duck://*"
-                },
+                "condition": [
+                    {
+                        "domain": "newtab"
+                    },
+                    {
+                        "domain": "settings"
+                    },
+                    {
+                        "domain": "bookmarks"
+                    },
+                    {
+                        "domain": "personal-information-removal"
+                    }
+                ],
                 "patchSettings": [
                     {
                         "op": "replace",
