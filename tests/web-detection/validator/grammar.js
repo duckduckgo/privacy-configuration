@@ -119,6 +119,7 @@ export const API_ALLOWLIST = {
     'performance.getEntriesByType.length': 'property',
     'performance.getEntriesByType.loadEventEnd': 'property',
     'performance.getEntriesByType.name': 'property',
+    'performance.getEntriesByType.name.replace': 'method',
     'performance.getEntriesByType.processingStart': 'property',
     'performance.getEntriesByType.responseStatus': 'property',
     'performance.getEntriesByType.startTime': 'property',
