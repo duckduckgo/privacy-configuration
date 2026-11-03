@@ -12,6 +12,7 @@ import {
     addHashToFeatures,
     stripReasons,
     getBaseFeatureConfigs,
+    addUnprotectedTemporaryUserAgentMitigations,
     readJsoncFile,
 } from './util.js';
 
@@ -371,6 +372,11 @@ async function buildPlatforms() {
                 applyGlobalUnprotectedTempExceptionsToFeatures(key, platformConfig, platformOverride.unprotectedTemporary);
             }
         }
+
+        addUnprotectedTemporaryUserAgentMitigations(platform, platformConfig, [
+            ...listData.exceptions,
+            ...(platformOverride.unprotectedTemporary || []),
+        ]);
 
         if (platformOverride.experimentalVariants) {
             platformConfig.experimentalVariants = platformOverride.experimentalVariants;
