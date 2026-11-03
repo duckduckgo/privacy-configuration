@@ -553,10 +553,19 @@
         ],
         "conditionalChanges": [
             {
-                "condition": {
-                    "injectName": "android",
-                    "internal": true
-                },
+                "condition": [
+                    {
+                        "injectName": "android",
+                        "internal": true
+                    },
+                    {
+                        "injectName": "android",
+                        "experiment": {
+                            "experimentName": "contentScopeExperiment10",
+                            "cohort": "treatment"
+                        }
+                    }
+                ],
                 "patchSettings": [
                     {
                         "op": "replace",
