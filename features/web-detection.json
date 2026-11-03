@@ -4794,6 +4794,189 @@
                             }
                         }
                     }
+                },
+                // Measurement of C-S-S feature setup, read for each breakage report. It fires no event
+                "setup_timings": {
+                    "state": "disabled",
+                    "triggers": {
+                        "breakageReport": {
+                            "state": "enabled",
+                            "runConditions": {
+                                "context": {
+                                    "top": true
+                                }
+                            }
+                        }
+                    },
+                    "actions": [
+                        // The measures C-S-S records for each feature's load and synchronous init. Listing the names keeps out measures the page makes
+                        {
+                            "define": {
+                                "names": {
+                                    "expr": [
+                                        "apiManipulationCallLoad",
+                                        "apiManipulationCallInit",
+                                        "autofillImportCallLoad",
+                                        "autofillImportCallInit",
+                                        "autofillPasskeysCallLoad",
+                                        "autofillPasskeysCallInit",
+                                        "breakageReportingCallLoad",
+                                        "breakageReportingCallInit",
+                                        "brokerProtectionCallLoad",
+                                        "brokerProtectionCallInit",
+                                        "browserUiLockCallLoad",
+                                        "browserUiLockCallInit",
+                                        "chromeWebstorePatchingCallLoad",
+                                        "chromeWebstorePatchingCallInit",
+                                        "clickToLoadCallLoad",
+                                        "clickToLoadCallInit",
+                                        "contextMenuCallLoad",
+                                        "contextMenuCallInit",
+                                        "cookieCallLoad",
+                                        "cookieCallInit",
+                                        "detectorPerfCallLoad",
+                                        "detectorPerfCallInit",
+                                        "duckAiChatHistoryCallLoad",
+                                        "duckAiChatHistoryCallInit",
+                                        "duckAiDataClearingCallLoad",
+                                        "duckAiDataClearingCallInit",
+                                        "duckPlayerCallLoad",
+                                        "duckPlayerCallInit",
+                                        "duckPlayerNativeCallLoad",
+                                        "duckPlayerNativeCallInit",
+                                        "elementHidingCallLoad",
+                                        "elementHidingCallInit",
+                                        "exceptionHandlerCallLoad",
+                                        "exceptionHandlerCallInit",
+                                        "faviconCallLoad",
+                                        "faviconCallInit",
+                                        "fingerprintingAudioCallLoad",
+                                        "fingerprintingAudioCallInit",
+                                        "fingerprintingBatteryCallLoad",
+                                        "fingerprintingBatteryCallInit",
+                                        "fingerprintingCanvasCallLoad",
+                                        "fingerprintingCanvasCallInit",
+                                        "fingerprintingHardwareCallLoad",
+                                        "fingerprintingHardwareCallInit",
+                                        "fingerprintingScreenSizeCallLoad",
+                                        "fingerprintingScreenSizeCallInit",
+                                        "fingerprintingTemporaryStorageCallLoad",
+                                        "fingerprintingTemporaryStorageCallInit",
+                                        "googleRejectedCallLoad",
+                                        "googleRejectedCallInit",
+                                        "gpcCallLoad",
+                                        "gpcCallInit",
+                                        "harmfulApisCallLoad",
+                                        "harmfulApisCallInit",
+                                        "hoverCallLoad",
+                                        "hoverCallInit",
+                                        "messageBridgeCallLoad",
+                                        "messageBridgeCallInit",
+                                        "navigatorInterfaceCallLoad",
+                                        "navigatorInterfaceCallInit",
+                                        "pageContextCallLoad",
+                                        "pageContextCallInit",
+                                        "pageObserverCallLoad",
+                                        "pageObserverCallInit",
+                                        "performanceMetricsCallLoad",
+                                        "performanceMetricsCallInit",
+                                        "printCallLoad",
+                                        "printCallInit",
+                                        "referrerCallLoad",
+                                        "referrerCallInit",
+                                        "tabSuspensionCallLoad",
+                                        "tabSuspensionCallInit",
+                                        "textSelectionCallLoad",
+                                        "textSelectionCallInit",
+                                        "trackerProtectionCallLoad",
+                                        "trackerProtectionCallInit",
+                                        "uaChBrandsCallLoad",
+                                        "uaChBrandsCallInit",
+                                        "webCompatCallLoad",
+                                        "webCompatCallInit",
+                                        "webDetectionCallLoad",
+                                        "webDetectionCallInit",
+                                        "webEventsCallLoad",
+                                        "webEventsCallInit",
+                                        "webInterferenceDetectionCallLoad",
+                                        "webInterferenceDetectionCallInit",
+                                        "webTelemetryCallLoad",
+                                        "webTelemetryCallInit",
+                                        "windowsPermissionUsageCallLoad",
+                                        "windowsPermissionUsageCallInit"
+                                    ]
+                                }
+                            }
+                        },
+                        {
+                            "define": {
+                                "measures": {
+                                    "api": {
+                                        "path": "performance.getEntriesByType",
+                                        "args": [
+                                            "measure"
+                                        ],
+                                        "where": {
+                                            "name": {
+                                                "in": {
+                                                    "ref": "names"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        // Builds that record no feature measures write nothing
+                        {
+                            "if": {
+                                "ref": "measures",
+                                "using": "length",
+                                "is": {
+                                    "gt": 0
+                                }
+                            },
+                            "then": {
+                                "breakageReportData": {
+                                    "data": {
+                                        "setupMeasureCount": {
+                                            "value": {
+                                                "ref": "measures",
+                                                "using": "length"
+                                            }
+                                        },
+                                        "setupTotalMs": {
+                                            "value": {
+                                                "sum": {
+                                                    "ref": "measures",
+                                                    "using": {
+                                                        "self": {
+                                                            "field": "duration"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        // Each measure of 1 ms or more, as its timeline entry
+                                        "slowSetups": {
+                                            "value": {
+                                                "ref": "measures",
+                                                "using": {
+                                                    "self": {
+                                                        "where": {
+                                                            "duration": {
+                                                                "gte": 1
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ]
                 }
             },
             "consent": {
