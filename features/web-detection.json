@@ -4795,7 +4795,7 @@
                         }
                     }
                 },
-                // Measurement of C-S-S feature setup, read for each breakage report. It fires no event
+                // Setup time of each C-S-S feature, from the Start and End marks C-S-S writes on every page. Read for each breakage report. It fires no event
                 "setup_timings": {
                     "state": "disabled",
                     "triggers": {
@@ -4809,117 +4809,117 @@
                         }
                     },
                     "actions": [
-                        // The measures C-S-S records for each feature's load and synchronous init. Listing the names keeps out measures the page makes
+                        // The End mark of each feature's load and init. Listing the names keeps out the page's own marks
                         {
                             "define": {
-                                "names": {
+                                "endNames": {
                                     "expr": [
-                                        "apiManipulationCallLoad",
-                                        "apiManipulationCallInit",
-                                        "autofillImportCallLoad",
-                                        "autofillImportCallInit",
-                                        "autofillPasskeysCallLoad",
-                                        "autofillPasskeysCallInit",
-                                        "breakageReportingCallLoad",
-                                        "breakageReportingCallInit",
-                                        "brokerProtectionCallLoad",
-                                        "brokerProtectionCallInit",
-                                        "browserUiLockCallLoad",
-                                        "browserUiLockCallInit",
-                                        "chromeWebstorePatchingCallLoad",
-                                        "chromeWebstorePatchingCallInit",
-                                        "clickToLoadCallLoad",
-                                        "clickToLoadCallInit",
-                                        "contextMenuCallLoad",
-                                        "contextMenuCallInit",
-                                        "cookieCallLoad",
-                                        "cookieCallInit",
-                                        "detectorPerfCallLoad",
-                                        "detectorPerfCallInit",
-                                        "duckAiChatHistoryCallLoad",
-                                        "duckAiChatHistoryCallInit",
-                                        "duckAiDataClearingCallLoad",
-                                        "duckAiDataClearingCallInit",
-                                        "duckPlayerCallLoad",
-                                        "duckPlayerCallInit",
-                                        "duckPlayerNativeCallLoad",
-                                        "duckPlayerNativeCallInit",
-                                        "elementHidingCallLoad",
-                                        "elementHidingCallInit",
-                                        "exceptionHandlerCallLoad",
-                                        "exceptionHandlerCallInit",
-                                        "faviconCallLoad",
-                                        "faviconCallInit",
-                                        "fingerprintingAudioCallLoad",
-                                        "fingerprintingAudioCallInit",
-                                        "fingerprintingBatteryCallLoad",
-                                        "fingerprintingBatteryCallInit",
-                                        "fingerprintingCanvasCallLoad",
-                                        "fingerprintingCanvasCallInit",
-                                        "fingerprintingHardwareCallLoad",
-                                        "fingerprintingHardwareCallInit",
-                                        "fingerprintingScreenSizeCallLoad",
-                                        "fingerprintingScreenSizeCallInit",
-                                        "fingerprintingTemporaryStorageCallLoad",
-                                        "fingerprintingTemporaryStorageCallInit",
-                                        "googleRejectedCallLoad",
-                                        "googleRejectedCallInit",
-                                        "gpcCallLoad",
-                                        "gpcCallInit",
-                                        "harmfulApisCallLoad",
-                                        "harmfulApisCallInit",
-                                        "hoverCallLoad",
-                                        "hoverCallInit",
-                                        "messageBridgeCallLoad",
-                                        "messageBridgeCallInit",
-                                        "navigatorInterfaceCallLoad",
-                                        "navigatorInterfaceCallInit",
-                                        "pageContextCallLoad",
-                                        "pageContextCallInit",
-                                        "pageObserverCallLoad",
-                                        "pageObserverCallInit",
-                                        "performanceMetricsCallLoad",
-                                        "performanceMetricsCallInit",
-                                        "printCallLoad",
-                                        "printCallInit",
-                                        "referrerCallLoad",
-                                        "referrerCallInit",
-                                        "tabSuspensionCallLoad",
-                                        "tabSuspensionCallInit",
-                                        "textSelectionCallLoad",
-                                        "textSelectionCallInit",
-                                        "trackerProtectionCallLoad",
-                                        "trackerProtectionCallInit",
-                                        "uaChBrandsCallLoad",
-                                        "uaChBrandsCallInit",
-                                        "webCompatCallLoad",
-                                        "webCompatCallInit",
-                                        "webDetectionCallLoad",
-                                        "webDetectionCallInit",
-                                        "webEventsCallLoad",
-                                        "webEventsCallInit",
-                                        "webInterferenceDetectionCallLoad",
-                                        "webInterferenceDetectionCallInit",
-                                        "webTelemetryCallLoad",
-                                        "webTelemetryCallInit",
-                                        "windowsPermissionUsageCallLoad",
-                                        "windowsPermissionUsageCallInit"
+                                        "apiManipulationCallLoadEnd",
+                                        "apiManipulationCallInitEnd",
+                                        "autofillImportCallLoadEnd",
+                                        "autofillImportCallInitEnd",
+                                        "autofillPasskeysCallLoadEnd",
+                                        "autofillPasskeysCallInitEnd",
+                                        "breakageReportingCallLoadEnd",
+                                        "breakageReportingCallInitEnd",
+                                        "brokerProtectionCallLoadEnd",
+                                        "brokerProtectionCallInitEnd",
+                                        "browserUiLockCallLoadEnd",
+                                        "browserUiLockCallInitEnd",
+                                        "chromeWebstorePatchingCallLoadEnd",
+                                        "chromeWebstorePatchingCallInitEnd",
+                                        "clickToLoadCallLoadEnd",
+                                        "clickToLoadCallInitEnd",
+                                        "contextMenuCallLoadEnd",
+                                        "contextMenuCallInitEnd",
+                                        "cookieCallLoadEnd",
+                                        "cookieCallInitEnd",
+                                        "detectorPerfCallLoadEnd",
+                                        "detectorPerfCallInitEnd",
+                                        "duckAiChatHistoryCallLoadEnd",
+                                        "duckAiChatHistoryCallInitEnd",
+                                        "duckAiDataClearingCallLoadEnd",
+                                        "duckAiDataClearingCallInitEnd",
+                                        "duckPlayerCallLoadEnd",
+                                        "duckPlayerCallInitEnd",
+                                        "duckPlayerNativeCallLoadEnd",
+                                        "duckPlayerNativeCallInitEnd",
+                                        "elementHidingCallLoadEnd",
+                                        "elementHidingCallInitEnd",
+                                        "exceptionHandlerCallLoadEnd",
+                                        "exceptionHandlerCallInitEnd",
+                                        "faviconCallLoadEnd",
+                                        "faviconCallInitEnd",
+                                        "fingerprintingAudioCallLoadEnd",
+                                        "fingerprintingAudioCallInitEnd",
+                                        "fingerprintingBatteryCallLoadEnd",
+                                        "fingerprintingBatteryCallInitEnd",
+                                        "fingerprintingCanvasCallLoadEnd",
+                                        "fingerprintingCanvasCallInitEnd",
+                                        "fingerprintingHardwareCallLoadEnd",
+                                        "fingerprintingHardwareCallInitEnd",
+                                        "fingerprintingScreenSizeCallLoadEnd",
+                                        "fingerprintingScreenSizeCallInitEnd",
+                                        "fingerprintingTemporaryStorageCallLoadEnd",
+                                        "fingerprintingTemporaryStorageCallInitEnd",
+                                        "googleRejectedCallLoadEnd",
+                                        "googleRejectedCallInitEnd",
+                                        "gpcCallLoadEnd",
+                                        "gpcCallInitEnd",
+                                        "harmfulApisCallLoadEnd",
+                                        "harmfulApisCallInitEnd",
+                                        "hoverCallLoadEnd",
+                                        "hoverCallInitEnd",
+                                        "messageBridgeCallLoadEnd",
+                                        "messageBridgeCallInitEnd",
+                                        "navigatorInterfaceCallLoadEnd",
+                                        "navigatorInterfaceCallInitEnd",
+                                        "pageContextCallLoadEnd",
+                                        "pageContextCallInitEnd",
+                                        "pageObserverCallLoadEnd",
+                                        "pageObserverCallInitEnd",
+                                        "performanceMetricsCallLoadEnd",
+                                        "performanceMetricsCallInitEnd",
+                                        "printCallLoadEnd",
+                                        "printCallInitEnd",
+                                        "referrerCallLoadEnd",
+                                        "referrerCallInitEnd",
+                                        "tabSuspensionCallLoadEnd",
+                                        "tabSuspensionCallInitEnd",
+                                        "textSelectionCallLoadEnd",
+                                        "textSelectionCallInitEnd",
+                                        "trackerProtectionCallLoadEnd",
+                                        "trackerProtectionCallInitEnd",
+                                        "uaChBrandsCallLoadEnd",
+                                        "uaChBrandsCallInitEnd",
+                                        "webCompatCallLoadEnd",
+                                        "webCompatCallInitEnd",
+                                        "webDetectionCallLoadEnd",
+                                        "webDetectionCallInitEnd",
+                                        "webEventsCallLoadEnd",
+                                        "webEventsCallInitEnd",
+                                        "webInterferenceDetectionCallLoadEnd",
+                                        "webInterferenceDetectionCallInitEnd",
+                                        "webTelemetryCallLoadEnd",
+                                        "webTelemetryCallInitEnd",
+                                        "windowsPermissionUsageCallLoadEnd",
+                                        "windowsPermissionUsageCallInitEnd"
                                     ]
                                 }
                             }
                         },
                         {
                             "define": {
-                                "measures": {
+                                "ends": {
                                     "api": {
                                         "path": "performance.getEntriesByType",
                                         "args": [
-                                            "measure"
+                                            "mark"
                                         ],
                                         "where": {
                                             "name": {
                                                 "in": {
-                                                    "ref": "names"
+                                                    "ref": "endNames"
                                                 }
                                             }
                                         }
@@ -4927,10 +4927,10 @@
                                 }
                             }
                         },
-                        // Builds that record no feature measures write nothing
+                        // Builds with no feature marks write nothing. Each duration runs from an End mark back to the latest Start mark of the same name: Apple's two bundles both mark duckPlayerNative, so its pairing can be off there
                         {
                             "if": {
-                                "ref": "measures",
+                                "ref": "ends",
                                 "using": "length",
                                 "is": {
                                     "gt": 0
@@ -4939,34 +4939,155 @@
                             "then": {
                                 "breakageReportData": {
                                     "data": {
-                                        "setupMeasureCount": {
+                                        "setupCount": {
                                             "value": {
-                                                "ref": "measures",
+                                                "ref": "ends",
                                                 "using": "length"
                                             }
                                         },
+                                        // Before content-scope-scripts#3178, a CallInit End mark lands after the other features' init and after any reply or load the init awaits
                                         "setupTotalMs": {
                                             "value": {
                                                 "sum": {
-                                                    "ref": "measures",
+                                                    "ref": "ends",
                                                     "using": {
                                                         "self": {
-                                                            "field": "duration"
+                                                            "field": {
+                                                                "sum": [
+                                                                    {
+                                                                        "self": "startTime"
+                                                                    },
+                                                                    {
+                                                                        "mul": [
+                                                                            -1,
+                                                                            {
+                                                                                "api": {
+                                                                                    "path": "Math.max.apply",
+                                                                                    "args": [
+                                                                                        null,
+                                                                                        {
+                                                                                            "api": {
+                                                                                                "path": "performance.getEntriesByName",
+                                                                                                "args": [
+                                                                                                    {
+                                                                                                        "self": {
+                                                                                                            "path": "name.replace",
+                                                                                                            "args": [
+                                                                                                                "End",
+                                                                                                                "Start"
+                                                                                                            ]
+                                                                                                        }
+                                                                                                    },
+                                                                                                    "mark"
+                                                                                                ],
+                                                                                                "field": "startTime"
+                                                                                            }
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                ]
+                                                            }
                                                         }
                                                     }
                                                 }
                                             }
                                         },
-                                        // Each measure of 1 ms or more, as its timeline entry
+                                        // [End mark name, ms] for each setup of 1 ms or more
                                         "slowSetups": {
                                             "value": {
-                                                "ref": "measures",
+                                                "ref": "ends",
                                                 "using": {
                                                     "self": {
                                                         "where": {
-                                                            "duration": {
+                                                            "expr": {
+                                                                "sum": [
+                                                                    {
+                                                                        "self": "startTime"
+                                                                    },
+                                                                    {
+                                                                        "mul": [
+                                                                            -1,
+                                                                            {
+                                                                                "api": {
+                                                                                    "path": "Math.max.apply",
+                                                                                    "args": [
+                                                                                        null,
+                                                                                        {
+                                                                                            "api": {
+                                                                                                "path": "performance.getEntriesByName",
+                                                                                                "args": [
+                                                                                                    {
+                                                                                                        "self": {
+                                                                                                            "path": "name.replace",
+                                                                                                            "args": [
+                                                                                                                "End",
+                                                                                                                "Start"
+                                                                                                            ]
+                                                                                                        }
+                                                                                                    },
+                                                                                                    "mark"
+                                                                                                ],
+                                                                                                "field": "startTime"
+                                                                                            }
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                ]
+                                                            },
+                                                            "is": {
                                                                 "gte": 1
                                                             }
+                                                        },
+                                                        "field": {
+                                                            "expr": [
+                                                                {
+                                                                    "self": "name"
+                                                                },
+                                                                {
+                                                                    "sum": [
+                                                                        {
+                                                                            "self": "startTime"
+                                                                        },
+                                                                        {
+                                                                            "mul": [
+                                                                                -1,
+                                                                                {
+                                                                                    "api": {
+                                                                                        "path": "Math.max.apply",
+                                                                                        "args": [
+                                                                                            null,
+                                                                                            {
+                                                                                                "api": {
+                                                                                                    "path": "performance.getEntriesByName",
+                                                                                                    "args": [
+                                                                                                        {
+                                                                                                            "self": {
+                                                                                                                "path": "name.replace",
+                                                                                                                "args": [
+                                                                                                                    "End",
+                                                                                                                    "Start"
+                                                                                                                ]
+                                                                                                            }
+                                                                                                        },
+                                                                                                        "mark"
+                                                                                                    ],
+                                                                                                    "field": "startTime"
+                                                                                                }
+                                                                                            }
+                                                                                        ]
+                                                                                    }
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
                                                         }
                                                     }
                                                 }
