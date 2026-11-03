@@ -4794,6 +4794,36 @@
                             }
                         }
                     }
+                },
+                // Setup time of each C-S-S feature, from the Start and End marks C-S-S writes on every page. Read for each breakage report. It fires no event
+                // prettier-ignore
+                "setup_timings": {
+                    "state": "disabled",
+                    "actions": [
+                        // [End mark name, ms] for each feature's load and init. The duration runs back to the last Start mark of the same name:
+                        // Apple's two bundles both mark duckPlayerNative, so its pairing can be off there
+                        {"define": {"setups": {"api": {
+                            "path": "performance.getEntriesByType",
+                            "args": ["mark"],
+                            "where": {"self": {"path": "name.search", "args": ["Call(Load|Init)End$"]}, "is": {"gte": 0}},
+                            "field": {"expr": [{"self": "name"}, {"sum": [{"self": "startTime"}, {"mul": [-1, {
+                                "api": {
+                                    "path": "performance.getEntriesByName",
+                                    "args": [{"self": {"path": "name.replace", "args": ["End", "Start"]}}, "mark"],
+                                    "field": "startTime"
+                                },
+                                "using": {"path": "at", "args": [-1]}
+                            }]}]}]}
+                        }}}},
+                        // Builds with no feature marks write nothing. Before content-scope-scripts#3178, a CallInit End mark lands after the other
+                        // features' init and after any reply or load the init awaits
+                        {"if": {"ref": "setups", "using": "length", "is": {"gt": 0}}, "then": {"breakageReportData": {"data": {
+                            "setupCount": {"value": {"ref": "setups", "using": "length"}},
+                            "setupTotalMs": {"value": {"sum": {"ref": "setups", "using": {"self": {"field": "1"}}}}},
+                            // Each [End mark name, ms] of 1 ms or more
+                            "slowSetups": {"value": {"ref": "setups", "using": {"self": {"where": {"1": {"gte": 1}}}}}}
+                        }}}}
+                    ]
                 }
             },
             "consent": {
