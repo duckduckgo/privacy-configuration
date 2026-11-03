@@ -4798,139 +4798,78 @@
                 // Setup time of each C-S-S feature, from the Start and End marks C-S-S writes on every page. Read for each breakage report. It fires no event
                 "setup_timings": {
                     "state": "disabled",
-                    "triggers": {
-                        "breakageReport": {
-                            "state": "enabled",
-                            "runConditions": {
-                                "context": {
-                                    "top": true
-                                }
-                            }
-                        }
-                    },
                     "actions": [
-                        // The End mark of each feature's load and init. Listing the names keeps out the page's own marks
+                        // [End mark name, ms] for each feature's load and init. The duration runs back to the latest Start mark of the same name: Apple's two bundles both mark duckPlayerNative, so its pairing can be off there
                         {
                             "define": {
-                                "endNames": {
-                                    "expr": [
-                                        "apiManipulationCallLoadEnd",
-                                        "apiManipulationCallInitEnd",
-                                        "autofillImportCallLoadEnd",
-                                        "autofillImportCallInitEnd",
-                                        "autofillPasskeysCallLoadEnd",
-                                        "autofillPasskeysCallInitEnd",
-                                        "breakageReportingCallLoadEnd",
-                                        "breakageReportingCallInitEnd",
-                                        "brokerProtectionCallLoadEnd",
-                                        "brokerProtectionCallInitEnd",
-                                        "browserUiLockCallLoadEnd",
-                                        "browserUiLockCallInitEnd",
-                                        "chromeWebstorePatchingCallLoadEnd",
-                                        "chromeWebstorePatchingCallInitEnd",
-                                        "clickToLoadCallLoadEnd",
-                                        "clickToLoadCallInitEnd",
-                                        "contextMenuCallLoadEnd",
-                                        "contextMenuCallInitEnd",
-                                        "cookieCallLoadEnd",
-                                        "cookieCallInitEnd",
-                                        "detectorPerfCallLoadEnd",
-                                        "detectorPerfCallInitEnd",
-                                        "duckAiChatHistoryCallLoadEnd",
-                                        "duckAiChatHistoryCallInitEnd",
-                                        "duckAiDataClearingCallLoadEnd",
-                                        "duckAiDataClearingCallInitEnd",
-                                        "duckPlayerCallLoadEnd",
-                                        "duckPlayerCallInitEnd",
-                                        "duckPlayerNativeCallLoadEnd",
-                                        "duckPlayerNativeCallInitEnd",
-                                        "elementHidingCallLoadEnd",
-                                        "elementHidingCallInitEnd",
-                                        "exceptionHandlerCallLoadEnd",
-                                        "exceptionHandlerCallInitEnd",
-                                        "faviconCallLoadEnd",
-                                        "faviconCallInitEnd",
-                                        "fingerprintingAudioCallLoadEnd",
-                                        "fingerprintingAudioCallInitEnd",
-                                        "fingerprintingBatteryCallLoadEnd",
-                                        "fingerprintingBatteryCallInitEnd",
-                                        "fingerprintingCanvasCallLoadEnd",
-                                        "fingerprintingCanvasCallInitEnd",
-                                        "fingerprintingHardwareCallLoadEnd",
-                                        "fingerprintingHardwareCallInitEnd",
-                                        "fingerprintingScreenSizeCallLoadEnd",
-                                        "fingerprintingScreenSizeCallInitEnd",
-                                        "fingerprintingTemporaryStorageCallLoadEnd",
-                                        "fingerprintingTemporaryStorageCallInitEnd",
-                                        "googleRejectedCallLoadEnd",
-                                        "googleRejectedCallInitEnd",
-                                        "gpcCallLoadEnd",
-                                        "gpcCallInitEnd",
-                                        "harmfulApisCallLoadEnd",
-                                        "harmfulApisCallInitEnd",
-                                        "hoverCallLoadEnd",
-                                        "hoverCallInitEnd",
-                                        "messageBridgeCallLoadEnd",
-                                        "messageBridgeCallInitEnd",
-                                        "navigatorInterfaceCallLoadEnd",
-                                        "navigatorInterfaceCallInitEnd",
-                                        "pageContextCallLoadEnd",
-                                        "pageContextCallInitEnd",
-                                        "pageObserverCallLoadEnd",
-                                        "pageObserverCallInitEnd",
-                                        "performanceMetricsCallLoadEnd",
-                                        "performanceMetricsCallInitEnd",
-                                        "printCallLoadEnd",
-                                        "printCallInitEnd",
-                                        "referrerCallLoadEnd",
-                                        "referrerCallInitEnd",
-                                        "tabSuspensionCallLoadEnd",
-                                        "tabSuspensionCallInitEnd",
-                                        "textSelectionCallLoadEnd",
-                                        "textSelectionCallInitEnd",
-                                        "trackerProtectionCallLoadEnd",
-                                        "trackerProtectionCallInitEnd",
-                                        "uaChBrandsCallLoadEnd",
-                                        "uaChBrandsCallInitEnd",
-                                        "webCompatCallLoadEnd",
-                                        "webCompatCallInitEnd",
-                                        "webDetectionCallLoadEnd",
-                                        "webDetectionCallInitEnd",
-                                        "webEventsCallLoadEnd",
-                                        "webEventsCallInitEnd",
-                                        "webInterferenceDetectionCallLoadEnd",
-                                        "webInterferenceDetectionCallInitEnd",
-                                        "webTelemetryCallLoadEnd",
-                                        "webTelemetryCallInitEnd",
-                                        "windowsPermissionUsageCallLoadEnd",
-                                        "windowsPermissionUsageCallInitEnd"
-                                    ]
-                                }
-                            }
-                        },
-                        {
-                            "define": {
-                                "ends": {
+                                "setups": {
                                     "api": {
                                         "path": "performance.getEntriesByType",
                                         "args": [
                                             "mark"
                                         ],
                                         "where": {
-                                            "name": {
-                                                "in": {
-                                                    "ref": "endNames"
-                                                }
+                                            "self": {
+                                                "path": "name.search",
+                                                "args": [
+                                                    "Call(Load|Init)End$"
+                                                ]
+                                            },
+                                            "is": {
+                                                "gte": 0
                                             }
+                                        },
+                                        "field": {
+                                            "expr": [
+                                                {
+                                                    "self": "name"
+                                                },
+                                                {
+                                                    "sum": [
+                                                        {
+                                                            "self": "startTime"
+                                                        },
+                                                        {
+                                                            "mul": [
+                                                                -1,
+                                                                {
+                                                                    "api": {
+                                                                        "path": "performance.getEntriesByName",
+                                                                        "args": [
+                                                                            {
+                                                                                "self": {
+                                                                                    "path": "name.replace",
+                                                                                    "args": [
+                                                                                        "End",
+                                                                                        "Start"
+                                                                                    ]
+                                                                                }
+                                                                            },
+                                                                            "mark"
+                                                                        ],
+                                                                        "field": "startTime"
+                                                                    },
+                                                                    "using": {
+                                                                        "path": "at",
+                                                                        "args": [
+                                                                            -1
+                                                                        ]
+                                                                    }
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
                                         }
                                     }
                                 }
                             }
                         },
-                        // Builds with no feature marks write nothing. Each duration runs from an End mark back to the latest Start mark of the same name: Apple's two bundles both mark duckPlayerNative, so its pairing can be off there
+                        // Builds with no feature marks write nothing. Before content-scope-scripts#3178, a CallInit End mark lands after the other features' init and after any reply or load the init awaits
                         {
                             "if": {
-                                "ref": "ends",
+                                "ref": "setups",
                                 "using": "length",
                                 "is": {
                                     "gt": 0
@@ -4941,153 +4880,32 @@
                                     "data": {
                                         "setupCount": {
                                             "value": {
-                                                "ref": "ends",
+                                                "ref": "setups",
                                                 "using": "length"
                                             }
                                         },
-                                        // Before content-scope-scripts#3178, a CallInit End mark lands after the other features' init and after any reply or load the init awaits
                                         "setupTotalMs": {
                                             "value": {
                                                 "sum": {
-                                                    "ref": "ends",
+                                                    "ref": "setups",
                                                     "using": {
                                                         "self": {
-                                                            "field": {
-                                                                "sum": [
-                                                                    {
-                                                                        "self": "startTime"
-                                                                    },
-                                                                    {
-                                                                        "mul": [
-                                                                            -1,
-                                                                            {
-                                                                                "api": {
-                                                                                    "path": "Math.max.apply",
-                                                                                    "args": [
-                                                                                        null,
-                                                                                        {
-                                                                                            "api": {
-                                                                                                "path": "performance.getEntriesByName",
-                                                                                                "args": [
-                                                                                                    {
-                                                                                                        "self": {
-                                                                                                            "path": "name.replace",
-                                                                                                            "args": [
-                                                                                                                "End",
-                                                                                                                "Start"
-                                                                                                            ]
-                                                                                                        }
-                                                                                                    },
-                                                                                                    "mark"
-                                                                                                ],
-                                                                                                "field": "startTime"
-                                                                                            }
-                                                                                        }
-                                                                                    ]
-                                                                                }
-                                                                            }
-                                                                        ]
-                                                                    }
-                                                                ]
-                                                            }
+                                                            "field": "1"
                                                         }
                                                     }
                                                 }
                                             }
                                         },
-                                        // [End mark name, ms] for each setup of 1 ms or more
+                                        // Each [End mark name, ms] of 1 ms or more
                                         "slowSetups": {
                                             "value": {
-                                                "ref": "ends",
+                                                "ref": "setups",
                                                 "using": {
                                                     "self": {
                                                         "where": {
-                                                            "expr": {
-                                                                "sum": [
-                                                                    {
-                                                                        "self": "startTime"
-                                                                    },
-                                                                    {
-                                                                        "mul": [
-                                                                            -1,
-                                                                            {
-                                                                                "api": {
-                                                                                    "path": "Math.max.apply",
-                                                                                    "args": [
-                                                                                        null,
-                                                                                        {
-                                                                                            "api": {
-                                                                                                "path": "performance.getEntriesByName",
-                                                                                                "args": [
-                                                                                                    {
-                                                                                                        "self": {
-                                                                                                            "path": "name.replace",
-                                                                                                            "args": [
-                                                                                                                "End",
-                                                                                                                "Start"
-                                                                                                            ]
-                                                                                                        }
-                                                                                                    },
-                                                                                                    "mark"
-                                                                                                ],
-                                                                                                "field": "startTime"
-                                                                                            }
-                                                                                        }
-                                                                                    ]
-                                                                                }
-                                                                            }
-                                                                        ]
-                                                                    }
-                                                                ]
-                                                            },
-                                                            "is": {
+                                                            "1": {
                                                                 "gte": 1
                                                             }
-                                                        },
-                                                        "field": {
-                                                            "expr": [
-                                                                {
-                                                                    "self": "name"
-                                                                },
-                                                                {
-                                                                    "sum": [
-                                                                        {
-                                                                            "self": "startTime"
-                                                                        },
-                                                                        {
-                                                                            "mul": [
-                                                                                -1,
-                                                                                {
-                                                                                    "api": {
-                                                                                        "path": "Math.max.apply",
-                                                                                        "args": [
-                                                                                            null,
-                                                                                            {
-                                                                                                "api": {
-                                                                                                    "path": "performance.getEntriesByName",
-                                                                                                    "args": [
-                                                                                                        {
-                                                                                                            "self": {
-                                                                                                                "path": "name.replace",
-                                                                                                                "args": [
-                                                                                                                    "End",
-                                                                                                                    "Start"
-                                                                                                                ]
-                                                                                                            }
-                                                                                                        },
-                                                                                                        "mark"
-                                                                                                    ],
-                                                                                                    "field": "startTime"
-                                                                                                }
-                                                                                            }
-                                                                                        ]
-                                                                                    }
-                                                                                }
-                                                                            ]
-                                                                        }
-                                                                    ]
-                                                                }
-                                                            ]
                                                         }
                                                     }
                                                 }
