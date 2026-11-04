@@ -261,8 +261,6 @@ const legacyDisabledFeatures = [
 async function buildPlatforms() {
     const platformConfigs = {};
     const tdsByPlatform = await getTdsByPlatform();
-    // Browser configs start from the extension config before its CNAME entries,
-    // so each one only gets CNAME entries from its own TDS
     let extensionConfigBeforeCnames;
 
     for (const platform of platforms) {
@@ -406,6 +404,7 @@ async function buildPlatforms() {
             platformConfig.experimentalVariants = platformOverride.experimentalVariants;
         }
 
+        // Browser configs copy this before CNAME entries are added, so each gets entries only from its own TDS
         if (platform === 'extension') {
             extensionConfigBeforeCnames = JSON.parse(JSON.stringify(platformConfig));
         }

@@ -10,7 +10,7 @@ import {
     addHashToFeatures,
 } from '../util.js';
 import { compatFunctions } from '../compatibility.js';
-import { TDS_PATH_FOR_PLATFORM } from '../constants.js';
+import { BROWSERS_SUBDIR, TDS_PATH_FOR_PLATFORM } from '../constants.js';
 import platforms from '../platforms.js';
 
 const ta1 = {
@@ -611,6 +611,18 @@ describe('addCnameEntriesToAllowlist', () => {
             'simple.com',
             'simple2.com',
         ]);
+    });
+});
+
+describe('platforms', () => {
+    it('lists extension before the browser configs built from it', () => {
+        const extensionIndex = platforms.indexOf('extension');
+        expect(extensionIndex).to.be.at.least(0);
+        platforms.forEach((platform, i) => {
+            if (platform.startsWith(BROWSERS_SUBDIR)) {
+                expect(i, platform).to.be.greaterThan(extensionIndex);
+            }
+        });
     });
 });
 
