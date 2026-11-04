@@ -1797,21 +1797,21 @@
             // Rewrites each shipped `all` as nested `if`s for clients on the C-S-S that parses match expressions.
             // That C-S-S reads every operand of an `all`; older C-S-S stops at the first false operand
             {
-                // App versions carrying the C-S-S that parses match expressions.
-                // The versions are placeholders until that app release is known for each platform. iOS and macOS share
+                // App versions carrying the C-S-S that parses match expressions, 19.0.0 or later.
+                // The apple and extension versions are placeholders until those apps ship it. iOS and macOS share
                 // the apple inject names, so their real versions need the range split used in the entry above
                 "condition": [
                     {
                         "injectName": "android",
-                        "minSupportedVersion": 99990000
+                        "minSupportedVersion": 53010000
                     },
                     {
                         "injectName": "android-adsjs",
-                        "minSupportedVersion": 99990000
+                        "minSupportedVersion": 53010000
                     },
                     {
                         "injectName": "windows",
-                        "minSupportedVersion": "999.0.0"
+                        "minSupportedVersion": "0.180.0"
                     },
                     {
                         "injectName": "apple",
