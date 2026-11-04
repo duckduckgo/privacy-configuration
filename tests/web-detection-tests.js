@@ -10,6 +10,12 @@ const OPERATOR_KEYS = [
     'none',
 ];
 
+const BRANCH_KEYS = [
+    'if',
+    'then',
+    'else',
+];
+
 const MATCH_LEVEL_KEYS = [
     'text',
     'element',
@@ -227,7 +233,10 @@ function forEachTextCondition(node, path, cb) {
     }
     if (node === null || typeof node !== 'object') return;
 
-    for (const op of OPERATOR_KEYS) {
+    for (const op of [
+        ...OPERATOR_KEYS,
+        ...BRANCH_KEYS,
+    ]) {
         if (op in node) forEachTextCondition(node[op], `${path}.${op}`, cb);
     }
     if ('text' in node) forEachTextLeaf(node.text, `${path}.text`, cb);
@@ -268,9 +277,10 @@ const XPATH_PATCH_PATH = /\/xpath(?:\/\d+)?$/;
 
 /** Patch paths that land on a `pattern` value, or on one entry of a `pattern` array. */
 const PATTERN_PATCH_PATH = /\/pattern(?:\/\d+)?$/;
+const MATCH_PATCH_PATH = /\/match$/;
 
 /**
- * Validate a patch operation targeting an `xpath` or `pattern` value.
+ * Validate a patch operation targeting a `match`, `xpath` or `pattern` value.
  *
  * Patches are applied client-side, so a value set only by a patch never appears as a
  * literal in the generated config and would otherwise go unchecked.
@@ -298,6 +308,10 @@ function assertExpressionPatch(operation, path) {
 
     if (PATTERN_PATCH_PATH.test(operationPath)) {
         assertValidPattern(operation.value, `${path} ${operationPath}`);
+    }
+
+    if (MATCH_PATCH_PATH.test(operationPath)) {
+        forEachTextCondition(operation.value, `${path} ${operationPath}`, assertTextConditionExpressions);
     }
 }
 
@@ -570,6 +584,23 @@ describe('webDetection config tests', () => {
                         },
                     },
                 ],
+            };
+            expect(collect(match)).to.deep.equal([
+                'a',
+                'b',
+                'c',
+            ]);
+        });
+
+        it('reaches leaves through if, then and else', () => {
+            const match = {
+                if: { text: { pattern: 'a' } },
+                then: {
+                    if: { element: { selector: '.x' } },
+                    then: { text: { pattern: 'b' } },
+                    else: false,
+                },
+                else: { text: { pattern: 'c' } },
             };
             expect(collect(match)).to.deep.equal([
                 'a',
