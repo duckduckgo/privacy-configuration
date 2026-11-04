@@ -1831,16 +1831,14 @@
                     }
                 ],
                 "patchSettings": [
-                    // Login errors: the shipped condition, with the text reads only on a page showing a password field
+                    // Login errors: the shipped condition, each check read only once the one before it holds
                     {
                         "op": "replace",
                         "path": "/detectors/login/error/match",
                         "value": {
-                            // Route: a visible password field, then the page text, before the rendered-text walk only login reads
                             "if": {
                                 "element": {
-                                    "selector": "input[type='password']",
-                                    "visibility": "visible"
+                                    "selector": "input[type='password']"
                                 }
                             },
                             "then": {
@@ -1859,23 +1857,23 @@
                                     }
                                 },
                                 "then": {
-                                    "all": [
-                                        {
-                                            "text": {
-                                                "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript) and not(ancestor::*[@hidden]) and not(ancestor::*[@aria-hidden='true']) and not(ancestor::*[contains(translate(@style,' ',''),'display:none')]) and not(ancestor::*[contains(translate(@style,' ',''),'visibility:hidden')])]",
-                                                "pattern": [
-                                                    "something went wrong",
-                                                    "an? (unexpected |unknown |internal )?error (has )?occurred",
-                                                    "(couldn.?t|could not|were unable to) (sign|log) you in",
-                                                    "(sign|log)[ -]?in (attempt )?(failed|unsuccessful)",
-                                                    "(experiencing|having) (some )?technical (difficulties|issues|problems)",
-                                                    "a (problem|technical error) (has )?occurred",
-                                                    "oops[\\s\\S]{0,40}(try again|refresh)",
-                                                    "(a|some|temporary) technical (issues?|difficult(y|ies)|problems?|errors?)"
-                                                ]
-                                            }
-                                        },
-                                        {
+                                    "if": {
+                                        "text": {
+                                            "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript) and not(ancestor::*[@hidden]) and not(ancestor::*[@aria-hidden='true']) and not(ancestor::*[contains(translate(@style,' ',''),'display:none')]) and not(ancestor::*[contains(translate(@style,' ',''),'visibility:hidden')])]",
+                                            "pattern": [
+                                                "something went wrong",
+                                                "an? (unexpected |unknown |internal )?error (has )?occurred",
+                                                "(couldn.?t|could not|were unable to) (sign|log) you in",
+                                                "(sign|log)[ -]?in (attempt )?(failed|unsuccessful)",
+                                                "(experiencing|having) (some )?technical (difficulties|issues|problems)",
+                                                "a (problem|technical error) (has )?occurred",
+                                                "oops[\\s\\S]{0,40}(try again|refresh)",
+                                                "(a|some|temporary) technical (issues?|difficult(y|ies)|problems?|errors?)"
+                                            ]
+                                        }
+                                    },
+                                    "then": {
+                                        "if": {
                                             "none": [
                                                 {
                                                     "text": {
@@ -1901,24 +1899,30 @@
                                                     }
                                                 }
                                             ]
-                                        }
-                                    ]
+                                        },
+                                        "then": {
+                                            "element": {
+                                                "selector": "input[type='password']",
+                                                "visibility": "visible"
+                                            }
+                                        },
+                                        "else": false
+                                    },
+                                    "else": false
                                 },
                                 "else": false
                             },
                             "else": false
                         }
                     },
-                    // Login cookie notices: the shipped condition, with the text reads only on a page showing a password field
+                    // Login cookie notices: the shipped condition, each check read only once the one before it holds
                     {
                         "op": "replace",
                         "path": "/detectors/login/cookies/match",
                         "value": {
-                            // Route: a visible password field, then the page text, before the rendered-text walk only login reads
                             "if": {
                                 "element": {
-                                    "selector": "input[type='password']",
-                                    "visibility": "visible"
+                                    "selector": "input[type='password']"
                                 }
                             },
                             "then": {
@@ -1937,35 +1941,42 @@
                                     }
                                 },
                                 "then": {
-                                    "text": {
-                                        "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript) and not(ancestor::*[@hidden]) and not(ancestor::*[@aria-hidden='true']) and not(ancestor::*[contains(translate(@style,' ',''),'display:none')]) and not(ancestor::*[contains(translate(@style,' ',''),'visibility:hidden')])]",
-                                        "pattern": [
-                                            "browser (has|have) cookies (disabled|blocked|turned off)",
-                                            "(looks like|seems that|seems like|appears that) (your )?cookies (are|have been) (disabled|blocked|turned off)",
-                                            "cookies (are|is) (disabled|blocked|not enabled|turned off) (in|on|for) (your|this) browser",
-                                            "cookies (must|need to|have to) be (enabled|allowed|turned on)",
-                                            "please (enable|turn on|allow) cookies",
-                                            "enable cookies (in|on|for) (your|this) browser",
-                                            "requires? (browser |third.party )?cookies to be (enabled|allowed)",
-                                            "browser (does ?n.?t|does not|do ?n.?t|do not) (accept|allow|support) cookies"
-                                        ]
-                                    }
+                                    "if": {
+                                        "text": {
+                                            "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript) and not(ancestor::*[@hidden]) and not(ancestor::*[@aria-hidden='true']) and not(ancestor::*[contains(translate(@style,' ',''),'display:none')]) and not(ancestor::*[contains(translate(@style,' ',''),'visibility:hidden')])]",
+                                            "pattern": [
+                                                "browser (has|have) cookies (disabled|blocked|turned off)",
+                                                "(looks like|seems that|seems like|appears that) (your )?cookies (are|have been) (disabled|blocked|turned off)",
+                                                "cookies (are|is) (disabled|blocked|not enabled|turned off) (in|on|for) (your|this) browser",
+                                                "cookies (must|need to|have to) be (enabled|allowed|turned on)",
+                                                "please (enable|turn on|allow) cookies",
+                                                "enable cookies (in|on|for) (your|this) browser",
+                                                "requires? (browser |third.party )?cookies to be (enabled|allowed)",
+                                                "browser (does ?n.?t|does not|do ?n.?t|do not) (accept|allow|support) cookies"
+                                            ]
+                                        }
+                                    },
+                                    "then": {
+                                        "element": {
+                                            "selector": "input[type='password']",
+                                            "visibility": "visible"
+                                        }
+                                    },
+                                    "else": false
                                 },
                                 "else": false
                             },
                             "else": false
                         }
                     },
-                    // Login browser notices: the shipped condition, with the text reads only on a page showing a password field
+                    // Login browser notices: the shipped condition, each check read only once the one before it holds
                     {
                         "op": "replace",
                         "path": "/detectors/login/browser/match",
                         "value": {
-                            // Route: a visible password field, then the page text, before the rendered-text walk only login reads
                             "if": {
                                 "element": {
-                                    "selector": "input[type='password']",
-                                    "visibility": "visible"
+                                    "selector": "input[type='password']"
                                 }
                             },
                             "then": {
@@ -1984,19 +1995,28 @@
                                     }
                                 },
                                 "then": {
-                                    "text": {
-                                        "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript) and not(ancestor::*[@hidden]) and not(ancestor::*[@aria-hidden='true']) and not(ancestor::*[contains(translate(@style,' ',''),'display:none')]) and not(ancestor::*[contains(translate(@style,' ',''),'visibility:hidden')])]",
-                                        "pattern": [
-                                            "browser[\\s\\S]{0,25}(is |are )?(not|no longer) supported",
-                                            "unsupported browser",
-                                            "browser (is )?(not compatible|incompatible)",
-                                            "incompatible browser",
-                                            "please (update|upgrade) your browser",
-                                            "your browser is (out of date|outdated|too old)",
-                                            "browser (is |are )?(currently )?unsupported",
-                                            "browser update (is )?required"
-                                        ]
-                                    }
+                                    "if": {
+                                        "text": {
+                                            "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript) and not(ancestor::*[@hidden]) and not(ancestor::*[@aria-hidden='true']) and not(ancestor::*[contains(translate(@style,' ',''),'display:none')]) and not(ancestor::*[contains(translate(@style,' ',''),'visibility:hidden')])]",
+                                            "pattern": [
+                                                "browser[\\s\\S]{0,25}(is |are )?(not|no longer) supported",
+                                                "unsupported browser",
+                                                "browser (is )?(not compatible|incompatible)",
+                                                "incompatible browser",
+                                                "please (update|upgrade) your browser",
+                                                "your browser is (out of date|outdated|too old)",
+                                                "browser (is |are )?(currently )?unsupported",
+                                                "browser update (is )?required"
+                                            ]
+                                        }
+                                    },
+                                    "then": {
+                                        "element": {
+                                            "selector": "input[type='password']",
+                                            "visibility": "visible"
+                                        }
+                                    },
+                                    "else": false
                                 },
                                 "else": false
                             },
