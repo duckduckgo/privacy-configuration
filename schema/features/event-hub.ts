@@ -46,7 +46,8 @@ type PeriodTrigger = {
 // `source` names the event that fires the pixel; data params on an immediate trigger forward
 // that event's payload and so omit their own `source`.
 // Overrides author `immediate`. The build emits `immediate_v2`, which fires once per event the
-// hub delivers after de-duplication, for platforms that parse only that name.
+// hub delivers after de-duplication, for platforms that parse only that name, and omits immediate
+// entries for platforms that parse no immediate name.
 type ImmediateTrigger = {
     type: 'immediate_v2' | 'immediate';
     source: string;
