@@ -225,7 +225,7 @@ jobs:
 
             # Sync Asana tasks for PRs that need manual review (non-auto-approved)
             # Task closure on merge is handled by the dedicated close_asana_on_merge job
-            - uses: duckduckgo/action-asana-sync@v11
+            - uses: duckduckgo/action-asana-sync@v17
               if: |
                   github.event.action != 'closed' &&
                   ((steps.approval.outputs.approved == 'true' && steps.check_files.outputs.files_valid == 'true') != true)
