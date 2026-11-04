@@ -3,6 +3,9 @@ import fs from 'fs';
 import xpath from 'xpath';
 import platforms from '../platforms.js';
 import { CURRENT_CONFIG_VERSION } from '../constants.js';
+import { immutableJSONPatch } from 'immutable-json-patch';
+import { checkSync } from 'recheck';
+import { assertValidUrlPattern, forEachConditionBlock } from './url-pattern.js';
 
 const OPERATOR_KEYS = [
     'any',
@@ -161,6 +164,29 @@ function assertValidPattern(pattern, path) {
         } catch (error) {
             expect.fail(`${path}[${index}]: ${JSON.stringify(entry)} is not a valid regular expression - ${error.message}`);
         }
+    }
+}
+
+/** recheck's verdict on each pattern source, shared across configs. */
+const backtrackingVerdicts = new Map();
+
+/**
+ * Assert a pattern does not backtrack exponentially under the flags content-scope-scripts compiles
+ * it with. A body's patterns run as one top-level alternation, which is as complex as its costliest
+ * branch, so each entry is checked alone. A polynomial pattern, or one recheck cannot decide within
+ * the time limit, passes.
+ *
+ * @param {string} source
+ * @param {string} path - used in error messages
+ */
+function assertNoExponentialBacktracking(source, path) {
+    let verdict = backtrackingVerdicts.get(source);
+    if (verdict === undefined) {
+        verdict = checkSync(source, 'gi', { timeout: 1000 });
+        backtrackingVerdicts.set(source, verdict);
+    }
+    if (verdict.status === 'vulnerable' && verdict.complexity.type === 'exponential') {
+        expect.fail(`${path}: ${JSON.stringify(source)} backtracks exponentially, as on ${verdict.attack.pattern}`);
     }
 }
 
@@ -356,6 +382,52 @@ function forEachWebDetectionConfig(cb) {
     }
 }
 
+/**
+ * Invoke `cb` with each set of detectors a client can run: the feature's own, and the result of each
+ * `domains` or `conditionalChanges` entry's patch.
+ *
+ * @param {import('../schema/features/web-detection').WebDetectionFeature<number>} webDetection
+ * @param {(detectors: Record<string, Record<string, any>>, path: string) => void} cb
+ */
+function forEachDetectorSet(webDetection, cb) {
+    const settings = /** @type {Record<string, any>} */ (webDetection.settings);
+    cb(settings.detectors ?? {}, 'detectors');
+    for (const key of [
+        'domains',
+        'conditionalChanges',
+    ]) {
+        for (const [
+            index,
+            entry,
+        ] of (settings[key] ?? []).entries()) {
+            if (!entry.patchSettings) continue;
+            cb(immutableJSONPatch(settings, entry.patchSettings).detectors ?? {}, `${key}[${index}].detectors`);
+        }
+    }
+}
+
+/**
+ * Invoke `cb` for every detector of every set a client can run.
+ *
+ * @param {import('../schema/features/web-detection').WebDetectionFeature<number>} webDetection
+ * @param {(detector: Record<string, any>, path: string) => void} cb
+ */
+function forEachClientDetector(webDetection, cb) {
+    forEachDetectorSet(webDetection, (detectors, setPath) => {
+        for (const [
+            groupName,
+            group,
+        ] of Object.entries(detectors)) {
+            for (const [
+                detectorId,
+                detector,
+            ] of Object.entries(group ?? {})) {
+                cb(detector, `${setPath}.${groupName}.${detectorId}`);
+            }
+        }
+    });
+}
+
 describe('webDetection config tests', () => {
     describe('match tree validation', () => {
         forEachWebDetectionConfig(({ configName, detectors }) => {
@@ -530,6 +602,47 @@ describe('webDetection config tests', () => {
                     forEachPatchOperation(webDetection, assertExpressionPatch);
                 });
             });
+        });
+    });
+
+    // Clients on content-scope-scripts 18.0.0 and earlier evaluate runConditions unguarded
+    describe('runConditions validation', () => {
+        forEachWebDetectionConfig(({ configName, webDetection }) => {
+            it(`${configName} runConditions urlPatterns parse`, () => {
+                forEachClientDetector(webDetection, (detector, path) => {
+                    for (const [
+                        trigger,
+                        settings,
+                    ] of Object.entries(detector?.triggers ?? {})) {
+                        forEachConditionBlock(settings?.runConditions, (block, index) => {
+                            if (block.urlPattern === undefined) return;
+                            assertValidUrlPattern(block.urlPattern, `${path}.triggers.${trigger}.runConditions[${index}]`);
+                        });
+                    }
+                });
+            });
+        });
+    });
+
+    describe('pattern backtracking', () => {
+        forEachWebDetectionConfig(({ configName, webDetection }) => {
+            it(`${configName} text patterns do not backtrack exponentially`, () => {
+                forEachClientDetector(webDetection, (detector, path) => {
+                    forEachTextCondition(detector?.match, `${path}.match`, (condition, conditionPath) => {
+                        const patterns = Array.isArray(condition.pattern)
+                            ? condition.pattern
+                            : [
+                                  condition.pattern,
+                              ];
+                        for (const [
+                            index,
+                            entry,
+                        ] of patterns.entries()) {
+                            if (typeof entry === 'string') assertNoExponentialBacktracking(entry, `${conditionPath}/pattern[${index}]`);
+                        }
+                    });
+                });
+            }).timeout(60000);
         });
     });
 
@@ -771,6 +884,55 @@ describe('webDetection config tests', () => {
 
         it('does not mistake xpathConfig for an xpath value', () => {
             expect(check({ op: 'replace', path: '/detectors/g/d/match/text/xpathConfig', value: { chunkSize: 8192 } })).to.not.throw();
+        });
+    });
+
+    describe('pattern backtracking (self-test)', () => {
+        /** @param {string} source */
+        const check = (source) => () => assertNoExponentialBacktracking(source, '$');
+
+        it('rejects a pattern that backtracks exponentially', () => {
+            expect(check('(a+)+$')).to.throw(/backtracks exponentially/);
+        });
+
+        it('accepts a linear pattern', () => {
+            expect(check('adblock(er)? detected')).to.not.throw();
+        });
+
+        it('accepts a polynomial pattern', () => {
+            expect(check('(error|code)\\s*:?\\s*22400[03]')).to.not.throw();
+        });
+    });
+
+    describe('urlPattern validation (self-test)', () => {
+        /** @param {unknown} pattern */
+        const check = (pattern) => () => assertValidUrlPattern(pattern, '$');
+
+        it('accepts absolute and relative patterns, and an object', () => {
+            expect(check('https://www.example.com/*')).to.not.throw();
+            expect(check('/news/*')).to.not.throw();
+            expect(check({ hostname: '*.example.com' })).to.not.throw();
+        });
+
+        it('rejects a malformed pattern', () => {
+            expect(check('https://example.com/(')).to.throw(/not a valid urlPattern/);
+        });
+
+        it('reaches every block of a condition array', () => {
+            /** @type {unknown[]} */
+            const found = [];
+            forEachConditionBlock(
+                [
+                    { urlPattern: 'a' },
+                    null,
+                    { domain: 'b' },
+                ],
+                (block) => found.push(block.urlPattern ?? block.domain),
+            );
+            expect(found).to.deep.equal([
+                'a',
+                'b',
+            ]);
         });
     });
 
