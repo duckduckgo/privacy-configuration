@@ -858,12 +858,37 @@ describe('Web detection detector schema', () => {
         ).to.equal(true);
     });
 
-    it('accepts several expression keys beside `using` and `is`', () => {
+    it('rejects several expression keys in one object, and accepts them under `all`', () => {
+        const text = { text: { pattern: 'a' } };
+        expect(validate({ match: { ...text, ...images }, actions: report })).to.equal(false);
+        expect(
+            validate({
+                match: {
+                    any: [
+                        true,
+                    ],
+                    none: [
+                        false,
+                    ],
+                },
+                actions: report,
+            }),
+        ).to.equal(false);
+        expect(validate({ match: { ...images, api: 'document.images', using: 'length', is: { gt: 0 } }, actions: report })).to.equal(false);
+        expect(validate({ match: { if: true, then: true, else: false, ...text }, actions: report })).to.equal(false);
         const detector = {
-            match: { ...images, api: 'document.images', using: 'length', is: { gt: 0 } },
+            match: {
+                all: [
+                    text,
+                    images,
+                ],
+            },
             actions: report,
         };
         expect(validate(detector), formatErrors(validate.errors)).to.equal(true);
+        expect(validate({ match: { ...images, using: 'length', is: { gt: 0 } }, actions: report }), formatErrors(validate.errors)).to.equal(
+            true,
+        );
     });
 
     it('accepts `actions` without `match`', () => {
