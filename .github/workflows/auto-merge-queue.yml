@@ -1,4 +1,4 @@
-# Automatically adds PRs opened by the daxtheduck bot account to the merge queue.
+# Automatically adds PRs opened by selected accounts to the merge queue.
 #
 # `gh pr merge --auto` enables auto-merge; on a branch protected by a merge queue
 # this enqueues the PR as soon as its requirements (approvals, required checks) are met,
@@ -8,7 +8,7 @@
 # GITHUB_TOKEN don't trigger further workflow runs, which would stop the
 # `merge_group` checks in tests.yml from running for the queued PR.
 
-name: Add daxtheduck PRs to merge queue
+name: Add PRs to merge queue
 
 on:
     pull_request:
@@ -16,16 +16,21 @@ on:
 
 permissions: {}
 
+env:
+    # JSON array of GitHub logins whose PRs are automatically added to the merge queue.
+    AUTO_MERGE_QUEUE_ACCOUNTS: '["daxtheduck"]'
+
 jobs:
     enqueue:
-        # Only PRs authored by daxtheduck, from this repository (not forks), and not drafts.
+        # Only PRs from this repository (not forks) that aren't drafts.
+        # (The `env` context isn't available in job-level `if`, so the account check is on the step.)
         if: >-
-            github.event.pull_request.user.login == 'daxtheduck' &&
             github.event.pull_request.head.repo.full_name == github.repository &&
             github.event.pull_request.draft == false
         runs-on: ubuntu-latest
         steps:
             - name: Enable auto-merge (add to merge queue)
+              if: contains(fromJSON(env.AUTO_MERGE_QUEUE_ACCOUNTS), github.event.pull_request.user.login)
               env:
                   GH_TOKEN: ${{ secrets.PRIVACY_CONFIG_PAT }}
                   PR_URL: ${{ github.event.pull_request.html_url }}
