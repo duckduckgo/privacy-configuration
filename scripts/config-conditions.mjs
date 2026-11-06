@@ -61,6 +61,16 @@ export const PLATFORM_INJECT_NAMES = {
 };
 
 /**
+ * The lowest version that reads content scope experiments, on platforms where it is above the first version
+ * with C-S-S conditional changes.
+ *
+ * @type {Partial<Record<Platform, Version>>}
+ */
+export const EXPERIMENTS_MIN_VERSION = {
+    windows: '0.178.0',
+};
+
+/**
  * Compare versions as C-S-S does: numbers numerically, strings part by part.
  *
  * @param {Version} a
@@ -106,12 +116,7 @@ export function maxVersion(a, b) {
  * @param {Client} client
  */
 export function matchCondition(condition, client) {
-    const blocks = Array.isArray(condition)
-        ? condition
-        : [
-              condition,
-          ];
-    return blocks.some((block) => matchBlock(block, client));
+    return conditionBlocks({ condition }).some((block) => matchBlock(block, client));
 }
 
 /**
@@ -171,7 +176,7 @@ export function applyConditionalChanges(settings, client) {
 /**
  * The condition blocks of a conditional change.
  *
- * @param {ConditionalChange} change
+ * @param {{ condition: ConditionBlock | ConditionBlock[] }} change
  * @returns {ConditionBlock[]}
  */
 export function conditionBlocks(change) {

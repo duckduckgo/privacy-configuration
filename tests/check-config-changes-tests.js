@@ -265,6 +265,11 @@ describe('check-config-changes: live experiments', () => {
         expect(reusedExperimentErrors(built(), built(), () => true)).to.deep.equal([]);
     });
 
+    it('passes a new subfeature without cohorts whose name was used before', () => {
+        const head = { features: { contentBlocking: { state: 'enabled', features: { tdsNextExperiment: { state: 'enabled' } } } } };
+        expect(reusedExperimentErrors({ features: {} }, head, () => true)).to.deep.equal([]);
+    });
+
     it('warns when a detector firing a live metric event changes', () => {
         expect(detectorWarnings(built(), built({ match: { text: { pattern: 'disable your adblocker' } } }))).to.have.length(1);
         const patch = {

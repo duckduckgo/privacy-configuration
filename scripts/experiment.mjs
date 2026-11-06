@@ -13,12 +13,12 @@
  * Run with --help for the options.
  */
 
-import { execFileSync } from 'child_process';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { fileURLToPath } from 'url';
 import { parseArgs } from 'util';
 import {
+    EXPERIMENTS_MIN_VERSION,
     PLATFORMS,
     PLATFORM_INJECT_NAMES,
     applyConditionalChanges,
@@ -26,7 +26,7 @@ import {
     maxVersion,
     sameVersionFamily,
 } from './config-conditions.mjs';
-import { ROOT, Workspace, overrideFile } from './config-files.mjs';
+import { Workspace, buildConfigs, copyWorkingTree, isShallowClone, overrideFile, usedInHistory } from './config-files.mjs';
 
 /**
  * @typedef {import('./config-conditions.mjs').Platform} Platform
@@ -63,6 +63,14 @@ import { ROOT, Workspace, overrideFile } from './config-files.mjs';
  * @typedef {'production' | 'enabled' | 'disabled'} ControlFlavour
  * @typedef {{ cohort: string, feature: string, patchSettings: PatchSettings }} CohortPatch
  *
+ * @typedef {object} LoadsCheck - what each cohort of a `create --enable-feature` experiment should load
+ * @property {string} slot
+ * @property {Cohort[]} cohorts
+ * @property {ControlFlavour} control
+ * @property {string[]} enableFeatures
+ * @property {Platform[]} platforms
+ * @property {Map<Platform, Version | undefined>} versions - the version each platform is evaluated at
+ *
  * @typedef {object} CreateOptions
  * @property {string} slot - subfeature name, or `auto` for the first unused Android slot
  * @property {string} parent
@@ -78,9 +86,6 @@ import { ROOT, Workspace, overrideFile } from './config-files.mjs';
 
 export const EXPERIMENTS_FEATURE = 'contentScopeExperiments';
 
-/** Windows reads content scope experiments from this version. */
-const WINDOWS_EXPERIMENTS_VERSION = '0.178.0';
-
 /** Features whose override settings are merged into the base settings by the build. */
 const MERGED_SETTINGS_FEATURES = [
     'customUserAgent',
@@ -92,6 +97,29 @@ const MERGED_SETTINGS_FEATURES = [
 ];
 
 /**
+ * Features that also load in a dedicated C-S-S bundle on the platform. An off block is scoped to the
+ * platform's main bundles, so it would leave them on in the dedicated one.
+ *
+ * @type {Partial<Record<Platform, string[]>>}
+ */
+const DEDICATED_BUNDLE_FEATURES = {
+    android: [
+        'duckAiDataClearing',
+        'duckAiChatHistory',
+        'brokerProtection',
+        'autofillImport',
+    ],
+    ios: [
+        'duckAiDataClearing',
+        'duckAiChatHistory',
+    ],
+    macos: [
+        'duckAiDataClearing',
+        'duckAiChatHistory',
+    ],
+};
+
+/**
  * Android only reads the experiment subfeatures it declares, in this order.
  */
 export const ANDROID_SLOTS = [
@@ -100,39 +128,27 @@ export const ANDROID_SLOTS = [
 ];
 
 /**
- * @param {string} name
+ * @param {string} slot
  */
-export function usedInHistory(name) {
-    const output = execFileSync(
-        'git',
-        [
-            'log',
-            '--format=%h',
-            '-1',
-            `-S"${name}"`,
-            '--',
-            'overrides',
-            'features',
-        ],
-        {
-            cwd: ROOT,
-            encoding: 'utf8',
-        },
-    );
-    return output.trim() !== '';
+export function slotUsedBefore(slot) {
+    return usedInHistory(slot, [
+        'overrides',
+        'features',
+    ]);
 }
 
-export function isShallowClone() {
-    return (
-        execFileSync(
-            'git',
-            [
-                'rev-parse',
-                '--is-shallow-repository',
-            ],
-            { cwd: ROOT, encoding: 'utf8' },
-        ).trim() === 'true'
-    );
+/**
+ * A warning when a fractional rollout reaches Windows, which enrols by a whole percent rounded down.
+ *
+ * @param {number} percent
+ * @param {Platform[]} platforms
+ * @returns {string[]}
+ */
+export function fractionalRolloutWarnings(percent, platforms) {
+    if (Number.isInteger(percent) || !platforms.includes('windows')) return [];
+    return [
+        `Windows enrols rollouts by a whole percent, rounded down: ${percent}% enrols ${Math.floor(percent)}% there`,
+    ];
 }
 
 /**
@@ -163,7 +179,7 @@ export function slotsInUse(ws) {
  * @param {JsonPath} path
  * @returns {any}
  */
-function valueAt(root, path) {
+export function valueAt(root, path) {
     return path.reduce((value, key) => /** @type {any} */ (value)?.[key], root);
 }
 
@@ -316,6 +332,18 @@ export function platformClients(platform, version, cohorts = {}) {
 }
 
 /**
+ * Whether any of the platform's clients loads the feature.
+ *
+ * @param {MergedFeature} feature
+ * @param {Platform} platform
+ * @param {Version | undefined} version
+ * @param {Record<string, string>} [cohorts]
+ */
+function loadsOn(feature, platform, version, cohorts = {}) {
+    return platformClients(platform, version, cohorts).some((client) => featureLoads(feature, client));
+}
+
+/**
  * Condition blocks matching every client of the platform. iOS and macOS share inject names, so they are
  * told apart by the major version of `version`.
  *
@@ -352,6 +380,25 @@ function additionalCheckPatch(state) {
 }
 
 /**
+ * The platforms whose clients the condition covers, as platformScope writes it.
+ *
+ * @param {ConditionalChange} change
+ * @returns {Platform[]}
+ */
+export function scopedPlatforms(change) {
+    const blocks = conditionBlocks(change);
+    return PLATFORMS.filter((platform) =>
+        blocks.some(
+            (block) =>
+                block.injectName !== undefined &&
+                PLATFORM_INJECT_NAMES[platform].includes(block.injectName) &&
+                (platform !== 'ios' || block.minSupportedVersion !== undefined) &&
+                (platform !== 'macos' || block.maxSupportedVersion !== undefined),
+        ),
+    );
+}
+
+/**
  * An off block: switches the feature off for every client of the scoped platforms.
  *
  * @param {ConditionalChange} change
@@ -364,11 +411,23 @@ export function isOffBlock(change) {
 }
 
 /**
+ * An enable block: switches the feature back on for experiment cohorts after an off block.
+ *
+ * @param {ConditionalChange} change
+ */
+function isEnableBlock(change) {
+    return (
+        JSON.stringify(change.patchSettings) === JSON.stringify(additionalCheckPatch('enabled')) &&
+        conditionBlocks(change).every((block) => block.experiment !== undefined)
+    );
+}
+
+/**
  * @param {Workspace} ws
  * @param {Location} location - a settings location
  * @param {ConditionalChange[]} changes
  */
-function appendChanges(ws, location, changes) {
+export function appendChanges(ws, location, changes) {
     if (changes.length === 0) return;
     const settings = valueAt(ws.parse(location.file), location.path);
     if (settings === undefined) {
@@ -465,9 +524,84 @@ export function expectedLoads(cohort, control, production) {
 }
 
 /**
+ * Check that each cohort, and the users outside the experiment, load each enabled feature as they should.
+ *
+ * @param {LoadsCheck} check
+ * @param {(feature: string, platform: Platform) => MergedFeature} before - the feature in production
+ * @param {(feature: string, platform: Platform) => MergedFeature} after - the feature with the experiment
+ * @returns {string[]} the result as table lines
+ */
+export function checkLoads({ slot, cohorts, control, enableFeatures, platforms, versions }, before, after) {
+    const columns = [
+        ...cohorts.map((c) => c.name),
+        'not enrolled',
+    ];
+    const lines = [
+        `| Platform | Feature | Production | ${columns.join(' | ')} |`,
+        `|---|---|---|${columns.map(() => '---|').join('')}`,
+    ];
+    for (const feature of enableFeatures) {
+        for (const platform of platforms) {
+            const version = versions.get(platform);
+            const production = loadsOn(before(feature, platform), platform, version);
+            const cells = [
+                ...cohorts.map((c) => c.name),
+                undefined,
+            ].map((cohort) => {
+                const actual = loadsOn(after(feature, platform), platform, version, cohort === undefined ? {} : { [slot]: cohort });
+                if (actual !== expectedLoads(cohort, control, production)) {
+                    throw new Error(
+                        `${feature} on ${platform}, ${cohort ?? 'not enrolled'}: expected ${actual ? 'off' : 'on'}, got ${actual ? 'on' : 'off'}`,
+                    );
+                }
+                return actual ? 'on' : 'off';
+            });
+            lines.push(`| ${platform} | ${feature} | ${production ? 'on' : 'off'} | ${cells.join(' | ')} |`);
+        }
+    }
+    return lines;
+}
+
+/**
+ * The feature as the built config for the platform has it.
+ *
+ * @param {Map<string, any>} configs - built config by platform
+ * @param {string} feature
+ * @param {Platform} platform
+ * @returns {MergedFeature}
+ */
+function builtFeature(configs, feature, platform) {
+    const built = configs.get(platform)?.features?.[feature];
+    if (built === undefined) throw new Error(`The built ${platform} config has no ${feature}`);
+    return { state: built.state, minSupportedVersion: built.minSupportedVersion, settings: built.settings ?? {} };
+}
+
+/**
+ * Run checkLoads on the built config: the repository as it is, against the repository with the pending edits.
+ *
+ * @param {Workspace} ws
+ * @param {LoadsCheck} check
+ * @returns {Promise<string[]>} the result as table lines
+ */
+export async function checkBuiltLoads(ws, check) {
+    const [
+        before,
+        after,
+    ] = await Promise.all([
+        buildConfigs(copyWorkingTree(), check.platforms),
+        buildConfigs(copyWorkingTree(ws.pending()), check.platforms),
+    ]);
+    return checkLoads(
+        check,
+        (feature, platform) => builtFeature(before, feature, platform),
+        (feature, platform) => builtFeature(after, feature, platform),
+    );
+}
+
+/**
  * @param {Workspace} ws
  * @param {CreateOptions} options
- * @returns {{ slot: string, report: string, warnings: string[] }}
+ * @returns {{ slot: string, report: string, warnings: string[], check: LoadsCheck }}
  */
 export function createExperiment(ws, options) {
     const { parent, platforms, cohorts, enableFeatures, control, patches } = options;
@@ -480,6 +614,7 @@ export function createExperiment(ws, options) {
     }
     if (options.rollout !== undefined && !(options.rollout > 0 && options.rollout <= 100))
         throw new Error('--rollout must be above 0 and at most 100');
+    if (options.rollout !== undefined) warnings.push(...fractionalRolloutWarnings(options.rollout, platforms));
     for (const patch of patches) {
         if (!cohorts.some((c) => c.name === patch.cohort)) throw new Error(`--patch names unknown cohort ${patch.cohort}`);
     }
@@ -488,7 +623,7 @@ export function createExperiment(ws, options) {
 
     let slot = options.slot;
     if (slot === 'auto') {
-        slot = pickSlot(slotsInUse(ws), usedInHistory);
+        slot = pickSlot(slotsInUse(ws), slotUsedBefore);
         if (isShallowClone())
             warnings.push(`This clone is shallow, so ${slot} may have been used before; run git fetch --unshallow and retry`);
     } else if (parent === EXPERIMENTS_FEATURE && platforms.includes('android') && !ANDROID_SLOTS.includes(slot)) {
@@ -522,8 +657,9 @@ export function createExperiment(ws, options) {
                 if (floor === undefined) continue;
                 version = version === undefined || !sameVersionFamily(version, floor) ? floor : maxVersion(version, floor);
             }
-            if (platform === 'windows' && parent === EXPERIMENTS_FEATURE) {
-                version = version === undefined ? WINDOWS_EXPERIMENTS_VERSION : maxVersion(version, WINDOWS_EXPERIMENTS_VERSION);
+            const experimentsFloor = EXPERIMENTS_MIN_VERSION[platform];
+            if (experimentsFloor !== undefined && parent === EXPERIMENTS_FEATURE) {
+                version = version === undefined ? experimentsFloor : maxVersion(version, experimentsFloor);
             }
         }
         versions.set(platform, version);
@@ -551,23 +687,21 @@ export function createExperiment(ws, options) {
         });
     }
 
-    /** @type {Map<string, Map<Platform, boolean>>} */
-    const production = new Map();
     for (const feature of enableFeatures) {
         const merged = /** @type {Map<Platform, MergedFeature>} */ (before.get(feature));
         /** @type {Map<Platform, boolean>} */
         const loads = new Map(
             platforms.map((platform) => [
                 platform,
-                platformClients(platform, versions.get(platform)).some((client) =>
-                    featureLoads(/** @type {MergedFeature} */ (merged.get(platform)), client),
-                ),
+                loadsOn(/** @type {MergedFeature} */ (merged.get(platform)), platform, versions.get(platform)),
             ]),
         );
-        production.set(feature, loads);
         const offPlatforms = platforms.filter((platform) => !loads.get(platform));
         const stateOff = offPlatforms.filter((platform) => merged.get(platform)?.state !== 'enabled');
         for (const platform of stateOff) {
+            if (DEDICATED_BUNDLE_FEATURES[platform]?.includes(feature)) {
+                throw new Error(`${feature} also loads in its own C-S-S bundle on ${platform}, which an off block does not cover`);
+            }
             const file = overrideFile(platform);
             if (ws.parse(file).features?.[feature] === undefined)
                 throw new Error(`${feature} is not in ${file}; add it before enabling it`);
@@ -621,40 +755,20 @@ export function createExperiment(ws, options) {
             ]);
     }
 
-    const columns = [
-        ...cohorts.map((c) => c.name),
-        'not enrolled',
-    ];
+    /** @type {LoadsCheck} */
+    const check = { slot, cohorts, control, enableFeatures, platforms, versions };
     const lines = [
         `${slot} under ${parent}: ${description}${options.rollout !== undefined && options.rollout < 100 ? `, rollout ${options.rollout}%` : ''}`,
     ];
     if (enableFeatures.length > 0) {
         lines.push(
             '',
-            `| Platform | Feature | Production | ${columns.join(' | ')} |`,
-            `|---|---|---|${columns.map(() => '---|').join('')}`,
+            ...checkLoads(
+                check,
+                (feature, platform) => /** @type {MergedFeature} */ (before.get(feature)?.get(platform)),
+                (feature, platform) => /** @type {MergedFeature} */ (mergedFeature(ws, feature, platform)),
+            ),
         );
-    }
-    for (const feature of enableFeatures) {
-        for (const platform of platforms) {
-            const merged = /** @type {MergedFeature} */ (mergedFeature(ws, feature, platform));
-            const productionLoads = /** @type {boolean} */ (production.get(feature)?.get(platform));
-            const cells = [
-                ...cohorts.map((c) => c.name),
-                undefined,
-            ].map((cohort) => {
-                const actual = platformClients(platform, versions.get(platform), cohort === undefined ? {} : { [slot]: cohort }).some(
-                    (client) => featureLoads(merged, client),
-                );
-                if (actual !== expectedLoads(cohort, control, productionLoads)) {
-                    throw new Error(
-                        `${feature} on ${platform}, ${cohort ?? 'not enrolled'}: expected ${actual ? 'off' : 'on'}, got ${actual ? 'on' : 'off'}`,
-                    );
-                }
-                return actual ? 'on' : 'off';
-            });
-            lines.push(`| ${platform} | ${feature} | ${productionLoads ? 'on' : 'off'} | ${cells.join(' | ')} |`);
-        }
     }
     patches.forEach((patch, i) => {
         for (const platform of platforms) {
@@ -672,7 +786,7 @@ export function createExperiment(ws, options) {
             }
         }
     });
-    return { slot, report: lines.join('\n'), warnings };
+    return { slot, report: lines.join('\n'), warnings, check };
 }
 
 /**
@@ -703,8 +817,12 @@ function selectLocations(ws, parent, slot, platforms) {
  */
 export function appendRolloutStep(ws, { parent, slot, percent, allowDecrease, platforms }) {
     if (!(percent > 0 && percent <= 100)) throw new Error('--percent must be above 0 and at most 100');
-    const warnings = [];
-    for (const location of selectLocations(ws, parent, slot, platforms)) {
+    const locations = selectLocations(ws, parent, slot, platforms);
+    const warnings = fractionalRolloutWarnings(
+        percent,
+        locations.flatMap((location) => location.platforms),
+    );
+    for (const location of locations) {
         /** @type {Subfeature} */
         const subfeature = valueAt(ws.parse(location.file), location.path);
         const steps = subfeature.rollout?.steps;
@@ -796,35 +914,84 @@ function allConditionalChanges(ws) {
 }
 
 /**
- * The indices of the conditional changes written for the slot: those whose every condition names it, and
- * the off block written immediately before them.
+ * The indices of the conditional changes written for the slot: those whose every condition names it.
  *
  * @param {ConditionalChange[]} changes
  * @param {string} slot
+ * @returns {number[]}
  */
 export function experimentChangeIndices(changes, slot) {
-    /** @type {number[]} */
-    const indices = [];
-    changes.forEach((change, index) => {
-        if (!conditionBlocks(change).every((block) => block.experiment?.experimentName === slot)) return;
-        const previous = changes[index - 1];
-        if (previous !== undefined && !indices.includes(index - 1) && isOffBlock(previous)) indices.push(index - 1);
-        indices.push(index);
-    });
-    return indices;
+    return changes.flatMap((change, index) =>
+        conditionBlocks(change).every((block) => block.experiment?.experimentName === slot)
+            ? [
+                  index,
+              ]
+            : [],
+    );
+}
+
+/**
+ * The off blocks that only the slot's enable blocks switch back on: those before one of the slot's enable
+ * blocks with no other experiment's enable block after them. An off block is shared by every experiment
+ * created while it was there.
+ *
+ * @param {ConditionalChange[]} changes
+ * @param {number[]} slotIndices - from experimentChangeIndices
+ * @returns {number[]}
+ */
+export function orphanedOffBlocks(changes, slotIndices) {
+    const enableIndices = slotIndices.filter((index) => isEnableBlock(changes[index]));
+    if (enableIndices.length === 0) return [];
+    const lastEnable = Math.max(...enableIndices);
+    return changes.flatMap((change, index) =>
+        index < lastEnable &&
+        isOffBlock(change) &&
+        !changes.some((other, later) => later > index && !slotIndices.includes(later) && isEnableBlock(other))
+            ? [
+                  index,
+              ]
+            : [],
+    );
+}
+
+/**
+ * Whether users outside any experiment load each feature, per platform that has it, at the feature's
+ * minimum version.
+ *
+ * @param {Workspace} ws
+ * @param {Iterable<string>} features
+ * @returns {Map<string, boolean>} keyed by `feature platform`
+ */
+function productionLoads(ws, features) {
+    /** @type {Map<string, boolean>} */
+    const loads = new Map();
+    for (const feature of features) {
+        for (const platform of PLATFORMS) {
+            const merged = mergedFeature(ws, feature, platform);
+            if (merged !== undefined) loads.set(`${feature} ${platform}`, loadsOn(merged, platform, merged.minSupportedVersion));
+        }
+    }
+    return loads;
 }
 
 /**
  * Remove the subfeature and the conditional changes written for it. contentScopeExperiments is removed
- * from an override once it has no subfeatures left.
+ * from an override once it has no subfeatures left. An off block no other experiment needs is removed too,
+ * and the feature's state on its platforms set back to disabled, unless `ship` keeps the feature on.
  *
  * @param {Workspace} ws
  * @param {string} parent
  * @param {string} slot
+ * @param {{ ship?: boolean }} [options]
  * @returns {string[]} report lines
  */
-export function removeExperiment(ws, parent, slot) {
+export function removeExperiment(ws, parent, slot, { ship = false } = {}) {
     const lines = [];
+    const lists = allConditionalChanges(ws);
+    const features = new Set(
+        lists.filter(({ changes }) => experimentChangeIndices(changes, slot).length > 0).map(({ feature }) => feature),
+    );
+    const before = productionLoads(ws, features);
     for (const location of locateSubfeature(ws, parent, slot)) {
         const remaining = Object.keys(valueAt(ws.parse(location.file), location.path.slice(0, -1)) ?? {});
         if (parent === EXPERIMENTS_FEATURE && location.file.startsWith('overrides/') && remaining.length === 1) {
@@ -841,16 +1008,17 @@ export function removeExperiment(ws, parent, slot) {
         }
         lines.push(`Removed ${slot} from ${location.file}`);
     }
-    /** @type {Set<string>} */
-    const features = new Set();
-    for (const { file, feature, path, changes } of allConditionalChanges(ws)) {
+    for (const { file, feature, path, changes } of lists) {
         const indices = experimentChangeIndices(changes, slot);
-        if (indices.length > 0 && indices.length === changes.length) {
+        const offBlocks = orphanedOffBlocks(changes, indices);
+        const removed = [
+            ...indices,
+            ...offBlocks,
+        ].sort((a, b) => a - b);
+        if (removed.length > 0 && removed.length === changes.length) {
             ws.edit(file, path, undefined);
         } else {
-            for (const index of [
-                ...indices,
-            ].reverse())
+            for (const index of removed.reverse())
                 ws.edit(
                     file,
                     [
@@ -860,11 +1028,45 @@ export function removeExperiment(ws, parent, slot) {
                     undefined,
                 );
         }
-        if (indices.length > 0) {
-            features.add(feature);
-            lines.push(`Removed ${indices.length} conditional changes from ${feature} in ${file}`);
+        if (indices.length > 0) lines.push(`Removed ${indices.length} conditional changes from ${feature} in ${file}`);
+        for (const index of offBlocks) {
+            const platforms = scopedPlatforms(changes[index]);
+            lines.push(`Removed the ${feature} off block for ${platforms.join(', ')} from ${file}`);
+            if (ship) continue;
+            for (const platform of platforms) {
+                if (ws.parse(overrideFile(platform)).features?.[feature] !== undefined) {
+                    ws.edit(
+                        overrideFile(platform),
+                        [
+                            'features',
+                            feature,
+                            'state',
+                        ],
+                        'disabled',
+                    );
+                }
+            }
         }
     }
+    const after = productionLoads(ws, features);
+    const changed = [
+        ...before,
+    ]
+        .filter(
+            ([
+                key,
+                loads,
+            ]) => after.get(key) !== loads,
+        )
+        .map(
+            ([
+                key,
+            ]) => key,
+        );
+    if (changed.length > 0 && !ship) {
+        throw new Error(`Removing ${slot} would change production for ${changed.join(', ')}; check its off blocks by hand`);
+    }
+    for (const key of changed) lines.push(`${key}: users outside experiments ${after.get(key) ? 'now load it' : 'no longer load it'}`);
     for (const feature of features) {
         const states = PLATFORMS.map((platform) => `${platform} ${mergedFeature(ws, feature, platform)?.state ?? 'absent'}`);
         lines.push(`${feature} state: ${states.join(', ')}`);
@@ -921,7 +1123,7 @@ const HELP = `Usage:
   experiment.mjs create  <slot>|auto --platforms <list> [options]
   experiment.mjs rollout <slot> --percent <p> [--allow-decrease]
   experiment.mjs disable <slot>
-  experiment.mjs remove  <slot>
+  experiment.mjs remove  <slot> [--ship]
 
 Common:
   --parent <feature>         feature that holds the subfeature (default: ${EXPERIMENTS_FEATURE})
@@ -933,12 +1135,12 @@ create:
   --cohorts <list>           name:weight pairs (default: control:1,treatment:1)
   --rollout <p>              enrol this percent of users; raise it later with rollout
   --min-version <list>       platform=version pairs for the slot's minSupportedVersion
-                             (default: the enabled features' minimum versions; Windows at least ${WINDOWS_EXPERIMENTS_VERSION})
+                             (default: the enabled features' minimum versions; Windows at least ${EXPERIMENTS_MIN_VERSION.windows})
   --description <text>
   --enable-feature <list>    C-S-S features that every cohort except control runs, through additionalCheck;
                              a feature that is off in production is turned on in the override and switched
                              off for everyone else on that platform. The feature's schema in schema/features
-                             must allow additionalCheck
+                             must allow additionalCheck. Checked against the built config before writing
   --control production|enabled|disabled
                              what control runs (default: production); users outside the rollout run production
   --patch <cohort>=<file>    JSON file { "feature": "...", "patchSettings": [...] } applied for that cohort;
@@ -948,17 +1150,19 @@ rollout:
   --percent <p>              appended as a new rollout step
   --allow-decrease           allow a lower percent; only Android un-enrols users
 
-remove: deletes the slot and every conditional change written for it. Features turned on by create stay on.
+remove: deletes the slot and every conditional change written for it. A feature create turned on goes back
+off once no other experiment switches it on, keeping production as it is.
+  --ship                     keep that feature on for everyone instead
 `;
 
 /**
  * @param {string | undefined} value
  * @param {string} flag
  */
-function parsePercent(value, flag) {
+export function parsePercent(value, flag) {
     if (value === undefined) return undefined;
     const number = Number(value);
-    if (!Number.isFinite(number)) throw new Error(`${flag} needs a number`);
+    if (!Number.isFinite(number) || number <= 0 || number > 100) throw new Error(`${flag} needs a percent above 0 and at most 100`);
     return number;
 }
 
@@ -991,10 +1195,11 @@ function parseCohorts(value) {
 }
 
 /**
- * @param {string} value
+ * @param {string} value - comma-separated platform=version pairs
+ * @param {string} flag
  * @returns {Partial<Record<Platform, Version>>}
  */
-function parseVersions(value) {
+export function parseVersions(value, flag) {
     /** @type {Partial<Record<Platform, Version>>} */
     const versions = {};
     for (const pair of value.split(',').filter(Boolean)) {
@@ -1002,7 +1207,7 @@ function parseVersions(value) {
             platform,
             version,
         ] = pair.split('=');
-        if (!PLATFORMS.includes(/** @type {Platform} */ (platform)) || !version) throw new Error(`Invalid --min-version entry: ${pair}`);
+        if (!PLATFORMS.includes(/** @type {Platform} */ (platform)) || !version) throw new Error(`Invalid ${flag} entry: ${pair}`);
         versions[/** @type {Platform} */ (platform)] = /^\d+$/.test(version) ? Number(version) : version;
     }
     return versions;
@@ -1038,6 +1243,7 @@ async function main() {
             patch: { type: 'string', multiple: true, default: [] },
             percent: { type: 'string' },
             'allow-decrease': { type: 'boolean', default: false },
+            ship: { type: 'boolean', default: false },
             'dry-run': { type: 'boolean', default: false },
             help: { type: 'boolean', default: false },
         },
@@ -1080,7 +1286,7 @@ async function main() {
             platforms: platforms ?? [],
             cohorts: parseCohorts(values.cohorts),
             rollout: parsePercent(values.rollout, '--rollout'),
-            minVersions: parseVersions(values['min-version']),
+            minVersions: parseVersions(values['min-version'], '--min-version'),
             description: values.description,
             enableFeatures: values['enable-feature'].split(',').filter(Boolean),
             control,
@@ -1088,6 +1294,10 @@ async function main() {
         });
         console.log(result.report);
         warnings = result.warnings;
+        if (result.check.enableFeatures.length > 0) {
+            await checkBuiltLoads(ws, result.check);
+            console.log('\nThe built config gives the same result.');
+        }
     } else if (command === 'rollout') {
         const percent = parsePercent(values.percent, '--percent');
         if (percent === undefined) throw new Error('rollout needs --percent');
@@ -1095,7 +1305,7 @@ async function main() {
     } else if (command === 'disable') {
         setSubfeatureState(ws, { parent, slot, state: 'disabled', platforms });
     } else {
-        console.log(removeExperiment(ws, parent, slot).join('\n'));
+        console.log(removeExperiment(ws, parent, slot, { ship: values.ship }).join('\n'));
     }
 
     for (const warning of warnings) console.warn(`Warning: ${warning}`);

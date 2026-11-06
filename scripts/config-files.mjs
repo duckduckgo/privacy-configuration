@@ -2,11 +2,15 @@
  * Read and edit the JSONC feature and override files, keeping comments and repository formatting.
  */
 
-import { readdirSync, readFileSync, writeFileSync } from 'fs';
-import { dirname, resolve } from 'path';
+import { execFile, execFileSync } from 'child_process';
+import { cpSync, mkdtempSync, readdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'fs';
+import { tmpdir } from 'os';
+import { dirname, join, relative, resolve, sep } from 'path';
 import { fileURLToPath } from 'url';
+import { promisify } from 'util';
 import { applyEdits, modify } from 'jsonc-parser';
 import * as prettier from 'prettier';
+import { CURRENT_CONFIG_VERSION } from '../constants.js';
 import { parseJsonc } from './set-jsonc-path.mjs';
 
 /**
@@ -15,6 +19,82 @@ import { parseJsonc } from './set-jsonc-path.mjs';
  */
 
 export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+
+/**
+ * @param {string[]} args
+ */
+export function git(...args) {
+    return execFileSync('git', args, { cwd: ROOT, encoding: 'utf8', maxBuffer: 1 << 28 });
+}
+
+export function isShallowClone() {
+    return git('rev-parse', '--is-shallow-repository').trim() === 'true';
+}
+
+/**
+ * Whether a commit reachable from `ref` added or removed the JSON string `"name"` in `paths`. The quotes are
+ * part of the search string, so contentScopeExperiment1 does not match contentScopeExperiment10.
+ *
+ * @param {string} name
+ * @param {string[]} paths
+ * @param {string} [ref]
+ */
+export function usedInHistory(name, paths, ref = 'HEAD') {
+    return git('log', '-1', '--format=%h', `-S"${name}"`, ref, '--', ...paths).trim() !== '';
+}
+
+/** Top-level entries the build does not read. */
+const NOT_BUILT = new Set([
+    '.git',
+    'node_modules',
+    'generated',
+]);
+
+/**
+ * Copy the working tree to a temporary directory and write `files` over it.
+ *
+ * @param {Map<string, string>} [files] - text by path relative to the repository root
+ * @returns {string} the directory
+ */
+export function copyWorkingTree(files = new Map()) {
+    const dir = mkdtempSync(join(tmpdir(), 'config-build-'));
+    cpSync(ROOT, dir, { recursive: true, filter: (source) => !NOT_BUILT.has(relative(ROOT, source).split(sep)[0]) });
+    for (const [
+        file,
+        text,
+    ] of files) {
+        writeFileSync(join(dir, file), text);
+    }
+    return dir;
+}
+
+/**
+ * Build the config tree in `dir`, read each platform's built config, and delete `dir`.
+ *
+ * @param {string} dir
+ * @param {readonly string[]} platforms
+ * @returns {Promise<Map<string, any>>} built config by platform
+ */
+export async function buildConfigs(dir, platforms) {
+    try {
+        symlinkSync(resolve(ROOT, 'node_modules'), join(dir, 'node_modules'));
+        await promisify(execFile)(
+            'node',
+            [
+                'index.js',
+            ],
+            { cwd: dir },
+        );
+        return new Map(
+            platforms.map((platform) => [
+                platform,
+                JSON.parse(readFileSync(join(dir, 'generated', `v${CURRENT_CONFIG_VERSION}`, `${platform}-config.json`), 'utf8')),
+            ]),
+        );
+    } finally {
+        rmSync(dir, { recursive: true, force: true });
+    }
+}
 
 /**
  * @param {Platform} platform
@@ -146,6 +226,20 @@ export class Workspace {
      */
     featureFile(feature) {
         return this.featureFiles[feature];
+    }
+
+    /**
+     * @returns {Map<string, string>} the edited files' text by path
+     */
+    pending() {
+        return new Map(
+            [
+                ...this.changed,
+            ].map((file) => [
+                file,
+                /** @type {string} */ (this.texts.get(file)),
+            ]),
+        );
     }
 
     async flush() {

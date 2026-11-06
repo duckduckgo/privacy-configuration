@@ -29,9 +29,10 @@ An experiment is a sub-feature of `contentScopeExperiments`, a slot, with `cohor
 | Inspect | `node scripts/experiment.mjs status <slot>` |
 | Raise the rollout | `node scripts/experiment.mjs rollout <slot> --percent 25` |
 | Stop | `node scripts/experiment.mjs disable <slot>`; everyone gets production |
-| Ship or clean up | `node scripts/experiment.mjs remove <slot>` deletes the slot and its conditional changes |
+| Clean up | `node scripts/experiment.mjs remove <slot>` deletes the slot and its conditional changes; production stays as it is |
+| Ship | The same with `--ship`, which keeps on for everyone a feature that `create` turned on |
 
-`create auto` picks an Android slot that no override and no past commit uses; in a shallow clone, run `git fetch --unshallow` first. It checks each cohort's result on every platform before writing.
+`create auto` picks an Android slot that no override and no past commit uses; in a shallow clone, run `git fetch --unshallow` first. Before writing, it checks each cohort's result on every platform, on the built config as well.
 
 Once an experiment is enabled with cohorts, start a new experiment rather than editing it. CI fails a pull request that changes its cohorts, adds a metric to it, or changes a metric other than renaming its event along with the detectors that fire it, and one that adds an experiment under a name used before. It warns when a detector that fires a live metric's event changes.
 
@@ -43,7 +44,7 @@ With `--enable-feature`, every cohort except `control` runs the feature, and `--
 | `enabled` | The feature |
 | `disabled` | Nothing of the feature |
 
-Where the feature is off in production, `create` turns it on in the override and switches it off through `additionalCheck` for everyone outside the enabled cohorts. `remove` leaves it on, which ships it. To abandon the experiment, `disable` it; when removing it later, set the feature's `state` back to `disabled` in the same change.
+Where the feature is off in production, `create` turns it on in the override and switches it off through `additionalCheck` for everyone outside the enabled cohorts. Experiments that switch on the same feature share that switch. `remove` takes it out once no remaining experiment needs it and sets the feature's `state` back to `disabled`; with `--ship`, the feature stays on for everyone instead.
 
 A `--patch` file names the feature and its JSON Patch. Use `add`: `replace` on a missing path changes nothing.
 
@@ -65,4 +66,4 @@ A `--patch` file names the feature and its JSON Patch. Use `add`: `replace` on a
 node scripts/web-detection-experiment.mjs create --mode disable --cohorts 4 --cohort-percent 5 --by group --dry-run
 ```
 
-`--help` covers sizing (`--rollout`, `--control-percent`, `--cohort-percent`) and seeding. Use `experiment.mjs` to raise, stop or inspect the experiment, and `web-detection-experiment.mjs remove --experiment <slot>` to remove it.
+`--help` covers sizing (`--rollout`, `--control-percent`, `--cohort-percent`) and seeding. Use `experiment.mjs` to raise, stop, inspect or remove the experiment.

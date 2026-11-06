@@ -5,26 +5,38 @@
  *
  * Usage:
  *   node scripts/web-detection-experiment.mjs create --mode enable --cohorts 10 --cohort-percent 5
- *   node scripts/web-detection-experiment.mjs remove --experiment contentScopeExperiment10
  *
  * `create` adds an experiment slot to each platform override and appends one conditional change per
- * cohort slice to features/web-detection.json. Run with --help for the options.
+ * cohort slice to the webDetection settings each platform reads. Run with --help for the options. Raise,
+ * stop, inspect and remove the experiment with experiment.mjs.
  */
 
 import { randomBytes } from 'crypto';
 import { fileURLToPath } from 'url';
 import { parseArgs } from 'util';
-import { applyConditionalChanges, maxVersion, sameVersionFamily } from './config-conditions.mjs';
-import { Workspace, editJsonc, overrideFile } from './config-files.mjs';
+import {
+    EXPERIMENTS_MIN_VERSION,
+    PLATFORMS,
+    PLATFORM_INJECT_NAMES,
+    applyConditionalChanges,
+    conditionBlocks,
+    maxVersion,
+    sameVersionFamily,
+} from './config-conditions.mjs';
+import { Workspace, buildConfigs, copyWorkingTree, isShallowClone, overrideFile } from './config-files.mjs';
 import {
     ANDROID_SLOTS,
     EXPERIMENTS_FEATURE,
     addSubfeature,
-    isShallowClone,
+    appendChanges,
+    fractionalRolloutWarnings,
+    locateSettings,
+    parsePercent,
+    parseVersions,
     pickSlot,
-    removeExperiment,
+    slotUsedBefore,
     slotsInUse,
-    usedInHistory,
+    valueAt,
 } from './experiment.mjs';
 
 /**
@@ -45,7 +57,7 @@ import {
  * @typedef {Record<string, Record<string, DetectorConfig>>} Detectors
  * @typedef {{ detectors: Detectors, conditionalChanges?: ConditionalChange[] }} WebDetectionSettings
  *
- * @typedef {number | 'sqrt' | 'remainder'} ControlSize
+ * @typedef {number | 'sqrt'} ControlSize
  * @typedef {{ rollout?: number, control?: ControlSize, cohortPercent?: number }} SizingInput
  * @typedef {{ rollout: number, control: number, cohort: number }} Sizing
  *
@@ -69,43 +81,19 @@ import {
  * @property {boolean} dryRun
  */
 
-const WEB_DETECTION_FILE = 'features/web-detection.json';
-
 /**
- * The C-S-S bundles that run web detection on each platform.
+ * The C-S-S bundles that run web detection on each platform: on Apple, only the isolated one.
  *
- * @type {Record<Platform, { injectNames: string[], minExperimentVersion?: Version }>}
+ * @type {Record<Platform, string[]>}
  */
-export const PLATFORMS = {
-    android: {
-        injectNames: [
-            'android',
-            'android-adsjs',
-        ],
-    },
-    ios: {
-        injectNames: [
-            'apple-isolated',
-        ],
-    },
-    macos: {
-        injectNames: [
-            'apple-isolated',
-        ],
-    },
-    // Windows reads content scope experiments from 0.178.0.
-    windows: {
-        injectNames: [
-            'windows',
-        ],
-        minExperimentVersion: '0.178.0',
-    },
-    extension: {
-        injectNames: [
-            'chrome-mv3',
-            'firefox',
-        ],
-    },
+const INJECT_NAMES = {
+    ...PLATFORM_INJECT_NAMES,
+    ios: [
+        'apple-isolated',
+    ],
+    macos: [
+        'apple-isolated',
+    ],
 };
 
 const DEFAULT_PLATFORMS = /** @type {Platform[]} */ ([
@@ -173,7 +161,7 @@ export function detectorIds(detectors, predicate = () => true) {
  * @returns {Client[]}
  */
 export function clientsFor(platform, version, cohorts = {}) {
-    return PLATFORMS[platform].injectNames.map((injectName) => ({ injectName, version, cohorts }));
+    return INJECT_NAMES[platform].map((injectName) => ({ injectName, version, cohorts }));
 }
 
 /**
@@ -196,16 +184,11 @@ export function autoRunning(settings, clients) {
  * @returns {Version}
  */
 export function latestGate(platform, settings, floor) {
-    const { injectNames, minExperimentVersion } = PLATFORMS[platform];
-    let latest = minExperimentVersion === undefined ? floor : maxVersion(floor, minExperimentVersion);
+    const experimentsFloor = EXPERIMENTS_MIN_VERSION[platform];
+    let latest = experimentsFloor === undefined ? floor : maxVersion(floor, experimentsFloor);
     for (const change of settings.conditionalChanges ?? []) {
-        const blocks = Array.isArray(change.condition)
-            ? change.condition
-            : [
-                  change.condition,
-              ];
-        for (const { injectName, minSupportedVersion } of blocks) {
-            if (injectName === undefined || !injectNames.includes(injectName) || minSupportedVersion === undefined) continue;
+        for (const { injectName, minSupportedVersion } of conditionBlocks(change)) {
+            if (injectName === undefined || !INJECT_NAMES[platform].includes(injectName) || minSupportedVersion === undefined) continue;
             if (!sameVersionFamily(minSupportedVersion, floor)) continue;
             latest = maxVersion(latest, minSupportedVersion);
         }
@@ -328,9 +311,8 @@ export function buildConditionalChanges(mode, experimentName, slices) {
 
 /**
  * Resolve the rollout R, control C and treatment cohort t, as shares of all users, where R = C + N·t.
- * At most two are given; a `sqrt` control (the default) is √N·t and a `remainder` control is R − N·t.
- * Shares are whole hundredths of a percent with the rounding going to control, and a derived rollout
- * is rounded up to a whole percent.
+ * At most two are given; a `sqrt` control (the default) is √N·t. Shares are whole hundredths of a percent
+ * with the rounding going to control, and a derived rollout is rounded up to a whole percent.
  *
  * @param {number} count - N, the number of treatment cohorts
  * @param {SizingInput} input - percents
@@ -340,19 +322,18 @@ export function resolveSizing(count, { rollout, control, cohortPercent }) {
     /** @param {number} percent */
     const toHundredths = (percent) => Math.round(percent * 100);
     const fixedControl = typeof control === 'number' ? toHundredths(control) : undefined;
-    if (rollout !== undefined && cohortPercent !== undefined && control !== undefined && control !== 'remainder') {
+    if (rollout !== undefined && cohortPercent !== undefined && control !== undefined) {
         throw new Error('Give at most two of --rollout, --control-percent and --cohort-percent');
     }
     let total;
     let cohort;
     if (cohortPercent === undefined) {
-        if (control === 'remainder') throw new Error('--control-percent remainder needs --cohort-percent');
         total = toHundredths(rollout ?? 100);
         cohort = Math.floor(fixedControl === undefined ? total / (count + Math.sqrt(count)) : (total - fixedControl) / count);
     } else {
         cohort = toHundredths(cohortPercent);
-        if (rollout !== undefined || control === 'remainder') {
-            total = toHundredths(rollout ?? 100);
+        if (rollout !== undefined) {
+            total = toHundredths(rollout);
         } else {
             const minimumControl = fixedControl ?? cohort * Math.sqrt(count);
             total = Math.ceil((count * cohort + minimumControl) / 100) * 100;
@@ -414,12 +395,12 @@ export function expectedRunning(mode, production, slice) {
  *
  * @param {Mode} mode
  * @param {string} experimentName
- * @param {WebDetectionSettings} settings - including the new conditional changes
+ * @param {(platform: Platform) => WebDetectionSettings} settingsFor - including the new conditional changes
  * @param {PlatformPlan[]} plans
  * @param {string[][]} slices
  * @returns {{ cohort: string, slice: string[] | undefined, running: Map<Platform, number> }[]}
  */
-export function verifyCohorts(mode, experimentName, settings, plans, slices) {
+export function verifyCohorts(mode, experimentName, settingsFor, plans, slices) {
     /** @type {(string[] | undefined)[]} */
     const cohortSlices = [
         undefined,
@@ -430,7 +411,10 @@ export function verifyCohorts(mode, experimentName, settings, plans, slices) {
         /** @type {Map<Platform, number>} */
         const running = new Map();
         for (const plan of plans) {
-            const actual = autoRunning(settings, clientsFor(plan.platform, plan.clientVersion, { [experimentName]: cohort }));
+            const actual = autoRunning(
+                settingsFor(plan.platform),
+                clientsFor(plan.platform, plan.clientVersion, { [experimentName]: cohort }),
+            );
             const expected = expectedRunning(mode, plan.production, slice);
             const missing = [
                 ...expected,
@@ -450,24 +434,45 @@ export function verifyCohorts(mode, experimentName, settings, plans, slices) {
 }
 
 /**
- * @param {string} text - web-detection.json
- * @param {ConditionalChange[]} changes
+ * Run verifyCohorts on the built config: production from the repository as it is, the cohorts from the
+ * repository with the pending edits.
+ *
+ * @param {Workspace} ws
+ * @param {Mode} mode
+ * @param {string} experimentName
+ * @param {PlatformPlan[]} plans
+ * @param {string[][]} slices
  */
-export function appendConditionalChanges(text, changes) {
-    return changes.reduce(
-        (current, change) =>
-            editJsonc(
-                current,
-                [
-                    'settings',
-                    'conditionalChanges',
-                    -1,
-                ],
-                change,
-                { isArrayInsertion: true },
-            ),
-        text,
-    );
+export async function verifyBuiltCohorts(ws, mode, experimentName, plans, slices) {
+    const platforms = plans.map((plan) => plan.platform);
+    const [
+        before,
+        after,
+    ] = await Promise.all([
+        buildConfigs(copyWorkingTree(), platforms),
+        buildConfigs(copyWorkingTree(ws.pending()), platforms),
+    ]);
+    /**
+     * @param {Map<string, any>} configs
+     * @param {Platform} platform
+     * @returns {WebDetectionSettings}
+     */
+    const builtSettings = (configs, platform) => {
+        const settings = configs.get(platform)?.features?.webDetection?.settings;
+        if (settings === undefined) throw new Error(`The built ${platform} config has no webDetection settings`);
+        return settings;
+    };
+    for (const plan of plans) {
+        const production = autoRunning(builtSettings(before, plan.platform), clientsFor(plan.platform, plan.clientVersion));
+        const differing = [
+            ...production,
+            ...plan.production,
+        ].filter((id) => production.has(id) !== plan.production.has(id));
+        if (differing.length > 0) {
+            throw new Error(`${plan.platform}: the built config differs in which detectors run in production: ${differing.join(', ')}`);
+        }
+    }
+    verifyCohorts(mode, experimentName, (platform) => builtSettings(after, platform), plans, slices);
 }
 
 /**
@@ -478,13 +483,16 @@ function formatVersion(version) {
 }
 
 /**
+ * Add the experiment to the workspace, without writing it.
+ *
  * @param {CreateOptions} options
+ * @param {Workspace} [ws]
  */
-export async function create(options) {
+export function create(options, ws = Workspace.fromRepository()) {
     const { mode, by, seed, platforms } = options;
     const sizing = resolveSizing(options.cohorts, options);
     const cohorts = buildCohorts(options.cohorts, sizing);
-    const warnings = [];
+    const warnings = fractionalRolloutWarnings(sizing.rollout / 100, platforms);
     if (sizing.rollout < 10000 && mode === 'enable') {
         warnings.push(`The ${formatShare(10000 - sizing.rollout)} of users outside the rollout run every production detector`);
     }
@@ -492,26 +500,36 @@ export async function create(options) {
         warnings.push(`Control (${formatShare(sizing.control)}) is smaller than a treatment cohort (${formatShare(sizing.cohort)})`);
     }
 
-    const ws = Workspace.fromRepository();
-    const settings = /** @type {WebDetectionSettings} */ (ws.parse(WEB_DETECTION_FILE).settings);
+    const locations = locateSettings(ws, 'webDetection', platforms);
+    /**
+     * @param {Platform} platform
+     * @returns {WebDetectionSettings}
+     */
+    const settingsFor = (platform) => {
+        const location = /** @type {import('./experiment.mjs').Location} */ (locations.find((l) => l.platforms.includes(platform)));
+        return valueAt(ws.parse(location.file), location.path);
+    };
 
     /** @type {PlatformPlan[]} */
     const plans = platforms.map((platform) => {
+        const settings = settingsFor(platform);
         /** @type {{ state: string, minSupportedVersion?: Version } | undefined} */
         const webDetection = ws.parse(overrideFile(platform)).features.webDetection;
         if (webDetection === undefined || webDetection.state !== 'enabled') {
             warnings.push(`webDetection is not enabled in ${overrideFile(platform)}; no cohort runs detectors there until it is`);
         }
         const floor = webDetection?.minSupportedVersion;
-        const { minExperimentVersion } = PLATFORMS[platform];
+        const experimentsFloor = EXPERIMENTS_MIN_VERSION[platform];
         const gate = floor === undefined ? undefined : latestGate(platform, settings, floor);
         const clientVersion = options.clientVersions[platform] ?? gate;
-        const experimentFloor = floor !== undefined && minExperimentVersion !== undefined ? maxVersion(floor, minExperimentVersion) : floor;
+        const experimentFloor = floor !== undefined && experimentsFloor !== undefined ? maxVersion(floor, experimentsFloor) : floor;
         const minSupportedVersion = mode === 'trial' ? (gate ?? experimentFloor) : experimentFloor;
         return { platform, clientVersion, minSupportedVersion, production: autoRunning(settings, clientsFor(platform, clientVersion)) };
     });
 
-    const allIds = detectorIds(settings.detectors).sort();
+    const allIds = [
+        ...new Set(platforms.flatMap((platform) => detectorIds(settingsFor(platform).detectors))),
+    ].sort();
     let candidates;
     if (mode === 'trial') {
         candidates = allIds.filter((id) => plans.some((plan) => !plan.production.has(id)));
@@ -522,8 +540,8 @@ export async function create(options) {
                         group,
                         name,
                     ] = id.split('/');
-                    const config = effectiveDetectors(settings, client)[group][name];
-                    return config.triggers?.auto?.when === undefined || config.actions?.fireEvent === undefined;
+                    const config = effectiveDetectors(settingsFor(plan.platform), client)[group]?.[name];
+                    return config?.triggers?.auto?.when === undefined || config.actions?.fireEvent === undefined;
                 }),
             ),
         );
@@ -549,7 +567,7 @@ export async function create(options) {
     const inUse = slotsInUse(ws);
     let experimentName = options.experiment;
     if (experimentName === 'auto') {
-        experimentName = pickSlot(inUse, usedInHistory);
+        experimentName = pickSlot(inUse, slotUsedBefore);
         if (isShallowClone()) {
             warnings.push(`This clone is shallow, so ${experimentName} may have been used before; run git fetch --unshallow and retry`);
         }
@@ -560,13 +578,26 @@ export async function create(options) {
         if (inUse.has(experimentName)) throw new Error(`${experimentName} is in use in an override`);
     }
 
-    const changes = buildConditionalChanges(mode, experimentName, slices);
-    ws.write(WEB_DETECTION_FILE, appendConditionalChanges(ws.read(WEB_DETECTION_FILE), changes));
-    const results = verifyCohorts(mode, experimentName, ws.parse(WEB_DETECTION_FILE).settings, plans, slices);
+    // A patch on a detector the settings lack fails, and C-S-S then skips the whole block, so each location
+    // patches only its own detectors.
+    for (const location of locations) {
+        const present = new Set(detectorIds(valueAt(ws.parse(location.file), location.path).detectors));
+        const changes = buildConditionalChanges(
+            mode,
+            experimentName,
+            slices.map((slice) => slice.filter((id) => present.has(id))),
+        );
+        appendChanges(
+            ws,
+            location,
+            changes.filter((change) => change.patchSettings.length > 0),
+        );
+    }
+    const results = verifyCohorts(mode, experimentName, settingsFor, plans, slices);
 
-    const description =
-        `Web detection ${mode} split by ${by}, seed ${seed}: control ${formatShare(sizing.control)}, ` +
-        `${options.cohorts} × ${formatShare(sizing.cohort)}, rollout ${formatShare(sizing.rollout)}`;
+    // The rollout, and with it each cohort's share of users, can change during the experiment, so the
+    // description leaves them out.
+    const description = `Web detection ${mode} split by ${by}, seed ${seed}: control weight ${sizing.control}, ${options.cohorts} × weight ${sizing.cohort}`;
     for (const plan of plans) {
         addSubfeature(ws, EXPERIMENTS_FEATURE, plan.platform, experimentName, {
             state: 'enabled',
@@ -582,7 +613,6 @@ export async function create(options) {
             cohorts,
         });
     }
-    if (!options.dryRun) await ws.flush();
 
     const lines = [
         `${options.dryRun ? 'Dry run: ' : ''}${experimentName}: ${description}`,
@@ -609,24 +639,11 @@ export async function create(options) {
               ]
             : []),
     ];
-    return { experimentName, report: lines.join('\n'), warnings };
-}
-
-/**
- * Remove the experiment slot and its conditional changes.
- *
- * @param {string} experimentName
- */
-export async function remove(experimentName) {
-    const ws = Workspace.fromRepository();
-    const lines = removeExperiment(ws, EXPERIMENTS_FEATURE, experimentName);
-    await ws.flush();
-    return lines.join('\n');
+    return { experimentName, report: lines.join('\n'), warnings, plans, slices };
 }
 
 const HELP = `Usage:
   web-detection-experiment.mjs create --mode <mode> --cohorts <n> [options]
-  web-detection-experiment.mjs remove --experiment <slot>
 
 create:
   --mode enable|disable|trial
@@ -635,22 +652,22 @@ create:
       trial    each cohort adds its slice of the detectors not running in production; control runs production
   --cohorts <n>            treatment cohorts, named treatment01, treatment02, ...
   --rollout <p>            percent of users enrolled (default: 100, or derived)
-  --control-percent <p>|sqrt|remainder
-                           percent of users in control; sqrt is √n × a treatment cohort, remainder is
-                           what the rollout leaves after the treatment cohorts (default: sqrt, or derived)
+  --control-percent <p>|sqrt
+                           percent of users in control; sqrt is √n × a treatment cohort
+                           (default: sqrt, or derived)
   --cohort-percent <p>     percent of users in each treatment cohort (default: derived)
                            Give at most two of these three; the third follows from
                            rollout = control + n × cohort. A derived rollout is rounded up to a whole percent.
   --by detector|group      split single detectors or whole groups (default: detector)
   --seed <string>          seed for the split (default: random, printed in the slot description)
   --experiment <slot>|auto contentScopeExperiments slot (default: auto, the first unused Android slot)
-  --platforms <list>       comma-separated from ${Object.keys(PLATFORMS).join(', ')} (default: ${DEFAULT_PLATFORMS.join(',')})
+  --platforms <list>       comma-separated from ${PLATFORMS.join(', ')} (default: ${DEFAULT_PLATFORMS.join(',')})
   --client-version <list>  platform=version pairs to evaluate production at
                            (default: the platform's highest web detection version gate)
   --dry-run                print the report without writing files
 
-remove:
-  --experiment <slot>      remove the slot from every override and its conditional changes
+Every cohort is checked against the built config before writing. Raise, stop, inspect and remove the
+experiment with experiment.mjs.
 `;
 
 /**
@@ -665,41 +682,11 @@ function parsePositiveInteger(value, flag) {
 
 /**
  * @param {string | undefined} value
- * @param {string} flag
- * @returns {number | undefined}
- */
-function parsePercent(value, flag) {
-    if (value === undefined) return undefined;
-    const number = Number(value);
-    if (!Number.isFinite(number) || number <= 0 || number > 100) throw new Error(`${flag} needs a percent above 0 and at most 100`);
-    return number;
-}
-
-/**
- * @param {string | undefined} value
  * @returns {ControlSize | undefined}
  */
 function parseControl(value) {
-    if (value === 'sqrt' || value === 'remainder') return value;
+    if (value === 'sqrt') return value;
     return parsePercent(value, '--control-percent');
-}
-
-/**
- * @param {string} value
- * @returns {Partial<Record<Platform, Version>>}
- */
-function parseClientVersions(value) {
-    /** @type {Partial<Record<Platform, Version>>} */
-    const versions = {};
-    for (const pair of value.split(',').filter(Boolean)) {
-        const [
-            platform,
-            version,
-        ] = pair.split('=');
-        if (!(platform in PLATFORMS) || !version) throw new Error(`Invalid --client-version entry: ${pair}`);
-        versions[/** @type {Platform} */ (platform)] = /^\d+$/.test(version) ? Number(version) : version;
-    }
-    return versions;
 }
 
 async function main() {
@@ -723,15 +710,9 @@ async function main() {
     const [
         command,
     ] = positionals;
-    if (values.help || (command !== 'create' && command !== 'remove')) {
+    if (values.help || command !== 'create') {
         console.log(HELP);
         process.exit(values.help ? 0 : 1);
-    }
-
-    if (command === 'remove') {
-        if (values.experiment === 'auto') throw new Error('remove needs --experiment <slot>');
-        console.log(await remove(values.experiment));
-        return;
     }
 
     const mode = values.mode;
@@ -740,25 +721,33 @@ async function main() {
     if (by !== 'detector' && by !== 'group') throw new Error('--by must be detector or group');
     const platforms = values.platforms.split(',').filter(Boolean);
     for (const platform of platforms) {
-        if (!(platform in PLATFORMS)) throw new Error(`Unknown platform: ${platform}`);
+        if (!PLATFORMS.includes(/** @type {Platform} */ (platform))) throw new Error(`Unknown platform: ${platform}`);
     }
 
-    const { experimentName, report, warnings } = await create({
-        mode,
-        by,
-        cohorts: parsePositiveInteger(values.cohorts, '--cohorts'),
-        cohortPercent: parsePercent(values['cohort-percent'], '--cohort-percent'),
-        control: parseControl(values['control-percent']),
-        seed: values.seed ?? randomBytes(4).toString('hex'),
-        experiment: values.experiment,
-        platforms: /** @type {Platform[]} */ (platforms),
-        clientVersions: parseClientVersions(values['client-version']),
-        rollout: parsePercent(values.rollout, '--rollout'),
-        dryRun: values['dry-run'],
-    });
+    const ws = Workspace.fromRepository();
+    const { experimentName, report, warnings, plans, slices } = create(
+        {
+            mode,
+            by,
+            cohorts: parsePositiveInteger(values.cohorts, '--cohorts'),
+            cohortPercent: parsePercent(values['cohort-percent'], '--cohort-percent'),
+            control: parseControl(values['control-percent']),
+            seed: values.seed ?? randomBytes(4).toString('hex'),
+            experiment: values.experiment,
+            platforms: /** @type {Platform[]} */ (platforms),
+            clientVersions: parseVersions(values['client-version'], '--client-version'),
+            rollout: parsePercent(values.rollout, '--rollout'),
+            dryRun: values['dry-run'],
+        },
+        ws,
+    );
     console.log(report);
     for (const warning of warnings) console.warn(`Warning: ${warning}`);
-    if (!values['dry-run']) console.log(`\nRemove with: node scripts/web-detection-experiment.mjs remove --experiment ${experimentName}`);
+    await verifyBuiltCohorts(ws, mode, experimentName, plans, slices);
+    console.log('\nThe built config gives the same result.');
+    if (values['dry-run']) return;
+    await ws.flush();
+    console.log(`Remove with: node scripts/experiment.mjs remove ${experimentName}`);
 }
 
 const isMainModule = process.argv[1] === fileURLToPath(import.meta.url);
