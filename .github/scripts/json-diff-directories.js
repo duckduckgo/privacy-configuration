@@ -7,6 +7,7 @@ import {
     analyzePatchesForApproval,
     generateChangeSummary,
     applyConditionalChangesToConfig,
+    indexDomainPatches,
 } from '../../automation-utils.js';
 
 const { compare } = pkg;
@@ -298,8 +299,8 @@ function displayApprovalStatus(dir1Files, dir2Files, isOpen) {
                     sortedJson2,
                 ] = alignJsonStructure(patchedJson1, patchedJson2);
 
-                // Compare the aligned configs
-                const patches = compare(sortedJson1, sortedJson2);
+                // Compare the aligned configs from the root, then index into per-site patches
+                const patches = indexDomainPatches(compare(sortedJson1, sortedJson2), patchedJson1, patchedJson2);
 
                 if (patches.length === 0) {
                     // Skip files that are identical after munging and patching
@@ -377,7 +378,8 @@ function displayApprovalStatus(dir1Files, dir2Files, isOpen) {
             if (disallowedPatches.length > 0) {
                 outString += '  **Disallowed paths that require review:**\n';
                 disallowedPatches.forEach((patch) => {
-                    outString += `  - \`${patch.path}\` (${patch.op})\n`;
+                    const scope = patch.domain ? ` for \`${patch.domain}\`` : '';
+                    outString += `  - \`${patch.path}\` (${patch.op})${scope}\n`;
                 });
             }
 

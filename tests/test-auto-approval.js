@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { analyzePatchesForApproval, generateChangeSummary } from '../automation-utils.js';
+import { analyzePatchesForApproval, generateChangeSummary, getScopedDomains, indexDomainPatches } from '../automation-utils.js';
 
 describe('Auto-approval logic tests', () => {
     const testCases = [
@@ -283,5 +283,317 @@ describe('generateChangeSummary specific tests', () => {
         expect(summary.otherChanges).to.equal(0);
         expect(Object.keys(summary.byOperation)).to.have.length(0);
         expect(Object.keys(summary.byPath)).to.have.length(0);
+    });
+});
+
+describe('Per-site patch indexing', () => {
+    const featurePath = '/features/autofill/features/siteSpecificFixes';
+
+    function configWith(settings) {
+        return {
+            features: {
+                autofill: {
+                    state: 'enabled',
+                    features: {
+                        siteSpecificFixes: {
+                            state: 'enabled',
+                            settings: { formBoundarySelector: 'form', formTypeSettings: [], ...settings },
+                        },
+                    },
+                },
+            },
+        };
+    }
+
+    const ringFix = {
+        domain: [
+            'ring.com',
+        ],
+        patchSettings: [
+            { op: 'add', path: '/formTypeSettings/-', value: { selector: 'form', type: 'signup' } },
+        ],
+    };
+
+    function analyze(baseSettings, updatedSettings, rootPatches) {
+        const patches = indexDomainPatches(rootPatches, configWith(baseSettings), configWith(updatedSettings));
+        return { patches, result: analyzePatchesForApproval(patches) };
+    }
+
+    it('reports a domain-scoped fix at the absolute path it writes', () => {
+        const { patches, result } = analyze(
+            { domains: [] },
+            {
+                domains: [
+                    ringFix,
+                ],
+            },
+            [
+                { op: 'add', path: `${featurePath}/settings/domains/0`, value: ringFix },
+            ],
+        );
+        expect(patches).to.deep.equal([
+            { op: 'add', path: `${featurePath}/settings/formTypeSettings/-`, domain: 'ring.com' },
+        ]);
+        expect(result.shouldApprove).to.equal(true);
+    });
+
+    it('approves a domain-scoped conditionalChanges fix', () => {
+        const entry = {
+            condition: { domain: 'icloud.com' },
+            patchSettings: [
+                { op: 'replace', path: '/formBoundarySelector', value: 'main' },
+            ],
+        };
+        const { result } = analyze(
+            {},
+            {
+                conditionalChanges: [
+                    entry,
+                ],
+            },
+            [
+                {
+                    op: 'add',
+                    path: `${featurePath}/settings/conditionalChanges`,
+                    value: [
+                        entry,
+                    ],
+                },
+            ],
+        );
+        expect(result.shouldApprove).to.equal(true);
+    });
+
+    it('approves removing a domain-scoped fix', () => {
+        const { patches, result } = analyze(
+            {
+                domains: [
+                    ringFix,
+                ],
+            },
+            { domains: [] },
+            [
+                { op: 'remove', path: `${featurePath}/settings/domains/0` },
+            ],
+        );
+        expect(patches[0]).to.include({ op: 'remove', path: `${featurePath}/settings/formTypeSettings/-` });
+        expect(result.shouldApprove).to.equal(true);
+    });
+
+    it('ignores entries that are unchanged or reordered', () => {
+        const coolors = {
+            domain: 'coolors.co',
+            patchSettings: [
+                { op: 'add', path: '/failsafeSettings/maxInputsPerPage', value: 110 },
+            ],
+        };
+        const { patches } = analyze(
+            {
+                domains: [
+                    ringFix,
+                    coolors,
+                ],
+            },
+            {
+                domains: [
+                    coolors,
+                    ringFix,
+                ],
+            },
+            [
+                { op: 'replace', path: `${featurePath}/settings/domains/0/domain`, value: 'coolors.co' },
+            ],
+        );
+        expect(patches).to.deep.equal([]);
+    });
+
+    it('does NOT approve a fix that writes outside the site-fix settings', () => {
+        const entry = {
+            domain: 'ring.com',
+            patchSettings: [
+                { op: 'replace', path: '/domains', value: [] },
+            ],
+        };
+        const { result } = analyze(
+            {},
+            {
+                domains: [
+                    entry,
+                ],
+            },
+            [],
+        );
+        expect(result.shouldApprove).to.equal(false);
+        expect(result.disallowedPatches[0]).to.include({ path: `${featurePath}/settings/domains`, domain: 'ring.com' });
+    });
+
+    it('does NOT approve changing the same settings for every site', () => {
+        const { result } = analyze({}, {}, [
+            { op: 'replace', path: `${featurePath}/settings/formBoundarySelector`, value: 'main' },
+        ]);
+        expect(result.shouldApprove).to.equal(false);
+    });
+
+    const riskyEntries = [
+        [
+            'a public suffix domain',
+            'domains',
+            { domain: 'co.uk', patchSettings: ringFix.patchSettings },
+        ],
+        [
+            'an empty domain list',
+            'domains',
+            { domain: [], patchSettings: ringFix.patchSettings },
+        ],
+        [
+            'a non-domain condition',
+            'conditionalChanges',
+            { condition: { internal: true }, patchSettings: ringFix.patchSettings },
+        ],
+        [
+            'a mixed condition',
+            'conditionalChanges',
+            { condition: { domain: 'ring.com', urlPattern: '*' }, patchSettings: ringFix.patchSettings },
+        ],
+        [
+            'a move operation',
+            'domains',
+            {
+                domain: 'ring.com',
+                patchSettings: [
+                    { op: 'move', from: '/domains', path: '/formTypeSettings' },
+                ],
+            },
+        ],
+        [
+            'a whole-settings operation',
+            'domains',
+            {
+                domain: 'ring.com',
+                patchSettings: [
+                    { op: 'replace', path: '', value: {} },
+                ],
+            },
+        ],
+        [
+            'no operations',
+            'domains',
+            { domain: 'ring.com', patchSettings: [] },
+        ],
+        [
+            'an unknown key',
+            'domains',
+            { domain: 'ring.com', patchSettings: ringFix.patchSettings, condition: { internal: true } },
+        ],
+    ];
+
+    riskyEntries.forEach(
+        ([
+            name,
+            entryKey,
+            entry,
+        ]) => {
+            it(`reports an entry with ${name} by index and does NOT approve`, () => {
+                const { patches, result } = analyze(
+                    {},
+                    {
+                        [entryKey]: [
+                            entry,
+                        ],
+                    },
+                    [],
+                );
+                expect(patches).to.deep.equal([
+                    { op: 'add', path: `${featurePath}/settings/${entryKey}/0`, value: entry },
+                ]);
+                expect(result.shouldApprove).to.equal(false);
+            });
+        },
+    );
+
+    it('leaves non-array entries to the root diff', () => {
+        const rootPatch = { op: 'replace', path: `${featurePath}/settings/domains`, value: {} };
+        const { patches, result } = analyze({ domains: [] }, { domains: {} }, [
+            rootPatch,
+        ]);
+        expect(patches).to.deep.equal([
+            rootPatch,
+        ]);
+        expect(result.shouldApprove).to.equal(false);
+    });
+
+    it('still checks other features against the root allowlist', () => {
+        const { result } = analyze(
+            { domains: [] },
+            {
+                domains: [
+                    ringFix,
+                ],
+            },
+            [
+                { op: 'add', path: '/features/autofill/exceptions/0', value: { domain: 'ring.com' } },
+            ],
+        );
+        expect(result.shouldApprove).to.equal(false);
+    });
+
+    it('does not let a domain tag approve paths in features that are not indexed', () => {
+        const result = analyzePatchesForApproval([
+            { op: 'add', path: '/features/elementHiding/settings/rules/0', domain: 'ring.com' },
+        ]);
+        expect(result.shouldApprove).to.equal(false);
+    });
+
+    it('matches feature paths on whole segments', () => {
+        const result = analyzePatchesForApproval([
+            { op: 'add', path: '/features/gpcExtra/exceptions/0', value: {} },
+        ]);
+        expect(result.shouldApprove).to.equal(false);
+    });
+
+    it('reads multiple domains and condition blocks', () => {
+        expect(
+            getScopedDomains(
+                {
+                    domain: [
+                        'a.com',
+                        'b.co.uk',
+                    ],
+                    patchSettings: [],
+                },
+                'domains',
+            ),
+        ).to.deep.equal([
+            'a.com',
+            'b.co.uk',
+        ]);
+        expect(
+            getScopedDomains(
+                {
+                    condition: [
+                        { domain: 'a.com' },
+                        { domain: 'localhost' },
+                    ],
+                    patchSettings: [],
+                },
+                'conditionalChanges',
+            ),
+        ).to.deep.equal([
+            'a.com',
+            'localhost',
+        ]);
+        expect(
+            getScopedDomains(
+                {
+                    condition: {
+                        domain: [
+                            'a.com',
+                        ],
+                    },
+                    patchSettings: [],
+                },
+                'conditionalChanges',
+            ),
+        ).to.equal(null);
     });
 });
