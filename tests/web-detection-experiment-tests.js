@@ -100,7 +100,7 @@ describe('web-detection-experiment', () => {
     });
 
     describe('matchCondition', () => {
-        const client = { injectName: 'apple-isolated', version: '1.210.0', cohorts: { exp: 'cohort01' } };
+        const client = { injectName: 'apple-isolated', version: '1.210.0', cohorts: { exp: 'treatment01' } };
 
         it('matches inject name and version range', () => {
             expect(
@@ -123,7 +123,7 @@ describe('web-detection-experiment', () => {
         });
 
         it('matches the assigned cohort only', () => {
-            expect(matchCondition({ experiment: { experimentName: 'exp', cohort: 'cohort01' } }, client)).to.equal(true);
+            expect(matchCondition({ experiment: { experimentName: 'exp', cohort: 'treatment01' } }, client)).to.equal(true);
             expect(matchCondition({ experiment: { experimentName: 'exp', cohort: 'control' } }, client)).to.equal(false);
         });
 
@@ -261,7 +261,7 @@ describe('web-detection-experiment', () => {
             const cohorts = buildCohorts(10, 5);
             expect(cohorts[0]).to.deep.equal({ name: 'control', weight: 50 });
             expect(cohorts.slice(1).map((c) => c.name)).to.deep.equal(
-                Array.from({ length: 10 }, (_, i) => `cohort${String(i + 1).padStart(2, '0')}`),
+                Array.from({ length: 10 }, (_, i) => `treatment${String(i + 1).padStart(2, '0')}`),
             );
             expect(cohorts.reduce((sum, c) => sum + c.weight, 0)).to.equal(100);
         });
@@ -287,7 +287,7 @@ describe('web-detection-experiment', () => {
             ] = buildConditionalChanges('enable', 'exp', slices);
             expect(first.condition).to.deep.equal([
                 { experiment: { experimentName: 'exp', cohort: 'control' } },
-                { experiment: { experimentName: 'exp', cohort: 'cohort02' } },
+                { experiment: { experimentName: 'exp', cohort: 'treatment02' } },
             ]);
             expect(first.patchSettings).to.deep.equal([
                 { op: 'add', path: '/detectors/groupA/a/state', value: 'disabled' },
@@ -298,7 +298,7 @@ describe('web-detection-experiment', () => {
             const [
                 first,
             ] = buildConditionalChanges('disable', 'exp', slices);
-            expect(first.condition).to.deep.equal({ experiment: { experimentName: 'exp', cohort: 'cohort01' } });
+            expect(first.condition).to.deep.equal({ experiment: { experimentName: 'exp', cohort: 'treatment01' } });
         });
 
         it('enables state and auto trigger in trial mode', () => {
@@ -370,11 +370,11 @@ describe('web-detection-experiment', () => {
                     0,
                     0,
                 ],
-                cohort01: [
+                treatment01: [
                     1,
                     1,
                 ],
-                cohort02: [
+                treatment02: [
                     2,
                     1,
                 ],
@@ -397,11 +397,11 @@ describe('web-detection-experiment', () => {
                     3,
                     2,
                 ],
-                cohort01: [
+                treatment01: [
                     2,
                     1,
                 ],
-                cohort02: [
+                treatment02: [
                     1,
                     1,
                 ],
@@ -423,11 +423,11 @@ describe('web-detection-experiment', () => {
                     3,
                     2,
                 ],
-                cohort01: [
+                treatment01: [
                     4,
                     3,
                 ],
-                cohort02: [
+                treatment02: [
                     3,
                     3,
                 ],
@@ -545,7 +545,7 @@ describe('web-detection-experiment', () => {
                     rollout: undefined,
                     dryRun: true,
                 });
-                expect(report).to.contain('| cohort04 | 10% |');
+                expect(report).to.contain('| treatment04 | 10% |');
                 expect(files.map((file) => readFileSync(file, 'utf8'))).to.deep.equal(before);
             });
         }
