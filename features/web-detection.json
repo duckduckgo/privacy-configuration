@@ -702,6 +702,7 @@
             },
             "video": {
                 "error": {
+                    // C-S-S 16.5.0+ clients get these patterns from copies in conditionalChanges: change them all
                     "match": {
                         "text": {
                             "pattern": [
@@ -779,10 +780,11 @@
                     }
                 },
                 "blocked": {
+                    // C-S-S 16.5.0+ clients get these patterns from copies in conditionalChanges: change them all
                     "match": {
                         "text": {
                             "pattern": [
-                                "(disable|turn off|deactivate|pause) your ad ?block(er)? to (watch|play|view|continue watching)",
+                                "(disable|turn off|deactivate|pause) your ad ?block(er)? to (watch|play|continue watching|view (this |the )?video)",
                                 "to (watch|view|play) (this|the) video,? (please )?(disable|turn off|deactivate)",
                                 "(video|player) (is )?(unavailable|blocked) (with|while using) an ad ?block(er)?"
                             ]
@@ -1819,10 +1821,74 @@
                         "op": "replace",
                         "path": "/detectors/blankPage/no_text_or_title/state",
                         "value": "enabled"
+                    },
+                    // Video errors: the shipped text check, then the same patterns against rendered text, so text only in a script no longer matches
+                    {
+                        "op": "replace",
+                        "path": "/detectors/video/error/match",
+                        "value": {
+                            "all": [
+                                {
+                                    "text": {
+                                        "pattern": [
+                                            "html5 video not found",
+                                            "video (file )?can(not|.?t) be played",
+                                            "video playback (error|failed)",
+                                            "(error|problem) playing (this |the )?(video|media|clip)",
+                                            "couldn.?t play this",
+                                            "(error|code)\\s*:?\\s*22400[03]",
+                                            "unexpected error.*\\[3001/6001\\]"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "text": {
+                                        "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                        "pattern": [
+                                            "html5 video not found",
+                                            "video (file )?can(not|.?t) be played",
+                                            "video playback (error|failed)",
+                                            "(error|problem) playing (this |the )?(video|media|clip)",
+                                            "couldn.?t play this",
+                                            "(error|code)\\s*:?\\s*22400[03]",
+                                            "unexpected error.*\\[3001/6001\\]"
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    // Video adblock walls: the shipped text check, then the same patterns against rendered text, so text only in a script no longer matches
+                    {
+                        "op": "replace",
+                        "path": "/detectors/video/blocked/match",
+                        "value": {
+                            "all": [
+                                {
+                                    "text": {
+                                        "pattern": [
+                                            "(disable|turn off|deactivate|pause) your ad ?block(er)? to (watch|play|continue watching|view (this |the )?video)",
+                                            "to (watch|view|play) (this|the) video,? (please )?(disable|turn off|deactivate)",
+                                            "(video|player) (is )?(unavailable|blocked) (with|while using) an ad ?block(er)?"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "text": {
+                                        "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                        "pattern": [
+                                            "(disable|turn off|deactivate|pause) your ad ?block(er)? to (watch|play|continue watching|view (this |the )?video)",
+                                            "to (watch|view|play) (this|the) video,? (please )?(disable|turn off|deactivate)",
+                                            "(video|player) (is )?(unavailable|blocked) (with|while using) an ad ?block(er)?"
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
                     }
                 ]
             },
-            // Rewrites the login detectors' shipped `all`s as nested `if`s for clients on the C-S-S that parses match expressions.
+            // Rewrites the login and video detectors' `all`s as nested `if`s for clients on the C-S-S that parses match expressions.
             // That C-S-S reads every operand of an `all`; older C-S-S stops at the first false operand
             {
                 // App versions carrying the C-S-S that parses match expressions, 19.0.0 or later.
@@ -2047,6 +2113,68 @@
                                     "else": false
                                 },
                                 "else": false
+                            },
+                            "else": false
+                        }
+                    },
+                    // Video errors: the 16.5.0+ condition, the rendered-text check read only once the plain text check holds
+                    {
+                        "op": "replace",
+                        "path": "/detectors/video/error/match",
+                        "value": {
+                            "if": {
+                                "text": {
+                                    "pattern": [
+                                        "html5 video not found",
+                                        "video (file )?can(not|.?t) be played",
+                                        "video playback (error|failed)",
+                                        "(error|problem) playing (this |the )?(video|media|clip)",
+                                        "couldn.?t play this",
+                                        "(error|code)\\s*:?\\s*22400[03]",
+                                        "unexpected error.*\\[3001/6001\\]"
+                                    ]
+                                }
+                            },
+                            "then": {
+                                "text": {
+                                    "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                    "pattern": [
+                                        "html5 video not found",
+                                        "video (file )?can(not|.?t) be played",
+                                        "video playback (error|failed)",
+                                        "(error|problem) playing (this |the )?(video|media|clip)",
+                                        "couldn.?t play this",
+                                        "(error|code)\\s*:?\\s*22400[03]",
+                                        "unexpected error.*\\[3001/6001\\]"
+                                    ]
+                                }
+                            },
+                            "else": false
+                        }
+                    },
+                    // Video adblock walls: the 16.5.0+ condition, the rendered-text check read only once the plain text check holds
+                    {
+                        "op": "replace",
+                        "path": "/detectors/video/blocked/match",
+                        "value": {
+                            "if": {
+                                "text": {
+                                    "pattern": [
+                                        "(disable|turn off|deactivate|pause) your ad ?block(er)? to (watch|play|continue watching|view (this |the )?video)",
+                                        "to (watch|view|play) (this|the) video,? (please )?(disable|turn off|deactivate)",
+                                        "(video|player) (is )?(unavailable|blocked) (with|while using) an ad ?block(er)?"
+                                    ]
+                                }
+                            },
+                            "then": {
+                                "text": {
+                                    "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                    "pattern": [
+                                        "(disable|turn off|deactivate|pause) your ad ?block(er)? to (watch|play|continue watching|view (this |the )?video)",
+                                        "to (watch|view|play) (this|the) video,? (please )?(disable|turn off|deactivate)",
+                                        "(video|player) (is )?(unavailable|blocked) (with|while using) an ad ?block(er)?"
+                                    ]
+                                }
                             },
                             "else": false
                         }
