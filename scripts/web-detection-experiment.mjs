@@ -11,31 +11,31 @@
  * cohort slice to features/web-detection.json. Run with --help for the options.
  */
 
-import { execFileSync } from 'child_process';
 import { randomBytes } from 'crypto';
-import { readFileSync, writeFileSync } from 'fs';
-import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
 import { parseArgs } from 'util';
-import { applyEdits, modify } from 'jsonc-parser';
-import { immutableJSONPatch } from 'immutable-json-patch';
-import * as prettier from 'prettier';
-import { parseJsonc } from './set-jsonc-path.mjs';
+import { applyConditionalChanges, maxVersion, sameVersionFamily } from './config-conditions.mjs';
+import { Workspace, editJsonc, overrideFile } from './config-files.mjs';
+import {
+    ANDROID_SLOTS,
+    EXPERIMENTS_FEATURE,
+    addSubfeature,
+    isShallowClone,
+    pickSlot,
+    removeExperiment,
+    slotsInUse,
+    usedInHistory,
+} from './experiment.mjs';
 
 /**
- * @typedef {'android' | 'ios' | 'macos' | 'windows' | 'extension'} Platform
+ * @typedef {import('./config-conditions.mjs').Platform} Platform
+ * @typedef {import('./config-conditions.mjs').Version} Version
+ * @typedef {import('./config-conditions.mjs').ConditionalChange} ConditionalChange
+ * @typedef {import('./config-conditions.mjs').PatchSettings} PatchSettings
+ * @typedef {import('./config-conditions.mjs').Client} Client
+ * @typedef {import('./experiment.mjs').Cohort} Cohort
  * @typedef {'enable' | 'disable' | 'trial'} Mode
  * @typedef {'detector' | 'group'} Unit
- * @typedef {string | number} Version
- *
- * @typedef {object} ConditionBlock
- * @property {string} [injectName]
- * @property {Version} [minSupportedVersion]
- * @property {Version} [maxSupportedVersion]
- * @property {{ experimentName: string, cohort: string }} [experiment]
- *
- * @typedef {import('immutable-json-patch').JSONPatchDocument} PatchSettings
- * @typedef {{ condition: ConditionBlock | ConditionBlock[], patchSettings: PatchSettings }} ConditionalChange
  *
  * @typedef {object} DetectorConfig
  * @property {string} [state]
@@ -45,23 +45,9 @@ import { parseJsonc } from './set-jsonc-path.mjs';
  * @typedef {Record<string, Record<string, DetectorConfig>>} Detectors
  * @typedef {{ detectors: Detectors, conditionalChanges?: ConditionalChange[] }} WebDetectionSettings
  *
- * @typedef {object} Client
- * @property {string} injectName
- * @property {Version | undefined} version
- * @property {Record<string, string>} cohorts - assigned cohort by experiment name
- *
- * @typedef {{ name: string, weight: number }} Cohort
- *
  * @typedef {number | 'sqrt' | 'remainder'} ControlSize
  * @typedef {{ rollout?: number, control?: ControlSize, cohortPercent?: number }} SizingInput
  * @typedef {{ rollout: number, control: number, cohort: number }} Sizing
- *
- * @typedef {object} ExperimentSlot
- * @property {'enabled'} state
- * @property {string} description
- * @property {Version} [minSupportedVersion]
- * @property {{ steps: { percent: number }[] }} [rollout]
- * @property {Cohort[]} cohorts
  *
  * @typedef {object} PlatformPlan
  * @property {Platform} platform
@@ -83,9 +69,7 @@ import { parseJsonc } from './set-jsonc-path.mjs';
  * @property {boolean} dryRun
  */
 
-const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const WEB_DETECTION_FILE = 'features/web-detection.json';
-const EXPERIMENTS_FEATURE = 'contentScopeExperiments';
 
 /**
  * The C-S-S bundles that run web detection on each platform.
@@ -138,21 +122,6 @@ const DEFAULT_PLATFORMS = /** @type {Platform[]} */ ([
 ]);
 
 /**
- * Android only reads the experiment subfeatures it declares, in this order.
- */
-export const ANDROID_SLOTS = [
-    ...Array.from({ length: 20 }, (_, i) => `contentScopeExperiment${i}`),
-    ...Array.from({ length: 100 }, (_, i) => `contentScopeExperiment${String(i + 1).padStart(3, '0')}`),
-];
-
-/**
- * @param {Platform} platform
- */
-function overrideFile(platform) {
-    return `overrides/${platform}-override.json`;
-}
-
-/**
  * @param {number} index - zero-based treatment index
  */
 export function cohortName(index) {
@@ -160,108 +129,14 @@ export function cohortName(index) {
 }
 
 /**
- * Compare versions as C-S-S does: numbers numerically, strings part by part.
- *
- * @param {Version} a
- * @param {Version} b
- * @returns {number} negative, zero or positive as `a` is lower, equal or higher
- */
-export function compareVersions(a, b) {
-    if (typeof a === 'number' && typeof b === 'number') return a - b;
-    const partsA = String(a).split('.').map(Number);
-    const partsB = String(b).split('.').map(Number);
-    for (let i = 0; i < Math.max(partsA.length, partsB.length); i++) {
-        const diff = (partsA[i] || 0) - (partsB[i] || 0);
-        if (diff !== 0) return diff;
-    }
-    return 0;
-}
-
-/**
- * Versions in the same family are comparable: both numbers, or strings with the same major part. iOS
- * (7.x) and macOS (1.x) share the `apple-isolated` bundle and are told apart by family.
- *
- * @param {Version} a
- * @param {Version} b
- */
-export function sameVersionFamily(a, b) {
-    if (typeof a === 'number' || typeof b === 'number') return typeof a === typeof b;
-    return a.split('.')[0] === b.split('.')[0];
-}
-
-/**
- * @param {Version} min
- * @param {Version} max
- */
-function maxVersion(min, max) {
-    return compareVersions(min, max) >= 0 ? min : max;
-}
-
-/**
- * Match a condition as C-S-S does. Blocks scoped to a domain, URL pattern, frame context, internal or
- * preview build never match, so the result is the state on an arbitrary page in a release build.
- *
- * @param {ConditionBlock | ConditionBlock[]} condition
- * @param {Client} client
- */
-export function matchCondition(condition, client) {
-    const blocks = Array.isArray(condition)
-        ? condition
-        : [
-              condition,
-          ];
-    return blocks.some((block) => matchBlock(block, client));
-}
-
-/**
- * @param {ConditionBlock} block
- * @param {Client} client
- */
-function matchBlock(block, client) {
-    for (const key of Object.keys(block)) {
-        if (
-            ![
-                'injectName',
-                'minSupportedVersion',
-                'maxSupportedVersion',
-                'experiment',
-            ].includes(key)
-        )
-            return false;
-    }
-    const { injectName, minSupportedVersion, maxSupportedVersion, experiment } = block;
-    const { version } = client;
-    if (injectName !== undefined && injectName !== client.injectName) return false;
-    if (minSupportedVersion !== undefined) {
-        if (version === undefined || typeof version !== typeof minSupportedVersion) return false;
-        if (compareVersions(version, minSupportedVersion) < 0) return false;
-    }
-    if (maxSupportedVersion !== undefined) {
-        if (version === undefined || typeof version !== typeof maxSupportedVersion) return false;
-        if (compareVersions(version, maxSupportedVersion) > 0) return false;
-    }
-    if (experiment !== undefined && client.cohorts[experiment.experimentName] !== experiment.cohort) return false;
-    return true;
-}
-
-/**
- * Apply the matching conditional changes in order. A block whose patch fails is skipped, as in C-S-S.
+ * The detectors after the conditional changes that match the client.
  *
  * @param {WebDetectionSettings} settings
  * @param {Client} client
  * @returns {Detectors}
  */
 export function effectiveDetectors(settings, client) {
-    let current = settings;
-    for (const change of settings.conditionalChanges ?? []) {
-        if (!matchCondition(change.condition, client)) continue;
-        try {
-            current = immutableJSONPatch(current, change.patchSettings);
-        } catch {
-            // C-S-S ignores a patch that fails to apply.
-        }
-    }
-    return current.detectors;
+    return applyConditionalChanges(settings, client).settings.detectors;
 }
 
 /**
@@ -581,20 +456,6 @@ export function verifyCohorts(mode, experimentName, settings, plans, slices) {
 }
 
 /**
- * @param {string} text
- * @param {(string | number)[]} path
- * @param {unknown} value - undefined removes the node
- * @param {{ isArrayInsertion?: boolean }} [options]
- */
-function editJsonc(text, path, value, options = {}) {
-    const edits = modify(text, path, value, {
-        formattingOptions: { tabSize: 4, insertSpaces: true, eol: '\n' },
-        ...options,
-    });
-    return applyEdits(text, edits);
-}
-
-/**
  * @param {string} text - web-detection.json
  * @param {ConditionalChange[]} changes
  */
@@ -613,187 +474,6 @@ export function appendConditionalChanges(text, changes) {
             ),
         text,
     );
-}
-
-/**
- * Remove the conditional changes whose every condition block names the experiment.
- *
- * @param {string} text - web-detection.json
- * @param {string} experimentName
- * @returns {{ text: string, removed: number }}
- */
-export function removeConditionalChanges(text, experimentName) {
-    const settings = /** @type {{ settings: WebDetectionSettings }} */ (parseJsonc(text, WEB_DETECTION_FILE)).settings;
-    const indices = (settings.conditionalChanges ?? []).flatMap((change, index) => {
-        const blocks = Array.isArray(change.condition)
-            ? change.condition
-            : [
-                  change.condition,
-              ];
-        return blocks.every((block) => block.experiment?.experimentName === experimentName)
-            ? [
-                  index,
-              ]
-            : [];
-    });
-    const updated = indices.reverse().reduce(
-        (current, index) =>
-            editJsonc(
-                current,
-                [
-                    'settings',
-                    'conditionalChanges',
-                    index,
-                ],
-                undefined,
-            ),
-        text,
-    );
-    return { text: updated, removed: indices.length };
-}
-
-/**
- * @param {string} text - a platform override
- * @returns {Record<string, unknown> | undefined}
- */
-function experimentSlots(text) {
-    const override = /** @type {{ features?: Record<string, { features?: Record<string, unknown> }> }} */ (parseJsonc(text, 'override'));
-    return override.features?.[EXPERIMENTS_FEATURE]?.features;
-}
-
-/**
- * @param {string} text - a platform override
- * @param {string} experimentName
- * @param {ExperimentSlot} slot
- */
-export function addExperimentSlot(text, experimentName, slot) {
-    const override = /** @type {{ features: Record<string, { features?: Record<string, unknown> }> }} */ (parseJsonc(text, 'override'));
-    const feature = override.features[EXPERIMENTS_FEATURE];
-    if (feature === undefined) {
-        return editJsonc(
-            text,
-            [
-                'features',
-                EXPERIMENTS_FEATURE,
-            ],
-            { state: 'enabled', exceptions: [], features: { [experimentName]: slot } },
-        );
-    }
-    if (feature.features?.[experimentName] !== undefined) {
-        throw new Error(`${experimentName} already exists in this override`);
-    }
-    if (feature.features === undefined) {
-        return editJsonc(
-            text,
-            [
-                'features',
-                EXPERIMENTS_FEATURE,
-                'features',
-            ],
-            { [experimentName]: slot },
-        );
-    }
-    return editJsonc(
-        text,
-        [
-            'features',
-            EXPERIMENTS_FEATURE,
-            'features',
-            experimentName,
-        ],
-        slot,
-    );
-}
-
-/**
- * Remove the slot, and the contentScopeExperiments feature once it has no slots left.
- *
- * @param {string} text - a platform override
- * @param {string} experimentName
- * @returns {{ text: string, removed: boolean }}
- */
-export function removeExperimentSlot(text, experimentName) {
-    const slots = experimentSlots(text);
-    if (slots?.[experimentName] === undefined) return { text, removed: false };
-    if (Object.keys(slots).length === 1) {
-        return {
-            text: editJsonc(
-                text,
-                [
-                    'features',
-                    EXPERIMENTS_FEATURE,
-                ],
-                undefined,
-            ),
-            removed: true,
-        };
-    }
-    return {
-        text: editJsonc(
-            text,
-            [
-                'features',
-                EXPERIMENTS_FEATURE,
-                'features',
-                experimentName,
-            ],
-            undefined,
-        ),
-        removed: true,
-    };
-}
-
-/**
- * @param {string} experimentName
- */
-function usedInHistory(experimentName) {
-    const output = execFileSync(
-        'git',
-        [
-            'log',
-            '--format=%h',
-            '-1',
-            `-S"${experimentName}"`,
-            '--',
-            'overrides',
-            'features',
-        ],
-        {
-            cwd: ROOT,
-            encoding: 'utf8',
-        },
-    );
-    return output.trim() !== '';
-}
-
-/**
- * The first Android slot that no override uses and that git history has never used. A reused slot keeps
- * earlier enrolments in any cohort whose name still exists.
- *
- * @param {Set<string>} inUse
- * @param {(name: string) => boolean} usedBefore
- */
-export function pickSlot(inUse, usedBefore) {
-    const slot = ANDROID_SLOTS.find((name) => !inUse.has(name) && !usedBefore(name));
-    if (slot === undefined) throw new Error('Every Android experiment slot has been used');
-    return slot;
-}
-
-/**
- * @param {string} file - relative to the repository root
- */
-function readFile(file) {
-    return readFileSync(resolve(ROOT, file), 'utf8');
-}
-
-/**
- * @param {string} file - relative to the repository root
- * @param {string} text
- */
-async function writeFormatted(file, text) {
-    const filepath = resolve(ROOT, file);
-    const config = await prettier.resolveConfig(filepath);
-    writeFileSync(filepath, await prettier.format(text, { ...config, filepath }));
 }
 
 /**
@@ -818,24 +498,13 @@ export async function create(options) {
         warnings.push(`Control (${formatShare(sizing.control)}) is smaller than a treatment cohort (${formatShare(sizing.cohort)})`);
     }
 
-    const webDetectionText = readFile(WEB_DETECTION_FILE);
-    const settings = /** @type {{ settings: WebDetectionSettings }} */ (parseJsonc(webDetectionText, WEB_DETECTION_FILE)).settings;
-
-    /** @type {Map<Platform, string>} */
-    const overrides = new Map(
-        platforms.map((platform) => [
-            platform,
-            readFile(overrideFile(platform)),
-        ]),
-    );
+    const ws = Workspace.fromRepository();
+    const settings = /** @type {WebDetectionSettings} */ (ws.parse(WEB_DETECTION_FILE).settings);
 
     /** @type {PlatformPlan[]} */
     const plans = platforms.map((platform) => {
-        const text = /** @type {string} */ (overrides.get(platform));
-        const override = /** @type {{ features: Record<string, { state: string, minSupportedVersion?: Version }> }} */ (
-            parseJsonc(text, overrideFile(platform))
-        );
-        const webDetection = override.features.webDetection;
+        /** @type {{ state: string, minSupportedVersion?: Version } | undefined} */
+        const webDetection = ws.parse(overrideFile(platform)).features.webDetection;
         if (webDetection === undefined || webDetection.state !== 'enabled') {
             warnings.push(`webDetection is not enabled in ${overrideFile(platform)}; no cohort runs detectors there until it is`);
         }
@@ -883,24 +552,11 @@ export async function create(options) {
     }
     const slices = dealSlices(units, options.cohorts, seed);
 
-    const inUse = new Set(
-        [
-            ...overrides.values(),
-        ].flatMap((text) => Object.keys(experimentSlots(text) ?? {})),
-    );
+    const inUse = slotsInUse(ws);
     let experimentName = options.experiment;
     if (experimentName === 'auto') {
         experimentName = pickSlot(inUse, usedInHistory);
-        if (
-            execFileSync(
-                'git',
-                [
-                    'rev-parse',
-                    '--is-shallow-repository',
-                ],
-                { cwd: ROOT, encoding: 'utf8' },
-            ).trim() === 'true'
-        ) {
+        if (isShallowClone()) {
             warnings.push(`This clone is shallow, so ${experimentName} may have been used before; run git fetch --unshallow and retry`);
         }
     } else {
@@ -911,34 +567,28 @@ export async function create(options) {
     }
 
     const changes = buildConditionalChanges(mode, experimentName, slices);
-    const newWebDetectionText = appendConditionalChanges(webDetectionText, changes);
-    const newSettings = /** @type {{ settings: WebDetectionSettings }} */ (parseJsonc(newWebDetectionText, WEB_DETECTION_FILE)).settings;
-    const results = verifyCohorts(mode, experimentName, newSettings, plans, slices);
+    ws.write(WEB_DETECTION_FILE, appendConditionalChanges(ws.read(WEB_DETECTION_FILE), changes));
+    const results = verifyCohorts(mode, experimentName, ws.parse(WEB_DETECTION_FILE).settings, plans, slices);
 
     const description =
         `Web detection ${mode} split by ${by}, seed ${seed}: control ${formatShare(sizing.control)}, ` +
         `${options.cohorts} × ${formatShare(sizing.cohort)}, rollout ${formatShare(sizing.rollout)}`;
-    if (!options.dryRun) {
-        await writeFormatted(WEB_DETECTION_FILE, newWebDetectionText);
-        for (const plan of plans) {
-            /** @type {ExperimentSlot} */
-            const slot = {
-                state: 'enabled',
-                description,
-                ...(plan.minSupportedVersion !== undefined && { minSupportedVersion: plan.minSupportedVersion }),
-                ...(sizing.rollout < 10000 && {
-                    rollout: {
-                        steps: [
-                            { percent: sizing.rollout / 100 },
-                        ],
-                    },
-                }),
-                cohorts,
-            };
-            const text = /** @type {string} */ (overrides.get(plan.platform));
-            await writeFormatted(overrideFile(plan.platform), addExperimentSlot(text, experimentName, slot));
-        }
+    for (const plan of plans) {
+        addSubfeature(ws, EXPERIMENTS_FEATURE, plan.platform, experimentName, {
+            state: 'enabled',
+            description,
+            ...(plan.minSupportedVersion !== undefined && { minSupportedVersion: plan.minSupportedVersion }),
+            ...(sizing.rollout < 10000 && {
+                rollout: {
+                    steps: [
+                        { percent: sizing.rollout / 100 },
+                    ],
+                },
+            }),
+            cohorts,
+        });
     }
+    if (!options.dryRun) await ws.flush();
 
     const lines = [
         `${options.dryRun ? 'Dry run: ' : ''}${experimentName}: ${description}`,
@@ -969,22 +619,14 @@ export async function create(options) {
 }
 
 /**
+ * Remove the experiment slot and its conditional changes.
+ *
  * @param {string} experimentName
  */
 export async function remove(experimentName) {
-    const { text, removed } = removeConditionalChanges(readFile(WEB_DETECTION_FILE), experimentName);
-    if (removed) await writeFormatted(WEB_DETECTION_FILE, text);
-    const lines = [
-        `Removed ${removed} conditional changes from ${WEB_DETECTION_FILE}`,
-    ];
-    for (const platform of /** @type {Platform[]} */ (Object.keys(PLATFORMS))) {
-        const file = overrideFile(platform);
-        const result = removeExperimentSlot(readFile(file), experimentName);
-        if (result.removed) {
-            await writeFormatted(file, result.text);
-            lines.push(`Removed ${experimentName} from ${file}`);
-        }
-    }
+    const ws = Workspace.fromRepository();
+    const lines = removeExperiment(ws, EXPERIMENTS_FEATURE, experimentName);
+    await ws.flush();
     return lines.join('\n');
 }
 

@@ -191,6 +191,8 @@ type DetectorGroup = Record<string, DetectorConfig>;
 
 export type WebDetectionSettings = CSSInjectFeatureSettings<{
     detectors?: Record<string, DetectorGroup>;
+    /** Generic C-S-S load gate, patched per experiment cohort via conditionalChanges. */
+    additionalCheck?: FeatureState;
 }>;
 
 export type WebDetectionFeature<VersionType> = Feature<WebDetectionSettings, VersionType>;

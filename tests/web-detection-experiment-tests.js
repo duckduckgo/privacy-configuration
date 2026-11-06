@@ -2,8 +2,6 @@ import { expect } from 'chai';
 import { readFileSync } from 'fs';
 import { parseJsonc } from '../scripts/set-jsonc-path.mjs';
 import {
-    ANDROID_SLOTS,
-    addExperimentSlot,
     appendConditionalChanges,
     autoRunning,
     buildCohorts,
@@ -11,18 +9,17 @@ import {
     buildConditionalChanges,
     buildUnits,
     clientsFor,
-    compareVersions,
     create,
     dealSlices,
     effectiveDetectors,
     latestGate,
-    matchCondition,
-    pickSlot,
-    removeConditionalChanges,
-    removeExperimentSlot,
-    sameVersionFamily,
     verifyCohorts,
 } from '../scripts/web-detection-experiment.mjs';
+import { ANDROID_SLOTS, experimentChangeIndices, slotsInUse } from '../scripts/experiment.mjs';
+import { Workspace } from '../scripts/config-files.mjs';
+
+/** The last Android slot the real config doesn't use, so dry runs never collide with a live experiment. */
+const FREE_SLOT = /** @type {string} */ (ANDROID_SLOTS.filter((slot) => !slotsInUse(Workspace.fromRepository()).has(slot)).at(-1));
 
 const auto = (state = 'enabled') => ({
     auto: {
@@ -74,81 +71,7 @@ const FIXTURE_TEXT = `{
 }
 `;
 
-const OVERRIDE_TEXT = `{
-    "features": {
-        // Web detection
-        "webDetection": {
-            "state": "enabled"
-        }
-    }
-}
-`;
-
 describe('web-detection-experiment', () => {
-    describe('versions', () => {
-        it('compares numbers and dotted strings', () => {
-            expect(compareVersions(5, 7)).to.be.below(0);
-            expect(compareVersions('1.10.0', '1.9.0')).to.be.above(0);
-            expect(compareVersions('7.234', '7.234.0')).to.equal(0);
-        });
-
-        it('groups versions by type and major part', () => {
-            expect(sameVersionFamily('7.234.0', '7.1.0')).to.equal(true);
-            expect(sameVersionFamily('1.204.0', '7.234.0')).to.equal(false);
-            expect(sameVersionFamily(52700000, 53010000)).to.equal(true);
-            expect(sameVersionFamily(52700000, '1.0.0')).to.equal(false);
-        });
-    });
-
-    describe('matchCondition', () => {
-        const client = { injectName: 'apple-isolated', version: '1.210.0', cohorts: { exp: 'treatment01' } };
-
-        it('matches inject name and version range', () => {
-            expect(
-                matchCondition({ injectName: 'apple-isolated', minSupportedVersion: '1.204.0', maxSupportedVersion: '1.999.999' }, client),
-            ).to.equal(true);
-            expect(matchCondition({ injectName: 'apple-isolated', minSupportedVersion: '7.234.0' }, client)).to.equal(false);
-            expect(matchCondition({ injectName: 'android' }, client)).to.equal(false);
-        });
-
-        it('matches any block in an array', () => {
-            expect(
-                matchCondition(
-                    [
-                        { injectName: 'android' },
-                        { injectName: 'apple-isolated' },
-                    ],
-                    client,
-                ),
-            ).to.equal(true);
-        });
-
-        it('matches the assigned cohort only', () => {
-            expect(matchCondition({ experiment: { experimentName: 'exp', cohort: 'treatment01' } }, client)).to.equal(true);
-            expect(matchCondition({ experiment: { experimentName: 'exp', cohort: 'control' } }, client)).to.equal(false);
-        });
-
-        it('never matches page-scoped or build-scoped blocks', () => {
-            for (const block of [
-                { domain: 'example.com' },
-                { urlPattern: 'https://*' },
-                { internal: true },
-                { context: { top: true } },
-            ]) {
-                expect(matchCondition(/** @type {any} */ (block), client)).to.equal(false);
-            }
-        });
-
-        it('never matches a version condition without a client version', () => {
-            expect(
-                matchCondition(
-                    { injectName: 'firefox', minSupportedVersion: '1.0.0' },
-                    { injectName: 'firefox', version: undefined, cohorts: {} },
-                ),
-            ).to.equal(false);
-        });
-    });
-
     describe('production state', () => {
         it('applies matching blocks', () => {
             const settings = fixtureSettings();
@@ -178,8 +101,8 @@ describe('web-detection-experiment', () => {
             settings.conditionalChanges.push({
                 condition: { injectName: 'android' },
                 patchSettings: [
-                    { op: 'replace', path: '/detectors/groupA/a/state', value: 'disabled' },
-                    { op: 'replace', path: '/detectors/missing/x/state', value: 'enabled' },
+                    { op: 'add', path: '/detectors/groupA/a/state', value: 'disabled' },
+                    { op: 'add', path: '/detectors/missing/x/state', value: 'enabled' },
                 ],
             });
             const detectors = effectiveDetectors(settings, { injectName: 'android', version: 200, cohorts: {} });
@@ -490,7 +413,7 @@ describe('web-detection-experiment', () => {
     });
 
     describe('JSONC edits', () => {
-        it('appends and removes conditional changes, keeping comments', () => {
+        it('appends conditional changes that remove finds, keeping comments', () => {
             const changes = buildConditionalChanges('disable', 'exp', [
                 [
                     'groupA/a',
@@ -505,55 +428,11 @@ describe('web-detection-experiment', () => {
             expect(parsed.settings.conditionalChanges.slice(1)).to.deep.equal(changes);
             expect(added).to.contain('// Existing block');
 
-            const { text, removed } = removeConditionalChanges(added, 'exp');
-            expect(removed).to.equal(2);
-            expect(parseJsonc(text, 'removed')).to.deep.equal(parseJsonc(FIXTURE_TEXT, 'fixture'));
-            expect(text).to.contain('// Leading comment');
-        });
-
-        it('creates contentScopeExperiments when missing and removes it with its last slot', () => {
-            const slot = {
-                state: /** @type {const} */ ('enabled'),
-                description: 'test',
-                cohorts: buildCohorts(1, resolveSizing(1, { cohortPercent: 10, control: 'remainder' })),
-            };
-            const added = addExperimentSlot(OVERRIDE_TEXT, 'contentScopeExperiment10', slot);
-            const parsed = /** @type {any} */ (parseJsonc(added, 'added'));
-            expect(parsed.features.contentScopeExperiments).to.deep.equal({
-                state: 'enabled',
-                exceptions: [],
-                features: { contentScopeExperiment10: slot },
-            });
-            expect(() => addExperimentSlot(added, 'contentScopeExperiment10', slot)).to.throw('already exists');
-
-            const { text, removed } = removeExperimentSlot(added, 'contentScopeExperiment10');
-            expect(removed).to.equal(true);
-            expect(parseJsonc(text, 'removed')).to.deep.equal(parseJsonc(OVERRIDE_TEXT, 'fixture'));
-            expect(text).to.contain('// Web detection');
-        });
-
-        it('keeps other slots when removing one', () => {
-            const slot = {
-                state: /** @type {const} */ ('enabled'),
-                description: 'test',
-                cohorts: buildCohorts(1, resolveSizing(1, { cohortPercent: 10, control: 'remainder' })),
-            };
-            const both = addExperimentSlot(
-                addExperimentSlot(OVERRIDE_TEXT, 'contentScopeExperiment10', slot),
-                'contentScopeExperiment11',
-                slot,
-            );
-            const { text } = removeExperimentSlot(both, 'contentScopeExperiment10');
-            expect(Object.keys(/** @type {any} */ (parseJsonc(text, 'removed')).features.contentScopeExperiments.features)).to.deep.equal([
-                'contentScopeExperiment11',
+            expect(experimentChangeIndices(parsed.settings.conditionalChanges, 'exp')).to.deep.equal([
+                1,
+                2,
             ]);
-        });
-    });
-
-    describe('pickSlot', () => {
-        it('skips slots in use or used before', () => {
-            const slot = pickSlot(new Set(ANDROID_SLOTS.slice(0, 10)), (name) => name === 'contentScopeExperiment10');
-            expect(slot).to.equal('contentScopeExperiment11');
+            expect(added).to.contain('// Leading comment');
         });
     });
 
@@ -575,7 +454,7 @@ describe('web-detection-experiment', () => {
                 control: undefined,
                 by: 'detector',
                 seed: 'test',
-                experiment: 'contentScopeExperiment100',
+                experiment: FREE_SLOT,
                 platforms: [
                     'android',
                     'ios',
