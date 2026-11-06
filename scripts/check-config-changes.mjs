@@ -13,6 +13,9 @@
  * Warnings: a changed detector that fires the event of a live experiment's metric.
  *
  * Usage: node scripts/check-config-changes.mjs [base-ref]   (default: origin/main)
+ *
+ * In a shallow clone, the first new experiment fetches the full history of base-ref when it is a remote-tracking
+ * branch.
  */
 
 import { execSync } from 'child_process';
@@ -26,6 +29,7 @@ import {
     ROOT,
     buildConfigs,
     copyWorkingTree,
+    fetchFullHistory,
     git,
     isShallowClone,
     listFeatureFiles,
@@ -548,12 +552,16 @@ export async function checkConfigChanges(baseRef) {
     const experimentFindings = [];
     /** @type {Finding[]} */
     const warningFindings = [];
+    /** @type {boolean | undefined} whether the lookups below see the base ref's full history */
+    let fullHistory;
     for (const platform of PLATFORMS) {
         const before = /** @type {Config} */ (base.get(platform));
         const after = /** @type {Config} */ (head.get(platform));
         /** @type {(parent: string, slot: string) => boolean} */
-        const usedBefore = (parent, slot) =>
-            usedInHistory(
+        const usedBefore = (parent, slot) => {
+            // Once fetched, the clone stays shallow at the checked-out commit, so ask only once.
+            fullHistory ??= !isShallowClone() || fetchFullHistory(baseRef);
+            return usedInHistory(
                 slot,
                 [
                     overrideFile(platform),
@@ -561,6 +569,7 @@ export async function checkConfigChanges(baseRef) {
                 ],
                 baseRef,
             );
+        };
         for (const message of [
             ...experimentErrors(before, after),
             ...reusedExperimentErrors(before, after, usedBefore),
@@ -570,7 +579,7 @@ export async function checkConfigChanges(baseRef) {
         for (const message of detectorWarnings(before, after)) warningFindings.push({ platform, message });
     }
     const warnings = mergeFindings(warningFindings);
-    if (isShallowClone()) warnings.push('This clone is shallow, so experiment names used before its history starts were not checked');
+    if (fullHistory === false) warnings.push('This clone is shallow, so experiment names used before its history starts were not checked');
     return {
         errors: [
             ...errors,
