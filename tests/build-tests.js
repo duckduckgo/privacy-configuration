@@ -10,6 +10,8 @@ import {
     addHashToFeatures,
 } from '../util.js';
 import { compatFunctions } from '../compatibility.js';
+import { BROWSERS_SUBDIR, TDS_PATH_FOR_PLATFORM } from '../constants.js';
+import platforms from '../platforms.js';
 
 const ta1 = {
     'f1.com': {
@@ -609,6 +611,26 @@ describe('addCnameEntriesToAllowlist', () => {
             'simple.com',
             'simple2.com',
         ]);
+    });
+});
+
+describe('platforms', () => {
+    it('lists extension before the browser configs built from it', () => {
+        const extensionIndex = platforms.indexOf('extension');
+        expect(extensionIndex).to.be.at.least(0);
+        platforms.forEach((platform, i) => {
+            if (platform.startsWith(BROWSERS_SUBDIR)) {
+                expect(i, platform).to.be.greaterThan(extensionIndex);
+            }
+        });
+    });
+});
+
+describe('TDS_PATH_FOR_PLATFORM', () => {
+    it('has a TDS path for every platform', () => {
+        for (const platform of platforms) {
+            expect(TDS_PATH_FOR_PLATFORM, platform).to.have.property(platform);
+        }
     });
 });
 
