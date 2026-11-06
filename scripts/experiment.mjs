@@ -528,8 +528,6 @@ export function createExperiment(ws, options) {
         }
         versions.set(platform, version);
     }
-    /** @param {Platform} platform */
-    const clientVersion = (platform) => (platform === 'extension' ? undefined : versions.get(platform));
 
     const sizes = cohorts.map((c) => `${c.name} ${c.weight}`).join(', ');
     const description =
@@ -561,7 +559,7 @@ export function createExperiment(ws, options) {
         const loads = new Map(
             platforms.map((platform) => [
                 platform,
-                platformClients(platform, clientVersion(platform)).some((client) =>
+                platformClients(platform, versions.get(platform)).some((client) =>
                     featureLoads(/** @type {MergedFeature} */ (merged.get(platform)), client),
                 ),
             ]),
@@ -645,7 +643,7 @@ export function createExperiment(ws, options) {
                 ...cohorts.map((c) => c.name),
                 undefined,
             ].map((cohort) => {
-                const actual = platformClients(platform, clientVersion(platform), cohort === undefined ? {} : { [slot]: cohort }).some(
+                const actual = platformClients(platform, versions.get(platform), cohort === undefined ? {} : { [slot]: cohort }).some(
                     (client) => featureLoads(merged, client),
                 );
                 if (actual !== expectedLoads(cohort, control, productionLoads)) {
@@ -661,7 +659,7 @@ export function createExperiment(ws, options) {
     patches.forEach((patch, i) => {
         for (const platform of platforms) {
             const merged = /** @type {MergedFeature} */ (mergedFeature(ws, patch.feature, platform));
-            for (const client of platformClients(platform, clientVersion(platform), { [slot]: patch.cohort })) {
+            for (const client of platformClients(platform, versions.get(platform), { [slot]: patch.cohort })) {
                 const { settings, failed } = applyConditionalChanges(merged.settings, client);
                 if (failed.some((change) => JSON.stringify(change) === JSON.stringify(patchChanges[i]))) {
                     throw new Error(`The ${patch.feature} patch for ${patch.cohort} fails to apply on ${platform} (${client.injectName})`);

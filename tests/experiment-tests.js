@@ -142,7 +142,7 @@ const CREATE = {
  * @param {string | undefined} cohort
  */
 function webDetectionLoads(ws, platform, cohort) {
-    const version = { android: 52700000, ios: '7.214.0', macos: '1.184.0', windows: '0.178.0', extension: undefined }[platform];
+    const version = { android: 52700000, ios: '7.214.0', macos: '1.184.0', windows: '0.178.0', extension: '2026.11.5' }[platform];
     const feature = /** @type {import('../scripts/experiment.mjs').MergedFeature} */ (mergedFeature(ws, 'webDetection', platform));
     return platformClients(platform, version, cohort === undefined ? {} : { contentScopeExperiment12: cohort }).some((client) =>
         featureLoads(feature, client),
