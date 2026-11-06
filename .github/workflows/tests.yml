@@ -36,6 +36,23 @@ jobs:
                     -f context="unit" \
                     -f target_url="$GITHUB_SERVER_URL/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
                     -f description="Unit tests ($JOB_STATUS)"
+    rollout-steps:
+        if: github.event_name == 'pull_request'
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+        steps:
+            - uses: actions/checkout@v6
+              with:
+                  fetch-depth: 0
+            - name: Use Node.js
+              uses: actions/setup-node@v6
+              with:
+                  node-version-file: .nvmrc
+            - name: Install dependencies
+              run: npm ci
+            - name: Check rollout steps are only appended
+              run: npm run check-rollout-steps -- "origin/${{ github.base_ref }}"
     lint:
         runs-on: ubuntu-latest
         permissions:
