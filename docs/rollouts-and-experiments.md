@@ -16,7 +16,7 @@ A sub-feature's `rollout.steps[].percent` (0–100) enrols that share of users. 
 | Lower | The same with `--allow-decrease`. Only Android un-enrols users |
 | Halt | Set the sub-feature's `state` to `disabled`; everyone enrolled loses it |
 
-CI fails a pull request that edits or removes a step (`npm run check-rollout-steps`). For how clients process rollouts, see [this Asana task](https://app.asana.com/0/1198194956794324/1204934761241565/f).
+CI fails a pull request that edits or removes a step (`npm run check-config-changes`). For how clients process rollouts, see [this Asana task](https://app.asana.com/0/1198194956794324/1204934761241565/f).
 
 ## Content scope experiments
 
@@ -32,6 +32,8 @@ An experiment is a sub-feature of `contentScopeExperiments`, a slot, with `cohor
 | Ship or clean up | `node scripts/experiment.mjs remove <slot>` deletes the slot and its conditional changes |
 
 `create auto` picks an Android slot that no override and no past commit uses; in a shallow clone, run `git fetch --unshallow` first. It checks each cohort's result on every platform before writing.
+
+Once an experiment is enabled with cohorts, start a new experiment rather than editing it. CI fails a pull request that changes its cohorts, adds a metric to it, or changes a metric other than renaming its event along with the detectors that fire it, and one that adds an experiment under a name used before. It warns when a detector that fires a live metric's event changes.
 
 With `--enable-feature`, every cohort except `control` runs the feature, and `--control` sets what control runs:
 
