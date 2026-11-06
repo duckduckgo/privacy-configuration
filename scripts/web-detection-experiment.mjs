@@ -74,7 +74,7 @@ const WEB_DETECTION_FILE = 'features/web-detection.json';
 /**
  * The C-S-S bundles that run web detection on each platform.
  *
- * @type {Record<Platform, { injectNames: string[], passesVersion: boolean, minExperimentVersion?: Version }>}
+ * @type {Record<Platform, { injectNames: string[], minExperimentVersion?: Version }>}
  */
 export const PLATFORMS = {
     android: {
@@ -82,35 +82,29 @@ export const PLATFORMS = {
             'android',
             'android-adsjs',
         ],
-        passesVersion: true,
     },
     ios: {
         injectNames: [
             'apple-isolated',
         ],
-        passesVersion: true,
     },
     macos: {
         injectNames: [
             'apple-isolated',
         ],
-        passesVersion: true,
     },
     // Windows reads content scope experiments from 0.178.0.
     windows: {
         injectNames: [
             'windows',
         ],
-        passesVersion: true,
         minExperimentVersion: '0.178.0',
     },
-    // The extension passes no version to C-S-S, so version conditions never match there.
     extension: {
         injectNames: [
             'chrome-mv3',
             'firefox',
         ],
-        passesVersion: false,
     },
 };
 
@@ -509,9 +503,9 @@ export async function create(options) {
             warnings.push(`webDetection is not enabled in ${overrideFile(platform)}; no cohort runs detectors there until it is`);
         }
         const floor = webDetection?.minSupportedVersion;
-        const { passesVersion, minExperimentVersion } = PLATFORMS[platform];
+        const { minExperimentVersion } = PLATFORMS[platform];
         const gate = floor === undefined ? undefined : latestGate(platform, settings, floor);
-        const clientVersion = passesVersion ? (options.clientVersions[platform] ?? gate) : undefined;
+        const clientVersion = options.clientVersions[platform] ?? gate;
         const experimentFloor = floor !== undefined && minExperimentVersion !== undefined ? maxVersion(floor, minExperimentVersion) : floor;
         const minSupportedVersion = mode === 'trial' ? (gate ?? experimentFloor) : experimentFloor;
         return { platform, clientVersion, minSupportedVersion, production: autoRunning(settings, clientsFor(platform, clientVersion)) };
