@@ -19,7 +19,7 @@ files used by each platform.
 - [Config Reviewer Documentation](docs/config-reviewer-documentation.md)
 - [Privacy Feature Key Mappings](docs/privacy-feature-key-mappings.md)
 - [Feature Implementer Documentation](docs/feature-implementer-documentation.md)
-- [Incremental Rollout Implementation Guide](docs/incremental-rollout-implementation-guide.md)
+- [Rollouts and Experiments](docs/rollouts-and-experiments.md)
 - [Writing a Schema for Your Config Feature](docs/writing-schema-for-config-feature.md)
 - [Implementation Guidelines: Remote Privacy Configuration/Allowlists](docs/implementation-guidelines-remote-privacy-configuration-allowlists.md)
 - [Remote Configuration Change Log](docs/remote-configuration-change-log.md)

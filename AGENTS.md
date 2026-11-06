@@ -24,6 +24,10 @@ Before proposing a site fix, read the matching rule in `.cursor/rules/`:
 
 Files in `features/` and `overrides/` are JSONC (JSON with comments). Read them with `readJsoncFile` from `util.js`, not `JSON.parse`.
 
+## Experiments and rollouts
+
+Change rollouts and run content scope experiments with `scripts/experiment.mjs`; split web detection detectors across cohorts with `scripts/web-detection-experiment.mjs`. Read [Rollouts and Experiments](docs/rollouts-and-experiments.md) first.
+
 ## Key Concepts
 
 - **Features**: Files in `features/` directory control privacy protection enable/disable
