@@ -339,6 +339,9 @@ const contentScopeScriptsVersionFormat = {
     matches: (value) => typeof value === 'string' && /^\d+\.\d+\.\d+$/.test(value),
 };
 
+// C-S-S before this release fails any condition block carrying the C-S-S version keys, so a lower value never takes effect.
+const FIRST_CONTENT_SCOPE_SCRIPTS_VERSION_GATED_RELEASE = '20.4.0';
+
 /**
  * @param {string} name a platform output name or a C-S-S inject name
  * @returns {string | undefined} the key into appVersionFormats
@@ -352,8 +355,9 @@ function versionPlatform(name) {
 }
 
 /**
- * Lists every version value in a config that is not in its platform's format. A condition block
- * with an `injectName` is judged by that platform, since base config ships every platform's blocks.
+ * Lists every version value in a config that is not in its platform's format, and every C-S-S
+ * version below the first release that reads it. A condition block with an `injectName` is judged
+ * by that platform, since base config ships every platform's blocks.
  * @param {unknown} node
  * @param {string} platform the built config's key into appVersionFormats
  * @param {string} nodePath
@@ -377,21 +381,31 @@ function collectVersionFormatFailures(node, platform, nodePath, failures) {
             if (!matches(value)) failures.push(`${valuePath} is ${JSON.stringify(value)}, expected ${appPlatform} ${format}`);
         } else if (key === 'minContentScopeScriptsVersion' || key === 'maxContentScopeScriptsVersion') {
             const { format, matches } = contentScopeScriptsVersionFormat;
-            if (!matches(value)) failures.push(`${valuePath} is ${JSON.stringify(value)}, expected C-S-S ${format}`);
+            if (!matches(value)) {
+                failures.push(`${valuePath} is ${JSON.stringify(value)}, expected C-S-S ${format}`);
+            } else if (compareVersions(/** @type {string} */ (value), FIRST_CONTENT_SCOPE_SCRIPTS_VERSION_GATED_RELEASE) < 0) {
+                const effect =
+                    key === 'maxContentScopeScriptsVersion'
+                        ? 'the block matches no client'
+                        : `it acts as ${FIRST_CONTENT_SCOPE_SCRIPTS_VERSION_GATED_RELEASE}`;
+                failures.push(
+                    `${valuePath} is ${JSON.stringify(value)}, below ${FIRST_CONTENT_SCOPE_SCRIPTS_VERSION_GATED_RELEASE}, the first C-S-S release that reads it; ${effect}`,
+                );
+            }
         } else {
             collectVersionFormatFailures(value, platform, valuePath, failures);
         }
     }
 }
 
-describe('Version formats', () => {
+describe('Version values', () => {
     for (const config of [
         ...latestConfigs,
         ...previousConfigs,
     ]) {
         const outputName = path.basename(config.name, '-config.json');
         const platform = versionPlatform(outputName);
-        it(`${config.name} versions should use the format of their platform`, () => {
+        it(`${config.name} versions should be valid for their platform`, () => {
             expect(platform, `no version format for ${outputName}`).to.not.equal(undefined);
             /** @type {string[]} */
             const failures = [];
