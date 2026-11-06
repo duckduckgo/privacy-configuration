@@ -151,7 +151,7 @@ function overrideFile(platform) {
  * @param {number} index - zero-based treatment index
  */
 export function cohortName(index) {
-    return `cohort${String(index + 1).padStart(2, '0')}`;
+    return `treatment${String(index + 1).padStart(2, '0')}`;
 }
 
 /**
@@ -937,7 +937,7 @@ create:
       enable   each cohort auto-runs only its slice of the production detectors; control runs none
       disable  each cohort stops its slice of the production detectors; control runs production
       trial    each cohort adds its slice of the detectors not running in production; control runs production
-  --cohorts <n>            treatment cohorts, named cohort01, cohort02, ...
+  --cohorts <n>            treatment cohorts, named treatment01, treatment02, ...
   --cohort-percent <p>     whole percent of users in each treatment cohort; control gets the rest
   --by detector|group      split single detectors or whole groups (default: detector)
   --seed <string>          seed for the split (default: random, printed in the slot description)
