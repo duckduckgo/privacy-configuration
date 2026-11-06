@@ -5,6 +5,7 @@ import { Workspace } from '../scripts/config-files.mjs';
 import {
     ANDROID_SLOTS,
     appendRolloutStep,
+    checkBuiltLoads,
     createExperiment,
     experimentChangeIndices,
     experimentStatus,
@@ -12,6 +13,7 @@ import {
     locateSettings,
     locateSubfeature,
     mergedFeature,
+    orphanedOffBlocks,
     pickSlot,
     platformClients,
     removeExperiment,
@@ -509,6 +511,56 @@ describe('experiment', () => {
             });
             expect(warnings).to.include('The webDetection patch for treatment changes nothing on android (android)');
         });
+
+        it('refuses to switch off a feature that also loads in its own bundle', () => {
+            const files = {
+                ...FILES,
+                'features/duck-ai-data-clearing.json': '{ "state": "disabled", "exceptions": [], "settings": {} }',
+                'overrides/android-override.json': '{ "features": { "duckAiDataClearing": { "state": "disabled" } } }',
+            };
+            const ws = new Workspace((file) => /** @type {Record<string, string>} */ (files)[file], {
+                ...FEATURE_FILES,
+                duckAiDataClearing: 'features/duck-ai-data-clearing.json',
+            });
+            expect(() =>
+                createExperiment(ws, {
+                    ...CREATE,
+                    platforms: [
+                        'android',
+                    ],
+                    enableFeatures: [
+                        'duckAiDataClearing',
+                    ],
+                }),
+            ).to.throw('also loads in its own C-S-S bundle on android');
+        });
+
+        it('warns that Windows rounds a fractional rollout down', () => {
+            expect(createExperiment(workspace(), { ...CREATE, rollout: 12.5 }).warnings).to.include(
+                'Windows enrols rollouts by a whole percent, rounded down: 12.5% enrols 12% there',
+            );
+            const ws = workspace();
+            createExperiment(ws, CREATE);
+            expect(
+                appendRolloutStep(ws, {
+                    parent: 'contentScopeExperiments',
+                    slot: 'contentScopeExperiment12',
+                    percent: 12.5,
+                    allowDecrease: false,
+                }),
+            ).to.deep.equal([
+                'Windows enrols rollouts by a whole percent, rounded down: 12.5% enrols 12% there',
+            ]);
+        });
+
+        it('gives the same result on the built config', async function () {
+            this.timeout(120000);
+            const ws = Workspace.fromRepository();
+            const slot = /** @type {string} */ (ANDROID_SLOTS.filter((name) => !slotsInUse(ws).has(name)).at(-1));
+            const { check } = createExperiment(ws, { ...CREATE, slot, rollout: undefined, control: 'disabled' });
+            const lines = await checkBuiltLoads(ws, check);
+            expect(lines).to.include('| windows | webDetection | on | off | on | on |');
+        });
     });
 
     describe('rollout and disable', () => {
@@ -586,10 +638,10 @@ describe('experiment', () => {
             createExperiment(ws, CREATE);
             const status = experimentStatus(ws, 'contentScopeExperiments', 'contentScopeExperiment12');
             expect(status).to.contain('| ios | overrides/ios-override.json | enabled | 10% | control 50%, treatment 50% | 7.214.0 |');
-            expect(status).to.contain('- webDetection in features/web-detection.json: 2');
+            expect(status).to.contain('- webDetection in features/web-detection.json: 1');
         });
 
-        it('finds the off block with the blocks that name the slot', () => {
+        it('finds the blocks that name the slot, and the off blocks only they switch back on', () => {
             const off = {
                 condition: [
                     { injectName: 'windows' },
@@ -598,38 +650,62 @@ describe('experiment', () => {
                     { op: 'add', path: '/additionalCheck', value: 'disabled' },
                 ],
             };
-            const named = { condition: { experiment: { experimentName: 'exp', cohort: 'treatment' } }, patchSettings: [] };
+            /** @param {string} experimentName */
+            const enable = (experimentName) => ({
+                condition: [
+                    { experiment: { experimentName, cohort: 'treatment' } },
+                ],
+                patchSettings: [
+                    { op: 'add', path: '/additionalCheck', value: 'enabled' },
+                ],
+            });
+            const patch = { condition: { experiment: { experimentName: 'exp', cohort: 'treatment' } }, patchSettings: [] };
             const other = { condition: { injectName: 'android' }, patchSettings: [] };
-            expect(
-                experimentChangeIndices(
-                    /** @type {any} */ ([
-                        other,
-                        off,
-                        named,
-                        named,
-                    ]),
-                    'exp',
-                ),
-            ).to.deep.equal([
-                1,
+            const changes = /** @type {any} */ ([
+                other,
+                off,
+                enable('exp'),
+                patch,
+            ]);
+            expect(experimentChangeIndices(changes, 'exp')).to.deep.equal([
                 2,
                 3,
             ]);
             expect(
-                experimentChangeIndices(
-                    /** @type {any} */ ([
-                        off,
-                        other,
-                        named,
-                    ]),
-                    'exp',
+                orphanedOffBlocks(
+                    changes,
+                    [
+                        2,
+                        3,
+                    ],
                 ),
             ).to.deep.equal([
-                2,
+                1,
             ]);
+            const shared = /** @type {any} */ ([
+                off,
+                enable('exp'),
+                enable('later'),
+            ]);
+            expect(
+                orphanedOffBlocks(
+                    shared,
+                    [
+                        1,
+                    ],
+                ),
+            ).to.deep.equal([]);
+            expect(
+                orphanedOffBlocks(
+                    changes,
+                    [
+                        3,
+                    ],
+                ),
+            ).to.deep.equal([]);
         });
 
-        it('restores every file except the feature states it turned on', () => {
+        it('restores every file, turning off the features create turned on', () => {
             const ws = workspace();
             createExperiment(ws, {
                 ...CREATE,
@@ -639,18 +715,44 @@ describe('experiment', () => {
                 ],
             });
             const lines = removeExperiment(ws, 'contentScopeExperiments', 'contentScopeExperiment12');
+            expect(lines).to.include('Removed the webDetection off block for ios from features/web-detection.json');
             expect(lines).to.include(
-                'webDetection state: android enabled, ios enabled, macos enabled, windows enabled, extension disabled',
+                'webDetection state: android enabled, ios disabled, macos enabled, windows disabled, extension disabled',
             );
             for (const [
                 file,
                 original,
             ] of Object.entries(FILES)) {
-                const expected = /** @type {any} */ (parseJsonc(original, file));
-                if (expected.features?.webDetection?.state === 'disabled') expected.features.webDetection.state = 'enabled';
-                expect(ws.parse(file), file).to.deep.equal(expected);
+                expect(ws.parse(file), file).to.deep.equal(parseJsonc(original, file));
             }
             expect(ws.read('features/web-detection.json')).to.contain('// Base web detection');
+        });
+
+        it('ships the features create turned on with ship', () => {
+            const ws = workspace();
+            createExperiment(ws, CREATE);
+            const lines = removeExperiment(ws, 'contentScopeExperiments', 'contentScopeExperiment12', { ship: true });
+            expect(lines).to.include('webDetection ios: users outside experiments now load it');
+            expect(lines).to.include('webDetection windows: users outside experiments now load it');
+            expect(ws.parse('overrides/windows-override.json').features.webDetection.state).to.equal('enabled');
+            expect(webDetectionLoads(ws, 'windows', undefined)).to.equal(true);
+        });
+
+        it('keeps an off block that a later experiment still needs', () => {
+            const ws = workspace();
+            createExperiment(ws, CREATE);
+            createExperiment(ws, { ...CREATE, slot: 'contentScopeExperiment13' });
+            removeExperiment(ws, 'contentScopeExperiments', 'contentScopeExperiment12');
+            for (const platform of /** @type {const} */ ([
+                'ios',
+                'windows',
+            ])) {
+                expect(webDetectionLoads(ws, platform, undefined), platform).to.equal(false);
+            }
+            const lines = removeExperiment(ws, 'contentScopeExperiments', 'contentScopeExperiment13');
+            expect(lines).to.include('Removed the webDetection off block for windows from overrides/windows-override.json');
+            expect(webDetectionLoads(ws, 'windows', undefined)).to.equal(false);
+            expect(ws.parse('overrides/windows-override.json').features.webDetection.state).to.equal('disabled');
         });
     });
 });

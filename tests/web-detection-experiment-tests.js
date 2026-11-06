@@ -2,7 +2,6 @@ import { expect } from 'chai';
 import { readFileSync } from 'fs';
 import { parseJsonc } from '../scripts/set-jsonc-path.mjs';
 import {
-    appendConditionalChanges,
     autoRunning,
     buildCohorts,
     resolveSizing,
@@ -13,9 +12,10 @@ import {
     dealSlices,
     effectiveDetectors,
     latestGate,
+    verifyBuiltCohorts,
     verifyCohorts,
 } from '../scripts/web-detection-experiment.mjs';
-import { ANDROID_SLOTS, experimentChangeIndices, slotsInUse } from '../scripts/experiment.mjs';
+import { ANDROID_SLOTS, appendChanges, experimentChangeIndices, slotsInUse } from '../scripts/experiment.mjs';
 import { Workspace } from '../scripts/config-files.mjs';
 
 /** The last Android slot the real config doesn't use, so dry runs never collide with a live experiment. */
@@ -198,20 +198,16 @@ describe('web-detection-experiment', () => {
             expect(resolveSizing(10, { cohortPercent: 5, control: 20 })).to.deep.equal({ rollout: 7000, control: 2000, cohort: 500 });
         });
 
-        it('gives control the remainder of the rollout', () => {
-            expect(resolveSizing(10, { cohortPercent: 5, control: 'remainder' })).to.deep.equal({
-                rollout: 10000,
-                control: 5000,
-                cohort: 500,
-            });
+        it('gives control the rest of a given rollout', () => {
+            expect(resolveSizing(10, { cohortPercent: 5, rollout: 100 })).to.deep.equal({ rollout: 10000, control: 5000, cohort: 500 });
             expect(resolveSizing(10, { cohortPercent: 5, rollout: 80 })).to.deep.equal({ rollout: 8000, control: 3000, cohort: 500 });
         });
 
         it('rejects impossible sizes', () => {
             expect(() => resolveSizing(10, { rollout: 50, control: 10, cohortPercent: 4 })).to.throw('at most two');
-            expect(() => resolveSizing(10, { control: 'remainder' })).to.throw('needs --cohort-percent');
+            expect(() => resolveSizing(10, { rollout: 50, control: 'sqrt', cohortPercent: 4 })).to.throw('at most two');
             expect(() => resolveSizing(10, { cohortPercent: 10 })).to.throw('at most 100%');
-            expect(() => resolveSizing(10, { cohortPercent: 10, control: 'remainder' })).to.throw('need a share of users');
+            expect(() => resolveSizing(10, { cohortPercent: 10, rollout: 100 })).to.throw('need a share of users');
             expect(() => resolveSizing(10, { rollout: 50, control: 60 })).to.throw('need a share of users');
         });
     });
@@ -302,7 +298,7 @@ describe('web-detection-experiment', () => {
                 ],
             };
             return Object.fromEntries(
-                verifyCohorts(mode, 'exp', withExperiment, plans(), slices).map((r) => [
+                verifyCohorts(mode, 'exp', () => withExperiment, plans(), slices).map((r) => [
                     r.cohort,
                     [
                         ...r.running.values(),
@@ -408,7 +404,7 @@ describe('web-detection-experiment', () => {
                     ...buildConditionalChanges('disable', 'exp', slices),
                 ],
             };
-            expect(() => verifyCohorts('enable', 'exp', wrong, plans(), slices)).to.throw('android control');
+            expect(() => verifyCohorts('enable', 'exp', () => wrong, plans(), slices)).to.throw('android control');
         });
     });
 
@@ -422,7 +418,19 @@ describe('web-detection-experiment', () => {
                     'groupA/b',
                 ],
             ]);
-            const added = appendConditionalChanges(FIXTURE_TEXT, changes);
+            const ws = new Workspace(() => FIXTURE_TEXT, {});
+            appendChanges(
+                ws,
+                {
+                    file: 'features/web-detection.json',
+                    path: [
+                        'settings',
+                    ],
+                    platforms: [],
+                },
+                changes,
+            );
+            const added = ws.read('features/web-detection.json');
             const parsed = /** @type {any} */ (parseJsonc(added, 'added'));
             expect(parsed.settings.conditionalChanges).to.have.length(3);
             expect(parsed.settings.conditionalChanges.slice(1)).to.deep.equal(changes);
@@ -484,6 +492,121 @@ describe('web-detection-experiment', () => {
             const { warnings } = await dryRun('enable');
             expect(warnings).to.include('The 40% of users outside the rollout run every production detector');
             expect((await dryRun('disable')).warnings.join('\n')).to.not.contain('outside the rollout');
+        });
+
+        it('gives the same result on the built config', async function () {
+            this.timeout(120000);
+            const ws = Workspace.fromRepository();
+            const { experimentName, plans, slices } = create(
+                {
+                    mode: 'disable',
+                    cohorts: 4,
+                    cohortPercent: 10,
+                    control: undefined,
+                    by: 'group',
+                    seed: 'test',
+                    experiment: FREE_SLOT,
+                    platforms: [
+                        'android',
+                        'ios',
+                        'macos',
+                        'windows',
+                    ],
+                    clientVersions: {},
+                    rollout: undefined,
+                    dryRun: true,
+                },
+                ws,
+            );
+            await verifyBuiltCohorts(ws, 'disable', experimentName, plans, slices);
+        });
+    });
+
+    describe('create on fixture files', () => {
+        /** Windows declares its own settings, with groupA only. */
+        const files = /** @type {Record<string, string>} */ ({
+            'features/web-detection.json': JSON.stringify({ state: 'enabled', exceptions: [], settings: fixtureSettings() }),
+            'features/content-scope-experiments.json': '{ "state": "disabled", "exceptions": [] }',
+            'overrides/android-override.json': '{ "features": { "webDetection": { "state": "enabled", "minSupportedVersion": 100 } } }',
+            'overrides/windows-override.json': JSON.stringify({
+                features: {
+                    webDetection: {
+                        state: 'enabled',
+                        minSupportedVersion: '0.147.0',
+                        settings: { detectors: { groupA: fixtureSettings().detectors.groupA } },
+                    },
+                },
+            }),
+            'overrides/ios-override.json': '{ "features": {} }',
+            'overrides/macos-override.json': '{ "features": {} }',
+            'overrides/extension-override.json': '{ "features": {} }',
+        });
+
+        /**
+         * @param {Partial<import('../scripts/web-detection-experiment.mjs').CreateOptions>} options
+         */
+        const run = (options) => {
+            const ws = new Workspace((file) => files[file], {
+                webDetection: 'features/web-detection.json',
+                contentScopeExperiments: 'features/content-scope-experiments.json',
+            });
+            const result = create(
+                {
+                    mode: 'disable',
+                    cohorts: 3,
+                    cohortPercent: 10,
+                    control: undefined,
+                    by: 'detector',
+                    seed: 'test',
+                    experiment: 'contentScopeExperiment12',
+                    platforms: [
+                        'android',
+                        'windows',
+                    ],
+                    clientVersions: {},
+                    rollout: undefined,
+                    dryRun: true,
+                    ...options,
+                },
+                ws,
+            );
+            return { ws, ...result };
+        };
+
+        it('patches the settings each platform reads, and only the detectors they have', () => {
+            const { ws, slices } = run({});
+            const base = ws.parse('features/web-detection.json').settings.conditionalChanges;
+            const windows = ws.parse('overrides/windows-override.json').features.webDetection.settings.conditionalChanges;
+            expect(experimentChangeIndices(base, 'contentScopeExperiment12')).to.have.length(3);
+            expect(windows).to.have.length(2);
+            expect(JSON.stringify(windows)).to.not.contain('groupB');
+            expect(slices.flat().sort()).to.deep.equal([
+                'groupA/a',
+                'groupA/b',
+                'groupB/c',
+            ]);
+        });
+
+        it('describes only what the experiment cannot change', () => {
+            const { ws } = run({});
+            const { description } =
+                ws.parse('overrides/android-override.json').features.contentScopeExperiments.features.contentScopeExperiment12;
+            expect(description).to.equal('Web detection disable split by detector, seed test: control weight 1800, 3 × weight 1000');
+        });
+
+        it('warns that Windows rounds a fractional rollout down', () => {
+            expect(run({ cohortPercent: undefined, rollout: 12.5 }).warnings).to.include(
+                'Windows enrols rollouts by a whole percent, rounded down: 12.5% enrols 12% there',
+            );
+            expect(
+                run({
+                    cohortPercent: undefined,
+                    rollout: 12.5,
+                    platforms: [
+                        'android',
+                    ],
+                }).warnings.join('\n'),
+            ).to.not.contain('Windows');
         });
     });
 });
