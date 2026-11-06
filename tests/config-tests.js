@@ -866,6 +866,32 @@ describe('Web detection detector schema', () => {
         expect(validate(detector), formatErrors(validate.errors)).to.equal(true);
     });
 
+    it('accepts payload buckets as an array of `{name, is}`, and rejects an object of them', () => {
+        const field = (/** @type {unknown} */ buckets) => ({
+            actions: { fireEvent: { type: 'a', data: { n: { value: { ...images, using: 'length' }, buckets } } } },
+        });
+        const array = field([
+            { name: 'none', is: 0 },
+            { name: 'some', is: { gte: 1 } },
+        ]);
+        expect(validate(array), formatErrors(validate.errors)).to.equal(true);
+        expect(validate(field({ none: 0, some: { gte: 1 } }))).to.equal(false);
+        expect(
+            validate(
+                field([
+                    { name: 'none' },
+                ]),
+            ),
+        ).to.equal(false);
+        expect(
+            validate(
+                field([
+                    { name: 'none', is: 0, value: 0 },
+                ]),
+            ),
+        ).to.equal(false);
+    });
+
     it('accepts `actions` without `match`', () => {
         expect(validate({ actions: report }), formatErrors(validate.errors)).to.equal(true);
     });
