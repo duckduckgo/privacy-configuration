@@ -7,6 +7,7 @@ import {
     appendConditionalChanges,
     autoRunning,
     buildCohorts,
+    resolveSizing,
     buildConditionalChanges,
     buildUnits,
     clientsFor,
@@ -256,18 +257,51 @@ describe('web-detection-experiment', () => {
         });
     });
 
+    describe('resolveSizing', () => {
+        it('defaults to a full rollout with a square-root control', () => {
+            expect(resolveSizing(10, {})).to.deep.equal({ rollout: 10000, control: 2410, cohort: 759 });
+        });
+
+        it('shares a given rollout with a square-root control', () => {
+            expect(resolveSizing(10, { rollout: 50 })).to.deep.equal({ rollout: 5000, control: 1210, cohort: 379 });
+        });
+
+        it('shares a given rollout after a fixed control', () => {
+            expect(resolveSizing(10, { rollout: 50, control: 10 })).to.deep.equal({ rollout: 5000, control: 1000, cohort: 400 });
+        });
+
+        it('derives the rollout from the cohort size, rounded up to a whole percent', () => {
+            expect(resolveSizing(10, { cohortPercent: 5 })).to.deep.equal({ rollout: 6600, control: 1600, cohort: 500 });
+            expect(resolveSizing(10, { cohortPercent: 5, control: 20 })).to.deep.equal({ rollout: 7000, control: 2000, cohort: 500 });
+        });
+
+        it('gives control the remainder of the rollout', () => {
+            expect(resolveSizing(10, { cohortPercent: 5, control: 'remainder' })).to.deep.equal({
+                rollout: 10000,
+                control: 5000,
+                cohort: 500,
+            });
+            expect(resolveSizing(10, { cohortPercent: 5, rollout: 80 })).to.deep.equal({ rollout: 8000, control: 3000, cohort: 500 });
+        });
+
+        it('rejects impossible sizes', () => {
+            expect(() => resolveSizing(10, { rollout: 50, control: 10, cohortPercent: 4 })).to.throw('at most two');
+            expect(() => resolveSizing(10, { control: 'remainder' })).to.throw('needs --cohort-percent');
+            expect(() => resolveSizing(10, { cohortPercent: 10 })).to.throw('at most 100%');
+            expect(() => resolveSizing(10, { cohortPercent: 10, control: 'remainder' })).to.throw('need a share of users');
+            expect(() => resolveSizing(10, { rollout: 50, control: 60 })).to.throw('need a share of users');
+        });
+    });
+
     describe('buildCohorts', () => {
-        it('gives control the remaining weight', () => {
-            const cohorts = buildCohorts(10, 5);
-            expect(cohorts[0]).to.deep.equal({ name: 'control', weight: 50 });
+        it('weights cohorts in hundredths of a percent summing to the rollout', () => {
+            const sizing = resolveSizing(10, { rollout: 50 });
+            const cohorts = buildCohorts(10, sizing);
+            expect(cohorts[0]).to.deep.equal({ name: 'control', weight: 1210 });
             expect(cohorts.slice(1).map((c) => c.name)).to.deep.equal(
                 Array.from({ length: 10 }, (_, i) => `treatment${String(i + 1).padStart(2, '0')}`),
             );
-            expect(cohorts.reduce((sum, c) => sum + c.weight, 0)).to.equal(100);
-        });
-
-        it('rejects a control smaller than a cohort', () => {
-            expect(() => buildCohorts(20, 5)).to.throw('control needs at least 5%');
+            expect(cohorts.reduce((sum, c) => sum + c.weight, 0)).to.equal(sizing.rollout);
         });
     });
 
@@ -478,7 +512,11 @@ describe('web-detection-experiment', () => {
         });
 
         it('creates contentScopeExperiments when missing and removes it with its last slot', () => {
-            const slot = { state: /** @type {const} */ ('enabled'), description: 'test', cohorts: buildCohorts(1, 10) };
+            const slot = {
+                state: /** @type {const} */ ('enabled'),
+                description: 'test',
+                cohorts: buildCohorts(1, resolveSizing(1, { cohortPercent: 10, control: 'remainder' })),
+            };
             const added = addExperimentSlot(OVERRIDE_TEXT, 'contentScopeExperiment10', slot);
             const parsed = /** @type {any} */ (parseJsonc(added, 'added'));
             expect(parsed.features.contentScopeExperiments).to.deep.equal({
@@ -495,7 +533,11 @@ describe('web-detection-experiment', () => {
         });
 
         it('keeps other slots when removing one', () => {
-            const slot = { state: /** @type {const} */ ('enabled'), description: 'test', cohorts: buildCohorts(1, 10) };
+            const slot = {
+                state: /** @type {const} */ ('enabled'),
+                description: 'test',
+                cohorts: buildCohorts(1, resolveSizing(1, { cohortPercent: 10, control: 'remainder' })),
+            };
             const both = addExperimentSlot(
                 addExperimentSlot(OVERRIDE_TEXT, 'contentScopeExperiment10', slot),
                 'contentScopeExperiment11',
@@ -522,32 +564,47 @@ describe('web-detection-experiment', () => {
             'overrides/windows-override.json',
         ];
 
+        /**
+         * @param {'enable' | 'disable'} mode
+         */
+        const dryRun = (mode) =>
+            create({
+                mode,
+                cohorts: 4,
+                cohortPercent: 10,
+                control: undefined,
+                by: 'detector',
+                seed: 'test',
+                experiment: 'contentScopeExperiment100',
+                platforms: [
+                    'android',
+                    'ios',
+                    'macos',
+                    'windows',
+                ],
+                clientVersions: {},
+                rollout: undefined,
+                dryRun: true,
+            });
+
         for (const mode of /** @type {const} */ ([
             'enable',
             'disable',
         ])) {
             it(`${mode}: verifies every cohort and writes nothing`, async () => {
                 const before = files.map((file) => readFileSync(file, 'utf8'));
-                const { report } = await create({
-                    mode,
-                    cohorts: 4,
-                    cohortPercent: 10,
-                    by: 'detector',
-                    seed: 'test',
-                    experiment: 'contentScopeExperiment100',
-                    platforms: [
-                        'android',
-                        'ios',
-                        'macos',
-                        'windows',
-                    ],
-                    clientVersions: {},
-                    rollout: undefined,
-                    dryRun: true,
-                });
+                const { report } = await dryRun(mode);
+                expect(report).to.contain('| control | 20% |');
                 expect(report).to.contain('| treatment04 | 10% |');
+                expect(report).to.contain('| not enrolled | 40% | production | |');
                 expect(files.map((file) => readFileSync(file, 'utf8'))).to.deep.equal(before);
             });
         }
+
+        it('warns when users outside an enable rollout run production', async () => {
+            const { warnings } = await dryRun('enable');
+            expect(warnings).to.include('The 40% of users outside the rollout run every production detector');
+            expect((await dryRun('disable')).warnings.join('\n')).to.not.contain('outside the rollout');
+        });
     });
 });

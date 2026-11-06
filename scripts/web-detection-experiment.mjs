@@ -52,6 +52,10 @@ import { parseJsonc } from './set-jsonc-path.mjs';
  *
  * @typedef {{ name: string, weight: number }} Cohort
  *
+ * @typedef {number | 'sqrt' | 'remainder'} ControlSize
+ * @typedef {{ rollout?: number, control?: ControlSize, cohortPercent?: number }} SizingInput
+ * @typedef {{ rollout: number, control: number, cohort: number }} Sizing
+ *
  * @typedef {object} ExperimentSlot
  * @property {'enabled'} state
  * @property {string} description
@@ -68,7 +72,8 @@ import { parseJsonc } from './set-jsonc-path.mjs';
  * @typedef {object} CreateOptions
  * @property {Mode} mode
  * @property {number} cohorts
- * @property {number} cohortPercent
+ * @property {number | undefined} cohortPercent
+ * @property {ControlSize | undefined} control
  * @property {Unit} by
  * @property {string} seed
  * @property {string} experiment - slot name, or `auto`
@@ -453,18 +458,62 @@ export function buildConditionalChanges(mode, experimentName, slices) {
 }
 
 /**
+ * Resolve the rollout R, control C and treatment cohort t, as shares of all users, where R = C + N·t.
+ * At most two are given; a `sqrt` control (the default) is √N·t and a `remainder` control is R − N·t.
+ * Shares are whole hundredths of a percent with the rounding going to control, and a derived rollout
+ * is rounded up to a whole percent.
+ *
+ * @param {number} count - N, the number of treatment cohorts
+ * @param {SizingInput} input - percents
+ * @returns {Sizing} hundredths of a percent
+ */
+export function resolveSizing(count, { rollout, control, cohortPercent }) {
+    /** @param {number} percent */
+    const toHundredths = (percent) => Math.round(percent * 100);
+    const fixedControl = typeof control === 'number' ? toHundredths(control) : undefined;
+    if (rollout !== undefined && cohortPercent !== undefined && control !== undefined && control !== 'remainder') {
+        throw new Error('Give at most two of --rollout, --control-percent and --cohort-percent');
+    }
+    let total;
+    let cohort;
+    if (cohortPercent === undefined) {
+        if (control === 'remainder') throw new Error('--control-percent remainder needs --cohort-percent');
+        total = toHundredths(rollout ?? 100);
+        cohort = Math.floor(fixedControl === undefined ? total / (count + Math.sqrt(count)) : (total - fixedControl) / count);
+    } else {
+        cohort = toHundredths(cohortPercent);
+        if (rollout !== undefined || control === 'remainder') {
+            total = toHundredths(rollout ?? 100);
+        } else {
+            const minimumControl = fixedControl ?? cohort * Math.sqrt(count);
+            total = Math.ceil((count * cohort + minimumControl) / 100) * 100;
+        }
+    }
+    const sizing = { rollout: total, control: total - count * cohort, cohort };
+    const summary = `rollout ${formatShare(sizing.rollout)}, control ${formatShare(sizing.control)}, ${count} × ${formatShare(cohort)}`;
+    if (total <= 0 || total > 10000) throw new Error(`Rollout must be above 0% and at most 100%: ${summary}`);
+    if (cohort <= 0 || sizing.control <= 0) throw new Error(`Control and every cohort need a share of users: ${summary}`);
+    return sizing;
+}
+
+/**
+ * @param {number} hundredths - a share of users in hundredths of a percent
+ */
+export function formatShare(hundredths) {
+    return `${hundredths / 100}%`;
+}
+
+/**
+ * Weights in hundredths of a percent of all users, so they sum to the rollout.
+ *
  * @param {number} count
- * @param {number} percent
+ * @param {Sizing} sizing
  * @returns {Cohort[]}
  */
-export function buildCohorts(count, percent) {
-    const control = 100 - count * percent;
-    if (control < percent) {
-        throw new Error(`${count} cohorts of ${percent}% leave ${control}% for control; control needs at least ${percent}%`);
-    }
+export function buildCohorts(count, sizing) {
     return [
-        { name: 'control', weight: control },
-        ...Array.from({ length: count }, (_, i) => ({ name: cohortName(i), weight: percent })),
+        { name: 'control', weight: sizing.control },
+        ...Array.from({ length: count }, (_, i) => ({ name: cohortName(i), weight: sizing.cohort })),
     ];
 }
 
@@ -759,10 +808,15 @@ function formatVersion(version) {
  */
 export async function create(options) {
     const { mode, by, seed, platforms } = options;
-    if (options.rollout !== undefined && mode === 'enable') {
-        throw new Error('--rollout is not allowed with --mode enable: users outside the rollout would run every production detector');
+    const sizing = resolveSizing(options.cohorts, options);
+    const cohorts = buildCohorts(options.cohorts, sizing);
+    const warnings = [];
+    if (sizing.rollout < 10000 && mode === 'enable') {
+        warnings.push(`The ${formatShare(10000 - sizing.rollout)} of users outside the rollout run every production detector`);
     }
-    const cohorts = buildCohorts(options.cohorts, options.cohortPercent);
+    if (sizing.control < sizing.cohort) {
+        warnings.push(`Control (${formatShare(sizing.control)}) is smaller than a treatment cohort (${formatShare(sizing.cohort)})`);
+    }
 
     const webDetectionText = readFile(WEB_DETECTION_FILE);
     const settings = /** @type {{ settings: WebDetectionSettings }} */ (parseJsonc(webDetectionText, WEB_DETECTION_FILE)).settings;
@@ -774,7 +828,6 @@ export async function create(options) {
             readFile(overrideFile(platform)),
         ]),
     );
-    const warnings = [];
 
     /** @type {PlatformPlan[]} */
     const plans = platforms.map((platform) => {
@@ -862,7 +915,9 @@ export async function create(options) {
     const newSettings = /** @type {{ settings: WebDetectionSettings }} */ (parseJsonc(newWebDetectionText, WEB_DETECTION_FILE)).settings;
     const results = verifyCohorts(mode, experimentName, newSettings, plans, slices);
 
-    const description = `Web detection ${mode} split by ${by}: ${options.cohorts} cohorts of ${options.cohortPercent}%, seed ${seed}`;
+    const description =
+        `Web detection ${mode} split by ${by}, seed ${seed}: control ${formatShare(sizing.control)}, ` +
+        `${options.cohorts} × ${formatShare(sizing.cohort)}, rollout ${formatShare(sizing.rollout)}`;
     if (!options.dryRun) {
         await writeFormatted(WEB_DETECTION_FILE, newWebDetectionText);
         for (const plan of plans) {
@@ -871,10 +926,10 @@ export async function create(options) {
                 state: 'enabled',
                 description,
                 ...(plan.minSupportedVersion !== undefined && { minSupportedVersion: plan.minSupportedVersion }),
-                ...(options.rollout !== undefined && {
+                ...(sizing.rollout < 10000 && {
                     rollout: {
                         steps: [
-                            { percent: options.rollout },
+                            { percent: sizing.rollout / 100 },
                         ],
                     },
                 }),
@@ -898,12 +953,17 @@ export async function create(options) {
         `| Cohort | Users | ${mode === 'enable' ? 'Runs only' : mode === 'disable' ? 'Stops' : 'Adds'} | Auto-running (${platforms.join(' / ')}) |`,
         '|---|---|---|---|',
         ...results.map(({ cohort, slice, running }) => {
-            const weight = cohorts.find((c) => c.name === cohort)?.weight;
+            const weight = cohort === 'control' ? sizing.control : sizing.cohort;
             const sliceText = slice === undefined ? (mode === 'enable' ? 'nothing' : 'production') : slice.join(', ');
-            return `| ${cohort} | ${weight}% | ${sliceText} | ${[
+            return `| ${cohort} | ${formatShare(weight)} | ${sliceText} | ${[
                 ...running.values(),
             ].join(' / ')} |`;
         }),
+        ...(sizing.rollout < 10000
+            ? [
+                  `| not enrolled | ${formatShare(10000 - sizing.rollout)} | production | |`,
+              ]
+            : []),
     ];
     return { experimentName, report: lines.join('\n'), warnings };
 }
@@ -929,7 +989,7 @@ export async function remove(experimentName) {
 }
 
 const HELP = `Usage:
-  web-detection-experiment.mjs create --mode <mode> --cohorts <n> --cohort-percent <p> [options]
+  web-detection-experiment.mjs create --mode <mode> --cohorts <n> [options]
   web-detection-experiment.mjs remove --experiment <slot>
 
 create:
@@ -938,14 +998,19 @@ create:
       disable  each cohort stops its slice of the production detectors; control runs production
       trial    each cohort adds its slice of the detectors not running in production; control runs production
   --cohorts <n>            treatment cohorts, named treatment01, treatment02, ...
-  --cohort-percent <p>     whole percent of users in each treatment cohort; control gets the rest
+  --rollout <p>            percent of users enrolled (default: 100, or derived)
+  --control-percent <p>|sqrt|remainder
+                           percent of users in control; sqrt is √n × a treatment cohort, remainder is
+                           what the rollout leaves after the treatment cohorts (default: sqrt, or derived)
+  --cohort-percent <p>     percent of users in each treatment cohort (default: derived)
+                           Give at most two of these three; the third follows from
+                           rollout = control + n × cohort. A derived rollout is rounded up to a whole percent.
   --by detector|group      split single detectors or whole groups (default: detector)
   --seed <string>          seed for the split (default: random, printed in the slot description)
   --experiment <slot>|auto contentScopeExperiments slot (default: auto, the first unused Android slot)
   --platforms <list>       comma-separated from ${Object.keys(PLATFORMS).join(', ')} (default: ${DEFAULT_PLATFORMS.join(',')})
   --client-version <list>  platform=version pairs to evaluate production at
                            (default: the platform's highest web detection version gate)
-  --rollout <percent>      enrol only this share of users (not with --mode enable)
   --dry-run                print the report without writing files
 
 remove:
@@ -960,6 +1025,27 @@ function parsePositiveInteger(value, flag) {
     const number = Number(value);
     if (!Number.isInteger(number) || number < 1) throw new Error(`${flag} needs a positive whole number`);
     return number;
+}
+
+/**
+ * @param {string | undefined} value
+ * @param {string} flag
+ * @returns {number | undefined}
+ */
+function parsePercent(value, flag) {
+    if (value === undefined) return undefined;
+    const number = Number(value);
+    if (!Number.isFinite(number) || number <= 0 || number > 100) throw new Error(`${flag} needs a percent above 0 and at most 100`);
+    return number;
+}
+
+/**
+ * @param {string | undefined} value
+ * @returns {ControlSize | undefined}
+ */
+function parseControl(value) {
+    if (value === 'sqrt' || value === 'remainder') return value;
+    return parsePercent(value, '--control-percent');
 }
 
 /**
@@ -987,6 +1073,7 @@ async function main() {
             mode: { type: 'string' },
             cohorts: { type: 'string' },
             'cohort-percent': { type: 'string' },
+            'control-percent': { type: 'string' },
             by: { type: 'string', default: 'detector' },
             seed: { type: 'string' },
             experiment: { type: 'string', default: 'auto' },
@@ -1024,12 +1111,13 @@ async function main() {
         mode,
         by,
         cohorts: parsePositiveInteger(values.cohorts, '--cohorts'),
-        cohortPercent: parsePositiveInteger(values['cohort-percent'], '--cohort-percent'),
+        cohortPercent: parsePercent(values['cohort-percent'], '--cohort-percent'),
+        control: parseControl(values['control-percent']),
         seed: values.seed ?? randomBytes(4).toString('hex'),
         experiment: values.experiment,
         platforms: /** @type {Platform[]} */ (platforms),
         clientVersions: parseClientVersions(values['client-version']),
-        rollout: values.rollout === undefined ? undefined : parsePositiveInteger(values.rollout, '--rollout'),
+        rollout: parsePercent(values.rollout, '--rollout'),
         dryRun: values['dry-run'],
     });
     console.log(report);
