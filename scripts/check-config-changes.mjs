@@ -15,14 +15,23 @@
  * Usage: node scripts/check-config-changes.mjs [base-ref]   (default: origin/main)
  */
 
-import { execFileSync, execSync } from 'child_process';
-import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync, symlinkSync } from 'fs';
+import { execSync } from 'child_process';
+import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync } from 'fs';
 import { tmpdir } from 'os';
 import { join, resolve } from 'path';
 import { fileURLToPath } from 'url';
 import { isDeepStrictEqual } from 'util';
-import { CURRENT_CONFIG_VERSION } from '../constants.js';
-import { ROOT, listFeatureFiles } from './config-files.mjs';
+import { PLATFORMS, conditionBlocks } from './config-conditions.mjs';
+import {
+    ROOT,
+    buildConfigs,
+    copyWorkingTree,
+    git,
+    isShallowClone,
+    listFeatureFiles,
+    overrideFile,
+    usedInHistory,
+} from './config-files.mjs';
 import { parseJsonc } from './set-jsonc-path.mjs';
 
 /**
@@ -41,15 +50,6 @@ export const EXPERIMENT_PARENTS = [
     'contentScopeExperiments',
     'contentBlocking',
     'blockList',
-];
-
-/** The platforms whose built configs are compared. */
-const PLATFORMS = [
-    'android',
-    'ios',
-    'macos',
-    'windows',
-    'extension',
 ];
 
 const CONFIG_DIRS = [
@@ -325,11 +325,7 @@ function detectorPatches(settings) {
     /** @type {Map<string, ConditionalChange[]>} */
     const patches = new Map();
     for (const change of settings?.conditionalChanges ?? []) {
-        const blocks = Array.isArray(change.condition)
-            ? change.condition
-            : [
-                  change.condition,
-              ];
+        const blocks = conditionBlocks(change);
         if (blocks.length > 0 && blocks.every((block) => 'experiment' in block)) continue;
         for (const operation of change.patchSettings ?? []) {
             for (const [
@@ -434,7 +430,8 @@ export function detectorWarnings(base, head) {
 }
 
 /**
- * Experiments on `head` that are not on `base` and whose name `usedBefore` reports.
+ * Experiments on `head` that are not on `base` and whose name `usedBefore` reports. Subfeatures without
+ * cohorts are not experiments.
  *
  * @param {Config} base
  * @param {Config} head
@@ -444,8 +441,11 @@ export function detectorWarnings(base, head) {
 export function reusedExperimentErrors(base, head, usedBefore) {
     const baseExperiments = experiments(base);
     const errors = [];
-    for (const id of experiments(head).keys()) {
-        if (baseExperiments.has(id)) continue;
+    for (const [
+        id,
+        experiment,
+    ] of experiments(head)) {
+        if (baseExperiments.has(id) || !experiment.cohorts?.length) continue;
         const [
             parent,
             slot,
@@ -500,7 +500,6 @@ function listJsonFiles(dir) {
  * @returns {string[]}
  */
 export function checkRolloutSteps(baseRef) {
-    const git = (/** @type {string[]} */ ...args) => execFileSync('git', args, { cwd: ROOT, encoding: 'utf8', maxBuffer: 1 << 28 });
     const baseFiles = new Set(git('ls-tree', '-r', '--name-only', baseRef, '--', ...CONFIG_DIRS).split('\n'));
     const failures = [];
     for (const file of CONFIG_DIRS.flatMap(listJsonFiles)) {
@@ -513,62 +512,38 @@ export function checkRolloutSteps(baseRef) {
 }
 
 /**
- * @param {string[]} args
- */
-function git(...args) {
-    return execFileSync('git', args, { cwd: ROOT, encoding: 'utf8', maxBuffer: 1 << 28 });
-}
-
-/**
- * Build the config at `baseRef` in a temporary directory and the working tree in place.
+ * Build the config at `baseRef` and the working tree, each in a temporary directory. The base uses the working
+ * tree's dependencies.
  *
  * @param {string} baseRef
- * @returns {{ base: Map<string, Config>, head: Map<string, Config> }} built configs by platform
+ * @returns {Promise<{ base: Map<string, Config>, head: Map<string, Config> }>} built configs by platform
  */
-function buildConfigs(baseRef) {
-    const dir = mkdtempSync(join(tmpdir(), 'config-base-'));
+async function buildBaseAndHead(baseRef) {
+    const baseDir = mkdtempSync(join(tmpdir(), 'config-base-'));
     try {
-        execSync(`git archive ${JSON.stringify(baseRef)} | tar -x -C ${JSON.stringify(dir)}`, { cwd: ROOT, stdio: 'pipe' });
-        symlinkSync(resolve(ROOT, 'node_modules'), join(dir, 'node_modules'));
-        execFileSync(
-            'node',
-            [
-                'index.js',
-            ],
-            { cwd: dir, stdio: 'pipe' },
-        );
-        execFileSync(
-            'node',
-            [
-                'index.js',
-            ],
-            { cwd: ROOT, stdio: 'pipe' },
-        );
-        /** @param {string} root */
-        const read = (root) =>
-            new Map(
-                PLATFORMS.map((platform) => [
-                    platform,
-                    /** @type {Config} */ (
-                        JSON.parse(readFileSync(join(root, 'generated', `v${CURRENT_CONFIG_VERSION}`, `${platform}-config.json`), 'utf8'))
-                    ),
-                ]),
-            );
-        return { base: read(dir), head: read(ROOT) };
-    } finally {
-        rmSync(dir, { recursive: true, force: true });
+        execSync(`git archive ${JSON.stringify(baseRef)} | tar -x -C ${JSON.stringify(baseDir)}`, { cwd: ROOT, stdio: 'pipe' });
+    } catch (error) {
+        rmSync(baseDir, { recursive: true, force: true });
+        throw error;
     }
+    const [
+        base,
+        head,
+    ] = await Promise.all([
+        buildConfigs(baseDir, PLATFORMS),
+        buildConfigs(copyWorkingTree(), PLATFORMS),
+    ]);
+    return { base, head };
 }
 
 /**
  * @param {string} baseRef
- * @returns {{ errors: string[], warnings: string[] }}
+ * @returns {Promise<{ errors: string[], warnings: string[] }>}
  */
-export function checkConfigChanges(baseRef) {
+export async function checkConfigChanges(baseRef) {
     const errors = checkRolloutSteps(baseRef);
-    const { base, head } = buildConfigs(baseRef);
+    const { base, head } = await buildBaseAndHead(baseRef);
     const featureFiles = listFeatureFiles();
-    const shallow = git('rev-parse', '--is-shallow-repository').trim() === 'true';
     /** @type {Finding[]} */
     const experimentFindings = [];
     /** @type {Finding[]} */
@@ -578,16 +553,14 @@ export function checkConfigChanges(baseRef) {
         const after = /** @type {Config} */ (head.get(platform));
         /** @type {(parent: string, slot: string) => boolean} */
         const usedBefore = (parent, slot) =>
-            git(
-                'log',
-                '-1',
-                '--format=%h',
-                `-S"${slot}"`,
+            usedInHistory(
+                slot,
+                [
+                    overrideFile(platform),
+                    featureFiles[parent] ?? 'features',
+                ],
                 baseRef,
-                '--',
-                `overrides/${platform}-override.json`,
-                featureFiles[parent] ?? 'features',
-            ).trim() !== '';
+            );
         for (const message of [
             ...experimentErrors(before, after),
             ...reusedExperimentErrors(before, after, usedBefore),
@@ -597,7 +570,7 @@ export function checkConfigChanges(baseRef) {
         for (const message of detectorWarnings(before, after)) warningFindings.push({ platform, message });
     }
     const warnings = mergeFindings(warningFindings);
-    if (shallow) warnings.push('This clone is shallow, so experiment names used before its history starts were not checked');
+    if (isShallowClone()) warnings.push('This clone is shallow, so experiment names used before its history starts were not checked');
     return {
         errors: [
             ...errors,
@@ -609,7 +582,7 @@ export function checkConfigChanges(baseRef) {
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
     const baseRef = process.argv[2] ?? 'origin/main';
-    const { errors, warnings } = checkConfigChanges(baseRef);
+    const { errors, warnings } = await checkConfigChanges(baseRef);
     const annotate = process.env.GITHUB_ACTIONS === 'true';
     for (const warning of warnings) console.log(annotate ? `::warning title=Config change::${warning}` : `Warning: ${warning}`);
     for (const error of errors) console.error(annotate ? `::error title=Config change::${error}` : `Error: ${error}`);
