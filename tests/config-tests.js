@@ -342,6 +342,25 @@ const contentScopeScriptsVersionFormat = {
 // C-S-S before this release fails any condition block carrying the C-S-S version keys, so a lower value never takes effect.
 const FIRST_CONTENT_SCOPE_SCRIPTS_VERSION_GATED_RELEASE = '20.4.0';
 
+// Extensions before this release send C-S-S no platform version, so condition blocks judged as extension never match on min/maxSupportedVersion.
+const FIRST_EXTENSION_RELEASE_SENDING_VERSION = '2026.11.5';
+
+// Feature and sub-feature entries, whose version bounds the extension enforces itself.
+const FEATURE_ENTRY_PATH = /^features\.[^.]+(\.features\.[^.]+)?$/;
+
+/**
+ * @param {string} valuePath
+ * @param {unknown} value
+ * @param {string} key a min or max version key
+ * @param {string} floor the first release where the key takes effect
+ * @param {string} release what that release is, e.g. "C-S-S release that reads it"
+ * @returns {string}
+ */
+function belowFirstReleaseFailure(valuePath, value, key, floor, release) {
+    const effect = key.startsWith('max') ? 'the block matches no client' : `it acts as ${floor}`;
+    return `${valuePath} is ${JSON.stringify(value)}, below ${floor}, the first ${release}; ${effect}`;
+}
+
 /**
  * @param {string} name a platform output name or a C-S-S inject name
  * @returns {string | undefined} the key into appVersionFormats
@@ -355,8 +374,9 @@ function versionPlatform(name) {
 }
 
 /**
- * Lists every version value in a config that is not in its platform's format, and every C-S-S
- * version below the first release that reads it. A condition block with an `injectName` is judged
+ * Lists every version value in a config that is not in its platform's format, every C-S-S version
+ * below the first release that reads it, and every extension condition-block version below the
+ * first extension release that sends its version. A condition block with an `injectName` is judged
  * by that platform, since base config ships every platform's blocks.
  * @param {unknown} node
  * @param {string} platform the built config's key into appVersionFormats
@@ -378,18 +398,36 @@ function collectVersionFormatFailures(node, platform, nodePath, failures) {
         const valuePath = `${nodePath}.${key}`;
         if (key === 'minSupportedVersion' || key === 'maxSupportedVersion') {
             const { format, matches } = appVersionFormats[appPlatform];
-            if (!matches(value)) failures.push(`${valuePath} is ${JSON.stringify(value)}, expected ${appPlatform} ${format}`);
+            if (!matches(value)) {
+                failures.push(`${valuePath} is ${JSON.stringify(value)}, expected ${appPlatform} ${format}`);
+            } else if (
+                appPlatform === 'extension' &&
+                !FEATURE_ENTRY_PATH.test(nodePath) &&
+                compareVersions(/** @type {string} */ (value), FIRST_EXTENSION_RELEASE_SENDING_VERSION) < 0
+            ) {
+                failures.push(
+                    belowFirstReleaseFailure(
+                        valuePath,
+                        value,
+                        key,
+                        FIRST_EXTENSION_RELEASE_SENDING_VERSION,
+                        'extension release that sends C-S-S its version',
+                    ),
+                );
+            }
         } else if (key === 'minContentScopeScriptsVersion' || key === 'maxContentScopeScriptsVersion') {
             const { format, matches } = contentScopeScriptsVersionFormat;
             if (!matches(value)) {
                 failures.push(`${valuePath} is ${JSON.stringify(value)}, expected C-S-S ${format}`);
             } else if (compareVersions(/** @type {string} */ (value), FIRST_CONTENT_SCOPE_SCRIPTS_VERSION_GATED_RELEASE) < 0) {
-                const effect =
-                    key === 'maxContentScopeScriptsVersion'
-                        ? 'the block matches no client'
-                        : `it acts as ${FIRST_CONTENT_SCOPE_SCRIPTS_VERSION_GATED_RELEASE}`;
                 failures.push(
-                    `${valuePath} is ${JSON.stringify(value)}, below ${FIRST_CONTENT_SCOPE_SCRIPTS_VERSION_GATED_RELEASE}, the first C-S-S release that reads it; ${effect}`,
+                    belowFirstReleaseFailure(
+                        valuePath,
+                        value,
+                        key,
+                        FIRST_CONTENT_SCOPE_SCRIPTS_VERSION_GATED_RELEASE,
+                        'C-S-S release that reads it',
+                    ),
                 );
             }
         } else {
