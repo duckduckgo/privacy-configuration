@@ -1679,6 +1679,34 @@
                 ]
             },
             {
+                // Extension: Login detectors in breakage reports only.
+                "condition": [
+                    {
+                        "injectName": "chrome-mv3"
+                    },
+                    {
+                        "injectName": "firefox"
+                    }
+                ],
+                "patchSettings": [
+                    {
+                        "op": "replace",
+                        "path": "/detectors/login/error/state",
+                        "value": "enabled"
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/login/cookies/state",
+                        "value": "enabled"
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/detectors/login/browser/state",
+                        "value": "enabled"
+                    }
+                ]
+            },
+            {
                 "condition": [
                     {
                         "injectName": "android",
