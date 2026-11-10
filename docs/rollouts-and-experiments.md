@@ -32,7 +32,7 @@ An experiment is a sub-feature of `contentScopeExperiments`, a slot, with `cohor
 | Clean up | `node scripts/experiment.mjs remove <slot>` deletes the slot and its conditional changes; production stays as it is |
 | Ship | The same with `--ship`, which keeps on for everyone a feature that `create` turned on |
 
-`create auto` picks an Android slot that no override and no past commit uses; in a shallow clone, run `git fetch --unshallow` first. Before writing, it checks each cohort's result on every platform, on the built config as well.
+`create auto` picks an Android slot that no override and no past commit uses; in a shallow clone, run `git fetch --unshallow` first.
 
 Once an experiment is enabled with cohorts, start a new experiment rather than editing it. Don't change its cohorts or add a metric to it; a metric can be removed, or have its event renamed along with the detectors that fire it. Never give a new experiment a name used before. A change to a detector that fires a live metric's event changes what the metric measures mid-experiment, so tell the experiment owner.
 
@@ -44,13 +44,7 @@ With `--enable-feature`, every cohort except `control` runs the feature, and `--
 | `enabled` | The feature |
 | `disabled` | Nothing of the feature |
 
-Where the feature is off in production, `create` turns it on in the override and switches it off through `additionalCheck` for everyone outside the enabled cohorts. Experiments that switch on the same feature share that switch. `remove` takes it out once no remaining experiment needs it and sets the feature's `state` back to `disabled`; with `--ship`, the feature stays on for everyone instead.
-
-`create` refuses:
-
-- `--enable-feature` or `--patch` with a `--parent` other than `contentScopeExperiments`: C-S-S only matches cohorts there.
-- A feature in `internal` or `preview` state: the off block would also turn it off for internal or preview users outside the experiment.
-- Turning on a feature with no `minSupportedVersion`: clients too old to apply the off block would run it.
+Where the feature is off in production, `create` sets its `state` to `enabled` in the override and turns it off through `additionalCheck` for everyone outside the enabled cohorts.
 
 A `--patch` file names the feature and its JSON Patch. Use `add`: `replace` on a missing path changes nothing.
 
