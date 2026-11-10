@@ -535,6 +535,65 @@ describe('experiment', () => {
             ).to.throw('also loads in its own C-S-S bundle on android');
         });
 
+        it('refuses to switch features or patch cohorts under another parent', () => {
+            const options = {
+                ...CREATE,
+                parent: 'subTest',
+                slot: 'newSub',
+                platforms: /** @type {import('../scripts/config-conditions.mjs').Platform[]} */ ([
+                    'android',
+                ]),
+            };
+            expect(() => createExperiment(workspace(), options)).to.throw('only matches cohorts under contentScopeExperiments');
+            expect(() =>
+                createExperiment(workspace(), {
+                    ...options,
+                    enableFeatures: [],
+                    patches: [
+                        { cohort: 'treatment', feature: 'webDetection', patchSettings: [] },
+                    ],
+                }),
+            ).to.throw('only matches cohorts under contentScopeExperiments');
+        });
+
+        it('refuses a feature in internal or preview state', () => {
+            for (const state of [
+                'internal',
+                'preview',
+            ]) {
+                const files = {
+                    ...FILES,
+                    'overrides/android-override.json': `{ "features": { "webDetection": { "state": "${state}", "minSupportedVersion": 52700000 } } }`,
+                };
+                const ws = new Workspace((file) => /** @type {Record<string, string>} */ (files)[file], FEATURE_FILES);
+                expect(() =>
+                    createExperiment(ws, {
+                        ...CREATE,
+                        platforms: [
+                            'android',
+                        ],
+                    }),
+                ).to.throw(`webDetection is ${state} on android; switching it per cohort would turn it off for ${state} users`);
+                expect(ws.pending().size).to.equal(0);
+            }
+        });
+
+        it('refuses to turn on a feature with no minSupportedVersion', () => {
+            const files = {
+                ...FILES,
+                'overrides/android-override.json': '{ "features": { "webDetection": { "state": "disabled" } } }',
+            };
+            const ws = new Workspace((file) => /** @type {Record<string, string>} */ (files)[file], FEATURE_FILES);
+            expect(() =>
+                createExperiment(ws, {
+                    ...CREATE,
+                    platforms: [
+                        'android',
+                    ],
+                }),
+            ).to.throw('webDetection has no minSupportedVersion on android');
+        });
+
         it('warns that Windows rounds a fractional rollout down', () => {
             expect(createExperiment(workspace(), { ...CREATE, rollout: 12.5 }).warnings).to.include(
                 'Windows enrols rollouts by a whole percent, rounded down: 12.5% enrols 12% there',

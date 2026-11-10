@@ -46,6 +46,12 @@ With `--enable-feature`, every cohort except `control` runs the feature, and `--
 
 Where the feature is off in production, `create` turns it on in the override and switches it off through `additionalCheck` for everyone outside the enabled cohorts. Experiments that switch on the same feature share that switch. `remove` takes it out once no remaining experiment needs it and sets the feature's `state` back to `disabled`; with `--ship`, the feature stays on for everyone instead.
 
+`create` refuses:
+
+- `--enable-feature` or `--patch` with a `--parent` other than `contentScopeExperiments`: C-S-S only matches cohorts there.
+- A feature in `internal` or `preview` state: the off block would also turn it off for internal or preview users outside the experiment.
+- Turning on a feature with no `minSupportedVersion`: clients too old to apply the off block would run it.
+
 A `--patch` file names the feature and its JSON Patch. Use `add`: `replace` on a missing path changes nothing.
 
 ```json

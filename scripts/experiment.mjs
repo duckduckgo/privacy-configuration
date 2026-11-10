@@ -620,6 +620,9 @@ export function createExperiment(ws, options) {
     }
     const enabledCohorts = cohorts.map((c) => c.name).filter((name) => name !== 'control' || control === 'enabled');
     if (enableFeatures.length > 0 && enabledCohorts.length === 0) throw new Error('--enable-feature needs a cohort other than control');
+    if (parent !== EXPERIMENTS_FEATURE && (enableFeatures.length > 0 || patches.length > 0)) {
+        throw new Error(`C-S-S only matches cohorts under ${EXPERIMENTS_FEATURE}, so --enable-feature and --patch need it as the parent`);
+    }
 
     let slot = options.slot;
     if (slot === 'auto') {
@@ -642,6 +645,11 @@ export function createExperiment(ws, options) {
         for (const platform of platforms) {
             const merged = mergedFeature(ws, feature, platform);
             if (merged === undefined) throw new Error(`${feature} is not configured for ${platform}`);
+            if (enableFeatures.includes(feature) && merged.state !== 'enabled' && merged.state !== 'disabled') {
+                throw new Error(
+                    `${feature} is ${merged.state} on ${platform}; switching it per cohort would turn it off for ${merged.state} users outside the experiment`,
+                );
+            }
             perPlatform.set(platform, merged);
         }
         before.set(feature, perPlatform);
@@ -705,6 +713,11 @@ export function createExperiment(ws, options) {
             const file = overrideFile(platform);
             if (ws.parse(file).features?.[feature] === undefined)
                 throw new Error(`${feature} is not in ${file}; add it before enabling it`);
+            if (merged.get(platform)?.minSupportedVersion === undefined) {
+                throw new Error(
+                    `${feature} has no minSupportedVersion on ${platform}; add one first, or enabling it reaches clients too old to apply the off block`,
+                );
+            }
             ws.edit(
                 file,
                 [
