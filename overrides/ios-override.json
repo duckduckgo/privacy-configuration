@@ -1225,6 +1225,129 @@
                             "weight": 1
                         }
                     ]
+                },
+                "contentScopeExperiment11": {
+                    "state": "enabled",
+                    "description": "Page load detectors: treatment also runs the first batch of slow, broken and empty page detectors (webDetection); control runs the live detectors",
+                    "minSupportedVersion": "7.246.0",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ],
+                    "settings": {
+                        // prettier-ignore
+                        "metrics": {
+                            "adwall": {"event": "adwall", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "admiralAdwall": {"event": "admiralAdwall", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "adwall_vendor": {"event": "adwall_vendor", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "captcha_recaptcha": {"event": "captcha_recaptcha", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "captcha_hcaptcha": {"event": "captcha_hcaptcha", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "captcha_turnstile": {"event": "captcha_turnstile", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "captcha_cloudflare": {"event": "captcha_cloudflare", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "captcha_datadome": {"event": "captcha_datadome", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "captcha_imperva": {"event": "captcha_imperva", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "captcha_arkose": {"event": "captcha_arkose", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "captcha_geetest": {"event": "captcha_geetest", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "captcha_awswaf": {"event": "captcha_awswaf", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "captcha_perimeterx": {"event": "captcha_perimeterx", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "captcha_other": {"event": "captcha_other", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "challenge_cloudflare": {"event": "challenge_cloudflare", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "challenge_generic": {"event": "challenge_generic", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "blockPage_cloudflare": {"event": "blockPage_cloudflare", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "blockPage_generic": {"event": "blockPage_generic", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "blockPage_vendor": {"event": "blockPage_vendor", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "blockPage_verificationfailed": {"event": "blockPage_verificationfailed", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "blockPage_vercel": {"event": "blockPage_vercel", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "blockPage_forbidden": {"event": "blockPage_forbidden", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "blockPage_toomanyrequests": {"event": "blockPage_toomanyrequests", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "blockPage_networksecurity": {"event": "blockPage_networksecurity", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "blockPage_title": {"event": "blockPage_title", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "errorPage_soft404": {"event": "errorPage_soft404", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "errorPage_unavailable": {"event": "errorPage_unavailable", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "geoblock": {"event": "geoblock", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "blankPage_empty": {"event": "blankPage_empty", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "login_error": {"event": "login_error", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "login_cookies": {"event": "login_cookies", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "login_browser": {"event": "login_browser", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]}
+                        }
+                    }
                 }
             }
         },
