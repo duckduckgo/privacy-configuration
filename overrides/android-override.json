@@ -5598,6 +5598,28 @@
                             "weight": 1
                         }
                     ]
+                },
+                "contentScopeExperiment11": {
+                    "state": "enabled",
+                    "description": "Page load detectors: treatment also runs the first batch of slow, broken and empty page detectors (webDetection); control runs the live detectors",
+                    "minSupportedVersion": 53010000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
                 }
             }
         },
