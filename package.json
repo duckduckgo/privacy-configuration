@@ -5,8 +5,9 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "npm run build && npm run unit-tests && npm run lint && npm run tsc",
+    "test": "npm run build && npm run unit-tests && npm run check-revoked-bundle-signing-keys && npm run lint && npm run tsc",
     "check-lockfile": "node scripts/check-lockfile.mjs",
+    "check-revoked-bundle-signing-keys": "node scripts/check-revoked-bundle-signing-keys.mjs",
     "lint": "npm run check-lockfile && eslint . && prettier . --check",
     "lint-fix": "npm run check-lockfile && eslint . --fix && prettier . --write",
     "tsc": "tsc",
@@ -27,11 +28,11 @@
     "eslint": "^9.17.0",
     "immutable-json-patch": "^6.0.2",
     "mocha": "^11.7.6",
-    "prettier": "3.8.4",
+    "prettier": "3.9.10",
     "prettier-plugin-multiline-arrays": "^4.1.7",
     "ts-json-schema-generator": "^2.9.0",
     "typescript": "^6.0.3",
-    "xpath": "^0.0.34"
+    "xpath": "^0.0.35"
   },
   "dependencies": {
     "eslint-plugin-json": "^4.0.1",
@@ -39,7 +40,7 @@
     "fast-json-patch": "^3.1.1",
     "jsonc-parser": "^3.3.1",
     "node-fetch": "^3.3.2",
-    "tldts": "^7.4.2"
+    "tldts": "^7.4.18"
   },
   "overrides": {
     "serialize-javascript": ">=7.0.5",
