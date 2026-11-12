@@ -9,6 +9,7 @@ import {
     mergeEventHubTelemetry,
     mergeInterferenceTypes,
     renameEventHubImmediateTriggers,
+    sequenceWebDetectionActions,
     addHashToFeatures,
     stripReasons,
     getBaseFeatureConfigs,
@@ -384,6 +385,10 @@ async function buildPlatforms() {
         collapseEventHubTelemetryPeriods(platformConfig);
         // Authors write `immediate`; emit the immediate trigger name this platform parses.
         renameEventHubImmediateTriggers(platformConfig, platform);
+
+        if (platform === 'ios' || platform === 'macos') {
+            sequenceWebDetectionActions(platformConfig);
+        }
 
         platformConfigs[platform] = platformConfig;
 

@@ -3,6 +3,7 @@ import fs from 'fs';
 import xpath from 'xpath';
 import platforms from '../platforms.js';
 import { CURRENT_CONFIG_VERSION } from '../constants.js';
+import { sequenceWebDetectionActions } from '../util.js';
 
 const OPERATOR_KEYS = [
     'any',
@@ -392,6 +393,146 @@ describe('webDetection config tests', () => {
 
         it('exercises every generated config (sanity)', () => {
             expect(latestConfigs.length).to.be.greaterThan(0);
+        });
+    });
+
+    describe('Apple action sequences', () => {
+        const ACTION_KEYS = [
+            'fireEvent',
+            'breakageReportData',
+            'define',
+        ];
+        // Keys whose value is an action body rather than an expression
+        const BODY_KEYS = [
+            'then',
+            'else',
+        ];
+
+        /**
+         * @param {unknown} value
+         * @returns {value is Record<string, any>}
+         */
+        const isPlainObject = (value) => typeof value === 'object' && value !== null && !Array.isArray(value);
+
+        /**
+         * Every object in a body position holding several action keys, or a `define` of several names.
+         *
+         * @param {unknown} body
+         * @param {string} path
+         * @returns {string[]}
+         */
+        const unsequenced = (body, path) => {
+            /** @type {string[]} */
+            const found = [];
+            /**
+             * @param {unknown} node
+             * @param {string} nodePath
+             * @param {boolean} inBody
+             */
+            const visit = (node, nodePath, inBody) => {
+                if (Array.isArray(node)) {
+                    node.forEach((entry, index) => visit(entry, `${nodePath}[${index}]`, inBody));
+                    return;
+                }
+                if (!isPlainObject(node)) return;
+                const actionKeys = Object.keys(node).filter((key) => ACTION_KEYS.includes(key));
+                if (inBody && (actionKeys.length > 1 || (isPlainObject(node.define) && Object.keys(node.define).length > 1)))
+                    found.push(nodePath);
+                for (const [
+                    key,
+                    value,
+                ] of Object.entries(node)) {
+                    visit(value, `${nodePath}.${key}`, BODY_KEYS.includes(key));
+                }
+            };
+            visit(body, path, true);
+            return found;
+        };
+
+        for (const config of latestConfigs.filter(({ name }) => /^v\d+\/(ios|macos)-config\.json$/.test(name))) {
+            it(`${config.name} holds every action of this release's detectors in its own sequence element`, () => {
+                const detectors = config.body.features?.webDetection?.settings?.detectors ?? {};
+                const found = Object.entries(detectors).flatMap(
+                    ([
+                        group,
+                        entries,
+                    ]) =>
+                        Object.entries(/** @type {Record<string, any>} */ (entries)).flatMap(
+                            ([
+                                id,
+                                detector,
+                            ]) => unsequenced(detector.actions, `detectors.${group}.${id}.actions`),
+                        ),
+                );
+                expect(found, found.join('\n')).to.deep.equal([]);
+            });
+        }
+
+        it('rewrites several action keys and a define of several names into a sequence (self-test)', () => {
+            const config = {
+                features: {
+                    webDetection: {
+                        settings: {
+                            detectors: {
+                                g: {
+                                    once: { match: true, actions: { fireEvent: { type: 'a' }, define: { b: 1 } } },
+                                    list: {
+                                        actions: [
+                                            { define: { x: 1, y: { ref: 'x' } } },
+                                            {
+                                                if: true,
+                                                then: { fireEvent: { type: 'b' }, define: { 'this.sent': true } },
+                                                else: { breakageReportData: {} },
+                                            },
+                                        ],
+                                    },
+                                },
+                            },
+                            conditionalChanges: [
+                                {
+                                    condition: { injectName: 'apple' },
+                                    patchSettings: [
+                                        { op: 'add', path: '/detectors/g/added', value: { actions: { define: { a: 1, b: 2 } } } },
+                                        {
+                                            op: 'replace',
+                                            path: '/detectors/g/list/actions',
+                                            value: { breakageReportData: {}, fireEvent: { type: 'd' } },
+                                        },
+                                    ],
+                                },
+                            ],
+                        },
+                    },
+                },
+            };
+            sequenceWebDetectionActions(config);
+            const settings = config.features.webDetection.settings;
+            expect(settings.detectors.g.once.actions).to.deep.equal([
+                { fireEvent: { type: 'a' } },
+                { define: { b: 1 } },
+            ]);
+            expect(settings.detectors.g.list.actions).to.deep.equal([
+                { define: { x: 1 } },
+                { define: { y: { ref: 'x' } } },
+                {
+                    if: true,
+                    then: [
+                        { fireEvent: { type: 'b' } },
+                        { define: { 'this.sent': true } },
+                    ],
+                    else: { breakageReportData: {} },
+                },
+            ]);
+            expect(settings.conditionalChanges[0].patchSettings[0].value).to.deep.equal({
+                actions: [
+                    { define: { a: 1 } },
+                    { define: { b: 2 } },
+                ],
+            });
+            expect(settings.conditionalChanges[0].patchSettings[1].value).to.deep.equal([
+                { breakageReportData: {} },
+                { fireEvent: { type: 'd' } },
+            ]);
         });
     });
 
