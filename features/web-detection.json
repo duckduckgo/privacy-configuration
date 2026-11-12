@@ -1825,9 +1825,7 @@
             // Rewrites the login detectors' shipped `all`s as nested `if`s for clients on the C-S-S that parses match expressions.
             // That C-S-S reads every operand of an `all`; older C-S-S stops at the first false operand
             {
-                // App versions carrying the C-S-S that parses match expressions, 19.0.0 or later.
-                // The apple and extension versions are placeholders until those apps ship it. iOS and macOS share
-                // the apple inject names, so their real versions need the range split used in the entry above
+                // App versions carrying the C-S-S that parses match expressions, 19.0.0 or later
                 "condition": [
                     {
                         "injectName": "android",
@@ -1841,21 +1839,24 @@
                         "injectName": "windows",
                         "minSupportedVersion": "0.180.0"
                     },
-                    {
-                        "injectName": "apple",
-                        "minSupportedVersion": "999.0.0"
-                    },
+                    // macOS. macOS and iOS share apple-isolated and both report string versions, so the cap keeps iOS 7.x out.
                     {
                         "injectName": "apple-isolated",
-                        "minSupportedVersion": "999.0.0"
+                        "minSupportedVersion": "1.216.0",
+                        "maxSupportedVersion": "1.9999.0"
+                    },
+                    // iOS
+                    {
+                        "injectName": "apple-isolated",
+                        "minSupportedVersion": "7.246.0"
                     },
                     {
                         "injectName": "chrome-mv3",
-                        "minSupportedVersion": "9999.1.1"
+                        "minSupportedVersion": "2026.11.12"
                     },
                     {
                         "injectName": "firefox",
-                        "minSupportedVersion": "9999.1.1"
+                        "minSupportedVersion": "2026.11.12"
                     }
                 ],
                 "patchSettings": [
