@@ -9,6 +9,7 @@ import {
     mergeEventHubTelemetry,
     mergeInterferenceTypes,
     renameEventHubImmediateTriggers,
+    sequenceWebDetectionActions,
     addHashToFeatures,
     stripReasons,
     getBaseFeatureConfigs,
@@ -387,6 +388,10 @@ async function buildPlatforms() {
         renameEventHubImmediateTriggers(platformConfig, platform);
         // Authors may write webDetection payload buckets as an object; clients read an array.
         arrayWebDetectionBuckets(platformConfig);
+
+        if (platform === 'ios' || platform === 'macos') {
+            sequenceWebDetectionActions(platformConfig);
+        }
 
         platformConfigs[platform] = platformConfig;
 

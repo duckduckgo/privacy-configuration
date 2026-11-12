@@ -225,6 +225,145 @@ export function collapseEventHubTelemetryPeriods(config) {
     }
 }
 
+const WEB_DETECTION_ACTION_KEYS = [
+    'fireEvent',
+    'breakageReportData',
+    'define',
+];
+
+/**
+ * @param {unknown} value
+ * @returns {value is Record<string, any>}
+ */
+function isPlainObject(value) {
+    return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+/**
+ * The actions of one object as single-key objects, in config order, a `define` of several names as
+ * one `define` per name; any other value as itself.
+ *
+ * @param {unknown} node
+ * @returns {unknown[]}
+ */
+function splitActions(node) {
+    if (!isPlainObject(node) || !Object.keys(node).some((key) => WEB_DETECTION_ACTION_KEYS.includes(key))) {
+        return [
+            node,
+        ];
+    }
+    return Object.entries(node).flatMap(
+        ([
+            key,
+            value,
+        ]) =>
+            key === 'define' && isPlainObject(value)
+                ? Object.entries(value).map(
+                      ([
+                          name,
+                          defined,
+                      ]) => ({ define: { [name]: defined } }),
+                  )
+                : [
+                      { [key]: value },
+                  ],
+    );
+}
+
+/**
+ * The body of `actions`, `then` or `else`, with each object of several actions spliced into the
+ * sequence holding it, or made a sequence.
+ *
+ * @param {unknown} body
+ * @returns {unknown}
+ */
+function sequenceBody(body) {
+    if (Array.isArray(body)) return body.flatMap((element) => splitActions(sequenceExpression(element)));
+    const elements = splitActions(sequenceExpression(body));
+    return elements.length === 1 ? elements[0] : elements;
+}
+
+/**
+ * An expression with the `then` and `else` bodies inside it rewritten by `sequenceBody`.
+ *
+ * @param {unknown} node
+ * @returns {unknown}
+ */
+function sequenceExpression(node) {
+    if (Array.isArray(node)) return node.map(sequenceExpression);
+    if (!isPlainObject(node)) return node;
+    return Object.fromEntries(
+        Object.entries(node).map(
+            ([
+                key,
+                value,
+            ]) => [
+                key,
+                key === 'then' || key === 'else' ? sequenceBody(value) : sequenceExpression(value),
+            ],
+        ),
+    );
+}
+
+/**
+ * A webDetection detector with its `actions` rewritten by `sequenceBody`.
+ *
+ * @param {unknown} detector
+ * @returns {unknown}
+ */
+function sequenceDetector(detector) {
+    if (!isPlainObject(detector) || !('actions' in detector)) return detector;
+    return { ...detector, actions: sequenceBody(detector.actions) };
+}
+
+/**
+ * Rewrite each webDetection object holding several action keys, and each `define` of several names,
+ * into a sequence in config order: in the detectors, and in the values `conditionalChanges` patches
+ * add or replace under `/detectors`. Apple clients deliver object keys in hash order, and a sequence
+ * keeps the order config lists them in.
+ *
+ * Mutates the config in place.
+ *
+ * @param {object} config - a fully-merged platform config
+ */
+export function sequenceWebDetectionActions(config) {
+    const settings = config?.features?.webDetection?.settings;
+    if (!settings) {
+        return;
+    }
+    for (const group of Object.values(settings.detectors ?? {})) {
+        for (const id of Object.keys(group)) {
+            group[id] = sequenceDetector(group[id]);
+        }
+    }
+    for (const entry of settings.conditionalChanges ?? []) {
+        for (const operation of entry.patchSettings ?? []) {
+            if ((operation.op !== 'add' && operation.op !== 'replace') || typeof operation.path !== 'string') continue;
+            const segments = operation.path.split('/').slice(1);
+            if (segments[0] !== 'detectors') continue;
+            if (segments.length === 1) {
+                for (const group of Object.values(operation.value ?? {})) {
+                    for (const id of Object.keys(group)) group[id] = sequenceDetector(group[id]);
+                }
+            } else if (segments.length === 2) {
+                for (const id of Object.keys(operation.value ?? {})) operation.value[id] = sequenceDetector(operation.value[id]);
+            } else if (segments.length === 3) {
+                operation.value = sequenceDetector(operation.value);
+            } else if (
+                [
+                    'actions',
+                    'then',
+                    'else',
+                ].includes(segments[segments.length - 1])
+            ) {
+                operation.value = sequenceBody(operation.value);
+            } else {
+                operation.value = sequenceExpression(operation.value);
+            }
+        }
+    }
+}
+
 // The immediate trigger name each platform parses, where it differs from the authored `immediate`.
 // Apple renamed the trigger to `immediate_v2` when web events began de-duplicating at the hub, and
 // skips entries still carrying `immediate`.
