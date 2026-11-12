@@ -14,6 +14,7 @@ import {
     getBaseFeatureConfigs,
     readJsoncFile,
 } from './util.js';
+import { arrayWebDetectionBuckets } from './web-detection-util.js';
 
 import { OVERRIDE_DIR, GENERATED_DIR, LISTS_DIR, BROWSERS_SUBDIR, CURRENT_CONFIG_VERSION, UNPROTECTED_LIST_NAME } from './constants.js';
 
@@ -384,6 +385,8 @@ async function buildPlatforms() {
         collapseEventHubTelemetryPeriods(platformConfig);
         // Authors write `immediate`; emit the immediate trigger name this platform parses.
         renameEventHubImmediateTriggers(platformConfig, platform);
+        // Authors may write webDetection payload buckets as an object; clients read an array.
+        arrayWebDetectionBuckets(platformConfig);
 
         platformConfigs[platform] = platformConfig;
 
