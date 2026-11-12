@@ -1,4 +1,4 @@
-import { Feature, CSSInjectFeatureSettings, FeatureState } from '../feature';
+import { Feature, CSSInjectFeatureSettings, FeatureState, SubFeature } from '../feature';
 
 type StateObject = {
     state: FeatureState;
@@ -40,4 +40,18 @@ export type DuckPlayerSettings = CSSInjectFeatureSettings<{
     };
 }>;
 
-export type DuckPlayerFeature<VersionType> = Feature<DuckPlayerSettings, VersionType>;
+type SubFeatures<VersionType> = {
+    customError?: SubFeature<
+        VersionType,
+        {
+            signInRequiredSelector?: string;
+            youtubeErrorSelector?: string;
+        }
+    >;
+};
+
+export type DuckPlayerFeature<VersionType> = Feature<
+    DuckPlayerSettings,
+    VersionType,
+    SubFeatures<VersionType> & Record<string, SubFeature<VersionType>>
+>;
