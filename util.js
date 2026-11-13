@@ -317,6 +317,49 @@ function sequenceDetector(detector) {
 }
 
 /**
+ * A patch operation with the actions in its value rewritten by `sequenceBody`, as one operation or,
+ * for several actions appended to `actions`, one append per action.
+ *
+ * @param {any} operation
+ * @returns {any[]}
+ */
+function sequencePatch(operation) {
+    if ((operation.op !== 'add' && operation.op !== 'replace') || typeof operation.path !== 'string') {
+        return [
+            operation,
+        ];
+    }
+    const segments = operation.path.split('/').slice(1);
+    if (segments[0] === 'detectors') {
+        if (segments.length === 5 && segments[3] === 'actions' && segments[4] === '-') {
+            return splitActions(sequenceExpression(operation.value)).map((value) => ({ ...operation, value }));
+        }
+        if (segments.length === 1) {
+            for (const group of Object.values(operation.value ?? {})) {
+                for (const id of Object.keys(group)) group[id] = sequenceDetector(group[id]);
+            }
+        } else if (segments.length === 2) {
+            for (const id of Object.keys(operation.value ?? {})) operation.value[id] = sequenceDetector(operation.value[id]);
+        } else if (segments.length === 3) {
+            operation.value = sequenceDetector(operation.value);
+        } else if (
+            [
+                'actions',
+                'then',
+                'else',
+            ].includes(segments[segments.length - 1])
+        ) {
+            operation.value = sequenceBody(operation.value);
+        } else {
+            operation.value = sequenceExpression(operation.value);
+        }
+    }
+    return [
+        operation,
+    ];
+}
+
+/**
  * Rewrite each webDetection object holding several action keys, and each `define` of several names,
  * into a sequence in config order: in the detectors, and in the values `conditionalChanges` patches
  * add or replace under `/detectors`. Apple clients deliver object keys in hash order, and a sequence
@@ -337,30 +380,7 @@ export function sequenceWebDetectionActions(config) {
         }
     }
     for (const entry of settings.conditionalChanges ?? []) {
-        for (const operation of entry.patchSettings ?? []) {
-            if ((operation.op !== 'add' && operation.op !== 'replace') || typeof operation.path !== 'string') continue;
-            const segments = operation.path.split('/').slice(1);
-            if (segments[0] !== 'detectors') continue;
-            if (segments.length === 1) {
-                for (const group of Object.values(operation.value ?? {})) {
-                    for (const id of Object.keys(group)) group[id] = sequenceDetector(group[id]);
-                }
-            } else if (segments.length === 2) {
-                for (const id of Object.keys(operation.value ?? {})) operation.value[id] = sequenceDetector(operation.value[id]);
-            } else if (segments.length === 3) {
-                operation.value = sequenceDetector(operation.value);
-            } else if (
-                [
-                    'actions',
-                    'then',
-                    'else',
-                ].includes(segments[segments.length - 1])
-            ) {
-                operation.value = sequenceBody(operation.value);
-            } else {
-                operation.value = sequenceExpression(operation.value);
-            }
-        }
+        if (entry.patchSettings) entry.patchSettings = entry.patchSettings.flatMap(sequencePatch);
     }
 }
 

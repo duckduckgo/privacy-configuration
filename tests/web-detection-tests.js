@@ -419,9 +419,10 @@ describe('webDetection config tests', () => {
          *
          * @param {unknown} body
          * @param {string} path
+         * @param {boolean} [inBody] - false when `body` is an expression, which holds bodies only under `then` and `else`
          * @returns {string[]}
          */
-        const unsequenced = (body, path) => {
+        const unsequenced = (body, path, inBody = true) => {
             /** @type {string[]} */
             const found = [];
             /**
@@ -445,28 +446,143 @@ describe('webDetection config tests', () => {
                     visit(value, `${nodePath}.${key}`, BODY_KEYS.includes(key));
                 }
             };
-            visit(body, path, true);
+            visit(body, path, inBody);
             return found;
+        };
+
+        /**
+         * @param {Record<string, any>} group - detectors by id
+         * @param {string} path
+         * @returns {string[]}
+         */
+        const unsequencedGroup = (group, path) =>
+            Object.entries(group).flatMap(
+                ([
+                    id,
+                    detector,
+                ]) => unsequenced(detector?.actions, `${path}.${id}.actions`),
+            );
+
+        /**
+         * The unsequenced actions in a value a patch adds or replaces under `/detectors`, read as the
+         * build reads it from the patch path.
+         *
+         * @param {{ op: string, path: string, value?: any }} operation
+         * @param {string} path
+         * @returns {string[]}
+         */
+        const unsequencedPatch = ({ op, path: patchPath, value }, path) => {
+            if (op !== 'add' && op !== 'replace') return [];
+            const segments = patchPath.split('/').slice(1);
+            if (segments[0] !== 'detectors') return [];
+            if (segments.length === 1)
+                return Object.entries(value ?? {}).flatMap(
+                    ([
+                        group,
+                        entries,
+                    ]) => unsequencedGroup(entries, `${path}.${group}`),
+                );
+            if (segments.length === 2) return unsequencedGroup(value ?? {}, path);
+            if (segments.length === 3) return unsequenced(value?.actions, `${path}.actions`);
+            const last = segments[segments.length - 1];
+            const inBody = BODY_KEYS.includes(last) || last === 'actions' || (segments[3] === 'actions' && last === '-');
+            return unsequenced(value, path, inBody);
         };
 
         for (const config of latestConfigs.filter(({ name }) => /^v\d+\/(ios|macos)-config\.json$/.test(name))) {
             it(`${config.name} holds every action of this release's detectors in its own sequence element`, () => {
-                const detectors = config.body.features?.webDetection?.settings?.detectors ?? {};
-                const found = Object.entries(detectors).flatMap(
-                    ([
-                        group,
-                        entries,
-                    ]) =>
-                        Object.entries(/** @type {Record<string, any>} */ (entries)).flatMap(
-                            ([
-                                id,
-                                detector,
-                            ]) => unsequenced(detector.actions, `detectors.${group}.${id}.actions`),
+                const settings = config.body.features?.webDetection?.settings ?? {};
+                const found = [
+                    ...Object.entries(settings.detectors ?? {}).flatMap(
+                        ([
+                            group,
+                            entries,
+                        ]) => unsequencedGroup(entries, `detectors.${group}`),
+                    ),
+                    ...(settings.conditionalChanges ?? []).flatMap((/** @type {any} */ entry, /** @type {number} */ index) =>
+                        (entry.patchSettings ?? []).flatMap((/** @type {any} */ operation, /** @type {number} */ opIndex) =>
+                            unsequencedPatch(operation, `conditionalChanges[${index}].patchSettings[${opIndex}].value`),
                         ),
-                );
+                    ),
+                ];
                 expect(found, found.join('\n')).to.deep.equal([]);
             });
         }
+
+        it('finds unsequenced actions in a patch value (self-test)', () => {
+            expect(
+                unsequencedPatch(
+                    { op: 'add', path: '/detectors/g/x/actions/-', value: { fireEvent: { type: 'a' }, define: { b: 1 } } },
+                    'v',
+                ),
+            ).to.deep.equal([
+                'v',
+            ]);
+            expect(unsequencedPatch({ op: 'add', path: '/detectors/g/x/actions', value: { define: { a: 1, b: 2 } } }, 'v')).to.deep.equal([
+                'v',
+            ]);
+            expect(
+                unsequencedPatch({ op: 'replace', path: '/detectors/g/x', value: { actions: { fireEvent: {}, define: { a: 1 } } } }, 'v'),
+            ).to.deep.equal([
+                'v.actions',
+            ]);
+            expect(unsequencedPatch({ op: 'add', path: '/detectors/g/x/match', value: { define: { a: 1, b: 2 } } }, 'v')).to.deep.equal([]);
+            expect(unsequencedPatch({ op: 'remove', path: '/detectors/g/x/actions' }, 'v')).to.deep.equal([]);
+        });
+
+        it('splits several actions appended to a body into one append each (self-test)', () => {
+            const config = {
+                features: {
+                    webDetection: {
+                        settings: {
+                            detectors: {
+                                g: {
+                                    list: {
+                                        actions: [
+                                            { define: { a: 1 } },
+                                        ],
+                                    },
+                                },
+                            },
+                            conditionalChanges: [
+                                {
+                                    condition: { injectName: 'apple' },
+                                    patchSettings: [
+                                        {
+                                            op: 'add',
+                                            path: '/detectors/g/list/actions/-',
+                                            value: { fireEvent: { type: 'b' }, define: { c: 1, d: 2 } },
+                                        },
+                                        {
+                                            op: 'add',
+                                            path: '/detectors/g/list/actions/-',
+                                            value: { if: true, then: { fireEvent: {}, define: { e: 1 } } },
+                                        },
+                                    ],
+                                },
+                            ],
+                        },
+                    },
+                },
+            };
+            sequenceWebDetectionActions(config);
+            expect(config.features.webDetection.settings.conditionalChanges[0].patchSettings).to.deep.equal([
+                { op: 'add', path: '/detectors/g/list/actions/-', value: { fireEvent: { type: 'b' } } },
+                { op: 'add', path: '/detectors/g/list/actions/-', value: { define: { c: 1 } } },
+                { op: 'add', path: '/detectors/g/list/actions/-', value: { define: { d: 2 } } },
+                {
+                    op: 'add',
+                    path: '/detectors/g/list/actions/-',
+                    value: {
+                        if: true,
+                        then: [
+                            { fireEvent: {} },
+                            { define: { e: 1 } },
+                        ],
+                    },
+                },
+            ]);
+        });
 
         it('rewrites several action keys and a define of several names into a sequence (self-test)', () => {
             const config = {
