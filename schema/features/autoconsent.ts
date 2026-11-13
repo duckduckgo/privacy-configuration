@@ -4,6 +4,8 @@ export type AutoconsentFeature<VersionType> = Feature<
     {
         disabledCMPs: string[] | undefined;
         filterlistExceptions: string[];
+        /** Time budget in milliseconds for the heuristic popup search. */
+        heuristicPopupSearchTimeout?: number;
         enableIfMainWorldIsSupported:
             | {
                   state: FeatureState;
