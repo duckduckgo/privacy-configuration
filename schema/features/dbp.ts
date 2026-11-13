@@ -19,6 +19,12 @@ type SettingsType = {
 };
 
 type SubFeatures<VersionType> = {
+    userAssistance?: SubFeature<
+        VersionType,
+        {
+            enabledBrokers: string[];
+        }
+    >;
     challengeSolver?: SubFeature<
         VersionType,
         {
