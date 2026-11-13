@@ -16,9 +16,6 @@ When a feature transitions from `internal` to `enabled` (or from `enabled` to `i
 ### Parent and Subfeature Independence
 Parent features and their subfeatures are **not** co-dependent — a subfeature's state is evaluated independently of its parent. Because of this, they often require the exact same gating (e.g. matching `state`, `minSupportedVersion`, rollout targets). When transitioning a subfeature, ensure its gating is explicitly set rather than assuming it inherits from the parent.
 
-### Rollout Step Edits
-When a rollout percentage changes, the diff must **append** a new entry to `rollout.steps[]` rather than mutate an existing entry. Each step is a discrete event clients persist; modifying an existing `percent` is silently ignored for already-enrolled users. Flag any PR that edits or removes an existing step object instead of appending a new one. See [`docs/rollouts-and-experiments.md`](../docs/rollouts-and-experiments.md).
-
 ## Build Pipeline
 
 ### Feature-Specific Config Transforms
@@ -62,14 +59,6 @@ This is a **warning**, not a block.
 - **Schema**: `schema/features/experiment-metrics.ts` - Metric shape shared by experiment subfeatures
 - **Tests**: `tests/experiment-metrics-tests.js` - Placement, shape, naming, and event-production checks
 - Metrics live in `settings.metrics` of experiment subfeatures under `contentScopeExperiments`, `blockList`, and `contentBlocking` only.
-
-### No Metric Additions to Already-Enabled Experiments
-
-Clients snapshot or anchor metric state at enrollment, and users enroll as soon as an experiment is enabled. A metric **added** to an experiment subfeature that already has `state: enabled` and `cohorts` in the base branch will silently not fire for already-enrolled users on some platforms. Flag any PR that adds new keys to an existing experiment's `settings.metrics` (or adds a whole `metrics` object to it) unless the same PR is what enables the experiment. **Removing** a metric is always fine — deletion is the kill switch and must not be flagged.
-
-### Detector Changes Affecting Live Experiment Metrics
-
-If a PR modifies a `webDetection` detector (its `match`, `triggers`, or `actions.fireEvent`) whose `fireEvent.type` is referenced as the `event` of a metric in an experiment that is currently `enabled` with cohorts, warn on the PR: the change applies to both cohorts equally so the A/B comparison survives, but the metric's meaning steps mid-experiment and analysis needs to know the date. This is a **warning**, not a block — ask the author to confirm the experiment owner is aware.
 
 ## Custom User Agent / Client Hints Validation
 
