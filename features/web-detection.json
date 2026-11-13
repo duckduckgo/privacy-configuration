@@ -1295,6 +1295,113 @@
                             "type": "blockPage_title"
                         }
                     }
+                },
+                // prettier-ignore
+                "waf_assets": {
+                    "state": "disabled",
+                    "triggers": {"auto": {"state": "enabled", "when": {"intervalMs": [1000, 5000]}}},
+                    "match": {
+                        "if": {"element": {
+                            "selector": [
+                                "script[src*='_Inc\\61 psul\\61 _Resource']",
+                                "img[src*='_Inc\\61 psul\\61 _Resource']",
+                                "link[href*='cdn.sucuri.net']"
+                            ],
+                            "visibility": "any"
+                        }},
+                        "then": {"any": [
+                            {
+                                "text": {
+                                    "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                    "pattern": "\\S"
+                                },
+                                "using": "length",
+                                "is": {"lt": 2000}
+                            },
+                            {
+                                "only": {"api": {
+                                    "path": "performance.getEntriesByType",
+                                    "args": ["navigation"],
+                                    "field": "responseStatus"
+                                }},
+                                "is": {"gte": 400}
+                            }
+                        ]},
+                        "else": false
+                    },
+                    "actions": [
+                        {"define": {
+                            "bodyTextLength": {
+                                "text": {
+                                    "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                    "pattern": "\\S"
+                                },
+                                "using": "length"
+                            },
+                            "status": {"only": {"api": {
+                                "path": "performance.getEntriesByType",
+                                "args": ["navigation"],
+                                "field": "responseStatus"
+                            }}}
+                        }},
+                        {
+                            "if": {"ref": "status", "is": {"gte": 400}},
+                            "then": {
+                                "define": {"route": "errorStatus"},
+                                "breakageReportData": {"data": {
+                                    "route": {"value": "errorStatus"},
+                                    "bodyTextLength": {"value": {"ref": "bodyTextLength"}}
+                                }}
+                            },
+                            "else": {
+                                "if": {"ref": "bodyTextLength", "is": {"lt": 2000}},
+                                "then": {
+                                    "define": {"route": "littleText"},
+                                    "breakageReportData": {"data": {
+                                        "route": {"value": "littleText"},
+                                        "bodyTextLength": {"value": {"ref": "bodyTextLength"}}
+                                    }}
+                                }
+                            }
+                        },
+                        {
+                            "if": {"any": [{"ref": "route", "is": "errorStatus"}, {"ref": "bodyTextLength", "is": {"lt": 500}}]},
+                            "then": [
+                                {
+                                    "if": {"ref": "route", "is": "littleText"},
+                                    "then": {"fireEvent": {"type": "wafAssetsPage_littleText_text0to499"}}
+                                },
+                                {
+                                    "if": {"all": [
+                                        {"ref": "route", "is": "errorStatus"},
+                                        {"ref": "bodyTextLength", "is": {"gte": 0, "lt": 500}}
+                                    ]},
+                                    "then": {"fireEvent": {"type": "wafAssetsPage_errorStatus_text0to499"}}
+                                },
+                                {
+                                    "if": {"all": [
+                                        {"ref": "route", "is": "errorStatus"},
+                                        {"ref": "bodyTextLength", "is": {"gte": 500, "lt": 1000}}
+                                    ]},
+                                    "then": {"fireEvent": {"type": "wafAssetsPage_errorStatus_text500to999"}}
+                                },
+                                {
+                                    "if": {"all": [
+                                        {"ref": "route", "is": "errorStatus"},
+                                        {"ref": "bodyTextLength", "is": {"gte": 1000, "lt": 2000}}
+                                    ]},
+                                    "then": {"fireEvent": {"type": "wafAssetsPage_errorStatus_text1000to1999"}}
+                                },
+                                {
+                                    "if": {"all": [
+                                        {"ref": "route", "is": "errorStatus"},
+                                        {"ref": "bodyTextLength", "is": {"gte": 2000}}
+                                    ]},
+                                    "then": {"fireEvent": {"type": "wafAssetsPage_errorStatus_text2000Plus"}}
+                                }
+                            ]
+                        }
+                    ]
                 }
             },
             "errorPage": {
@@ -1330,6 +1437,38 @@
                             "type": "errorPage_soft404"
                         }
                     }
+                },
+                // prettier-ignore
+                "soft404_phrases_count": {
+                    "state": "disabled",
+                    "triggers": {"auto": {"state": "enabled", "when": {"intervalMs": [1000, 5000]}}},
+                    "match": {
+                        "text": {
+                            "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                            "pattern": ["access denied", "page not found", "404 not found"]
+                        },
+                        "using": "length",
+                        "is": {"gte": 1}
+                    },
+                    "actions": [
+                        {"define": {"keywordCount": {
+                            "text": {
+                                "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                "pattern": ["access denied", "page not found", "404 not found"]
+                            },
+                            "using": "length"
+                        }}},
+                        {"breakageReportData": {"data": {"keywordCount": {"value": {"ref": "keywordCount"}}}}},
+                        {"if": {"ref": "keywordCount", "is": 1}, "then": {"fireEvent": {"type": "errorPhraseCount_count1"}}},
+                        {
+                            "if": {"ref": "keywordCount", "is": {"gte": 2, "lt": 5}},
+                            "then": {"fireEvent": {"type": "errorPhraseCount_count2to4"}}
+                        },
+                        {
+                            "if": {"ref": "keywordCount", "is": {"gte": 5}},
+                            "then": {"fireEvent": {"type": "errorPhraseCount_count5Plus"}}
+                        }
+                    ]
                 },
                 "title_unavailable_en": {
                     "state": "disabled",
@@ -1476,6 +1615,916 @@
                         "fireEvent": {
                             "type": "blankPage_empty"
                         }
+                    }
+                },
+                // The load event ended and the page painted no text, image, non-white canvas or SVG
+                // prettier-ignore
+                "no_contentful_paint": {
+                    "state": "disabled",
+                    // Reads at 5 s and 15 s
+                    "triggers": {"auto": {"state": "enabled", "when": {"intervalMs": [5000, 15000]}}},
+                    "match": {"any": [
+                        // Settled: the engine records no paint timing, or the page has been hidden since navigation start.
+                        // The if in actions does not hold, so the detector is done with nothing written
+                        {"none": [{"api": {"path": "PerformanceObserver.supportedEntryTypes.includes", "args": ["paint"]}}]},
+                        {
+                            "api": {"path": "performance.getEntriesByName", "args": ["hidden", "visibility-state"]},
+                            "using": "length",
+                            "is": {"gt": 0}
+                        },
+                        // Settled: the page painted content
+                        {
+                            "api": {"path": "performance.getEntriesByName", "args": ["first-contentful-paint", "paint"]},
+                            "using": "length",
+                            "is": {"gt": 0}
+                        },
+                        // Wait: the page is visible, and the load event ended 3 s before this read
+                        {"all": [
+                            {"none": [{"api": "document.hidden"}]},
+                            {"all": [
+                                {
+                                    "only": {"api": {
+                                        "path": "performance.getEntriesByType",
+                                        "args": ["navigation"],
+                                        "field": "loadEventEnd"
+                                    }},
+                                    "is": {"gt": 0}
+                                },
+                                {
+                                    "api": {"path": "performance.now", "args": []},
+                                    "is": {"gte": {"sum": [
+                                        {"only": {"api": {
+                                            "path": "performance.getEntriesByType",
+                                            "args": ["navigation"],
+                                            "field": "loadEventEnd"
+                                        }}},
+                                        3000
+                                    ]}}
+                                }
+                            ]}
+                        ]}
+                    ]},
+                    "actions": {
+                        // Detected: paint timing recorded, never hidden, and no contentful paint, so match held on the wait
+                        "if": {"all": [
+                            {"api": {"path": "PerformanceObserver.supportedEntryTypes.includes", "args": ["paint"]}},
+                            {
+                                "api": {"path": "performance.getEntriesByName", "args": ["hidden", "visibility-state"]},
+                                "using": "length",
+                                "is": 0
+                            },
+                            {
+                                "api": {"path": "performance.getEntriesByName", "args": ["first-contentful-paint", "paint"]},
+                                "using": "length",
+                                "is": 0
+                            }
+                        ]},
+                        "then": [
+                            {"define": {
+                                // Navigation value
+                                "loadEventEnd": {"only": {"api": {
+                                    "path": "performance.getEntriesByType",
+                                    "args": ["navigation"],
+                                    "field": "loadEventEnd"
+                                }}},
+                                // A first paint without a contentful one painted only backgrounds or borders
+                                "firstPaints": {
+                                    "api": {"path": "performance.getEntriesByName", "args": ["first-paint", "paint"]},
+                                    "using": "length"
+                                },
+                                // Iframes paint in their own documents
+                                "visibleIframes": {"element": {"selector": "iframe", "visibility": "visible"}, "using": "length"}
+                            }},
+                            {"breakageReportData": {"data": {
+                                "firstPaint": {"value": {"ref": "firstPaints"}},
+                                "visibleIframes": {"value": {"ref": "visibleIframes"}}
+                            }}},
+                            // Threshold: no visible iframe
+                            {
+                                "if": {"ref": "visibleIframes", "is": 0},
+                                "then": [
+                                    // Events: the load end, and whether anything painted
+                                    {
+                                        "if": {"ref": "loadEventEnd", "is": {"gt": 0, "lt": 3000}},
+                                        "then": {"fireEvent": {"type": "noContentfulPaint_load0to3s"}}
+                                    },
+                                    {
+                                        "if": {"ref": "loadEventEnd", "is": {"gte": 3000, "lt": 8000}},
+                                        "then": {"fireEvent": {"type": "noContentfulPaint_load3to8s"}}
+                                    },
+                                    {
+                                        "if": {"ref": "loadEventEnd", "is": {"gte": 8000}},
+                                        "then": {"fireEvent": {"type": "noContentfulPaint_load8sPlus"}}
+                                    },
+                                    {
+                                        "if": {"ref": "firstPaints", "is": 0},
+                                        "then": {"fireEvent": {"type": "noContentfulPaint_firstPaintNone"}}
+                                    },
+                                    {
+                                        "if": {"ref": "firstPaints", "is": {"gte": 1}},
+                                        "then": {"fireEvent": {"type": "noContentfulPaint_firstPaintPainted"}}
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                },
+                // Measurement: the largest number of elements in the document over the first 4 s. It fires no event
+                // prettier-ignore
+                "page_size": {
+                    "state": "disabled",
+                    // Reads every 500 ms up to 4 s
+                    "triggers": {"auto": {
+                        "state": "enabled",
+                        "when": {"intervalMs": [500, 1000, 1500, 2000, 2500, 3000, 3500, 4000]}
+                    }},
+                    "actions": [
+                        // The element count at this read, and the largest so far, 0 before the first read
+                        {"define": {"elementCount": {
+                            "api": {"path": "document.getElementsByTagName", "args": ["*"]},
+                            "using": "length"
+                        }}},
+                        {
+                            "if": {"ref": "this.maxElements", "is": {"type": "undefined"}},
+                            "then": {"define": {"this.maxElements": 0}}
+                        },
+                        {"define": {"this.maxElements": {"api": {
+                            "path": "Math.max",
+                            "args": [{"ref": "this.maxElements"}, {"ref": "elementCount"}]
+                        }}}},
+                        // Measurement: the element count at this read and the largest so far
+                        {"breakageReportData": {"data": {
+                            "elementCount": {"value": {"ref": "elementCount"}},
+                            "maxElementCount": {"value": {"ref": "this.maxElements"}}
+                        }}}
+                    ]
+                }
+            },
+            "pageLoad": {
+                // prettier-ignore
+                "load_time": {
+                    "state": "disabled",
+                    "triggers": {
+                        "auto": {"state": "enabled", "when": {"intervalMs": [3000, 8000, 15000]}},
+                        // pageLoad.navigation writes this load's values to breakage reports
+                        "breakageReport": {"state": "disabled"}
+                    },
+                    "actions": {
+                        "if": {"none": [{"ref": "this.finished", "is": true}]},
+                        "then": [
+                            {"define": {
+                                "loadEventEnd": {"only": {"api": {
+                                    "path": "performance.getEntriesByType",
+                                    "args": ["navigation"],
+                                    "field": "loadEventEnd"
+                                }}},
+                                "elapsed": {"api": {"path": "performance.now", "args": []}},
+                                "navigationType": {"only": {"api": {
+                                    "path": "performance.getEntriesByType",
+                                    "args": ["navigation"],
+                                    "field": "type"
+                                }}},
+                                "hiddenDuringLoad": {
+                                    "if": {"api": {
+                                        "path": "PerformanceObserver.supportedEntryTypes.includes",
+                                        "args": ["visibility-state"]
+                                    }},
+                                    "then": {
+                                        "api": {
+                                            "path": "performance.getEntriesByName",
+                                            "args": ["hidden", "visibility-state"],
+                                            "where": {"startTime": {"lt": {
+                                                "if": {"ref": "loadEventEnd", "is": 0},
+                                                "then": {"ref": "elapsed"},
+                                                "else": {"ref": "loadEventEnd"}
+                                            }}}
+                                        },
+                                        "using": "length",
+                                        "is": {"gt": 0}
+                                    },
+                                    "else": "unsupported"
+                                }
+                            }},
+                            {
+                                "if": {"all": [
+                                    {"any": [{"ref": "loadEventEnd", "is": {"gt": 0}}, {"ref": "elapsed", "is": {"gte": 15000}}]},
+                                    {"none": [
+                                        {"ref": "loadEventEnd", "is": {"gt": 0, "lt": 8000}},
+                                        {"ref": "hiddenDuringLoad", "is": true},
+                                        {"all": [{"ref": "hiddenDuringLoad", "is": "unsupported"}, {"api": "document.hidden"}]},
+                                        {
+                                            "api": {
+                                                "path": "performance.getEntriesByName",
+                                                "args": ["first-contentful-paint", "paint"],
+                                                "where": {"startTime": {"lt": 3000}}
+                                            },
+                                            "using": "length",
+                                            "is": {"gt": 0}
+                                        }
+                                    ]},
+                                    {"none": [{"ref": "this.sent", "is": true}]}
+                                ]},
+                                "then": [
+                                    {
+                                        "if": {"ref": "loadEventEnd", "is": 0},
+                                        "then": {"fireEvent": {"type": "pageLoadTime_loadLoadingAfter15s"}}
+                                    },
+                                    {
+                                        "if": {"ref": "loadEventEnd", "is": {"gte": 8000, "lt": 15000}},
+                                        "then": {"fireEvent": {"type": "pageLoadTime_load8to15s"}}
+                                    },
+                                    {
+                                        "if": {"ref": "loadEventEnd", "is": {"gte": 15000}},
+                                        "then": {"fireEvent": {"type": "pageLoadTime_load15sPlus"}}
+                                    },
+                                    {
+                                        "if": {"all": [
+                                            {"ref": "navigationType", "is": "reload"},
+                                            {"ref": "loadEventEnd", "is": 0}
+                                        ]},
+                                        "then": {"fireEvent": {"type": "pageLoadTime_slowReloadLoadingAfter15s"}}
+                                    },
+                                    {
+                                        "if": {"all": [
+                                            {"ref": "navigationType", "is": "reload"},
+                                            {"ref": "loadEventEnd", "is": {"gte": 8000, "lt": 15000}}
+                                        ]},
+                                        "then": {"fireEvent": {"type": "pageLoadTime_slowReload8to15s"}}
+                                    },
+                                    {
+                                        "if": {"all": [
+                                            {"ref": "navigationType", "is": "reload"},
+                                            {"ref": "loadEventEnd", "is": {"gte": 15000}}
+                                        ]},
+                                        "then": {"fireEvent": {"type": "pageLoadTime_slowReload15sPlus"}}
+                                    },
+                                    {"define": {"this.sent": true}}
+                                ]
+                            },
+                            {"define": {"this.finished": {"ref": "loadEventEnd", "is": {"gt": 0}}}}
+                        ]
+                    }
+                },
+                // prettier-ignore
+                "navigation": {
+                    "state": "disabled",
+                    "triggers": {"breakageReport": {"state": "enabled", "runConditions": {"context": {"top": true}}}},
+                    "actions": [
+                        {"define": {
+                            "loadEventEnd": {"only": {"api": {
+                                "path": "performance.getEntriesByType",
+                                "args": ["navigation"],
+                                "field": "loadEventEnd"
+                            }}},
+                            "elapsed": {"api": {"path": "performance.now", "args": []}},
+                            "navigationType": {"only": {"api": {
+                                "path": "performance.getEntriesByType",
+                                "args": ["navigation"],
+                                "field": "type"
+                            }}},
+                            "hiddenDuringLoad": {
+                                "if": {"api": {
+                                    "path": "PerformanceObserver.supportedEntryTypes.includes",
+                                    "args": ["visibility-state"]
+                                }},
+                                "then": {
+                                    "api": {
+                                        "path": "performance.getEntriesByName",
+                                        "args": ["hidden", "visibility-state"],
+                                        "where": {"startTime": {"lt": {
+                                            "if": {"ref": "loadEventEnd", "is": 0},
+                                            "then": {"ref": "elapsed"},
+                                            "else": {"ref": "loadEventEnd"}
+                                        }}}
+                                    },
+                                    "using": "length",
+                                    "is": {"gt": 0}
+                                },
+                                "else": "unsupported"
+                            },
+                            "bodySize": {"only": {"api": {
+                                "path": "performance.getEntriesByType",
+                                "args": ["navigation"],
+                                "field": "decodedBodySize"
+                            }}}
+                        }},
+                        {"breakageReportData": {"data": {
+                            "loadEventEnd": {"value": {"ref": "loadEventEnd"}},
+                            "elapsed": {"value": {"ref": "elapsed"}},
+                            "navigationType": {"value": {"ref": "navigationType"}},
+                            "hiddenDuringLoad": {"value": {"ref": "hiddenDuringLoad"}},
+                            "bodySize": {"value": {"ref": "bodySize"}}
+                        }}}
+                    ]
+                }
+            },
+            "styleBreakage": {
+                // prettier-ignore
+                "missing_styles_or_fonts": {
+                    "state": "disabled",
+                    "triggers": {"auto": {"state": "enabled", "when": {"intervalMs": [5000]}}},
+                    "match": {"any": [
+                        {
+                            "api": {
+                                "path": "performance.getEntriesByType",
+                                "args": ["resource"],
+                                "where": {"initiatorType": "link", "responseStatus": {"gte": 400}}
+                            },
+                            "using": "length",
+                            "is": {"gt": 0}
+                        },
+                        {"api": {"path": "document.fonts", "where": {"status": "error"}}, "using": "length", "is": {"gt": 0}},
+                        {"element": {"selector": "link[rel~='stylesheet']:not([disabled])", "where": {"sheet": {"type": "null"}}}}
+                    ]},
+                    "actions": [
+                        {"define": {
+                            "failedStylesheets": {
+                                "if": {"api": {
+                                    "path": "Reflect.has",
+                                    "args": [{"api": "PerformanceResourceTiming.prototype"}, "responseStatus"]
+                                }},
+                                "then": {
+                                    "api": {
+                                        "path": "performance.getEntriesByType",
+                                        "args": ["resource"],
+                                        "where": {"initiatorType": "link", "responseStatus": {"gte": 400}}
+                                    },
+                                    "using": "length"
+                                },
+                                "else": "unsupported"
+                            },
+                            "failedFontFaces": {
+                                "api": {"path": "document.fonts", "where": {"status": "error"}},
+                                "using": "length"
+                            },
+                            "unappliedStylesheets": {
+                                "element": {
+                                    "selector": "link[rel~='stylesheet']:not([disabled])",
+                                    "where": {"sheet": {"type": "null"}}
+                                },
+                                "using": "length"
+                            },
+                            "loadEventEnd": {"only": {"api": {
+                                "path": "performance.getEntriesByType",
+                                "args": ["navigation"],
+                                "field": "loadEventEnd"
+                            }}}
+                        }},
+                        {"breakageReportData": {"data": {
+                            "failedStylesheets": {"value": {"ref": "failedStylesheets"}},
+                            "failedFontFaces": {"value": {"ref": "failedFontFaces"}},
+                            "unappliedStylesheets": {"value": {"ref": "unappliedStylesheets"}}
+                        }}},
+                        {
+                            "if": {"all": [
+                                {"ref": "unappliedStylesheets", "is": {"gte": 1}},
+                                {"ref": "loadEventEnd", "is": {"gt": 0}}
+                            ]},
+                            "then": [
+                                {
+                                    "if": {"ref": "unappliedStylesheets", "is": 1},
+                                    "then": {"fireEvent": {"type": "stylesMissing_sheets1"}}
+                                },
+                                {
+                                    "if": {"ref": "unappliedStylesheets", "is": {"gte": 2, "lt": 5}},
+                                    "then": {"fireEvent": {"type": "stylesMissing_sheets2to4"}}
+                                },
+                                {
+                                    "if": {"ref": "unappliedStylesheets", "is": {"gte": 5}},
+                                    "then": {"fireEvent": {"type": "stylesMissing_sheets5Plus"}}
+                                }
+                            ]
+                        }
+                    ]
+                }
+            },
+            "imageBreakage": {
+                // prettier-ignore
+                "broken_images": {
+                    "state": "disabled",
+                    "triggers": {"auto": {"state": "enabled", "when": {"intervalMs": [5000]}}},
+                    "match": {
+                        "sum": [
+                            {
+                                "element": {
+                                    "selector": "img:not([width='0']):not([width='1']):not([height='0']):not([height='1'])",
+                                    "where": {"complete": true, "naturalWidth": 0, "currentSrc.length": {"gt": 0}}
+                                },
+                                "using": "length"
+                            },
+                            {
+                                "element": {
+                                    "selector": "img:is([width='0'], [width='1'], [height='0'], [height='1'])",
+                                    "where": {"complete": true, "naturalWidth": 0, "currentSrc.length": {"gt": 0}}
+                                },
+                                "using": "length"
+                            }
+                        ],
+                        "is": {"gte": 1}
+                    },
+                    "actions": [
+                        {"define": {
+                            "brokenImages": {
+                                "element": {
+                                    "selector": "img:not([width='0']):not([width='1']):not([height='0']):not([height='1'])",
+                                    "where": {"complete": true, "naturalWidth": 0, "currentSrc.length": {"gt": 0}}
+                                },
+                                "using": "length"
+                            },
+                            "trackingPixels": {
+                                "element": {
+                                    "selector": "img:is([width='0'], [width='1'], [height='0'], [height='1'])",
+                                    "where": {"complete": true, "naturalWidth": 0, "currentSrc.length": {"gt": 0}}
+                                },
+                                "using": "length"
+                            },
+                            "images": {
+                                "element": {
+                                    "selector": "img:not([width='0']):not([width='1']):not([height='0']):not([height='1'])"
+                                },
+                                "using": "length"
+                            },
+                            "brokenShare": {"div": [{"ref": "brokenImages"}, {"ref": "images"}]},
+                            "visibleBrokenImages": {
+                                "element": {
+                                    "selector": "img:not([width='0']):not([width='1']):not([height='0']):not([height='1'])",
+                                    "visibility": "visible",
+                                    "where": {
+                                        "complete": true,
+                                        "naturalWidth": 0,
+                                        "currentSrc.length": {"gt": 0},
+                                        "width": {"gte": 16},
+                                        "height": {"gte": 16}
+                                    }
+                                },
+                                "using": "length"
+                            }
+                        }},
+                        {"breakageReportData": {"data": {
+                            "brokenImages": {"value": {"ref": "brokenImages"}},
+                            "trackingPixels": {"value": {"ref": "trackingPixels"}},
+                            "images": {"value": {"ref": "images"}},
+                            "visibleBrokenImages": {"value": {"ref": "visibleBrokenImages"}}
+                        }}},
+                        {
+                            "if": {"any": [
+                                {"ref": "visibleBrokenImages", "is": {"gte": 2}},
+                                {"all": [{"ref": "visibleBrokenImages", "is": 1}, {"ref": "brokenShare", "is": {"gte": 0.1}}]}
+                            ]},
+                            "then": [
+                                {
+                                    "if": {"ref": "visibleBrokenImages", "is": 1},
+                                    "then": {"fireEvent": {"type": "brokenImages_count1"}}
+                                },
+                                {
+                                    "if": {"ref": "visibleBrokenImages", "is": {"gte": 2, "lt": 5}},
+                                    "then": {"fireEvent": {"type": "brokenImages_count2to4"}}
+                                },
+                                {
+                                    "if": {"ref": "visibleBrokenImages", "is": {"gte": 5, "lt": 10}},
+                                    "then": {"fireEvent": {"type": "brokenImages_count5to9"}}
+                                },
+                                {
+                                    "if": {"ref": "visibleBrokenImages", "is": {"gte": 10}},
+                                    "then": {"fireEvent": {"type": "brokenImages_count10Plus"}}
+                                },
+                                {
+                                    "if": {"ref": "brokenShare", "is": {"gte": 0.1, "lt": 0.25}},
+                                    "then": {"fireEvent": {"type": "brokenImages_share10to25"}}
+                                },
+                                {
+                                    "if": {"ref": "brokenShare", "is": {"gte": 0.25, "lt": 0.5}},
+                                    "then": {"fireEvent": {"type": "brokenImages_share25to50"}}
+                                },
+                                {
+                                    "if": {"ref": "brokenShare", "is": {"gte": 0.5, "lt": 0.9}},
+                                    "then": {"fireEvent": {"type": "brokenImages_share50to90"}}
+                                },
+                                {
+                                    "if": {"ref": "brokenShare", "is": {"gte": 0.9}},
+                                    "then": {"fireEvent": {"type": "brokenImages_share90Plus"}}
+                                }
+                            ]
+                        }
+                    ]
+                }
+            },
+            "consent": {
+                // Consent words inside a fixed or sticky element. Breakage reports only
+                // prettier-ignore
+                "fixed_banner": {
+                    "state": "disabled",
+                    // Reads at 3 s and 10 s, and stops once the condition holds
+                    "triggers": {"auto": {"state": "enabled", "when": {"intervalMs": [3000, 10000]}}},
+                    // Detected: a visible fixed or sticky container holding three consent words or more
+                    "match": {"element": {
+                        "selector": ["div", "section", "aside", "dialog", "form"],
+                        "where": {
+                            // Positioned fixed or sticky. The text reads and checkVisibility run only on positioned elements
+                            "if": {
+                                "api": {"path": "getComputedStyle", "args": [{"self": {}}]},
+                                "using": "position",
+                                "is": {"in": ["fixed", "sticky"]}
+                            },
+                            "then": {"all": [
+                                {
+                                    "text": {
+                                        "pattern": [
+                                            "cookies",
+                                            "privacy",
+                                            "policy",
+                                            "consent",
+                                            "accept",
+                                            "agree",
+                                            "personalized",
+                                            "legitimate interest"
+                                        ],
+                                        "root": {"self": {}}
+                                    },
+                                    "using": "length",
+                                    "is": {"gte": 3}
+                                },
+                                {"self": {"path": "checkVisibility", "args": []}, "is": true}
+                            ]},
+                            "else": false
+                        }
+                    }},
+                    "actions": [
+                        {"define": {
+                            // The containers match selects
+                            "consentContainers": {"element": {
+                                "selector": ["div", "section", "aside", "dialog", "form"],
+                                "where": {
+                                    "if": {
+                                        "api": {"path": "getComputedStyle", "args": [{"self": {}}]},
+                                        "using": "position",
+                                        "is": {"in": ["fixed", "sticky"]}
+                                    },
+                                    "then": {"all": [
+                                        {
+                                            "text": {
+                                                "pattern": [
+                                                    "cookies",
+                                                    "privacy",
+                                                    "policy",
+                                                    "consent",
+                                                    "accept",
+                                                    "agree",
+                                                    "personalized",
+                                                    "legitimate interest"
+                                                ],
+                                                "root": {"self": {}}
+                                            },
+                                            "using": "length",
+                                            "is": {"gte": 3}
+                                        },
+                                        {"self": {"path": "checkVisibility", "args": []}, "is": true}
+                                    ]},
+                                    "else": false
+                                }
+                            }},
+                            // The share of the viewport the largest container covers
+                            "viewportCover": {"div": [
+                                {"api": {
+                                    "path": "Math.max.apply",
+                                    "args": [
+                                        null,
+                                        {
+                                            "ref": "consentContainers",
+                                            "using": {"self": {"field": {"mul": [
+                                                {"self": {"path": "getBoundingClientRect", "args": [], "field": "width"}},
+                                                {"self": {"path": "getBoundingClientRect", "args": [], "field": "height"}}
+                                            ]}}}
+                                        }
+                                    ]
+                                }},
+                                {"mul": [{"api": "innerWidth"}, {"api": "innerHeight"}]}
+                            ]}
+                        }},
+                        // Breakage reports only: a banner is part of a working page. viewportCover separates a banner from a wall over the viewport
+                        {"breakageReportData": {"data": {
+                            "containers": {"value": {"ref": "consentContainers", "using": "length"}},
+                            "viewportCover": {"value": {"ref": "viewportCover"}}
+                        }}}
+                    ]
+                }
+            },
+            "paywalls": {
+                // A subscription word and a price inside one fixed or sticky element. Breakage reports only
+                // prettier-ignore
+                "accept_or_pay_fixed": {
+                    "state": "disabled",
+                    // Reads at 3 s and 10 s, and stops once the condition holds
+                    "triggers": {"auto": {"state": "enabled", "when": {"intervalMs": [3000, 10000]}}},
+                    // Detected: a visible fixed or sticky container holding a subscription word and a price
+                    "match": {"element": {
+                        "selector": ["div", "section", "aside", "dialog", "form"],
+                        "where": {
+                            // Positioned fixed or sticky. The text reads and checkVisibility run only on positioned elements
+                            "if": {
+                                "api": {"path": "getComputedStyle", "args": [{"self": {}}]},
+                                "using": "position",
+                                "is": {"in": ["fixed", "sticky"]}
+                            },
+                            "then": {"all": [
+                                {"text": {
+                                    "pattern": ["\\babo\\b", "abonnent", "abbonamento", "abonn[eé]", "ad-free", "subscribe"],
+                                    "root": {"self": {}}
+                                }},
+                                {"text": {
+                                    "pattern": [
+                                        "(eur|usd|chf|aud|gbp|brl|cny|zar|rs)\\s?\\d+([.,]\\d{2})?",
+                                        "[€$£₹]\\s?\\d+([.,]\\d{2})?",
+                                        "\\d+([.,]\\d{2})?\\s?(eur|usd|chf|aud|gbp|brl|cny|zar|[€$£₹])"
+                                    ],
+                                    "root": {"self": {}}
+                                }},
+                                {"self": {"path": "checkVisibility", "args": []}, "is": true}
+                            ]},
+                            "else": false
+                        }
+                    }},
+                    "actions": [
+                        // The containers match selects
+                        {"define": {"payContainers": {"element": {
+                            "selector": ["div", "section", "aside", "dialog", "form"],
+                            "where": {
+                                "if": {
+                                    "api": {"path": "getComputedStyle", "args": [{"self": {}}]},
+                                    "using": "position",
+                                    "is": {"in": ["fixed", "sticky"]}
+                                },
+                                "then": {"all": [
+                                    {"text": {
+                                        "pattern": ["\\babo\\b", "abonnent", "abbonamento", "abonn[eé]", "ad-free", "subscribe"],
+                                        "root": {"self": {}}
+                                    }},
+                                    {"text": {
+                                        "pattern": [
+                                            "(eur|usd|chf|aud|gbp|brl|cny|zar|rs)\\s?\\d+([.,]\\d{2})?",
+                                            "[€$£₹]\\s?\\d+([.,]\\d{2})?",
+                                            "\\d+([.,]\\d{2})?\\s?(eur|usd|chf|aud|gbp|brl|cny|zar|[€$£₹])"
+                                        ],
+                                        "root": {"self": {}}
+                                    }},
+                                    {"self": {"path": "checkVisibility", "args": []}, "is": true}
+                                ]},
+                                "else": false
+                            }
+                        }}}},
+                        {
+                            // The root guard for consentWords
+                            "if": {"ref": "payContainers"},
+                            "then": [
+                                // The consent words inside the containers: the choice an accept-or-pay wall offers beside paying
+                                {"define": {"consentWords": {
+                                    "text": {
+                                        "pattern": [
+                                            "accept",
+                                            "agree",
+                                            "consent",
+                                            "reject",
+                                            "akzeptier",
+                                            "zustimm",
+                                            "einwillig",
+                                            "accett",
+                                            "acconsent"
+                                        ],
+                                        "root": {"ref": "payContainers"}
+                                    },
+                                    "using": "length"
+                                }}},
+                                // Breakage reports only
+                                {"breakageReportData": {"data": {
+                                    "containers": {"value": {"ref": "payContainers", "using": "length"}},
+                                    "consentWords": {"value": {"ref": "consentWords"}}
+                                }}}
+                            ]
+                        }
+                    ]
+                }
+            },
+            "unresponsive": {
+                // The time the page's first click, tap or key press waited for its handlers
+                // prettier-ignore
+                "first_input_delay": {
+                    "state": "disabled",
+                    // Reads at 5 s, 15 s and 30 s
+                    "triggers": {"auto": {"state": "enabled", "when": {"intervalMs": [5000, 15000, 30000]}}},
+                    // Wait: the page's first input, or an engine that records no first-input entry. The detector is done once either holds
+                    "match": {"any": [
+                        {"none": [
+                            {"api": {"path": "PerformanceObserver.supportedEntryTypes.includes", "args": ["first-input"]}}
+                        ]},
+                        {
+                            "api": {"path": "performance.getEntriesByType", "args": ["first-input"]},
+                            "using": "length",
+                            "is": {"gt": 0}
+                        }
+                    ]},
+                    "actions": {
+                        // The engine records first-input entries: match held on the page's first input
+                        "if": {
+                            "api": {"path": "performance.getEntriesByType", "args": ["first-input"]},
+                            "using": "length",
+                            "is": {"gt": 0}
+                        },
+                        "then": [
+                            // The entry, the time its handlers waited, and the time from the input to the next paint after they ran
+                            {"define": {
+                                "firstInput": {"only": {"api": {
+                                    "path": "performance.getEntriesByType",
+                                    "args": ["first-input"]
+                                }}},
+                                "inputDelay": {
+                                    "ref": "firstInput",
+                                    "using": {"sum": [{"self": "processingStart"}, {"mul": [{"self": "startTime"}, -1]}]}
+                                },
+                                "duration": {"ref": "firstInput", "using": "duration"}
+                            }},
+                            // Detected: the input's handlers started 300 ms or more after it, the boundary of the published poor band.
+                            // A first input answered within it ends the detector with no breakage entry
+                            {
+                                "if": {"ref": "inputDelay", "is": {"gte": 300}},
+                                "then": [
+                                    {"breakageReportData": {"data": {
+                                        "inputDelay": {"value": {"ref": "inputDelay"}},
+                                        "duration": {"value": {"ref": "duration"}}
+                                    }}},
+                                    // Events: the delay and the duration
+                                    {
+                                        "if": {"ref": "inputDelay", "is": {"gte": 300, "lt": 1000}},
+                                        "then": {"fireEvent": {"type": "slowFirstInput_delay300to999"}}
+                                    },
+                                    {
+                                        "if": {"ref": "inputDelay", "is": {"gte": 1000, "lt": 3000}},
+                                        "then": {"fireEvent": {"type": "slowFirstInput_delay1to3s"}}
+                                    },
+                                    {
+                                        "if": {"ref": "inputDelay", "is": {"gte": 3000}},
+                                        "then": {"fireEvent": {"type": "slowFirstInput_delay3sPlus"}}
+                                    },
+                                    {
+                                        "if": {"ref": "duration", "is": {"lt": 500}},
+                                        "then": {"fireEvent": {"type": "slowFirstInput_durationUnder500"}}
+                                    },
+                                    {
+                                        "if": {"ref": "duration", "is": {"gte": 500, "lt": 1000}},
+                                        "then": {"fireEvent": {"type": "slowFirstInput_duration500to999"}}
+                                    },
+                                    {
+                                        "if": {"ref": "duration", "is": {"gte": 1000, "lt": 3000}},
+                                        "then": {"fireEvent": {"type": "slowFirstInput_duration1to3s"}}
+                                    },
+                                    {
+                                        "if": {"ref": "duration", "is": {"gte": 3000}},
+                                        "then": {"fireEvent": {"type": "slowFirstInput_duration3sPlus"}}
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            },
+            "resourceBreakage": {
+                // Subresources that received an error status, counted by what started them. Chromium only
+                // prettier-ignore
+                "failed_subresources": {
+                    "state": "disabled",
+                    // One read, 5 s after the detector starts
+                    "triggers": {"auto": {"state": "enabled", "when": {"intervalMs": [5000]}}},
+                    // Detected: a subresource received a 4xx or 5xx status. On an engine that reports no responseStatus,
+                    // match holds and actions writes nothing. A cross-origin load without CORS reports 0, and is not counted
+                    "match": {
+                        "if": {"api": {
+                            "path": "Reflect.has",
+                            "args": [{"api": "PerformanceResourceTiming.prototype"}, "responseStatus"]
+                        }},
+                        "then": {
+                            "api": {
+                                "path": "performance.getEntriesByType",
+                                "args": ["resource"],
+                                "where": {"responseStatus": {"gte": 400}}
+                            },
+                            "using": "length",
+                            "is": {"gte": 1}
+                        },
+                        "else": true
+                    },
+                    "actions": {
+                        "if": {"api": {
+                            "path": "Reflect.has",
+                            "args": [{"api": "PerformanceResourceTiming.prototype"}, "responseStatus"]
+                        }},
+                        "then": [
+                            // The failures, per initiator, and the server errors. A failed preload or prefetch counts under styles
+                            {"define": {
+                                "failedResources": {
+                                    "api": {
+                                        "path": "performance.getEntriesByType",
+                                        "args": ["resource"],
+                                        "where": {"responseStatus": {"gte": 400}}
+                                    },
+                                    "using": "length"
+                                },
+                                "scripts": {
+                                    "api": {
+                                        "path": "performance.getEntriesByType",
+                                        "args": ["resource"],
+                                        "where": {"initiatorType": "script", "responseStatus": {"gte": 400}}
+                                    },
+                                    "using": "length"
+                                },
+                                "images": {
+                                    "api": {
+                                        "path": "performance.getEntriesByType",
+                                        "args": ["resource"],
+                                        "where": {"initiatorType": "img", "responseStatus": {"gte": 400}}
+                                    },
+                                    "using": "length"
+                                },
+                                "styles": {
+                                    "api": {
+                                        "path": "performance.getEntriesByType",
+                                        "args": ["resource"],
+                                        "where": {"initiatorType": {"in": ["link", "css"]}, "responseStatus": {"gte": 400}}
+                                    },
+                                    "using": "length"
+                                },
+                                "requests": {
+                                    "api": {
+                                        "path": "performance.getEntriesByType",
+                                        "args": ["resource"],
+                                        "where": {
+                                            "initiatorType": {"in": ["fetch", "xmlhttprequest"]},
+                                            "responseStatus": {"gte": 400}
+                                        }
+                                    },
+                                    "using": "length"
+                                },
+                                "serverErrors": {
+                                    "api": {
+                                        "path": "performance.getEntriesByType",
+                                        "args": ["resource"],
+                                        "where": {"responseStatus": {"gte": 500}}
+                                    },
+                                    "using": "length"
+                                }
+                            }},
+                            {"breakageReportData": {"data": {
+                                "failedResources": {"value": {"ref": "failedResources"}},
+                                "scripts": {"value": {"ref": "scripts"}},
+                                "images": {"value": {"ref": "images"}},
+                                "styles": {"value": {"ref": "styles"}},
+                                "requests": {"value": {"ref": "requests"}},
+                                "serverErrors": {"value": {"ref": "serverErrors"}}
+                            }}},
+                            // Threshold: two or more failed scripts, or two or more failed stylesheets and loads from CSS.
+                            // Failed images, requests and server errors alone are in breakage reports only: apps answer their own requests
+                            // with an error status by design
+                            {
+                                "if": {"any": [{"ref": "scripts", "is": {"gte": 2}}, {"ref": "styles", "is": {"gte": 2}}]},
+                                "then": [
+                                    // Events: the failures per initiator. A count of 0 fires none
+                                    {
+                                        "if": {"ref": "scripts", "is": 1},
+                                        "then": {"fireEvent": {"type": "failedSubresources_scripts1"}}
+                                    },
+                                    {
+                                        "if": {"ref": "scripts", "is": {"gte": 2, "lt": 5}},
+                                        "then": {"fireEvent": {"type": "failedSubresources_scripts2to4"}}
+                                    },
+                                    {
+                                        "if": {"ref": "scripts", "is": {"gte": 5}},
+                                        "then": {"fireEvent": {"type": "failedSubresources_scripts5Plus"}}
+                                    },
+                                    {
+                                        "if": {"ref": "images", "is": 1},
+                                        "then": {"fireEvent": {"type": "failedSubresources_images1"}}
+                                    },
+                                    {
+                                        "if": {"ref": "images", "is": {"gte": 2, "lt": 5}},
+                                        "then": {"fireEvent": {"type": "failedSubresources_images2to4"}}
+                                    },
+                                    {
+                                        "if": {"ref": "images", "is": {"gte": 5}},
+                                        "then": {"fireEvent": {"type": "failedSubresources_images5Plus"}}
+                                    },
+                                    {
+                                        "if": {"ref": "styles", "is": 1},
+                                        "then": {"fireEvent": {"type": "failedSubresources_styles1"}}
+                                    },
+                                    {
+                                        "if": {"ref": "styles", "is": {"gte": 2, "lt": 5}},
+                                        "then": {"fireEvent": {"type": "failedSubresources_styles2to4"}}
+                                    },
+                                    {
+                                        "if": {"ref": "styles", "is": {"gte": 5}},
+                                        "then": {"fireEvent": {"type": "failedSubresources_styles5Plus"}}
+                                    }
+                                ]
+                            }
+                        ]
                     }
                 }
             }
@@ -2050,6 +3099,76 @@
                             },
                             "else": false
                         }
+                    }
+                ]
+            },
+            {
+                "condition": {
+                    "experiment": {
+                        "experimentName": "contentScopeExperiment11",
+                        "cohort": "treatment"
+                    }
+                },
+                "patchSettings": [
+                    {
+                        "op": "add",
+                        "path": "/detectors/blockPage/waf_assets/state",
+                        "value": "enabled"
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/errorPage/soft404_phrases_count/state",
+                        "value": "enabled"
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/blankPage/no_contentful_paint/state",
+                        "value": "enabled"
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/blankPage/page_size/state",
+                        "value": "enabled"
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/pageLoad/load_time/state",
+                        "value": "enabled"
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/pageLoad/navigation/state",
+                        "value": "enabled"
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/styleBreakage/missing_styles_or_fonts/state",
+                        "value": "enabled"
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/imageBreakage/broken_images/state",
+                        "value": "enabled"
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/consent/fixed_banner/state",
+                        "value": "enabled"
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/paywalls/accept_or_pay_fixed/state",
+                        "value": "enabled"
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/unresponsive/first_input_delay/state",
+                        "value": "enabled"
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/resourceBreakage/failed_subresources/state",
+                        "value": "enabled"
                     }
                 ]
             }
