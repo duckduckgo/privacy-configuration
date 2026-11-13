@@ -317,13 +317,32 @@ function sequenceDetector(detector) {
 }
 
 /**
+ * Throws on a patch path inside a detector's `actions`, other than an append to `actions/-`: the
+ * build splits elements of `actions`, so a key or index there no longer points at what config wrote.
+ *
+ * @param {unknown} path - a patch `path` or `from`
+ */
+function assertPatchOutsideActions(path) {
+    if (typeof path !== 'string') return;
+    const segments = path.split('/').slice(1);
+    if (segments[0] !== 'detectors' || segments[3] !== 'actions' || segments.length <= 4) return;
+    if (segments.length === 5 && segments[4] === '-') return;
+    throw new Error(
+        `${path}: a patch addresses a value inside \`actions\`, which iOS and macOS read as a sequence split by action: patch \`actions\` whole, or append to \`actions/-\``,
+    );
+}
+
+/**
  * A patch operation with the actions in its value rewritten by `sequenceBody`, as one operation or,
- * for several actions appended to `actions`, one append per action.
+ * for several actions appended to `actions`, one append per action. Throws on a path inside
+ * `actions` (see `assertPatchOutsideActions`).
  *
  * @param {any} operation
  * @returns {any[]}
  */
 function sequencePatch(operation) {
+    assertPatchOutsideActions(operation.path);
+    assertPatchOutsideActions(operation.from);
     if ((operation.op !== 'add' && operation.op !== 'replace') || typeof operation.path !== 'string') {
         return [
             operation,
@@ -363,7 +382,8 @@ function sequencePatch(operation) {
  * Rewrite each webDetection object holding several action keys, and each `define` of several names,
  * into a sequence in config order: in the detectors, and in the values `conditionalChanges` patches
  * add or replace under `/detectors`. Apple clients deliver object keys in hash order, and a sequence
- * keeps the order config lists them in.
+ * keeps the order config lists them in. Throws on a patch path inside `actions` other than an append
+ * to `actions/-`.
  *
  * Mutates the config in place.
  *

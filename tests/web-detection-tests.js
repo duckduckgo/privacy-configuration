@@ -584,6 +584,56 @@ describe('webDetection config tests', () => {
             ]);
         });
 
+        describe('rejects a patch that addresses inside `actions` (self-test)', () => {
+            /**
+             * @param {Record<string, unknown>} operation
+             */
+            const sequence = (operation) =>
+                sequenceWebDetectionActions({
+                    features: {
+                        webDetection: {
+                            settings: {
+                                detectors: { g: { x: { actions: { fireEvent: { type: 'a' }, define: { b: 1 } } } } },
+                                conditionalChanges: [
+                                    {
+                                        condition: { injectName: 'apple' },
+                                        patchSettings: [
+                                            operation,
+                                        ],
+                                    },
+                                ],
+                            },
+                        },
+                    },
+                });
+
+            for (const operation of [
+                { op: 'replace', path: '/detectors/g/x/actions/fireEvent/type', value: 'c' },
+                { op: 'add', path: '/detectors/g/x/actions/0', value: { fireEvent: { type: 'c' } } },
+                { op: 'add', path: '/detectors/g/x/actions/1/then/-', value: { fireEvent: { type: 'c' } } },
+                { op: 'remove', path: '/detectors/g/x/actions/define' },
+                { op: 'test', path: '/detectors/g/x/actions/0/fireEvent/type', value: 'a' },
+                { op: 'move', from: '/detectors/g/x/actions/define', path: '/detectors/g/y/actions' },
+                { op: 'copy', from: '/detectors/g/x/actions/0', path: '/detectors/g/y/actions' },
+            ]) {
+                it(`${operation.op} ${operation.from ?? operation.path}`, () => {
+                    expect(() => sequence(operation)).to.throw(/inside `actions`/);
+                });
+            }
+
+            for (const operation of [
+                { op: 'add', path: '/detectors/g/x/actions/-', value: { fireEvent: { type: 'c' } } },
+                { op: 'replace', path: '/detectors/g/x/actions', value: { fireEvent: { type: 'c' } } },
+                { op: 'remove', path: '/detectors/g/x/actions' },
+                { op: 'replace', path: '/detectors/g/x/match/actions/0', value: 1 },
+                { op: 'copy', from: '/detectors/g/x/actions', path: '/detectors/g/y/actions' },
+            ]) {
+                it(`accepts ${operation.op} ${operation.from ?? operation.path}`, () => {
+                    expect(() => sequence(operation)).not.to.throw();
+                });
+            }
+        });
+
         it('rewrites several action keys and a define of several names into a sequence (self-test)', () => {
             const config = {
                 features: {
