@@ -317,10 +317,73 @@ function sequenceDetector(detector) {
 }
 
 /**
+ * Throws on a patch path inside a detector's `actions`, other than an append to `actions/-`: the
+ * build splits elements of `actions`, so a key or index there no longer points at what config wrote.
+ *
+ * @param {unknown} path - a patch `path` or `from`
+ */
+function assertPatchOutsideActions(path) {
+    if (typeof path !== 'string') return;
+    const segments = path.split('/').slice(1);
+    if (segments[0] !== 'detectors' || segments[3] !== 'actions' || segments.length <= 4) return;
+    if (segments.length === 5 && segments[4] === '-') return;
+    throw new Error(
+        `${path}: a patch addresses a value inside \`actions\`, which iOS and macOS read as a sequence split by action: patch \`actions\` whole, or append to \`actions/-\``,
+    );
+}
+
+/**
+ * A patch operation with the actions in its value rewritten by `sequenceBody`, as one operation or,
+ * for several actions appended to `actions`, one append per action. Throws on a path inside
+ * `actions` (see `assertPatchOutsideActions`).
+ *
+ * @param {any} operation
+ * @returns {any[]}
+ */
+function sequencePatch(operation) {
+    assertPatchOutsideActions(operation.path);
+    assertPatchOutsideActions(operation.from);
+    if ((operation.op !== 'add' && operation.op !== 'replace') || typeof operation.path !== 'string') {
+        return [
+            operation,
+        ];
+    }
+    const segments = operation.path.split('/').slice(1);
+    if (segments[0] === 'detectors') {
+        if (segments.length === 5 && segments[3] === 'actions' && segments[4] === '-') {
+            return splitActions(sequenceExpression(operation.value)).map((value) => ({ ...operation, value }));
+        }
+        if (segments.length === 1) {
+            for (const group of Object.values(operation.value ?? {})) {
+                for (const id of Object.keys(group)) group[id] = sequenceDetector(group[id]);
+            }
+        } else if (segments.length === 2) {
+            for (const id of Object.keys(operation.value ?? {})) operation.value[id] = sequenceDetector(operation.value[id]);
+        } else if (segments.length === 3) {
+            operation.value = sequenceDetector(operation.value);
+        } else if (
+            [
+                'actions',
+                'then',
+                'else',
+            ].includes(segments[segments.length - 1])
+        ) {
+            operation.value = sequenceBody(operation.value);
+        } else {
+            operation.value = sequenceExpression(operation.value);
+        }
+    }
+    return [
+        operation,
+    ];
+}
+
+/**
  * Rewrite each webDetection object holding several action keys, and each `define` of several names,
  * into a sequence in config order: in the detectors, and in the values `conditionalChanges` patches
  * add or replace under `/detectors`. Apple clients deliver object keys in hash order, and a sequence
- * keeps the order config lists them in.
+ * keeps the order config lists them in. Throws on a patch path inside `actions` other than an append
+ * to `actions/-`.
  *
  * Mutates the config in place.
  *
@@ -337,30 +400,7 @@ export function sequenceWebDetectionActions(config) {
         }
     }
     for (const entry of settings.conditionalChanges ?? []) {
-        for (const operation of entry.patchSettings ?? []) {
-            if ((operation.op !== 'add' && operation.op !== 'replace') || typeof operation.path !== 'string') continue;
-            const segments = operation.path.split('/').slice(1);
-            if (segments[0] !== 'detectors') continue;
-            if (segments.length === 1) {
-                for (const group of Object.values(operation.value ?? {})) {
-                    for (const id of Object.keys(group)) group[id] = sequenceDetector(group[id]);
-                }
-            } else if (segments.length === 2) {
-                for (const id of Object.keys(operation.value ?? {})) operation.value[id] = sequenceDetector(operation.value[id]);
-            } else if (segments.length === 3) {
-                operation.value = sequenceDetector(operation.value);
-            } else if (
-                [
-                    'actions',
-                    'then',
-                    'else',
-                ].includes(segments[segments.length - 1])
-            ) {
-                operation.value = sequenceBody(operation.value);
-            } else {
-                operation.value = sequenceExpression(operation.value);
-            }
-        }
+        if (entry.patchSettings) entry.patchSettings = entry.patchSettings.flatMap(sequencePatch);
     }
 }
 
