@@ -7,6 +7,7 @@ import {
     COMPARISON_OPERATORS,
     DEFINE_NAME_PATTERN,
     EXPRESSION_KEYS,
+    LIST_CONDITION,
     MODIFIER_KEYS,
     OPERATOR_KEYS,
     SOURCE_KEYS,
@@ -112,9 +113,27 @@ function providesValues(node, single, ctx) {
             const type = typeof body === 'string' ? nameType(body, ctx) : undefined;
             return type?.list !== undefined && !(type.leaf && single === 'boolean');
         }
+        case 'if':
+            // The branch taken is read as the operand would be
+            return branchResults(node).some((branch) => providesValues(branch, single, ctx));
         default:
             return false;
     }
+}
+
+/**
+ * The expression each branch of an `if` gives: the branch, or a sequence's last element.
+ *
+ * @param {Record<string, unknown>} node - the object holding `if`
+ * @returns {unknown[]}
+ */
+function branchResults(node) {
+    return [
+        'then',
+        'else',
+    ]
+        .filter((key) => key in node)
+        .map((key) => (Array.isArray(node[key]) ? node[key][node[key].length - 1] : node[key]));
 }
 
 /**
@@ -369,8 +388,8 @@ function nameType(name, ctx) {
 }
 
 /**
- * Check a name's type in the position a `ref` reads it in: the condition leaf holds in boolean
- * position when it has an item, and a selected list gives its one item in number position.
+ * Check a name's type in the position a `ref` reads it in: a selected list holds in boolean position
+ * when it has an item, and gives its one item in number position.
  *
  * @param {StaticType} type
  * @param {Position} position
@@ -380,9 +399,9 @@ function nameType(name, ctx) {
  */
 function refType(type, position, ctx, path) {
     if (position === 'boolean') {
-        if (type.list === 'selected' && type.leaf) return typeOf('boolean');
-        if (type.list !== undefined) fail(ctx, path, 'boolean position takes a boolean, and the name is bound to a list');
-        else if (!allows(type, 'boolean'))
+        // A list holds when it has an item
+        if (type.list === 'selected') return typeOf('boolean');
+        if (type.list === undefined && !allows(type, 'boolean'))
             fail(ctx, path, `boolean position takes a boolean, and config types the name as ${describeType(type)}`);
         return typeOf('boolean');
     }
@@ -546,13 +565,19 @@ function checkExprKey(key, body, position, scope, ctx, path, holder) {
             return checkExpr(body, position, scope, ctx, path);
         case 'only': {
             expectPosition(ctx, path, '`only`', position, [
+                'boolean',
                 'value',
                 'number',
+                'list',
                 'root',
             ]);
             const type = oneItem(checkExpr(body, 'list', child(scope), ctx, path), ctx, path);
             if (position === 'number' && !allows(type, 'number'))
                 fail(ctx, path, `number position takes a number, and config types the value as ${describeType(type)}`);
+            if (position === 'boolean' && !allows(type, 'boolean'))
+                fail(ctx, path, `boolean position takes a boolean, and config types the value as ${describeType(type)}`);
+            if (position === 'list' && type.types !== null && !type.types.includes('array') && !type.types.includes('object'))
+                fail(ctx, path, `list position takes a list, and config types the value as ${describeType(type)}`);
             return type;
         }
         case 'sum':
@@ -565,7 +590,7 @@ function checkExprKey(key, body, position, scope, ctx, path, holder) {
             asArray(body).forEach((operand, index) => {
                 const operandPath = Array.isArray(body) ? `${path}[${index}]` : path;
                 const listed = providesValues(operand, 'number', ctx);
-                const type = checkExpr(operand, listed ? 'spread' : 'number', child(scope), ctx, operandPath);
+                const type = checkExpr(operand, listed ? 'spread' : 'number', { ...child(scope), spreadOf: 'number' }, ctx, operandPath);
                 if (listed && !allows(type, 'number'))
                     fail(ctx, operandPath, `\`${key}\` takes numbers, and config types the values as ${describeType(type)}`);
                 nan ||= type.nan;
@@ -625,7 +650,7 @@ function checkExprKey(key, body, position, scope, ctx, path, holder) {
                     guards,
                 };
                 if (providesValues(operand, 'boolean', ctx)) {
-                    const type = checkExpr(operand, 'spread', operandScope, ctx, operandPath);
+                    const type = checkExpr(operand, 'spread', { ...operandScope, spreadOf: 'boolean' }, ctx, operandPath);
                     if (!allows(type, 'boolean'))
                         fail(ctx, operandPath, `\`${key}\` takes booleans, and config types the values as ${describeType(type)}`);
                 } else {
@@ -639,6 +664,8 @@ function checkExprKey(key, body, position, scope, ctx, path, holder) {
                 'boolean',
                 'value',
                 'number',
+                'list',
+                'spread',
                 'root',
             ]);
             const branches = holder ?? {};
@@ -661,11 +688,42 @@ function checkExprKey(key, body, position, scope, ctx, path, holder) {
             };
             // A run name bound in one branch may be bound after the `if`, with the type each branch binds
             const before = new Map(ctx.runNames);
-            const thenType = 'then' in branches ? checkBody(branches.then, position, branchScope, ctx, `${base}.then`) : UNKNOWN;
+            // Under `sum`, `mul`, `any`, `all` and `none`, a branch giving no list is one operand
+            const single = scope.spreadOf ?? 'value';
+            const branchPosition = (/** @type {unknown} */ branch) =>
+                position !== 'spread' || providesValues(Array.isArray(branch) ? branch[branch.length - 1] : branch, single, ctx)
+                    ? position
+                    : single;
+            const thenType =
+                'then' in branches ? checkBody(branches.then, branchPosition(branches.then), branchScope, ctx, `${base}.then`) : UNKNOWN;
             const afterThen = ctx.runNames;
             ctx.runNames = new Map(before);
             const elseType =
-                'else' in branches ? checkBody(branches.else, position, branchScope, ctx, `${base}.else`) : typeOf('undefined');
+                'else' in branches
+                    ? checkBody(branches.else, branchPosition(branches.else), branchScope, ctx, `${base}.else`)
+                    : typeOf('undefined');
+            if (position === 'spread') {
+                for (const [
+                    branch,
+                    type,
+                ] of [
+                    [
+                        'then',
+                        thenType,
+                    ],
+                    [
+                        'else',
+                        elseType,
+                    ],
+                ]) {
+                    if (branch in branches && !allows(type, single))
+                        fail(
+                            ctx,
+                            `${base}.${branch}`,
+                            `this operand takes ${single}s, and config types the branch as ${describeType(type)}`,
+                        );
+                }
+            }
             for (const [
                 name,
                 type,
@@ -785,17 +843,11 @@ function expectStrings(value, ctx, path, what) {
  */
 function checkConditionSource(key, branch, position, scope, ctx, path) {
     const bodies = collectBodies(branch, position, ctx, path);
+    if (bodies.length === 0) fail(ctx, path, `\`${key}\` needs at least one body`);
     const withField = bodies.filter(({ body }) => 'field' in body).length;
     if (withField && withField !== bodies.length) fail(ctx, path, 'every body of one `element` source has `field`, or none does');
     const hasField = withField > 0;
-    if (hasField)
-        expectPosition(ctx, path, '`element` with `field`', position, [
-            'value',
-            'number',
-            'list',
-            'spread',
-            'root',
-        ]);
+    if (hasField && position === 'boolean') fail(ctx, path, `\`element\` with \`field\`: ${LIST_CONDITION}`);
 
     /** @type {StaticType[]} */
     const valueTypes = [];

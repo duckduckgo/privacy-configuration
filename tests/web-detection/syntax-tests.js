@@ -651,8 +651,10 @@ describe('webDetection config tests', () => {
                         field: 'matches',
                     },
                 });
-                expectError('`element` with `field` fills', fieldOf('img', 'complete'));
-                expectError('`api` with `where` fills', { api: { path: 'document.fonts', where: { status: 'error' } } });
+                expectError('a list as a condition holds when it has an item', fieldOf('img', 'complete'));
+                expectError('a list as a condition holds when it has an item', {
+                    api: { path: 'document.fonts', where: { status: 'error' } },
+                });
                 expectError('boolean position takes a boolean, and config types the value as number', imgCount);
                 expectError('boolean position takes a boolean, and config types the value as number', {
                     only: img,
@@ -674,6 +676,50 @@ describe('webDetection config tests', () => {
                 });
             });
 
+            it('rejects a source with no body', () => {
+                expectError('`element` needs at least one body', { element: [] });
+                expectError('`text` needs at least one body', { text: [] });
+            });
+
+            it('places `only` in any position, checking its item', () => {
+                expectValid({ only: fieldOf('img', 'complete') });
+                expectError('boolean position takes a boolean, and config types the value as number', {
+                    only: fieldOf('img', 'naturalWidth'),
+                });
+                expectValid({
+                    only: {
+                        only: {
+                            api: {
+                                path: 'performance.getEntriesByType',
+                                args: [
+                                    'navigation',
+                                ],
+                            },
+                        },
+                    },
+                    is: {},
+                });
+                expectValid({ only: { if: true, then: img, else: img }, is: {} });
+            });
+
+            it('spreads an `if` under `sum`, `any`, `all` and `none` when a branch gives a list', () => {
+                expectValid({ sum: { if: true, then: fieldOf('img', 'naturalWidth'), else: 0 }, is: { gt: 0 } });
+                expectValid({
+                    any: {
+                        if: true,
+                        then: {
+                            expr: [
+                                true,
+                                false,
+                            ],
+                        },
+                        else: false,
+                    },
+                });
+                expectError('this operand takes booleans', { all: { if: true, then: fieldOf('img', 'naturalWidth'), else: true } });
+                expectError('`if` without `else`', { sum: { if: true, then: fieldOf('img', 'naturalWidth') }, is: { gt: 0 } });
+            });
+
             it('places `only` over lists only', () => {
                 expectValid({ only: fieldOf('img', 'naturalWidth'), is: { gt: 0 } });
                 expectValid({ only: { api: { path: 'document.fonts' } }, is: { field: 'status', is: 'loaded' } });
@@ -686,8 +732,7 @@ describe('webDetection config tests', () => {
                 });
                 expectError('`using` `length` fills', { only: imgCount, is: { gt: 0 } });
                 expectError('A number fills', { only: 1, is: 0 });
-                expectError('`if` fills', { only: { if: true, then: img, else: img }, is: 0 });
-                expectError('`only` fills', { only: img });
+                expectError('boolean position takes a boolean, and config types the value as object', { only: img });
                 expectError('number position takes a number, and config types the value as string', {
                     div: [
                         { only: fieldOf('img', 'src') },

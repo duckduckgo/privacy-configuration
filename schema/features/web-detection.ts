@@ -82,7 +82,7 @@ type FieldRead =
       }
     | ExprObject;
 
-type TypeName = 'number' | 'string' | 'boolean' | 'null' | 'undefined' | 'array' | 'object';
+type TypeName = 'number' | 'string' | 'boolean' | 'null' | 'undefined' | 'array' | 'object' | 'function' | 'symbol' | 'bigint';
 
 type PredicateReserved = {
     any?: MaybeArray<Predicate>;

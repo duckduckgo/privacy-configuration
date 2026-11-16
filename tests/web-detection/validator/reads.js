@@ -7,6 +7,7 @@ import {
     ELEMENT_METHOD_ALLOWLIST,
     FIELD_KEYS,
     FUNCTION_READS,
+    LIST_CONDITION,
     apiBody,
 } from './grammar.js';
 import { checkPredicate } from './predicates.js';
@@ -48,12 +49,9 @@ export function checkApi(body, position, scope, ctx, path, root, asFunction = fa
         return UNKNOWN;
     }
     const hasWhere = 'where' in body;
-    expectPosition(ctx, path, hasWhere ? '`api` with `where`' : '`api`', position, [
-        ...(hasWhere
-            ? []
-            : [
-                  'boolean',
-              ]),
+    if (hasWhere && position === 'boolean') fail(ctx, path, `\`api\` with \`where\`: ${LIST_CONDITION}`);
+    expectPosition(ctx, path, '`api`', position, [
+        'boolean',
         'value',
         'number',
         'list',

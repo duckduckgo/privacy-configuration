@@ -83,6 +83,10 @@ export const FIELD_KEYS = [
     'args',
 ];
 
+/** Why a selected list other than the condition leaf is refused as a condition */
+export const LIST_CONDITION =
+    'a list as a condition holds when it has an item, which reads like a test of its values: `only` gives its one item, and `using: "length"` counts them';
+
 export const TYPE_NAMES = [
     'number',
     'string',
@@ -91,6 +95,9 @@ export const TYPE_NAMES = [
     'undefined',
     'array',
     'object',
+    'function',
+    'symbol',
+    'bigint',
 ];
 
 export const COMPARISON_OPERATORS = [

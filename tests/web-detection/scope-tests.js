@@ -237,8 +237,19 @@ describe('webDetection config tests', () => {
                 expectError('go together', items('img', { is: true }));
             });
 
-            it('rejects an unknown type name', () => {
+            it('rejects an unknown type name, and takes the names `typeof` gives', () => {
                 expectError('unknown type name', { ...loadEventEnd, is: { type: 'integer' } });
+                expectValid({
+                    ...loadEventEnd,
+                    is: {
+                        type: [
+                            'function',
+                            'symbol',
+                            'bigint',
+                            'number',
+                        ],
+                    },
+                });
             });
 
             it('rejects predicates that never hold for a read value', () => {

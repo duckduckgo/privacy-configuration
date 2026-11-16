@@ -7,7 +7,7 @@ import { asArray } from './walk.js';
  */
 
 /**
- * @typedef {'number' | 'string' | 'boolean' | 'null' | 'undefined' | 'array' | 'object'} TypeName
+ * @typedef {'number' | 'string' | 'boolean' | 'null' | 'undefined' | 'array' | 'object' | 'function' | 'symbol' | 'bigint'} TypeName
  */
 
 /**

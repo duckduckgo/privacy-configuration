@@ -182,7 +182,7 @@ describe('webDetection config tests', () => {
                     { if: { ref: 'x' }, then: { breakageReportData: {} } },
                 ],
             });
-            expectError('the name is bound to a list', {
+            expectValid({
                 actions: [
                     { define: { x: { element: { selector: 'img', field: 'naturalWidth' } } } },
                     { if: { ref: 'x' }, then: { breakageReportData: {} } },

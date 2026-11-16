@@ -658,7 +658,9 @@ describe('webDetection config tests', () => {
             it('gives its operand in its own position', () => {
                 expectValid({ sum: { expr: { element: { selector: 'img', field: 'naturalWidth' } } }, is: { gt: 0 } });
                 expectValid({ expr: img });
-                expectError('`element` with `field` fills', { expr: { element: { selector: 'img', field: 'naturalWidth' } } });
+                expectError('a list as a condition holds when it has an item', {
+                    expr: { element: { selector: 'img', field: 'naturalWidth' } },
+                });
             });
         });
     });
