@@ -6,5 +6,6 @@ export type WebExtensionsConfig<VersionType> = Feature<
     {
         embedded?: SubFeature<VersionType>;
         cpmDiagnosticsRecorder?: SubFeature<VersionType>;
+        cpmStableBaseURL?: SubFeature<VersionType>;
     }
 >;

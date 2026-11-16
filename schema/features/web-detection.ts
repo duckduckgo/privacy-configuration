@@ -175,7 +175,13 @@ export type Body = Expr | Expr[];
 export type PayloadField = {
     value: Expr;
     when?: Predicate;
-    buckets?: Record<string, Predicate>;
+    buckets?: Bucket[];
+};
+
+/** Tested in array order: the first bucket whose `is` holds names the value. */
+export type Bucket = {
+    name: string;
+    is: Predicate;
 };
 
 export type PayloadSpec = Record<PayloadKey, PayloadField>;
@@ -191,6 +197,8 @@ type DetectorGroup = Record<string, DetectorConfig>;
 
 export type WebDetectionSettings = CSSInjectFeatureSettings<{
     detectors?: Record<string, DetectorGroup>;
+    /** Generic C-S-S load gate, patched per experiment cohort via conditionalChanges. */
+    additionalCheck?: FeatureState;
 }>;
 
 export type WebDetectionFeature<VersionType> = Feature<WebDetectionSettings, VersionType>;

@@ -4,19 +4,28 @@ import fetch from 'node-fetch';
 import {
     addCnameEntriesToAllowlist,
     collapseEventHubTelemetryPeriods,
-    sequenceWebDetectionActions,
     inlineReasonArrays,
     mergeAllowlistedTrackers,
     mergeEventHubTelemetry,
     mergeInterferenceTypes,
     renameEventHubImmediateTriggers,
+    sequenceWebDetectionActions,
     addHashToFeatures,
     stripReasons,
     getBaseFeatureConfigs,
     readJsoncFile,
 } from './util.js';
+import { arrayWebDetectionBuckets } from './web-detection-util.js';
 
-import { OVERRIDE_DIR, GENERATED_DIR, LISTS_DIR, BROWSERS_SUBDIR, CURRENT_CONFIG_VERSION, UNPROTECTED_LIST_NAME } from './constants.js';
+import {
+    OVERRIDE_DIR,
+    GENERATED_DIR,
+    LISTS_DIR,
+    BROWSERS_SUBDIR,
+    CURRENT_CONFIG_VERSION,
+    UNPROTECTED_LIST_NAME,
+    TDS_PATH_FOR_PLATFORM,
+} from './constants.js';
 
 import platforms from './platforms.js';
 import { compatFunctions, removeEolFeatures } from './compatibility.js';
@@ -36,18 +45,38 @@ const debugOutput = process.argv.includes('--debug');
 
 const tdsPath = 'live';
 
-async function getTds() {
-    let tds;
-    if (tdsPath === 'live') {
-        console.log('Fetching remote TDS');
-        const response = await fetch('https://staticcdn.duckduckgo.com/trackerblocking/v3/tds.json');
-        tds = await response.json();
-        console.log('Fetched remote TDS');
-    } else {
+/**
+ * Load the TDS each platform's clients use, keyed by platform.
+ */
+async function getTdsByPlatform() {
+    const tdsByPlatform = {};
+    if (tdsPath !== 'live') {
         console.log('Using local TDS');
-        tds = JSON.parse(fs.readFileSync(tdsPath));
+        const tds = JSON.parse(fs.readFileSync(tdsPath));
+        for (const platform of platforms) {
+            tdsByPlatform[platform] = tds;
+        }
+        return tdsByPlatform;
     }
-    return tds;
+
+    const tdsByPath = {};
+    for (const platform of platforms) {
+        const path = TDS_PATH_FOR_PLATFORM[platform];
+        if (!path) {
+            throw new Error(`No TDS path for platform ${platform}`);
+        }
+        if (!tdsByPath[path]) {
+            const url = `https://staticcdn.duckduckgo.com/trackerblocking/${path}`;
+            console.log(`Fetching remote TDS ${url}`);
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`Failed to fetch ${url}: ${response.status}`);
+            }
+            tdsByPath[path] = await response.json();
+        }
+        tdsByPlatform[platform] = tdsByPath[path];
+    }
+    return tdsByPlatform;
 }
 
 /**
@@ -233,7 +262,8 @@ const legacyDisabledFeatures = [
 // Handle platform specific overrides and write configs to disk
 async function buildPlatforms() {
     const platformConfigs = {};
-    const tds = await getTds();
+    const tdsByPlatform = await getTdsByPlatform();
+    let extensionConfigBeforeCnames;
 
     for (const platform of platforms) {
         let platformConfig = JSON.parse(JSON.stringify(defaultConfig));
@@ -241,9 +271,8 @@ async function buildPlatforms() {
 
         // Use extension config as the base for browser configs
         // Extension comes first in the list of platforms so its config should be defined
-        // in the platformConfigs array
         if (platform.includes(BROWSERS_SUBDIR)) {
-            platformConfig = JSON.parse(JSON.stringify(platformConfigs.extension));
+            platformConfig = JSON.parse(JSON.stringify(extensionConfigBeforeCnames));
         }
 
         // Handle feature overrides
@@ -311,20 +340,6 @@ async function buildPlatforms() {
                                 overrideSettings.interferenceTypes || {},
                             ),
                         };
-                    } else if (key === 'webDetection' && platformKey === 'settings') {
-                        // Append platform conditionalChanges after the base ones, so a platform can gate
-                        // patches on its own app version while inheriting the base detectors. Other
-                        // webDetection settings keys still override wholesale.
-                        const baseSettings = platformConfig.features[key].settings || {};
-                        const overrideSettings = platformOverride.features[key][platformKey];
-                        platformConfig.features[key][platformKey] = {
-                            ...baseSettings,
-                            ...overrideSettings,
-                            conditionalChanges: [
-                                ...(baseSettings.conditionalChanges || []),
-                                ...(overrideSettings.conditionalChanges || []),
-                            ],
-                        };
                     } else if ((key === 'clickToLoad' || key === 'clickToPlay') && platformKey === 'settings') {
                         // Handle Click to Load settings override later, so that individual entities
                         // are disabled/enabled correctly (and disabled by default).
@@ -391,7 +406,11 @@ async function buildPlatforms() {
             platformConfig.experimentalVariants = platformOverride.experimentalVariants;
         }
 
-        addCnameEntriesToAllowlist(tds, platformConfig.features.trackerAllowlist.settings.allowlistedTrackers);
+        // Browser configs copy this before CNAME entries are added, so each gets entries only from its own TDS
+        if (platform === 'extension') {
+            extensionConfigBeforeCnames = JSON.parse(JSON.stringify(platformConfig));
+        }
+        addCnameEntriesToAllowlist(tdsByPlatform[platform], platformConfig.features.trackerAllowlist.settings.allowlistedTrackers);
         platformConfig = inlineReasonArrays(platformConfig);
 
         // Clients read eventHub periods as integer seconds; collapse any authored unit object
@@ -399,6 +418,8 @@ async function buildPlatforms() {
         collapseEventHubTelemetryPeriods(platformConfig);
         // Authors write `immediate`; emit the immediate trigger name this platform parses.
         renameEventHubImmediateTriggers(platformConfig, platform);
+        // Authors may write webDetection payload buckets as an object; clients read an array.
+        arrayWebDetectionBuckets(platformConfig);
 
         if (platform === 'ios' || platform === 'macos') {
             sequenceWebDetectionActions(platformConfig);

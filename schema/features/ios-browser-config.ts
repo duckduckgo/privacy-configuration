@@ -1,7 +1,18 @@
 import { Feature, SubFeature } from '../feature';
 
+type OnboardingAIModel = {
+    id: string;
+    provider: string;
+    modelShortName: string;
+};
+
 type SettingsType = {
     promptCooldownInterval?: number;
+    // Fallback AI model list for the onboarding model-picker step when the /models API is unavailable
+    onboardingAIModelsFallback?: {
+        defaultModelId: string;
+        models: OnboardingAIModel[];
+    };
 };
 
 type SubFeatures<VersionType> = {
