@@ -153,8 +153,15 @@ describe('webDetection config tests', () => {
     });
 
     describe('Apple action sequences', () => {
+        // Actions that give the same result in either order, which C-S-S before 19.0.0 reads only from an object
+        const ORDER_FREE_ACTION_KEYS = [
+            'fireEvent',
+            'breakageReportData',
+        ];
+
         /**
-         * Every object in a body position holding several action keys, or a `define` of several names.
+         * Every object in a body position holding several action keys, other than just `fireEvent` and
+         * `breakageReportData`, or a `define` of several names.
          *
          * @param {unknown} body
          * @param {string} path
@@ -175,7 +182,11 @@ describe('webDetection config tests', () => {
                 }
                 if (!isPlainObject(node)) return;
                 const actionKeys = Object.keys(node).filter((key) => ACTION_KEYS.includes(key));
-                if (inBody && (actionKeys.length > 1 || (isPlainObject(node.define) && Object.keys(node.define).length > 1)))
+                const orderFree = Object.keys(node).every((key) => ORDER_FREE_ACTION_KEYS.includes(key));
+                if (
+                    inBody &&
+                    ((actionKeys.length > 1 && !orderFree) || (isPlainObject(node.define) && Object.keys(node.define).length > 1))
+                )
                     found.push(nodePath);
                 for (const [
                     key,
@@ -235,7 +246,7 @@ describe('webDetection config tests', () => {
                                         {
                                             op: 'replace',
                                             path: '/detectors/g/list/actions',
-                                            value: { breakageReportData: {}, fireEvent: { type: 'd' } },
+                                            value: { breakageReportData: {}, fireEvent: { type: 'd' }, define: { c: 1 } },
                                         },
                                         {
                                             op: 'add',
@@ -278,6 +289,7 @@ describe('webDetection config tests', () => {
             expect(settings.conditionalChanges[0].patchSettings[1].value).to.deep.equal([
                 { breakageReportData: {} },
                 { fireEvent: { type: 'd' } },
+                { define: { c: 1 } },
             ]);
             // A sequence element holds no nested sequence, so several actions take an always-taken `if`
             expect(settings.conditionalChanges[0].patchSettings[2].value).to.deep.equal({
@@ -296,6 +308,102 @@ describe('webDetection config tests', () => {
             });
             expect(settings.conditionalChanges[0].patchSettings[4].value).to.deep.equal({ fireEvent: { type: 'f' } });
         });
+
+        it('leaves an object of only fireEvent and breakageReportData as one object (self-test)', () => {
+            const config = {
+                features: {
+                    webDetection: {
+                        settings: {
+                            detectors: {
+                                g: {
+                                    both: { match: true, actions: { fireEvent: { type: 'a' }, breakageReportData: {} } },
+                                    branch: {
+                                        actions: {
+                                            if: true,
+                                            then: { breakageReportData: {}, fireEvent: { type: 'b' } },
+                                            else: false,
+                                        },
+                                    },
+                                },
+                            },
+                            conditionalChanges: [
+                                {
+                                    condition: { injectName: 'apple-isolated' },
+                                    patchSettings: [
+                                        {
+                                            op: 'replace',
+                                            path: '/detectors/g/both/actions',
+                                            value: { breakageReportData: {}, fireEvent: { type: 'c' } },
+                                        },
+                                        {
+                                            op: 'add',
+                                            path: '/detectors/g/both/actions/-',
+                                            value: { fireEvent: { type: 'd' }, breakageReportData: {} },
+                                        },
+                                    ],
+                                },
+                            ],
+                        },
+                    },
+                },
+            };
+            sequenceWebDetectionActions(config);
+            const settings = config.features.webDetection.settings;
+            expect(settings.detectors.g.both.actions).to.deep.equal({ fireEvent: { type: 'a' }, breakageReportData: {} });
+            expect(settings.detectors.g.branch.actions.then).to.deep.equal({ breakageReportData: {}, fireEvent: { type: 'b' } });
+            expect(settings.conditionalChanges[0].patchSettings[0].value).to.deep.equal({
+                breakageReportData: {},
+                fireEvent: { type: 'c' },
+            });
+            expect(settings.conditionalChanges[0].patchSettings[1].value).to.deep.equal({
+                fireEvent: { type: 'd' },
+                breakageReportData: {},
+            });
+        });
+
+        // Remove once Apple's webDetection minSupportedVersion is at or above the first iOS and macOS releases
+        // carrying C-S-S 19.0.0. Until then, those apps read `fireEvent` and `breakageReportData` from an
+        // `actions` object only. The versions are above every shipped Apple gate and below this release's placeholder
+        const PRE_EXPRESSION_APPLE_VERSIONS = [
+            '7.999.0',
+            '1.999.0',
+        ];
+
+        for (const config of latestConfigs.filter(({ name }) => /^v\d+\/(ios|macos)-config\.json$/.test(name))) {
+            const settings = config.body.features?.webDetection?.settings;
+            if (!settings) continue;
+            for (const version of PRE_EXPRESSION_APPLE_VERSIONS) {
+                it(`${config.name} gives apple-isolated ${version} every enabled detector's actions as an object`, () => {
+                    const detectors = clientDetectors(
+                        settings,
+                        [
+                            'apple-isolated',
+                        ],
+                        version,
+                        false,
+                    );
+                    /** @type {string[]} */
+                    const wrong = [];
+                    for (const [
+                        groupName,
+                        group,
+                    ] of Object.entries(detectors)) {
+                        for (const [
+                            detectorId,
+                            detector,
+                        ] of Object.entries(group)) {
+                            if (detector.state === 'disabled' || detector.actions === undefined) continue;
+                            if (
+                                !isPlainObject(detector.actions) ||
+                                Object.keys(detector.actions).some((key) => !ORDER_FREE_ACTION_KEYS.includes(key))
+                            )
+                                wrong.push(`detectors.${groupName}.${detectorId}`);
+                        }
+                    }
+                    expect(wrong, wrong.join('\n')).to.deep.equal([]);
+                });
+            }
+        }
     });
 
     describe('naming validation', () => {

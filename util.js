@@ -238,6 +238,13 @@ const BODY_KEYS = [
     'else',
 ];
 
+// Actions whose order doesn't change what they do. C-S-S before 19.0.0 reads them only from an
+// `actions` object, so an object of just these stays one
+const ORDER_FREE_ACTION_KEYS = [
+    'fireEvent',
+    'breakageReportData',
+];
+
 /**
  * @param {unknown} value
  * @returns {value is Record<string, any>}
@@ -248,13 +255,18 @@ function isPlainObject(value) {
 
 /**
  * The actions of one object as single-key objects, in config order, a `define` of several names as
- * one `define` per name; any other value as itself.
+ * one `define` per name; an object of only `fireEvent` and `breakageReportData`, and any other value,
+ * as itself.
  *
  * @param {unknown} node
  * @returns {unknown[]}
  */
 function splitActions(node) {
-    if (!isPlainObject(node) || !Object.keys(node).some((key) => WEB_DETECTION_ACTION_KEYS.includes(key))) {
+    if (
+        !isPlainObject(node) ||
+        !Object.keys(node).some((key) => WEB_DETECTION_ACTION_KEYS.includes(key)) ||
+        Object.keys(node).every((key) => ORDER_FREE_ACTION_KEYS.includes(key))
+    ) {
         return [
             node,
         ];
@@ -336,10 +348,10 @@ function sequenceDetector(detector) {
 }
 
 /**
- * Rewrite each webDetection object holding several action keys, and each `define` of several names,
- * into a sequence in config order: in the detectors, and in the values `conditionalChanges` patches
- * add or replace under `/detectors`. Apple clients deliver object keys in hash order, and a sequence
- * keeps the order config lists them in.
+ * Rewrite each webDetection object holding several action keys, other than just `fireEvent` and
+ * `breakageReportData`, and each `define` of several names, into a sequence in config order: in the
+ * detectors, and in the values `conditionalChanges` patches add or replace under `/detectors`. Apple
+ * clients deliver object keys in hash order, and a sequence keeps the order config lists them in.
  *
  * Mutates the config in place.
  *
