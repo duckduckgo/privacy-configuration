@@ -1794,9 +1794,9 @@
                     }
                 ]
             },
-            // Browser-internal pages. The macOS tab web view behind a native page loads an empty duck:// document
-            // with no title or text; these are its hosts. Must stay after the entry that enables the detector.
-            // Evaluated on every settings read in every frame, so it uses domain conditions, which are string comparisons
+            // A cheap domain check so blankPage doesn't run on macOS internal pages (duck://newtab and others), which are
+            // known false positives.
+            // Ensure this entry stays after any patches which enable the detector.
             {
                 "condition": [
                     {
