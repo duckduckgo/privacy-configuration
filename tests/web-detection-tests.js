@@ -4,6 +4,7 @@ import xpath from 'xpath';
 import platforms from '../platforms.js';
 import { CURRENT_CONFIG_VERSION } from '../constants.js';
 import { sequenceWebDetectionActions } from '../util.js';
+import { applyConditionalChanges } from '../scripts/config-conditions.mjs';
 
 const OPERATOR_KEYS = [
     'any',
@@ -407,6 +408,11 @@ describe('webDetection config tests', () => {
             'then',
             'else',
         ];
+        // Actions that give the same result in either order, which C-S-S before 19.0.0 reads only from an object
+        const ORDER_FREE_ACTION_KEYS = [
+            'fireEvent',
+            'breakageReportData',
+        ];
 
         /**
          * @param {unknown} value
@@ -415,7 +421,8 @@ describe('webDetection config tests', () => {
         const isPlainObject = (value) => typeof value === 'object' && value !== null && !Array.isArray(value);
 
         /**
-         * Every object in a body position holding several action keys, or a `define` of several names.
+         * Every object in a body position holding several action keys, other than just `fireEvent` and
+         * `breakageReportData`, or a `define` of several names.
          *
          * @param {unknown} body
          * @param {string} path
@@ -436,7 +443,11 @@ describe('webDetection config tests', () => {
                 }
                 if (!isPlainObject(node)) return;
                 const actionKeys = Object.keys(node).filter((key) => ACTION_KEYS.includes(key));
-                if (inBody && (actionKeys.length > 1 || (isPlainObject(node.define) && Object.keys(node.define).length > 1)))
+                const orderFree = Object.keys(node).every((key) => ORDER_FREE_ACTION_KEYS.includes(key));
+                if (
+                    inBody &&
+                    ((actionKeys.length > 1 && !orderFree) || (isPlainObject(node.define) && Object.keys(node.define).length > 1))
+                )
                     found.push(nodePath);
                 for (const [
                     key,
@@ -496,7 +507,7 @@ describe('webDetection config tests', () => {
                                         {
                                             op: 'replace',
                                             path: '/detectors/g/list/actions',
-                                            value: { breakageReportData: {}, fireEvent: { type: 'd' } },
+                                            value: { breakageReportData: {}, fireEvent: { type: 'd' }, define: { c: 1 } },
                                         },
                                     ],
                                 },
@@ -532,8 +543,166 @@ describe('webDetection config tests', () => {
             expect(settings.conditionalChanges[0].patchSettings[1].value).to.deep.equal([
                 { breakageReportData: {} },
                 { fireEvent: { type: 'd' } },
+                { define: { c: 1 } },
             ]);
         });
+
+        it('leaves an object of only fireEvent and breakageReportData as one object (self-test)', () => {
+            const config = {
+                features: {
+                    webDetection: {
+                        settings: {
+                            detectors: {
+                                g: {
+                                    both: { match: true, actions: { fireEvent: { type: 'a' }, breakageReportData: {} } },
+                                    branch: {
+                                        actions: {
+                                            if: true,
+                                            then: { breakageReportData: {}, fireEvent: { type: 'b' } },
+                                            else: false,
+                                        },
+                                    },
+                                },
+                            },
+                            conditionalChanges: [
+                                {
+                                    condition: { injectName: 'apple-isolated' },
+                                    patchSettings: [
+                                        {
+                                            op: 'replace',
+                                            path: '/detectors/g/both/actions',
+                                            value: { breakageReportData: {}, fireEvent: { type: 'c' } },
+                                        },
+                                    ],
+                                },
+                            ],
+                        },
+                    },
+                },
+            };
+            sequenceWebDetectionActions(config);
+            const settings = config.features.webDetection.settings;
+            expect(settings.detectors.g.both.actions).to.deep.equal({ fireEvent: { type: 'a' }, breakageReportData: {} });
+            expect(settings.detectors.g.branch.actions.then).to.deep.equal({ breakageReportData: {}, fireEvent: { type: 'b' } });
+            expect(settings.conditionalChanges[0].patchSettings[0].value).to.deep.equal({
+                breakageReportData: {},
+                fireEvent: { type: 'c' },
+            });
+        });
+    });
+
+    describe('breakage report data', () => {
+        /** @param {unknown} node */
+        const writesBreakageData = (node) => {
+            if (Array.isArray(node)) return node.some(writesBreakageData);
+            if (node === null || typeof node !== 'object') return false;
+            return 'breakageReportData' in node || Object.values(node).some(writesBreakageData);
+        };
+
+        /**
+         * Whether a detector can run on a breakage report and has no `breakageReportData` action.
+         *
+         * @param {unknown} detector
+         */
+        const missesBreakageData = (detector) =>
+            detector !== null &&
+            typeof detector === 'object' &&
+            /** @type {Record<string, any>} */ (detector).triggers?.breakageReport?.state !== 'disabled' &&
+            !writesBreakageData(/** @type {Record<string, any>} */ (detector).actions);
+
+        forEachWebDetectionConfig(({ configName, webDetection, detectors }) => {
+            it(`${configName}: every detector that can run on a breakage report has a breakageReportData action`, () => {
+                /** @type {string[]} */
+                const missing = [];
+                for (const [
+                    group,
+                    entries,
+                ] of Object.entries(detectors)) {
+                    for (const [
+                        id,
+                        detector,
+                    ] of Object.entries(/** @type {Record<string, any>} */ (entries))) {
+                        if (missesBreakageData(detector)) missing.push(`detectors.${group}.${id}`);
+                    }
+                }
+                forEachPatchOperation(webDetection, (operation, path) => {
+                    if ((operation.op !== 'add' && operation.op !== 'replace') || typeof operation.path !== 'string') return;
+                    const segments = operation.path.split('/').slice(1);
+                    if (segments[0] !== 'detectors') return;
+                    const where = `${path} ${operation.path}`;
+                    if (segments.length === 1) {
+                        for (const [
+                            group,
+                            entries,
+                        ] of Object.entries(operation.value ?? {})) {
+                            for (const [
+                                id,
+                                detector,
+                            ] of Object.entries(/** @type {Record<string, any>} */ (entries))) {
+                                if (missesBreakageData(detector)) missing.push(`${where} ${group}.${id}`);
+                            }
+                        }
+                    } else if (segments.length === 2) {
+                        for (const [
+                            id,
+                            detector,
+                        ] of Object.entries(operation.value ?? {})) {
+                            if (missesBreakageData(detector)) missing.push(`${where} ${id}`);
+                        }
+                    } else if (segments.length === 3) {
+                        if (missesBreakageData(operation.value)) missing.push(where);
+                    } else if (segments.length === 4 && segments[3] === 'actions') {
+                        const detector = /** @type {Record<string, any>} */ (detectors)[segments[1]]?.[segments[2]];
+                        if (missesBreakageData({ ...detector, actions: operation.value })) missing.push(where);
+                    }
+                });
+                expect(missing, missing.join('\n')).to.deep.equal([]);
+            });
+        });
+
+        // Remove once Apple's webDetection minSupportedVersion is at or above the first iOS and macOS releases
+        // carrying C-S-S 19.0.0. Until then, those apps read `fireEvent` and `breakageReportData` from an
+        // `actions` object only. The versions are above every shipped Apple gate and below the C-S-S 19.0.0 placeholder
+        const PRE_EXPRESSION_APPLE_VERSIONS = [
+            '7.999.0',
+            '1.999.0',
+        ];
+
+        for (const config of latestConfigs.filter(({ name }) => /^v\d+\/(ios|macos)-config\.json$/.test(name))) {
+            const settings = config.body.features?.webDetection?.settings;
+            if (!settings) continue;
+            for (const version of PRE_EXPRESSION_APPLE_VERSIONS) {
+                it(`${config.name} gives apple-isolated ${version} every enabled detector's actions as an object`, () => {
+                    const { settings: patched, failed } = applyConditionalChanges(settings, {
+                        injectName: 'apple-isolated',
+                        version,
+                        cohorts: {},
+                    });
+                    expect(failed, 'conditionalChanges that fail to patch').to.deep.equal([]);
+                    /** @type {string[]} */
+                    const wrong = [];
+                    for (const [
+                        group,
+                        entries,
+                    ] of Object.entries(patched.detectors ?? {})) {
+                        for (const [
+                            id,
+                            detector,
+                        ] of Object.entries(/** @type {Record<string, any>} */ (entries))) {
+                            if (detector.state === 'disabled' || detector.actions === undefined) continue;
+                            const { actions } = detector;
+                            if (
+                                Array.isArray(actions) ||
+                                typeof actions !== 'object' ||
+                                Object.keys(actions).some((key) => key !== 'fireEvent' && key !== 'breakageReportData')
+                            )
+                                wrong.push(`detectors.${group}.${id}`);
+                        }
+                    }
+                    expect(wrong, wrong.join('\n')).to.deep.equal([]);
+                });
+            }
+        }
     });
 
     describe('naming validation', () => {
