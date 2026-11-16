@@ -23,6 +23,8 @@ on:
             - reopened
             - synchronize
             - review_requested
+            - ready_for_review
+            - assigned
 
 jobs:
     # Dedicated job to sync Asana tasks when PR is closed (merged or abandoned)
@@ -225,7 +227,7 @@ jobs:
 
             # Sync Asana tasks for PRs that need manual review (non-auto-approved)
             # Task closure on merge is handled by the dedicated close_asana_on_merge job
-            - uses: duckduckgo/action-asana-sync@v11
+            - uses: duckduckgo/action-asana-sync@v17
               if: |
                   github.event.action != 'closed' &&
                   ((steps.approval.outputs.approved == 'true' && steps.check_files.outputs.files_valid == 'true') != true)
@@ -236,6 +238,9 @@ jobs:
                   GITHUB_PAT: ${{ secrets.GH_RO_PAT }}
                   USER_MAP: ${{ vars.USER_MAP }}
                   ASSIGN_PR_AUTHOR: 'true'
+                  # Reviewers requested by auto-assign-assignees-as-reviewers.yml (GITHUB_TOKEN) never
+                  # trigger a run, and the concurrency group drops queued runs, so take reviewers from PR state
+                  INCLUDE_ASSIGNEES: 'true'
 
             - name: Create comment
               if: github.event.action == 'opened' && (steps.approval.outputs.approved == 'true' && steps.check_files.outputs.files_valid == 'true') != true
