@@ -20,6 +20,7 @@ import {
     UNKNOWN,
     allows,
     describeType,
+    isList,
     itemOf,
     mergeTypes,
     oneItem,
@@ -399,9 +400,9 @@ function nameType(name, ctx) {
  */
 function refType(type, position, ctx, path) {
     if (position === 'boolean') {
-        // A list holds when it has an item
+        // A selected list holds when it has an item
         if (type.list === 'selected') return typeOf('boolean');
-        if (type.list === undefined && !allows(type, 'boolean'))
+        if ((type.list === undefined && !allows(type, 'boolean')) || type.list === 'array')
             fail(ctx, path, `boolean position takes a boolean, and config types the name as ${describeType(type)}`);
         return typeOf('boolean');
     }
@@ -542,8 +543,8 @@ function checkExprKey(key, body, position, scope, ctx, path, holder) {
         }
         case 'expr':
             if (Array.isArray(body)) {
-                // A list of the entries' values, typed as a selected list is, so `length`, `at` and `apply`
-                // read it. It stays a list: never one number, nor a boolean
+                // An array of the entries' values, which `length`, `at` and `apply` read. It stays an
+                // array: never one number, nor a boolean
                 expectPosition(ctx, path, '`expr` over an array, a list,', position, [
                     'value',
                     'list',
@@ -552,7 +553,7 @@ function checkExprKey(key, body, position, scope, ctx, path, holder) {
                 ]);
                 const entries = body.map((entry, index) => checkExpr(entry, 'value', child(scope), ctx, `${path}[${index}]`));
                 const item = entries.length ? mergeTypes(entries.map(itemOf)) : UNKNOWN;
-                return position === 'spread' ? item : { ...item, list: 'selected' };
+                return position === 'spread' ? item : { ...item, list: 'array' };
             }
             // Its operand's value in its own position. An operand with `is` gives a boolean
             if (isPlainObject(body) && 'is' in body) {
@@ -941,17 +942,16 @@ function checkRootEntry(entry, scope, ctx, path, readsXPath) {
     if (entry === '') fail(ctx, path, 'a selector root is a non-empty string');
     const type = checkExpr(entry, 'root', scope, ctx, path);
     // `null` and `undefined` are an empty scope. A list's items are nodes
-    const allowed =
-        type.list === 'selected'
-            ? [
-                  'object',
-              ]
-            : [
-                  'string',
-                  'object',
-                  'null',
-                  'undefined',
-              ];
+    const allowed = isList(type)
+        ? [
+              'object',
+          ]
+        : [
+              'string',
+              'object',
+              'null',
+              'undefined',
+          ];
     if (type.types !== null && type.types.some((name) => !allowed.includes(name)))
         fail(ctx, path, `a root gives a selector, a node or a list of nodes, and config types it as ${describeType(type)}`);
     // The expression is valid, but evaluating it from a shadow root throws `NotSupportedError`
@@ -973,6 +973,10 @@ function checkRootEntry(entry, scope, ctx, path, readsXPath) {
 export function sourceType(type, list, position, ctx, path) {
     if (position === 'spread') return type;
     if (position === 'number') {
+        if (list === 'array') {
+            fail(ctx, path, `number position takes a number, and config types the value as ${describeType({ ...type, list })}`);
+            return type;
+        }
         const item = list ? oneItem(type, ctx, path) : type;
         if (!allows(item, 'number')) fail(ctx, path, `number position takes a number, and config types the value as ${describeType(item)}`);
         return item;

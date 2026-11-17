@@ -179,6 +179,45 @@ describe('webDetection config tests', () => {
             });
         });
 
+        it('rejects a name bound to an `expr` array as a condition or a number, and reads its length', () => {
+            const bindArray = {
+                define: {
+                    list: {
+                        expr: [
+                            6,
+                        ],
+                    },
+                },
+            };
+            expectError('boolean position takes a boolean, and config types the name as an array of number', {
+                actions: [
+                    bindArray,
+                    { if: { ref: 'list' }, then: { breakageReportData: {} } },
+                ],
+            });
+            expectError('number position takes a number, and config types the value as an array of number', {
+                actions: [
+                    bindArray,
+                    {
+                        define: {
+                            half: {
+                                div: [
+                                    { ref: 'list' },
+                                    2,
+                                ],
+                            },
+                        },
+                    },
+                ],
+            });
+            expectValid({
+                actions: [
+                    bindArray,
+                    { if: { ref: 'list', using: 'length', is: { gt: 0 } }, then: { breakageReportData: {} } },
+                ],
+            });
+        });
+
         it('types a ref by the defines that can bind it', () => {
             expectError('number position takes a number', {
                 actions: [

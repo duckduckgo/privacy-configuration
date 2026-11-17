@@ -17,6 +17,7 @@ import {
     describeInterfaces,
     describeType,
     interfaceProperties,
+    isList,
     itemOf,
     mergeTypes,
     oneItem,
@@ -232,7 +233,7 @@ function checkCallArgs(apiPath, args, argTypes, ctx, path) {
     const numbers = isApply ? argTypes.slice(1, 2).map(itemOf) : argTypes;
     numbers.forEach((type, index) => {
         const argPath = `${path}[${isApply ? 1 : index}]`;
-        if (!isApply && type.list === 'selected') fail(ctx, argPath, `\`${method}\` takes numbers; \`${method}.apply\` takes a list`);
+        if (!isApply && isList(type)) fail(ctx, argPath, `\`${method}\` takes numbers; \`${method}.apply\` takes a list`);
         else if (!allows(type, 'number'))
             fail(ctx, argPath, `\`${method}\` takes numbers, and config types the value as ${describeType(type)}`);
     });
@@ -253,7 +254,7 @@ export function checkFieldRead(field, subject, scope, ctx, path) {
     if (isPlainObject(field) && expressionKeysOf(field).length) {
         const type = checkExpr(field, 'value', bindItem(scope, subject), ctx, path);
         // A selected list reaches the predicate as an array
-        return type.list === 'selected' ? { ...type, list: 'maybe' } : type;
+        return isList(type) ? { ...type, list: 'maybe' } : type;
     }
     /** @type {Record<string, any>} */
     let read;
@@ -359,7 +360,7 @@ function readName(current, name, isCall, ctx, path, args, options = {}) {
         };
     }
     const item = readsItem(name, isCall, args);
-    if (current.list === 'selected') {
+    if (isList(current)) {
         if (item) return oneItem(current, ctx, path);
         if (name === 'length' && !isCall) return typeOf('number');
         fail(ctx, path, `reads "${name}" on a list, which \`at\`, an index and \`length\` read; \`only\` takes its one item`);

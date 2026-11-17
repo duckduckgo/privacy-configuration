@@ -28,7 +28,7 @@ import { asArray } from './walk.js';
  *   customElement?: boolean,
  *   fragment?: boolean,
  *   apiPaths?: string[],
- *   list?: 'selected' | 'maybe',
+ *   list?: 'selected' | 'array' | 'maybe',
  *   leaf?: boolean,
  *   nonNumericStrings?: boolean,
  * }} StaticType
@@ -41,9 +41,11 @@ import { asArray } from './walk.js';
  * read through, one for each branch that reads a different one, which names read from it extend
  * for the allowlist.
  *
- * `list` marks a selected list, and the other keys then describe its items. `selected` is what
- * `element`, `text` and `api` with `where` give. `maybe` is a value that is a selected list on
- * some pages or branches only: an `api` with `field`, or an `if` with one list branch.
+ * `list` marks a list, and the other keys then describe its items. `selected` is what `element`,
+ * `text` and `api` with `where` give, which holds as a condition when it has an item and gives its
+ * one item in number position. `array` is what `expr` over an array gives, an array value, which
+ * fills neither position. `maybe` is a value that is a list on some pages or branches only: an
+ * `api` with `field`, or an `if` with one list branch.
  *
  * `leaf` marks the selected list of `element` without `field` or `text`, the condition leaf, which
  * in boolean position holds when it has an item.
@@ -111,7 +113,8 @@ export function mergeTypes(list) {
         ];
     const withStrings = list.filter((entry) => entry.types?.includes('string'));
     if (merged.types && withStrings.length && withStrings.every((entry) => entry.nonNumericStrings)) merged.nonNumericStrings = true;
-    if (list.length && list.every((entry) => entry.list === 'selected')) merged.list = 'selected';
+    const kind = list[0]?.list;
+    if (kind !== undefined && list.every((entry) => entry.list === kind)) merged.list = kind;
     else if (list.some((entry) => entry.list !== undefined)) merged.list = 'maybe';
     if (list.length && list.every((entry) => entry.leaf)) merged.leaf = true;
     return merged;
@@ -149,6 +152,15 @@ export function oneItem(type, ctx, path) {
 }
 
 /**
+ * Whether the value is always a list, which `at`, an index and `length` read.
+ *
+ * @param {StaticType} type
+ */
+export function isList(type) {
+    return type.list === 'selected' || type.list === 'array';
+}
+
+/**
  * @param {StaticType} type
  * @param {TypeName} name
  */
@@ -161,7 +173,9 @@ export function allows(type, name) {
  */
 export function describeType(type) {
     const item = type.types === null ? 'unknown' : type.types.join(' or ');
-    return type.list === 'selected' ? `a list of ${item}` : item;
+    if (type.list === 'selected') return `a list of ${item}`;
+    if (type.list === 'array') return `an array of ${item}`;
+    return item;
 }
 
 /**
