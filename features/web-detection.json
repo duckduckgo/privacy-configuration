@@ -33,8 +33,8 @@
                             "state": "enabled",
                             "when": {
                                 "intervalMs": [
-                                    3100,
-                                    5100
+                                    3000,
+                                    5000
                                 ]
                             }
                         }
@@ -64,8 +64,8 @@
                             "state": "enabled",
                             "when": {
                                 "intervalMs": [
-                                    3200,
-                                    5200
+                                    3000,
+                                    5000
                                 ]
                             }
                         }
@@ -92,8 +92,8 @@
                             "state": "enabled",
                             "when": {
                                 "intervalMs": [
-                                    3300,
-                                    5300
+                                    3000,
+                                    5000
                                 ]
                             }
                         }
@@ -120,8 +120,8 @@
                             "state": "enabled",
                             "when": {
                                 "intervalMs": [
-                                    3400,
-                                    5400
+                                    3000,
+                                    5000
                                 ]
                             }
                         }
@@ -148,8 +148,8 @@
                             "state": "enabled",
                             "when": {
                                 "intervalMs": [
-                                    3500,
-                                    5500
+                                    3000,
+                                    5000
                                 ]
                             }
                         }
@@ -176,8 +176,8 @@
                             "state": "enabled",
                             "when": {
                                 "intervalMs": [
-                                    3600,
-                                    5600
+                                    3000,
+                                    5000
                                 ]
                             }
                         }
@@ -742,9 +742,9 @@
                             "state": "disabled",
                             "when": {
                                 "intervalMs": [
-                                    4600,
-                                    6600,
-                                    10600
+                                    3000,
+                                    5000,
+                                    10000
                                 ]
                             }
                         }
@@ -764,8 +764,8 @@
                             "state": "disabled",
                             "when": {
                                 "intervalMs": [
-                                    6900,
-                                    11000
+                                    5000,
+                                    10000
                                 ]
                             }
                         }
@@ -789,9 +789,9 @@
                             "state": "disabled",
                             "when": {
                                 "intervalMs": [
-                                    4700,
-                                    6700,
-                                    10700
+                                    3000,
+                                    5000,
+                                    10000
                                 ]
                             }
                         }
@@ -816,9 +816,9 @@
                             "state": "disabled",
                             "when": {
                                 "intervalMs": [
-                                    4800,
-                                    6800,
-                                    10800
+                                    3000,
+                                    5000,
+                                    10000
                                 ]
                             }
                         }
@@ -1054,8 +1054,8 @@
                             "state": "enabled",
                             "when": {
                                 "intervalMs": [
-                                    3700,
-                                    5700
+                                    3000,
+                                    5000
                                 ]
                             }
                         }
@@ -1120,8 +1120,8 @@
                             "state": "enabled",
                             "when": {
                                 "intervalMs": [
-                                    3800,
-                                    5800
+                                    3000,
+                                    5000
                                 ]
                             }
                         }
@@ -1154,8 +1154,8 @@
                             "state": "enabled",
                             "when": {
                                 "intervalMs": [
-                                    3900,
-                                    10900
+                                    3000,
+                                    10000
                                 ]
                             }
                         }
@@ -1219,8 +1219,8 @@
                             "state": "enabled",
                             "when": {
                                 "intervalMs": [
-                                    4000,
-                                    6000
+                                    3000,
+                                    5000
                                 ]
                             }
                         }
@@ -1252,8 +1252,8 @@
                             "state": "enabled",
                             "when": {
                                 "intervalMs": [
-                                    4100,
-                                    6100
+                                    3000,
+                                    5000
                                 ]
                             }
                         }
@@ -1283,8 +1283,8 @@
                             "state": "enabled",
                             "when": {
                                 "intervalMs": [
-                                    4200,
-                                    6200
+                                    3000,
+                                    5000
                                 ]
                             }
                         }
@@ -1457,8 +1457,8 @@
                             "state": "enabled",
                             "when": {
                                 "intervalMs": [
-                                    4300,
-                                    6300
+                                    3000,
+                                    5000
                                 ]
                             }
                         }
@@ -1469,38 +1469,6 @@
                         },
                         "breakageReportData": {}
                     }
-                },
-                // prettier-ignore
-                "soft404_phrases_count": {
-                    "state": "disabled",
-                    "triggers": {"auto": {"state": "enabled", "when": {"intervalMs": [1000, 5000]}}},
-                    "match": {
-                        "text": {
-                            "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
-                            "pattern": ["access denied", "page not found", "404 not found"]
-                        },
-                        "using": "length",
-                        "is": {"gte": 1}
-                    },
-                    "actions": [
-                        {"define": {"keywordCount": {
-                            "text": {
-                                "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
-                                "pattern": ["access denied", "page not found", "404 not found"]
-                            },
-                            "using": "length"
-                        }}},
-                        {"breakageReportData": {"data": {"keywordCount": {"value": {"ref": "keywordCount"}}}}},
-                        {"if": {"ref": "keywordCount", "is": 1}, "then": {"fireEvent": {"type": "errorPhraseCount_count1"}}},
-                        {
-                            "if": {"ref": "keywordCount", "is": {"gte": 2, "lt": 5}},
-                            "then": {"fireEvent": {"type": "errorPhraseCount_count2to4"}}
-                        },
-                        {
-                            "if": {"ref": "keywordCount", "is": {"gte": 5}},
-                            "then": {"fireEvent": {"type": "errorPhraseCount_count5Plus"}}
-                        }
-                    ]
                 },
                 "title_unavailable_en": {
                     "state": "disabled",
@@ -1547,6 +1515,399 @@
                     "actions": {
                         "breakageReportData": {}
                     }
+                },
+                // prettier-ignore
+                "soft404_phrases_count": {
+                    "state": "disabled",
+                    "triggers": {"auto": {"state": "enabled", "when": {"intervalMs": [1000, 5000]}}},
+                    "match": {
+                        "text": {
+                            "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                            "pattern": ["access denied", "page not found", "404 not found"]
+                        },
+                        "using": "length",
+                        "is": {"gte": 1}
+                    },
+                    "actions": [
+                        {"define": {"keywordCount": {
+                            "text": {
+                                "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                "pattern": ["access denied", "page not found", "404 not found"]
+                            },
+                            "using": "length"
+                        }}},
+                        {"breakageReportData": {"data": {"keywordCount": {"value": {"ref": "keywordCount"}}}}},
+                        {"if": {"ref": "keywordCount", "is": 1}, "then": {"fireEvent": {"type": "errorPhraseCount_count1"}}},
+                        {
+                            "if": {"ref": "keywordCount", "is": {"gte": 2, "lt": 5}},
+                            "then": {"fireEvent": {"type": "errorPhraseCount_count2to4"}}
+                        },
+                        {
+                            "if": {"ref": "keywordCount", "is": {"gte": 5}},
+                            "then": {"fireEvent": {"type": "errorPhraseCount_count5Plus"}}
+                        }
+                    ]
+                },
+                "soft404_features": {
+                    "state": "disabled",
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    3000,
+                                    10000
+                                ]
+                            }
+                        }
+                    },
+                    "match": {
+                        "if": {
+                            "all": [
+                                {
+                                    "div": [
+                                        {
+                                            "text": {
+                                                "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                                "pattern": "\\S"
+                                            },
+                                            "using": "length"
+                                        },
+                                        {
+                                            "api": {
+                                                "path": "performance.getEntriesByType",
+                                                "args": [
+                                                    "navigation"
+                                                ],
+                                                "field": "decodedBodySize"
+                                            }
+                                        }
+                                    ],
+                                    "is": {
+                                        "lt": 0.15
+                                    }
+                                },
+                                {
+                                    "any": [
+                                        {
+                                            "element": {
+                                                "selector": "img"
+                                            },
+                                            "using": "length",
+                                            "is": {
+                                                "lt": 2
+                                            }
+                                        },
+                                        {
+                                            "api": {
+                                                "path": "Array.from",
+                                                "args": [
+                                                    {
+                                                        "api": {
+                                                            "path": "document.title.matchAll",
+                                                            "args": [
+                                                                "\\S+"
+                                                            ]
+                                                        }
+                                                    }
+                                                ]
+                                            },
+                                            "using": "length",
+                                            "is": {
+                                                "lte": 3
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        "then": {
+                            "text": {
+                                "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                "pattern": [
+                                    "\\b404\\b",
+                                    "\\berror\\b",
+                                    "\\bfound\\b",
+                                    "\\bpage\\b",
+                                    "\\bfile\\b",
+                                    "\\bresource\\b",
+                                    "\\burl\\b",
+                                    "\\baccess denied\\b",
+                                    "\\bforbidden\\b",
+                                    "\\bunavailable\\b",
+                                    "\\bgone\\b",
+                                    "\\bredirect\\b",
+                                    "\\btemporary\\b",
+                                    "\\bpermanent\\b",
+                                    "\\bserver\\b",
+                                    "\\bclient\\b",
+                                    "\\bbrowser\\b",
+                                    "\\bnetwork\\b",
+                                    "\\bdns\\b",
+                                    "\\btypo\\b",
+                                    "\\bmisspelling\\b",
+                                    "\\bstale\\b",
+                                    "\\bbroken\\b",
+                                    "\\bdead\\b",
+                                    "\\bobsolete\\b",
+                                    "\\bexpired\\b",
+                                    "\\binvalid\\b",
+                                    "\\bmalformed\\b",
+                                    "\\bcorrupt\\b",
+                                    "\\bunreachable\\b",
+                                    "\\bdeleted\\b"
+                                ]
+                            },
+                            "using": "length",
+                            "is": {
+                                "gte": 5
+                            }
+                        },
+                        "else": false
+                    },
+                    "actions": [
+                        {
+                            "define": {
+                                "bodyTextLength": {
+                                    "text": {
+                                        "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                        "pattern": "\\S"
+                                    },
+                                    "using": "length"
+                                },
+                                "contentByteRatio": {
+                                    "div": [
+                                        {
+                                            "ref": "bodyTextLength"
+                                        },
+                                        {
+                                            "api": {
+                                                "path": "performance.getEntriesByType",
+                                                "args": [
+                                                    "navigation"
+                                                ],
+                                                "field": "decodedBodySize"
+                                            }
+                                        }
+                                    ]
+                                },
+                                "keywordCount": {
+                                    "text": {
+                                        "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                        "pattern": [
+                                            "\\b404\\b",
+                                            "\\berror\\b",
+                                            "\\bfound\\b",
+                                            "\\bpage\\b",
+                                            "\\bfile\\b",
+                                            "\\bresource\\b",
+                                            "\\burl\\b",
+                                            "\\baccess denied\\b",
+                                            "\\bforbidden\\b",
+                                            "\\bunavailable\\b",
+                                            "\\bgone\\b",
+                                            "\\bredirect\\b",
+                                            "\\btemporary\\b",
+                                            "\\bpermanent\\b",
+                                            "\\bserver\\b",
+                                            "\\bclient\\b",
+                                            "\\bbrowser\\b",
+                                            "\\bnetwork\\b",
+                                            "\\bdns\\b",
+                                            "\\btypo\\b",
+                                            "\\bmisspelling\\b",
+                                            "\\bstale\\b",
+                                            "\\bbroken\\b",
+                                            "\\bdead\\b",
+                                            "\\bobsolete\\b",
+                                            "\\bexpired\\b",
+                                            "\\binvalid\\b",
+                                            "\\bmalformed\\b",
+                                            "\\bcorrupt\\b",
+                                            "\\bunreachable\\b",
+                                            "\\bdeleted\\b"
+                                        ]
+                                    },
+                                    "using": "length"
+                                }
+                            }
+                        },
+                        {
+                            "breakageReportData": {
+                                "data": {
+                                    "contentByteRatio": {
+                                        "value": {
+                                            "ref": "contentByteRatio"
+                                        }
+                                    },
+                                    "keywordCount": {
+                                        "value": {
+                                            "ref": "keywordCount"
+                                        }
+                                    },
+                                    "bodyTextLength": {
+                                        "value": {
+                                            "ref": "bodyTextLength"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "if": {
+                                "ref": "bodyTextLength",
+                                "is": {
+                                    "lt": 2000
+                                }
+                            },
+                            "then": [
+                                {
+                                    "if": {
+                                        "ref": "keywordCount",
+                                        "is": {
+                                            "gte": 5,
+                                            "lt": 10
+                                        }
+                                    },
+                                    "then": {
+                                        "fireEvent": {
+                                            "type": "soft404Features_keywords5to9"
+                                        }
+                                    }
+                                },
+                                {
+                                    "if": {
+                                        "ref": "keywordCount",
+                                        "is": {
+                                            "gte": 10,
+                                            "lt": 25
+                                        }
+                                    },
+                                    "then": {
+                                        "fireEvent": {
+                                            "type": "soft404Features_keywords10to24"
+                                        }
+                                    }
+                                },
+                                {
+                                    "if": {
+                                        "ref": "keywordCount",
+                                        "is": {
+                                            "gte": 25
+                                        }
+                                    },
+                                    "then": {
+                                        "fireEvent": {
+                                            "type": "soft404Features_keywords25Plus"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "failure_phrases_small_page": {
+                    "state": "disabled",
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    3000,
+                                    10000
+                                ]
+                            }
+                        }
+                    },
+                    "match": {
+                        "if": {
+                            "text": {
+                                "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                "pattern": [
+                                    "something went wrong",
+                                    "temporary error",
+                                    "this is taking longer than"
+                                ]
+                            }
+                        },
+                        "then": {
+                            "text": {
+                                "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                "pattern": "\\S"
+                            },
+                            "using": "length",
+                            "is": {
+                                "lt": 2000
+                            }
+                        },
+                        "else": false
+                    },
+                    "actions": [
+                        {
+                            "define": {
+                                "bodyTextLength": {
+                                    "text": {
+                                        "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                        "pattern": "\\S"
+                                    },
+                                    "using": "length"
+                                }
+                            }
+                        },
+                        {
+                            "breakageReportData": {
+                                "data": {
+                                    "bodyTextLength": {
+                                        "value": {
+                                            "ref": "bodyTextLength"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "if": {
+                                "ref": "bodyTextLength",
+                                "is": {
+                                    "gte": 0,
+                                    "lt": 500
+                                }
+                            },
+                            "then": {
+                                "fireEvent": {
+                                    "type": "failurePhrasesSmallPage_text0to499"
+                                }
+                            }
+                        },
+                        {
+                            "if": {
+                                "ref": "bodyTextLength",
+                                "is": {
+                                    "gte": 500,
+                                    "lt": 1000
+                                }
+                            },
+                            "then": {
+                                "fireEvent": {
+                                    "type": "failurePhrasesSmallPage_text500to999"
+                                }
+                            }
+                        },
+                        {
+                            "if": {
+                                "ref": "bodyTextLength",
+                                "is": {
+                                    "gte": 1000,
+                                    "lt": 2000
+                                }
+                            },
+                            "then": {
+                                "fireEvent": {
+                                    "type": "failurePhrasesSmallPage_text1000to1999"
+                                }
+                            }
+                        }
+                    ]
                 }
             },
             "geoblocks": {
@@ -1571,8 +1932,8 @@
                             "state": "enabled",
                             "when": {
                                 "intervalMs": [
-                                    4400,
-                                    6400
+                                    3000,
+                                    5000
                                 ]
                             }
                         }
@@ -1641,7 +2002,7 @@
                             "state": "enabled",
                             "when": {
                                 "intervalMs": [
-                                    6500
+                                    5000
                                 ]
                             }
                         }
@@ -1651,6 +2012,265 @@
                             "type": "blankPage_empty"
                         },
                         "breakageReportData": {}
+                    }
+                },
+                "app_root_empty": {
+                    "state": "disabled",
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    5000,
+                                    10000
+                                ]
+                            }
+                        }
+                    },
+                    "match": {
+                        "any": [
+                            {
+                                "none": [
+                                    {
+                                        "element": {
+                                            "selector": [
+                                                "#app",
+                                                "#root",
+                                                "#__next"
+                                            ],
+                                            "visibility": "any"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "all": [
+                                    {
+                                        "only": {
+                                            "api": {
+                                                "path": "performance.getEntriesByType",
+                                                "args": [
+                                                    "navigation"
+                                                ],
+                                                "field": "loadEventEnd"
+                                            }
+                                        },
+                                        "is": {
+                                            "gt": 0
+                                        }
+                                    },
+                                    {
+                                        "api": {
+                                            "path": "performance.now",
+                                            "args": []
+                                        },
+                                        "is": {
+                                            "gte": {
+                                                "sum": [
+                                                    {
+                                                        "only": {
+                                                            "api": {
+                                                                "path": "performance.getEntriesByType",
+                                                                "args": [
+                                                                    "navigation"
+                                                                ],
+                                                                "field": "loadEventEnd"
+                                                            }
+                                                        }
+                                                    },
+                                                    3000
+                                                ]
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    "actions": {
+                        "if": {
+                            "all": [
+                                {
+                                    "element": {
+                                        "selector": [
+                                            "#app",
+                                            "#root",
+                                            "#__next"
+                                        ],
+                                        "visibility": "any"
+                                    }
+                                },
+                                {
+                                    "none": [
+                                        {
+                                            "element": {
+                                                "selector": [
+                                                    "#app",
+                                                    "#root",
+                                                    "#__next"
+                                                ],
+                                                "visibility": "content"
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        "then": [
+                            {
+                                "define": {
+                                    "loadEventEnd": {
+                                        "only": {
+                                            "api": {
+                                                "path": "performance.getEntriesByType",
+                                                "args": [
+                                                    "navigation"
+                                                ],
+                                                "field": "loadEventEnd"
+                                            }
+                                        }
+                                    },
+                                    "failedScripts": {
+                                        "if": {
+                                            "api": {
+                                                "path": "Reflect.has",
+                                                "args": [
+                                                    {
+                                                        "api": "PerformanceResourceTiming.prototype"
+                                                    },
+                                                    "responseStatus"
+                                                ]
+                                            }
+                                        },
+                                        "then": {
+                                            "api": {
+                                                "path": "performance.getEntriesByType",
+                                                "args": [
+                                                    "resource"
+                                                ],
+                                                "where": {
+                                                    "initiatorType": "script",
+                                                    "responseStatus": {
+                                                        "gte": 400
+                                                    }
+                                                }
+                                            },
+                                            "using": "length"
+                                        },
+                                        "else": "unsupported"
+                                    },
+                                    "bodyTextLength": {
+                                        "text": {
+                                            "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                            "pattern": "\\S"
+                                        },
+                                        "using": "length"
+                                    }
+                                }
+                            },
+                            {
+                                "breakageReportData": {
+                                    "data": {
+                                        "failedScripts": {
+                                            "value": {
+                                                "ref": "failedScripts"
+                                            }
+                                        },
+                                        "bodyTextLength": {
+                                            "value": {
+                                                "ref": "bodyTextLength"
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            {
+                                "if": {
+                                    "ref": "bodyTextLength",
+                                    "is": {
+                                        "lt": 500
+                                    }
+                                },
+                                "then": [
+                                    {
+                                        "if": {
+                                            "ref": "loadEventEnd",
+                                            "is": {
+                                                "gt": 0,
+                                                "lt": 3000
+                                            }
+                                        },
+                                        "then": {
+                                            "fireEvent": {
+                                                "type": "appRootEmpty_load0to3s"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "if": {
+                                            "ref": "loadEventEnd",
+                                            "is": {
+                                                "gte": 3000,
+                                                "lt": 8000
+                                            }
+                                        },
+                                        "then": {
+                                            "fireEvent": {
+                                                "type": "appRootEmpty_load3to8s"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "if": {
+                                            "ref": "loadEventEnd",
+                                            "is": {
+                                                "gte": 8000
+                                            }
+                                        },
+                                        "then": {
+                                            "fireEvent": {
+                                                "type": "appRootEmpty_load8sPlus"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "if": {
+                                            "ref": "failedScripts",
+                                            "is": 0
+                                        },
+                                        "then": {
+                                            "fireEvent": {
+                                                "type": "appRootEmpty_scripts0"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "if": {
+                                            "ref": "failedScripts",
+                                            "is": 1
+                                        },
+                                        "then": {
+                                            "fireEvent": {
+                                                "type": "appRootEmpty_scripts1"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "if": {
+                                            "ref": "failedScripts",
+                                            "is": {
+                                                "gte": 2
+                                            }
+                                        },
+                                        "then": {
+                                            "fireEvent": {
+                                                "type": "appRootEmpty_scripts2Plus"
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
                     }
                 },
                 // The load event ended and the page painted no text, image, non-white canvas or SVG
@@ -1759,6 +2379,927 @@
                                     {
                                         "if": {"ref": "firstPaints", "is": {"gte": 1}},
                                         "then": {"fireEvent": {"type": "noContentfulPaint_firstPaintPainted"}}
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                },
+                // An empty mount container, sampled at nine viewport points: a point is empty when the element there is html,
+                // body or the container. The samples persist across reads in detector names, so the detector has no match
+                "viewport_sample": {
+                    "state": "disabled",
+                    // Reads at 5 s and 10 s, each with a re-sample 200 ms later, and at 15 s
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    5000,
+                                    5200,
+                                    10000,
+                                    10200,
+                                    15000
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        // Finished: no mount container, a container holding content, or a detection
+                        "if": {
+                            "none": [
+                                {
+                                    "ref": "this.finished",
+                                    "is": true
+                                }
+                            ]
+                        },
+                        "then": [
+                            // Wait: the page is visible, and the load event ended 3 s before this read. loadEventEnd is a navigation value
+                            {
+                                "define": {
+                                    "loadEventEnd": {
+                                        "only": {
+                                            "api": {
+                                                "path": "performance.getEntriesByType",
+                                                "args": [
+                                                    "navigation"
+                                                ],
+                                                "field": "loadEventEnd"
+                                            }
+                                        }
+                                    },
+                                    "settled": {
+                                        "all": [
+                                            {
+                                                "none": [
+                                                    {
+                                                        "api": "document.hidden"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "all": [
+                                                    {
+                                                        "ref": "loadEventEnd",
+                                                        "is": {
+                                                            "gt": 0
+                                                        }
+                                                    },
+                                                    {
+                                                        "api": {
+                                                            "path": "performance.now",
+                                                            "args": []
+                                                        },
+                                                        "is": {
+                                                            "gte": {
+                                                                "sum": [
+                                                                    {
+                                                                        "ref": "loadEventEnd"
+                                                                    },
+                                                                    3000
+                                                                ]
+                                                            }
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                }
+                            },
+                            // Finished: no mount container, or, on a settled read, a container holding content
+                            {
+                                "define": {
+                                    "this.finished": {
+                                        "any": [
+                                            {
+                                                "none": [
+                                                    {
+                                                        "element": {
+                                                            "selector": [
+                                                                "#app",
+                                                                "#root",
+                                                                "#__next"
+                                                            ],
+                                                            "visibility": "any"
+                                                        }
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "if": {
+                                                    "ref": "settled",
+                                                    "is": true
+                                                },
+                                                "then": {
+                                                    "element": {
+                                                        "selector": [
+                                                            "#app",
+                                                            "#root",
+                                                            "#__next"
+                                                        ],
+                                                        "visibility": "content"
+                                                    }
+                                                },
+                                                "else": false
+                                            }
+                                        ]
+                                    }
+                                }
+                            },
+                            // Wait: an unsettled read clears the samples
+                            {
+                                "if": {
+                                    "ref": "settled",
+                                    "is": false
+                                },
+                                "then": {
+                                    "define": {
+                                        "this.lastEmpty": null,
+                                        "this.firstAt": null
+                                    }
+                                }
+                            },
+                            {
+                                "if": {
+                                    "all": [
+                                        {
+                                            "ref": "settled",
+                                            "is": true
+                                        },
+                                        {
+                                            "none": [
+                                                {
+                                                    "ref": "this.finished",
+                                                    "is": true
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                "then": [
+                                    // This read's sample
+                                    {
+                                        "define": {
+                                            // The element at each of nine points, at 20%, 50% and 80% of the viewport width and height
+                                            "h1": {
+                                                "api": {
+                                                    "path": "document.elementFromPoint",
+                                                    "args": [
+                                                        {
+                                                            "mul": [
+                                                                {
+                                                                    "api": "innerWidth"
+                                                                },
+                                                                0.2
+                                                            ]
+                                                        },
+                                                        {
+                                                            "mul": [
+                                                                {
+                                                                    "api": "innerHeight"
+                                                                },
+                                                                0.2
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "h2": {
+                                                "api": {
+                                                    "path": "document.elementFromPoint",
+                                                    "args": [
+                                                        {
+                                                            "mul": [
+                                                                {
+                                                                    "api": "innerWidth"
+                                                                },
+                                                                0.5
+                                                            ]
+                                                        },
+                                                        {
+                                                            "mul": [
+                                                                {
+                                                                    "api": "innerHeight"
+                                                                },
+                                                                0.2
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "h3": {
+                                                "api": {
+                                                    "path": "document.elementFromPoint",
+                                                    "args": [
+                                                        {
+                                                            "mul": [
+                                                                {
+                                                                    "api": "innerWidth"
+                                                                },
+                                                                0.8
+                                                            ]
+                                                        },
+                                                        {
+                                                            "mul": [
+                                                                {
+                                                                    "api": "innerHeight"
+                                                                },
+                                                                0.2
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "h4": {
+                                                "api": {
+                                                    "path": "document.elementFromPoint",
+                                                    "args": [
+                                                        {
+                                                            "mul": [
+                                                                {
+                                                                    "api": "innerWidth"
+                                                                },
+                                                                0.2
+                                                            ]
+                                                        },
+                                                        {
+                                                            "mul": [
+                                                                {
+                                                                    "api": "innerHeight"
+                                                                },
+                                                                0.5
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "h5": {
+                                                "api": {
+                                                    "path": "document.elementFromPoint",
+                                                    "args": [
+                                                        {
+                                                            "mul": [
+                                                                {
+                                                                    "api": "innerWidth"
+                                                                },
+                                                                0.5
+                                                            ]
+                                                        },
+                                                        {
+                                                            "mul": [
+                                                                {
+                                                                    "api": "innerHeight"
+                                                                },
+                                                                0.5
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "h6": {
+                                                "api": {
+                                                    "path": "document.elementFromPoint",
+                                                    "args": [
+                                                        {
+                                                            "mul": [
+                                                                {
+                                                                    "api": "innerWidth"
+                                                                },
+                                                                0.8
+                                                            ]
+                                                        },
+                                                        {
+                                                            "mul": [
+                                                                {
+                                                                    "api": "innerHeight"
+                                                                },
+                                                                0.5
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "h7": {
+                                                "api": {
+                                                    "path": "document.elementFromPoint",
+                                                    "args": [
+                                                        {
+                                                            "mul": [
+                                                                {
+                                                                    "api": "innerWidth"
+                                                                },
+                                                                0.2
+                                                            ]
+                                                        },
+                                                        {
+                                                            "mul": [
+                                                                {
+                                                                    "api": "innerHeight"
+                                                                },
+                                                                0.8
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "h8": {
+                                                "api": {
+                                                    "path": "document.elementFromPoint",
+                                                    "args": [
+                                                        {
+                                                            "mul": [
+                                                                {
+                                                                    "api": "innerWidth"
+                                                                },
+                                                                0.5
+                                                            ]
+                                                        },
+                                                        {
+                                                            "mul": [
+                                                                {
+                                                                    "api": "innerHeight"
+                                                                },
+                                                                0.8
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "h9": {
+                                                "api": {
+                                                    "path": "document.elementFromPoint",
+                                                    "args": [
+                                                        {
+                                                            "mul": [
+                                                                {
+                                                                    "api": "innerWidth"
+                                                                },
+                                                                0.8
+                                                            ]
+                                                        },
+                                                        {
+                                                            "mul": [
+                                                                {
+                                                                    "api": "innerHeight"
+                                                                },
+                                                                0.8
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            // Points whose element is html, body or the mount container
+                                            "emptyPoints": {
+                                                "sum": [
+                                                    {
+                                                        "if": {
+                                                            "ref": "h1",
+                                                            "using": {
+                                                                "path": "matches",
+                                                                "args": [
+                                                                    "html, body, #app, #root, #__next"
+                                                                ]
+                                                            },
+                                                            "is": true
+                                                        },
+                                                        "then": 1,
+                                                        "else": 0
+                                                    },
+                                                    {
+                                                        "if": {
+                                                            "ref": "h2",
+                                                            "using": {
+                                                                "path": "matches",
+                                                                "args": [
+                                                                    "html, body, #app, #root, #__next"
+                                                                ]
+                                                            },
+                                                            "is": true
+                                                        },
+                                                        "then": 1,
+                                                        "else": 0
+                                                    },
+                                                    {
+                                                        "if": {
+                                                            "ref": "h3",
+                                                            "using": {
+                                                                "path": "matches",
+                                                                "args": [
+                                                                    "html, body, #app, #root, #__next"
+                                                                ]
+                                                            },
+                                                            "is": true
+                                                        },
+                                                        "then": 1,
+                                                        "else": 0
+                                                    },
+                                                    {
+                                                        "if": {
+                                                            "ref": "h4",
+                                                            "using": {
+                                                                "path": "matches",
+                                                                "args": [
+                                                                    "html, body, #app, #root, #__next"
+                                                                ]
+                                                            },
+                                                            "is": true
+                                                        },
+                                                        "then": 1,
+                                                        "else": 0
+                                                    },
+                                                    {
+                                                        "if": {
+                                                            "ref": "h5",
+                                                            "using": {
+                                                                "path": "matches",
+                                                                "args": [
+                                                                    "html, body, #app, #root, #__next"
+                                                                ]
+                                                            },
+                                                            "is": true
+                                                        },
+                                                        "then": 1,
+                                                        "else": 0
+                                                    },
+                                                    {
+                                                        "if": {
+                                                            "ref": "h6",
+                                                            "using": {
+                                                                "path": "matches",
+                                                                "args": [
+                                                                    "html, body, #app, #root, #__next"
+                                                                ]
+                                                            },
+                                                            "is": true
+                                                        },
+                                                        "then": 1,
+                                                        "else": 0
+                                                    },
+                                                    {
+                                                        "if": {
+                                                            "ref": "h7",
+                                                            "using": {
+                                                                "path": "matches",
+                                                                "args": [
+                                                                    "html, body, #app, #root, #__next"
+                                                                ]
+                                                            },
+                                                            "is": true
+                                                        },
+                                                        "then": 1,
+                                                        "else": 0
+                                                    },
+                                                    {
+                                                        "if": {
+                                                            "ref": "h8",
+                                                            "using": {
+                                                                "path": "matches",
+                                                                "args": [
+                                                                    "html, body, #app, #root, #__next"
+                                                                ]
+                                                            },
+                                                            "is": true
+                                                        },
+                                                        "then": 1,
+                                                        "else": 0
+                                                    },
+                                                    {
+                                                        "if": {
+                                                            "ref": "h9",
+                                                            "using": {
+                                                                "path": "matches",
+                                                                "args": [
+                                                                    "html, body, #app, #root, #__next"
+                                                                ]
+                                                            },
+                                                            "is": true
+                                                        },
+                                                        "then": 1,
+                                                        "else": 0
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    {
+                                        // Route: at least 8 of 9 points empty on this read and the one before
+                                        "if": {
+                                            "all": [
+                                                {
+                                                    "ref": "this.lastEmpty",
+                                                    "is": {
+                                                        "type": "number",
+                                                        "gte": 8
+                                                    }
+                                                },
+                                                {
+                                                    "ref": "emptyPoints",
+                                                    "is": {
+                                                        "gte": 8
+                                                    }
+                                                }
+                                            ]
+                                        },
+                                        "then": [
+                                            {
+                                                "define": {
+                                                    "route": "empty",
+                                                    "bodyTextLength": {
+                                                        "text": {
+                                                            "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                                            "pattern": "\\S"
+                                                        },
+                                                        "using": "length"
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "breakageReportData": {
+                                                    "data": {
+                                                        "route": {
+                                                            "value": {
+                                                                "ref": "route"
+                                                            }
+                                                        },
+                                                        "emptyPoints": {
+                                                            "value": {
+                                                                "ref": "emptyPoints"
+                                                            }
+                                                        },
+                                                        "bodyTextLength": {
+                                                            "value": {
+                                                                "ref": "bodyTextLength"
+                                                            }
+                                                        }
+                                                    }
+                                                },
+                                                "define": {
+                                                    "this.finished": true
+                                                }
+                                            }
+                                        ],
+                                        "else": {
+                                            // Route: every point holds the element the first sample found there, at least 4.5 s later.
+                                            // Timers fire late, so the bound is under the 5 s between reads. this.firstAt is undefined before the
+                                            // first sample and null after an unsettled read, and sum errors on either
+                                            "if": {
+                                                "if": {
+                                                    "ref": "this.firstAt",
+                                                    "is": {
+                                                        "type": "number"
+                                                    }
+                                                },
+                                                "then": {
+                                                    "all": [
+                                                        {
+                                                            "api": {
+                                                                "path": "performance.now",
+                                                                "args": []
+                                                            },
+                                                            "is": {
+                                                                "gte": {
+                                                                    "sum": [
+                                                                        {
+                                                                            "ref": "this.firstAt"
+                                                                        },
+                                                                        4500
+                                                                    ]
+                                                                }
+                                                            }
+                                                        },
+                                                        {
+                                                            "ref": "h1",
+                                                            "is": {
+                                                                "eq": {
+                                                                    "ref": "this.first1"
+                                                                }
+                                                            }
+                                                        },
+                                                        {
+                                                            "ref": "h2",
+                                                            "is": {
+                                                                "eq": {
+                                                                    "ref": "this.first2"
+                                                                }
+                                                            }
+                                                        },
+                                                        {
+                                                            "ref": "h3",
+                                                            "is": {
+                                                                "eq": {
+                                                                    "ref": "this.first3"
+                                                                }
+                                                            }
+                                                        },
+                                                        {
+                                                            "ref": "h4",
+                                                            "is": {
+                                                                "eq": {
+                                                                    "ref": "this.first4"
+                                                                }
+                                                            }
+                                                        },
+                                                        {
+                                                            "ref": "h5",
+                                                            "is": {
+                                                                "eq": {
+                                                                    "ref": "this.first5"
+                                                                }
+                                                            }
+                                                        },
+                                                        {
+                                                            "ref": "h6",
+                                                            "is": {
+                                                                "eq": {
+                                                                    "ref": "this.first6"
+                                                                }
+                                                            }
+                                                        },
+                                                        {
+                                                            "ref": "h7",
+                                                            "is": {
+                                                                "eq": {
+                                                                    "ref": "this.first7"
+                                                                }
+                                                            }
+                                                        },
+                                                        {
+                                                            "ref": "h8",
+                                                            "is": {
+                                                                "eq": {
+                                                                    "ref": "this.first8"
+                                                                }
+                                                            }
+                                                        },
+                                                        {
+                                                            "ref": "h9",
+                                                            "is": {
+                                                                "eq": {
+                                                                    "ref": "this.first9"
+                                                                }
+                                                            }
+                                                        }
+                                                    ]
+                                                },
+                                                "else": false
+                                            },
+                                            "then": [
+                                                {
+                                                    "define": {
+                                                        "route": "unchanged",
+                                                        "bodyTextLength": {
+                                                            "text": {
+                                                                "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                                                "pattern": "\\S"
+                                                            },
+                                                            "using": "length"
+                                                        },
+                                                        // Points on the root or inside the container
+                                                        "insidePoints": {
+                                                            "sum": [
+                                                                {
+                                                                    "if": {
+                                                                        "ref": "h1",
+                                                                        "using": {
+                                                                            "path": "matches",
+                                                                            "args": [
+                                                                                "html, body, #app, #root, #__next, #app *, #root *, #__next *"
+                                                                            ]
+                                                                        },
+                                                                        "is": true
+                                                                    },
+                                                                    "then": 1,
+                                                                    "else": 0
+                                                                },
+                                                                {
+                                                                    "if": {
+                                                                        "ref": "h2",
+                                                                        "using": {
+                                                                            "path": "matches",
+                                                                            "args": [
+                                                                                "html, body, #app, #root, #__next, #app *, #root *, #__next *"
+                                                                            ]
+                                                                        },
+                                                                        "is": true
+                                                                    },
+                                                                    "then": 1,
+                                                                    "else": 0
+                                                                },
+                                                                {
+                                                                    "if": {
+                                                                        "ref": "h3",
+                                                                        "using": {
+                                                                            "path": "matches",
+                                                                            "args": [
+                                                                                "html, body, #app, #root, #__next, #app *, #root *, #__next *"
+                                                                            ]
+                                                                        },
+                                                                        "is": true
+                                                                    },
+                                                                    "then": 1,
+                                                                    "else": 0
+                                                                },
+                                                                {
+                                                                    "if": {
+                                                                        "ref": "h4",
+                                                                        "using": {
+                                                                            "path": "matches",
+                                                                            "args": [
+                                                                                "html, body, #app, #root, #__next, #app *, #root *, #__next *"
+                                                                            ]
+                                                                        },
+                                                                        "is": true
+                                                                    },
+                                                                    "then": 1,
+                                                                    "else": 0
+                                                                },
+                                                                {
+                                                                    "if": {
+                                                                        "ref": "h5",
+                                                                        "using": {
+                                                                            "path": "matches",
+                                                                            "args": [
+                                                                                "html, body, #app, #root, #__next, #app *, #root *, #__next *"
+                                                                            ]
+                                                                        },
+                                                                        "is": true
+                                                                    },
+                                                                    "then": 1,
+                                                                    "else": 0
+                                                                },
+                                                                {
+                                                                    "if": {
+                                                                        "ref": "h6",
+                                                                        "using": {
+                                                                            "path": "matches",
+                                                                            "args": [
+                                                                                "html, body, #app, #root, #__next, #app *, #root *, #__next *"
+                                                                            ]
+                                                                        },
+                                                                        "is": true
+                                                                    },
+                                                                    "then": 1,
+                                                                    "else": 0
+                                                                },
+                                                                {
+                                                                    "if": {
+                                                                        "ref": "h7",
+                                                                        "using": {
+                                                                            "path": "matches",
+                                                                            "args": [
+                                                                                "html, body, #app, #root, #__next, #app *, #root *, #__next *"
+                                                                            ]
+                                                                        },
+                                                                        "is": true
+                                                                    },
+                                                                    "then": 1,
+                                                                    "else": 0
+                                                                },
+                                                                {
+                                                                    "if": {
+                                                                        "ref": "h8",
+                                                                        "using": {
+                                                                            "path": "matches",
+                                                                            "args": [
+                                                                                "html, body, #app, #root, #__next, #app *, #root *, #__next *"
+                                                                            ]
+                                                                        },
+                                                                        "is": true
+                                                                    },
+                                                                    "then": 1,
+                                                                    "else": 0
+                                                                },
+                                                                {
+                                                                    "if": {
+                                                                        "ref": "h9",
+                                                                        "using": {
+                                                                            "path": "matches",
+                                                                            "args": [
+                                                                                "html, body, #app, #root, #__next, #app *, #root *, #__next *"
+                                                                            ]
+                                                                        },
+                                                                        "is": true
+                                                                    },
+                                                                    "then": 1,
+                                                                    "else": 0
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                },
+                                                {
+                                                    "breakageReportData": {
+                                                        "data": {
+                                                            "route": {
+                                                                "value": {
+                                                                    "ref": "route"
+                                                                }
+                                                            },
+                                                            "emptyPoints": {
+                                                                "value": {
+                                                                    "ref": "emptyPoints"
+                                                                }
+                                                            },
+                                                            "bodyTextLength": {
+                                                                "value": {
+                                                                    "ref": "bodyTextLength"
+                                                                }
+                                                            },
+                                                            "insidePoints": {
+                                                                "value": {
+                                                                    "ref": "insidePoints"
+                                                                }
+                                                            }
+                                                        }
+                                                    },
+                                                    "define": {
+                                                        "this.finished": true
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    // This read's empty count, for the next read's empty route
+                                    {
+                                        "define": {
+                                            "this.lastEmpty": {
+                                                "ref": "emptyPoints"
+                                            }
+                                        }
+                                    },
+                                    // The first sample, for the unchanged route
+                                    {
+                                        "if": {
+                                            "ref": "this.firstAt",
+                                            "is": {
+                                                "type": [
+                                                    "undefined",
+                                                    "null"
+                                                ]
+                                            }
+                                        },
+                                        "then": {
+                                            "define": {
+                                                "this.firstAt": {
+                                                    "api": {
+                                                        "path": "performance.now",
+                                                        "args": []
+                                                    }
+                                                },
+                                                "this.first1": {
+                                                    "ref": "h1"
+                                                },
+                                                "this.first2": {
+                                                    "ref": "h2"
+                                                },
+                                                "this.first3": {
+                                                    "ref": "h3"
+                                                },
+                                                "this.first4": {
+                                                    "ref": "h4"
+                                                },
+                                                "this.first5": {
+                                                    "ref": "h5"
+                                                },
+                                                "this.first6": {
+                                                    "ref": "h6"
+                                                },
+                                                "this.first7": {
+                                                    "ref": "h7"
+                                                },
+                                                "this.first8": {
+                                                    "ref": "h8"
+                                                },
+                                                "this.first9": {
+                                                    "ref": "h9"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    // Threshold: under 500 characters of rendered text, on the empty route. route is bound only on a detecting read.
+                                    // The unchanged route is in breakage reports only
+                                    {
+                                        "if": {
+                                            "all": [
+                                                {
+                                                    "ref": "bodyTextLength",
+                                                    "is": {
+                                                        "lt": 500
+                                                    }
+                                                },
+                                                {
+                                                    "ref": "route",
+                                                    "is": "empty"
+                                                }
+                                            ]
+                                        },
+                                        "then": {
+                                            "fireEvent": {
+                                                "type": "viewportEmpty_empty8of9"
+                                            }
+                                        }
                                     }
                                 ]
                             }
@@ -2143,6 +3684,172 @@
                             ]
                         }
                     ]
+                }
+            },
+            "regionBreakage": {
+                "comments_empty": {
+                    "state": "disabled",
+                    "triggers": {
+                        "breakageReport": {
+                            "runConditions": {
+                                "context": {
+                                    "top": true
+                                },
+                                "urlPattern": "https://www.example.com/*"
+                            }
+                        }
+                    },
+                    "actions": [
+                        {
+                            "define": {
+                                "comments": {
+                                    "element": {
+                                        "selector": [
+                                            "#comments"
+                                        ]
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "if": {
+                                "ref": "comments"
+                            },
+                            "then": {
+                                "if": {
+                                    "all": [
+                                        {
+                                            "none": {
+                                                "text": {
+                                                    "xpath": ".//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                                    "pattern": "\\S",
+                                                    "root": {
+                                                        "ref": "comments"
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "element": {
+                                                "selector": "img",
+                                                "where": {
+                                                    "complete": true,
+                                                    "naturalWidth": {
+                                                        "gt": 0
+                                                    }
+                                                },
+                                                "root": {
+                                                    "ref": "comments"
+                                                }
+                                            },
+                                            "using": "length",
+                                            "is": {
+                                                "lt": 1
+                                            }
+                                        }
+                                    ]
+                                },
+                                "then": {
+                                    "breakageReportData": {
+                                        "data": {
+                                            "region": {
+                                                "value": "empty"
+                                            },
+                                            "brokenImages": {
+                                                "value": {
+                                                    "element": {
+                                                        "selector": "img",
+                                                        "where": {
+                                                            "complete": true,
+                                                            "naturalWidth": 0,
+                                                            "currentSrc.length": {
+                                                                "gt": 0
+                                                            }
+                                                        },
+                                                        "root": {
+                                                            "ref": "comments"
+                                                        }
+                                                    },
+                                                    "using": "length"
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "else": {
+                                    "breakageReportData": {
+                                        "data": {
+                                            "region": {
+                                                "value": "filled"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                }
+            },
+            "protectionsBreakage": {
+                // Measurement, read again for each breakage report. It fires no event
+                "visible_content_counters": {
+                    "state": "disabled",
+                    // One read, 5 s after the detector starts
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    5000
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        // Measurement: loaded images, broken images and rendered text length. An image our protections block reads as broken
+                        "breakageReportData": {
+                            "data": {
+                                "loadedImages": {
+                                    "value": {
+                                        "element": {
+                                            "selector": "img",
+                                            "where": {
+                                                "complete": true,
+                                                "naturalWidth": {
+                                                    "gt": 0
+                                                }
+                                            }
+                                        },
+                                        "using": "length"
+                                    }
+                                },
+                                "brokenImages": {
+                                    "value": {
+                                        "element": {
+                                            "selector": "img",
+                                            "where": {
+                                                "complete": true,
+                                                "naturalWidth": 0,
+                                                "currentSrc.length": {
+                                                    "gt": 0
+                                                }
+                                            }
+                                        },
+                                        "using": "length"
+                                    }
+                                },
+                                "bodyTextLength": {
+                                    "value": {
+                                        "text": {
+                                            "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                            "pattern": "\\S"
+                                        },
+                                        "using": "length"
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             },
             "consent": {
@@ -2675,11 +4382,11 @@
                                 "state": "enabled",
                                 "when": {
                                     "intervalMs": [
-                                        1100,
-                                        7100,
-                                        11100,
-                                        15100,
-                                        20100
+                                        1000,
+                                        7000,
+                                        11000,
+                                        15000,
+                                        20000
                                     ]
                                 }
                             }
@@ -2708,11 +4415,11 @@
                                 "state": "enabled",
                                 "when": {
                                     "intervalMs": [
-                                        1200,
-                                        7200,
-                                        11200,
-                                        15200,
-                                        20200
+                                        1000,
+                                        7000,
+                                        11000,
+                                        15000,
+                                        20000
                                     ]
                                 }
                             }
@@ -2741,11 +4448,11 @@
                                 "state": "enabled",
                                 "when": {
                                     "intervalMs": [
-                                        1300,
-                                        7300,
-                                        11300,
-                                        15300,
-                                        20300
+                                        1000,
+                                        7000,
+                                        11000,
+                                        15000,
+                                        20000
                                     ]
                                 }
                             }
@@ -3261,6 +4968,1430 @@
                             },
                             "else": false
                         }
+                    }
+                ]
+            },
+            // Updates shipped detectors on this release's clients: their actions, and match and triggers where they change.
+            // Older clients keep the shipped forms in detectors
+            {
+                // This release's clients: app versions carrying the C-S-S that parses match and actions expressions.
+                // The versions are placeholders until that app release is known for each platform. iOS and macOS share
+                // the apple inject names, so their real versions need the range split used in the entry above
+                "condition": [
+                    {
+                        "injectName": "android",
+                        "minSupportedVersion": 99990000
+                    },
+                    {
+                        "injectName": "android-adsjs",
+                        "minSupportedVersion": 99990000
+                    },
+                    {
+                        "injectName": "windows",
+                        "minSupportedVersion": "999.0.0"
+                    },
+                    {
+                        "injectName": "apple",
+                        "minSupportedVersion": "999.0.0"
+                    },
+                    {
+                        "injectName": "apple-isolated",
+                        "minSupportedVersion": "999.0.0"
+                    },
+                    {
+                        "injectName": "chrome-mv3",
+                        "minSupportedVersion": "9999.1.1"
+                    },
+                    {
+                        "injectName": "chrome",
+                        "minSupportedVersion": "9999.1.1"
+                    },
+                    {
+                        "injectName": "firefox",
+                        "minSupportedVersion": "9999.1.1"
+                    }
+                ],
+                "patchSettings": [
+                    // Block-page status and text length: the shipped event, with the response status and rendered text length
+                    {
+                        "op": "add",
+                        "path": "/detectors/captcha/cloudflare_challenge_extra/actions",
+                        "value": [
+                            // Event: the shipped event, on every detection
+                            {
+                                "fireEvent": {
+                                    "type": "challenge_cloudflare"
+                                }
+                            },
+                            {
+                                "define": {
+                                    // Navigation value. Engines without responseStatus read unsupported, which is in no range
+                                    "status": {
+                                        "if": {
+                                            "api": {
+                                                "path": "Reflect.has",
+                                                "args": [
+                                                    {
+                                                        "api": "PerformanceResourceTiming.prototype"
+                                                    },
+                                                    "responseStatus"
+                                                ]
+                                            }
+                                        },
+                                        "then": {
+                                            "only": {
+                                                "api": {
+                                                    "path": "performance.getEntriesByType",
+                                                    "args": [
+                                                        "navigation"
+                                                    ],
+                                                    "field": "responseStatus"
+                                                }
+                                            }
+                                        },
+                                        "else": "unsupported"
+                                    },
+                                    // An interstitial has little text; a content page carrying the vendor markup has more
+                                    "bodyTextLength": {
+                                        "text": {
+                                            "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                            "pattern": "\\S"
+                                        },
+                                        "using": "length"
+                                    }
+                                }
+                            },
+                            {
+                                "breakageReportData": {
+                                    "data": {
+                                        "bodyTextLength": {
+                                            "value": {
+                                                "ref": "bodyTextLength"
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            // Events: the response status and the rendered text length
+                            {
+                                "if": {
+                                    "ref": "status",
+                                    "is": {
+                                        "gte": 200,
+                                        "lt": 300
+                                    }
+                                },
+                                "then": {
+                                    "fireEvent": {
+                                        "type": "challenge_status2xx"
+                                    }
+                                }
+                            },
+                            {
+                                "if": {
+                                    "ref": "status",
+                                    "is": {
+                                        "gte": 400,
+                                        "lt": 500
+                                    }
+                                },
+                                "then": {
+                                    "fireEvent": {
+                                        "type": "challenge_status4xx"
+                                    }
+                                }
+                            },
+                            {
+                                "if": {
+                                    "ref": "status",
+                                    "is": {
+                                        "gte": 500,
+                                        "lt": 600
+                                    }
+                                },
+                                "then": {
+                                    "fireEvent": {
+                                        "type": "challenge_status5xx"
+                                    }
+                                }
+                            },
+                            {
+                                "if": {
+                                    "ref": "bodyTextLength",
+                                    "is": {
+                                        "gte": 0,
+                                        "lt": 500
+                                    }
+                                },
+                                "then": {
+                                    "fireEvent": {
+                                        "type": "challenge_text0to499"
+                                    }
+                                }
+                            },
+                            {
+                                "if": {
+                                    "ref": "bodyTextLength",
+                                    "is": {
+                                        "gte": 500,
+                                        "lt": 2000
+                                    }
+                                },
+                                "then": {
+                                    "fireEvent": {
+                                        "type": "challenge_text500to1999"
+                                    }
+                                }
+                            },
+                            {
+                                "if": {
+                                    "ref": "bodyTextLength",
+                                    "is": {
+                                        "gte": 2000
+                                    }
+                                },
+                                "then": {
+                                    "fireEvent": {
+                                        "type": "challenge_text2000Plus"
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/captcha/cloudflare_access_denied/actions",
+                        "value": [
+                            // Event: the shipped event, on every detection
+                            {
+                                "fireEvent": {
+                                    "type": "blockPage_cloudflare"
+                                }
+                            },
+                            {
+                                "define": {
+                                    // Navigation value. Engines without responseStatus read unsupported, which is in no range
+                                    "status": {
+                                        "if": {
+                                            "api": {
+                                                "path": "Reflect.has",
+                                                "args": [
+                                                    {
+                                                        "api": "PerformanceResourceTiming.prototype"
+                                                    },
+                                                    "responseStatus"
+                                                ]
+                                            }
+                                        },
+                                        "then": {
+                                            "only": {
+                                                "api": {
+                                                    "path": "performance.getEntriesByType",
+                                                    "args": [
+                                                        "navigation"
+                                                    ],
+                                                    "field": "responseStatus"
+                                                }
+                                            }
+                                        },
+                                        "else": "unsupported"
+                                    },
+                                    // An interstitial has little text; a content page carrying the vendor markup has more
+                                    "bodyTextLength": {
+                                        "text": {
+                                            "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                            "pattern": "\\S"
+                                        },
+                                        "using": "length"
+                                    }
+                                }
+                            },
+                            {
+                                "breakageReportData": {
+                                    "data": {
+                                        "bodyTextLength": {
+                                            "value": {
+                                                "ref": "bodyTextLength"
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            // Events: the response status and the rendered text length
+                            {
+                                "if": {
+                                    "ref": "status",
+                                    "is": {
+                                        "gte": 200,
+                                        "lt": 300
+                                    }
+                                },
+                                "then": {
+                                    "fireEvent": {
+                                        "type": "blockPage_status2xx"
+                                    }
+                                }
+                            },
+                            {
+                                "if": {
+                                    "ref": "status",
+                                    "is": {
+                                        "gte": 400,
+                                        "lt": 500
+                                    }
+                                },
+                                "then": {
+                                    "fireEvent": {
+                                        "type": "blockPage_status4xx"
+                                    }
+                                }
+                            },
+                            {
+                                "if": {
+                                    "ref": "status",
+                                    "is": {
+                                        "gte": 500,
+                                        "lt": 600
+                                    }
+                                },
+                                "then": {
+                                    "fireEvent": {
+                                        "type": "blockPage_status5xx"
+                                    }
+                                }
+                            },
+                            {
+                                "if": {
+                                    "ref": "bodyTextLength",
+                                    "is": {
+                                        "gte": 0,
+                                        "lt": 500
+                                    }
+                                },
+                                "then": {
+                                    "fireEvent": {
+                                        "type": "blockPage_text0to499"
+                                    }
+                                }
+                            },
+                            {
+                                "if": {
+                                    "ref": "bodyTextLength",
+                                    "is": {
+                                        "gte": 500,
+                                        "lt": 2000
+                                    }
+                                },
+                                "then": {
+                                    "fireEvent": {
+                                        "type": "blockPage_text500to1999"
+                                    }
+                                }
+                            },
+                            {
+                                "if": {
+                                    "ref": "bodyTextLength",
+                                    "is": {
+                                        "gte": 2000
+                                    }
+                                },
+                                "then": {
+                                    "fireEvent": {
+                                        "type": "blockPage_text2000Plus"
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    // Vercel checkpoint: records the read that first finds the checkpoint, and reports whether it cleared or still
+                    // showed 8 s later, with how long it showed. The detector finishes through this.finished, so it has no match
+                    {
+                        "op": "remove",
+                        "path": "/detectors/blockPage/vercel_checkpoint/match"
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/blockPage/vercel_checkpoint/triggers",
+                        // Reads at 1 s, 5 s, 10 s and 15 s
+                        "value": {
+                            "auto": {
+                                "state": "enabled",
+                                "when": {
+                                    "intervalMs": [
+                                        1000,
+                                        5000,
+                                        10000,
+                                        15000
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/blockPage/vercel_checkpoint/actions",
+                        "value": {
+                            // Finished: no checkpoint at the first read, or a route holds
+                            "if": {
+                                "none": [
+                                    {
+                                        "ref": "this.finished",
+                                        "is": true
+                                    }
+                                ]
+                            },
+                            "then": [
+                                {
+                                    "define": {
+                                        "checkpoint": {
+                                            "text": {
+                                                "selector": [
+                                                    "title"
+                                                ],
+                                                "pattern": [
+                                                    "^vercel security checkpoint$"
+                                                ]
+                                            }
+                                        },
+                                        "now": {
+                                            "api": {
+                                                "path": "performance.now",
+                                                "args": []
+                                            }
+                                        }
+                                    }
+                                },
+                                // The first read. With no checkpoint, finished: the title is served with the document
+                                {
+                                    "if": {
+                                        "ref": "this.firstSeen",
+                                        "is": {
+                                            "type": "undefined"
+                                        }
+                                    },
+                                    "then": [
+                                        {
+                                            "define": {
+                                                "this.finished": {
+                                                    "none": [
+                                                        {
+                                                            "ref": "checkpoint"
+                                                        }
+                                                    ]
+                                                },
+                                                "this.firstSeen": {
+                                                    "ref": "now"
+                                                }
+                                            }
+                                        },
+                                        // Event: the shipped event, at the first read that finds the checkpoint
+                                        {
+                                            "if": {
+                                                "ref": "checkpoint"
+                                            },
+                                            "then": {
+                                                "fireEvent": {
+                                                    "type": "blockPage_vercel"
+                                                }
+                                            }
+                                        }
+                                    ]
+                                },
+                                {
+                                    "if": {
+                                        "none": [
+                                            {
+                                                "ref": "this.finished",
+                                                "is": true
+                                            }
+                                        ]
+                                    },
+                                    "then": [
+                                        // From the read that first found the checkpoint
+                                        {
+                                            "define": {
+                                                "shownFor": {
+                                                    "sum": [
+                                                        {
+                                                            "ref": "now"
+                                                        },
+                                                        {
+                                                            "mul": [
+                                                                {
+                                                                    "ref": "this.firstSeen"
+                                                                },
+                                                                -1
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        {
+                                            // Route: the checkpoint has gone
+                                            "if": {
+                                                "none": [
+                                                    {
+                                                        "ref": "checkpoint"
+                                                    }
+                                                ]
+                                            },
+                                            "then": {
+                                                "define": {
+                                                    "route": "cleared"
+                                                }
+                                            },
+                                            // Route: the checkpoint still shows 8 s or more after the read that first found it
+                                            "else": {
+                                                "if": {
+                                                    "ref": "shownFor",
+                                                    "is": {
+                                                        "gte": 8000
+                                                    }
+                                                },
+                                                "then": {
+                                                    "define": {
+                                                        "route": "held"
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "if": {
+                                                "ref": "route",
+                                                "is": {
+                                                    "in": [
+                                                        "cleared",
+                                                        "held"
+                                                    ]
+                                                }
+                                            },
+                                            "then": [
+                                                {
+                                                    "breakageReportData": {
+                                                        "data": {
+                                                            "route": {
+                                                                "value": {
+                                                                    "ref": "route"
+                                                                }
+                                                            },
+                                                            "shownFor": {
+                                                                "value": {
+                                                                    "ref": "shownFor"
+                                                                }
+                                                            }
+                                                        }
+                                                    },
+                                                    "define": {
+                                                        "this.finished": true
+                                                    }
+                                                },
+                                                // Threshold: the checkpoint showed for 8 s or more. One that passes sooner is in breakage reports only
+                                                {
+                                                    "if": {
+                                                        "ref": "shownFor",
+                                                        "is": {
+                                                            "gte": 8000
+                                                        }
+                                                    },
+                                                    "then": [
+                                                        // Events: a checkpoint that cleared after 8 s or more, or a held one
+                                                        {
+                                                            "if": {
+                                                                "ref": "route",
+                                                                "is": "cleared"
+                                                            },
+                                                            "then": {
+                                                                "fireEvent": {
+                                                                    "type": "vercelCheckpoint_cleared_shown8sPlus"
+                                                                }
+                                                            }
+                                                        },
+                                                        {
+                                                            "if": {
+                                                                "ref": "route",
+                                                                "is": "held"
+                                                            },
+                                                            "then": {
+                                                                "fireEvent": {
+                                                                    "type": "vercelCheckpoint_held8s"
+                                                                }
+                                                            }
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    // HTTP 403 pages: a bare "Forbidden" counts only on an error status
+                    {
+                        "op": "add",
+                        "path": "/detectors/blockPage/http_forbidden_en/match",
+                        "value": {
+                            "any": [
+                                // Route: status wording specific enough on its own
+                                {
+                                    "text": {
+                                        "selector": [
+                                            "title",
+                                            "h1"
+                                        ],
+                                        "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                        "pattern": [
+                                            "\\b403\\b[^.]{0,40}forbidden",
+                                            "forbidden[^.]{0,30}\\b403\\b",
+                                            "access is denied"
+                                        ]
+                                    }
+                                },
+                                // Route: a bare "Forbidden", on a response with an error status or on an engine without responseStatus
+                                {
+                                    "all": [
+                                        {
+                                            "text": {
+                                                "selector": [
+                                                    "title",
+                                                    "h1"
+                                                ],
+                                                "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                                "pattern": [
+                                                    "^\\s*forbidden\\b"
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "only": {
+                                                "api": {
+                                                    "path": "performance.getEntriesByType",
+                                                    "args": [
+                                                        "navigation"
+                                                    ],
+                                                    "field": "responseStatus"
+                                                }
+                                            },
+                                            "is": {
+                                                "any": [
+                                                    {
+                                                        "type": "undefined"
+                                                    },
+                                                    {
+                                                        "gte": 400
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/blockPage/http_forbidden_en/triggers",
+                        // Reads at 1 s and 5 s
+                        "value": {
+                            "auto": {
+                                "state": "enabled",
+                                "when": {
+                                    "intervalMs": [
+                                        1000,
+                                        5000
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/blockPage/http_forbidden_en/actions",
+                        "value": [
+                            // Event: the shipped event, on every detection. match holds only on a route
+                            {
+                                "fireEvent": {
+                                    "type": "blockPage_forbidden"
+                                }
+                            },
+                            // Navigation value
+                            {
+                                "define": {
+                                    "status": {
+                                        "only": {
+                                            "api": {
+                                                "path": "performance.getEntriesByType",
+                                                "args": [
+                                                    "navigation"
+                                                ],
+                                                "field": "responseStatus"
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            {
+                                // Route: status wording specific enough on its own
+                                "if": {
+                                    "text": {
+                                        "selector": [
+                                            "title",
+                                            "h1"
+                                        ],
+                                        "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                        "pattern": [
+                                            "\\b403\\b[^.]{0,40}forbidden",
+                                            "forbidden[^.]{0,30}\\b403\\b",
+                                            "access is denied"
+                                        ]
+                                    }
+                                },
+                                "then": {
+                                    "define": {
+                                        "route": "wording"
+                                    }
+                                },
+                                // Route: a bare "Forbidden", on a response with an error status or on an engine without responseStatus
+                                "else": {
+                                    "if": {
+                                        "all": [
+                                            {
+                                                "text": {
+                                                    "selector": [
+                                                        "title",
+                                                        "h1"
+                                                    ],
+                                                    "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                                    "pattern": [
+                                                        "^\\s*forbidden\\b"
+                                                    ]
+                                                }
+                                            },
+                                            {
+                                                "ref": "status",
+                                                "is": {
+                                                    "any": [
+                                                        {
+                                                            "type": "undefined"
+                                                        },
+                                                        {
+                                                            "gte": 400
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        ]
+                                    },
+                                    "then": {
+                                        "define": {
+                                            "route": "bareForbidden"
+                                        }
+                                    }
+                                }
+                            },
+                            {
+                                "breakageReportData": {
+                                    "data": {
+                                        "route": {
+                                            "value": {
+                                                "ref": "route"
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            // Events: the route and the response status. The bare route holds only on an error status.
+                            // Engines without responseStatus read undefined, which no range holds, and fire none
+                            {
+                                "if": {
+                                    "all": [
+                                        {
+                                            "ref": "route",
+                                            "is": "wording"
+                                        },
+                                        {
+                                            "ref": "status",
+                                            "is": {
+                                                "gte": 200,
+                                                "lt": 300
+                                            }
+                                        }
+                                    ]
+                                },
+                                "then": {
+                                    "fireEvent": {
+                                        "type": "forbiddenPage_wording_status2xx"
+                                    }
+                                }
+                            },
+                            {
+                                "if": {
+                                    "all": [
+                                        {
+                                            "ref": "route",
+                                            "is": "wording"
+                                        },
+                                        {
+                                            "ref": "status",
+                                            "is": {
+                                                "gte": 400,
+                                                "lt": 500
+                                            }
+                                        }
+                                    ]
+                                },
+                                "then": {
+                                    "fireEvent": {
+                                        "type": "forbiddenPage_wording_status4xx"
+                                    }
+                                }
+                            },
+                            {
+                                "if": {
+                                    "all": [
+                                        {
+                                            "ref": "route",
+                                            "is": "wording"
+                                        },
+                                        {
+                                            "ref": "status",
+                                            "is": {
+                                                "gte": 500,
+                                                "lt": 600
+                                            }
+                                        }
+                                    ]
+                                },
+                                "then": {
+                                    "fireEvent": {
+                                        "type": "forbiddenPage_wording_status5xx"
+                                    }
+                                }
+                            },
+                            {
+                                "if": {
+                                    "all": [
+                                        {
+                                            "ref": "route",
+                                            "is": "bareForbidden"
+                                        },
+                                        {
+                                            "ref": "status",
+                                            "is": {
+                                                "gte": 400,
+                                                "lt": 500
+                                            }
+                                        }
+                                    ]
+                                },
+                                "then": {
+                                    "fireEvent": {
+                                        "type": "forbiddenPage_bareForbidden_status4xx"
+                                    }
+                                }
+                            },
+                            {
+                                "if": {
+                                    "all": [
+                                        {
+                                            "ref": "route",
+                                            "is": "bareForbidden"
+                                        },
+                                        {
+                                            "ref": "status",
+                                            "is": {
+                                                "gte": 500,
+                                                "lt": 600
+                                            }
+                                        }
+                                    ]
+                                },
+                                "then": {
+                                    "fireEvent": {
+                                        "type": "forbiddenPage_bareForbidden_status5xx"
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    // HTTP 429 pages: a bare "too many requests" counts only on an error status
+                    {
+                        "op": "add",
+                        "path": "/detectors/blockPage/http_rate_limited_en/match",
+                        "value": {
+                            "any": [
+                                // Route: status wording specific enough on its own
+                                {
+                                    "text": {
+                                        "selector": [
+                                            "title",
+                                            "h1"
+                                        ],
+                                        "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                        "pattern": [
+                                            "\\b429\\b[^.]{0,30}too many requests"
+                                        ]
+                                    }
+                                },
+                                // Route: a bare "too many requests", on a response with an error status or on an engine without responseStatus
+                                {
+                                    "all": [
+                                        {
+                                            "text": {
+                                                "selector": [
+                                                    "title",
+                                                    "h1"
+                                                ],
+                                                "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                                "pattern": [
+                                                    "too many requests"
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "only": {
+                                                "api": {
+                                                    "path": "performance.getEntriesByType",
+                                                    "args": [
+                                                        "navigation"
+                                                    ],
+                                                    "field": "responseStatus"
+                                                }
+                                            },
+                                            "is": {
+                                                "any": [
+                                                    {
+                                                        "type": "undefined"
+                                                    },
+                                                    {
+                                                        "gte": 400
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/blockPage/http_rate_limited_en/triggers",
+                        // Reads at 1 s and 5 s
+                        "value": {
+                            "auto": {
+                                "state": "enabled",
+                                "when": {
+                                    "intervalMs": [
+                                        1000,
+                                        5000
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/blockPage/http_rate_limited_en/actions",
+                        "value": [
+                            // Event: the shipped event, on every detection. match holds only on a route
+                            {
+                                "fireEvent": {
+                                    "type": "blockPage_toomanyrequests"
+                                }
+                            },
+                            // Navigation value
+                            {
+                                "define": {
+                                    "status": {
+                                        "only": {
+                                            "api": {
+                                                "path": "performance.getEntriesByType",
+                                                "args": [
+                                                    "navigation"
+                                                ],
+                                                "field": "responseStatus"
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            {
+                                // Route: status wording specific enough on its own
+                                "if": {
+                                    "text": {
+                                        "selector": [
+                                            "title",
+                                            "h1"
+                                        ],
+                                        "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                        "pattern": [
+                                            "\\b429\\b[^.]{0,30}too many requests"
+                                        ]
+                                    }
+                                },
+                                "then": {
+                                    "define": {
+                                        "route": "wording"
+                                    }
+                                },
+                                // Route: a bare "too many requests", on a response with an error status or on an engine without responseStatus
+                                "else": {
+                                    "if": {
+                                        "all": [
+                                            {
+                                                "text": {
+                                                    "selector": [
+                                                        "title",
+                                                        "h1"
+                                                    ],
+                                                    "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                                    "pattern": [
+                                                        "too many requests"
+                                                    ]
+                                                }
+                                            },
+                                            {
+                                                "ref": "status",
+                                                "is": {
+                                                    "any": [
+                                                        {
+                                                            "type": "undefined"
+                                                        },
+                                                        {
+                                                            "gte": 400
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        ]
+                                    },
+                                    "then": {
+                                        "define": {
+                                            "route": "bareTooManyRequests"
+                                        }
+                                    }
+                                }
+                            },
+                            {
+                                "breakageReportData": {
+                                    "data": {
+                                        "route": {
+                                            "value": {
+                                                "ref": "route"
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            // Events: the route and the response status. The bare route holds only on an error status.
+                            // Engines without responseStatus read undefined, which no range holds, and fire none
+                            {
+                                "if": {
+                                    "all": [
+                                        {
+                                            "ref": "route",
+                                            "is": "wording"
+                                        },
+                                        {
+                                            "ref": "status",
+                                            "is": {
+                                                "gte": 200,
+                                                "lt": 300
+                                            }
+                                        }
+                                    ]
+                                },
+                                "then": {
+                                    "fireEvent": {
+                                        "type": "rateLimitedPage_wording_status2xx"
+                                    }
+                                }
+                            },
+                            {
+                                "if": {
+                                    "all": [
+                                        {
+                                            "ref": "route",
+                                            "is": "wording"
+                                        },
+                                        {
+                                            "ref": "status",
+                                            "is": {
+                                                "gte": 400,
+                                                "lt": 500
+                                            }
+                                        }
+                                    ]
+                                },
+                                "then": {
+                                    "fireEvent": {
+                                        "type": "rateLimitedPage_wording_status4xx"
+                                    }
+                                }
+                            },
+                            {
+                                "if": {
+                                    "all": [
+                                        {
+                                            "ref": "route",
+                                            "is": "wording"
+                                        },
+                                        {
+                                            "ref": "status",
+                                            "is": {
+                                                "gte": 500,
+                                                "lt": 600
+                                            }
+                                        }
+                                    ]
+                                },
+                                "then": {
+                                    "fireEvent": {
+                                        "type": "rateLimitedPage_wording_status5xx"
+                                    }
+                                }
+                            },
+                            {
+                                "if": {
+                                    "all": [
+                                        {
+                                            "ref": "route",
+                                            "is": "bareTooManyRequests"
+                                        },
+                                        {
+                                            "ref": "status",
+                                            "is": {
+                                                "gte": 400,
+                                                "lt": 500
+                                            }
+                                        }
+                                    ]
+                                },
+                                "then": {
+                                    "fireEvent": {
+                                        "type": "rateLimitedPage_bareTooManyRequests_status4xx"
+                                    }
+                                }
+                            },
+                            {
+                                "if": {
+                                    "all": [
+                                        {
+                                            "ref": "route",
+                                            "is": "bareTooManyRequests"
+                                        },
+                                        {
+                                            "ref": "status",
+                                            "is": {
+                                                "gte": 500,
+                                                "lt": 600
+                                            }
+                                        }
+                                    ]
+                                },
+                                "then": {
+                                    "fireEvent": {
+                                        "type": "rateLimitedPage_bareTooManyRequests_status5xx"
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    // Verification titles: as the block-page status and text length above
+                    {
+                        "op": "add",
+                        "path": "/detectors/verification/title_en/actions",
+                        "value": [
+                            // Event: the shipped event, on every detection
+                            {
+                                "fireEvent": {
+                                    "type": "challenge_generic"
+                                }
+                            },
+                            {
+                                "define": {
+                                    // Navigation value. Engines without responseStatus read unsupported, which is in no range
+                                    "status": {
+                                        "if": {
+                                            "api": {
+                                                "path": "Reflect.has",
+                                                "args": [
+                                                    {
+                                                        "api": "PerformanceResourceTiming.prototype"
+                                                    },
+                                                    "responseStatus"
+                                                ]
+                                            }
+                                        },
+                                        "then": {
+                                            "only": {
+                                                "api": {
+                                                    "path": "performance.getEntriesByType",
+                                                    "args": [
+                                                        "navigation"
+                                                    ],
+                                                    "field": "responseStatus"
+                                                }
+                                            }
+                                        },
+                                        "else": "unsupported"
+                                    },
+                                    // An interstitial has little text; a content page carrying the vendor markup has more
+                                    "bodyTextLength": {
+                                        "text": {
+                                            "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                            "pattern": "\\S"
+                                        },
+                                        "using": "length"
+                                    }
+                                }
+                            },
+                            {
+                                "breakageReportData": {
+                                    "data": {
+                                        "bodyTextLength": {
+                                            "value": {
+                                                "ref": "bodyTextLength"
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            // Events: the response status and the rendered text length
+                            {
+                                "if": {
+                                    "ref": "status",
+                                    "is": {
+                                        "gte": 200,
+                                        "lt": 300
+                                    }
+                                },
+                                "then": {
+                                    "fireEvent": {
+                                        "type": "challenge_status2xx"
+                                    }
+                                }
+                            },
+                            {
+                                "if": {
+                                    "ref": "status",
+                                    "is": {
+                                        "gte": 400,
+                                        "lt": 500
+                                    }
+                                },
+                                "then": {
+                                    "fireEvent": {
+                                        "type": "challenge_status4xx"
+                                    }
+                                }
+                            },
+                            {
+                                "if": {
+                                    "ref": "status",
+                                    "is": {
+                                        "gte": 500,
+                                        "lt": 600
+                                    }
+                                },
+                                "then": {
+                                    "fireEvent": {
+                                        "type": "challenge_status5xx"
+                                    }
+                                }
+                            },
+                            {
+                                "if": {
+                                    "ref": "bodyTextLength",
+                                    "is": {
+                                        "gte": 0,
+                                        "lt": 500
+                                    }
+                                },
+                                "then": {
+                                    "fireEvent": {
+                                        "type": "challenge_text0to499"
+                                    }
+                                }
+                            },
+                            {
+                                "if": {
+                                    "ref": "bodyTextLength",
+                                    "is": {
+                                        "gte": 500,
+                                        "lt": 2000
+                                    }
+                                },
+                                "then": {
+                                    "fireEvent": {
+                                        "type": "challenge_text500to1999"
+                                    }
+                                }
+                            },
+                            {
+                                "if": {
+                                    "ref": "bodyTextLength",
+                                    "is": {
+                                        "gte": 2000
+                                    }
+                                },
+                                "then": {
+                                    "fireEvent": {
+                                        "type": "challenge_text2000Plus"
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    // No text or title: the response size and the media count
+                    {
+                        "op": "add",
+                        "path": "/detectors/blankPage/no_text_or_title/match",
+                        // Detected: no rendered text and no title
+                        "value": {
+                            "none": [
+                                {
+                                    "text": {
+                                        "xpath": "//title/text() | //body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                        "pattern": [
+                                            "\\S"
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/blankPage/no_text_or_title/triggers",
+                        // One read, 5 s after the detector starts
+                        "value": {
+                            "auto": {
+                                "state": "enabled",
+                                "when": {
+                                    "intervalMs": [
+                                        5000
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "op": "add",
+                        "path": "/detectors/blankPage/no_text_or_title/actions",
+                        "value": [
+                            // Event: the shipped event, on every detection
+                            {
+                                "fireEvent": {
+                                    "type": "blankPage_empty"
+                                }
+                            },
+                            // The response size, a navigation value, and the media count
+                            {
+                                "define": {
+                                    "bodySize": {
+                                        "only": {
+                                            "api": {
+                                                "path": "performance.getEntriesByType",
+                                                "args": [
+                                                    "navigation"
+                                                ],
+                                                "field": "decodedBodySize"
+                                            }
+                                        }
+                                    },
+                                    "media": {
+                                        "element": {
+                                            "selector": [
+                                                "img",
+                                                "video",
+                                                "canvas",
+                                                "svg",
+                                                "iframe",
+                                                "embed",
+                                                "object"
+                                            ]
+                                        },
+                                        "using": "length"
+                                    }
+                                }
+                            },
+                            {
+                                "breakageReportData": {
+                                    "data": {
+                                        "media": {
+                                            "value": {
+                                                "ref": "media"
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            // Threshold: no media either. A page showing only media, such as an image opened directly, fires no size event
+                            {
+                                "if": {
+                                    "ref": "media",
+                                    "is": 0
+                                },
+                                "then": [
+                                    // Events: the response size
+                                    {
+                                        "if": {
+                                            "ref": "bodySize",
+                                            "is": 0
+                                        },
+                                        "then": {
+                                            "fireEvent": {
+                                                "type": "noTextOrTitle_size0"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "if": {
+                                            "ref": "bodySize",
+                                            "is": {
+                                                "gt": 0,
+                                                "lt": 1024
+                                            }
+                                        },
+                                        "then": {
+                                            "fireEvent": {
+                                                "type": "noTextOrTitle_sizeUnder1KB"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "if": {
+                                            "ref": "bodySize",
+                                            "is": {
+                                                "gte": 1024,
+                                                "lt": 102400
+                                            }
+                                        },
+                                        "then": {
+                                            "fireEvent": {
+                                                "type": "noTextOrTitle_size1to100KB"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "if": {
+                                            "ref": "bodySize",
+                                            "is": {
+                                                "gte": 102400
+                                            }
+                                        },
+                                        "then": {
+                                            "fireEvent": {
+                                                "type": "noTextOrTitle_size100KBPlus"
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
                     }
                 ]
             },
