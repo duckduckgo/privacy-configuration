@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+import { immutableJSONPatch } from 'immutable-json-patch';
 import { sequenceWebDetectionActions } from '../../util.js';
 import {
     CLIENT_RELEASES,
@@ -268,8 +269,13 @@ describe('webDetection config tests', () => {
                 { define: { b: 1 } },
             ]);
             expect(settings.detectors.g.list.actions).to.deep.equal([
-                { define: { x: 1 } },
-                { define: { y: { ref: 'x' } } },
+                {
+                    if: true,
+                    then: [
+                        { define: { x: 1 } },
+                        { define: { y: { ref: 'x' } } },
+                    ],
+                },
                 {
                     if: true,
                     then: [
@@ -306,6 +312,69 @@ describe('webDetection config tests', () => {
                 ],
             });
             expect(settings.conditionalChanges[0].patchSettings[4].value).to.deep.equal({ fireEvent: { type: 'f' } });
+        });
+
+        it('keeps each authored sequence element one element, so patch indices address the same action (self-test)', () => {
+            const detector = {
+                actions: [
+                    { define: { a: 1, b: 2 } },
+                    { fireEvent: { type: 'x' } },
+                ],
+            };
+            const defines = {
+                if: true,
+                then: [
+                    { define: { a: 1 } },
+                    { define: { b: 2 } },
+                ],
+            };
+            const cases = [
+                {
+                    operation: { op: 'replace', path: '/detectors/g/d/actions/1', value: { fireEvent: { type: 'y' } } },
+                    actions: [
+                        defines,
+                        { fireEvent: { type: 'y' } },
+                    ],
+                },
+                {
+                    operation: { op: 'remove', path: '/detectors/g/d/actions/1' },
+                    actions: [
+                        defines,
+                    ],
+                },
+                {
+                    operation: { op: 'replace', path: '/detectors/g/d/actions/1/fireEvent/type', value: 'z' },
+                    actions: [
+                        defines,
+                        { fireEvent: { type: 'z' } },
+                    ],
+                },
+            ];
+            for (const { operation, actions } of cases) {
+                const config = {
+                    features: {
+                        webDetection: {
+                            settings: {
+                                detectors: { g: { d: structuredClone(detector) } },
+                                conditionalChanges: [
+                                    {
+                                        condition: { injectName: 'apple-isolated' },
+                                        patchSettings: [
+                                            operation,
+                                        ],
+                                    },
+                                ],
+                            },
+                        },
+                    },
+                };
+                sequenceWebDetectionActions(config);
+                const settings = config.features.webDetection.settings;
+                const patched = /** @type {Record<string, any>} */ (
+                    immutableJSONPatch(settings, settings.conditionalChanges[0].patchSettings)
+                );
+                expect(patched.detectors.g.d.actions, operation.op).to.deep.equal(actions);
+            }
         });
 
         it('leaves an object of only fireEvent and breakageReportData as one object (self-test)', () => {

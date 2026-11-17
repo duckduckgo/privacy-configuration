@@ -290,14 +290,17 @@ function splitActions(node) {
 }
 
 /**
- * The body of `actions`, `then` or `else`, with each object of several actions spliced into the
- * sequence holding it, or made a sequence.
+ * The body of `actions`, `then` or `else`, with an object of several actions made a sequence, and
+ * each element of a sequence rewritten by `sequenceElement`.
+ *
+ * Each authored element stays one element, so a patch path that indexes into the sequence points
+ * at the same element on Apple as on the other platforms.
  *
  * @param {unknown} body
  * @returns {unknown}
  */
 function sequenceBody(body) {
-    if (Array.isArray(body)) return body.flatMap((element) => splitActions(sequenceExpression(element)));
+    if (Array.isArray(body)) return body.map(sequenceElement);
     const elements = splitActions(sequenceExpression(body));
     return elements.length === 1 ? elements[0] : elements;
 }
@@ -325,8 +328,8 @@ function sequenceExpression(node) {
 }
 
 /**
- * One element of a sequence, rewritten as `sequenceBody` would splice it. A sequence element holds no
- * nested sequence, so several actions become an `if` that always takes its `then`, run in order.
+ * One element of a sequence, with its actions split. A sequence element holds no nested sequence, so
+ * several actions become an `if` that always takes its `then`, run in order.
  *
  * @param {unknown} element
  * @returns {unknown}
