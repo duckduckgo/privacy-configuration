@@ -31,10 +31,8 @@
 
 /**
  * @typedef {{
- *   mode: 'collect' | 'check',
  *   errors: string[],
  *   functionApis: WeakSet<object>,
- *   structuralErrors: string[],
  *   hasMatch: boolean,
  *   runNames: Map<string, StaticType>,
  *   detectorNames: Map<string, StaticType>,
@@ -46,10 +44,7 @@
  *
  * `runNames` holds the run names a `define` may have bound at the point of the walk, with the type
  * of each value that can be bound. `detectorNames` holds the type of each detector name, from every
- * `define` of it in the detector, which the `collect` walk gathers into `collected`.
- *
- * A detector is walked twice: `collect` gathers the detector names' types, and `check` reports every
- * error.
+ * `define` of it in the detector, as the walk before gathered them into `collected`.
  */
 
 /** @type {Scope} */
@@ -93,10 +88,8 @@ export function expectPosition(ctx, path, what, position, fills) {
  */
 export function newContext() {
     return {
-        mode: 'collect',
         errors: [],
         functionApis: new WeakSet(),
-        structuralErrors: [],
         hasMatch: false,
         runNames: new Map(),
         detectorNames: new Map(),

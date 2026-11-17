@@ -161,6 +161,24 @@ describe('webDetection config tests', () => {
             });
         });
 
+        it('types a detector name bound to another detector name', () => {
+            expectError('number position takes a number, and config types the value as string', {
+                actions: [
+                    { define: { 'this.a': 'x' } },
+                    { define: { 'this.b': { ref: 'this.a' } } },
+                    {
+                        define: {
+                            n: {
+                                sum: [
+                                    { ref: 'this.b' },
+                                ],
+                            },
+                        },
+                    },
+                ],
+            });
+        });
+
         it('types a ref by the defines that can bind it', () => {
             expectError('number position takes a number', {
                 actions: [
