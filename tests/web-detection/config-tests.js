@@ -9,8 +9,8 @@ import {
     runsOnBreakageReport,
     writesBreakageData,
 } from './clients.js';
-import { forEachPatchOperation, forEachPatchedDetector, forEachWebDetectionConfig, latestConfigs } from './configs.js';
-import { ACTION_KEYS, BRANCH_KEYS, EXPRESSION_KEYS, NAME_PATTERN, PROPERTY_TABLES } from './validator/grammar.js';
+import { detectorNameErrors, forEachPatchOperation, forEachPatchedDetector, forEachWebDetectionConfig, latestConfigs } from './configs.js';
+import { ACTION_KEYS, BRANCH_KEYS, EXPRESSION_KEYS, PROPERTY_TABLES } from './validator/grammar.js';
 import { interfaceProperties, selectorInterfaces } from './validator/types.js';
 import { assertValidDetector, validateDetector } from './validator/validate.js';
 import { forEachDetectorTextCondition, isPlainObject } from './validator/walk.js';
@@ -406,20 +406,43 @@ describe('webDetection config tests', () => {
     });
 
     describe('naming validation', () => {
-        forEachWebDetectionConfig(({ configName, detectors }) => {
+        forEachWebDetectionConfig(({ configName, webDetection }) => {
             describe(configName, () => {
-                it('detector and group names should be named correctly', () => {
-                    for (const [
-                        groupName,
-                        groupDetectors,
-                    ] of Object.entries(detectors)) {
-                        expect(groupName).to.match(NAME_PATTERN);
-                        for (const detectorName of Object.keys(groupDetectors)) {
-                            expect(detectorName).to.match(NAME_PATTERN);
-                        }
-                    }
+                it('detector and group names should be named correctly, including those patches add', () => {
+                    const errors = detectorNameErrors(webDetection);
+                    expect(errors, errors.join('\n')).to.deep.equal([]);
                 });
             });
+        });
+
+        it('checks the names of detectors and groups that patches add (self-test)', () => {
+            const webDetection = /** @type {any} */ ({
+                state: 'enabled',
+                exceptions: [],
+                settings: {
+                    detectors: { good: { ok: { match: true } } },
+                    domains: [
+                        {
+                            domain: 'example.com',
+                            patchSettings: [
+                                { op: 'add', path: '/detectors/bad-group', value: { ok: { match: true } } },
+                            ],
+                        },
+                    ],
+                    conditionalChanges: [
+                        {
+                            condition: { injectName: 'android' },
+                            patchSettings: [
+                                { op: 'add', path: '/detectors/good/bad-name', value: { match: true } },
+                            ],
+                        },
+                    ],
+                },
+            });
+            expect(detectorNameErrors(webDetection)).to.deep.equal([
+                'domains[0] (example.com) detectors.bad-group.ok: group name "bad-group" does not match /^[a-zA-Z][a-zA-Z0-9_]*$/',
+                'conditionalChanges[0] detectors.good.bad-name: detector name "good.bad-name" does not match /^[a-zA-Z][a-zA-Z0-9_]*$/',
+            ]);
         });
     });
 

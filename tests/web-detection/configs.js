@@ -2,6 +2,7 @@ import fs from 'fs';
 import { immutableJSONPatch } from 'immutable-json-patch';
 import platforms from '../../platforms.js';
 import { CURRENT_CONFIG_VERSION } from '../../constants.js';
+import { NAME_PATTERN } from './validator/grammar.js';
 
 const platformOutput = platforms.map((item) => item.replace('browsers/', 'extension-'));
 
@@ -77,7 +78,7 @@ function detectorPointer(pointer) {
  * applied on its own, to the literal settings.
  *
  * @param {import('../../schema/features/web-detection').WebDetectionFeature<number>} webDetection
- * @param {(detector: Record<string, any>, path: string) => void} cb
+ * @param {(detector: Record<string, any>, path: string, groupName: string, detectorName: string) => void} cb
  */
 export function forEachPatchedDetector(webDetection, cb) {
     const settings = /** @type {Record<string, any>} */ (webDetection.settings);
@@ -126,7 +127,47 @@ export function forEachPatchedDetector(webDetection, cb) {
                 group,
                 name,
             ] = key.split('\u0000');
-            cb(detectors[group][name], `${label} detectors.${group}.${name}`);
+            cb(detectors[group][name], `${label} detectors.${group}.${name}`, group, name);
         }
     }
+}
+
+/**
+ * Group and detector names that do not match `NAME_PATTERN`, in the literal settings and in each detector a
+ * patch list adds or changes. C-S-S runs a detector under whatever name config gives it.
+ *
+ * @param {import('../../schema/features/web-detection').WebDetectionFeature<number>} webDetection
+ * @returns {string[]}
+ */
+export function detectorNameErrors(webDetection) {
+    const errors = new Set();
+    /**
+     * @param {string} groupName
+     * @param {string[]} detectorNames
+     * @param {string} label
+     */
+    const check = (groupName, detectorNames, label) => {
+        if (!NAME_PATTERN.test(groupName)) errors.add(`${label}: group name "${groupName}" does not match ${NAME_PATTERN}`);
+        for (const name of detectorNames) {
+            if (!NAME_PATTERN.test(name)) errors.add(`${label}: detector name "${groupName}.${name}" does not match ${NAME_PATTERN}`);
+        }
+    };
+    for (const [
+        groupName,
+        group,
+    ] of Object.entries(webDetection.settings?.detectors ?? {})) {
+        check(groupName, Object.keys(group), 'detectors');
+    }
+    forEachPatchedDetector(webDetection, (_detector, path, groupName, detectorName) =>
+        check(
+            groupName,
+            [
+                detectorName,
+            ],
+            path,
+        ),
+    );
+    return [
+        ...errors,
+    ];
 }
