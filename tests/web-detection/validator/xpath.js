@@ -27,10 +27,7 @@ const MAX_TAIL_RATIO = 4;
  * @param {string} path
  */
 function checkXPathConfig(xpathConfig, ctx, path) {
-    if (!isPlainObject(xpathConfig)) {
-        fail(ctx, path, '`xpathConfig` is an object');
-        return;
-    }
+    if (!isPlainObject(xpathConfig)) return;
     const { chunkSize, chunkTail } = xpathConfig;
     for (const [
         key,

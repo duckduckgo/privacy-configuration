@@ -449,6 +449,38 @@ describe('webDetection config tests', () => {
         });
 
         describe('placement', () => {
+            it('refuses a number in list position, through `ref` and `only`', () => {
+                expectActionsError('list position takes a list, and config types the name as number', [
+                    { define: { n: 1 } },
+                    { define: { x: { only: { ref: 'n' } } } },
+                ]);
+                expectError('list position takes a list, and config types the value as number', {
+                    only: { only: fieldOf('img', 'naturalWidth') },
+                    is: {},
+                });
+            });
+
+            it('refuses `self` in boolean position on an element', () => {
+                expectError('boolean position takes a boolean, and config types the value as object', {
+                    element: { selector: 'div', where: { self: {} } },
+                });
+            });
+
+            it('refuses a `field` path with an empty name', () => {
+                expectError('a path has an empty name', { ...fieldOf('img', 'currentSrc..length'), using: 'length', is: 0 });
+            });
+
+            it('takes `field` on every body of an `element` source, or none', () => {
+                expectError('every body of one `element` source has `field`, or none does', {
+                    element: [
+                        { selector: 'img', field: 'naturalWidth' },
+                        { selector: 'p' },
+                    ],
+                    using: 'length',
+                    is: 0,
+                });
+            });
+
             it('rejects literals outside their positions', () => {
                 expectError('A number fills', 1);
                 expectError('A boolean fills', {

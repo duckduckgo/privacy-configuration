@@ -435,6 +435,10 @@ describe('webDetection config tests', () => {
         });
 
         describe('expression `root` on `element` and `text`', () => {
+            it('refuses an empty selector root', () => {
+                expectError('a selector root is a non-empty string', { element: { selector: 'img', root: '' } });
+            });
+
             it('takes an expression giving a node or a list of nodes', () => {
                 expectValid({ element: { selector: 'img', root: { element: { selector: 'article' } } } });
                 expectValid({ text: { pattern: 'a', root: { only: { element: { selector: 'article' } } } } });
