@@ -7,6 +7,20 @@ import { ACTION_KEYS, BRANCH_KEYS } from './validator/grammar.js';
 import { validateDetector } from './validator/validate.js';
 import { itemWalkWarnings, repeatedEventWarnings } from './validator/warnings.js';
 
+/**
+ * Print a warning that fails no test. In GitHub Actions it's a workflow annotation, which shows on the
+ * PR's checks; GitHub reads annotations from stdout, with `%`, CR and LF escaped.
+ *
+ * @param {string} message
+ */
+function warn(message) {
+    if (process.env.GITHUB_ACTIONS) {
+        console.log(`::warning title=webDetection::${message.replace(/%/g, '%25').replace(/\r/g, '%0D').replace(/\n/g, '%0A')}`);
+    } else {
+        console.warn(`warning: ${message}`);
+    }
+}
+
 describe('webDetection config tests', () => {
     describe('detectors in every view a client can see', () => {
         /** @type {Array<{ name: string, check: (detector: Record<string, any>, path: string) => string[] }>} */
@@ -34,11 +48,11 @@ describe('webDetection config tests', () => {
                 });
 
                 it('warns on events sent on every run', () => {
-                    for (const warning of viewErrors(views, repeatedEventWarnings)) console.warn(`warning: ${config.name} ${warning}`);
+                    for (const warning of viewErrors(views, repeatedEventWarnings)) warn(`${config.name} ${warning}`);
                 });
 
                 it('warns on walks from each item that no `if` guards', () => {
-                    for (const warning of viewErrors(views, itemWalkWarnings)) console.warn(`warning: ${config.name} ${warning}`);
+                    for (const warning of viewErrors(views, itemWalkWarnings)) warn(`${config.name} ${warning}`);
                 });
             });
         }
