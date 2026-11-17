@@ -360,12 +360,13 @@ describe('webDetection config tests', () => {
             });
         });
 
-        // Remove once Apple's webDetection minSupportedVersion is at or above the first iOS and macOS releases
-        // carrying C-S-S 19.0.0. Until then, those apps read `fireEvent` and `breakageReportData` from an
-        // `actions` object only. The versions are above every shipped Apple gate and below this release's placeholder
+        // The last iOS and macOS releases carrying C-S-S before 19.0.0, which read `fireEvent` and
+        // `breakageReportData` from an `actions` object only. iOS 7.246.0 and macOS 1.216.0 carry 20.5.0.
+        //
+        // Remove once Apple's webDetection minSupportedVersion is above these.
         const PRE_EXPRESSION_APPLE_VERSIONS = [
-            '7.999.0',
-            '1.999.0',
+            '7.245.0',
+            '1.215.0',
         ];
 
         for (const config of latestConfigs.filter(({ name }) => /^v\d+\/(ios|macos)-config\.json$/.test(name))) {
