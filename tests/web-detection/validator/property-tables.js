@@ -1,8 +1,6 @@
-#!/usr/bin/env node
-
 /**
- * Generates tests/data/element-property-tables.json, the element property tables the
- * webDetection CI checks read (tests/web-detection/validator/grammar.js).
+ * Builds the element property tables the webDetection CI checks read (grammar.js), from the
+ * installed @webref packages.
  *
  * For each element interface, and each interface an element interface inherits from, the
  * output lists the attributes it declares, in its partials from every spec and through its
@@ -14,23 +12,13 @@
  * Attributes named like a key a predicate reserves at item level are listed in
  * `reservedNameProperties`: config can only test them through the long form
  * `{"field": <name>, "is": ...}`, or `{"self": <name>, "is": ...}`.
- *
- * Usage: node scripts/generate-element-property-tables.mjs
- *
- * tests/web-detection/config-tests.js imports `buildTables` to check the checked-in output is current.
  */
 
-import { writeFileSync } from 'fs';
 import { createRequire } from 'module';
-import { dirname, join } from 'path';
-import { fileURLToPath, pathToFileURL } from 'url';
 
 const require = createRequire(import.meta.url);
 const idl = require('@webref/idl');
 const elements = require('@webref/elements');
-
-const rootDir = join(dirname(fileURLToPath(import.meta.url)), '..');
-const OUTPUT_PATH = join(rootDir, 'tests/data/element-property-tables.json');
 
 /** Keys a predicate reserves at item level: its own, and the expression keys that make an object an expression there. */
 const RESERVED_KEYS = [
@@ -80,10 +68,15 @@ const NAMESPACE_SPECS = {
  * @typedef {{ type: string, generic: string, nullable: boolean, union: boolean, idlType: string | IdlType[] }} IdlType
  * @typedef {{ type: string, name?: string, idlType?: IdlType, special?: string }} IdlMember
  * @typedef {{ type: string, name: string, partial?: boolean, inheritance?: string | null, members?: IdlMember[], idlType?: IdlType, target?: string, includes?: string }} IdlDefinition
+ * @typedef {{
+ *   reservedNameProperties: string[],
+ *   tags: Record<string, Record<string, string>>,
+ *   interfaces: Record<string, { inherits: string | null, properties: Record<string, string> }>,
+ * }} PropertyTables
  */
 
 /**
- * @returns {Promise<object>} the tables, as written to OUTPUT_PATH
+ * @returns {Promise<PropertyTables>}
  */
 export async function buildTables() {
     /** @type {Record<string, IdlDefinition[]>} */
@@ -259,22 +252,8 @@ export async function buildTables() {
     }
 
     return {
-        _meta: {
-            description: 'Element interface attributes and types, and tag to interface maps, for the webDetection CI checks.',
-            generatedBy: 'scripts/generate-element-property-tables.mjs',
-            sources: {
-                '@webref/idl': require('@webref/idl/package.json').version,
-                '@webref/elements': require('@webref/elements/package.json').version,
-            },
-        },
         reservedNameProperties,
         tags,
         interfaces: interfaceTable,
     };
-}
-
-if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-    const tables = await buildTables();
-    writeFileSync(OUTPUT_PATH, JSON.stringify(tables, null, 4) + '\n');
-    console.log(`Wrote ${OUTPUT_PATH}`);
 }

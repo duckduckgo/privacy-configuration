@@ -1,5 +1,4 @@
 import { expect } from 'chai';
-import { buildTables } from '../../scripts/generate-element-property-tables.mjs';
 import { sequenceWebDetectionActions } from '../../util.js';
 import {
     CLIENT_RELEASES,
@@ -564,14 +563,6 @@ describe('webDetection config tests', () => {
     });
 
     describe('element property tables', () => {
-        it('match what the generator builds from the installed @webref packages', async function () {
-            this.timeout(60000);
-            expect(await buildTables()).to.deep.equal(
-                PROPERTY_TABLES,
-                'tests/data/element-property-tables.json is stale: run npm run generate-element-property-tables',
-            );
-        });
-
         it('carry the types the load-state recipes read', () => {
             expect(interfaceProperties('HTMLImageElement').get('naturalWidth')).to.equal('unsigned long');
             expect(interfaceProperties('HTMLImageElement').get('currentSrc')).to.equal('USVString');
