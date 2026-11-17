@@ -251,7 +251,7 @@ export function checkExpr(node, position, scope, ctx, path) {
     const valuePosition = hasIs ? 'value' : position;
     // With `using`, the expression keys give the value `using` reads from
     const keyPosition = hasUsing ? 'root' : valuePosition;
-    let type = checkExprKey(key, node[key], keyPosition, scope, ctx, `${path}.${key}`, node);
+    let type = checkExprKey(key, node, keyPosition, scope, ctx, path);
     if (hasUsing) {
         type = checkUsing(node.using, type, valuePosition, { ...scope, bound: type }, ctx, path);
     }
@@ -488,274 +488,381 @@ function isConditionLeaf(node) {
 }
 
 /**
+ * The type of an expression key's value, checked in its position.
+ *
  * @param {string} key
- * @param {unknown} body
+ * @param {Record<string, any>} holder - the expression object holding the key
  * @param {Position} position
  * @param {Scope} scope
  * @param {Context} ctx
- * @param {string} path
- * @param {Record<string, any>} [holder] - the expression object holding the key
+ * @param {string} holderPath - the path of the expression object
  * @returns {StaticType}
  */
-function checkExprKey(key, body, position, scope, ctx, path, holder) {
+function checkExprKey(key, holder, position, scope, ctx, holderPath) {
+    const body = holder[key];
+    const path = `${holderPath}.${key}`;
     switch (key) {
         case 'element':
         case 'text':
             return checkConditionSource(key, body, position, scope, ctx, path);
         case 'api':
-            return checkApi(apiBody(body), position, scope, ctx, path, undefined, holder !== undefined && ctx.functionApis.has(holder));
-        case 'self': {
-            if (!scope.bound) {
-                fail(ctx, path, '`self` reads from `using`, `where` or `field`, and none encloses it');
-                return UNKNOWN;
-            }
-            const selfBody = apiBody(body);
-            if (isPlainObject(selfBody) && Object.keys(selfBody).length === 0) {
-                // The bound value itself
-                if (position !== 'boolean') return sourceType(itemOf(scope.bound), scope.bound.list, position, ctx, path);
-                if (!allows(scope.bound, 'boolean'))
-                    fail(ctx, path, `boolean position takes a boolean, and config types the value as ${describeType(scope.bound)}`);
-                return typeOf('boolean');
-            }
-            return checkApi(selfBody, position, scope, ctx, path, scope.bound, false, true);
-        }
+            return checkApi(apiBody(body), position, scope, ctx, path, undefined, ctx.functionApis.has(holder));
+        case 'self':
+            return checkSelf(body, position, scope, ctx, path);
         case 'expr':
-            if (Array.isArray(body)) {
-                // An array of the entries' values, which `length`, `at` and `apply` read. It stays an
-                // array: never one number, nor a boolean
-                expectPosition(ctx, path, '`expr` over an array, a list,', position, [
-                    'value',
-                    'list',
-                    'spread',
-                    'root',
-                ]);
-                const entries = body.map((entry, index) => checkExpr(entry, 'value', child(scope), ctx, `${path}[${index}]`));
-                const item = entries.length ? mergeTypes(entries.map(itemOf)) : UNKNOWN;
-                return position === 'spread' ? item : { ...item, list: 'array' };
-            }
-            // Its operand's value in its own position. An operand with `is` gives a boolean
-            if (isPlainObject(body) && 'is' in body) {
-                expectPosition(ctx, path, '`expr` over `is`', position, [
-                    'boolean',
-                    'value',
-                ]);
-                return checkExpr(body, 'boolean', scope, ctx, path);
-            }
-            return checkExpr(body, position, scope, ctx, path);
-        case 'only': {
-            expectPosition(ctx, path, '`only`', position, [
-                'boolean',
-                'value',
-                'number',
-                'list',
-                'root',
-            ]);
-            const type = itemOf(checkExpr(body, 'list', child(scope), ctx, path));
-            if (position === 'number' && !allows(type, 'number'))
-                fail(ctx, path, `number position takes a number, and config types the value as ${describeType(type)}`);
-            if (position === 'boolean' && !allows(type, 'boolean'))
-                fail(ctx, path, `boolean position takes a boolean, and config types the value as ${describeType(type)}`);
-            if (position === 'list' && type.types !== null && !type.types.includes('array') && !type.types.includes('object'))
-                fail(ctx, path, `list position takes a list, and config types the value as ${describeType(type)}`);
-            return type;
-        }
+            return checkExprBody(body, position, scope, ctx, path);
+        case 'only':
+            return checkOnly(body, position, scope, ctx, path);
         case 'sum':
-        case 'mul': {
-            expectPosition(ctx, path, `\`${key}\``, position, [
-                'value',
-                'number',
-            ]);
-            let nan = false;
-            asArray(body).forEach((operand, index) => {
-                const operandPath = Array.isArray(body) ? `${path}[${index}]` : path;
-                const listed = providesValues(operand, 'number', ctx);
-                const type = checkExpr(
-                    operand,
-                    listed ? 'spread' : 'number',
-                    { ...child(scope), spreadOf: listed ? 'number' : undefined },
-                    ctx,
-                    operandPath,
-                );
-                if (listed && !allows(type, 'number'))
-                    fail(ctx, operandPath, `\`${key}\` takes numbers, and config types the values as ${describeType(type)}`);
-                nan ||= type.nan;
-            });
-            return {
-                types: [
-                    'number',
-                ],
-                nan,
-            };
-        }
-        case 'div': {
-            expectPosition(ctx, path, '`div`', position, [
-                'value',
-                'number',
-            ]);
-            if (!Array.isArray(body) || body.length !== 2) {
-                return {
-                    types: [
-                        'number',
-                    ],
-                    nan: true,
-                };
-            }
-            body.forEach((operand, index) => checkExpr(operand, 'number', child(scope), ctx, `${path}[${index}]`));
-            return {
-                types: [
-                    'number',
-                ],
-                nan: true,
-            };
-        }
+        case 'mul':
+            return checkArith(key, body, position, scope, ctx, path);
+        case 'div':
+            return checkDiv(body, position, scope, ctx, path);
         case 'any':
         case 'all':
-        case 'none': {
-            expectPosition(ctx, path, `\`${key}\``, position, [
-                'boolean',
-                'value',
-            ]);
-            const operands = asArray(body);
-            // The operands of a condition's top-level `all` guard each other
-            const guards =
-                scope.conditionRoot && key === 'all'
-                    ? [
-                          ...scope.guards,
-                          ...operands,
-                      ]
-                    : scope.guards;
-            operands.forEach((operand, index) => {
-                const operandPath = Array.isArray(body) ? `${path}[${index}]` : path;
-                /** @type {Scope} */
-                const operandScope = {
-                    ...child(scope),
-                    underNone: scope.underNone || key === 'none',
-                    noneAbove: scope.noneAbove || key === 'none',
-                    guards,
-                    spreadOf: undefined,
-                };
-                if (providesValues(operand, 'boolean', ctx)) {
-                    const type = checkExpr(operand, 'spread', { ...operandScope, spreadOf: 'boolean' }, ctx, operandPath);
-                    if (!allows(type, 'boolean'))
-                        fail(ctx, operandPath, `\`${key}\` takes booleans, and config types the values as ${describeType(type)}`);
-                } else {
-                    checkExpr(operand, 'boolean', operandScope, ctx, operandPath);
-                }
-            });
-            return typeOf('boolean');
-        }
-        case 'if': {
-            expectPosition(ctx, path, '`if`', position, [
-                'boolean',
-                'value',
-                'number',
-                'list',
-                'spread',
-                'root',
-            ]);
-            const branches = holder ?? {};
-            const base = path.slice(0, -'.if'.length);
-            if (!('then' in branches)) fail(ctx, path, '`if` needs `then`');
-            if (!('else' in branches) && position !== 'value')
-                fail(
-                    ctx,
-                    path,
-                    `\`if\` without \`else\` gives \`undefined\` when its condition does not hold, so it fills value position only, not ${position} position`,
-                );
-            checkExpr(body, 'boolean', { ...child(scope), conditionRoot: true }, ctx, path);
-            /** @type {Scope} */
-            const branchScope = {
-                ...child(scope),
-                guards: [
-                    ...scope.guards,
-                    ...guardsOf(body),
-                ],
-            };
-            // A run name bound in one branch may be bound after the `if`, with the type each branch binds
-            const before = new Map(ctx.runNames);
-            // Under `sum`, `mul`, `any`, `all` and `none`, a branch giving no list is one operand
-            const single = scope.spreadOf ?? 'value';
-            const branchPosition = (/** @type {unknown} */ branch) =>
-                position !== 'spread' || providesValues(Array.isArray(branch) ? branch[branch.length - 1] : branch, single, ctx)
-                    ? position
-                    : single;
-            const thenType =
-                'then' in branches ? checkBody(branches.then, branchPosition(branches.then), branchScope, ctx, `${base}.then`) : UNKNOWN;
-            const afterThen = ctx.runNames;
-            ctx.runNames = new Map(before);
-            const elseType =
-                'else' in branches
-                    ? checkBody(branches.else, branchPosition(branches.else), branchScope, ctx, `${base}.else`)
-                    : typeOf('undefined');
-            if (position === 'spread') {
-                for (const [
-                    branch,
-                    type,
-                ] of [
-                    [
-                        'then',
-                        thenType,
-                    ],
-                    [
-                        'else',
-                        elseType,
-                    ],
-                ]) {
-                    if (branch in branches && !allows(type, single))
-                        fail(
-                            ctx,
-                            `${base}.${branch}`,
-                            `this operand takes ${single}s, and config types the branch as ${describeType(type)}`,
-                        );
-                }
-            }
-            for (const [
-                name,
-                type,
-            ] of afterThen) {
-                const other = ctx.runNames.get(name);
-                ctx.runNames.set(
-                    name,
-                    other && other !== type
-                        ? mergeTypes([
-                              type,
-                              other,
-                          ])
-                        : type,
-                );
-            }
-            return mergeTypes([
-                thenType,
-                elseType,
-            ]);
-        }
-        case 'ref': {
-            if (typeof body !== 'string' || !DEFINE_NAME_PATTERN.test(body)) {
-                fail(ctx, path, `\`ref\` ${JSON.stringify(body)} does not match ${DEFINE_NAME_PATTERN}`);
-                return UNKNOWN;
-            }
-            if (scope.inMatch) {
-                fail(ctx, path, '`match` reads the page only, and holds no `ref`');
-                return UNKNOWN;
-            }
-            if (body.startsWith('this.') && ctx.hasMatch)
-                fail(ctx, path, `a detector with \`match\` runs \`actions\` once, so it reads no detector name: "${body}"`);
-            const type = nameType(body, ctx);
-            if (!type) {
-                fail(
-                    ctx,
-                    path,
-                    body.startsWith('this.')
-                        ? `\`ref\` "${body}" reads a detector name no \`define\` in the detector binds`
-                        : `\`ref\` "${body}" reads a run name no \`define\` binds before it in evaluation order`,
-                );
-                return UNKNOWN;
-            }
-            return refType(type, position, ctx, path);
-        }
+        case 'none':
+            return checkLogic(key, body, position, scope, ctx, path);
+        case 'if':
+            return checkIf(holder, position, scope, ctx, holderPath);
+        case 'ref':
+            return checkRef(body, position, scope, ctx, path);
         default:
             return UNKNOWN;
     }
+}
+
+/**
+ * `self`: the value `using`, `where` or `field` binds, or a read from it.
+ *
+ * @param {unknown} body
+ * @param {Position} position
+ * @param {Scope} scope
+ * @param {Context} ctx
+ * @param {string} path
+ * @returns {StaticType}
+ */
+function checkSelf(body, position, scope, ctx, path) {
+    if (!scope.bound) {
+        fail(ctx, path, '`self` reads from `using`, `where` or `field`, and none encloses it');
+        return UNKNOWN;
+    }
+    const selfBody = apiBody(body);
+    if (isPlainObject(selfBody) && Object.keys(selfBody).length === 0) {
+        // The bound value itself
+        if (position !== 'boolean') return sourceType(itemOf(scope.bound), scope.bound.list, position, ctx, path);
+        if (!allows(scope.bound, 'boolean'))
+            fail(ctx, path, `boolean position takes a boolean, and config types the value as ${describeType(scope.bound)}`);
+        return typeOf('boolean');
+    }
+    return checkApi(selfBody, position, scope, ctx, path, scope.bound, false, true);
+}
+
+/**
+ * `expr`: over an array, an array of the entries' values; otherwise its operand's value.
+ *
+ * @param {unknown} body
+ * @param {Position} position
+ * @param {Scope} scope
+ * @param {Context} ctx
+ * @param {string} path
+ * @returns {StaticType}
+ */
+function checkExprBody(body, position, scope, ctx, path) {
+    if (Array.isArray(body)) {
+        // An array of the entries' values, which `length`, `at` and `apply` read. It stays an
+        // array: never one number, nor a boolean
+        expectPosition(ctx, path, '`expr` over an array, a list,', position, [
+            'value',
+            'list',
+            'spread',
+            'root',
+        ]);
+        const entries = body.map((entry, index) => checkExpr(entry, 'value', child(scope), ctx, `${path}[${index}]`));
+        const item = entries.length ? mergeTypes(entries.map(itemOf)) : UNKNOWN;
+        return position === 'spread' ? item : { ...item, list: 'array' };
+    }
+    // Its operand's value in its own position. An operand with `is` gives a boolean
+    if (isPlainObject(body) && 'is' in body) {
+        expectPosition(ctx, path, '`expr` over `is`', position, [
+            'boolean',
+            'value',
+        ]);
+        return checkExpr(body, 'boolean', scope, ctx, path);
+    }
+    return checkExpr(body, position, scope, ctx, path);
+}
+
+/**
+ * `only`: the one item of a list.
+ *
+ * @param {unknown} body
+ * @param {Position} position
+ * @param {Scope} scope
+ * @param {Context} ctx
+ * @param {string} path
+ * @returns {StaticType}
+ */
+function checkOnly(body, position, scope, ctx, path) {
+    expectPosition(ctx, path, '`only`', position, [
+        'boolean',
+        'value',
+        'number',
+        'list',
+        'root',
+    ]);
+    const type = itemOf(checkExpr(body, 'list', child(scope), ctx, path));
+    if (position === 'number' && !allows(type, 'number'))
+        fail(ctx, path, `number position takes a number, and config types the value as ${describeType(type)}`);
+    if (position === 'boolean' && !allows(type, 'boolean'))
+        fail(ctx, path, `boolean position takes a boolean, and config types the value as ${describeType(type)}`);
+    if (position === 'list' && type.types !== null && !type.types.includes('array') && !type.types.includes('object'))
+        fail(ctx, path, `list position takes a list, and config types the value as ${describeType(type)}`);
+    return type;
+}
+
+/**
+ * `sum` and `mul`: a number from number operands, each item of a list operand counting as one.
+ *
+ * @param {'sum' | 'mul'} key
+ * @param {unknown} body
+ * @param {Position} position
+ * @param {Scope} scope
+ * @param {Context} ctx
+ * @param {string} path
+ * @returns {StaticType}
+ */
+function checkArith(key, body, position, scope, ctx, path) {
+    expectPosition(ctx, path, `\`${key}\``, position, [
+        'value',
+        'number',
+    ]);
+    let nan = false;
+    asArray(body).forEach((operand, index) => {
+        const operandPath = Array.isArray(body) ? `${path}[${index}]` : path;
+        const listed = providesValues(operand, 'number', ctx);
+        const type = checkExpr(
+            operand,
+            listed ? 'spread' : 'number',
+            { ...child(scope), spreadOf: listed ? 'number' : undefined },
+            ctx,
+            operandPath,
+        );
+        if (listed && !allows(type, 'number'))
+            fail(ctx, operandPath, `\`${key}\` takes numbers, and config types the values as ${describeType(type)}`);
+        nan ||= type.nan;
+    });
+    return {
+        types: [
+            'number',
+        ],
+        nan,
+    };
+}
+
+/**
+ * `div`: a number from two number operands.
+ *
+ * @param {unknown} body
+ * @param {Position} position
+ * @param {Scope} scope
+ * @param {Context} ctx
+ * @param {string} path
+ * @returns {StaticType}
+ */
+function checkDiv(body, position, scope, ctx, path) {
+    expectPosition(ctx, path, '`div`', position, [
+        'value',
+        'number',
+    ]);
+    if (!Array.isArray(body) || body.length !== 2) {
+        return {
+            types: [
+                'number',
+            ],
+            nan: true,
+        };
+    }
+    body.forEach((operand, index) => checkExpr(operand, 'number', child(scope), ctx, `${path}[${index}]`));
+    return {
+        types: [
+            'number',
+        ],
+        nan: true,
+    };
+}
+
+/**
+ * `any`, `all` and `none`: a boolean from boolean operands, each item of a list operand counting
+ * as one.
+ *
+ * @param {'any' | 'all' | 'none'} key
+ * @param {unknown} body
+ * @param {Position} position
+ * @param {Scope} scope
+ * @param {Context} ctx
+ * @param {string} path
+ * @returns {StaticType}
+ */
+function checkLogic(key, body, position, scope, ctx, path) {
+    expectPosition(ctx, path, `\`${key}\``, position, [
+        'boolean',
+        'value',
+    ]);
+    const operands = asArray(body);
+    // The operands of a condition's top-level `all` guard each other
+    const guards =
+        scope.conditionRoot && key === 'all'
+            ? [
+                  ...scope.guards,
+                  ...operands,
+              ]
+            : scope.guards;
+    operands.forEach((operand, index) => {
+        const operandPath = Array.isArray(body) ? `${path}[${index}]` : path;
+        /** @type {Scope} */
+        const operandScope = {
+            ...child(scope),
+            underNone: scope.underNone || key === 'none',
+            noneAbove: scope.noneAbove || key === 'none',
+            guards,
+            spreadOf: undefined,
+        };
+        if (providesValues(operand, 'boolean', ctx)) {
+            const type = checkExpr(operand, 'spread', { ...operandScope, spreadOf: 'boolean' }, ctx, operandPath);
+            if (!allows(type, 'boolean'))
+                fail(ctx, operandPath, `\`${key}\` takes booleans, and config types the values as ${describeType(type)}`);
+        } else {
+            checkExpr(operand, 'boolean', operandScope, ctx, operandPath);
+        }
+    });
+    return typeOf('boolean');
+}
+
+/**
+ * `if`, with the `then` and `else` beside it.
+ *
+ * @param {Record<string, any>} holder - the expression object holding `if`
+ * @param {Position} position
+ * @param {Scope} scope
+ * @param {Context} ctx
+ * @param {string} holderPath - the path of the expression object
+ * @returns {StaticType}
+ */
+function checkIf(holder, position, scope, ctx, holderPath) {
+    const body = holder.if;
+    const path = `${holderPath}.if`;
+    expectPosition(ctx, path, '`if`', position, [
+        'boolean',
+        'value',
+        'number',
+        'list',
+        'spread',
+        'root',
+    ]);
+    if (!('then' in holder)) fail(ctx, path, '`if` needs `then`');
+    if (!('else' in holder) && position !== 'value')
+        fail(
+            ctx,
+            path,
+            `\`if\` without \`else\` gives \`undefined\` when its condition does not hold, so it fills value position only, not ${position} position`,
+        );
+    checkExpr(body, 'boolean', { ...child(scope), conditionRoot: true }, ctx, path);
+    /** @type {Scope} */
+    const branchScope = {
+        ...child(scope),
+        guards: [
+            ...scope.guards,
+            ...guardsOf(body),
+        ],
+    };
+    // A run name bound in one branch may be bound after the `if`, with the type each branch binds
+    const before = new Map(ctx.runNames);
+    // Under `sum`, `mul`, `any`, `all` and `none`, a branch giving no list is one operand
+    const single = scope.spreadOf ?? 'value';
+    const branchPosition = (/** @type {unknown} */ branch) =>
+        position !== 'spread' || providesValues(Array.isArray(branch) ? branch[branch.length - 1] : branch, single, ctx)
+            ? position
+            : single;
+    const thenType =
+        'then' in holder ? checkBody(holder.then, branchPosition(holder.then), branchScope, ctx, `${holderPath}.then`) : UNKNOWN;
+    const afterThen = ctx.runNames;
+    ctx.runNames = new Map(before);
+    const elseType =
+        'else' in holder
+            ? checkBody(holder.else, branchPosition(holder.else), branchScope, ctx, `${holderPath}.else`)
+            : typeOf('undefined');
+    if (position === 'spread') {
+        for (const [
+            branch,
+            type,
+        ] of [
+            [
+                'then',
+                thenType,
+            ],
+            [
+                'else',
+                elseType,
+            ],
+        ]) {
+            if (branch in holder && !allows(type, single))
+                fail(ctx, `${holderPath}.${branch}`, `this operand takes ${single}s, and config types the branch as ${describeType(type)}`);
+        }
+    }
+    for (const [
+        name,
+        type,
+    ] of afterThen) {
+        const other = ctx.runNames.get(name);
+        ctx.runNames.set(
+            name,
+            other && other !== type
+                ? mergeTypes([
+                      type,
+                      other,
+                  ])
+                : type,
+        );
+    }
+    return mergeTypes([
+        thenType,
+        elseType,
+    ]);
+}
+
+/**
+ * `ref`: the value a `define` binds to the name.
+ *
+ * @param {unknown} body
+ * @param {Position} position
+ * @param {Scope} scope
+ * @param {Context} ctx
+ * @param {string} path
+ * @returns {StaticType}
+ */
+function checkRef(body, position, scope, ctx, path) {
+    if (typeof body !== 'string' || !DEFINE_NAME_PATTERN.test(body)) {
+        fail(ctx, path, `\`ref\` ${JSON.stringify(body)} does not match ${DEFINE_NAME_PATTERN}`);
+        return UNKNOWN;
+    }
+    if (scope.inMatch) {
+        fail(ctx, path, '`match` reads the page only, and holds no `ref`');
+        return UNKNOWN;
+    }
+    if (body.startsWith('this.') && ctx.hasMatch)
+        fail(ctx, path, `a detector with \`match\` runs \`actions\` once, so it reads no detector name: "${body}"`);
+    const type = nameType(body, ctx);
+    if (!type) {
+        fail(
+            ctx,
+            path,
+            body.startsWith('this.')
+                ? `\`ref\` "${body}" reads a detector name no \`define\` in the detector binds`
+                : `\`ref\` "${body}" reads a run name no \`define\` binds before it in evaluation order`,
+        );
+        return UNKNOWN;
+    }
+    return refType(type, position, ctx, path);
 }
 
 /**
