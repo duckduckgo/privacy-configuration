@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { clientDetectors, compareVersions, fireEventTypes, runsOnBreakageReport, writesBreakageData } from './clients.js';
+import { clientViews, fireEventTypes, runsOnBreakageReport, writesBreakageData } from './clients.js';
 import { validateDetector } from './validator/validate.js';
 import { itemWalkWarnings, repeatedEventWarnings } from './validator/warnings.js';
 
@@ -421,61 +421,66 @@ describe('webDetection config tests', () => {
         });
 
         describe('client views', () => {
-            const settings = {
-                detectors: { g: { d: { match: true } } },
-                conditionalChanges: [
-                    {
-                        condition: { injectName: 'android', minSupportedVersion: 10 },
-                        patchSettings: [
-                            { op: 'add', path: '/detectors/g/d/state', value: 'disabled' },
-                        ],
+            /**
+             * @param {Record<string, any>} [subfeature] - the `x` experiment's subfeature
+             */
+            const configWith = (subfeature) => ({
+                features: {
+                    contentScopeExperiments: { state: 'enabled', features: subfeature ? { x: subfeature } : {} },
+                    webDetection: {
+                        settings: {
+                            detectors: { g: { d: { match: true } } },
+                            conditionalChanges: [
+                                {
+                                    condition: { injectName: 'android', minSupportedVersion: 10 },
+                                    patchSettings: [
+                                        { op: 'add', path: '/detectors/g/d/state', value: 'disabled' },
+                                    ],
+                                },
+                                {
+                                    condition: { experiment: { experimentName: 'x', cohort: 'y' } },
+                                    patchSettings: [
+                                        { op: 'add', path: '/detectors/g/d/triggers', value: {} },
+                                    ],
+                                },
+                                {
+                                    condition: { domain: 'example.com' },
+                                    patchSettings: [
+                                        { op: 'add', path: '/detectors/g/d/state', value: 'enabled' },
+                                    ],
+                                },
+                            ],
+                        },
                     },
-                    {
-                        condition: { experiment: { experimentName: 'x', cohort: 'y' } },
-                        patchSettings: [
-                            { op: 'add', path: '/detectors/g/d/triggers', value: {} },
-                        ],
-                    },
-                ],
-            };
+                },
+            });
+            /**
+             * @param {Record<string, any>} config
+             * @param {import('../../scripts/config-conditions.mjs').Platform} platform
+             * @param {number | string} version
+             * @param {boolean} assumeUndecided
+             */
+            const detectorOf = (config, platform, version, assumeUndecided) =>
+                clientViews(config, platform, version, assumeUndecided)[0].detectors.g.d;
 
-            it('applies an entry when its platform and version hold, and other keys as given', () => {
-                expect(
-                    clientDetectors(
-                        settings,
-                        [
-                            'android',
-                        ],
-                        10,
-                        false,
-                    ).g.d,
-                ).to.deep.equal({ match: true, state: 'disabled' });
-                expect(
-                    clientDetectors(
-                        settings,
-                        [
-                            'android',
-                        ],
-                        9,
-                        false,
-                    ).g.d,
-                ).to.deep.equal({ match: true });
-                expect(
-                    clientDetectors(
-                        settings,
-                        [
-                            'windows',
-                        ],
-                        10,
-                        true,
-                    ).g.d,
-                ).to.deep.equal({ match: true, triggers: {} });
+            it('applies an entry when its platform and version hold', () => {
+                expect(detectorOf(configWith(), 'android', 10, false)).to.deep.equal({ match: true, state: 'disabled' });
+                expect(detectorOf(configWith(), 'android', 9, false)).to.deep.equal({ match: true });
             });
 
-            it('compares numbers numerically and strings by component, and no other mix', () => {
-                expect(compareVersions('1.10.0', '1.9.0')).to.be.greaterThan(0);
-                expect(compareVersions(52720000, 52700000)).to.be.greaterThan(0);
-                expect(compareVersions('1.0.0', 1)).to.equal(undefined);
+            it('applies page conditions, and every cohort of an experiment the client can be in, only when assumed', () => {
+                const experiment = { state: 'enabled', minSupportedVersion: '1.2.0' };
+                expect(detectorOf(configWith(experiment), 'windows', '1.2.0', false)).to.deep.equal({ match: true });
+                expect(detectorOf(configWith(experiment), 'windows', '1.2.0', true)).to.deep.equal({
+                    match: true,
+                    triggers: {},
+                    state: 'enabled',
+                });
+                expect(detectorOf(configWith(experiment), 'windows', '1.1.0', true)).to.deep.equal({ match: true, state: 'enabled' });
+                expect(detectorOf(configWith({ state: 'disabled' }), 'windows', '1.2.0', true)).to.deep.equal({
+                    match: true,
+                    state: 'enabled',
+                });
             });
 
             it('lists the event type of every fireEvent, in branches and sequences', () => {

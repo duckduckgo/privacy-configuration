@@ -4,7 +4,7 @@ import { ORDER_FREE_ACTION_KEYS, isPlainObject, sequenceWebDetectionActions } fr
 import {
     CLIENT_RELEASES,
     TEMP_EVENT_TYPE_PREFIX,
-    clientDetectors,
+    clientViews,
     eventHubConsumers,
     fireEventTypes,
     runsOnBreakageReport,
@@ -59,15 +59,20 @@ describe('webDetection config tests', () => {
             const settings = config.body.features?.webDetection?.settings;
             const clients = CLIENT_RELEASES.find((entry) => entry.configs.test(config.name));
             if (!settings?.detectors || !clients) continue;
+            const views = [
+                false,
+                true,
+            ].flatMap((assumeUndecided) => clientViews(config.body, clients.platform, clients.version, assumeUndecided));
             describe(config.name, () => {
+                it(`at ${clients.version}, every conditionalChanges entry a client matches applies`, () => {
+                    const failed = views.flatMap(({ label, failed }) => failed.map((entry) => `${label}: ${JSON.stringify(entry)}`));
+                    expect(failed, failed.join('\n')).to.deep.equal([]);
+                });
+
                 it(`at ${clients.version}, every detector parses once conditionalChanges apply`, () => {
                     /** @type {string[]} */
                     const errors = [];
-                    for (const others of [
-                        true,
-                        false,
-                    ]) {
-                        const detectors = clientDetectors(settings, clients.injectNames, clients.version, others);
+                    for (const { detectors } of views) {
                         for (const [
                             groupName,
                             group,
@@ -89,11 +94,7 @@ describe('webDetection config tests', () => {
                 it(`at ${clients.version}, every detector a breakage report runs writes breakage data`, () => {
                     /** @type {string[]} */
                     const errors = [];
-                    for (const others of [
-                        true,
-                        false,
-                    ]) {
-                        const detectors = clientDetectors(settings, clients.injectNames, clients.version, others);
+                    for (const { detectors } of views) {
                         for (const [
                             groupName,
                             group,
@@ -116,11 +117,10 @@ describe('webDetection config tests', () => {
                 });
 
                 it('warns on events sent on every run', () => {
-                    const detectors = clientDetectors(settings, clients.injectNames, clients.version, true);
                     for (const [
                         groupName,
                         group,
-                    ] of Object.entries(detectors)) {
+                    ] of views.filter(({ assumeUndecided }) => assumeUndecided).flatMap(({ detectors }) => Object.entries(detectors))) {
                         for (const [
                             detectorId,
                             detector,
@@ -133,11 +133,10 @@ describe('webDetection config tests', () => {
                 });
 
                 it('warns on walks from each item that no `if` guards', () => {
-                    const detectors = clientDetectors(settings, clients.injectNames, clients.version, true);
                     for (const [
                         groupName,
                         group,
-                    ] of Object.entries(detectors)) {
+                    ] of views.filter(({ assumeUndecided }) => assumeUndecided).flatMap(({ detectors }) => Object.entries(detectors))) {
                         for (const [
                             detectorId,
                             detector,
@@ -427,45 +426,42 @@ describe('webDetection config tests', () => {
         // `breakageReportData` from an `actions` object only. iOS 7.246.0 and macOS 1.216.0 carry 20.5.0.
         //
         // Remove once Apple's webDetection minSupportedVersion is above these.
-        const PRE_EXPRESSION_APPLE_VERSIONS = [
-            '7.245.0',
-            '1.215.0',
-        ];
+        const PRE_EXPRESSION_APPLE_VERSIONS = {
+            ios: '7.245.0',
+            macos: '1.215.0',
+        };
 
         for (const config of latestConfigs.filter(({ name }) => /^v\d+\/(ios|macos)-config\.json$/.test(name))) {
-            const settings = config.body.features?.webDetection?.settings;
-            if (!settings) continue;
-            for (const version of PRE_EXPRESSION_APPLE_VERSIONS) {
-                it(`${config.name} gives apple-isolated ${version} every enabled detector's actions as an object`, () => {
-                    const detectors = clientDetectors(
-                        settings,
-                        [
-                            'apple-isolated',
-                        ],
-                        version,
-                        false,
-                    );
-                    /** @type {string[]} */
-                    const wrong = [];
+            const platform = config.name.includes('ios') ? 'ios' : 'macos';
+            const version = PRE_EXPRESSION_APPLE_VERSIONS[platform];
+            it(`${config.name} gives apple-isolated ${version} every enabled detector's actions as an object`, () => {
+                const detectors = [
+                    false,
+                    true,
+                ]
+                    .flatMap((assumeUndecided) => clientViews(config.body, platform, version, assumeUndecided))
+                    .filter(({ injectName }) => injectName === 'apple-isolated')
+                    .flatMap((view) => Object.entries(view.detectors));
+                /** @type {string[]} */
+                const wrong = [];
+                for (const [
+                    groupName,
+                    group,
+                ] of detectors) {
                     for (const [
-                        groupName,
-                        group,
-                    ] of Object.entries(detectors)) {
-                        for (const [
-                            detectorId,
-                            detector,
-                        ] of Object.entries(group)) {
-                            if (detector.state === 'disabled' || detector.actions === undefined) continue;
-                            if (
-                                !isPlainObject(detector.actions) ||
-                                Object.keys(detector.actions).some((key) => !ORDER_FREE_ACTION_KEYS.includes(key))
-                            )
-                                wrong.push(`detectors.${groupName}.${detectorId}`);
-                        }
+                        detectorId,
+                        detector,
+                    ] of Object.entries(group)) {
+                        if (detector.state === 'disabled' || detector.actions === undefined) continue;
+                        if (
+                            !isPlainObject(detector.actions) ||
+                            Object.keys(detector.actions).some((key) => !ORDER_FREE_ACTION_KEYS.includes(key))
+                        )
+                            wrong.push(`detectors.${groupName}.${detectorId}`);
                     }
-                    expect(wrong, wrong.join('\n')).to.deep.equal([]);
-                });
-            }
+                }
+                expect(wrong, wrong.join('\n')).to.deep.equal([]);
+            });
         }
     });
 

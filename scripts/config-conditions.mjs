@@ -20,7 +20,8 @@ import { immutableJSONPatch } from 'immutable-json-patch';
  * @typedef {object} Client
  * @property {string} injectName
  * @property {Version | undefined} version
- * @property {Record<string, string>} cohorts - assigned cohort by experiment name
+ * @property {Record<string, string | true>} cohorts - assigned cohort by experiment name, or `true` for every cohort
+ * @property {boolean} [assumeUndecided] - whether the condition keys in UNDECIDED_KEYS hold
  */
 
 /** @type {Platform[]} */
@@ -109,8 +110,22 @@ export function maxVersion(a, b) {
 }
 
 /**
- * Match a condition as C-S-S does. Blocks scoped to a domain, URL pattern, frame context, internal or
- * preview build never match, so the result is the state on an arbitrary page in a release build.
+ * Condition keys C-S-S matches against the page, the frame or the build rather than the client's platform,
+ * version and cohorts.
+ */
+const UNDECIDED_KEYS = [
+    'domain',
+    'urlPattern',
+    'context',
+    'internal',
+    'preview',
+    'minContentScopeScriptsVersion',
+    'maxContentScopeScriptsVersion',
+];
+
+/**
+ * Match a condition as C-S-S does. Blocks with a key in UNDECIDED_KEYS match only when the client
+ * assumes they hold, so by default the result is the state on an arbitrary page in a release build.
  *
  * @param {ConditionBlock | ConditionBlock[]} condition
  * @param {Client} client
@@ -125,6 +140,7 @@ export function matchCondition(condition, client) {
  */
 function matchBlock(block, client) {
     for (const key of Object.keys(block)) {
+        if (UNDECIDED_KEYS.includes(key) && client.assumeUndecided) continue;
         if (
             ![
                 'injectName',
@@ -146,7 +162,8 @@ function matchBlock(block, client) {
         if (version === undefined || typeof version !== typeof maxSupportedVersion) return false;
         if (compareVersions(version, maxSupportedVersion) > 0) return false;
     }
-    if (experiment !== undefined && client.cohorts[experiment.experimentName] !== experiment.cohort) return false;
+    const cohort = experiment === undefined ? undefined : client.cohorts[experiment.experimentName];
+    if (experiment !== undefined && cohort !== true && cohort !== experiment.cohort) return false;
     return true;
 }
 

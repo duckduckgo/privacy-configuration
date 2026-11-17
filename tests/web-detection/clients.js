@@ -1,101 +1,82 @@
-import { immutableJSONPatch } from 'immutable-json-patch';
-import { asArray } from './validator/walk.js';
+import { PLATFORM_INJECT_NAMES, applyConditionalChanges, compareVersions } from '../../scripts/config-conditions.mjs';
 import { isPlainObject } from '../../util.js';
 import { EXPERIMENT_METRIC_PARENTS } from '../../constants.js';
 
 /**
- * The clients of each generated config, and the first app version carrying this release: the
+ * @typedef {import('../../scripts/config-conditions.mjs').Platform} Platform
+ * @typedef {import('../../scripts/config-conditions.mjs').Version} Version
+ */
+
+/**
+ * The platform of each generated config, and the first app version carrying this release: the
  * `minSupportedVersion` of the entry in the platform override that applies to this release's clients.
- * Both are placeholders no client reaches until the app release carrying that C-S-S is known.
+ * The versions are placeholders no client reaches until the app release carrying that C-S-S is known.
  *
- * @type {Array<{ configs: RegExp, injectNames: string[], version: number | string }>}
+ * @type {Array<{ configs: RegExp, platform: Platform, version: Version }>}
  */
 export const CLIENT_RELEASES = [
-    {
-        configs: /^v\d+\/android-config\.json$/,
-        injectNames: [
-            'android',
-            'android-adsjs',
-        ],
-        version: 99990000,
-    },
-    {
-        configs: /^v\d+\/windows-config\.json$/,
-        injectNames: [
-            'windows',
-        ],
-        version: '999.0.0',
-    },
-    {
-        configs: /^v\d+\/(ios|macos)-config\.json$/,
-        injectNames: [
-            'apple',
-            'apple-isolated',
-        ],
-        version: '999.0.0',
-    },
-    {
-        configs: /^v\d+\/extension(-[a-z0-9]+)?-config\.json$/,
-        injectNames: [
-            'chrome-mv3',
-            'chrome',
-            'firefox',
-        ],
-        version: '9999.1.1',
-    },
+    { configs: /^v\d+\/android-config\.json$/, platform: 'android', version: 99990000 },
+    { configs: /^v\d+\/windows-config\.json$/, platform: 'windows', version: '999.0.0' },
+    { configs: /^v\d+\/ios-config\.json$/, platform: 'ios', version: '999.0.0' },
+    { configs: /^v\d+\/macos-config\.json$/, platform: 'macos', version: '999.0.0' },
+    { configs: /^v\d+\/extension(-[a-z0-9]+)?-config\.json$/, platform: 'extension', version: '9999.1.1' },
+];
+
+/** Subfeature states a client runs an experiment in, in some build. */
+const EXPERIMENT_STATES = [
+    'enabled',
+    'internal',
+    'preview',
 ];
 
 /**
- * Compare app versions as C-S-S does: numbers numerically, strings by dotted components.
+ * The content scope experiments a client at this version can be in, each holding every cohort: those
+ * whose subfeature is on at or below the version.
  *
- * @param {number | string} a
- * @param {number | string} b
- * @returns {number | undefined} negative, 0 or positive; undefined when the kinds differ
+ * @param {Record<string, any>} configBody
+ * @param {Version} version
+ * @returns {Record<string, true>}
  */
-export function compareVersions(a, b) {
-    if (typeof a !== typeof b) return undefined;
-    if (typeof a === 'number' && typeof b === 'number') return a - b;
-    const left = String(a).split('.').map(Number);
-    const right = String(b).split('.').map(Number);
-    for (let index = 0; index < Math.max(left.length, right.length); index++) {
-        const difference = (left[index] ?? 0) - (right[index] ?? 0);
-        if (difference !== 0) return difference;
+function experimentsAt(configBody, version) {
+    /** @type {Record<string, true>} */
+    const cohorts = {};
+    for (const [
+        name,
+        subfeature,
+    ] of Object.entries(configBody.features?.contentScopeExperiments?.features ?? {})) {
+        const min = subfeature.minSupportedVersion;
+        if (!EXPERIMENT_STATES.includes(subfeature.state)) continue;
+        if (min !== undefined && (typeof min !== typeof version || compareVersions(version, min) < 0)) continue;
+        cohorts[name] = true;
     }
-    return 0;
+    return cohorts;
 }
 
 /**
- * The detectors a client sees once `conditionalChanges` apply: each entry applies when one of its
- * condition blocks holds. `injectName` and the version keys are decided by the client, and every
- * other key by `others`.
+ * The detectors each of a platform's inject names sees once `conditionalChanges` apply, with the
+ * entries whose patch fails, which C-S-S skips.
  *
- * @param {Record<string, any>} settings - webDetection settings
- * @param {string[]} injectNames
- * @param {number | string} version
- * @param {boolean} others - whether condition keys a client's platform and version do not decide hold
- * @returns {Record<string, Record<string, any>>}
+ * @param {Record<string, any>} configBody
+ * @param {Platform} platform
+ * @param {Version} version
+ * @param {boolean} assumeUndecided - whether conditions on the page, frame or build hold, and every
+ *   cohort of each experiment the client can be in, or the client is in no experiment
+ * @returns {Array<{ label: string, injectName: string, assumeUndecided: boolean, detectors: Record<string, Record<string, any>>, failed: unknown[] }>}
  */
-export function clientDetectors(settings, injectNames, version, others) {
-    /**
-     * @param {Record<string, any>} block
-     */
-    const holds = (block) =>
-        Object.entries(block).every(
-            ([
-                key,
-                value,
-            ]) => {
-                if (key === 'injectName') return injectNames.includes(value);
-                if (key === 'minSupportedVersion') return (compareVersions(version, value) ?? -1) >= 0;
-                if (key === 'maxSupportedVersion') return (compareVersions(version, value) ?? 1) <= 0;
-                return others;
-            },
-        );
-    let view = { detectors: settings.detectors };
-    for (const entry of settings.conditionalChanges ?? []) {
-        if (asArray(entry.condition).some(holds)) view = /** @type {any} */ (immutableJSONPatch(view, entry.patchSettings));
-    }
-    return view.detectors ?? {};
+export function clientViews(configBody, platform, version, assumeUndecided) {
+    const settings = configBody.features?.webDetection?.settings;
+    if (!settings) return [];
+    const cohorts = assumeUndecided ? experimentsAt(configBody, version) : {};
+    return PLATFORM_INJECT_NAMES[platform].map((injectName) => {
+        const view = applyConditionalChanges(settings, { injectName, version, cohorts, assumeUndecided });
+        return {
+            label: `${injectName} ${version}${assumeUndecided ? ' (any page, build and cohort)' : ''}`,
+            injectName,
+            assumeUndecided,
+            detectors: view.settings.detectors ?? {},
+            failed: view.failed,
+        };
+    });
 }
 
 /**
