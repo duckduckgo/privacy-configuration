@@ -302,7 +302,7 @@ function checkBuckets(buckets, type, ctx, path) {
     /** @type {{ name: string, set: BucketSet }[]} */
     const simple = [];
     buckets.forEach((bucket, i) => {
-        const bucketPath = `${path}.${i}`;
+        const bucketPath = `${path}[${i}]`;
         if (!isPlainObject(bucket) || !('is' in bucket)) return;
         const { name, is: predicate } = bucket;
         const isPath = `${bucketPath}.is`;
