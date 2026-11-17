@@ -182,6 +182,15 @@ describe('webDetection config tests', () => {
                         shadowImages,
                     ],
                 });
+                const scoped = { element: { selector: 'img', root: { ref: 'region' } }, using: 'length' };
+                expectActionsError('carries `is`', [
+                    { define: { region: shadowRoot } },
+                    { if: { ref: 'region' }, then: { breakageReportData: { data: { n: { value: scoped } } } } },
+                ]);
+                expectActionsValid([
+                    { define: { region: shadowRoot } },
+                    { if: { ref: 'region', is: { type: 'object' } }, then: { breakageReportData: { data: { n: { value: scoped } } } } },
+                ]);
             });
 
             itAll('rejects a scoped XPath expression that selects from the document', () => {
