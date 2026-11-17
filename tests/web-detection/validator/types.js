@@ -1,10 +1,5 @@
-import { fail } from './context.js';
 import { PROPERTY_TABLES } from './grammar.js';
 import { asArray } from './walk.js';
-
-/**
- * @typedef {import('./context.js').Context} Context
- */
 
 /**
  * @typedef {'number' | 'string' | 'boolean' | 'null' | 'undefined' | 'array' | 'object' | 'function' | 'symbol' | 'bigint'} TypeName
@@ -128,26 +123,6 @@ export function itemOf(type) {
     const item = { ...type };
     delete item.list;
     delete item.leaf;
-    return item;
-}
-
-/**
- * The one item of a list, where an expression reads one value from it.
- *
- * @param {StaticType} type
- * @param {Context} ctx
- * @param {string} path
- * @returns {StaticType}
- */
-export function oneItem(type, ctx, path) {
-    const item = itemOf(type);
-    if (item.apiPaths?.some((name) => name === 'performance.getEntries' || name.startsWith('performance.getEntries.'))) {
-        fail(
-            ctx,
-            path,
-            'performance.getEntries selects every entry, so it never gives one value; read its length through `using`, or use getEntriesByType or getEntriesByName',
-        );
-    }
     return item;
 }
 

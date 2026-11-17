@@ -23,15 +23,7 @@ import { isPlainObject } from '../../../util.js';
  * @param {string} path
  */
 export function checkPredicate(predicate, level, subject, scope, ctx, path) {
-    if (
-        predicate === null ||
-        [
-            'string',
-            'number',
-            'boolean',
-        ].includes(typeof predicate)
-    )
-        return;
+    if (isLiteral(predicate)) return;
     if (Array.isArray(predicate)) {
         fail(
             ctx,
@@ -165,9 +157,9 @@ function checkOperators(predicate, subject, scope, ctx, path) {
  * @param {'fireEvent' | 'breakageReportData'} action
  * @param {Context} ctx
  * @param {string} path
- * @param {Scope} [scope] - the payload scope, with the index of its action item
+ * @param {Scope} scope - the payload scope, with the index of its action item
  */
-export function checkPayloadSpec(data, action, ctx, path, scope = PAYLOAD_SCOPE) {
+export function checkPayloadSpec(data, action, ctx, path, scope) {
     if (!isPlainObject(data)) {
         fail(ctx, path, '`data` maps payload keys to fields');
         return;

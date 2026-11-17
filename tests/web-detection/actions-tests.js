@@ -391,16 +391,6 @@ describe('webDetection config tests', () => {
              */
             const walksOf = (where) => itemWalkWarnings({ match: { element: { selector: 'div', where } }, actions: {} }, '$');
             const words = { text: { pattern: 'consent', root: { self: {} } } };
-            const links = {
-                self: {
-                    path: 'querySelectorAll',
-                    args: [
-                        'a',
-                    ],
-                },
-                using: 'length',
-                is: { gt: 0 },
-            };
             const positioned = {
                 api: {
                     path: 'getComputedStyle',
@@ -412,41 +402,17 @@ describe('webDetection config tests', () => {
                 is: 'fixed',
             };
 
-            it('warns on a source rooted at the item, and a call walking from it, with no `if` above it in the `where`', () => {
+            it('warns on a source rooted at the item with no `if` above it in the `where`', () => {
                 expect(walksOf(words)).to.deep.equal([
                     '$.match.element.where.text.root: walks the page from each item of the enclosing `where` or `field`, and nested items walk the same nodes again; test something cheaper in an `if` first',
                 ]);
-                expect(
-                    walksOf({
-                        all: [
-                            positioned,
-                            links,
-                        ],
-                    }).length,
-                ).to.equal(1);
-                expect(
-                    walksOf({
-                        field: {
-                            path: 'closest',
-                            args: [
-                                'form',
-                            ],
-                        },
-                        is: { type: 'object' },
-                    }).length,
-                ).to.equal(1);
             });
 
             it('passes a walk behind an `if`, and one outside every `where` and `field`', () => {
                 expect(
                     walksOf({
                         if: positioned,
-                        then: {
-                            all: [
-                                words,
-                                links,
-                            ],
-                        },
+                        then: words,
                         else: false,
                     }),
                 ).to.deep.equal([]);

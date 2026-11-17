@@ -11,7 +11,7 @@ import {
     writesBreakageData,
 } from './clients.js';
 import { detectorNameErrors, forEachPatchOperation, forEachPatchedDetector, forEachWebDetectionConfig, latestConfigs } from './configs.js';
-import { ACTION_KEYS, BRANCH_KEYS, EXPRESSION_KEYS, PROPERTY_TABLES } from './validator/grammar.js';
+import { ACTION_KEYS, BRANCH_KEYS } from './validator/grammar.js';
 import { interfaceProperties, selectorInterfaces } from './validator/types.js';
 import { assertValidDetector, validateDetector } from './validator/validate.js';
 import { forEachDetectorTextCondition } from './validator/walk.js';
@@ -673,13 +673,6 @@ describe('webDetection config tests', () => {
             expect(selectorInterfaces('svg')).to.deep.equal([
                 'SVGSVGElement',
             ]);
-        });
-
-        it('list the properties named like a reserved key, which config reads through the long form', () => {
-            for (const entry of PROPERTY_TABLES.reservedNameProperties) {
-                const property = entry.split('.').pop();
-                expect(EXPRESSION_KEYS.concat('field', 'is')).to.include(property);
-            }
         });
     });
 });

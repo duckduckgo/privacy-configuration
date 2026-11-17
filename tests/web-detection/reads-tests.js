@@ -9,7 +9,7 @@ import {
     items,
     numberTest,
     text,
-    title,
+    fontsStatus,
 } from './fixtures.js';
 
 describe('webDetection config tests', () => {
@@ -94,7 +94,7 @@ describe('webDetection config tests', () => {
                     },
                 ]);
                 expectError('`apply` takes its arguments as a selected list', { ...maxOf(5), is: {} });
-                expectError('`apply` takes its arguments as a selected list', { ...maxOf({ api: { path: 'document.title' } }), is: {} });
+                expectError('`apply` takes its arguments as a selected list', { ...maxOf(fontsStatus), is: {} });
                 expectError('`Math.max` takes numbers, and config types the value as string', { ...maxOf(fieldOf('img', 'src')), is: {} });
                 expectError('`Math.max.apply` takes a list', {
                     api: {
@@ -117,15 +117,6 @@ describe('webDetection config tests', () => {
                     is: {},
                 });
                 expectError('`args` is an array', { api: { path: 'Math.max', args: 1 }, is: {} });
-                expectError('does not parse', {
-                    api: {
-                        path: 'JSON.parse',
-                        args: [
-                            '{',
-                        ],
-                    },
-                    is: {},
-                });
             });
 
             it('reads a method as a function in an `args` entry, named as its own call', () => {
@@ -160,35 +151,14 @@ describe('webDetection config tests', () => {
 
             it('checks `api` names are read as the kind API_ALLOWLIST records', () => {
                 expectError('reads the method "performance.now" without calling it', { api: { path: 'performance.now' }, is: {} });
-                expectError('calls "document.title", which API_ALLOWLIST records as a property', {
-                    api: { path: 'document.title', args: [] },
+                expectError('calls "document.fonts.status", which API_ALLOWLIST records as a property', {
+                    api: { path: 'document.fonts.status', args: [] },
                     is: {},
                 });
                 expectError('reads the method "performance.getEntriesByType" without calling it', {
                     api: { path: 'performance', field: 'getEntriesByType.length' },
                     is: {},
                 });
-            });
-
-            it('counts words with `matchAll` and `Array.from`, as a number', () => {
-                const words = {
-                    api: {
-                        path: 'Array.from',
-                        args: [
-                            {
-                                api: {
-                                    path: 'document.title.matchAll',
-                                    args: [
-                                        '\\S+',
-                                    ],
-                                },
-                            },
-                        ],
-                    },
-                    using: 'length',
-                };
-                expectValid({ ...words, is: { lte: 3 } });
-                expectError('A string fills', { ...words, is: { lte: 'x' } });
             });
 
             it('reads `length` and indexes on strings', () => {
@@ -209,12 +179,10 @@ describe('webDetection config tests', () => {
                         selector: 'div',
                         where: {
                             field: {
-                                path: 'getAttribute',
-                                args: [
-                                    'role',
-                                ],
+                                path: 'checkVisibility',
+                                args: [],
                             },
-                            is: 'dialog',
+                            is: true,
                         },
                     },
                     using: 'length',
@@ -251,8 +219,7 @@ describe('webDetection config tests', () => {
                     using: 'length',
                     is: 0,
                 });
-                expectError('"document.readyState.length"', { api: { path: 'document.readyState' }, is: { length: 8 } });
-                expectValid({ ...title, is: { type: 'string', length: { gte: 7 } } });
+                expectError('"document.fonts.status.length"', { ...fontsStatus, is: { length: 8 } });
                 expectValid({
                     api: {
                         path: 'performance.getEntriesByType',
@@ -265,47 +232,17 @@ describe('webDetection config tests', () => {
                     is: 0,
                 });
             });
-
-            it('rejects reading one value from performance.getEntries', () => {
-                const entries = { api: { path: 'performance.getEntries', args: [] } };
-                const durations = { api: { path: 'performance.getEntries', args: [], field: 'duration' } };
-                expectError('performance.getEntries selects every entry', { ...durations, is: { gt: 0 } });
-                expectError('performance.getEntries selects every entry', { only: entries, is: {} });
-                expectError('performance.getEntries selects every entry', {
-                    div: [
-                        durations,
-                        1,
-                    ],
-                    is: { gt: 0 },
-                });
-                expectError('performance.getEntries selects every entry', {
-                    ...entries,
-                    using: {
-                        path: 'at',
-                        args: [
-                            0,
-                        ],
-                    },
-                    is: {},
-                });
-                expectValid({ api: { ...entries.api, where: {} }, using: 'length', is: { gt: 0 } });
-                expectError('"performance.getEntries.length", which is not in API_ALLOWLIST', {
-                    ...entries,
-                    using: 'length',
-                    is: { gt: 0 },
-                });
-            });
         });
 
         describe('`self` and `api` paths', () => {
             it('takes a path as short for an `api` body', () => {
-                expectValid({ api: 'document.title', is: { type: 'string' } });
+                expectValid({ api: 'document.fonts.status', is: { type: 'string' } });
                 expectValid({
                     api: {
                         path: 'Math.max',
                         args: [
                             1,
-                            { api: 'document.title.length' },
+                            { api: 'innerWidth' },
                         ],
                     },
                     is: { gt: 0 },
@@ -343,7 +280,7 @@ describe('webDetection config tests', () => {
                 expectValid({
                     sum: fieldOf('img', {
                         api: {
-                            path: 'Math.min',
+                            path: 'Math.max',
                             args: [
                                 { self: 'naturalWidth' },
                                 5,
@@ -520,8 +457,8 @@ describe('webDetection config tests', () => {
                     if: true,
                     then: document,
                     else: document,
-                    using: 'title',
-                    is: { type: 'string' },
+                    using: 'hidden',
+                    is: { type: 'boolean' },
                 });
                 const byType = {
                     only: {
@@ -556,7 +493,7 @@ describe('webDetection config tests', () => {
                 ]);
                 const image = { only: { element: { selector: 'img' } } };
                 const either = { if: true, then: image, else: document };
-                expectValid({ ...either, using: 'title', is: { type: 'string' } });
+                expectValid({ ...either, using: 'hidden', is: { type: 'boolean' } });
                 expectError('"document.naturalWidth", which is not in API_ALLOWLIST', {
                     ...either,
                     using: 'naturalWidth',

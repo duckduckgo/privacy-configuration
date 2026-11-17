@@ -4,6 +4,7 @@ import {
     expectError,
     expectValid,
     fieldOf,
+    fontsStatus,
     img,
     imgCount,
     items,
@@ -79,7 +80,7 @@ describe('webDetection config tests', () => {
                     else: false,
                 });
                 expectError(notExpression, {
-                    api: { path: 'document.title' },
+                    ...fontsStatus,
                     is: {
                         eq: [
                             'a',
@@ -188,9 +189,8 @@ describe('webDetection config tests', () => {
 
             it('rejects an array as a predicate, which `in` and `any` replace', () => {
                 const notPredicate = 'an array is not a predicate';
-                const title = { api: { path: 'document.title' } };
                 expectError(notPredicate, {
-                    ...title,
+                    ...fontsStatus,
                     is: [
                         'a',
                         'b',
@@ -217,7 +217,7 @@ describe('webDetection config tests', () => {
                 });
                 expectError(notPredicate, true, {
                     a: {
-                        value: title,
+                        value: fontsStatus,
                         when: [
                             'a',
                             'b',
@@ -225,7 +225,7 @@ describe('webDetection config tests', () => {
                     },
                 });
                 expectValid({
-                    ...title,
+                    ...fontsStatus,
                     is: {
                         in: [
                             'a',
@@ -233,9 +233,9 @@ describe('webDetection config tests', () => {
                         ],
                     },
                 });
-                expectValid({ ...title, is: { in: 'a' } });
+                expectValid({ ...fontsStatus, is: { in: 'a' } });
                 expectValid({
-                    ...title,
+                    ...fontsStatus,
                     is: {
                         in: {
                             expr: [
@@ -246,7 +246,7 @@ describe('webDetection config tests', () => {
                     },
                 });
                 expectValid({
-                    ...title,
+                    ...fontsStatus,
                     is: {
                         none: {
                             in: [
@@ -271,7 +271,7 @@ describe('webDetection config tests', () => {
                 });
                 expectValid(true, {
                     a: {
-                        value: title,
+                        value: fontsStatus,
                         when: {
                             in: [
                                 'a',
@@ -282,7 +282,7 @@ describe('webDetection config tests', () => {
                 });
                 // Each entry is an expression in value position
                 expectError('"document.cookie", which is not in API_ALLOWLIST', {
-                    ...title,
+                    ...fontsStatus,
                     is: {
                         in: [
                             { api: { path: 'document.cookie' } },
@@ -290,7 +290,7 @@ describe('webDetection config tests', () => {
                     },
                 });
                 expectError('an array is not an expression', {
-                    ...title,
+                    ...fontsStatus,
                     is: {
                         in: [
                             [
@@ -536,7 +536,7 @@ describe('webDetection config tests', () => {
                     word: { value: { if: true, then: 'yes', else: 'no' } },
                     state: { value: { if: false, then: 'x', else: null } },
                 });
-                expectValid({ api: { path: 'document.readyState' }, is: { eq: { api: { path: 'document.readyState' } } } });
+                expectValid({ ...fontsStatus, is: { eq: fontsStatus } });
             });
 
             it('places every source and boolean expression in value position', () => {
@@ -642,15 +642,6 @@ describe('webDetection config tests', () => {
 
             it('places a bare `api` in boolean position, and keeps `element` with `field`, `api` with `where` and a length out of it', () => {
                 expectValid({ api: { path: 'document.hidden' } });
-                expectValid({
-                    api: {
-                        path: 'matchMedia',
-                        args: [
-                            '(prefers-reduced-motion: reduce)',
-                        ],
-                        field: 'matches',
-                    },
-                });
                 expectError('a list as a condition holds when it has an item', fieldOf('img', 'complete'));
                 expectError('a list as a condition holds when it has an item', {
                     api: { path: 'document.fonts', where: { status: 'error' } },

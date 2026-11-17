@@ -154,13 +154,9 @@ export const ACTION_KEYS = [
  * @type {Record<string, 'method' | 'property'>}
  */
 export const API_ALLOWLIST = {
-    Array: 'property',
-    'Array.from': 'method',
-    'Array.from.length': 'property',
     Math: 'property',
     'Math.max': 'method',
     'Math.max.apply': 'method',
-    'Math.min': 'method',
     Number: 'property',
     'Number.isFinite': 'method',
     'Number.isNaN': 'method',
@@ -177,18 +173,11 @@ export const API_ALLOWLIST = {
     'document.getElementsByTagName': 'method',
     'document.getElementsByTagName.length': 'property',
     'document.hidden': 'property',
-    'document.readyState': 'property',
-    'document.title': 'property',
-    'document.title.length': 'property',
-    'document.title.matchAll': 'method',
     getComputedStyle: 'method',
     'getComputedStyle.position': 'property',
     innerHeight: 'property',
     innerWidth: 'property',
-    matchMedia: 'method',
-    'matchMedia.matches': 'property',
     performance: 'property',
-    'performance.getEntries': 'method',
     'performance.getEntriesByName': 'method',
     'performance.getEntriesByName.length': 'property',
     'performance.getEntriesByName.startTime': 'property',
@@ -211,10 +200,8 @@ export const API_ALLOWLIST = {
  * @type {Record<string, TypeName>}
  */
 export const BUILTIN_RETURN_TYPES = {
-    'Array.from': 'array',
     'Math.max': 'number',
     'Math.max.apply': 'number',
-    'Math.min': 'number',
     'Number.isFinite': 'boolean',
     'Number.isNaN': 'boolean',
     'Reflect.has': 'boolean',
@@ -244,19 +231,7 @@ export function apiBody(raw) {
  */
 export const ELEMENT_METHOD_ALLOWLIST = {
     checkVisibility: 'boolean',
-    closest: 'Element?',
-    getAttribute: 'DOMString?',
-    getAttributeNS: 'DOMString?',
-    getAttributeNames: 'sequence<DOMString>',
     getBoundingClientRect: 'DOMRect',
-    getClientRects: 'DOMRectList',
-    hasAttribute: 'boolean',
-    hasAttributeNS: 'boolean',
-    hasAttributes: 'boolean',
-    hasChildNodes: 'boolean',
-    matches: 'boolean',
-    querySelector: 'Element?',
-    querySelectorAll: 'NodeList',
 };
 
 export const PROPERTY_TABLES = await buildTables();

@@ -8,10 +8,6 @@
  * its ancestors'. Each attribute maps to its IDL type, with typedefs resolved, enums written as
  * `DOMString`, and `unrestricted` kept on `double` and `float`. Tags map to their interfaces per
  * namespace.
- *
- * Attributes named like a key a predicate reserves at item level are listed in
- * `reservedNameProperties`: config can only test them through the long form
- * `{"field": <name>, "is": ...}`, or `{"self": <name>, "is": ...}`.
  */
 
 import { createRequire } from 'module';
@@ -19,26 +15,6 @@ import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 const idl = require('@webref/idl');
 const elements = require('@webref/elements');
-
-/** Keys a predicate reserves at item level: its own, and the expression keys that make an object an expression there. */
-const RESERVED_KEYS = [
-    'any',
-    'all',
-    'none',
-    'field',
-    'is',
-    'element',
-    'text',
-    'api',
-    'self',
-    'expr',
-    'only',
-    'sum',
-    'mul',
-    'div',
-    'if',
-    'ref',
-];
 
 /** Element specs in @webref/elements, by namespace. SVG 1.1 is left out: SVG 2 and its modules supersede it. */
 const NAMESPACE_SPECS = {
@@ -69,7 +45,6 @@ const NAMESPACE_SPECS = {
  * @typedef {{ type: string, name?: string, idlType?: IdlType, special?: string }} IdlMember
  * @typedef {{ type: string, name: string, partial?: boolean, inheritance?: string | null, members?: IdlMember[], idlType?: IdlType, target?: string, includes?: string }} IdlDefinition
  * @typedef {{
- *   reservedNameProperties: string[],
  *   tags: Record<string, Record<string, string>>,
  *   interfaces: Record<string, { inherits: string | null, properties: Record<string, string> }>,
  * }} PropertyTables
@@ -196,8 +171,6 @@ export async function buildTables() {
 
     /** @type {Record<string, { inherits: string | null, properties: Record<string, string> }>} */
     const interfaceTable = {};
-    /** @type {string[]} */
-    const reservedNameProperties = [];
     for (const name of [
         ...elementInterfaces,
     ].sort()) {
@@ -215,9 +188,6 @@ export async function buildTables() {
             ),
         );
         interfaceTable[name] = { inherits: interfaces.get(name)?.inheritance ?? null, properties: sorted };
-        for (const property of Object.keys(properties)) {
-            if (RESERVED_KEYS.includes(property)) reservedNameProperties.push(`${name}.${property}`);
-        }
     }
 
     const allElements = await elements.listAll();
@@ -252,7 +222,6 @@ export async function buildTables() {
     }
 
     return {
-        reservedNameProperties,
         tags,
         interfaces: interfaceTable,
     };

@@ -53,16 +53,9 @@ export function repeatedEventWarnings(detector, path) {
     return warnings;
 }
 
-/** Methods on an element that walk its subtree, or for `closest` its ancestors. */
-const ITEM_WALK_METHODS = [
-    'querySelector',
-    'querySelectorAll',
-    'closest',
-];
-
 /**
  * Warnings on a walk from each item of a `where` or `field` that no `if` inside it guards: an
- * `element` or `text` source rooted at the item, or a call of ITEM_WALK_METHODS on it. Matched
+ * `element` or `text` source rooted at the item. Matched
  * elements nest, so each walk covers nodes an enclosing item's walk covers again.
  *
  * @param {Record<string, any>} detector
@@ -92,7 +85,6 @@ export function itemWalkWarnings(detector, path) {
         }
         const body = typeof read === 'string' ? { path: read } : read;
         if (!isPlainObject(body)) return;
-        if (exposed && typeof body.path === 'string' && ITEM_WALK_METHODS.includes(body.path.split('.')[0])) warn(readPath);
         visit(body.args, `${readPath}.args`, exposed);
         visit(body.where, `${readPath}.where`, true);
         if ('field' in body) visitRead(body.field, `${readPath}.field`, true);

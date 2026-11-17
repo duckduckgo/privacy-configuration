@@ -20,7 +20,6 @@ import {
     isList,
     itemOf,
     mergeTypes,
-    oneItem,
     typeFromIdl,
     typeOf,
 } from './types.js';
@@ -190,26 +189,9 @@ function checkArg(arg, scope, ctx, path) {
 }
 
 /**
- * Whether an `apply` list is one config shows is a list: a selected list, `{"expr": [...]}`, or
- * `Array.from`, `Array.of` or `concat` over one. `apply` over any other value, such as `null` or
- * a `FontFaceSet`, passes no arguments.
- *
- * @param {unknown} arg
- * @param {StaticType | undefined} type
- * @returns {boolean}
- */
-function isApplyList(arg, type) {
-    if (type?.list !== undefined) return true;
-    if (!isPlainObject(arg)) return false;
-    const body = apiBody(arg.api);
-    if (!isPlainObject(body) || typeof body.path !== 'string') return false;
-    const path = body.path;
-    return path === 'Array.from' || path === 'Array.of' || path.endsWith('.concat.call');
-}
-
-/**
- * Check the arguments of a call config can type: the list `apply` takes, a string `JSON.parse`
- * parses, and the numbers `Math.max` and `Math.min` take.
+ * Check the arguments of a call config can type: the list `apply` takes, and the numbers `Math.max`
+ * takes. `apply` over a value config doesn't show is a list, such as `null` or a `FontFaceSet`,
+ * passes no arguments.
  *
  * @param {string} apiPath
  * @param {unknown[]} args
@@ -219,18 +201,11 @@ function isApplyList(arg, type) {
  */
 function checkCallArgs(apiPath, args, argTypes, ctx, path) {
     const isApply = apiPath.endsWith('.apply');
-    if (isApply && !isApplyList(args[1], argTypes[1])) {
-        fail(ctx, `${path}[1]`, '`apply` takes its arguments as a selected list, `{"expr": [...]}`, or `Array.from` or `concat` over one');
-    }
-    if (apiPath === 'JSON.parse' && typeof args[0] === 'string') {
-        try {
-            JSON.parse(args[0]);
-        } catch {
-            fail(ctx, `${path}[0]`, 'the string passed to `JSON.parse` does not parse');
-        }
+    if (isApply && argTypes[1]?.list === undefined) {
+        fail(ctx, `${path}[1]`, '`apply` takes its arguments as a selected list or `{"expr": [...]}`');
     }
     const method = isApply ? apiPath.slice(0, -'.apply'.length) : apiPath;
-    if (method !== 'Math.max' && method !== 'Math.min') return;
+    if (method !== 'Math.max') return;
     const numbers = isApply ? argTypes.slice(1, 2).map(itemOf) : argTypes;
     numbers.forEach((type, index) => {
         const argPath = `${path}[${isApply ? 1 : index}]`;
@@ -362,12 +337,12 @@ function readName(current, name, isCall, ctx, path, args, options = {}) {
     }
     const item = readsItem(name, isCall, args);
     if (isList(current)) {
-        if (item) return oneItem(current, ctx, path);
+        if (item) return itemOf(current);
         if (name === 'length' && !isCall) return typeOf('number');
         fail(ctx, path, `reads "${name}" on a list, which \`at\`, an index and \`length\` read; \`only\` takes its one item`);
         return UNKNOWN;
     }
-    if (item && (current.list === 'maybe' || current.apiPaths !== undefined)) return oneItem(current, ctx, path);
+    if (item && (current.list === 'maybe' || current.apiPaths !== undefined)) return itemOf(current);
     if (current.list) current = itemOf(current);
     if (current.apiPaths !== undefined && current.interfaces) {
         // Branches reading an `api` and branches giving an element: check the name both ways

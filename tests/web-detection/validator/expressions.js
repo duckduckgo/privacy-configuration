@@ -23,7 +23,6 @@ import {
     isList,
     itemOf,
     mergeTypes,
-    oneItem,
     selectorInterfaces,
     selectorNamesCustomElement,
     typeOf,
@@ -75,7 +74,7 @@ function valueNode(node) {
  * @returns {Scope}
  */
 export function bindItem(scope, type) {
-    return { ...child(scope), bound: type, perItem: true, inItem: true };
+    return { ...child(scope), bound: type, inItem: true };
 }
 
 /**
@@ -169,7 +168,7 @@ function isScalarPredicate(predicate) {
  * @returns {StaticType}
  */
 export function predicateSubject(type, predicate, ctx, path) {
-    return type.list && isScalarPredicate(predicate) ? oneItem(type, ctx, path) : type;
+    return type.list && isScalarPredicate(predicate) ? itemOf(type) : type;
 }
 
 /**
@@ -260,9 +259,7 @@ export function checkExpr(node, position, scope, ctx, path) {
     const keyPosition = hasUsing ? 'root' : valuePosition;
     let type = checkExprKey(key, node[key], keyPosition, scope, ctx, `${path}.${key}`, node);
     if (hasUsing) {
-        const root = { [key]: node[key] };
-        const usingScope = { ...scope, bound: type, perItem: scope.perItem === true && readsOuterSelf(root) };
-        type = checkUsing(node.using, type, valuePosition, usingScope, ctx, path);
+        type = checkUsing(node.using, type, valuePosition, { ...scope, bound: type }, ctx, path);
     }
     if (hasIs) {
         checkPredicate(node.is, 'value', predicateSubject(type, node.is, ctx, `${path}.is`), child(scope), ctx, `${path}.is`);
@@ -573,7 +570,7 @@ function checkExprKey(key, body, position, scope, ctx, path, holder) {
                 'list',
                 'root',
             ]);
-            const type = oneItem(checkExpr(body, 'list', child(scope), ctx, path), ctx, path);
+            const type = itemOf(checkExpr(body, 'list', child(scope), ctx, path));
             if (position === 'number' && !allows(type, 'number'))
                 fail(ctx, path, `number position takes a number, and config types the value as ${describeType(type)}`);
             if (position === 'boolean' && !allows(type, 'boolean'))
@@ -900,7 +897,7 @@ function checkConditionSource(key, branch, position, scope, ctx, path) {
             const rootPath = `${bodyPath}.root`;
             const valid = checkRoot(body.root, child(scope), ctx, rootPath, key === 'text' && 'xpath' in body);
             // Read only in boolean position with no `none` above it, an empty scope does not hold
-            const needsGuard = position !== 'boolean' || scope.underNone || scope.noneAbove === true || underNone;
+            const needsGuard = position !== 'boolean' || scope.noneAbove === true || underNone;
             if (valid && needsGuard) checkRootGuard(body.root, scope, ctx, bodyPath);
         }
     }
@@ -978,7 +975,7 @@ export function sourceType(type, list, position, ctx, path) {
             fail(ctx, path, `number position takes a number, and config types the value as ${describeType({ ...type, list })}`);
             return type;
         }
-        const item = list ? oneItem(type, ctx, path) : type;
+        const item = list ? itemOf(type) : type;
         if (!allows(item, 'number')) fail(ctx, path, `number position takes a number, and config types the value as ${describeType(item)}`);
         return item;
     }

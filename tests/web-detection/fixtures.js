@@ -61,7 +61,7 @@ export const loadEventEnd = {
     },
 };
 export const now = { api: { path: 'performance.now', args: [] } };
-export const title = { api: { path: 'document.title' } };
+export const fontsStatus = { api: { path: 'document.fonts.status' } };
 /** A region, which guards a source rooted at it when `match` repeats it */
 export const guard = {
     element: {

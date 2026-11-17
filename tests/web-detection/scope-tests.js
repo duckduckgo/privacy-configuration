@@ -13,7 +13,7 @@ import {
     numberTest,
     rootedImages,
     text,
-    title,
+    fontsStatus,
 } from './fixtures.js';
 
 describe('webDetection config tests', () => {
@@ -149,19 +149,12 @@ describe('webDetection config tests', () => {
             });
 
             it('rejects a scoped leaf in `where` with a `none` above it, in the match tree or the predicate, with no guard', () => {
-                const comments = {
-                    self: {
-                        path: 'querySelector',
-                        args: [
-                            '.comments',
-                        ],
-                    },
-                };
-                const cardsWithImage = { selector: '.card', where: { element: { selector: 'img', root: comments } } };
+                const parent = { self: 'parentElement' };
+                const cardsWithImage = { selector: '.card', where: { element: { selector: 'img', root: parent } } };
                 expectValid({ element: cardsWithImage });
                 expectError('needs a guard', { none: { element: cardsWithImage } });
                 expectError('needs a guard', {
-                    element: { selector: '.card', where: { none: { element: { selector: 'img', root: comments } } } },
+                    element: { selector: '.card', where: { none: { element: { selector: 'img', root: parent } } } },
                 });
             });
 
@@ -589,7 +582,7 @@ describe('webDetection config tests', () => {
                 });
                 expectValid(true, {
                     a: {
-                        value: title,
+                        value: { only: text },
                         buckets: [
                             { name: 'empty', is: { length: 0 } },
                             { name: 'any', is: { length: { gte: 0 } } },
@@ -666,10 +659,10 @@ describe('webDetection config tests', () => {
             });
 
             it('checks overlap between a literal and a comparison that converts it', () => {
-                // Config does not type `document.title`, so its buckets compare without a guard
+                // Config does not type `document.fonts.status`, so its buckets compare without a guard
                 expectError('overlap', true, {
                     a: {
-                        value: title,
+                        value: fontsStatus,
                         buckets: [
                             { name: 'none', is: null },
                             { name: 'some', is: { gte: 0 } },
@@ -678,7 +671,7 @@ describe('webDetection config tests', () => {
                 });
                 expectError('overlap', true, {
                     a: {
-                        value: title,
+                        value: fontsStatus,
                         buckets: [
                             { name: 's', is: '7' },
                             { name: 'n', is: { gte: 0 } },
@@ -687,7 +680,7 @@ describe('webDetection config tests', () => {
                 });
                 expectError('overlap', true, {
                     a: {
-                        value: title,
+                        value: fontsStatus,
                         buckets: [
                             {
                                 name: 's',
@@ -703,7 +696,7 @@ describe('webDetection config tests', () => {
                 });
                 expectValid(true, {
                     a: {
-                        value: title,
+                        value: fontsStatus,
                         buckets: [
                             { name: 's', is: '7' },
                             { name: 'n', is: 7 },
@@ -712,7 +705,7 @@ describe('webDetection config tests', () => {
                 });
                 expectValid(true, {
                     a: {
-                        value: title,
+                        value: fontsStatus,
                         buckets: [
                             { name: 'none', is: null },
                             { name: 'some', is: { gt: 0 } },
@@ -721,7 +714,7 @@ describe('webDetection config tests', () => {
                 });
                 expectValid(true, {
                     a: {
-                        value: title,
+                        value: fontsStatus,
                         buckets: [
                             { name: 'unsupported', is: 'unsupported' },
                             { name: 'some', is: { gte: 0 } },

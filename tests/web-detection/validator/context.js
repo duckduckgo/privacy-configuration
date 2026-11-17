@@ -10,7 +10,6 @@
  *   conditionRoot: boolean,
  *   guards: unknown[],
  *   bound?: StaticType,
- *   perItem?: boolean,
  *   inItem?: boolean,
  *   noneAbove?: boolean,
  *   spreadOf?: 'number' | 'boolean',
@@ -20,9 +19,8 @@
  * condition of an `if`, whose top-level `all` operands guard each other. `guards` are the expressions
  * guarding a scoped `element` or `text`: the operands of that `all`, and the condition of each
  * enclosing `if` with the operands of its top-level `all`. `bound` is the type `self` reads, set inside
- * `using`, `where` and `field`. `perItem` is set where `self` reads a value per item: inside `where`
- * and `field`, and inside a `using` beside an expression that reads such a `self`. `inItem` is set
- * anywhere inside a `where` or `field`, where every expression runs once per item. `noneAbove` is set
+ * `using`, `where` and `field`. `inItem` is set anywhere inside a `where` or `field`, where every
+ * expression runs once per item. `noneAbove` is set
  * under a `none` anywhere above, in a condition or a predicate: `where` clears `underNone` for its own
  * comparisons, and keeps `noneAbove`. `spreadOf` is set on an operand of `sum`, `mul`, `any`, `all` or
  * `none` checked in spread position: the position an operand that is not spread takes there, which an
