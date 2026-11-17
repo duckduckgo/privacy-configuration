@@ -17,22 +17,6 @@ import { interfaceProperties, selectorInterfaces } from './validator/types.js';
 describe('webDetection config tests', () => {
     describe('validateDetector (self-test)', () => {
         describe('`api` names and data reads', () => {
-            it('rejects `allowGetter`, which is no source body or `field` key', () => {
-                expectError('unknown source body key "allowGetter"', {
-                    element: { selector: 'img', allowGetter: true, where: { complete: true } },
-                    using: 'length',
-                    is: 0,
-                });
-                expectError('unknown source body key "allowGetter"', {
-                    api: { path: 'document.title', allowGetter: true },
-                    is: { type: 'string' },
-                });
-                expectError('unknown `field` key "allowGetter"', {
-                    ...fieldOf('img', { path: 'naturalWidth', allowGetter: true }),
-                    is: { gt: 0 },
-                });
-            });
-
             it('checks expression `args`, and the calls config can type', () => {
                 const widths = fieldOf('img', 'naturalWidth');
                 const maxOf = (/** @type {unknown} */ list) => ({
@@ -109,16 +93,6 @@ describe('webDetection config tests', () => {
                 });
                 expectError('boolean position takes a boolean, and config types the value as number', maxOf(widths));
                 expectError('reads the method "Math.max" without calling it', { api: { path: 'Math.max' }, is: {} });
-                expectError('unknown expression key "composed"', {
-                    api: {
-                        path: 'Math.max',
-                        args: [
-                            { composed: true },
-                        ],
-                    },
-                    is: {},
-                });
-                expectError('`args` is an array', { api: { path: 'Math.max', args: 1 }, is: {} });
             });
 
             it('reads a method as a function in an `args` entry, named as its own call', () => {
@@ -251,7 +225,6 @@ describe('webDetection config tests', () => {
                 });
                 expectError('"document.cookie", which is not in API_ALLOWLIST', { api: 'document.cookie', is: {} });
                 expectError('reads the method "performance.now" without calling it', { api: 'performance.now', is: {} });
-                expectError('`api` takes a path or one body object', { api: 5, is: {} });
             });
 
             it('passes the value to a listed method through `self`, in `where` and under `is`', () => {
@@ -342,19 +315,11 @@ describe('webDetection config tests', () => {
                         is: true,
                     }),
                 );
-                expectError(
-                    'unknown `field` key "call"',
-                    items('video', { duration: { field: { call: { api: 'Number.isFinite' } }, is: true } }),
-                );
             });
 
             it('rejects `self` outside `using`, `where` and `field`', () => {
                 expectError('`self` reads from `using`, `where` or `field`', { self: 'length', is: 0 });
                 expectError('`self` reads from `using`, `where` or `field`', true, { x: { value: { self: {} } } });
-            });
-
-            it('rejects `as`', () => {
-                expectError('unknown expression key "as"', items('img', { naturalWidth: { gt: { self: 'naturalHeight', as: 'h' } } }));
             });
 
             const navigation = {
@@ -513,19 +478,6 @@ describe('webDetection config tests', () => {
                 expectValid({ api: { path: 'document' }, using: 'fonts', is: { type: 'object' } });
                 expectValid({ api: { path: 'document' }, using: { path: 'fonts', where: { status: 'error' } }, is: {} });
                 expectError('`using` reads from an expression', { using: 'length', is: 1 });
-                expectError('`using` takes a path', { ...img, using: 1, is: {} });
-                expectError('unknown source body key "root"', {
-                    ...img,
-                    using: {
-                        path: 'at',
-                        args: [
-                            0,
-                        ],
-                        root: img,
-                    },
-                    is: {},
-                });
-                expectError('unknown source body key "root"', { api: { root: img, path: 'length' }, is: { gt: 0 } });
             });
 
             it('takes an expression reading the value beside it through `self`', () => {

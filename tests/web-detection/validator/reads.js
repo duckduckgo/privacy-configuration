@@ -1,15 +1,6 @@
 import { child, expectPosition, fail } from './context.js';
-import { bindItem, checkBodyKeys, checkExpr, sourceType } from './expressions.js';
-import {
-    API_ALLOWLIST,
-    SOURCE_BODY_KEYS,
-    BUILTIN_RETURN_TYPES,
-    ELEMENT_METHOD_ALLOWLIST,
-    FIELD_KEYS,
-    FUNCTION_READS,
-    LIST_CONDITION,
-    apiBody,
-} from './grammar.js';
+import { bindItem, checkExpr, sourceType } from './expressions.js';
+import { API_ALLOWLIST, BUILTIN_RETURN_TYPES, ELEMENT_METHOD_ALLOWLIST, FUNCTION_READS, LIST_CONDITION, apiBody } from './grammar.js';
 import { checkPredicate } from './predicates.js';
 import {
     UNKNOWN,
@@ -45,10 +36,7 @@ import { isPlainObject } from '../../../util.js';
  * @returns {StaticType}
  */
 export function checkApi(body, position, scope, ctx, path, root, asFunction = false, bound = false) {
-    if (!isPlainObject(body)) {
-        fail(ctx, path, '`api` takes a path or one body object');
-        return UNKNOWN;
-    }
+    if (!isPlainObject(body)) return UNKNOWN;
     const hasWhere = 'where' in body;
     if (hasWhere && position === 'boolean') fail(ctx, path, `\`api\` with \`where\`: ${LIST_CONDITION}`);
     expectPosition(ctx, path, '`api`', position, [
@@ -59,13 +47,9 @@ export function checkApi(body, position, scope, ctx, path, root, asFunction = fa
         'spread',
         'root',
     ]);
-    checkBodyKeys(body, SOURCE_BODY_KEYS.api, ctx, path);
     const pathless = bound && body.path === undefined;
     if (pathless && 'args' in body) fail(ctx, path, '`args` calls the last name in `path`, so it needs `path`');
-    if (!pathless && (typeof body.path !== 'string' || body.path === '')) {
-        fail(ctx, `${path}.path`, '`path` is a non-empty string');
-        return UNKNOWN;
-    }
+    if (!pathless && typeof body.path !== 'string') return UNKNOWN;
     const names = pathless ? [] : String(body.path).split('.');
     const asArgument = asFunction && !('args' in body);
     /** @type {StaticType} */
@@ -166,10 +150,7 @@ function checkApiName(name, isCall, ctx, path, next, asArgument = false) {
  * @returns {StaticType[]}
  */
 function checkArgs(args, scope, ctx, path) {
-    if (!Array.isArray(args)) {
-        fail(ctx, path, '`args` is an array');
-        return [];
-    }
+    if (!Array.isArray(args)) return [];
     return args.map((arg, index) => checkArg(arg, scope, ctx, `${path}[${index}]`));
 }
 
@@ -237,28 +218,14 @@ export function checkFieldRead(field, subject, scope, ctx, path) {
     if (typeof field === 'string') {
         read = { path: field };
     } else if (isPlainObject(field)) {
-        for (const key of Object.keys(field)) {
-            if (!FIELD_KEYS.includes(key)) fail(ctx, path, `unknown \`field\` key "${key}"`);
-        }
-        if (!('path' in field)) {
-            fail(
-                ctx,
-                path,
-                'args' in field ? '`args` calls the last name in `path`, so it needs `path`' : '`field` needs `path`, or is an expression',
-            );
-        }
         read = field;
     } else {
-        fail(ctx, path, '`field` is a string, an object or an expression');
         return UNKNOWN;
     }
 
     let current = subject;
     if (read.path !== undefined) {
-        if (typeof read.path !== 'string' || read.path === '') {
-            fail(ctx, path, '`path` is a non-empty string');
-            return UNKNOWN;
-        }
+        if (typeof read.path !== 'string') return UNKNOWN;
         const argTypes = read.args !== undefined ? checkArgs(read.args, bindItem(scope, subject), ctx, `${path}.args`) : undefined;
         const names = read.path.split('.');
         names.forEach((name, index) => {

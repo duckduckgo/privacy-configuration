@@ -2,16 +2,12 @@ import { isDeepStrictEqual } from 'node:util';
 import { child, expectPosition, fail } from './context.js';
 import {
     ACTION_KEYS,
-    SOURCE_BODY_KEYS,
     BRANCH_KEYS,
     COMPARISON_OPERATORS,
     DEFINE_NAME_PATTERN,
-    EXPRESSION_KEYS,
     LIST_CONDITION,
-    MODIFIER_KEYS,
     OPERATOR_KEYS,
     SOURCE_KEYS,
-    VISIBILITY_VALUES,
     apiBody,
 } from './grammar.js';
 import { checkPayloadSpec, checkPredicate, isLiteral } from './predicates.js';
@@ -220,9 +216,7 @@ export function checkExpr(node, position, scope, ctx, path) {
     const keys = Object.keys(node);
     if (keys.some((key) => ACTION_KEYS.includes(key))) return checkActions(node, position, scope, ctx, path);
     for (const key of keys) {
-        if (BRANCH_KEYS.includes(key)) {
-            if (!('if' in node)) fail(ctx, `${path}.${key}`, `\`${key}\` sits beside \`if\` only`);
-        } else if (!EXPRESSION_KEYS.includes(key) && !MODIFIER_KEYS.includes(key)) fail(ctx, path, `unknown expression key "${key}"`);
+        if (BRANCH_KEYS.includes(key) && !('if' in node)) fail(ctx, `${path}.${key}`, `\`${key}\` sits beside \`if\` only`);
     }
     const exprKeys = expressionKeysOf(node);
     const hasUsing = 'using' in node;
@@ -281,10 +275,7 @@ export function checkExpr(node, position, scope, ctx, path) {
  */
 export function checkBody(node, position, scope, ctx, path) {
     if (!Array.isArray(node)) return checkExpr(node, position, scope, ctx, path);
-    if (node.length === 0) {
-        fail(ctx, path, 'a sequence holds at least one element');
-        return UNKNOWN;
-    }
+    if (node.length === 0) return UNKNOWN;
     /** @type {StaticType} */
     let type = UNKNOWN;
     node.forEach((element, index) => {
@@ -320,15 +311,7 @@ function checkActions(node, position, scope, ctx, path) {
             continue;
         }
         if (scope.inItem) fail(ctx, actionPath, `\`${key}\` inside a \`where\` or \`field\` runs once per item: run it outside`);
-        if (!isPlainObject(body)) {
-            fail(ctx, actionPath, `\`${key}\` takes an object`);
-            continue;
-        }
-        for (const bodyKey of Object.keys(body)) {
-            if (bodyKey !== 'data' && !(key === 'fireEvent' && bodyKey === 'type')) fail(ctx, actionPath, `unknown key "${bodyKey}"`);
-        }
-        if (key === 'fireEvent' && typeof body.type !== 'string') fail(ctx, `${actionPath}.type`, '`type` takes a string');
-        if ('data' in body)
+        if (isPlainObject(body) && 'data' in body)
             checkPayloadSpec(body.data, /** @type {'fireEvent' | 'breakageReportData'} */ (key), ctx, `${actionPath}.data`, child(scope));
     }
     return typeOf('undefined');
@@ -343,10 +326,7 @@ function checkActions(node, position, scope, ctx, path) {
  * @param {string} path
  */
 function checkDefine(define, scope, ctx, path) {
-    if (!isPlainObject(define) || Object.keys(define).length === 0) {
-        fail(ctx, path, '`define` takes an object of at least one name');
-        return;
-    }
+    if (!isPlainObject(define)) return;
     for (const [
         name,
         value,
@@ -613,7 +593,6 @@ function checkExprKey(key, body, position, scope, ctx, path, holder) {
                 'number',
             ]);
             if (!Array.isArray(body) || body.length !== 2) {
-                fail(ctx, path, '`div` takes an array of two operands');
                 return {
                     types: [
                         'number',
@@ -790,50 +769,16 @@ function collectBodies(branch, position, ctx, path, underNone = false) {
     if (Array.isArray(branch)) {
         return branch.flatMap((entry, index) => collectBodies(entry, position, ctx, `${path}[${index}]`, underNone));
     }
-    if (!isPlainObject(branch)) {
-        fail(ctx, path, 'a source body is an object, or an array of them');
-        return [];
-    }
+    if (!isPlainObject(branch)) return [];
     const opKeys = Object.keys(branch).filter((key) => OPERATOR_KEYS.includes(key));
     if (opKeys.length === 0)
         return [
             { body: branch, path, underNone },
         ];
 
-    const otherKeys = Object.keys(branch).filter((key) => !OPERATOR_KEYS.includes(key));
-    if (otherKeys.length)
-        fail(ctx, path, `source body mixes operator keys [${opKeys.join(', ')}] with body keys [${otherKeys.join(', ')}]`);
     if (position !== 'boolean')
         fail(ctx, path, `\`{${opKeys.join('|')}}\` blocks over source bodies are boolean only, not ${position} position`);
     return opKeys.flatMap((key) => collectBodies(branch[key], position, ctx, `${path}.${key}`, underNone || key === 'none'));
-}
-
-/**
- * @param {Record<string, any>} body
- * @param {string[]} allowed
- * @param {Context} ctx
- * @param {string} path
- */
-export function checkBodyKeys(body, allowed, ctx, path) {
-    for (const key of Object.keys(body)) {
-        if (!allowed.includes(key)) fail(ctx, path, `unknown source body key "${key}"`);
-    }
-}
-
-/**
- * @param {unknown} value
- * @param {Context} ctx
- * @param {string} path
- * @param {string} what
- * @returns {value is string | string[]}
- */
-function expectStrings(value, ctx, path, what) {
-    const ok =
-        typeof value === 'string'
-            ? value !== ''
-            : Array.isArray(value) && value.length > 0 && value.every((v) => typeof v === 'string' && v !== '');
-    if (!ok) fail(ctx, path, `${what} is a non-empty string or array of them`);
-    return ok;
 }
 
 /**
@@ -858,11 +803,7 @@ function checkConditionSource(key, branch, position, scope, ctx, path) {
     /** @type {StaticType[]} */
     const valueTypes = [];
     for (const { body, path: bodyPath, underNone } of bodies) {
-        checkBodyKeys(body, SOURCE_BODY_KEYS[key], ctx, bodyPath);
         if (key === 'text') {
-            expectStrings(body.pattern, ctx, `${bodyPath}.pattern`, '`pattern`');
-            if ('selector' in body) expectStrings(body.selector, ctx, `${bodyPath}.selector`, '`selector`');
-            if ('xpath' in body) expectStrings(body.xpath, ctx, `${bodyPath}.xpath`, '`xpath`');
             checkTextExpressions(body, ctx, bodyPath);
             valueTypes.push(typeOf('string'));
             if ('root' in body && 'xpath' in body) {
@@ -877,10 +818,6 @@ function checkConditionSource(key, branch, position, scope, ctx, path) {
                 }
             }
         } else {
-            expectStrings(body.selector, ctx, `${bodyPath}.selector`, '`selector`');
-            if ('visibility' in body && !VISIBILITY_VALUES.includes(body.visibility)) {
-                fail(ctx, `${bodyPath}.visibility`, `unknown visibility ${JSON.stringify(body.visibility)}`);
-            }
             /** @type {StaticType} */
             const itemType = {
                 types: [
@@ -920,10 +857,7 @@ function checkConditionSource(key, branch, position, scope, ctx, path) {
  * @returns {boolean} whether the root has entries
  */
 function checkRoot(root, scope, ctx, path, readsXPath) {
-    if (Array.isArray(root) && root.length === 0) {
-        fail(ctx, path, '`root` needs at least one entry');
-        return false;
-    }
+    if (Array.isArray(root) && root.length === 0) return false;
     asArray(root).forEach((entry, index) =>
         checkRootEntry(entry, scope, ctx, Array.isArray(root) ? `${path}[${index}]` : path, readsXPath),
     );
@@ -999,10 +933,7 @@ function checkUsing(using, root, position, scope, ctx, path) {
     const usingPath = `${path}.using`;
     if (isPlainObject(using) && expressionKeysOf(using).length) return checkExpr(using, position, scope, ctx, usingPath);
     const body = typeof using === 'string' ? { path: using } : using;
-    if (!isPlainObject(body)) {
-        fail(ctx, usingPath, '`using` takes a path, an `api` body without `root`, or an expression');
-        return UNKNOWN;
-    }
+    if (!isPlainObject(body)) return UNKNOWN;
     // `length` alone is a number, as C-S-S compiles it
     if (body.path === 'length' && Object.keys(body).length === 1)
         expectPosition(ctx, usingPath, '`using` `length`', position, [

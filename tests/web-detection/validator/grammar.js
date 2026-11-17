@@ -36,69 +36,15 @@ export const EXPRESSION_KEYS = [
     'ref',
 ];
 
-/** In the order they apply: `using` binds `self` to the expression's value, and `is` tests the result. */
-export const MODIFIER_KEYS = [
-    'using',
-    'is',
-];
-
 /** Keys valid only beside `if`. */
 export const BRANCH_KEYS = [
     'then',
     'else',
 ];
 
-export const SOURCE_BODY_KEYS = {
-    element: [
-        'selector',
-        'visibility',
-        'where',
-        'field',
-        'root',
-    ],
-    text: [
-        'pattern',
-        'selector',
-        'xpath',
-        'xpathConfig',
-        'root',
-    ],
-    api: [
-        'path',
-        'args',
-        'where',
-        'field',
-    ],
-};
-
-export const VISIBILITY_VALUES = [
-    'visible',
-    'hidden',
-    'any',
-    'content',
-];
-
-export const FIELD_KEYS = [
-    'path',
-    'args',
-];
-
 /** Why a selected list other than the condition leaf is refused as a condition */
 export const LIST_CONDITION =
     'a list as a condition holds when it has an item, which reads like a test of its values: `only` gives its one item, and `using: "length"` counts them';
-
-export const TYPE_NAMES = [
-    'number',
-    'string',
-    'boolean',
-    'null',
-    'undefined',
-    'array',
-    'object',
-    'function',
-    'symbol',
-    'bigint',
-];
 
 export const COMPARISON_OPERATORS = [
     'lt',
@@ -119,20 +65,6 @@ export const VALUE_OPERATORS = [
 export const PAYLOAD_ACTIONS = [
     'fireEvent',
     'breakageReportData',
-];
-
-export const PAYLOAD_FIELD_KEYS = [
-    'value',
-    'when',
-    'buckets',
-];
-
-/** Keys of a detector. */
-export const DETECTOR_KEYS = [
-    'state',
-    'triggers',
-    'match',
-    'actions',
 ];
 
 /** The keys that make an object an action. */

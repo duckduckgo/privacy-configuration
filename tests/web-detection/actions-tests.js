@@ -76,8 +76,6 @@ describe('webDetection config tests', () => {
         });
 
         it('rejects shapes the client does not parse', () => {
-            expectError('unknown detector key "items"', { items: [], actions: { breakageReportData: {} } });
-            expectError('a detector needs `actions`', { state: 'disabled', triggers: {} });
             expectError('"api" is not an action', { actions: { fireEvent: { type: 'a' }, api: 'document' } });
             expectError('sits in value position only, not boolean position', {
                 match: {
@@ -95,7 +93,6 @@ describe('webDetection config tests', () => {
                     ],
                 ],
             });
-            expectError('a sequence holds at least one element', { actions: [] });
             expectError('`then` sits beside `if` only', { actions: { then: { breakageReportData: {} } } });
             expectError('`if` needs `then`', { actions: { if: true, else: { breakageReportData: {} } } });
             expectError('an object takes one expression key', { actions: { if: true, then: 1, api: 'document' } });
@@ -104,10 +101,6 @@ describe('webDetection config tests', () => {
                 actions: { breakageReportData: {} },
             });
             expectError('name does not match', { actions: { define: { 'that.x': 1 } } });
-            expectError('unknown key "state"', {
-                match: true,
-                actions: { breakageReportData: { data: {} }, fireEvent: { type: 'a', state: 'enabled' } },
-            });
         });
 
         it('rejects an action, a ref and a detector name in a detector with match', () => {

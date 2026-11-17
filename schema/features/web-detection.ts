@@ -2,6 +2,14 @@ import { ConditionBlockOrArray, CSSInjectFeatureSettings, Feature, FeatureState 
 
 type MaybeArray<T> = T | T[];
 
+/** @minLength 1 */
+type NonEmptyString = string;
+
+/** @minItems 1 */
+type NonEmptyList<T> = T[];
+
+type NonEmptyStrings = NonEmptyString | NonEmptyList<NonEmptyString>;
+
 type TriggerBase = {
     state?: FeatureState;
     runConditions?: ConditionBlockOrArray;
@@ -48,13 +56,13 @@ type XPathConfig = {
 
 export type ConditionTypes = {
     text: {
-        pattern: MaybeArray<string>;
-        selector?: MaybeArray<string>;
-        xpath?: MaybeArray<string>;
+        pattern: NonEmptyStrings;
+        selector?: NonEmptyStrings;
+        xpath?: NonEmptyStrings;
         xpathConfig?: XPathConfig;
     };
     element: {
-        selector: MaybeArray<string>;
+        selector: NonEmptyStrings;
         visibility?: 'visible' | 'hidden' | 'any' | 'content';
     };
 };
@@ -77,7 +85,7 @@ type Arg = Expr;
 type FieldRead =
     | string
     | {
-          path: string;
+          path: NonEmptyString;
           args?: Arg[];
       }
     | ExprObject;
@@ -108,7 +116,7 @@ type PredicateObject = PredicateReserved & PredicateOperators & { [path: string]
 export type Predicate = string | number | boolean | null | PredicateObject;
 
 type Root = {
-    root?: MaybeArray<Expr>;
+    root?: Expr | NonEmptyList<Expr>;
 };
 
 type ItemKeys = {
@@ -119,7 +127,7 @@ type ItemKeys = {
 export type ElementBody = ConditionTypes['element'] & Root & ItemKeys;
 export type TextBody = ConditionTypes['text'] & Root;
 export type ApiBody = {
-    path: string;
+    path: NonEmptyString;
     args?: Arg[];
 } & ItemKeys;
 type UsingBody = ApiBody;
@@ -165,22 +173,25 @@ export type ActionObject = Partial<{
     breakageReportData: {
         data?: PayloadSpec;
     };
-    define: Record<Name, Expr>;
+    define: Defines;
 }>;
+
+/** @minProperties 1 */
+type Defines = Record<Name, Expr>;
 
 export type Expr = number | boolean | string | null | ExprObject | ActionObject;
 
-export type Body = Expr | Expr[];
+export type Body = Expr | NonEmptyList<Expr>;
 
 export type PayloadField = {
     value: Expr;
     when?: Predicate;
-    buckets?: Bucket[];
+    buckets?: NonEmptyList<Bucket>;
 };
 
 /** Tested in array order: the first bucket whose `is` holds names the value. */
 export type Bucket = {
-    name: string;
+    name: NonEmptyString;
     is: Predicate;
 };
 

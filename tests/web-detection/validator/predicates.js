@@ -1,6 +1,6 @@
 import { PAYLOAD_SCOPE, child, fail } from './context.js';
 import { checkExpr, predicateSubject } from './expressions.js';
-import { COMPARISON_OPERATORS, NAME_PATTERN, OPERATOR_KEYS, PAYLOAD_FIELD_KEYS, TYPE_NAMES, VALUE_OPERATORS } from './grammar.js';
+import { COMPARISON_OPERATORS, NAME_PATTERN, OPERATOR_KEYS, VALUE_OPERATORS } from './grammar.js';
 import { checkFieldRead, numberGuard } from './reads.js';
 import { describeType } from './types.js';
 import { asArray, isItemExpression } from './walk.js';
@@ -88,7 +88,6 @@ function checkOperators(predicate, subject, scope, ctx, path) {
     const comparisons = COMPARISON_OPERATORS.filter(has);
     for (const key of comparisons) checkExpr(predicate[key], 'number', child(scope), ctx, `${path}.${key}`);
 
-    if (has('fails') && typeof predicate.fails !== 'boolean') fail(ctx, `${path}.fails`, '`fails` is a boolean');
     if (predicate.fails === true) {
         const beside = Object.keys(predicate).filter((key) => key !== 'fails');
         if (beside.length)
@@ -101,17 +100,7 @@ function checkOperators(predicate, subject, scope, ctx, path) {
 
     /** @type {string[] | null} */
     let listed = null;
-    if (has('type')) {
-        const names = asArray(predicate.type);
-        const unknown = names.filter((name) => !TYPE_NAMES.includes(name));
-        if (unknown.length)
-            fail(
-                ctx,
-                `${path}.type`,
-                `unknown type name ${unknown.map((name) => JSON.stringify(name)).join(', ')}; names are ${TYPE_NAMES.join(', ')}`,
-            );
-        listed = names;
-    }
+    if (has('type')) listed = asArray(predicate.type);
 
     const guard = numberGuard(predicate);
     // `Number.isFinite` holding means a number, when tested before the comparisons. `Number.isNaN`
@@ -160,10 +149,7 @@ function checkOperators(predicate, subject, scope, ctx, path) {
  * @param {Scope} scope - the payload scope, with the index of its action item
  */
 export function checkPayloadSpec(data, action, ctx, path, scope) {
-    if (!isPlainObject(data)) {
-        fail(ctx, path, '`data` maps payload keys to fields');
-        return;
-    }
+    if (!isPlainObject(data)) return;
     for (const [
         key,
         field,
@@ -171,17 +157,7 @@ export function checkPayloadSpec(data, action, ctx, path, scope) {
         const fieldPath = `${path}.${key}`;
         if (!NAME_PATTERN.test(key)) fail(ctx, fieldPath, `payload key "${key}" does not match ${NAME_PATTERN}`);
         if (key === 'nativeData') fail(ctx, fieldPath, 'payload key "nativeData" is reserved');
-        if (!isPlainObject(field)) {
-            fail(ctx, fieldPath, 'a payload field is an object with `value`');
-            continue;
-        }
-        for (const fieldKey of Object.keys(field)) {
-            if (!PAYLOAD_FIELD_KEYS.includes(fieldKey)) fail(ctx, fieldPath, `unknown payload field key "${fieldKey}"`);
-        }
-        if (!('value' in field)) {
-            fail(ctx, fieldPath, 'a payload field needs `value`');
-            continue;
-        }
+        if (!isPlainObject(field) || !('value' in field)) continue;
         const type = checkExpr(field.value, 'value', scope, ctx, `${fieldPath}.value`);
         if (action === 'fireEvent' && !('buckets' in field)) fail(ctx, fieldPath, 'a `fireEvent` payload field is sent through `buckets`');
         if ('when' in field) {
@@ -322,27 +298,13 @@ function bucketSetsOverlap(a, b) {
  * @param {string} path
  */
 function checkBuckets(buckets, type, ctx, path) {
-    if (!Array.isArray(buckets) || buckets.length === 0) {
-        fail(ctx, path, '`buckets` is an array of at least one `{"name", "is"}` bucket');
-        return;
-    }
+    if (!Array.isArray(buckets)) return;
     /** @type {{ name: string, set: BucketSet }[]} */
     const simple = [];
     buckets.forEach((bucket, i) => {
         const bucketPath = `${path}.${i}`;
-        if (!isPlainObject(bucket)) {
-            fail(ctx, bucketPath, 'a bucket is `{"name", "is"}`');
-            return;
-        }
-        for (const key of Object.keys(bucket)) {
-            if (key !== 'name' && key !== 'is') fail(ctx, bucketPath, `unknown bucket key "${key}"`);
-        }
+        if (!isPlainObject(bucket) || !('is' in bucket)) return;
         const { name, is: predicate } = bucket;
-        if (typeof name !== 'string' || name === '') fail(ctx, `${bucketPath}.name`, 'a bucket name is a non-empty string');
-        if (!('is' in bucket)) {
-            fail(ctx, bucketPath, 'a bucket needs `is`');
-            return;
-        }
         const isPath = `${bucketPath}.is`;
         checkPredicate(predicate, 'value', predicateSubject(type, predicate, ctx, isPath), PAYLOAD_SCOPE, ctx, isPath);
         const set = simpleBucketSet(predicate);

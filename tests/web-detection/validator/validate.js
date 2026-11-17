@@ -1,7 +1,6 @@
 import { isDeepStrictEqual } from 'node:util';
 import { MATCH_SCOPE, PAYLOAD_SCOPE, newContext } from './context.js';
 import { checkBody, checkExpr } from './expressions.js';
-import { DETECTOR_KEYS } from './grammar.js';
 import { isPlainObject } from '../../../util.js';
 
 /**
@@ -47,20 +46,10 @@ export function validateDetector(detector, path) {
         return [
             `${path}: a detector is an object`,
         ];
-    /** @type {string[]} */
-    const structuralErrors = [];
-    for (const key of Object.keys(detector)) {
-        if (!DETECTOR_KEYS.includes(key)) structuralErrors.push(`${path}: unknown detector key "${key}"`);
-    }
-    if (!('actions' in detector)) structuralErrors.push(`${path}: a detector needs \`actions\``);
     const ctx = newContext();
     ctx.hasMatch = 'match' in detector;
-    const errors = runChecks(ctx, () => {
+    return runChecks(ctx, () => {
         if ('match' in detector) checkExpr(detector.match, 'boolean', MATCH_SCOPE, ctx, `${path}.match`);
         if ('actions' in detector) checkBody(detector.actions, 'value', PAYLOAD_SCOPE, ctx, `${path}.actions`);
     });
-    return [
-        ...structuralErrors,
-        ...errors,
-    ];
 }
