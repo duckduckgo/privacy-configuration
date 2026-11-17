@@ -9,13 +9,7 @@ import {
     apiBody,
 } from './grammar.js';
 
-/**
- * @param {unknown} value
- * @returns {value is Record<string, any>}
- */
-export function isPlainObject(value) {
-    return value !== null && typeof value === 'object' && !Array.isArray(value);
-}
+import { isPlainObject } from '../../../util.js';
 
 /**
  * @template T

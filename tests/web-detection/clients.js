@@ -1,5 +1,7 @@
 import { immutableJSONPatch } from 'immutable-json-patch';
-import { asArray, isPlainObject } from './validator/walk.js';
+import { asArray } from './validator/walk.js';
+import { isPlainObject } from '../../util.js';
+import { EXPERIMENT_METRIC_PARENTS } from '../../constants.js';
 
 /**
  * The clients of each generated config, and the first app version carrying this release: the
@@ -96,14 +98,6 @@ export function clientDetectors(settings, injectNames, version, others) {
     return view.detectors ?? {};
 }
 
-// Features whose subfeatures may declare experiment metrics that consume events
-// (see tests/experiment-metrics-tests.js).
-const METRIC_PARENTS = [
-    'contentScopeExperiments',
-    'blockList',
-    'contentBlocking',
-];
-
 /**
  * Event types something in a config consumes: counter and data `source`s, the `trigger.source`
  * of immediate telemetry entries, and experiment metric events.
@@ -122,7 +116,7 @@ export function eventHubConsumers(configBody) {
         }
         if ('source' in entry.trigger && entry.trigger.source) consumers.add(entry.trigger.source);
     }
-    for (const parent of METRIC_PARENTS) {
+    for (const parent of EXPERIMENT_METRIC_PARENTS) {
         for (const subFeature of Object.values(configBody?.features?.[parent]?.features ?? {})) {
             for (const metric of Object.values(/** @type {Record<string, any>} */ (subFeature)?.settings?.metrics ?? {})) {
                 if (typeof metric?.event === 'string') consumers.add(metric.event);

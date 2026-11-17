@@ -240,7 +240,7 @@ const BODY_KEYS = [
 
 // Actions whose order doesn't change what they do. C-S-S before 19.0.0 reads them only from an
 // `actions` object, so an object of just these stays one
-const ORDER_FREE_ACTION_KEYS = [
+export const ORDER_FREE_ACTION_KEYS = [
     'fireEvent',
     'breakageReportData',
 ];
@@ -249,7 +249,7 @@ const ORDER_FREE_ACTION_KEYS = [
  * @param {unknown} value
  * @returns {value is Record<string, any>}
  */
-function isPlainObject(value) {
+export function isPlainObject(value) {
     return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 

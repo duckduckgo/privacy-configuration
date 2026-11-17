@@ -2,7 +2,7 @@ import { child, expectPosition, fail } from './context.js';
 import { bindItem, checkBodyKeys, checkExpr, sourceType } from './expressions.js';
 import {
     API_ALLOWLIST,
-    BODY_KEYS,
+    SOURCE_BODY_KEYS,
     BUILTIN_RETURN_TYPES,
     ELEMENT_METHOD_ALLOWLIST,
     FIELD_KEYS,
@@ -24,7 +24,8 @@ import {
     typeFromIdl,
     typeOf,
 } from './types.js';
-import { expressionKeysOf, isPlainObject } from './walk.js';
+import { expressionKeysOf } from './walk.js';
+import { isPlainObject } from '../../../util.js';
 
 /**
  * @typedef {import('./context.js').Context} Context
@@ -59,7 +60,7 @@ export function checkApi(body, position, scope, ctx, path, root, asFunction = fa
         'spread',
         'root',
     ]);
-    checkBodyKeys(body, BODY_KEYS.api, ctx, path);
+    checkBodyKeys(body, SOURCE_BODY_KEYS.api, ctx, path);
     const pathless = bound && body.path === undefined;
     if (pathless && 'args' in body) fail(ctx, path, '`args` calls the last name in `path`, so it needs `path`');
     if (!pathless && (typeof body.path !== 'string' || body.path === '')) {

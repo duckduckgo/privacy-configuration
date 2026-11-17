@@ -2,7 +2,7 @@ import { isDeepStrictEqual } from 'node:util';
 import { child, expectPosition, fail } from './context.js';
 import {
     ACTION_KEYS,
-    BODY_KEYS,
+    SOURCE_BODY_KEYS,
     BRANCH_KEYS,
     COMPARISON_OPERATORS,
     DEFINE_NAME_PATTERN,
@@ -28,7 +28,8 @@ import {
     selectorNamesCustomElement,
     typeOf,
 } from './types.js';
-import { asArray, expressionKeysOf, forEachTextLeaf, isPlainObject, readsOuterSelf, refsIn } from './walk.js';
+import { asArray, expressionKeysOf, forEachTextLeaf, readsOuterSelf, refsIn } from './walk.js';
+import { isPlainObject } from '../../../util.js';
 import { selectsFromDocument } from './xpath.js';
 
 /**
@@ -860,7 +861,7 @@ function checkConditionSource(key, branch, position, scope, ctx, path) {
     /** @type {StaticType[]} */
     const valueTypes = [];
     for (const { body, path: bodyPath, underNone } of bodies) {
-        checkBodyKeys(body, BODY_KEYS[key], ctx, bodyPath);
+        checkBodyKeys(body, SOURCE_BODY_KEYS[key], ctx, bodyPath);
         if (key === 'text') {
             expectStrings(body.pattern, ctx, `${bodyPath}.pattern`, '`pattern`');
             if ('selector' in body) expectStrings(body.selector, ctx, `${bodyPath}.selector`, '`selector`');

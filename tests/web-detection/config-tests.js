@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { immutableJSONPatch } from 'immutable-json-patch';
-import { sequenceWebDetectionActions } from '../../util.js';
+import { ORDER_FREE_ACTION_KEYS, isPlainObject, sequenceWebDetectionActions } from '../../util.js';
 import {
     CLIENT_RELEASES,
     TEMP_EVENT_TYPE_PREFIX,
@@ -14,7 +14,7 @@ import { detectorNameErrors, forEachPatchOperation, forEachPatchedDetector, forE
 import { ACTION_KEYS, BRANCH_KEYS, EXPRESSION_KEYS, PROPERTY_TABLES } from './validator/grammar.js';
 import { interfaceProperties, selectorInterfaces } from './validator/types.js';
 import { assertValidDetector, validateDetector } from './validator/validate.js';
-import { forEachDetectorTextCondition, isPlainObject } from './validator/walk.js';
+import { forEachDetectorTextCondition } from './validator/walk.js';
 import { itemWalkWarnings, repeatedEventWarnings } from './validator/warnings.js';
 import { assertExpressionPatch, assertTextConditionExpressions, assertXPathConfig, assertXPathConfigPatch } from './validator/xpath.js';
 
@@ -153,12 +153,6 @@ describe('webDetection config tests', () => {
     });
 
     describe('Apple action sequences', () => {
-        // Actions that give the same result in either order, which C-S-S before 19.0.0 reads only from an object
-        const ORDER_FREE_ACTION_KEYS = [
-            'fireEvent',
-            'breakageReportData',
-        ];
-
         /**
          * Every object in a body position holding several action keys, other than just `fireEvent` and
          * `breakageReportData`, or a `define` of several names.

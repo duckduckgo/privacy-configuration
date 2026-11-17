@@ -3,7 +3,8 @@ import { checkExpr, predicateSubject } from './expressions.js';
 import { COMPARISON_OPERATORS, NAME_PATTERN, OPERATOR_KEYS, PAYLOAD_FIELD_KEYS, TYPE_NAMES, VALUE_OPERATORS } from './grammar.js';
 import { checkFieldRead, numberGuard } from './reads.js';
 import { describeType } from './types.js';
-import { asArray, isItemExpression, isPlainObject } from './walk.js';
+import { asArray, isItemExpression } from './walk.js';
+import { isPlainObject } from '../../../util.js';
 
 /**
  * @typedef {import('./context.js').Context} Context

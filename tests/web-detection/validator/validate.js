@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import { MATCH_SCOPE, PAYLOAD_SCOPE, newContext } from './context.js';
 import { checkBody, checkExpr } from './expressions.js';
 import { DETECTOR_KEYS } from './grammar.js';
-import { isPlainObject } from './walk.js';
+import { isPlainObject } from '../../../util.js';
 
 /**
  * @typedef {import('./context.js').Context} Context

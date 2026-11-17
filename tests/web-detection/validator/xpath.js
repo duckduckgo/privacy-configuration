@@ -1,6 +1,14 @@
 import { expect } from 'chai';
 import xpath from 'xpath';
-import { MAX_TAIL_RATIO, MIN_CHUNK_SIZE } from './grammar.js';
+
+/** Floor for a non-zero chunkSize. Smaller chunks multiply regex tests for little gain. */
+const MIN_CHUNK_SIZE = 1024;
+
+/**
+ * Upper bound on chunkTail as a fraction of chunkSize. A tail is re-scanned by the
+ * following test, so this caps the scanning overhead a config can impose at 1.25x.
+ */
+const MAX_TAIL_RATIO = 4;
 
 /**
  * Assert an `xpathConfig` block holds sensible values.

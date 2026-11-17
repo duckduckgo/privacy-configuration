@@ -1,10 +1,4 @@
-/**
- * @param {unknown} value
- * @returns {value is Record<string, any>}
- */
-function isJsonObject(value) {
-    return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
+import { isPlainObject } from './util.js';
 
 const WEB_DETECTION_PAYLOAD_ACTIONS = [
     'fireEvent',
@@ -23,7 +17,7 @@ const INTEGER_NAME = /^(0|[1-9][0-9]*)$/;
  * @returns {unknown}
  */
 function bucketArray(buckets, path) {
-    if (!isJsonObject(buckets)) return buckets;
+    if (!isPlainObject(buckets)) return buckets;
     return Object.entries(buckets).map(
         ([
             name,
@@ -44,7 +38,7 @@ function bucketArray(buckets, path) {
  * @param {string} path
  */
 function arrayFieldBuckets(field, path) {
-    if (isJsonObject(field) && 'buckets' in field) field.buckets = bucketArray(field.buckets, `${path}.buckets`);
+    if (isPlainObject(field) && 'buckets' in field) field.buckets = bucketArray(field.buckets, `${path}.buckets`);
 }
 
 /**
@@ -52,7 +46,7 @@ function arrayFieldBuckets(field, path) {
  * @param {string} path
  */
 function arrayPayloadBuckets(data, path) {
-    if (!isJsonObject(data)) return;
+    if (!isPlainObject(data)) return;
     for (const [
         key,
         field,
@@ -73,7 +67,7 @@ function arrayBucketsUnder(node, path, key) {
         node.forEach((entry, index) => arrayBucketsUnder(entry, `${path}.${index}`));
         return;
     }
-    if (!isJsonObject(node)) return;
+    if (!isPlainObject(node)) return;
     if (key !== undefined && WEB_DETECTION_PAYLOAD_ACTIONS.includes(key)) arrayPayloadBuckets(node.data, `${path}.data`);
     for (const [
         childKey,

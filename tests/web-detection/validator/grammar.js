@@ -48,7 +48,7 @@ export const BRANCH_KEYS = [
     'else',
 ];
 
-export const BODY_KEYS = {
+export const SOURCE_BODY_KEYS = {
     element: [
         'selector',
         'visibility',
@@ -260,12 +260,3 @@ export const ELEMENT_METHOD_ALLOWLIST = {
 };
 
 export const PROPERTY_TABLES = await buildTables();
-
-/** Floor for a non-zero chunkSize. Smaller chunks multiply regex tests for little gain. */
-export const MIN_CHUNK_SIZE = 1024;
-
-/**
- * Upper bound on chunkTail as a fraction of chunkSize. A tail is re-scanned by the
- * following test, so this caps the scanning overhead a config can impose at 1.25x.
- */
-export const MAX_TAIL_RATIO = 4;

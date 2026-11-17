@@ -1,5 +1,6 @@
 import { BRANCH_KEYS, apiBody } from './grammar.js';
-import { definesName, expressionKeysOf, forEachTextLeaf, isPlainObject, readsOuterSelf, refsIn } from './walk.js';
+import { definesName, expressionKeysOf, forEachTextLeaf, readsOuterSelf, refsIn } from './walk.js';
+import { isPlainObject } from '../../../util.js';
 
 /**
  * Warnings on a `fireEvent` that sends its event on every run: in a detector with no `match`, one no
