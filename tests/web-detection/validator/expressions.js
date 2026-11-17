@@ -590,7 +590,13 @@ function checkExprKey(key, body, position, scope, ctx, path, holder) {
             asArray(body).forEach((operand, index) => {
                 const operandPath = Array.isArray(body) ? `${path}[${index}]` : path;
                 const listed = providesValues(operand, 'number', ctx);
-                const type = checkExpr(operand, listed ? 'spread' : 'number', { ...child(scope), spreadOf: 'number' }, ctx, operandPath);
+                const type = checkExpr(
+                    operand,
+                    listed ? 'spread' : 'number',
+                    { ...child(scope), spreadOf: listed ? 'number' : undefined },
+                    ctx,
+                    operandPath,
+                );
                 if (listed && !allows(type, 'number'))
                     fail(ctx, operandPath, `\`${key}\` takes numbers, and config types the values as ${describeType(type)}`);
                 nan ||= type.nan;
@@ -648,6 +654,7 @@ function checkExprKey(key, body, position, scope, ctx, path, holder) {
                     underNone: scope.underNone || key === 'none',
                     noneAbove: scope.noneAbove || key === 'none',
                     guards,
+                    spreadOf: undefined,
                 };
                 if (providesValues(operand, 'boolean', ctx)) {
                     const type = checkExpr(operand, 'spread', { ...operandScope, spreadOf: 'boolean' }, ctx, operandPath);
