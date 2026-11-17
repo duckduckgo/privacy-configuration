@@ -92,6 +92,9 @@ export const ACTION_KEYS = [
  * @type {Record<string, 'method' | 'property'>}
  */
 export const API_ALLOWLIST = {
+    Array: 'property',
+    'Array.from': 'method',
+    'Array.from.length': 'property',
     Math: 'property',
     'Math.max': 'method',
     'Math.max.apply': 'method',
@@ -117,6 +120,8 @@ export const API_ALLOWLIST = {
     'document.getElementsByTagName': 'method',
     'document.getElementsByTagName.length': 'property',
     'document.hidden': 'property',
+    'document.title': 'property',
+    'document.title.matchAll': 'method',
     getComputedStyle: 'method',
     'getComputedStyle.position': 'property',
     innerHeight: 'property',
@@ -144,6 +149,7 @@ export const API_ALLOWLIST = {
  * @type {Record<string, TypeName>}
  */
 export const BUILTIN_RETURN_TYPES = {
+    'Array.from': 'array',
     'Math.max': 'number',
     'Math.max.apply': 'number',
     'Number.isFinite': 'boolean',
