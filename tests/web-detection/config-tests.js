@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { immutableJSONPatch } from 'immutable-json-patch';
 import { ORDER_FREE_ACTION_KEYS, isPlainObject, sequenceWebDetectionActions } from '../../util.js';
-import { TEMP_EVENT_TYPE_PREFIX, clientViews, eventHubConsumers, fireEventTypes } from './clients.js';
+import { TEMP_EVENT_TYPE_PREFIX, breakageDataErrors, clientViews, eventHubConsumers, fireEventTypes } from './clients.js';
 import { detectorNameErrors, detectorViews, forEachWebDetectionConfig, latestConfigs, viewErrors } from './configs.js';
 import { ACTION_KEYS, BRANCH_KEYS } from './validator/grammar.js';
 import { validateDetector } from './validator/validate.js';
@@ -12,6 +12,7 @@ describe('webDetection config tests', () => {
         /** @type {Array<{ name: string, check: (detector: Record<string, any>, path: string) => string[] }>} */
         const DETECTOR_CHECKS = [
             { name: 'is well formed', check: validateDetector },
+            { name: 'a breakage report runs writes breakage data', check: breakageDataErrors },
         ];
 
         for (const config of latestConfigs) {
@@ -41,6 +42,44 @@ describe('webDetection config tests', () => {
                 });
             });
         }
+
+        it('checks detectors that domain patches and version-gated entries add (self-test)', () => {
+            /** @param {string} type */
+            const sending = (type) => ({ match: true, actions: { fireEvent: { type } } });
+            const config = {
+                name: 'v6/android-config.json',
+                body: {
+                    features: {
+                        webDetection: {
+                            settings: {
+                                detectors: { g: { base: { match: true, actions: { breakageReportData: {} } } } },
+                                domains: [
+                                    {
+                                        domain: 'example.com',
+                                        patchSettings: [
+                                            { op: 'add', path: '/detectors/g/onDomain', value: sending('a') },
+                                        ],
+                                    },
+                                ],
+                                conditionalChanges: [
+                                    {
+                                        condition: { injectName: 'android', minSupportedVersion: 1, maxSupportedVersion: 2 },
+                                        patchSettings: [
+                                            { op: 'add', path: '/detectors/g/gated', value: sending('b') },
+                                        ],
+                                    },
+                                ],
+                            },
+                        },
+                    },
+                },
+            };
+            const errors = viewErrors(detectorViews(config), breakageDataErrors);
+            expect(errors.map((error) => error.split(':').slice(0, 2).join(':'))).to.deep.equal([
+                'domains[0] (example.com): detectors.g.onDomain',
+                'conditionalChanges[0]: detectors.g.gated',
+            ]);
+        });
 
         it('exercises every generated config (sanity)', () => {
             expect(latestConfigs.filter((config) => detectorViews(config).length).length).to.be.greaterThan(0);

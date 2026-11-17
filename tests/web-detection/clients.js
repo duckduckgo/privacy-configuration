@@ -163,5 +163,20 @@ export function runsOnBreakageReport(detector) {
     return detector.state !== 'disabled' && detector.triggers?.breakageReport?.state !== 'disabled';
 }
 
+/**
+ * An error when a breakage report runs the detector and no `breakageReportData` action writes to its
+ * breakage entry.
+ *
+ * @param {Record<string, any>} detector
+ * @param {string} path
+ * @returns {string[]}
+ */
+export function breakageDataErrors(detector, path) {
+    if (!runsOnBreakageReport(detector) || writesBreakageData(detector)) return [];
+    return [
+        `${path}: runs when a breakage report is made, since the \`breakageReport\` trigger is on unless set to "disabled" (on by default), but no \`breakageReportData\` action writes to its breakage entry; add one, or set \`triggers.breakageReport.state\` to "disabled"`,
+    ];
+}
+
 /** `temp_` types are placeholders for detectors whose eventHub telemetry is not defined yet (for example, during experiments) */
 export const TEMP_EVENT_TYPE_PREFIX = 'temp_';
