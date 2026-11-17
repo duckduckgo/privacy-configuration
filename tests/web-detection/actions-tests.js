@@ -1,38 +1,11 @@
 import { expect } from 'chai';
 import { clientViews, fireEventTypes, runsOnBreakageReport, writesBreakageData } from './clients.js';
-import { validateDetector } from './validator/validate.js';
+import { expectDetectorError as expectError, expectDetectorValid as expectValid, imgCount, itAll } from './fixtures.js';
 import { itemWalkWarnings, repeatedEventWarnings } from './validator/warnings.js';
 
 describe('webDetection config tests', () => {
     describe('validateDetector, match and actions (self-test)', () => {
-        /**
-         * @param {Record<string, unknown>} detector
-         */
-        const errorsOf = (detector) => validateDetector(detector, '$');
-
-        /**
-         * @param {Record<string, unknown>} detector
-         */
-        const expectValid = (detector) => {
-            const errors = errorsOf(detector);
-            expect(errors, errors.join('\n')).to.deep.equal([]);
-        };
-
-        /**
-         * @param {string} fragment
-         * @param {Record<string, unknown>} detector
-         */
-        const expectError = (fragment, detector) => {
-            const errors = errorsOf(detector);
-            expect(
-                errors.some((error) => error.includes(fragment)),
-                `expected an error containing ${JSON.stringify(fragment)}, got:\n${errors.join('\n') || '(none)'}`,
-            ).to.equal(true);
-        };
-
-        const imgCount = { element: { selector: 'img' }, using: 'length' };
-
-        it('passes a detector that detects once, with several actions in one object', () => {
+        itAll('passes a detector that detects once, with several actions in one object', () => {
             expectValid({
                 match: { ...imgCount, is: { gte: 5 } },
                 actions: [
@@ -42,7 +15,7 @@ describe('webDetection config tests', () => {
             });
         });
 
-        it('passes a measurement sending its event once, finished by a detector name', () => {
+        itAll('passes a measurement sending its event once, finished by a detector name', () => {
             expectValid({
                 actions: {
                     if: {
@@ -75,7 +48,7 @@ describe('webDetection config tests', () => {
             });
         });
 
-        it('rejects shapes the client does not parse', () => {
+        itAll('rejects shapes the client does not parse', () => {
             expectError('"api" is not an action', { actions: { fireEvent: { type: 'a' }, api: 'document' } });
             expectError('sits in value position only, not boolean position', {
                 match: {
@@ -103,14 +76,14 @@ describe('webDetection config tests', () => {
             expectError('name does not match', { actions: { define: { 'that.x': 1 } } });
         });
 
-        it('rejects an action, a ref and a detector name in a detector with match', () => {
+        itAll('rejects an action, a ref and a detector name in a detector with match', () => {
             expectError('holds no action', { match: { expr: { define: { x: 1 } } }, actions: { breakageReportData: {} } });
             expectError('holds no `ref`', { match: { ref: 'x' }, actions: { breakageReportData: {} } });
             expectError('binds no detector name', { match: true, actions: { define: { 'this.x': 1 } } });
             expectError('reads no detector name', { match: true, actions: { define: { x: { ref: 'this.x' } } } });
         });
 
-        it('rejects a run name read before a define binds it, and passes one bound in an earlier branch', () => {
+        itAll('rejects a run name read before a define binds it, and passes one bound in an earlier branch', () => {
             expectError('reads a run name no `define` binds before it', {
                 actions: [
                     { define: { y: { ref: 'x' } } },
@@ -132,7 +105,7 @@ describe('webDetection config tests', () => {
             });
         });
 
-        it('passes a detector name read before its define, and rejects one no define binds', () => {
+        itAll('passes a detector name read before its define, and rejects one no define binds', () => {
             expectValid({
                 actions: {
                     define: {
@@ -154,7 +127,7 @@ describe('webDetection config tests', () => {
             });
         });
 
-        it('types a detector name bound to another detector name', () => {
+        itAll('types a detector name bound to another detector name', () => {
             expectError('number position takes a number, and config types the value as string', {
                 actions: [
                     { define: { 'this.a': 'x' } },
@@ -172,7 +145,7 @@ describe('webDetection config tests', () => {
             });
         });
 
-        it('rejects a name bound to an `expr` array as a condition or a number, and reads its length', () => {
+        itAll('rejects a name bound to an `expr` array as a condition or a number, and reads its length', () => {
             const bindArray = {
                 define: {
                     list: {
@@ -211,7 +184,7 @@ describe('webDetection config tests', () => {
             });
         });
 
-        it('types a ref by the defines that can bind it', () => {
+        itAll('types a ref by the defines that can bind it', () => {
             expectError('number position takes a number', {
                 actions: [
                     { define: { x: 'unsupported' } },
@@ -255,93 +228,13 @@ describe('webDetection config tests', () => {
             });
         });
 
-        it('requires a root guard in actions: a ref to the bound root in an enclosing condition', () => {
-            const scoped = { element: { selector: 'img', root: { ref: 'region' } }, using: 'length' };
-            expectValid({
-                actions: [
-                    { define: { region: { element: { selector: '#comments' } } } },
-                    { if: { ref: 'region' }, then: { breakageReportData: { data: { n: { value: scoped } } } } },
-                ],
-            });
-            expectValid({
-                actions: [
-                    { define: { region: { element: { selector: '#comments' } } } },
-                    {
-                        define: {
-                            empty: {
-                                all: [
-                                    { ref: 'region' },
-                                    { ...scoped, is: 0 },
-                                ],
-                            },
-                        },
-                    },
-                ],
-            });
-            expectError('`root` needs a guard', {
-                actions: [
-                    { define: { region: { element: { selector: '#comments' } } } },
-                    { breakageReportData: { data: { n: { value: scoped } } } },
-                ],
-            });
-            expectError('`root` needs a guard', {
-                actions: {
-                    if: true,
-                    then: {
-                        breakageReportData: {
-                            data: { n: { value: { element: { selector: 'img', root: '#comments' }, using: 'length' } } },
-                        },
-                    },
-                },
-            });
-            const shadow = { only: { element: { selector: 'x-widget' } }, using: 'shadowRoot' };
-            expectError('carries `is`', {
-                actions: [
-                    { define: { region: shadow } },
-                    { if: { ref: 'region' }, then: { breakageReportData: { data: { n: { value: scoped } } } } },
-                ],
-            });
-            expectValid({
-                actions: [
-                    { define: { region: shadow } },
-                    { if: { ref: 'region', is: { type: 'object' } }, then: { breakageReportData: { data: { n: { value: scoped } } } } },
-                ],
-            });
-        });
-
-        it('requires a root guard in match: the root expression repeated in the same condition', () => {
-            const region = { element: { selector: '#comments' } };
-            const empty = { element: { selector: 'img', root: region }, using: 'length', is: 0 };
-            expectValid({
-                match: {
-                    all: [
-                        region,
-                        empty,
-                    ],
-                },
-                actions: { breakageReportData: {} },
-            });
-            expectValid({ match: { if: region, then: empty, else: false }, actions: { breakageReportData: {} } });
-            expectError('`root` needs a guard', { match: empty, actions: { breakageReportData: {} } });
-            expectError('`root` needs a guard', {
-                match: {
-                    all: [
-                        { element: { selector: '#other' } },
-                        empty,
-                    ],
-                },
-                actions: { breakageReportData: {} },
-            });
-            expectValid({ match: { element: { selector: 'img', root: region } }, actions: { breakageReportData: {} } });
-        });
-
         describe('repeated events', () => {
             /**
              * @param {Record<string, unknown>} detector
              */
             const warningsOf = (detector) => repeatedEventWarnings(detector, '$');
 
-            it('warns on an event in a detector with no match that no detector name guards', () => {
+            itAll('warns on an event in a detector with no match that no detector name guards', () => {
                 expect(warningsOf({ actions: { fireEvent: { type: 'a' } } }).length).to.equal(1);
                 expect(warningsOf({ actions: { if: { ref: 'n', is: 1 }, then: { fireEvent: { type: 'a' } } } }).length).to.equal(1);
                 expect(
@@ -358,7 +251,7 @@ describe('webDetection config tests', () => {
                 ).to.equal(1);
             });
 
-            it('passes an event guarded by a detector name its branch binds, and any event in a detector with match', () => {
+            itAll('passes an event guarded by a detector name its branch binds, and any event in a detector with match', () => {
                 expect(
                     warningsOf({
                         actions: {
@@ -395,13 +288,13 @@ describe('webDetection config tests', () => {
                 is: 'fixed',
             };
 
-            it('warns on a source rooted at the item with no `if` above it in the `where`', () => {
+            itAll('warns on a source rooted at the item with no `if` above it in the `where`', () => {
                 expect(walksOf(words)).to.deep.equal([
                     '$.match.element.where.text.root: walks the page from each item of the enclosing `where` or `field`, and nested items walk the same nodes again; test something cheaper in an `if` first',
                 ]);
             });
 
-            it('passes a walk behind an `if`, and one outside every `where` and `field`', () => {
+            itAll('passes a walk behind an `if`, and one outside every `where` and `field`', () => {
                 expect(
                     walksOf({
                         if: positioned,
@@ -456,12 +349,12 @@ describe('webDetection config tests', () => {
             const detectorOf = (config, platform, version, assumeUndecided) =>
                 clientViews(config, platform, version, assumeUndecided)[0].detectors.g.d;
 
-            it('applies an entry when its platform and version hold', () => {
+            itAll('applies an entry when its platform and version hold', () => {
                 expect(detectorOf(configWith(), 'android', 10, false)).to.deep.equal({ match: true, state: 'disabled' });
                 expect(detectorOf(configWith(), 'android', 9, false)).to.deep.equal({ match: true });
             });
 
-            it('applies page conditions, and every cohort of an experiment the client can be in, only when assumed', () => {
+            itAll('applies page conditions, and every cohort of an experiment the client can be in, only when assumed', () => {
                 const experiment = { state: 'enabled', minSupportedVersion: '1.2.0' };
                 expect(detectorOf(configWith(experiment), 'windows', '1.2.0', false)).to.deep.equal({ match: true });
                 expect(detectorOf(configWith(experiment), 'windows', '1.2.0', true)).to.deep.equal({
@@ -476,7 +369,7 @@ describe('webDetection config tests', () => {
                 });
             });
 
-            it('lists the event type of every fireEvent, in branches and sequences', () => {
+            itAll('lists the event type of every fireEvent, in branches and sequences', () => {
                 expect(
                     fireEventTypes({
                         actions: [
@@ -500,7 +393,7 @@ describe('webDetection config tests', () => {
                 ]);
             });
 
-            it('finds a breakageReportData action in branches and sequences', () => {
+            itAll('finds a breakageReportData action in branches and sequences', () => {
                 expect(
                     writesBreakageData({
                         actions: [
@@ -526,7 +419,7 @@ describe('webDetection config tests', () => {
                 ).to.equal(false);
             });
 
-            it('runs a detector on a breakage report unless it or its trigger is disabled', () => {
+            itAll('runs a detector on a breakage report unless it or its trigger is disabled', () => {
                 expect(runsOnBreakageReport({ match: true, actions: {} })).to.equal(true);
                 expect(runsOnBreakageReport({ state: 'disabled', match: true, actions: {} })).to.equal(false);
                 expect(runsOnBreakageReport({ triggers: { breakageReport: { state: 'disabled' } }, match: true, actions: {} })).to.equal(

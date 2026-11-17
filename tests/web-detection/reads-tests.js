@@ -11,13 +11,14 @@ import {
     numberTest,
     text,
     fontsStatus,
+    itAll,
 } from './fixtures.js';
 import { interfaceProperties, selectorInterfaces } from './validator/types.js';
 
 describe('webDetection config tests', () => {
     describe('validateDetector (self-test)', () => {
         describe('`api` names and data reads', () => {
-            it('checks expression `args`, and the calls config can type', () => {
+            itAll('checks expression `args`, and the calls config can type', () => {
                 const widths = fieldOf('img', 'naturalWidth');
                 const maxOf = (/** @type {unknown} */ list) => ({
                     api: {
@@ -95,7 +96,7 @@ describe('webDetection config tests', () => {
                 expectError('reads the method "Math.max" without calling it', { api: { path: 'Math.max' }, is: {} });
             });
 
-            it('reads a method as a function in an `args` entry, named as its own call', () => {
+            itAll('reads a method as a function in an `args` entry, named as its own call', () => {
                 expectValid({
                     api: {
                         path: 'Math.max',
@@ -125,7 +126,7 @@ describe('webDetection config tests', () => {
                 });
             });
 
-            it('checks `api` names are read as the kind API_ALLOWLIST records', () => {
+            itAll('checks `api` names are read as the kind API_ALLOWLIST records', () => {
                 expectError('reads the method "performance.now" without calling it', { api: { path: 'performance.now' }, is: {} });
                 expectError('calls "document.fonts.status", which API_ALLOWLIST records as a property', {
                     api: { path: 'document.fonts.status', args: [] },
@@ -137,19 +138,19 @@ describe('webDetection config tests', () => {
                 });
             });
 
-            it('reads `length` and indexes on strings', () => {
+            itAll('reads `length` and indexes on strings', () => {
                 expectValid({ only: text, is: { length: 1 } });
                 expectValid({ only: text, is: { 0: 'a' } });
             });
 
-            it('reads page-defined values under names outside the tables on custom elements only', () => {
+            itAll('reads page-defined values under names outside the tables on custom elements only', () => {
                 expectValid({ only: { element: { selector: 'x-widget' } }, is: { value: 3 } });
                 expectError('"value" is not a property of HTMLDivElement', { only: { element: { selector: 'div' } }, is: { value: 3 } });
             });
         });
 
         describe('calls on element items', () => {
-            it('admits methods on ELEMENT_METHOD_ALLOWLIST only', () => {
+            itAll('admits methods on ELEMENT_METHOD_ALLOWLIST only', () => {
                 expectValid({
                     element: {
                         selector: 'div',
@@ -174,7 +175,7 @@ describe('webDetection config tests', () => {
         });
 
         describe('`api` allowlist', () => {
-            it('checks each name of the path, `field` names and the names predicates read', () => {
+            itAll('checks each name of the path, `field` names and the names predicates read', () => {
                 expectError('"document.cookie", which is not in API_ALLOWLIST', {
                     api: { path: 'document.cookie' },
                     is: { type: 'string' },
@@ -211,7 +212,7 @@ describe('webDetection config tests', () => {
         });
 
         describe('`self` and `api` paths', () => {
-            it('takes a path as short for an `api` body', () => {
+            itAll('takes a path as short for an `api` body', () => {
                 expectValid({ api: 'document.fonts.status', is: { type: 'string' } });
                 expectValid({
                     api: {
@@ -227,7 +228,7 @@ describe('webDetection config tests', () => {
                 expectError('reads the method "performance.now" without calling it', { api: 'performance.now', is: {} });
             });
 
-            it('passes the value to a listed method through `self`, in `where` and under `is`', () => {
+            itAll('passes the value to a listed method through `self`, in `where` and under `is`', () => {
                 expectValid(items('video', { duration: numberTest('isFinite') }));
                 expectValid(
                     items('video', {
@@ -266,7 +267,7 @@ describe('webDetection config tests', () => {
                 });
             });
 
-            it('reads each item through `self` in `where`, by the item’s type', () => {
+            itAll('reads each item through `self` in `where`, by the item’s type', () => {
                 expectValid(items('img', { naturalWidth: { gt: { self: 'naturalHeight' } } }));
                 expectValid(
                     items('img', {
@@ -300,7 +301,7 @@ describe('webDetection config tests', () => {
                 });
             });
 
-            it('rejects a method not on the allowlist, and `call` in `field`', () => {
+            itAll('rejects a method not on the allowlist, and `call` in `field`', () => {
                 expectError(
                     '"Number.isInteger", which is not in API_ALLOWLIST',
                     items('video', {
@@ -317,7 +318,7 @@ describe('webDetection config tests', () => {
                 );
             });
 
-            it('rejects `self` outside `using`, `where` and `field`', () => {
+            itAll('rejects `self` outside `using`, `where` and `field`', () => {
                 expectError('`self` reads from `using`, `where` or `field`', { self: 'length', is: 0 });
                 expectError('`self` reads from `using`, `where` or `field`', true, { x: { value: { self: {} } } });
             });
@@ -331,7 +332,7 @@ describe('webDetection config tests', () => {
                 },
             };
 
-            it('names a path `using` reads by the name of the expression beside it, through `ref` and `only`', () => {
+            itAll('names a path `using` reads by the name of the expression beside it, through `ref` and `only`', () => {
                 expectActionsValid([
                     { define: { navigation: { only: navigation } } },
                     { define: { ended: { ref: 'navigation', using: 'loadEventEnd', is: { gt: 0 } } } },
@@ -349,7 +350,7 @@ describe('webDetection config tests', () => {
                 });
             });
 
-            it('reads an item with `at` or an index on a list or an `api` read, under the item’s name', () => {
+            itAll('reads an item with `at` or an index on a list or an `api` read, under the item’s name', () => {
                 const at = (
                     /** @type {Record<string, unknown>} */ root,
                     /** @type {unknown[]} */ args,
@@ -418,7 +419,7 @@ describe('webDetection config tests', () => {
                 });
             });
 
-            it('checks what `using` reads under each name the expression beside it may have', () => {
+            itAll('checks what `using` reads under each name the expression beside it may have', () => {
                 const document = { api: { path: 'document' } };
                 expectValid({
                     if: true,
@@ -468,19 +469,19 @@ describe('webDetection config tests', () => {
                 });
             });
 
-            it('rejects an expression beside `using` that CI cannot name', () => {
+            itAll('rejects an expression beside `using` that CI cannot name', () => {
                 expectError('this expression has neither', { only: text, using: 'length', is: { gt: 0 } });
                 expectError('this expression has neither', { expr: imgCount, using: { path: 'toFixed', args: [] }, is: {} });
                 expectError('A number fills', { expr: 1, using: { path: 'toFixed', args: [] }, is: {} });
             });
 
-            it('takes a path, or an `api` body without `root`, beside an expression', () => {
+            itAll('takes a path, or an `api` body without `root`, beside an expression', () => {
                 expectValid({ api: { path: 'document' }, using: 'fonts', is: { type: 'object' } });
                 expectValid({ api: { path: 'document' }, using: { path: 'fonts', where: { status: 'error' } }, is: {} });
                 expectError('`using` reads from an expression', { using: 'length', is: 1 });
             });
 
-            it('takes an expression reading the value beside it through `self`', () => {
+            itAll('takes an expression reading the value beside it through `self`', () => {
                 expectValid({
                     only: navigation,
                     using: {
@@ -503,7 +504,7 @@ describe('webDetection config tests', () => {
                 });
             });
 
-            it('applies `using`, then `is`', () => {
+            itAll('applies `using`, then `is`', () => {
                 expectValid({ ...img, using: 'length', is: { gte: 5 } });
                 expectActionsValid([
                     { define: { images: { ...img, using: 'length' } } },
@@ -513,7 +514,7 @@ describe('webDetection config tests', () => {
         });
 
         describe('`expr`', () => {
-            it('binds a value, and what `using` reads from it', () => {
+            itAll('binds a value, and what `using` reads from it', () => {
                 expectActionsValid([
                     { define: { imageElements: img, imageCount: { ref: 'imageElements', using: 'length' } } },
                     {
@@ -532,7 +533,7 @@ describe('webDetection config tests', () => {
                 ]);
             });
 
-            it('gives the boolean an `is` inside it gives', () => {
+            itAll('gives the boolean an `is` inside it gives', () => {
                 expectActionsValid([
                     { define: { enoughImages: { expr: { ...img, using: 'length', is: { gte: 2 } } } } },
                     { breakageReportData: { data: { enough: { value: { ref: 'enoughImages' } } } } },
@@ -546,7 +547,7 @@ describe('webDetection config tests', () => {
                 });
             });
 
-            it('gives its operand in its own position', () => {
+            itAll('gives its operand in its own position', () => {
                 expectValid({ sum: { expr: { element: { selector: 'img', field: 'naturalWidth' } } }, is: { gt: 0 } });
                 expectValid({ expr: img });
                 expectError('a list as a condition holds when it has an item', {
@@ -557,7 +558,7 @@ describe('webDetection config tests', () => {
     });
 
     describe('element property tables', () => {
-        it('carry the IDL types of element properties', () => {
+        itAll('carry the IDL types of element properties', () => {
             expect(interfaceProperties('HTMLImageElement').get('naturalWidth')).to.equal('unsigned long');
             expect(interfaceProperties('HTMLImageElement').get('currentSrc')).to.equal('USVString');
             expect(interfaceProperties('HTMLLinkElement').get('sheet')).to.equal('CSSStyleSheet?');
@@ -568,7 +569,7 @@ describe('webDetection config tests', () => {
             expect(interfaceProperties('HTMLMediaElement').get('duration')).to.equal('unrestricted double');
         });
 
-        it('map tags to their interfaces, in every namespace', () => {
+        itAll('map tags to their interfaces, in every namespace', () => {
             expect(selectorInterfaces('img')).to.deep.equal([
                 'HTMLImageElement',
             ]);

@@ -11,12 +11,13 @@ import {
     loadEventEnd,
     now,
     text,
+    itAll,
 } from './fixtures.js';
 
 describe('webDetection config tests', () => {
     describe('validateDetector (self-test)', () => {
         describe('shape', () => {
-            it('passes the shipped forms: leaves, legacy blocks and boolean literals', () => {
+            itAll('passes the shipped forms: leaves, legacy blocks and boolean literals', () => {
                 expectValid({ text: { pattern: 'foo' } });
                 expectValid({
                     text: {
@@ -57,7 +58,7 @@ describe('webDetection config tests', () => {
                 });
             });
 
-            it('rejects an array as an expression, in every position', () => {
+            itAll('rejects an array as an expression, in every position', () => {
                 const notExpression = 'an array is not an expression';
                 expectError(notExpression, [
                     { text: { pattern: 'a' } },
@@ -108,7 +109,7 @@ describe('webDetection config tests', () => {
                 });
             });
 
-            it('takes a list through `expr`, which stays a list', () => {
+            itAll('takes a list through `expr`, which stays a list', () => {
                 expectValid({
                     any: {
                         expr: [
@@ -187,7 +188,7 @@ describe('webDetection config tests', () => {
                 });
             });
 
-            it('rejects an array as a predicate, which `in` and `any` replace', () => {
+            itAll('rejects an array as a predicate, which `in` and `any` replace', () => {
                 const notPredicate = 'an array is not a predicate';
                 expectError(notPredicate, {
                     ...fontsStatus,
@@ -301,7 +302,7 @@ describe('webDetection config tests', () => {
                 });
             });
 
-            it('rejects an object mixing operator keys with leaf keys, and passes them under `all`', () => {
+            itAll('rejects an object mixing operator keys with leaf keys, and passes them under `all`', () => {
                 expectError('an object takes one expression key', {
                     all: [
                         { text: { pattern: 'foo' } },
@@ -320,7 +321,7 @@ describe('webDetection config tests', () => {
                 });
             });
 
-            it('rejects legacy blocks over bodies outside boolean position', () => {
+            itAll('rejects legacy blocks over bodies outside boolean position', () => {
                 expectError('boolean only', {
                     text: {
                         any: [
@@ -332,7 +333,7 @@ describe('webDetection config tests', () => {
                 });
             });
 
-            it('rejects several expression keys in one object, in every position', () => {
+            itAll('rejects several expression keys in one object, in every position', () => {
                 const oneKey = 'an object takes one expression key';
                 expectError(oneKey, true, { a: { value: { text: { pattern: 'a' }, element: { selector: 'img' } } } });
                 expectError(oneKey, { text: { pattern: 'a' }, element: { selector: 'img' } });
@@ -364,7 +365,7 @@ describe('webDetection config tests', () => {
                 });
             });
 
-            it('places `is` in boolean and value position', () => {
+            itAll('places `is` in boolean and value position', () => {
                 expectValid(true, { a: { value: { ...img, using: 'length', is: { gt: 0 } } } });
                 expectError('`is` gives a boolean', {
                     sum: [
@@ -374,7 +375,7 @@ describe('webDetection config tests', () => {
                 });
             });
 
-            it('takes two operands in `div`', () => {
+            itAll('takes two operands in `div`', () => {
                 expectValid({
                     div: [
                         now,
@@ -384,7 +385,7 @@ describe('webDetection config tests', () => {
                 });
             });
 
-            it('checks `if` has `then`, and `else` outside value position', () => {
+            itAll('checks `if` has `then`, and `else` outside value position', () => {
                 expectValid({ if: true, then: 1, else: 2, is: 1 });
                 expectValid({ if: true, then: 1, is: 1 });
                 expectError('fills value position only, not number position', {
@@ -396,18 +397,18 @@ describe('webDetection config tests', () => {
                 expectError('`if` needs `then`', { if: true, else: 2, is: 1 });
             });
 
-            it('rejects a `self` with `args` and no `path`', () => {
+            itAll('rejects a `self` with `args` and no `path`', () => {
                 expectError('needs `path`', { ...img, using: { self: { args: [] } }, is: {} });
             });
         });
 
         describe('names', () => {
-            it('rejects a define or ref not matching the name pattern', () => {
+            itAll('rejects a define or ref not matching the name pattern', () => {
                 expectActionsError('does not match', { define: { '1images': imgCount } });
                 expectActionsError('does not match', { define: { x: { ref: 'not-a-name' } } });
             });
 
-            it('rejects a ref to a run name no define binds before it', () => {
+            itAll('rejects a ref to a run name no define binds before it', () => {
                 expectActionsError('reads a run name no `define` binds before it', { define: { x: { ref: 'missing' } } });
                 expectActionsError('reads a run name no `define` binds before it', {
                     define: {
@@ -432,7 +433,7 @@ describe('webDetection config tests', () => {
                 });
             });
 
-            it('reads a ref in the ref’s own position', () => {
+            itAll('reads a ref in the ref’s own position', () => {
                 expectActionsValid([
                     { define: { images: img } },
                     { breakageReportData: { data: { images: { value: { ref: 'images', using: 'length' } } } } },
@@ -449,7 +450,7 @@ describe('webDetection config tests', () => {
         });
 
         describe('placement', () => {
-            it('refuses a number in list position, through `ref` and `only`', () => {
+            itAll('refuses a number in list position, through `ref` and `only`', () => {
                 expectActionsError('list position takes a list, and config types the name as number', [
                     { define: { n: 1 } },
                     { define: { x: { only: { ref: 'n' } } } },
@@ -460,17 +461,17 @@ describe('webDetection config tests', () => {
                 });
             });
 
-            it('refuses `self` in boolean position on an element', () => {
+            itAll('refuses `self` in boolean position on an element', () => {
                 expectError('boolean position takes a boolean, and config types the value as object', {
                     element: { selector: 'div', where: { self: {} } },
                 });
             });
 
-            it('refuses a `field` path with an empty name', () => {
+            itAll('refuses a `field` path with an empty name', () => {
                 expectError('a path has an empty name', { ...fieldOf('img', 'currentSrc..length'), using: 'length', is: 0 });
             });
 
-            it('takes `field` on every body of an `element` source, or none', () => {
+            itAll('takes `field` on every body of an `element` source, or none', () => {
                 expectError('every body of one `element` source has `field`, or none does', {
                     element: [
                         { selector: 'img', field: 'naturalWidth' },
@@ -481,7 +482,7 @@ describe('webDetection config tests', () => {
                 });
             });
 
-            it('rejects literals outside their positions', () => {
+            itAll('rejects literals outside their positions', () => {
                 expectError('A number fills', 1);
                 expectError('A boolean fills', {
                     sum: [
@@ -492,7 +493,7 @@ describe('webDetection config tests', () => {
                 });
             });
 
-            it('takes string and null literals in value position only', () => {
+            itAll('takes string and null literals in value position only', () => {
                 expectError('A string fills', 'x');
                 expectError('`null` fills', {
                     any: [
@@ -515,7 +516,7 @@ describe('webDetection config tests', () => {
                 expectValid({ ...fontsStatus, is: { eq: fontsStatus } });
             });
 
-            it('places every source and boolean expression in value position', () => {
+            itAll('places every source and boolean expression in value position', () => {
                 expectValid(true, {
                     matched: {
                         value: text,
@@ -544,7 +545,7 @@ describe('webDetection config tests', () => {
                 expectValid({ only: { element: { selector: 'input' } }, is: { hidden: false } });
             });
 
-            it('rejects a `fireEvent` payload field without buckets, and passes any `breakageReportData` value', () => {
+            itAll('rejects a `fireEvent` payload field without buckets, and passes any `breakageReportData` value', () => {
                 const images = { define: { images: img } };
                 for (const value of [
                     { ref: 'images' },
@@ -593,13 +594,13 @@ describe('webDetection config tests', () => {
                 ]);
             });
 
-            it('places `text` and `element` without `field` in list position', () => {
+            itAll('places `text` and `element` without `field` in list position', () => {
                 expectValid({ only: text, is: { length: { gt: 0 } } });
                 expectValid({ only: img, is: { field: { path: 'tagName' }, is: 'IMG' } });
                 expectValid({ ...text, using: 'length', is: { gt: 0 } });
             });
 
-            it('rejects `text` and `element` without `field` in number position', () => {
+            itAll('rejects `text` and `element` without `field` in number position', () => {
                 expectError('config types the value as string', {
                     div: [
                         text,
@@ -616,20 +617,23 @@ describe('webDetection config tests', () => {
                 });
             });
 
-            it('places a bare `api` in boolean position, and keeps `element` with `field`, `api` with `where` and a length out of it', () => {
-                expectValid({ api: { path: 'document.hidden' } });
-                expectError('a list as a condition holds when it has an item', fieldOf('img', 'complete'));
-                expectError('a list as a condition holds when it has an item', {
-                    api: { path: 'document.fonts', where: { status: 'error' } },
-                });
-                expectError('boolean position takes a boolean, and config types the value as number', imgCount);
-                expectError('boolean position takes a boolean, and config types the value as number', {
-                    only: img,
-                    using: 'naturalWidth',
-                });
-            });
+            itAll(
+                'places a bare `api` in boolean position, and keeps `element` with `field`, `api` with `where` and a length out of it',
+                () => {
+                    expectValid({ api: { path: 'document.hidden' } });
+                    expectError('a list as a condition holds when it has an item', fieldOf('img', 'complete'));
+                    expectError('a list as a condition holds when it has an item', {
+                        api: { path: 'document.fonts', where: { status: 'error' } },
+                    });
+                    expectError('boolean position takes a boolean, and config types the value as number', imgCount);
+                    expectError('boolean position takes a boolean, and config types the value as number', {
+                        only: img,
+                        using: 'naturalWidth',
+                    });
+                },
+            );
 
-            it('places lists of values under operators', () => {
+            itAll('places lists of values under operators', () => {
                 expectValid({ all: fieldOf('img', 'complete') });
                 expectValid({ sum: fieldOf('img', 'naturalWidth'), is: { gt: 100 } });
                 expectError('`all` takes booleans', { all: fieldOf('img', 'naturalWidth') });
@@ -643,12 +647,12 @@ describe('webDetection config tests', () => {
                 });
             });
 
-            it('rejects a source with no body', () => {
+            itAll('rejects a source with no body', () => {
                 expectError('`element` needs at least one body', { element: [] });
                 expectError('`text` needs at least one body', { text: [] });
             });
 
-            it('places `only` in any position, checking its item', () => {
+            itAll('places `only` in any position, checking its item', () => {
                 expectValid({ only: fieldOf('img', 'complete') });
                 expectError('boolean position takes a boolean, and config types the value as number', {
                     only: fieldOf('img', 'naturalWidth'),
@@ -669,7 +673,7 @@ describe('webDetection config tests', () => {
                 expectValid({ only: { if: true, then: img, else: img }, is: {} });
             });
 
-            it('spreads an `if` under `sum`, `any`, `all` and `none` when a branch gives a list', () => {
+            itAll('spreads an `if` under `sum`, `any`, `all` and `none` when a branch gives a list', () => {
                 expectValid({ sum: { if: true, then: fieldOf('img', 'naturalWidth'), else: 0 }, is: { gt: 0 } });
                 expectValid({
                     any: {
@@ -687,7 +691,7 @@ describe('webDetection config tests', () => {
                 expectError('`if` without `else`', { sum: { if: true, then: fieldOf('img', 'naturalWidth') }, is: { gt: 0 } });
             });
 
-            it('places `only` over lists only', () => {
+            itAll('places `only` over lists only', () => {
                 expectValid({ only: fieldOf('img', 'naturalWidth'), is: { gt: 0 } });
                 expectValid({ only: { api: { path: 'document.fonts' } }, is: { field: 'status', is: 'loaded' } });
                 expectValid({
@@ -709,7 +713,7 @@ describe('webDetection config tests', () => {
                 });
             });
 
-            it('spreads sources under operators, with presence leaves booleans under `any`, `all` and `none`', () => {
+            itAll('spreads sources under operators, with presence leaves booleans under `any`, `all` and `none`', () => {
                 expectValid({
                     any: [
                         img,
@@ -727,7 +731,7 @@ describe('webDetection config tests', () => {
                 expectError('`mul` takes numbers, and config types the values as string', { mul: text, is: { gt: 0 } });
             });
 
-            it('tests a selected list’s one item under a predicate that compares, and the list as an array under any other', () => {
+            itAll('tests a selected list’s one item under a predicate that compares, and the list as an array under any other', () => {
                 expectValid({ ...fieldOf('img', 'naturalWidth'), is: { lt: 2000 } });
                 expectValid({ ...img, is: { length: { gte: 5 } } });
                 expectValid({ ...img, is: { type: 'array' } });
@@ -773,14 +777,14 @@ describe('webDetection config tests', () => {
                 });
             });
 
-            it('checks each `field` step suits the type the previous one gives', () => {
+            itAll('checks each `field` step suits the type the previous one gives', () => {
                 expectValid(items('img', { 'currentSrc.length': { gt: 0 } }));
                 expectValid(items('link', { 'sheet.cssRules': { fails: false } }));
                 expectError('reads "length" on a value config types as number', items('img', { 'naturalWidth.length': 0 }));
                 expectError('reads "foo" on a value config types as string', items('img', { 'src.foo': 0 }));
             });
 
-            it('rejects `feature` in `field`, and counts rendered text through `text`', () => {
+            itAll('rejects `feature` in `field`, and counts rendered text through `text`', () => {
                 const excluded = '[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]';
                 const rendered = (root) => ({ text: { xpath: `.//text()${excluded}`, pattern: '\\S', root } });
                 expectValid({ text: { xpath: `//body//text()${excluded}`, pattern: '\\S' }, using: 'length', is: { lt: 2000 } });

@@ -12,14 +12,24 @@ import {
     loadEventEnd,
     numberTest,
     rootedImages,
+    shadowRoot,
     text,
     fontsStatus,
+    itAll,
 } from './fixtures.js';
+
+/**
+ * A payload of one field, `a`, sending the value through the buckets.
+ *
+ * @param {unknown} value
+ * @param {unknown[]} buckets
+ */
+const bucketsOf = (value, buckets) => ({ a: { value, buckets } });
 
 describe('webDetection config tests', () => {
     describe('validateDetector (self-test)', () => {
         describe('`root` guard', () => {
-            it('passes a guard in match repeating the root, in the same top-level `all` or an enclosing `if`', () => {
+            itAll('passes a guard in match repeating the root, in the same top-level `all` or an enclosing `if`', () => {
                 expectValid({
                     all: [
                         guard,
@@ -48,7 +58,7 @@ describe('webDetection config tests', () => {
                 });
             });
 
-            it('passes a guard in actions: a `ref` to the bound root', () => {
+            itAll('passes a guard in actions: a `ref` to the bound root', () => {
                 const scoped = { element: { selector: 'img', root: { ref: 'comments' } }, using: 'length' };
                 expectActionsValid([
                     { define: { comments: guard } },
@@ -77,7 +87,7 @@ describe('webDetection config tests', () => {
                 });
             });
 
-            it('checks each entry of an array root for a guard', () => {
+            itAll('checks each entry of an array root for a guard', () => {
                 const sidebar = { element: { selector: '#sidebar' } };
                 const scoped = (/** @type {unknown} */ root) => ({ element: { selector: 'img', root }, using: 'length', is: { lt: 1 } });
                 expectValid({
@@ -101,7 +111,7 @@ describe('webDetection config tests', () => {
                 });
             });
 
-            it('passes a scoped leaf read only in boolean position with no `none` above it', () => {
+            itAll('passes a scoped leaf read only in boolean position with no `none` above it', () => {
                 expectValid({
                     element: {
                         selector: 'img',
@@ -113,7 +123,7 @@ describe('webDetection config tests', () => {
                 expectValid({ element: { selector: 'img', root: { element: { selector: '#comments' } } } });
             });
 
-            it('rejects a scoped expression with no guard, or a guard elsewhere', () => {
+            itAll('rejects a scoped expression with no guard, or a guard elsewhere', () => {
                 expectError('needs a guard', {
                     all: [
                         { element: { selector: 'img', root: '#comments' }, using: 'length', is: { lt: 1 } },
@@ -133,7 +143,7 @@ describe('webDetection config tests', () => {
                 expectError('needs a guard', guard, { images: { value: rootedImages } });
             });
 
-            it('rejects a scoped leaf under `none` with no guard', () => {
+            itAll('rejects a scoped leaf under `none` with no guard', () => {
                 expectError('needs a guard', {
                     none: [
                         {
@@ -148,7 +158,7 @@ describe('webDetection config tests', () => {
                 });
             });
 
-            it('rejects a scoped leaf in `where` with a `none` above it, in the match tree or the predicate, with no guard', () => {
+            itAll('rejects a scoped leaf in `where` with a `none` above it, in the match tree or the predicate, with no guard', () => {
                 const parent = { self: 'parentElement' };
                 const cardsWithImage = { selector: '.card', where: { element: { selector: 'img', root: parent } } };
                 expectValid({ element: cardsWithImage });
@@ -158,8 +168,7 @@ describe('webDetection config tests', () => {
                 });
             });
 
-            it('requires `is` on a guard that is not an `element` or `text` source', () => {
-                const shadowRoot = { only: { element: { selector: 'my-widget' } }, using: 'shadowRoot' };
+            itAll('requires `is` on a guard that is not an `element` or `text` source', () => {
                 const shadowImages = { element: { selector: 'img', root: shadowRoot }, using: 'length', is: { lt: 1 } };
                 expectError('carries `is`', {
                     all: [
@@ -175,7 +184,7 @@ describe('webDetection config tests', () => {
                 });
             });
 
-            it('rejects a scoped XPath expression that selects from the document', () => {
+            itAll('rejects a scoped XPath expression that selects from the document', () => {
                 expectError('starts ".//"', {
                     text: {
                         pattern: 'a',
@@ -204,8 +213,7 @@ describe('webDetection config tests', () => {
                 expectValid({ text: { pattern: 'a', xpath: './a[count(//b) > 0]', root: '#comments' } });
             });
 
-            it('rejects an XPath expression evaluated from a shadow root', () => {
-                const shadowRoot = { only: { element: { selector: 'x-widget' } }, using: 'shadowRoot' };
+            itAll('rejects an XPath expression evaluated from a shadow root', () => {
                 expectError('cannot be evaluated from a shadow root', {
                     text: { pattern: 'a', xpath: './/text()', root: shadowRoot },
                 });
@@ -225,12 +233,12 @@ describe('webDetection config tests', () => {
         });
 
         describe('predicates', () => {
-            it('rejects `field` without `is`, and `is` without `field`', () => {
+            itAll('rejects `field` without `is`, and `is` without `field`', () => {
                 expectError('go together', items('img', { field: 'src' }));
                 expectError('go together', items('img', { is: true }));
             });
 
-            it('takes the type names `typeof` gives', () => {
+            itAll('takes the type names `typeof` gives', () => {
                 expectValid({
                     ...loadEventEnd,
                     is: {
@@ -244,7 +252,7 @@ describe('webDetection config tests', () => {
                 });
             });
 
-            it('rejects predicates that never hold for a read value', () => {
+            itAll('rejects predicates that never hold for a read value', () => {
                 expectError('also lists string, null', {
                     ...loadEventEnd,
                     is: {
@@ -259,7 +267,7 @@ describe('webDetection config tests', () => {
                 expectValid({ ...loadEventEnd, is: { type: 'number', gt: 0 } });
             });
 
-            it('checks `fails` is a boolean, and `"fails": true` reads no value', () => {
+            itAll('checks `"fails": true` reads no value', () => {
                 expectValid({ ...loadEventEnd, is: { fails: false, gt: 0 } });
                 expectValid({ ...loadEventEnd, is: { fails: true } });
                 expectValid(items('link', { sheet: { fails: false } }));
@@ -267,14 +275,14 @@ describe('webDetection config tests', () => {
                 expectError('the failed value, which aborts', { ...loadEventEnd, is: { fails: true, type: 'number' } });
             });
 
-            it('reads `exists` as a property name', () => {
+            itAll('reads `exists` as a property name', () => {
                 expectError('"performance.getEntriesByType.loadEventEnd.exists", which is not in API_ALLOWLIST', {
                     ...loadEventEnd,
                     is: { exists: true },
                 });
             });
 
-            it('checks operators suit an element property’s type', () => {
+            itAll('checks operators suit an element property’s type', () => {
                 expectError('guard it', items('input', { selectionStart: { gt: 0 } }));
                 expectError('guard it', items('img', { src: { gt: 0 } }));
                 expectValid(items('input', { selectionStart: { type: 'number', gt: 0 } }));
@@ -285,18 +293,18 @@ describe('webDetection config tests', () => {
                 expectValid(items('link', { sheet: null }));
             });
 
-            it('checks property names per tag, and against every element interface when the selector names none', () => {
+            itAll('checks property names per tag, and against every element interface when the selector names none', () => {
                 expectError('"naturalwidth" is not a property of HTMLImageElement', items('img', { naturalwidth: 0 }));
                 expectError('is not a property of HTMLDivElement', items('div.card', { naturalWidth: 0 }));
                 expectValid(items('.card', { naturalWidth: 0 }));
                 expectValid(items('x-widget', { hidden: false }));
             });
 
-            it('rejects a property path on a value typed as a number', () => {
+            itAll('rejects a property path on a value typed as a number', () => {
                 expectError('reads "length" on a value config types as number', { ...imgCount, is: { length: 0 } });
             });
 
-            it('requires `Number.isFinite` or `Number.isNaN` beside a comparison under `none` on a value that can be NaN', () => {
+            itAll('requires `Number.isFinite` or `Number.isNaN` beside a comparison under `none` on a value that can be NaN', () => {
                 const ratio = {
                     div: [
                         imgCount,
@@ -326,7 +334,7 @@ describe('webDetection config tests', () => {
         });
 
         describe('`where` expressions', () => {
-            it('admits a boolean expression over `self`, alone and beside predicates under combinators', () => {
+            itAll('admits a boolean expression over `self`, alone and beside predicates under combinators', () => {
                 const has = {
                     api: {
                         path: 'Reflect.has',
@@ -356,7 +364,7 @@ describe('webDetection config tests', () => {
                 expectValid(items('option', { self: 'text', is: 'Sign in' }));
             });
 
-            it('admits a source rooted at the item without a guard', () => {
+            itAll('admits a source rooted at the item without a guard', () => {
                 expectValid(items('.card', { element: { selector: 'img', root: { self: {} } } }));
                 expectValid(items('.card', { element: { selector: 'p', root: { self: {} } }, using: 'length', is: { gte: 2 } }));
                 expectError(
@@ -365,36 +373,39 @@ describe('webDetection config tests', () => {
                 );
             });
 
-            it('rejects a source in a `where` or `field` reading neither `self` nor a `ref`, which a `define` before computes once', () => {
-                const same = 'reads neither `self` nor a `ref`';
-                const width = { api: 'innerWidth' };
-                expectError(same, items('.card', { element: { selector: 'img' } }));
-                expectError(same, items('.card', { element: { selector: 'img', where: { self: 'complete', is: true } } }));
-                expectError(same, items('img', { naturalWidth: { gt: width } }));
-                expectError(same, { sum: { element: { selector: 'img', field: width } }, is: { gt: 0 } });
-                expectValid(
-                    items('div', {
-                        api: {
-                            path: 'getComputedStyle',
-                            args: [
-                                { self: {} },
-                            ],
+            itAll(
+                'rejects a source in a `where` or `field` reading neither `self` nor a `ref`, which a `define` before computes once',
+                () => {
+                    const same = 'reads neither `self` nor a `ref`';
+                    const width = { api: 'innerWidth' };
+                    expectError(same, items('.card', { element: { selector: 'img' } }));
+                    expectError(same, items('.card', { element: { selector: 'img', where: { self: 'complete', is: true } } }));
+                    expectError(same, items('img', { naturalWidth: { gt: width } }));
+                    expectError(same, { sum: { element: { selector: 'img', field: width } }, is: { gt: 0 } });
+                    expectValid(
+                        items('div', {
+                            api: {
+                                path: 'getComputedStyle',
+                                args: [
+                                    { self: {} },
+                                ],
+                            },
+                            using: 'position',
+                            is: 'fixed',
+                        }),
+                    );
+                    expectActionsValid([
+                        { define: { width } },
+                        {
+                            define: {
+                                wide: { element: { selector: 'img', where: { naturalWidth: { gt: { ref: 'width' } } } }, using: 'length' },
+                            },
                         },
-                        using: 'position',
-                        is: 'fixed',
-                    }),
-                );
-                expectActionsValid([
-                    { define: { width } },
-                    {
-                        define: {
-                            wide: { element: { selector: 'img', where: { naturalWidth: { gt: { ref: 'width' } } } }, using: 'length' },
-                        },
-                    },
-                ]);
-            });
+                    ]);
+                },
+            );
 
-            it('rejects `fireEvent` and `breakageReportData` in a `where`, which run once per item, and admits `define`', () => {
+            itAll('rejects `fireEvent` and `breakageReportData` in a `where`, which run once per item, and admits `define`', () => {
                 const completeImages = (/** @type {unknown} */ then) => ({
                     define: {
                         n: {
@@ -425,21 +436,21 @@ describe('webDetection config tests', () => {
                 );
             });
 
-            it('checks the names `self` reads against the item’s properties', () => {
+            itAll('checks the names `self` reads against the item’s properties', () => {
                 expectError('"naturalwidth" is not a property of HTMLImageElement', items('img', { self: 'naturalwidth', is: 0 }));
             });
 
-            it('rejects an object mixing expression keys and property paths, and a property named like an expression key', () => {
+            itAll('rejects an object mixing expression keys and property paths, and a property named like an expression key', () => {
                 expect(errorsOf(items('option', { text: 'Sign in' }))).to.not.deep.equal([]);
             });
         });
 
         describe('expression `root` on `element` and `text`', () => {
-            it('refuses an empty selector root', () => {
+            itAll('refuses an empty selector root', () => {
                 expectError('a selector root is a non-empty string', { element: { selector: 'img', root: '' } });
             });
 
-            it('takes an expression giving a node or a list of nodes', () => {
+            itAll('takes an expression giving a node or a list of nodes', () => {
                 expectValid({ element: { selector: 'img', root: { element: { selector: 'article' } } } });
                 expectValid({ text: { pattern: 'a', root: { only: { element: { selector: 'article' } } } } });
                 expectValid({
@@ -451,7 +462,7 @@ describe('webDetection config tests', () => {
                 expectValid({ element: { selector: 'img', root: { api: { path: 'document' } } } });
             });
 
-            it('takes an array of selectors and expressions, and a selector a read gives', () => {
+            itAll('takes an array of selectors and expressions, and a selector a read gives', () => {
                 expectValid({
                     element: {
                         selector: 'img',
@@ -465,7 +476,7 @@ describe('webDetection config tests', () => {
                 expectValid({ text: { pattern: 'a', root: { only: fieldOf('a', 'href') } } });
             });
 
-            it('rejects a root of text, numbers or values that are not nodes', () => {
+            itAll('rejects a root of text, numbers or values that are not nodes', () => {
                 expectError('config types it as a list of string', { element: { selector: 'img', root: text } });
                 expectError('config types it as a list of number', { element: { selector: 'img', root: fieldOf('img', 'naturalWidth') } });
                 expectError('config types it as number', { text: { pattern: 'a', root: { only: fieldOf('img', 'naturalWidth') } } });
@@ -490,7 +501,7 @@ describe('webDetection config tests', () => {
                 expectError('config types it as number', { element: { selector: 'img', root: imgCount } });
             });
 
-            it('checks names inside roots', () => {
+            itAll('checks names inside roots', () => {
                 expectActionsValid([
                     { define: { region: { element: { selector: '#a' } } } },
                     {
@@ -510,192 +521,167 @@ describe('webDetection config tests', () => {
                 expectActionsError('reads a run name no `define` binds', { define: { widths: { ref: 'widths', using: 'length' } } });
             });
 
-            it('checks payload keys', () => {
+            itAll('checks payload keys', () => {
                 expectValid(true, { brokenImages: { value: imgCount } });
                 expectError('reserved', true, { nativeData: { value: imgCount } });
                 expectError('does not match', true, { _internal: { value: imgCount } });
                 expectError('does not match', true, { '2x': { value: imgCount } });
             });
 
-            it('checks buckets for overlap among simple predicates', () => {
-                expectValid(true, {
-                    a: {
-                        value: imgCount,
-                        buckets: [
-                            { name: 'none', is: 0 },
-                            { name: '1-2', is: { gte: 1, lt: 3 } },
-                            { name: '3+', is: { gte: 3 } },
-                        ],
-                    },
-                });
-                expectValid(true, {
-                    a: {
-                        value: loadEventEnd,
-                        buckets: [
-                            { name: 'loading', is: 0 },
-                            { name: 'fast', is: { gt: 0, lt: 3000 } },
-                        ],
-                    },
-                });
-                expectError('overlap', true, {
-                    a: {
-                        value: imgCount,
-                        buckets: [
-                            { name: 'none', is: 0 },
-                            { name: '0-3', is: { gte: 0, lt: 3 } },
-                        ],
-                    },
-                });
-                expectError('overlap', true, {
-                    a: {
-                        value: imgCount,
-                        buckets: [
-                            { name: 'low', is: { lte: 3 } },
-                            { name: 'high', is: { gte: 3 } },
-                        ],
-                    },
-                });
-                expectError('overlap', true, {
-                    a: {
-                        value: { api: { path: 'document.readyState' } },
-                        buckets: [
-                            {
-                                name: 'early',
-                                is: {
-                                    in: [
-                                        'loading',
-                                        'interactive',
-                                    ],
-                                },
+            itAll('checks buckets for overlap among simple predicates', () => {
+                expectValid(
+                    true,
+                    bucketsOf(imgCount, [
+                        { name: 'none', is: 0 },
+                        { name: '1-2', is: { gte: 1, lt: 3 } },
+                        { name: '3+', is: { gte: 3 } },
+                    ]),
+                );
+                expectValid(
+                    true,
+                    bucketsOf(loadEventEnd, [
+                        { name: 'loading', is: 0 },
+                        { name: 'fast', is: { gt: 0, lt: 3000 } },
+                    ]),
+                );
+                expectError(
+                    'overlap',
+                    true,
+                    bucketsOf(imgCount, [
+                        { name: 'none', is: 0 },
+                        { name: '0-3', is: { gte: 0, lt: 3 } },
+                    ]),
+                );
+                expectError(
+                    'overlap',
+                    true,
+                    bucketsOf(imgCount, [
+                        { name: 'low', is: { lte: 3 } },
+                        { name: 'high', is: { gte: 3 } },
+                    ]),
+                );
+                expectError(
+                    'overlap',
+                    true,
+                    bucketsOf(fontsStatus, [
+                        {
+                            name: 'early',
+                            is: {
+                                in: [
+                                    'loading',
+                                    'interactive',
+                                ],
                             },
-                            { name: 'mid', is: 'interactive' },
-                        ],
-                    },
-                });
-                expectValid(true, {
-                    a: {
-                        value: { only: text },
-                        buckets: [
-                            { name: 'empty', is: { length: 0 } },
-                            { name: 'any', is: { length: { gte: 0 } } },
-                        ],
-                    },
-                });
+                        },
+                        { name: 'mid', is: 'interactive' },
+                    ]),
+                );
+                expectValid(
+                    true,
+                    bucketsOf({ only: text }, [
+                        { name: 'empty', is: { length: 0 } },
+                        { name: 'any', is: { length: { gte: 0 } } },
+                    ]),
+                );
             });
 
-            it('takes any non-empty bucket name', () => {
-                expectValid(true, {
-                    a: {
-                        value: imgCount,
-                        buckets: [
-                            { name: '0', is: 0 },
-                            { name: '1+', is: { gte: 1 } },
-                        ],
-                    },
-                });
+            itAll('takes any non-empty bucket name', () => {
+                expectValid(
+                    true,
+                    bucketsOf(imgCount, [
+                        { name: '0', is: 0 },
+                        { name: '1+', is: { gte: 1 } },
+                    ]),
+                );
             });
 
-            it('lets entries sharing a name overlap', () => {
-                expectValid(true, {
-                    a: {
-                        value: imgCount,
-                        buckets: [
-                            { name: 'edge', is: { lt: 2 } },
-                            { name: 'middle', is: { gte: 2, lt: 8 } },
-                            { name: 'edge', is: { gte: 8 } },
-                            { name: 'edge', is: { gte: 100 } },
-                        ],
-                    },
-                });
+            itAll('lets entries sharing a name overlap', () => {
+                expectValid(
+                    true,
+                    bucketsOf(imgCount, [
+                        { name: 'edge', is: { lt: 2 } },
+                        { name: 'middle', is: { gte: 2, lt: 8 } },
+                        { name: 'edge', is: { gte: 8 } },
+                        { name: 'edge', is: { gte: 100 } },
+                    ]),
+                );
             });
 
-            it('checks overlap between a literal and a comparison that converts it', () => {
+            itAll('checks overlap between a literal and a comparison that converts it', () => {
                 // Config does not type `document.fonts.status`, so its buckets compare without a guard
-                expectError('overlap', true, {
-                    a: {
-                        value: fontsStatus,
-                        buckets: [
-                            { name: 'none', is: null },
-                            { name: 'some', is: { gte: 0 } },
-                        ],
-                    },
-                });
-                expectError('overlap', true, {
-                    a: {
-                        value: fontsStatus,
-                        buckets: [
-                            { name: 's', is: '7' },
-                            { name: 'n', is: { gte: 0 } },
-                        ],
-                    },
-                });
-                expectError('overlap', true, {
-                    a: {
-                        value: fontsStatus,
-                        buckets: [
-                            {
-                                name: 's',
-                                is: {
-                                    in: [
-                                        true,
-                                    ],
-                                },
+                expectError(
+                    'overlap',
+                    true,
+                    bucketsOf(fontsStatus, [
+                        { name: 'none', is: null },
+                        { name: 'some', is: { gte: 0 } },
+                    ]),
+                );
+                expectError(
+                    'overlap',
+                    true,
+                    bucketsOf(fontsStatus, [
+                        { name: 's', is: '7' },
+                        { name: 'n', is: { gte: 0 } },
+                    ]),
+                );
+                expectError(
+                    'overlap',
+                    true,
+                    bucketsOf(fontsStatus, [
+                        {
+                            name: 's',
+                            is: {
+                                in: [
+                                    true,
+                                ],
                             },
-                            { name: 'n', is: { gte: 1 } },
-                        ],
-                    },
-                });
-                expectValid(true, {
-                    a: {
-                        value: fontsStatus,
-                        buckets: [
-                            { name: 's', is: '7' },
-                            { name: 'n', is: 7 },
-                        ],
-                    },
-                });
-                expectValid(true, {
-                    a: {
-                        value: fontsStatus,
-                        buckets: [
-                            { name: 'none', is: null },
-                            { name: 'some', is: { gt: 0 } },
-                        ],
-                    },
-                });
-                expectValid(true, {
-                    a: {
-                        value: fontsStatus,
-                        buckets: [
-                            { name: 'unsupported', is: 'unsupported' },
-                            { name: 'some', is: { gte: 0 } },
-                        ],
-                    },
-                });
-                expectValid(true, {
-                    a: {
-                        value: { only: fieldOf('img', 'src') },
-                        buckets: [
-                            { name: 'none', is: null },
-                            { name: 'some', is: { type: 'number', gte: 0 } },
-                        ],
-                    },
-                });
+                        },
+                        { name: 'n', is: { gte: 1 } },
+                    ]),
+                );
+                expectValid(
+                    true,
+                    bucketsOf(fontsStatus, [
+                        { name: 's', is: '7' },
+                        { name: 'n', is: 7 },
+                    ]),
+                );
+                expectValid(
+                    true,
+                    bucketsOf(fontsStatus, [
+                        { name: 'none', is: null },
+                        { name: 'some', is: { gt: 0 } },
+                    ]),
+                );
+                expectValid(
+                    true,
+                    bucketsOf(fontsStatus, [
+                        { name: 'unsupported', is: 'unsupported' },
+                        { name: 'some', is: { gte: 0 } },
+                    ]),
+                );
+                expectValid(
+                    true,
+                    bucketsOf({ only: fieldOf('img', 'src') }, [
+                        { name: 'none', is: null },
+                        { name: 'some', is: { type: 'number', gte: 0 } },
+                    ]),
+                );
             });
 
-            it('checks bucket and `when` operators against the value’s type', () => {
-                expectError('guard it', true, {
-                    a: {
-                        value: { only: fieldOf('img', 'src') },
-                        buckets: [
-                            { name: 'long', is: { gt: 100 } },
-                        ],
-                    },
-                });
+            itAll('checks bucket and `when` operators against the value’s type', () => {
+                expectError(
+                    'guard it',
+                    true,
+                    bucketsOf({ only: fieldOf('img', 'src') }, [
+                        { name: 'long', is: { gt: 100 } },
+                    ]),
+                );
                 expectError('guard it', true, { a: { value: { only: fieldOf('img', 'src') }, when: { gt: 100 } } });
             });
 
-            it('admits a comparison on a value whose only strings are literals that convert to NaN', () => {
+            itAll('admits a comparison on a value whose only strings are literals that convert to NaN', () => {
                 /**
                  * @param {unknown} then
                  * @param {unknown} otherwise
@@ -720,30 +706,27 @@ describe('webDetection config tests', () => {
                 ];
                 expectValid(true, { a: { value: engineGuarded(imgCount, 'unsupported'), buckets } });
                 // "7" and "" convert to numbers, and a string read from the page may too
-                expectError('guard it', true, {
-                    a: {
-                        value: engineGuarded(imgCount, '7'),
-                        buckets: [
-                            { name: '1+', is: { gte: 1 } },
-                        ],
-                    },
-                });
-                expectError('guard it', true, {
-                    a: {
-                        value: engineGuarded(imgCount, ''),
-                        buckets: [
-                            { name: '1+', is: { gte: 1 } },
-                        ],
-                    },
-                });
-                expectError('guard it', true, {
-                    a: {
-                        value: engineGuarded({ only: fieldOf('img', 'src') }, 'unsupported'),
-                        buckets: [
-                            { name: '1+', is: { gte: 1 } },
-                        ],
-                    },
-                });
+                expectError(
+                    'guard it',
+                    true,
+                    bucketsOf(engineGuarded(imgCount, '7'), [
+                        { name: '1+', is: { gte: 1 } },
+                    ]),
+                );
+                expectError(
+                    'guard it',
+                    true,
+                    bucketsOf(engineGuarded(imgCount, ''), [
+                        { name: '1+', is: { gte: 1 } },
+                    ]),
+                );
+                expectError(
+                    'guard it',
+                    true,
+                    bucketsOf(engineGuarded({ only: fieldOf('img', 'src') }, 'unsupported'), [
+                        { name: '1+', is: { gte: 1 } },
+                    ]),
+                );
             });
         });
     });

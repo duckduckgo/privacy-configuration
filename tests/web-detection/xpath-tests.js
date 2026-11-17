@@ -1,4 +1,4 @@
-import { expectError, expectValid } from './fixtures.js';
+import { expectError, expectValid, itAll } from './fixtures.js';
 
 describe('webDetection config tests', () => {
     describe('xpathConfig validation (self-test)', () => {
@@ -7,7 +7,7 @@ describe('webDetection config tests', () => {
          */
         const withConfig = (xpathConfig) => ({ text: { pattern: 'a', xpath: '//p//text()', xpathConfig } });
 
-        it('accepts an in-bounds config, chunkSize 0 with any tail, and chunkTail 0', () => {
+        itAll('accepts an in-bounds config, chunkSize 0 with any tail, and chunkTail 0', () => {
             expectValid(withConfig({ chunkSize: 8192, chunkTail: 512 }));
             expectValid(withConfig({ chunkSize: 0 }));
             // The tail is unused once chunking is off, so the ratio does not apply
@@ -15,22 +15,22 @@ describe('webDetection config tests', () => {
             expectValid(withConfig({ chunkSize: 8192, chunkTail: 0 }));
         });
 
-        it('rejects non-integer and negative values', () => {
+        itAll('rejects non-integer and negative values', () => {
             expectError('expected a non-negative integer', withConfig({ chunkSize: 8192.5 }));
             expectError('expected a non-negative integer', withConfig({ chunkSize: -1 }));
             expectError('expected a non-negative integer', withConfig({ chunkTail: '512' }));
         });
 
-        it('rejects a non-zero chunkSize below the floor', () => {
+        itAll('rejects a non-zero chunkSize below the floor', () => {
             expectError('expected 0 (chunking disabled) or at least 1024', withConfig({ chunkSize: 32 }));
         });
 
-        it('rejects a chunkTail above a quarter of chunkSize', () => {
+        itAll('rejects a chunkTail above a quarter of chunkSize', () => {
             expectError('expected at most chunkSize / 4', withConfig({ chunkSize: 8192, chunkTail: 2049 }));
             expectValid(withConfig({ chunkSize: 8192, chunkTail: 2048 }));
         });
 
-        it('checks a lone chunkTail in isolation, since the ratio needs a chunkSize', () => {
+        itAll('checks a lone chunkTail in isolation, since the ratio needs a chunkSize', () => {
             expectValid(withConfig({ chunkTail: 99999 }));
             expectError('expected a non-negative integer', withConfig({ chunkTail: -1 }));
         });
@@ -43,13 +43,13 @@ describe('webDetection config tests', () => {
         /** @param {unknown} pattern */
         const withPattern = (pattern) => ({ text: { pattern } });
 
-        it('accepts XPath expressions of the shape detectors use', () => {
+        itAll('accepts XPath expressions of the shape detectors use', () => {
             expectValid(withXPath('//div//text()'));
             expectValid(withXPath('//*[@class="banner"]//text()'));
             expectValid(withXPath('//div[contains(@id, "consent")]'));
         });
 
-        it('rejects malformed XPath expressions, in a single value or an array entry', () => {
+        itAll('rejects malformed XPath expressions, in a single value or an array entry', () => {
             expectError('is not a valid XPath expression', withXPath('//div['));
             expectError('is not a valid XPath expression', withXPath('//div[@class="a"'));
             expectError('$.match.text.xpath[1]: "//span[" is not a valid XPath expression', {
@@ -63,7 +63,7 @@ describe('webDetection config tests', () => {
             });
         });
 
-        it('accepts a single pattern and an array of them', () => {
+        itAll('accepts a single pattern and an array of them', () => {
             expectValid(withPattern('foo'));
             expectValid(
                 withPattern([
@@ -73,7 +73,7 @@ describe('webDetection config tests', () => {
             );
         });
 
-        it('rejects a malformed pattern, and entries only valid as a pair', () => {
+        itAll('rejects a malformed pattern, and entries only valid as a pair', () => {
             expectError('is not a valid regular expression', withPattern('foo('));
             expectError('is not a valid regular expression', withPattern('[a-'));
             expectError(
