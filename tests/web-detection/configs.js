@@ -3,6 +3,11 @@ import { immutableJSONPatch } from 'immutable-json-patch';
 import platforms from '../../platforms.js';
 import { CURRENT_CONFIG_VERSION } from '../../constants.js';
 import { NAME_PATTERN } from './validator/grammar.js';
+import { CLIENT_RELEASES, clientViews } from './clients.js';
+
+/**
+ * @typedef {{ label: string, detectors: Record<string, Record<string, Record<string, any>>>, failed?: unknown[] }} DetectorView
+ */
 
 const platformOutput = platforms.map((item) => item.replace('browsers/', 'extension-'));
 
@@ -12,33 +17,6 @@ export const latestConfigs = platformOutput.map((plat) => {
         body: JSON.parse(fs.readFileSync(`./generated/v${CURRENT_CONFIG_VERSION}/${plat}-config.json`)),
     };
 });
-
-/**
- * Invoke `cb` for every patch operation the feature can apply, from either the
- * per-domain or the conditional lists.
- *
- * @param {import('../../schema/features/web-detection').WebDetectionFeature<number>} webDetection
- * @param {(operation: Record<string, any>, path: string) => void} cb
- */
-export function forEachPatchOperation(webDetection, cb) {
-    const settings = /** @type {Record<string, any>} */ (webDetection.settings);
-    for (const [
-        index,
-        entry,
-    ] of (settings.domains ?? []).entries()) {
-        for (const operation of entry.patchSettings ?? []) {
-            cb(operation, `domains[${index}] (${entry.domain})`);
-        }
-    }
-    for (const [
-        index,
-        entry,
-    ] of (settings.conditionalChanges ?? []).entries()) {
-        for (const operation of entry.patchSettings ?? []) {
-            cb(operation, `conditionalChanges[${index}]`);
-        }
-    }
-}
 
 /**
  * Iterate every generated config that has a webDetection feature with detectors.
@@ -74,13 +52,13 @@ function detectorPointer(pointer) {
 }
 
 /**
- * Invoke `cb` for each detector a patch list touches, as the patch leaves it. Each list is
- * applied on its own, to the literal settings.
+ * The detectors each patch list touches, as the list leaves them. Each list is applied on its own,
+ * to the literal settings.
  *
  * @param {import('../../schema/features/web-detection').WebDetectionFeature<number>} webDetection
- * @param {(detector: Record<string, any>, path: string, groupName: string, detectorName: string) => void} cb
+ * @returns {DetectorView[]}
  */
-export function forEachPatchedDetector(webDetection, cb) {
+export function patchedViews(webDetection) {
     const settings = /** @type {Record<string, any>} */ (webDetection.settings);
     const lists = [
         ...(settings.domains ?? []).map((/** @type {Record<string, any>} */ entry, /** @type {number} */ index) => ({
@@ -92,11 +70,13 @@ export function forEachPatchedDetector(webDetection, cb) {
             operations: entry.patchSettings ?? [],
         })),
     ];
+    /** @type {DetectorView[]} */
+    const views = [];
     for (const { label, operations } of lists) {
         if (!operations.length) continue;
-        const patched = /** @type {Record<string, any>} */ (immutableJSONPatch(settings, operations));
-        const detectors = patched.detectors ?? {};
-        const touched = new Set();
+        const patched = /** @type {Record<string, any>} */ (immutableJSONPatch(settings, operations)).detectors ?? {};
+        /** @type {DetectorView['detectors']} */
+        const detectors = {};
         for (const operation of operations) {
             for (const pointer of [
                 operation.path,
@@ -108,28 +88,84 @@ export function forEachPatchedDetector(webDetection, cb) {
                     name,
                 ] = detectorPointer(pointer);
                 for (const groupName of group === undefined
-                    ? Object.keys(detectors)
+                    ? Object.keys(patched)
                     : [
                           group,
                       ]) {
                     for (const detectorName of name === undefined
-                        ? Object.keys(detectors[groupName] ?? {})
+                        ? Object.keys(patched[groupName] ?? {})
                         : [
                               name,
                           ]) {
-                        if (detectors[groupName]?.[detectorName]) touched.add(`${groupName}\u0000${detectorName}`);
+                        const detector = patched[groupName]?.[detectorName];
+                        if (detector) (detectors[groupName] ??= {})[detectorName] = detector;
                     }
                 }
             }
         }
-        for (const key of touched) {
-            const [
-                group,
-                name,
-            ] = key.split('\u0000');
-            cb(detectors[group][name], `${label} detectors.${group}.${name}`, group, name);
+        views.push({ label, detectors });
+    }
+    return views;
+}
+
+/**
+ * Every view of a generated config's detectors a client can see: the literal detectors, those each
+ * patch list touches, and each platform client's at this release, on an arbitrary page in a release
+ * build and with every page, build and cohort condition holding.
+ *
+ * @param {{ name: string, body: Record<string, any> }} config
+ * @returns {DetectorView[]}
+ */
+export function detectorViews(config) {
+    const webDetection = config.body.features?.webDetection;
+    if (!webDetection?.settings?.detectors) return [];
+    const release = CLIENT_RELEASES.find((entry) => entry.configs.test(config.name));
+    return [
+        { label: 'detectors', detectors: webDetection.settings.detectors },
+        ...patchedViews(webDetection),
+        ...(release
+            ? [
+                  false,
+                  true,
+              ].flatMap((assumeUndecided) => clientViews(config.body, release.platform, release.version, assumeUndecided))
+            : []),
+    ];
+}
+
+/**
+ * The errors a check gives on every detector of the views, each once, with the first view it
+ * appears in.
+ *
+ * @param {DetectorView[]} views
+ * @param {(detector: Record<string, any>, path: string) => string[]} check
+ * @returns {string[]}
+ */
+export function viewErrors(views, check) {
+    /** @type {Map<string, string>} */
+    const errors = new Map();
+    for (const { label, detectors } of views) {
+        for (const [
+            groupName,
+            group,
+        ] of Object.entries(detectors)) {
+            for (const [
+                detectorId,
+                detector,
+            ] of Object.entries(group)) {
+                for (const error of check(detector, `detectors.${groupName}.${detectorId}`)) {
+                    if (!errors.has(error)) errors.set(error, label);
+                }
+            }
         }
     }
+    return [
+        ...errors,
+    ].map(
+        ([
+            error,
+            label,
+        ]) => `${label}: ${error}`,
+    );
 }
 
 /**
@@ -158,15 +194,22 @@ export function detectorNameErrors(webDetection) {
     ] of Object.entries(webDetection.settings?.detectors ?? {})) {
         check(groupName, Object.keys(group), 'detectors');
     }
-    forEachPatchedDetector(webDetection, (_detector, path, groupName, detectorName) =>
-        check(
+    for (const { label, detectors } of patchedViews(webDetection)) {
+        for (const [
             groupName,
-            [
-                detectorName,
-            ],
-            path,
-        ),
-    );
+            group,
+        ] of Object.entries(detectors)) {
+            for (const name of Object.keys(group)) {
+                check(
+                    groupName,
+                    [
+                        name,
+                    ],
+                    `${label} detectors.${groupName}.${name}`,
+                );
+            }
+        }
+    }
     return [
         ...errors,
     ];

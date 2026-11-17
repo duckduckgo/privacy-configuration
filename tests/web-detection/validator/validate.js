@@ -1,5 +1,4 @@
 import { isDeepStrictEqual } from 'node:util';
-import { expect } from 'chai';
 import { MATCH_SCOPE, PAYLOAD_SCOPE, newContext } from './context.js';
 import { checkBody, checkExpr } from './expressions.js';
 import { DETECTOR_KEYS } from './grammar.js';
@@ -64,13 +63,4 @@ export function validateDetector(detector, path) {
         ...structuralErrors,
         ...errors,
     ];
-}
-
-/**
- * @param {Record<string, any>} detector
- * @param {string} path
- */
-export function assertValidDetector(detector, path) {
-    const errors = validateDetector(detector, path);
-    expect(errors, `\n${errors.join('\n')}`).to.deep.equal([]);
 }

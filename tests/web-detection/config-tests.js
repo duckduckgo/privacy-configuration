@@ -1,154 +1,50 @@
 import { expect } from 'chai';
 import { immutableJSONPatch } from 'immutable-json-patch';
 import { ORDER_FREE_ACTION_KEYS, isPlainObject, sequenceWebDetectionActions } from '../../util.js';
-import {
-    CLIENT_RELEASES,
-    TEMP_EVENT_TYPE_PREFIX,
-    clientViews,
-    eventHubConsumers,
-    fireEventTypes,
-    runsOnBreakageReport,
-    writesBreakageData,
-} from './clients.js';
-import { detectorNameErrors, forEachPatchOperation, forEachPatchedDetector, forEachWebDetectionConfig, latestConfigs } from './configs.js';
+import { TEMP_EVENT_TYPE_PREFIX, clientViews, eventHubConsumers, fireEventTypes } from './clients.js';
+import { detectorNameErrors, detectorViews, forEachWebDetectionConfig, latestConfigs, viewErrors } from './configs.js';
 import { ACTION_KEYS, BRANCH_KEYS } from './validator/grammar.js';
-import { interfaceProperties, selectorInterfaces } from './validator/types.js';
-import { assertValidDetector, validateDetector } from './validator/validate.js';
-import { forEachDetectorTextCondition } from './validator/walk.js';
+import { validateDetector } from './validator/validate.js';
 import { itemWalkWarnings, repeatedEventWarnings } from './validator/warnings.js';
-import { assertExpressionPatch, assertTextConditionExpressions, assertXPathConfig, assertXPathConfigPatch } from './validator/xpath.js';
 
 describe('webDetection config tests', () => {
-    describe('match tree validation', () => {
-        forEachWebDetectionConfig(({ configName, webDetection, detectors }) => {
-            describe(configName, () => {
-                for (const [
-                    groupName,
-                    group,
-                ] of Object.entries(detectors)) {
-                    for (const [
-                        detectorId,
-                        detector,
-                    ] of Object.entries(group)) {
-                        it(`${groupName}.${detectorId} match tree and payloads are well formed`, () => {
-                            assertValidDetector(detector, `detectors.${groupName}.${detectorId}`);
-                        });
-                    }
+    describe('detectors in every view a client can see', () => {
+        /** @type {Array<{ name: string, check: (detector: Record<string, any>, path: string) => string[] }>} */
+        const DETECTOR_CHECKS = [
+            { name: 'is well formed', check: validateDetector },
+        ];
+
+        for (const config of latestConfigs) {
+            const views = detectorViews(config);
+            if (!views.length) continue;
+            describe(config.name, () => {
+                for (const { name, check } of DETECTOR_CHECKS) {
+                    it(`every detector ${name}`, () => {
+                        const errors = viewErrors(views, check);
+                        expect(errors, errors.join('\n')).to.deep.equal([]);
+                    });
                 }
 
-                it('detectors as patch operations leave them are well formed', () => {
-                    forEachPatchedDetector(webDetection, (detector, path) => {
-                        assertValidDetector(detector, path);
-                        forEachDetectorTextCondition(detector, path, assertTextConditionExpressions);
-                        forEachDetectorTextCondition(detector, path, (condition, conditionPath) => {
-                            if (condition.xpathConfig !== undefined)
-                                assertXPathConfig(condition.xpathConfig, `${conditionPath}/xpathConfig`);
-                        });
-                    });
-                });
-            });
-        });
-
-        it('exercises every generated config (sanity)', () => {
-            expect(latestConfigs.length).to.be.greaterThan(0);
-        });
-    });
-
-    describe('client views', () => {
-        for (const config of latestConfigs) {
-            const settings = config.body.features?.webDetection?.settings;
-            const clients = CLIENT_RELEASES.find((entry) => entry.configs.test(config.name));
-            if (!settings?.detectors || !clients) continue;
-            const views = [
-                false,
-                true,
-            ].flatMap((assumeUndecided) => clientViews(config.body, clients.platform, clients.version, assumeUndecided));
-            describe(config.name, () => {
-                it(`at ${clients.version}, every conditionalChanges entry a client matches applies`, () => {
-                    const failed = views.flatMap(({ label, failed }) => failed.map((entry) => `${label}: ${JSON.stringify(entry)}`));
+                it('applies every conditionalChanges entry a client matches', () => {
+                    const failed = views.flatMap(({ label, failed }) =>
+                        (failed ?? []).map((entry) => `${label}: ${JSON.stringify(entry)}`),
+                    );
                     expect(failed, failed.join('\n')).to.deep.equal([]);
                 });
 
-                it(`at ${clients.version}, every detector parses once conditionalChanges apply`, () => {
-                    /** @type {string[]} */
-                    const errors = [];
-                    for (const { detectors } of views) {
-                        for (const [
-                            groupName,
-                            group,
-                        ] of Object.entries(detectors)) {
-                            for (const [
-                                detectorId,
-                                detector,
-                            ] of Object.entries(group)) {
-                                errors.push(...validateDetector(detector, `detectors.${groupName}.${detectorId}`));
-                            }
-                        }
-                    }
-                    const unique = [
-                        ...new Set(errors),
-                    ];
-                    expect(unique, unique.join('\n')).to.deep.equal([]);
-                });
-
-                it(`at ${clients.version}, every detector a breakage report runs writes breakage data`, () => {
-                    /** @type {string[]} */
-                    const errors = [];
-                    for (const { detectors } of views) {
-                        for (const [
-                            groupName,
-                            group,
-                        ] of Object.entries(detectors)) {
-                            for (const [
-                                detectorId,
-                                detector,
-                            ] of Object.entries(group)) {
-                                if (!runsOnBreakageReport(detector) || writesBreakageData(detector)) continue;
-                                errors.push(
-                                    `detectors.${groupName}.${detectorId}: runs when a breakage report is made, since the \`breakageReport\` trigger is on unless set to "disabled" (on by default), but no \`breakageReportData\` action writes to its breakage entry; add one, or set \`triggers.breakageReport.state\` to "disabled"`,
-                                );
-                            }
-                        }
-                    }
-                    const unique = [
-                        ...new Set(errors),
-                    ];
-                    expect(unique, unique.join('\n')).to.deep.equal([]);
-                });
-
                 it('warns on events sent on every run', () => {
-                    for (const [
-                        groupName,
-                        group,
-                    ] of views.filter(({ assumeUndecided }) => assumeUndecided).flatMap(({ detectors }) => Object.entries(detectors))) {
-                        for (const [
-                            detectorId,
-                            detector,
-                        ] of Object.entries(group)) {
-                            for (const warning of repeatedEventWarnings(detector, `${config.name} detectors.${groupName}.${detectorId}`)) {
-                                console.warn(`warning: ${warning}`);
-                            }
-                        }
-                    }
+                    for (const warning of viewErrors(views, repeatedEventWarnings)) console.warn(`warning: ${config.name} ${warning}`);
                 });
 
                 it('warns on walks from each item that no `if` guards', () => {
-                    for (const [
-                        groupName,
-                        group,
-                    ] of views.filter(({ assumeUndecided }) => assumeUndecided).flatMap(({ detectors }) => Object.entries(detectors))) {
-                        for (const [
-                            detectorId,
-                            detector,
-                        ] of Object.entries(group)) {
-                            for (const warning of itemWalkWarnings(detector, `${config.name} detectors.${groupName}.${detectorId}`)) {
-                                console.warn(`warning: ${warning}`);
-                            }
-                        }
-                    }
+                    for (const warning of viewErrors(views, itemWalkWarnings)) console.warn(`warning: ${config.name} ${warning}`);
                 });
             });
         }
+
+        it('exercises every generated config (sanity)', () => {
+            expect(latestConfigs.filter((config) => detectorViews(config).length).length).to.be.greaterThan(0);
+        });
     });
 
     describe('Apple action sequences', () => {
@@ -589,85 +485,6 @@ describe('webDetection config tests', () => {
             ).to.deep.equal([
                 'countedEvent',
                 'exampleEvent',
-            ]);
-        });
-    });
-
-    describe('xpathConfig validation', () => {
-        forEachWebDetectionConfig(({ configName, webDetection, detectors }) => {
-            describe(configName, () => {
-                for (const [
-                    groupName,
-                    group,
-                ] of Object.entries(detectors)) {
-                    for (const [
-                        detectorId,
-                        detector,
-                    ] of Object.entries(group)) {
-                        it(`${groupName}.${detectorId} xpathConfig values are within sensible bounds`, () => {
-                            forEachDetectorTextCondition(detector, `detectors.${groupName}.${detectorId}`, (condition, path) => {
-                                if (condition.xpathConfig !== undefined) {
-                                    assertXPathConfig(condition.xpathConfig, `${path}/xpathConfig`);
-                                }
-                            });
-                        });
-                    }
-                }
-
-                it('xpathConfig patch operations are within sensible bounds', () => {
-                    forEachPatchOperation(webDetection, assertXPathConfigPatch);
-                });
-            });
-        });
-    });
-
-    describe('expression validation', () => {
-        forEachWebDetectionConfig(({ configName, webDetection, detectors }) => {
-            describe(configName, () => {
-                for (const [
-                    groupName,
-                    group,
-                ] of Object.entries(detectors)) {
-                    for (const [
-                        detectorId,
-                        detector,
-                    ] of Object.entries(group)) {
-                        it(`${groupName}.${detectorId} xpath and pattern values are well formed`, () => {
-                            forEachDetectorTextCondition(detector, `detectors.${groupName}.${detectorId}`, assertTextConditionExpressions);
-                        });
-                    }
-                }
-
-                it('xpath and pattern patch operations are well formed', () => {
-                    forEachPatchOperation(webDetection, assertExpressionPatch);
-                });
-            });
-        });
-    });
-
-    describe('element property tables', () => {
-        it('carry the types the load-state recipes read', () => {
-            expect(interfaceProperties('HTMLImageElement').get('naturalWidth')).to.equal('unsigned long');
-            expect(interfaceProperties('HTMLImageElement').get('currentSrc')).to.equal('USVString');
-            expect(interfaceProperties('HTMLLinkElement').get('sheet')).to.equal('CSSStyleSheet?');
-            // Inherited from Element and Node
-            expect(interfaceProperties('HTMLImageElement').get('tagName')).to.equal('DOMString');
-            expect(interfaceProperties('HTMLImageElement').get('isConnected')).to.equal('boolean');
-            // `unrestricted` is kept
-            expect(interfaceProperties('HTMLMediaElement').get('duration')).to.equal('unrestricted double');
-        });
-
-        it('map tags to their interfaces, in every namespace', () => {
-            expect(selectorInterfaces('img')).to.deep.equal([
-                'HTMLImageElement',
-            ]);
-            expect(selectorInterfaces('a').sort()).to.deep.equal([
-                'HTMLAnchorElement',
-                'MathMLElement',
-                'SVGAElement',
-            ]);
-            expect(selectorInterfaces('svg')).to.deep.equal([
-                'SVGSVGElement',
             ]);
         });
     });

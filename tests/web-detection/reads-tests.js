@@ -1,3 +1,4 @@
+import { expect } from 'chai';
 import {
     expectActionsError,
     expectActionsValid,
@@ -11,6 +12,7 @@ import {
     text,
     fontsStatus,
 } from './fixtures.js';
+import { interfaceProperties, selectorInterfaces } from './validator/types.js';
 
 describe('webDetection config tests', () => {
     describe('validateDetector (self-test)', () => {
@@ -599,6 +601,33 @@ describe('webDetection config tests', () => {
                     expr: { element: { selector: 'img', field: 'naturalWidth' } },
                 });
             });
+        });
+    });
+
+    describe('element property tables', () => {
+        it('carry the IDL types of element properties', () => {
+            expect(interfaceProperties('HTMLImageElement').get('naturalWidth')).to.equal('unsigned long');
+            expect(interfaceProperties('HTMLImageElement').get('currentSrc')).to.equal('USVString');
+            expect(interfaceProperties('HTMLLinkElement').get('sheet')).to.equal('CSSStyleSheet?');
+            // Inherited from Element and Node
+            expect(interfaceProperties('HTMLImageElement').get('tagName')).to.equal('DOMString');
+            expect(interfaceProperties('HTMLImageElement').get('isConnected')).to.equal('boolean');
+            // `unrestricted` is kept
+            expect(interfaceProperties('HTMLMediaElement').get('duration')).to.equal('unrestricted double');
+        });
+
+        it('map tags to their interfaces, in every namespace', () => {
+            expect(selectorInterfaces('img')).to.deep.equal([
+                'HTMLImageElement',
+            ]);
+            expect(selectorInterfaces('a').sort()).to.deep.equal([
+                'HTMLAnchorElement',
+                'MathMLElement',
+                'SVGAElement',
+            ]);
+            expect(selectorInterfaces('svg')).to.deep.equal([
+                'SVGSVGElement',
+            ]);
         });
     });
 });

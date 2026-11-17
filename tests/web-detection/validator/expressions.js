@@ -29,7 +29,7 @@ import {
 } from './types.js';
 import { asArray, expressionKeysOf, forEachTextLeaf, readsOuterSelf, refsIn } from './walk.js';
 import { isPlainObject } from '../../../util.js';
-import { selectsFromDocument } from './xpath.js';
+import { checkTextExpressions, selectsFromDocument } from './xpath.js';
 
 /**
  * @typedef {import('./context.js').Context} Context
@@ -863,6 +863,7 @@ function checkConditionSource(key, branch, position, scope, ctx, path) {
             expectStrings(body.pattern, ctx, `${bodyPath}.pattern`, '`pattern`');
             if ('selector' in body) expectStrings(body.selector, ctx, `${bodyPath}.selector`, '`selector`');
             if ('xpath' in body) expectStrings(body.xpath, ctx, `${bodyPath}.xpath`, '`xpath`');
+            checkTextExpressions(body, ctx, bodyPath);
             valueTypes.push(typeOf('string'));
             if ('root' in body && 'xpath' in body) {
                 for (const expression of asArray(body.xpath)) {
