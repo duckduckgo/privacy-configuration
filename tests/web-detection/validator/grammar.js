@@ -1,3 +1,4 @@
+// @ts-check
 import { buildTables } from './property-tables.js';
 
 /**

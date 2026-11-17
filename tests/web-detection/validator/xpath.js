@@ -1,4 +1,5 @@
-import xpath from 'xpath';
+// @ts-check
+import xpathModule from 'xpath';
 import { fail } from './context.js';
 import { isPlainObject } from '../../../util.js';
 import { asArray } from './walk.js';
@@ -6,6 +7,17 @@ import { asArray } from './walk.js';
 /**
  * @typedef {import('./context.js').Context} Context
  */
+
+/**
+ * The parser `xpath` uses internally, which its types leave out.
+ *
+ * @typedef {{
+ *   parse(source: string): { expression: { expression: unknown } },
+ *   BarOperation: new (...args: never[]) => { lhs: unknown, rhs: unknown },
+ *   PathExpr: new (...args: never[]) => { locationPath?: { absolute?: boolean }, filter: unknown },
+ * }} XPathParser
+ */
+const xpath = /** @type {XPathParser} */ (/** @type {unknown} */ (xpathModule));
 
 /** Floor for a non-zero chunkSize. Smaller chunks multiply regex tests for little gain. */
 const MIN_CHUNK_SIZE = 1024;
@@ -65,7 +77,10 @@ export function selectsFromDocument(expression) {
     } catch {
         return false;
     }
-    /** @param {unknown} node */
+    /**
+     * @param {unknown} node
+     * @returns {boolean}
+     */
     const absolute = (node) => {
         if (node instanceof xpath.BarOperation) return absolute(node.lhs) || absolute(node.rhs);
         if (!(node instanceof xpath.PathExpr)) return false;

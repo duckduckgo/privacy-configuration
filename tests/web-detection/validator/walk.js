@@ -1,3 +1,4 @@
+// @ts-check
 import { BRANCH_KEYS, COMPARISON_OPERATORS, EXPRESSION_KEYS, OPERATOR_KEYS, VALUE_OPERATORS, apiBody } from './grammar.js';
 
 import { isPlainObject } from '../../../util.js';
@@ -28,7 +29,7 @@ export function forEachTextLeaf(node, path, cb) {
         node.forEach((n, i) => forEachTextLeaf(n, `${path}[${i}]`, cb));
         return;
     }
-    if (node === null || typeof node !== 'object') return;
+    if (!isPlainObject(node)) return;
 
     const opKeys = OPERATOR_KEYS.filter((k) => k in node);
     if (opKeys.length > 0) {

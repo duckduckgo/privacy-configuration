@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * @typedef {import('./types.js').Position} Position
  * @typedef {import('./types.js').StaticType} StaticType

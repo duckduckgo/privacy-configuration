@@ -1,3 +1,4 @@
+// @ts-check
 import { child, expectPosition, fail } from './context.js';
 import { bindItem, checkExpr, sourceType } from './expressions.js';
 import { API_ALLOWLIST, BUILTIN_RETURN_TYPES, ELEMENT_METHOD_ALLOWLIST, FUNCTION_READS, LIST_CONDITION, apiBody } from './grammar.js';

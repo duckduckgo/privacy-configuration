@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * Builds the element property tables the webDetection CI checks read (grammar.js), from the
  * installed @webref packages.
@@ -12,9 +13,11 @@
 
 import { createRequire } from 'module';
 
-const require = createRequire(import.meta.url);
-const idl = require('@webref/idl');
-const elements = require('@webref/elements');
+const load = createRequire(import.meta.url);
+/** @type {{ parseAll(): Promise<Record<string, IdlDefinition[]>> }} */
+const idl = load('@webref/idl');
+/** @type {{ listAll(): Promise<Record<string, { elements: Array<{ name: string, interface?: string }> }>> }} */
+const elements = load('@webref/elements');
 
 /** Element specs in @webref/elements, by namespace. SVG 1.1 is left out: SVG 2 and its modules supersede it. */
 const NAMESPACE_SPECS = {

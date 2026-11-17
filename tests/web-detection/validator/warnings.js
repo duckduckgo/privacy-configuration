@@ -1,3 +1,4 @@
+// @ts-check
 import { BRANCH_KEYS, apiBody } from './grammar.js';
 import { definesName, expressionKeysOf, forEachTextLeaf, readsOuterSelf, refsIn } from './walk.js';
 import { isPlainObject } from '../../../util.js';

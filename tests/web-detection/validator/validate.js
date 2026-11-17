@@ -1,3 +1,4 @@
+// @ts-check
 import { isDeepStrictEqual } from 'node:util';
 import { MATCH_SCOPE, PAYLOAD_SCOPE, newContext } from './context.js';
 import { checkBody, checkExpr } from './expressions.js';

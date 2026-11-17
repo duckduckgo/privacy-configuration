@@ -1,3 +1,4 @@
+// @ts-check
 import { PLATFORM_INJECT_NAMES, applyConditionalChanges, compareVersions } from '../../scripts/config-conditions.mjs';
 import { isPlainObject } from '../../util.js';
 import { EXPERIMENT_METRIC_PARENTS } from '../../constants.js';
@@ -89,7 +90,7 @@ export function clientViews(configBody, platform, version, assumeUndecided) {
 export function eventHubConsumers(configBody) {
     const telemetry = /** @type {import('../../schema/features/event-hub').EventHubFeature<number> | undefined} */ (
         configBody?.features?.eventHub
-    )?.settings.telemetry;
+    )?.settings?.telemetry;
     const consumers = new Set();
     for (const entry of Object.values(telemetry ?? {})) {
         for (const param of Object.values(entry.parameters)) {

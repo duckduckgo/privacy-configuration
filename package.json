@@ -10,7 +10,7 @@
     "check-revoked-bundle-signing-keys": "node scripts/check-revoked-bundle-signing-keys.mjs",
     "lint": "npm run check-lockfile && eslint . && prettier . --check",
     "lint-fix": "npm run check-lockfile && eslint . --fix && prettier . --write",
-    "tsc": "tsc",
+    "tsc": "tsc && tsc -p tests/web-detection",
     "tsc-watch": "tsc --watch",
     "unit-tests": "mocha './tests/**/*.js'",
     "build": "node index.js",
@@ -22,6 +22,7 @@
   "devDependencies": {
     "@duckduckgo/eslint-config": "github:duckduckgo/eslint-config#v0.2.1",
     "@octokit/rest": "^22.0.1",
+    "@types/node": "^24.19.2",
     "@webref/elements": "^2.9.1",
     "@webref/idl": "^3.85.1",
     "ajv": "^8.20.0",

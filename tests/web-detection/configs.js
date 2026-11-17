@@ -1,3 +1,4 @@
+// @ts-check
 import fs from 'fs';
 import { immutableJSONPatch } from 'immutable-json-patch';
 import platforms from '../../platforms.js';
@@ -14,7 +15,7 @@ const platformOutput = platforms.map((item) => item.replace('browsers/', 'extens
 export const latestConfigs = platformOutput.map((plat) => {
     return {
         name: `v${CURRENT_CONFIG_VERSION}/${plat}-config.json`,
-        body: JSON.parse(fs.readFileSync(`./generated/v${CURRENT_CONFIG_VERSION}/${plat}-config.json`)),
+        body: JSON.parse(fs.readFileSync(`./generated/v${CURRENT_CONFIG_VERSION}/${plat}-config.json`, 'utf8')),
     };
 });
 

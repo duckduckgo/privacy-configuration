@@ -1,3 +1,4 @@
+// @ts-check
 import { isDeepStrictEqual } from 'node:util';
 import { child, expectPosition, fail } from './context.js';
 import {
@@ -778,11 +779,9 @@ function checkIf(holder, position, scope, ctx, holderPath) {
     // A run name bound in one branch may be bound after the `if`, with the type each branch binds
     const before = new Map(ctx.runNames);
     // Under `sum`, `mul`, `any`, `all` and `none`, a branch giving no list is one operand
-    const single = scope.spreadOf ?? 'value';
+    const single = position === 'spread' ? scope.spreadOf : undefined;
     const branchPosition = (/** @type {unknown} */ branch) =>
-        position !== 'spread' || providesValues(Array.isArray(branch) ? branch[branch.length - 1] : branch, single, ctx)
-            ? position
-            : single;
+        single && !providesValues(Array.isArray(branch) ? branch[branch.length - 1] : branch, single, ctx) ? single : position;
     const thenType =
         'then' in holder ? checkBody(holder.then, branchPosition(holder.then), branchScope, ctx, `${holderPath}.then`) : UNKNOWN;
     const afterThen = ctx.runNames;
@@ -791,20 +790,12 @@ function checkIf(holder, position, scope, ctx, holderPath) {
         'else' in holder
             ? checkBody(holder.else, branchPosition(holder.else), branchScope, ctx, `${holderPath}.else`)
             : typeOf('undefined');
-    if (position === 'spread') {
-        for (const [
-            branch,
-            type,
-        ] of [
-            [
-                'then',
-                thenType,
-            ],
-            [
-                'else',
-                elseType,
-            ],
-        ]) {
+    if (single) {
+        for (const branch of /** @type {const} */ ([
+            'then',
+            'else',
+        ])) {
+            const type = branch === 'then' ? thenType : elseType;
             if (branch in holder && !allows(type, single))
                 fail(ctx, `${holderPath}.${branch}`, `this operand takes ${single}s, and config types the branch as ${describeType(type)}`);
         }

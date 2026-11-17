@@ -1,3 +1,4 @@
+// @ts-check
 import { PAYLOAD_SCOPE, child, fail } from './context.js';
 import { checkExpr, predicateSubject } from './expressions.js';
 import { COMPARISON_OPERATORS, NAME_PATTERN, OPERATOR_KEYS, VALUE_OPERATORS } from './grammar.js';

@@ -1,3 +1,4 @@
+// @ts-check
 import { PROPERTY_TABLES } from './grammar.js';
 import { asArray } from './walk.js';
 
