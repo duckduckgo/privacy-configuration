@@ -159,12 +159,12 @@ describe('webDetection config tests', () => {
             });
 
             itAll('rejects a scoped leaf in `where` with a `none` above it, in the match tree or the predicate, with no guard', () => {
-                const parent = { self: 'parentElement' };
-                const cardsWithImage = { selector: '.card', where: { element: { selector: 'img', root: parent } } };
+                const shadow = { self: 'shadowRoot' };
+                const cardsWithImage = { selector: '.card', where: { element: { selector: 'img', root: shadow } } };
                 expectValid({ element: cardsWithImage });
                 expectError('needs a guard', { none: { element: cardsWithImage } });
                 expectError('needs a guard', {
-                    element: { selector: '.card', where: { none: { element: { selector: 'img', root: parent } } } },
+                    element: { selector: '.card', where: { none: { element: { selector: 'img', root: shadow } } } },
                 });
             });
 
@@ -243,7 +243,7 @@ describe('webDetection config tests', () => {
 
         describe('predicates', () => {
             itAll('rejects `field` without `is`, and `is` without `field`', () => {
-                expectError('go together', items('img', { field: 'src' }));
+                expectError('go together', items('img', { field: 'currentSrc' }));
                 expectError('go together', items('img', { is: true }));
             });
 
@@ -292,20 +292,30 @@ describe('webDetection config tests', () => {
             });
 
             itAll('checks operators suit an element property’s type', () => {
-                expectError('guard it', items('input', { selectionStart: { gt: 0 } }));
-                expectError('guard it', items('img', { src: { gt: 0 } }));
-                expectValid(items('input', { selectionStart: { type: 'number', gt: 0 } }));
-                expectValid(items('input', { selectionStart: { ...numberTest('isFinite'), gt: 0 } }));
-                expectError('guard it', items('input', { selectionStart: { gt: 0, ...numberTest('isFinite') } }));
-                expectError('guard it', items('input', { selectionStart: { ...numberTest('isFinite', false), gt: 0 } }));
-                expectError('guard it', items('input', { selectionStart: { ...numberTest('isNaN'), gt: 0 } }));
+                expectError('guard it', items('link', { sheet: { gt: 0 } }));
+                expectError('guard it', items('img', { currentSrc: { gt: 0 } }));
+                expectValid(items('link', { sheet: { type: 'number', gt: 0 } }));
+                expectValid(items('link', { sheet: { ...numberTest('isFinite'), gt: 0 } }));
+                expectError('guard it', items('link', { sheet: { gt: 0, ...numberTest('isFinite') } }));
+                expectError('guard it', items('link', { sheet: { ...numberTest('isFinite', false), gt: 0 } }));
+                expectError('guard it', items('link', { sheet: { ...numberTest('isNaN'), gt: 0 } }));
                 expectValid(items('link', { sheet: null }));
             });
 
             itAll('checks property names per tag, and against every element interface when the selector names none', () => {
-                expectError('"naturalwidth" is not a property of HTMLImageElement', items('img', { naturalwidth: 0 }));
-                expectError('is not a property of HTMLDivElement', items('div.card', { naturalWidth: 0 }));
-                expectValid(items('.card', { naturalWidth: 0 }));
+                expectError(
+                    `reads "naturalwidth" on HTMLImageElement or HTMLElement or Element, which is not in ELEMENT_ALLOWLIST`,
+                    items('img', { naturalwidth: 0 }),
+                );
+                expectError(
+                    `reads "naturalWidth" on HTMLElement or Element, which is not in ELEMENT_ALLOWLIST`,
+                    items('div.card', { naturalWidth: 0 }),
+                );
+                expectError(
+                    `reads "naturalWidth" on HTMLElement or Element, which is not in ELEMENT_ALLOWLIST`,
+                    items('.card', { naturalWidth: 0 }),
+                );
+                expectValid(items('.card', { hidden: false }));
                 expectValid(items('x-widget', { hidden: false }));
             });
 
@@ -355,22 +365,22 @@ describe('webDetection config tests', () => {
                 };
                 expectValid(items('img', has));
                 expectValid(
-                    items('input', {
+                    items('img', {
                         any: [
-                            { self: 'checked', is: true },
-                            { type: 'checkbox' },
+                            { self: 'complete', is: true },
+                            { naturalWidth: 0 },
                         ],
                     }),
                 );
                 expectError(
                     'an array is not a predicate',
-                    items('input', [
-                        { self: 'checked', is: true },
-                        { type: 'checkbox' },
+                    items('img', [
+                        { self: 'complete', is: true },
+                        { naturalWidth: 0 },
                     ]),
                 );
-                expectValid(items('option', { field: 'text', is: 'Sign in' }));
-                expectValid(items('option', { self: 'text', is: 'Sign in' }));
+                expectValid(items('option', { field: 'textContent', is: 'Sign in' }));
+                expectValid(items('option', { self: 'textContent', is: 'Sign in' }));
             });
 
             itAll('admits a source rooted at the item without a guard', () => {
@@ -446,7 +456,10 @@ describe('webDetection config tests', () => {
             });
 
             itAll('checks the names `self` reads against the item’s properties', () => {
-                expectError('"naturalwidth" is not a property of HTMLImageElement', items('img', { self: 'naturalwidth', is: 0 }));
+                expectError(
+                    `reads "naturalwidth" on HTMLImageElement or HTMLElement or Element, which is not in ELEMENT_ALLOWLIST`,
+                    items('img', { self: 'naturalwidth', is: 0 }),
+                );
             });
 
             itAll('rejects an object mixing expression keys and property paths, and a property named like an expression key', () => {
@@ -482,7 +495,7 @@ describe('webDetection config tests', () => {
                         ],
                     },
                 });
-                expectValid({ text: { pattern: 'a', root: { only: fieldOf('a', 'href') } } });
+                expectValid({ text: { pattern: 'a', root: { only: fieldOf('template', 'textContent') } } });
             });
 
             itAll('rejects a root of text, numbers or values that are not nodes', () => {
@@ -672,7 +685,7 @@ describe('webDetection config tests', () => {
                 );
                 expectValid(
                     true,
-                    bucketsOf({ only: fieldOf('img', 'src') }, [
+                    bucketsOf({ only: fieldOf('img', 'currentSrc') }, [
                         { name: 'none', is: null },
                         { name: 'some', is: { type: 'number', gte: 0 } },
                     ]),
@@ -683,11 +696,11 @@ describe('webDetection config tests', () => {
                 expectError(
                     'guard it',
                     true,
-                    bucketsOf({ only: fieldOf('img', 'src') }, [
+                    bucketsOf({ only: fieldOf('img', 'currentSrc') }, [
                         { name: 'long', is: { gt: 100 } },
                     ]),
                 );
-                expectError('guard it', true, { a: { value: { only: fieldOf('img', 'src') }, when: { gt: 100 } } });
+                expectError('guard it', true, { a: { value: { only: fieldOf('img', 'currentSrc') }, when: { gt: 100 } } });
             });
 
             itAll('admits a comparison on a value whose only strings are literals that convert to NaN', () => {
@@ -732,7 +745,7 @@ describe('webDetection config tests', () => {
                 expectError(
                     'guard it',
                     true,
-                    bucketsOf(engineGuarded({ only: fieldOf('img', 'src') }, 'unsupported'), [
+                    bucketsOf(engineGuarded({ only: fieldOf('img', 'currentSrc') }, 'unsupported'), [
                         { name: '1+', is: { gte: 1 } },
                     ]),
                 );

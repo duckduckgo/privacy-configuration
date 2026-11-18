@@ -1,6 +1,4 @@
 // @ts-check
-import { buildTables } from './property-tables.js';
-
 /**
  * @typedef {import('./types.js').TypeName} TypeName
  */
@@ -128,7 +126,7 @@ export const API_ALLOWLIST = {
 };
 
 /**
- * The type each JS builtin on API_ALLOWLIST returns. The tables from WebIDL do not cover them.
+ * The type each JS builtin on API_ALLOWLIST returns.
  *
  * @type {Record<string, TypeName>}
  */
@@ -158,13 +156,74 @@ export function apiBody(raw) {
 }
 
 /**
- * Methods a `field` may call on `element` items, with the IDL type each returns. Each leaves the
- * page unchanged: it fires no event and changes no focus, DOM or state. WebIDL does not mark
- * side effects, so this list is kept by hand.
+ * A type in ELEMENT_ALLOWLIST: type names joined by `|`. Each is a TypeName, `nan` for a number
+ * that can be NaN, `fragment` for a shadow root or other document fragment, or an
+ * ELEMENT_ALLOWLIST interface, whose names a read from the value may take. An entry needing
+ * another type adds it here.
+ *
+ * @typedef {'boolean' | 'number' | 'number|nan' | 'string' | 'object|null' | 'fragment|null' | 'DOMRect'} TypeSpec
+ * @typedef {{ kind: 'method' | 'property', type: TypeSpec }} ElementMember
  */
-export const ELEMENT_METHOD_ALLOWLIST = {
-    checkVisibility: 'boolean',
-    getBoundingClientRect: 'DOMRect',
+
+/**
+ * Every name a read from an element may take, by the interface declaring it, with the type it
+ * gives: a `method`'s return when called, a `property`'s value. Every element reads the `Element`
+ * and `HTMLElement` names, and the names of the interfaces TAG_INTERFACES gives its tag. A value
+ * typed as another object reads no name.
+ *
+ * C-S-S reads any name config gives, so this list is the review point. A detector reading a name
+ * not listed adds it here in the same change. A method leaves the page unchanged: it fires no
+ * event and changes no focus, DOM or state. Names reading user data or URLs, such as `href`,
+ * `src` and `ownerDocument`, stay off the list. `currentSrc` is a URL, listed for detectors that
+ * read its `length` to tell an image with a source from one without.
+ *
+ * @type {Record<string, Record<string, ElementMember>>}
+ */
+export const ELEMENT_ALLOWLIST = {
+    Element: {
+        checkVisibility: { kind: 'method', type: 'boolean' },
+        getBoundingClientRect: { kind: 'method', type: 'DOMRect' },
+        shadowRoot: { kind: 'property', type: 'fragment|null' },
+        textContent: { kind: 'property', type: 'string' },
+    },
+    HTMLElement: {
+        hidden: { kind: 'property', type: 'boolean' },
+    },
+    HTMLImageElement: {
+        complete: { kind: 'property', type: 'boolean' },
+        currentSrc: { kind: 'property', type: 'string' },
+        height: { kind: 'property', type: 'number' },
+        naturalWidth: { kind: 'property', type: 'number' },
+        width: { kind: 'property', type: 'number' },
+    },
+    HTMLLinkElement: {
+        sheet: { kind: 'property', type: 'object|null' },
+    },
+    HTMLMediaElement: {
+        duration: { kind: 'property', type: 'number|nan' },
+    },
+    DOMRect: {
+        height: { kind: 'property', type: 'number' },
+        width: { kind: 'property', type: 'number' },
+    },
 };
 
-export const PROPERTY_TABLES = await buildTables();
+/**
+ * The ELEMENT_ALLOWLIST interfaces of each tag whose names a detector reads, by lower-case tag.
+ *
+ * @type {Record<string, string[]>}
+ */
+export const TAG_INTERFACES = {
+    audio: [
+        'HTMLMediaElement',
+    ],
+    img: [
+        'HTMLImageElement',
+    ],
+    link: [
+        'HTMLLinkElement',
+    ],
+    video: [
+        'HTMLMediaElement',
+    ],
+};

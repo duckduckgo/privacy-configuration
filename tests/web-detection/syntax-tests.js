@@ -581,7 +581,7 @@ describe('webDetection config tests', () => {
 
             itAll('places `text` and `element` without `field` in list position', () => {
                 expectValid({ only: text, is: { length: { gt: 0 } } });
-                expectValid({ only: img, is: { field: { path: 'tagName' }, is: 'IMG' } });
+                expectValid({ only: img, is: { field: { path: 'textContent' }, is: '' } });
                 expectValid({ ...text, using: 'length', is: { gt: 0 } });
             });
 
@@ -622,10 +622,10 @@ describe('webDetection config tests', () => {
                 expectValid({ all: fieldOf('img', 'complete') });
                 expectValid({ sum: fieldOf('img', 'naturalWidth'), is: { gt: 100 } });
                 expectError('`all` takes booleans', { all: fieldOf('img', 'naturalWidth') });
-                expectError('`sum` takes numbers', { sum: fieldOf('img', 'src'), is: { gt: 0 } });
+                expectError('`sum` takes numbers', { sum: fieldOf('img', 'currentSrc'), is: { gt: 0 } });
                 expectError('number position takes a number', {
                     div: [
-                        fieldOf('img', 'src'),
+                        fieldOf('img', 'currentSrc'),
                         1,
                     ],
                     is: { gt: 0 },
@@ -691,7 +691,7 @@ describe('webDetection config tests', () => {
                 expectError('boolean position takes a boolean, and config types the value as object', { only: img });
                 expectError('number position takes a number, and config types the value as string', {
                     div: [
-                        { only: fieldOf('img', 'src') },
+                        { only: fieldOf('img', 'currentSrc') },
                         1,
                     ],
                     is: { gt: 0 },
@@ -720,7 +720,7 @@ describe('webDetection config tests', () => {
                 expectValid({ ...fieldOf('img', 'naturalWidth'), is: { lt: 2000 } });
                 expectValid({ ...img, is: { length: { gte: 5 } } });
                 expectValid({ ...img, is: { type: 'array' } });
-                expectError('guard it', { ...fieldOf('img', 'src'), is: { gt: 3 } });
+                expectError('guard it', { ...fieldOf('img', 'currentSrc'), is: { gt: 3 } });
                 expectError('guard it', {
                     ...img,
                     is: {
@@ -754,7 +754,7 @@ describe('webDetection config tests', () => {
                 });
                 expectError('guard it', true, {
                     sources: {
-                        value: fieldOf('img', 'src'),
+                        value: fieldOf('img', 'currentSrc'),
                         buckets: [
                             { name: 'long', is: { gt: 100 } },
                         ],
@@ -764,9 +764,12 @@ describe('webDetection config tests', () => {
 
             itAll('checks each `field` step suits the type the previous one gives', () => {
                 expectValid(items('img', { 'currentSrc.length': { gt: 0 } }));
-                expectValid(items('link', { 'sheet.cssRules': { fails: false } }));
+                expectError(
+                    'reads "cssRules" on an object no ELEMENT_ALLOWLIST interface',
+                    items('link', { 'sheet.cssRules': { fails: false } }),
+                );
                 expectError('reads "length" on a value config types as number', items('img', { 'naturalWidth.length': 0 }));
-                expectError('reads "foo" on a value config types as string', items('img', { 'src.foo': 0 }));
+                expectError('reads "foo" on a value config types as string', items('img', { 'currentSrc.foo': 0 }));
             });
 
             itAll('rejects `feature` in `field`, and counts rendered text through `text`', () => {

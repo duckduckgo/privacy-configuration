@@ -1,18 +1,18 @@
 // @ts-check
 import { child, expectPosition, fail } from './context.js';
 import { bindItem, checkExpr, sourceType } from './expressions.js';
-import { API_ALLOWLIST, BUILTIN_RETURN_TYPES, ELEMENT_METHOD_ALLOWLIST, FUNCTION_READS, LIST_CONDITION, apiBody } from './grammar.js';
+import { API_ALLOWLIST, BUILTIN_RETURN_TYPES, FUNCTION_READS, LIST_CONDITION, apiBody } from './grammar.js';
 import { checkPredicate } from './predicates.js';
 import {
     UNKNOWN,
+    allowlistEntries,
     allows,
     describeInterfaces,
     describeType,
-    interfaceProperties,
     isList,
     itemOf,
     mergeTypes,
-    typeFromIdl,
+    typeFromSpec,
     typeOf,
 } from './types.js';
 import { expressionKeysOf } from './walk.js';
@@ -325,18 +325,12 @@ function readName(current, name, isCall, ctx, path, args, options = {}) {
         for (const apiPath of apiPaths) checkApiName(apiPath, isCall, ctx, path, options.next, options.asArgument);
         return { types: null, nan: false, apiPaths };
     }
-    // The tables do not type the items of an IDL sequence
-    if (isCall && item && current.types?.includes('array')) return UNKNOWN;
     if (isCall) {
         if (!current.interfaces) {
             fail(ctx, path, `calls ${name}() on a value that is not an element or an \`api\` read`);
             return UNKNOWN;
         }
-        if (!Object.hasOwn(ELEMENT_METHOD_ALLOWLIST, name)) {
-            fail(ctx, path, `calls ${name}() on an element, which is not in ELEMENT_METHOD_ALLOWLIST`);
-            return UNKNOWN;
-        }
-        return typeFromIdl(ELEMENT_METHOD_ALLOWLIST[/** @type {keyof typeof ELEMENT_METHOD_ALLOWLIST} */ (name)]);
+        return readMember(current, name, true, ctx, path);
     }
     if (current.types === null) return UNKNOWN;
 
@@ -359,20 +353,47 @@ function readName(current, name, isCall, ctx, path, args, options = {}) {
         } else if (type === 'array' && isIndex) {
             results.push(UNKNOWN);
         } else if (type === 'object' && current.interfaces) {
-            const found = current.interfaces.map((iface) => interfaceProperties(iface).get(name)).filter((idl) => idl !== undefined);
-            if (found.length) {
-                results.push(...found.map(typeFromIdl));
-            } else if (current.customElement) {
-                results.push(UNKNOWN);
-            } else {
-                fail(ctx, path, `"${name}" is not a property of ${describeInterfaces(current.interfaces)}`);
-            }
+            results.push(readMember(current, name, false, ctx, path));
         } else if (type === 'object') {
-            results.push(UNKNOWN);
+            // Neither an element, an ELEMENT_ALLOWLIST interface nor an `api` read, so no list names it
+            fail(ctx, path, `reads "${name}" on an object no ELEMENT_ALLOWLIST interface or \`api\` name names`);
         } else {
             wrong.push(type);
         }
     }
     if (wrong.length) fail(ctx, path, `reads "${name}" on a value config types as ${wrong.join(' or ')}`);
     return results.length ? mergeTypes(results) : UNKNOWN;
+}
+
+/**
+ * Read or call one ELEMENT_ALLOWLIST name on a value of the given interfaces. A custom element
+ * reads page-defined values under any other name.
+ *
+ * @param {StaticType} current - with `interfaces`
+ * @param {string} name
+ * @param {boolean} isCall
+ * @param {Context} ctx
+ * @param {string} path
+ * @returns {StaticType}
+ */
+function readMember(current, name, isCall, ctx, path) {
+    const interfaces = current.interfaces ?? [];
+    const entries = allowlistEntries(interfaces, name);
+    if (!entries.length) {
+        if (current.customElement) return UNKNOWN;
+        fail(ctx, path, `${isCall ? 'calls' : 'reads'} "${name}" on ${describeInterfaces(interfaces)}, which is not in ELEMENT_ALLOWLIST`);
+        return UNKNOWN;
+    }
+    const kind = isCall ? 'method' : 'property';
+    if (entries.some((entry) => entry.kind !== kind)) {
+        fail(
+            ctx,
+            path,
+            isCall
+                ? `calls "${name}", which ELEMENT_ALLOWLIST records as a property`
+                : `reads the method "${name}" without calling it; a method is called through \`args\``,
+        );
+        return UNKNOWN;
+    }
+    return mergeTypes(entries.map((entry) => typeFromSpec(entry.type)));
 }

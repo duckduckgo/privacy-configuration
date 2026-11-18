@@ -1,5 +1,5 @@
 // @ts-check
-import { PROPERTY_TABLES } from './grammar.js';
+import { ELEMENT_ALLOWLIST, TAG_INTERFACES } from './grammar.js';
 import { asArray } from './walk.js';
 
 /**
@@ -30,9 +30,9 @@ import { asArray } from './walk.js';
  * }} StaticType
  *
  * `types` is null when config does not show the type. `nan` is set when the value can be NaN.
- * `interfaces` names the element interfaces an element value can have, and `customElement` is
- * set when it can also be a custom element, whose page-defined values have names outside the
- * tables. `fragment` is set when the value can be a shadow root or other document fragment, which
+ * `interfaces` names the ELEMENT_ALLOWLIST interfaces whose names the value can read, and
+ * `customElement` is set when it can also be a custom element, whose page-defined values have
+ * names outside the list. `fragment` is set when the value can be a shadow root or other document fragment, which
  * browsers refuse as an XPath context node. `apiPaths` are the `api` names the value may have been
  * read through, one for each branch that reads a different one, which names read from it extend
  * for the allowlist.
@@ -188,148 +188,52 @@ function splitTopLevel(text, isSeparator) {
     return parts;
 }
 
-const NUMERIC_IDL_TYPES = [
-    'byte',
-    'octet',
-    'short',
-    'unsigned short',
-    'long',
-    'unsigned long',
-    'long long',
-    'unsigned long long',
-    'float',
-    'double',
-    'unrestricted float',
-    'unrestricted double',
-];
-
-const STRING_IDL_TYPES = [
-    'DOMString',
-    'USVString',
-    'ByteString',
-    'CSSOMString',
-];
-
-/** Interfaces outside the tables that give `StaticType.fragment`. Their properties are not checked. */
-const FRAGMENT_INTERFACES = [
-    'ShadowRoot',
-    'DocumentFragment',
-];
-
-const ARRAY_IDL_GENERICS = [
-    'sequence',
-    'FrozenArray',
-    'ObservableArray',
-];
-
 /**
- * The static type of a value of an IDL type, as the property tables write it.
+ * The static type of a value ELEMENT_ALLOWLIST types as `spec`.
  *
- * @param {string} idlType
+ * @param {import('./grammar.js').TypeSpec} spec
  * @returns {StaticType}
  */
-export function typeFromIdl(idlType) {
-    let text = idlType.trim();
-    const nullable = text.endsWith('?');
-    if (nullable) text = text.slice(0, -1).trim();
-
-    /** @type {StaticType} */
-    let result;
-    const generic = /^(\w+)<(.*)>$/.exec(text);
-    if (text.startsWith('(') && text.endsWith(')')) {
-        result = mergeTypes(
-            text
-                .slice(1, -1)
-                .split(' or ')
-                .map((member) => typeFromIdl(member)),
-        );
-    } else if (generic) {
-        result = typeOf(ARRAY_IDL_GENERICS.includes(generic[1]) ? 'array' : 'object');
-    } else if (NUMERIC_IDL_TYPES.includes(text)) {
-        result = {
-            types: [
-                'number',
-            ],
-            nan: text.startsWith('unrestricted '),
-        };
-    } else if (STRING_IDL_TYPES.includes(text)) {
-        result = typeOf('string');
-    } else if (text === 'boolean' || text === 'undefined' || text === 'object') {
-        result = typeOf(text);
-    } else if (text === 'any') {
-        result = UNKNOWN;
-    } else if (PROPERTY_TABLES.interfaces[text]) {
-        result = {
-            types: [
-                'object',
-            ],
-            nan: false,
-            interfaces: [
-                text,
-            ],
-        };
-    } else if (FRAGMENT_INTERFACES.includes(text)) {
-        result = { ...typeOf('object'), fragment: true };
-    } else {
-        // An interface outside the tables: its properties are not checked
-        result = typeOf('object');
-    }
-    return nullable
-        ? mergeTypes([
-              result,
-              typeOf('null'),
-          ])
-        : result;
+export function typeFromSpec(spec) {
+    return mergeTypes(
+        spec.split('|').map((part) => {
+            if (part === 'nan') return { types: [], nan: true };
+            if (part === 'fragment') return { ...typeOf('object'), fragment: true };
+            if (Object.hasOwn(ELEMENT_ALLOWLIST, part))
+                return {
+                    ...typeOf('object'),
+                    interfaces: [
+                        part,
+                    ],
+                };
+            return typeOf(/** @type {TypeName} */ (part));
+        }),
+    );
 }
-
-/** @type {Map<string, Map<string, string>>} */
-const interfacePropertyCache = new Map();
 
 /**
- * Every attribute of an element interface, its ancestors' included, with its IDL type.
+ * The entry of each interface that lists a name.
  *
+ * @param {string[]} interfaces
  * @param {string} name
- * @returns {Map<string, string>}
+ * @returns {import('./grammar.js').ElementMember[]}
  */
-export function interfaceProperties(name) {
-    let properties = interfacePropertyCache.get(name);
-    if (properties) return properties;
-    const entry = PROPERTY_TABLES.interfaces[name];
-    properties = new Map(entry?.inherits ? interfaceProperties(entry.inherits) : []);
-    for (const [
-        property,
-        type,
-    ] of Object.entries(entry?.properties ?? {})) {
-        properties.set(property, type);
-    }
-    interfacePropertyCache.set(name, properties);
-    return properties;
+export function allowlistEntries(interfaces, name) {
+    return interfaces.flatMap((iface) => {
+        const members = ELEMENT_ALLOWLIST[iface];
+        return members && Object.hasOwn(members, name)
+            ? [
+                  members[name],
+              ]
+            : [];
+    });
 }
 
-/** Element interfaces by lower-case tag, across namespaces. `a` is both an HTML and an SVG element. */
-const TAG_INTERFACES = new Map();
-for (const tagTable of Object.values(PROPERTY_TABLES.tags)) {
-    for (const [
-        tag,
-        name,
-    ] of Object.entries(tagTable)) {
-        const key = tag.toLowerCase();
-        TAG_INTERFACES.set(key, [
-            ...new Set([
-                ...(TAG_INTERFACES.get(key) ?? []),
-                name,
-            ]),
-        ]);
-    }
-}
-
-/** Every interface an element can have. */
-const ALL_ELEMENT_INTERFACES = Object.keys(PROPERTY_TABLES.interfaces).filter((name) => {
-    for (let current = /** @type {string | null} */ (name); current; current = PROPERTY_TABLES.interfaces[current]?.inherits ?? null) {
-        if (current === 'Element') return true;
-    }
-    return false;
-});
+/** Interfaces whose names every element reads, whatever its tag. */
+const ELEMENT_BASE_INTERFACES = [
+    'HTMLElement',
+    'Element',
+];
 
 /**
  * The tags a selector list can match, or null when one of its selectors names no tag.
@@ -350,8 +254,8 @@ function selectorTags(selector) {
 }
 
 /**
- * The element interfaces a selector's matches can have. A tag outside the tables is a custom or
- * unknown element, whose interface is HTMLElement.
+ * The ELEMENT_ALLOWLIST interfaces a selector's matches read names from: those TAG_INTERFACES gives
+ * each tag it can match, and the interfaces every element has.
  *
  * @param {unknown} selector - a selector or an array of them
  * @returns {string[]}
@@ -359,23 +263,19 @@ function selectorTags(selector) {
 export function selectorInterfaces(selector) {
     const names = new Set();
     for (const entry of asArray(selector)) {
-        const tags = typeof entry === 'string' ? selectorTags(entry) : null;
-        if (!tags) return ALL_ELEMENT_INTERFACES;
-        for (const tag of tags) {
-            for (const name of TAG_INTERFACES.get(tag) ?? [
-                'HTMLElement',
-            ])
-                names.add(name);
+        for (const tag of (typeof entry === 'string' ? selectorTags(entry) : null) ?? []) {
+            for (const name of TAG_INTERFACES[tag] ?? []) names.add(name);
         }
     }
     return [
         ...names,
+        ...ELEMENT_BASE_INTERFACES,
     ];
 }
 
 /**
  * Whether a selector names a custom element, whose page-defined values are readable under names
- * outside the tables.
+ * outside ELEMENT_ALLOWLIST.
  *
  * @param {unknown} selector - a selector or an array of them
  */
@@ -387,5 +287,5 @@ export function selectorNamesCustomElement(selector) {
  * @param {string[]} interfaces
  */
 export function describeInterfaces(interfaces) {
-    return interfaces === ALL_ELEMENT_INTERFACES ? 'any element interface' : interfaces.join(' or ');
+    return interfaces.join(' or ');
 }

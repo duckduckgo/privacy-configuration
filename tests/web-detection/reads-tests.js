@@ -1,4 +1,3 @@
-import { expect } from 'chai';
 import {
     expectActionsError,
     expectActionsValid,
@@ -13,7 +12,6 @@ import {
     fontsStatus,
     itAll,
 } from './fixtures.js';
-import { interfaceProperties, selectorInterfaces } from './validator/types.js';
 
 describe('webDetection config tests', () => {
     describe('validateDetector (self-test)', () => {
@@ -82,7 +80,10 @@ describe('webDetection config tests', () => {
                 ]);
                 expectError('`apply` takes its arguments as a selected list', { ...maxOf(5), is: {} });
                 expectError('`apply` takes its arguments as a selected list', { ...maxOf(fontsStatus), is: {} });
-                expectError('`Math.max` takes numbers, and config types the value as string', { ...maxOf(fieldOf('img', 'src')), is: {} });
+                expectError('`Math.max` takes numbers, and config types the value as string', {
+                    ...maxOf(fieldOf('img', 'textContent')),
+                    is: {},
+                });
                 expectError('`Math.max.apply` takes a list', {
                     api: {
                         path: 'Math.max',
@@ -142,15 +143,78 @@ describe('webDetection config tests', () => {
                 expectValid({ only: text, is: { length: 1 } });
                 expectValid({ only: text, is: { 0: 'a' } });
             });
+        });
 
-            itAll('reads page-defined values under names outside the tables on custom elements only', () => {
+        describe('element names', () => {
+            const notListed = 'which is not in ELEMENT_ALLOWLIST';
+
+            itAll('reads a name ELEMENT_ALLOWLIST lists for the tag, or for every element', () => {
+                expectValid({ only: img, is: { complete: true, naturalWidth: 0 } });
+                expectValid({ only: { element: { selector: 'video' } }, using: 'duration', is: { gt: 0 } });
+                expectValid({ only: { element: { selector: '#main > div' } }, using: 'textContent.length', is: 0 });
+                expectError(`reads "naturalWidth" on HTMLMediaElement or HTMLElement or Element, ${notListed}`, {
+                    only: { element: { selector: 'video' } },
+                    is: { naturalWidth: 0 },
+                });
+            });
+
+            itAll('refuses an unlisted name, a typo, and a name on an element of unknown tag', () => {
+                expectError(`reads "naturalWidht" on HTMLImageElement or HTMLElement or Element, ${notListed}`, {
+                    only: img,
+                    is: { naturalWidht: 0 },
+                });
+                expectError(`reads "value" on HTMLElement or Element, ${notListed}`, {
+                    only: { element: { selector: 'div' } },
+                    is: { value: 3 },
+                });
+                expectError(`reads "complete" on HTMLElement or Element, ${notListed}`, {
+                    only: { element: { selector: '.thumbnail' } },
+                    is: { complete: true },
+                });
+            });
+
+            itAll('refuses names reading user data or URLs, and any read from an object no interface names', () => {
+                /**
+                 * @param {string} using
+                 * @param {unknown} [element]
+                 */
+                const sent = (using, element = img) => ({ breakageReportData: { data: { c: { value: { only: element, using } } } } });
+                expectActionsError(
+                    `reads "ownerDocument" on HTMLImageElement or HTMLElement or Element, ${notListed}`,
+                    sent('ownerDocument.cookie'),
+                );
+                expectActionsError(`reads "href" on HTMLElement or Element, ${notListed}`, sent('href', { element: { selector: 'a' } }));
+                expectError('reads "cssRules" on an object no ELEMENT_ALLOWLIST interface', {
+                    only: { element: { selector: 'link' } },
+                    using: 'sheet.cssRules.length',
+                    is: 0,
+                });
+            });
+
+            itAll('reads a listed interface a method gives', () => {
+                expectValid({
+                    only: img,
+                    using: { self: { path: 'getBoundingClientRect', args: [] }, using: 'width' },
+                    is: { gt: 0 },
+                });
+                expectError(`reads "x" on DOMRect, ${notListed}`, {
+                    only: img,
+                    using: { self: { path: 'getBoundingClientRect', args: [] }, using: 'x' },
+                    is: { gt: 0 },
+                });
+            });
+
+            itAll('reads page-defined values under names outside ELEMENT_ALLOWLIST on custom elements only', () => {
                 expectValid({ only: { element: { selector: 'x-widget' } }, is: { value: 3 } });
-                expectError('"value" is not a property of HTMLDivElement', { only: { element: { selector: 'div' } }, is: { value: 3 } });
+                expectError(`reads "value" on HTMLElement or Element, ${notListed}`, {
+                    only: { element: { selector: 'div' } },
+                    is: { value: 3 },
+                });
             });
         });
 
         describe('calls on element items', () => {
-            itAll('admits methods on ELEMENT_METHOD_ALLOWLIST only', () => {
+            itAll('admits methods on ELEMENT_ALLOWLIST only, called', () => {
                 expectValid({
                     element: {
                         selector: 'div',
@@ -165,12 +229,17 @@ describe('webDetection config tests', () => {
                     using: 'length',
                     is: { gt: 0 },
                 });
-                expectError('not in ELEMENT_METHOD_ALLOWLIST', {
+                expectError('calls "click" on HTMLElement or Element, which is not in ELEMENT_ALLOWLIST', {
                     element: { selector: 'button', where: { field: { path: 'click', args: [] }, is: true } },
                     using: 'length',
                     is: 0,
                 });
-                expectError('not an element', items('img', { field: { path: 'src.toString', args: [] }, is: 'x' }));
+                expectError('not an element', items('img', { field: { path: 'currentSrc.toString', args: [] }, is: 'x' }));
+                expectError('reads the method "checkVisibility" without calling it', items('img', { checkVisibility: true }));
+                expectError(
+                    'calls "complete", which ELEMENT_ALLOWLIST records as a property',
+                    items('img', { field: { path: 'complete', args: [] }, is: true }),
+                );
             });
         });
 
@@ -268,7 +337,7 @@ describe('webDetection config tests', () => {
             });
 
             itAll('reads each item through `self` in `where`, by the item’s type', () => {
-                expectValid(items('img', { naturalWidth: { gt: { self: 'naturalHeight' } } }));
+                expectValid(items('img', { width: { gt: { self: 'height' } } }));
                 expectValid(
                     items('img', {
                         field: {
@@ -285,7 +354,7 @@ describe('webDetection config tests', () => {
                 );
                 expectValid(items('img', { field: { self: 'naturalWidth' }, is: 0 }));
                 expectError(
-                    '"noSuchProperty" is not a property of HTMLImageElement',
+                    `reads "noSuchProperty" on HTMLImageElement or HTMLElement or Element, which is not in ELEMENT_ALLOWLIST`,
                     items('img', { field: { self: 'noSuchProperty' }, is: 0 }),
                 );
                 expectError('"performance.getEntriesByType.name", which is not in API_ALLOWLIST', {
@@ -381,7 +450,7 @@ describe('webDetection config tests', () => {
                 });
                 expectValid({ ...img, using: '0.naturalWidth', is: { gt: 0 } });
                 expectValid({ ...img, using: 'length', is: { gte: 5 } });
-                expectError('"naturalWidth" is not a property of HTMLHeadingElement', {
+                expectError(`reads "naturalWidth" on HTMLElement or Element, which is not in ELEMENT_ALLOWLIST`, {
                     ...at(
                         { element: { selector: 'h1' } },
                         [
@@ -554,33 +623,6 @@ describe('webDetection config tests', () => {
                     expr: { element: { selector: 'img', field: 'naturalWidth' } },
                 });
             });
-        });
-    });
-
-    describe('element property tables', () => {
-        itAll('carry the IDL types of element properties', () => {
-            expect(interfaceProperties('HTMLImageElement').get('naturalWidth')).to.equal('unsigned long');
-            expect(interfaceProperties('HTMLImageElement').get('currentSrc')).to.equal('USVString');
-            expect(interfaceProperties('HTMLLinkElement').get('sheet')).to.equal('CSSStyleSheet?');
-            // Inherited from Element and Node
-            expect(interfaceProperties('HTMLImageElement').get('tagName')).to.equal('DOMString');
-            expect(interfaceProperties('HTMLImageElement').get('isConnected')).to.equal('boolean');
-            // `unrestricted` is kept
-            expect(interfaceProperties('HTMLMediaElement').get('duration')).to.equal('unrestricted double');
-        });
-
-        itAll('map tags to their interfaces, in every namespace', () => {
-            expect(selectorInterfaces('img')).to.deep.equal([
-                'HTMLImageElement',
-            ]);
-            expect(selectorInterfaces('a').sort()).to.deep.equal([
-                'HTMLAnchorElement',
-                'MathMLElement',
-                'SVGAElement',
-            ]);
-            expect(selectorInterfaces('svg')).to.deep.equal([
-                'SVGSVGElement',
-            ]);
         });
     });
 });
