@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import fs from 'fs';
 import platforms from '../platforms.js';
-import { CURRENT_CONFIG_VERSION } from '../constants.js';
+import { CURRENT_CONFIG_VERSION, EXPERIMENT_METRIC_PARENTS } from '../constants.js';
 import { createValidator, formatErrors } from './schema-validation.js';
 
 /**
@@ -12,18 +12,6 @@ import { createValidator, formatErrors } from './schema-validation.js';
  * Metric names are scoped to the experiment that declares them, so two experiments may
  * bind the same name to different events.
  */
-
-/**
- * The only features whose subfeatures may carry experiment metrics.
- *
- * The TDS experiment parent is `blockList` on Android and `contentBlocking` on every other
- * platform; content scope experiments use one name everywhere.
- */
-const PARTICIPATING_PARENTS = [
-    'contentScopeExperiments',
-    'blockList',
-    'contentBlocking',
-];
 
 // Names the NA experiment framework already fires as built-in retention metrics; a
 // config-declared metric with one of these names would be indistinguishable in the data.
@@ -73,7 +61,7 @@ function collectFiredEventTypes(config) {
  * @param {(ctx: { parent: string, subFeatureName: string, metricName: string, metric: any, path: string }) => void} cb
  */
 function forEachDeclaredMetric(config, cb) {
-    for (const parent of PARTICIPATING_PARENTS) {
+    for (const parent of EXPERIMENT_METRIC_PARENTS) {
         const subFeatures = config?.features?.[parent]?.features ?? {};
         for (const [
             subFeatureName,
@@ -109,7 +97,7 @@ function findMisplacedMetrics(config) {
         featureName,
         feature,
     ] of Object.entries(config?.features ?? {})) {
-        const parentParticipates = PARTICIPATING_PARENTS.includes(featureName);
+        const parentParticipates = EXPERIMENT_METRIC_PARENTS.includes(featureName);
         if (feature?.settings && 'metrics' in feature.settings) {
             // Feature-level settings never carry metrics, participating or not.
             misplaced.push(`${featureName}.settings.metrics`);
