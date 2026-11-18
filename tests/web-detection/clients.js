@@ -23,6 +23,12 @@ import { EXPERIMENT_METRIC_PARENTS } from '../../constants.js';
  * `minSupportedVersion` of the entry in the platform override that applies to this release's clients.
  * The versions are placeholders no client reaches until the app release carrying that C-S-S is known.
  *
+ * iOS (7.x) and macOS (1.x) share the Apple inject names, and C-S-S compares versions across the two.
+ * The placeholder `999.0.0` is above both, so until real versions replace it, the macOS view matches
+ * iOS-only gates (`minSupportedVersion` 7.x), which no macOS release reaches, and both views miss
+ * every range with a `maxSupportedVersion`, such as a macOS-only range. `patchedViews` still checks
+ * the detectors each such entry patches, on its own.
+ *
  * @type {Array<{ configs: RegExp, platform: Platform, version: Version }>}
  */
 export const CLIENT_RELEASES = [
