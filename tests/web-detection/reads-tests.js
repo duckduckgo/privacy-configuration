@@ -541,7 +541,23 @@ describe('webDetection config tests', () => {
             itAll('rejects an expression beside `using` that CI cannot name', () => {
                 expectError('this expression has neither', { only: text, using: 'length', is: { gt: 0 } });
                 expectError('this expression has neither', { expr: imgCount, using: { path: 'toFixed', args: [] }, is: {} });
-                expectError('A number fills', { expr: 1, using: { path: 'toFixed', args: [] }, is: {} });
+                expectError('this expression has neither', { expr: 1, using: { path: 'toFixed', args: [] }, is: {} });
+            });
+
+            itAll('places the expression beside `using` in value position', () => {
+                expectValid({
+                    sum: [
+                        imgCount,
+                        1,
+                    ],
+                    using: {
+                        div: [
+                            { self: {} },
+                            2,
+                        ],
+                    },
+                    is: { gt: 1 },
+                });
             });
 
             itAll('takes a path, or an `api` body without `root`, beside an expression', () => {

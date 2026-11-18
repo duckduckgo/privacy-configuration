@@ -493,12 +493,15 @@ describe('webDetection config tests', () => {
                     is: { gt: 0 },
                 });
                 expectError('A string fills', { only: 'x', is: 1 });
-                expectError('A string fills', { element: { selector: 'p' }, using: 'length', is: { gt: 'x' } });
                 expectValid(true, {
                     word: { value: { if: true, then: 'yes', else: 'no' } },
                     state: { value: { if: false, then: 'x', else: null } },
                 });
                 expectValid({ ...fontsStatus, is: { eq: fontsStatus } });
+            });
+
+            itAll('places the operands of `lt`, `lte`, `gt` and `gte` in value position, which the JS operators convert', () => {
+                expectValid({ ...imgCount, is: { gt: '5' } });
             });
 
             itAll('places every source and boolean expression in value position', () => {

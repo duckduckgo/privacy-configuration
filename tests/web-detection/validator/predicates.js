@@ -87,7 +87,8 @@ function checkOperators(predicate, subject, scope, ctx, path) {
         );
     }
     const comparisons = COMPARISON_OPERATORS.filter(has);
-    for (const key of comparisons) checkExpr(predicate[key], 'number', child(scope), ctx, `${path}.${key}`);
+    // The JS operators convert their operands, so an operand is a value, as C-S-S compiles it
+    for (const key of comparisons) checkExpr(predicate[key], 'value', child(scope), ctx, `${path}.${key}`);
 
     if (predicate.fails === true) {
         const beside = Object.keys(predicate).filter((key) => key !== 'fails');

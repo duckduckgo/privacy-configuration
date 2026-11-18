@@ -9,7 +9,7 @@ import { asArray } from './walk.js';
 /**
  * What an expression's position expects, as C-S-S names it. `list` is the operand of `only`.
  * `spread` is an operand of `sum`, `mul`, `any`, `all` and `none` that gives a list, contributing
- * each item. `root` is the `root` of a source, and the expression beside `using`.
+ * each item. `root` is the `root` of a source.
  *
  * @typedef {'boolean' | 'value' | 'number' | 'list' | 'spread' | 'root'} Position
  */

@@ -250,8 +250,8 @@ export function checkExpr(node, position, scope, ctx, path) {
 
     // With `is`, the expression computes a value for the predicate
     const valuePosition = hasIs ? 'value' : position;
-    // With `using`, the expression keys give the value `using` reads from
-    const keyPosition = hasUsing ? 'root' : valuePosition;
+    // With `using`, the expression keys give the value `using` reads from, in value position as C-S-S compiles it
+    const keyPosition = hasUsing ? 'value' : valuePosition;
     let type = checkExprKey(key, node, keyPosition, scope, ctx, path);
     if (hasUsing) {
         type = checkUsing(node.using, type, valuePosition, { ...scope, bound: type }, ctx, path);
