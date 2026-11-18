@@ -287,7 +287,7 @@ describe('webDetection config tests', () => {
         // Remove once Apple's webDetection minSupportedVersion is above these.
         const PRE_EXPRESSION_APPLE_VERSIONS = {
             ios: '7.245.0',
-            macos: '1.215.0',
+            macos: '1.215.1',
         };
 
         for (const config of latestConfigs.filter(({ name }) => /^v\d+\/(ios|macos)-config\.json$/.test(name))) {
