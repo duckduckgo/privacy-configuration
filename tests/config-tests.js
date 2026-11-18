@@ -586,32 +586,43 @@ describe('EventHub validation tests', () => {
                     ),
             );
 
+            // Each check collects a message per failing parameter, so one run reports every broken parameter.
             describe('parameters', () => {
                 // Immediate-trigger data params forward the triggering event's payload; the
                 // event stream is named by the trigger's `source`, so a param-level `source`
                 // is disallowed.
                 it('source must be omitted on immediate-trigger data params', () => {
+                    const errors = [];
                     for (const { label, param, immediate } of params) {
                         if (param.template !== 'data' || !immediate) continue;
-                        expect(param.source, `Parameter '${label}' must not specify source on an immediate trigger`).to.equal(undefined);
+                        if (param.source !== undefined) {
+                            errors.push(`Parameter '${label}' must not specify source on an immediate trigger`);
+                        }
                     }
+                    expect(errors).to.deep.equal([]);
                 });
 
                 // Counter params and period data params identify their event stream via `source`.
                 it('source should be a non-empty string on every other param', () => {
+                    const errors = [];
                     for (const { label, param, immediate } of params) {
                         if (param.template === 'data' && immediate) continue;
-                        expect(param.source).to.be.a('string', `Parameter '${label}' source must be a string`);
-                        expect(param.source.length).to.be.greaterThan(0, `Parameter '${label}' source must not be empty`);
+                        if (typeof param.source !== 'string' || param.source.length === 0) {
+                            errors.push(`Parameter '${label}' source must be a non-empty string, got: ${JSON.stringify(param.source)}`);
+                        }
                     }
+                    expect(errors).to.deep.equal([]);
                 });
 
                 it('dataKey should be a non-empty string on data params', () => {
+                    const errors = [];
                     for (const { label, param } of params) {
                         if (param.template !== 'data') continue;
-                        expect(param.dataKey).to.be.a('string', `Parameter '${label}' dataKey must be a string`);
-                        expect(param.dataKey.length).to.be.greaterThan(0, `Parameter '${label}' dataKey must not be empty`);
+                        if (typeof param.dataKey !== 'string' || param.dataKey.length === 0) {
+                            errors.push(`Parameter '${label}' dataKey must be a non-empty string, got: ${JSON.stringify(param.dataKey)}`);
+                        }
                     }
+                    expect(errors).to.deep.equal([]);
                 });
             });
 
@@ -619,100 +630,108 @@ describe('EventHub validation tests', () => {
             // which forwards a value from the event payload) carry none.
             const counterParams = params.filter(({ param }) => param.template === 'counter');
 
+            // A counter with missing buckets fails 'buckets should not be empty'; the other bucket
+            // checks treat it as having none so it can't stop them checking later parameters.
             describe('counter parameter buckets', () => {
                 it('buckets should not be empty', () => {
+                    const errors = [];
                     for (const { label, param } of counterParams) {
-                        expect(param.buckets).to.be.an('object', `Parameter '${label}' buckets must be an object`);
-                        expect(Object.keys(param.buckets).length).to.be.greaterThan(0, `Parameter '${label}' buckets must not be empty`);
+                        if (typeof param.buckets !== 'object' || param.buckets === null || Object.keys(param.buckets).length === 0) {
+                            errors.push(`Parameter '${label}' buckets must be a non-empty object`);
+                        }
                     }
+                    expect(errors).to.deep.equal([]);
                 });
 
                 it('lt must be greater than gte', () => {
+                    const errors = [];
                     for (const { label, param } of counterParams) {
                         for (const [
                             name,
                             bucket,
-                        ] of Object.entries(param.buckets)) {
-                            if (bucket.lt !== undefined) {
-                                expect(bucket.lt).to.be.greaterThan(
-                                    bucket.gte,
+                        ] of Object.entries(param.buckets || {})) {
+                            if (bucket.lt !== undefined && !(bucket.lt > bucket.gte)) {
+                                errors.push(
                                     `Parameter '${label}' bucket '${name}' lt (${bucket.lt}) must be greater than gte (${bucket.gte})`,
                                 );
                             }
                         }
                     }
+                    expect(errors).to.deep.equal([]);
                 });
 
                 it('every lt must match another bucket gte (no gaps)', () => {
+                    const errors = [];
                     for (const { label, param } of counterParams) {
-                        const gteValues = new Set(Object.values(param.buckets).map((b) => b.gte));
+                        const gteValues = new Set(Object.values(param.buckets || {}).map((b) => b.gte));
                         for (const [
                             name,
                             bucket,
-                        ] of Object.entries(param.buckets)) {
-                            if (bucket.lt !== undefined) {
-                                expect(gteValues.has(bucket.lt)).to.equal(
-                                    true,
-                                    `Parameter '${label}' bucket '${name}' lt (${bucket.lt}) does not match any bucket's gte`,
-                                );
+                        ] of Object.entries(param.buckets || {})) {
+                            if (bucket.lt !== undefined && !gteValues.has(bucket.lt)) {
+                                errors.push(`Parameter '${label}' bucket '${name}' lt (${bucket.lt}) does not match any bucket's gte`);
                             }
                         }
                     }
+                    expect(errors).to.deep.equal([]);
                 });
 
                 it('gte values must be unique across buckets', () => {
+                    const errors = [];
                     for (const { label, param } of counterParams) {
                         const seen = new Set();
                         for (const [
                             name,
                             bucket,
-                        ] of Object.entries(param.buckets)) {
-                            expect(seen.has(bucket.gte)).to.equal(
-                                false,
-                                `Parameter '${label}' has duplicate gte value ${bucket.gte} in bucket '${name}'`,
-                            );
+                        ] of Object.entries(param.buckets || {})) {
+                            if (seen.has(bucket.gte)) {
+                                errors.push(`Parameter '${label}' has duplicate gte value ${bucket.gte} in bucket '${name}'`);
+                            }
                             seen.add(bucket.gte);
                         }
                     }
+                    expect(errors).to.deep.equal([]);
                 });
 
                 it('lt values must be unique across buckets', () => {
+                    const errors = [];
                     for (const { label, param } of counterParams) {
                         const seen = new Set();
                         for (const [
                             name,
                             bucket,
-                        ] of Object.entries(param.buckets)) {
+                        ] of Object.entries(param.buckets || {})) {
                             if (bucket.lt !== undefined) {
-                                expect(seen.has(bucket.lt)).to.equal(
-                                    false,
-                                    `Parameter '${label}' has duplicate lt value ${bucket.lt} in bucket '${name}'`,
-                                );
+                                if (seen.has(bucket.lt)) {
+                                    errors.push(`Parameter '${label}' has duplicate lt value ${bucket.lt} in bucket '${name}'`);
+                                }
                                 seen.add(bucket.lt);
                             }
                         }
                     }
+                    expect(errors).to.deep.equal([]);
                 });
 
                 it('should have at most one unbounded bucket (missing lt)', () => {
+                    const errors = [];
                     for (const { label, param } of counterParams) {
-                        const unbounded = Object.entries(param.buckets).filter(
-                            ([
-                                ,
-                                b,
-                            ]) => b.lt === undefined,
-                        );
-                        expect(unbounded.length).to.be.at.most(
-                            1,
-                            `Parameter '${label}' has ${unbounded.length} unbounded buckets: ${unbounded
-                                .map(
-                                    ([
-                                        n,
-                                    ]) => n,
-                                )
-                                .join(', ')}`,
-                        );
+                        const unbounded = Object.entries(param.buckets || {})
+                            .filter(
+                                ([
+                                    ,
+                                    b,
+                                ]) => b.lt === undefined,
+                            )
+                            .map(
+                                ([
+                                    n,
+                                ]) => n,
+                            );
+                        if (unbounded.length > 1) {
+                            errors.push(`Parameter '${label}' has ${unbounded.length} unbounded buckets: ${unbounded.join(', ')}`);
+                        }
                     }
+                    expect(errors).to.deep.equal([]);
                 });
             });
         });
