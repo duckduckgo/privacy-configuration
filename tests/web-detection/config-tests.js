@@ -76,7 +76,7 @@ describe('webDetection config tests', () => {
             });
         }
 
-        it('checks detectors that domain patches and version-gated entries add (self-test)', () => {
+        it('checks detectors that version-gated entries add (self-test)', () => {
             /** @param {string} type */
             const sending = (type) => ({ match: true, actions: { fireEvent: { type } } });
             const config = {
@@ -86,14 +86,6 @@ describe('webDetection config tests', () => {
                         webDetection: {
                             settings: {
                                 detectors: { g: { base: { match: true, actions: { breakageReportData: {} } } } },
-                                domains: [
-                                    {
-                                        domain: 'example.com',
-                                        patchSettings: [
-                                            { op: 'add', path: '/detectors/g/onDomain', value: sending('a') },
-                                        ],
-                                    },
-                                ],
                                 conditionalChanges: [
                                     {
                                         condition: { injectName: 'android', minSupportedVersion: 1, maxSupportedVersion: 2 },
@@ -109,7 +101,6 @@ describe('webDetection config tests', () => {
             };
             const errors = viewErrors(detectorViews(config), breakageDataErrors);
             expect(errors.map((error) => error.split(':').slice(0, 2).join(':'))).to.deep.equal([
-                'domains[0] (example.com): detectors.g.onDomain',
                 'conditionalChanges[0]: detectors.g.gated',
             ]);
         });
@@ -345,18 +336,11 @@ describe('webDetection config tests', () => {
                 exceptions: [],
                 settings: {
                     detectors: { good: { ok: { match: true } } },
-                    domains: [
-                        {
-                            domain: 'example.com',
-                            patchSettings: [
-                                { op: 'add', path: '/detectors/bad-group', value: { ok: { match: true } } },
-                            ],
-                        },
-                    ],
                     conditionalChanges: [
                         {
                             condition: { injectName: 'android' },
                             patchSettings: [
+                                { op: 'add', path: '/detectors/bad-group', value: { ok: { match: true } } },
                                 { op: 'add', path: '/detectors/good/bad-name', value: { match: true } },
                             ],
                         },
@@ -364,7 +348,7 @@ describe('webDetection config tests', () => {
                 },
             });
             expect(detectorNameErrors(webDetection)).to.deep.equal([
-                'domains[0] (example.com) detectors.bad-group.ok: group name "bad-group" does not match /^[a-zA-Z][a-zA-Z0-9_]*$/',
+                'conditionalChanges[0] detectors.bad-group.ok: group name "bad-group" does not match /^[a-zA-Z][a-zA-Z0-9_]*$/',
                 'conditionalChanges[0] detectors.good.bad-name: detector name "good.bad-name" does not match /^[a-zA-Z][a-zA-Z0-9_]*$/',
             ]);
         });

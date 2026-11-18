@@ -84,24 +84,18 @@ function detectorPointer(pointer) {
 }
 
 /**
- * The detectors each patch list touches, as the list leaves them. Each list is applied on its own,
- * to the literal settings.
+ * The detectors each `conditionalChanges` patch list touches, as the list leaves them. Each list is
+ * applied on its own, to the literal settings.
  *
  * @param {import('../../schema/features/web-detection').WebDetectionFeature<number>} webDetection
  * @returns {DetectorView[]}
  */
 export function patchedViews(webDetection) {
     const settings = /** @type {Record<string, any>} */ (webDetection.settings);
-    const lists = [
-        ...(settings.domains ?? []).map((/** @type {Record<string, any>} */ entry, /** @type {number} */ index) => ({
-            label: `domains[${index}] (${entry.domain})`,
-            operations: entry.patchSettings ?? [],
-        })),
-        ...(settings.conditionalChanges ?? []).map((/** @type {Record<string, any>} */ entry, /** @type {number} */ index) => ({
-            label: `conditionalChanges[${index}]`,
-            operations: entry.patchSettings ?? [],
-        })),
-    ];
+    const lists = (settings.conditionalChanges ?? []).map((/** @type {Record<string, any>} */ entry, /** @type {number} */ index) => ({
+        label: `conditionalChanges[${index}]`,
+        operations: entry.patchSettings ?? [],
+    }));
     /** @type {DetectorView[]} */
     const views = [];
     for (const { label, operations } of lists) {
