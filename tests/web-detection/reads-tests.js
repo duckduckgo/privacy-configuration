@@ -254,13 +254,13 @@ describe('webDetection config tests', () => {
                     is: { type: 'string' },
                 });
                 expectError('"document.title.foo"', { api: { path: 'document', field: 'title.foo' }, is: {} });
-                expectError('"performance.getEntriesByType.name"', {
+                expectError('"performance.getEntriesByType.nextHopProtocol"', {
                     api: {
                         path: 'performance.getEntriesByType',
                         args: [
                             'resource',
                         ],
-                        where: { name: 'x' },
+                        where: { nextHopProtocol: 'x' },
                     },
                     using: 'length',
                     is: 0,
@@ -357,13 +357,13 @@ describe('webDetection config tests', () => {
                     `reads "noSuchProperty" on HTMLImageElement or HTMLElement or Element, which is not in ELEMENT_ALLOWLIST`,
                     items('img', { field: { self: 'noSuchProperty' }, is: 0 }),
                 );
-                expectError('"performance.getEntriesByType.name", which is not in API_ALLOWLIST', {
+                expectError('"performance.getEntriesByType.nextHopProtocol", which is not in API_ALLOWLIST', {
                     api: {
                         path: 'performance.getEntriesByType',
                         args: [
                             'resource',
                         ],
-                        where: { duration: { gt: { self: 'name.length' } } },
+                        where: { duration: { gt: { self: 'nextHopProtocol.length' } } },
                     },
                     using: 'length',
                     is: 0,
@@ -407,9 +407,9 @@ describe('webDetection config tests', () => {
                     { define: { ended: { ref: 'navigation', using: 'loadEventEnd', is: { gt: 0 } } } },
                 ]);
                 expectValid({ only: navigation, using: 'responseStatus', is: { gte: 400 } });
-                expectError('"performance.getEntriesByType.name", which is not in API_ALLOWLIST', {
+                expectError('"performance.getEntriesByType.nextHopProtocol", which is not in API_ALLOWLIST', {
                     only: navigation,
-                    using: 'name',
+                    using: 'nextHopProtocol',
                     is: { type: 'string' },
                 });
                 expectError('reads the method "performance.now" without calling it', {
@@ -519,9 +519,9 @@ describe('webDetection config tests', () => {
                     },
                 };
                 const entry = { if: { api: { path: 'document.hidden' } }, then: byType, else: byName };
-                expectError('"performance.getEntriesByType.name", which is not in API_ALLOWLIST', {
+                expectError('"performance.getEntriesByType.nextHopProtocol", which is not in API_ALLOWLIST', {
                     ...entry,
-                    using: 'name',
+                    using: 'nextHopProtocol',
                     is: { type: 'string' },
                 });
                 expectActionsError('"performance.getEntriesByName.duration", which is not in API_ALLOWLIST', [
@@ -578,11 +578,11 @@ describe('webDetection config tests', () => {
                     is: { gt: 0 },
                 });
                 expectValid({ ...img, using: { self: 'length' }, is: { gte: 5 } });
-                expectError('"performance.getEntriesByType.name", which is not in API_ALLOWLIST', {
+                expectError('"performance.getEntriesByType.nextHopProtocol", which is not in API_ALLOWLIST', {
                     only: navigation,
                     using: {
                         sum: [
-                            { self: 'name.length' },
+                            { self: 'nextHopProtocol.length' },
                         ],
                     },
                     is: { gt: 0 },
