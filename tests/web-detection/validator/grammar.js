@@ -99,6 +99,8 @@ export const API_ALLOWLIST = {
     Reflect: 'property',
     'Reflect.has': 'method',
     document: 'property',
+    'document.elementFromPoint': 'method',
+    'document.elementFromPoint.matches': 'method',
     'document.fonts': 'property',
     'document.fonts.status': 'property',
     'document.getElementsByTagName': 'method',
