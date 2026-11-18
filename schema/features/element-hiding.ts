@@ -1,4 +1,5 @@
-import { ConditionBlock, Feature } from '../feature';
+import { Operation } from '../json-patch';
+import { ConditionBlock, ConditionBlockOrArray, Feature } from '../feature';
 
 type ElementHidingValue = {
     property: string;
@@ -54,6 +55,10 @@ interface ElementHidingConfiguration {
     mediaAndFormSelectors?: string;
     adLabelStrings?: string[];
     styleTagExceptions?: StyleTagException[];
+    conditionalChanges?: {
+        condition: ConditionBlockOrArray;
+        patchSettings: Operation<number[]>[];
+    }[];
 }
 
 export type ElementHidingFeature<VersionType> = Feature<ElementHidingConfiguration, VersionType>;

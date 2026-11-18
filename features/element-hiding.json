@@ -551,6 +551,43 @@
             3250,
             5250
         ],
+        "conditionalChanges": [
+            {
+                "condition": [
+                    {
+                        "injectName": "android",
+                        "internal": true
+                    },
+                    {
+                        "injectName": "android",
+                        "experiment": {
+                            "experimentName": "contentScopeExperiment10",
+                            "cohort": "treatment"
+                        }
+                    }
+                ],
+                "patchSettings": [
+                    {
+                        "op": "replace",
+                        "path": "/hideTimeouts",
+                        "value": [
+                            0,
+                            100,
+                            500,
+                            1000,
+                            2000
+                        ]
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/unhideTimeouts",
+                        "value": [
+                            3250
+                        ]
+                    }
+                ]
+            }
+        ],
         "mediaAndFormSelectors": "video,canvas,embed,object,audio,map,form,input,textarea,select,option",
         "adLabelStrings": [
             "ad",
@@ -2698,6 +2735,15 @@
                 ]
             },
             {
+                "domain": "linkvertise.com",
+                "rules": [
+                    {
+                        "selector": ".ad-wrapper",
+                        "type": "override"
+                    }
+                ]
+            },
+            {
                 "domain": "livebeaches.com",
                 "rules": [
                     {
@@ -3832,6 +3878,15 @@
                     {
                         "selector": ".top-ad",
                         "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "smithsonianmag.com",
+                "rules": [
+                    {
+                        "selector": ".harzsgqwhvxtyit3fqb0yixss3ng",
+                        "type": "hide-empty"
                     }
                 ]
             },
