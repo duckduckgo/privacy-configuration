@@ -216,7 +216,8 @@ export function clientStates(configBody, version) {
 
 /**
  * The detectors each of a platform's inject names sees once `conditionalChanges` apply, in each
- * state `clientStates` gives, with the entries whose patch fails, which C-S-S skips.
+ * state `clientStates` gives, with the entries whose patch fails, which C-S-S skips, or whose
+ * operation reads a pointer that names no value, which C-S-S applies as a no-op.
  *
  * @param {Record<string, any>} configBody
  * @param {Platform} platform
@@ -229,7 +230,7 @@ export function clientViews(configBody, platform, version) {
     const states = clientStates(configBody, version);
     return PLATFORM_INJECT_NAMES[platform].flatMap((injectName) =>
         states.map(({ label, state }) => {
-            const view = applyConditionalChanges(settings, { ...state, injectName, version });
+            const view = applyConditionalChanges(settings, { ...state, injectName, version }, { requireTargets: true });
             return {
                 label: [
                     `${injectName} ${version}`,

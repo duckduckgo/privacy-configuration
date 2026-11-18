@@ -527,6 +527,29 @@ describe('webDetection config tests', () => {
                 });
             });
 
+            itAll('fails an entry whose operation reads a pointer that names no value', () => {
+                const typo = {
+                    condition: { injectName: 'android' },
+                    patchSettings: [
+                        { op: 'replace', path: '/detectors/g/d/matc', value: false },
+                    ],
+                };
+                const [
+                    view,
+                ] = clientViews(
+                    configWith([
+                        typo,
+                        adding({ injectName: 'android' }, 'state'),
+                    ]),
+                    'android',
+                    10,
+                );
+                expect(view.failed).to.deep.equal([
+                    typo,
+                ]);
+                expect(view.detectors.g.d).to.deep.equal({ match: true, triggers: { auto: {} }, state: true });
+            });
+
             itAll('lists the event type of every fireEvent, in branches and sequences', () => {
                 expect(
                     fireEventTypes({

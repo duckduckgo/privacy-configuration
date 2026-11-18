@@ -204,14 +204,66 @@ export function entryCondition(entry) {
 }
 
 /**
+ * The JSON pointers an operation reads before it writes: the target of `replace`, `remove` and
+ * `test`, and the `from` of `move` and `copy`.
+ *
+ * @param {import('immutable-json-patch').JSONPatchOperation} operation
+ * @returns {string[]}
+ */
+function readPointers(operation) {
+    switch (operation.op) {
+        case 'replace':
+        case 'remove':
+        case 'test':
+            return [
+                operation.path,
+            ];
+        case 'move':
+        case 'copy':
+            return [
+                operation.from,
+            ];
+        default:
+            return [];
+    }
+}
+
+/**
+ * Whether a JSON pointer names a value in the document.
+ *
+ * @param {unknown} document
+ * @param {string} pointer
+ */
+function pointerResolves(document, pointer) {
+    let current = document;
+    for (const segment of pointer.split('/').slice(1)) {
+        const key = segment.replace(/~1/g, '/').replace(/~0/g, '~');
+        if (Array.isArray(current)) {
+            if (!/^(0|[1-9]\d*)$/.test(key) || Number(key) >= current.length) return false;
+            current = current[Number(key)];
+        } else if (typeof current === 'object' && current !== null && Object.hasOwn(current, key)) {
+            current = /** @type {Record<string, unknown>} */ (current)[key];
+        } else {
+            return false;
+        }
+    }
+    return true;
+}
+
+/**
  * Apply the matching conditional changes in order. A block whose patch fails is skipped, as in C-S-S.
+ *
+ * With `requireTargets`, an operation reading a pointer that names no value, such as a `replace` at
+ * a mistyped path, fails its block too. C-S-S applies such an operation as a no-op, which leaves the
+ * block applied without the change it was written for.
  *
  * @template {{ conditionalChanges?: ConditionalChange[], domains?: ConditionalChange[] }} Settings
  * @param {Settings} settings
  * @param {Client} client
+ * @param {{ requireTargets?: boolean }} [options]
  * @returns {{ settings: Settings, failed: ConditionalChange[] }}
  */
-export function applyConditionalChanges(settings, client) {
+export function applyConditionalChanges(settings, client, { requireTargets = false } = {}) {
     let current = settings;
     /** @type {ConditionalChange[]} */
     const failed = [];
@@ -219,7 +271,15 @@ export function applyConditionalChanges(settings, client) {
         const condition = entryCondition(change);
         if (condition !== null && !matchCondition(condition, client)) continue;
         try {
-            current = immutableJSONPatch(current, change.patchSettings ?? []);
+            let patched = current;
+            for (const operation of change.patchSettings ?? []) {
+                const missing = requireTargets ? readPointers(operation).find((pointer) => !pointerResolves(patched, pointer)) : undefined;
+                if (missing !== undefined) throw new Error(`${operation.op} reads ${missing}, which names no value`);
+                patched = immutableJSONPatch(patched, [
+                    operation,
+                ]);
+            }
+            current = patched;
         } catch {
             failed.push(change);
         }
