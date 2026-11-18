@@ -231,13 +231,6 @@ const WEB_DETECTION_ACTION_KEYS = [
     'define',
 ];
 
-/** Keys whose value is a body: an expression or a sequence of them. */
-const BODY_KEYS = [
-    'actions',
-    'then',
-    'else',
-];
-
 // Actions whose order doesn't change what they do. C-S-S before 19.0.0 reads them only from an
 // `actions` object, so an object of just these stays one
 export const ORDER_FREE_ACTION_KEYS = [
@@ -290,17 +283,14 @@ function splitActions(node) {
 }
 
 /**
- * The body of `actions`, `then` or `else`, with an object of several actions made a sequence, and
- * each element of a sequence rewritten by `sequenceElement`.
- *
- * Each authored element stays one element, so a patch path that indexes into the sequence points
- * at the same element on Apple as on the other platforms.
+ * The body of `actions`, `then` or `else`, with each object of several actions spliced into the
+ * sequence holding it, or made a sequence.
  *
  * @param {unknown} body
  * @returns {unknown}
  */
 function sequenceBody(body) {
-    if (Array.isArray(body)) return body.map(sequenceElement);
+    if (Array.isArray(body)) return body.flatMap((element) => splitActions(sequenceExpression(element)));
     const elements = splitActions(sequenceExpression(body));
     return elements.length === 1 ? elements[0] : elements;
 }
@@ -325,18 +315,6 @@ function sequenceExpression(node) {
             ],
         ),
     );
-}
-
-/**
- * One element of a sequence, with its actions split. A sequence element holds no nested sequence, so
- * several actions become an `if` that always takes its `then`, run in order.
- *
- * @param {unknown} element
- * @returns {unknown}
- */
-function sequenceElement(element) {
-    const elements = splitActions(sequenceExpression(element));
-    return elements.length === 1 ? elements[0] : { if: true, then: elements };
 }
 
 /**
@@ -383,10 +361,14 @@ export function sequenceWebDetectionActions(config) {
                 for (const id of Object.keys(operation.value ?? {})) operation.value[id] = sequenceDetector(operation.value[id]);
             } else if (segments.length === 3) {
                 operation.value = sequenceDetector(operation.value);
-            } else if (BODY_KEYS.includes(segments[segments.length - 1])) {
+            } else if (
+                [
+                    'actions',
+                    'then',
+                    'else',
+                ].includes(segments[segments.length - 1])
+            ) {
                 operation.value = sequenceBody(operation.value);
-            } else if (/^(\d+|-)$/.test(segments[segments.length - 1]) && BODY_KEYS.includes(segments[segments.length - 2])) {
-                operation.value = sequenceElement(operation.value);
             } else {
                 operation.value = sequenceExpression(operation.value);
             }
