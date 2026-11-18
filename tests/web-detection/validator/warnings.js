@@ -1,6 +1,6 @@
 // @ts-check
 import { BRANCH_KEYS, apiBody } from './grammar.js';
-import { definesName, expressionKeysOf, forEachTextLeaf, readsOuterSelf, refsIn } from './walk.js';
+import { definesName, expressionKeysOf, forEachSourceBody, readsOuterSelf, refsIn } from './walk.js';
 import { isPlainObject } from '../../../util.js';
 
 /**
@@ -107,7 +107,7 @@ export function itemWalkWarnings(detector, path) {
         ] of Object.entries(node)) {
             const childPath = `${nodePath}.${key}`;
             if (key === 'element' || key === 'text') {
-                forEachTextLeaf(value, childPath, (body, bodyPath) => {
+                forEachSourceBody(value, childPath, (body, bodyPath) => {
                     if (exposed && 'root' in body && readsOuterSelf(body.root)) warn(`${bodyPath}.root`);
                     visit(body.root, `${bodyPath}.root`, exposed);
                     visit(body.where, `${bodyPath}.where`, true);

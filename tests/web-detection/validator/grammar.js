@@ -5,7 +5,7 @@ import { buildTables } from './property-tables.js';
  * @typedef {import('./types.js').TypeName} TypeName
  */
 
-/** Combinators in match, in predicates, and in the legacy blocks over `text` and `element` bodies. */
+/** Combinators in match and in predicates. */
 export const OPERATOR_KEYS = [
     'any',
     'all',

@@ -35,6 +35,23 @@ describe('webDetection config tests', () => {
             ).to.equal(true);
         });
 
+        it('rejects an empty source body, an empty body list, and an `any`, `all` or `none` block as a body', () => {
+            expectRejected('empty text body', { match: { text: {} }, actions });
+            expectRejected('empty element body', { match: { element: {} }, actions });
+            expectRejected('empty text body list', { match: { text: [] }, actions });
+            expectRejected('block over text bodies', {
+                match: {
+                    text: {
+                        all: [
+                            { pattern: 'a' },
+                            { pattern: 'b' },
+                        ],
+                    },
+                },
+                actions,
+            });
+        });
+
         it('rejects empty strings, lists and `define`', () => {
             expectRejected('empty pattern', { match: { text: { pattern: '' } }, actions });
             expectRejected('empty pattern list', { match: { text: { pattern: [] } }, actions });

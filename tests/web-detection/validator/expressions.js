@@ -24,7 +24,7 @@ import {
     selectorNamesCustomElement,
     typeOf,
 } from './types.js';
-import { asArray, expressionKeysOf, forEachTextLeaf, readsOuterSelf, refsIn } from './walk.js';
+import { asArray, expressionKeysOf, forEachSourceBody, readsOuterSelf, refsIn } from './walk.js';
 import { isPlainObject } from '../../../util.js';
 import { checkTextExpressions, selectsFromDocument } from './xpath.js';
 
@@ -99,7 +99,7 @@ function providesValues(node, single, ctx) {
             return single === 'number';
         case 'element': {
             let hasField = false;
-            forEachTextLeaf(body, '', (leaf) => {
+            forEachSourceBody(body, '', (leaf) => {
                 hasField ||= 'field' in leaf;
             });
             return hasField || single === 'number';
@@ -482,7 +482,7 @@ function isConditionLeaf(node) {
     const keys = expressionKeysOf(node);
     if (keys.length !== 1 || (keys[0] !== 'element' && keys[0] !== 'text')) return false;
     let hasField = false;
-    forEachTextLeaf(node[keys[0]], '', (leaf) => {
+    forEachSourceBody(node[keys[0]], '', (leaf) => {
         hasField ||= 'field' in leaf;
     });
     return !hasField;
@@ -857,26 +857,28 @@ function checkRef(body, position, scope, ctx, path) {
 }
 
 /**
+ * The bodies of a source: the body, or each entry of an array. A body is an object of its own keys,
+ * and holds no `any`, `all` or `none`, which combine expressions.
+ *
  * @param {unknown} branch
- * @param {Position} position
  * @param {Context} ctx
  * @param {string} path
- * @returns {{ body: Record<string, any>, path: string, underNone: boolean }[]}
+ * @returns {{ body: Record<string, any>, path: string }[]}
  */
-function collectBodies(branch, position, ctx, path, underNone = false) {
-    if (Array.isArray(branch)) {
-        return branch.flatMap((entry, index) => collectBodies(entry, position, ctx, `${path}[${index}]`, underNone));
-    }
-    if (!isPlainObject(branch)) return [];
-    const opKeys = Object.keys(branch).filter((key) => OPERATOR_KEYS.includes(key));
-    if (opKeys.length === 0)
-        return [
-            { body: branch, path, underNone },
-        ];
-
-    if (position !== 'boolean')
-        fail(ctx, path, `\`{${opKeys.join('|')}}\` blocks over source bodies are boolean only, not ${position} position`);
-    return opKeys.flatMap((key) => collectBodies(branch[key], position, ctx, `${path}.${key}`, underNone || key === 'none'));
+function collectBodies(branch, ctx, path) {
+    /** @type {{ body: Record<string, any>, path: string }[]} */
+    const bodies = [];
+    forEachSourceBody(branch, path, (body, bodyPath) => {
+        const opKeys = Object.keys(body).filter((key) => OPERATOR_KEYS.includes(key));
+        if (opKeys.length)
+            fail(
+                ctx,
+                bodyPath,
+                `a source body holds no ${opKeys.join(', ')}: \`{"${opKeys[0]}": [...]}\` combines sources, each in its own object`,
+            );
+        else bodies.push({ body, path: bodyPath });
+    });
+    return bodies;
 }
 
 /**
@@ -891,7 +893,7 @@ function collectBodies(branch, position, ctx, path, underNone = false) {
  * @returns {StaticType}
  */
 function checkConditionSource(key, branch, position, scope, ctx, path) {
-    const bodies = collectBodies(branch, position, ctx, path);
+    const bodies = collectBodies(branch, ctx, path);
     if (bodies.length === 0) fail(ctx, path, `\`${key}\` needs at least one body`);
     const withField = bodies.filter(({ body }) => 'field' in body).length;
     if (withField && withField !== bodies.length) fail(ctx, path, 'every body of one `element` source has `field`, or none does');
@@ -900,7 +902,7 @@ function checkConditionSource(key, branch, position, scope, ctx, path) {
 
     /** @type {StaticType[]} */
     const valueTypes = [];
-    for (const { body, path: bodyPath, underNone } of bodies) {
+    for (const { body, path: bodyPath } of bodies) {
         if (key === 'text') {
             checkTextExpressions(body, ctx, bodyPath);
             valueTypes.push(typeOf('string'));
@@ -933,7 +935,7 @@ function checkConditionSource(key, branch, position, scope, ctx, path) {
             const rootPath = `${bodyPath}.root`;
             const valid = checkRoot(body.root, child(scope), ctx, rootPath, key === 'text' && 'xpath' in body);
             // Read only in boolean position with no `none` above it, an empty scope does not hold
-            const needsGuard = position !== 'boolean' || scope.noneAbove === true || underNone;
+            const needsGuard = position !== 'boolean' || scope.noneAbove === true;
             if (valid && needsGuard) checkRootGuard(body.root, scope, ctx, bodyPath);
         }
     }

@@ -17,33 +17,8 @@ import {
 describe('webDetection config tests', () => {
     describe('validateDetector (self-test)', () => {
         describe('shape', () => {
-            itAll('passes the shipped forms: leaves, legacy blocks and boolean literals', () => {
+            itAll('passes leaves and boolean literals', () => {
                 expectValid({ text: { pattern: 'foo' } });
-                expectValid({
-                    text: {
-                        all: [
-                            { pattern: 'foo' },
-                            { pattern: 'bar' },
-                        ],
-                    },
-                });
-                expectValid({
-                    text: {
-                        all: [
-                            {
-                                any: [
-                                    { pattern: 'a' },
-                                    { pattern: 'b' },
-                                ],
-                            },
-                            {
-                                none: [
-                                    { pattern: 'c' },
-                                ],
-                            },
-                        ],
-                    },
-                });
                 expectValid({
                     any: [
                         { text: { pattern: 'a' } },
@@ -54,6 +29,28 @@ describe('webDetection config tests', () => {
                     any: [
                         true,
                         false,
+                    ],
+                });
+            });
+
+            itAll('rejects an `any`, `all` or `none` block inside a source body', () => {
+                const block = 'a source body holds no';
+                expectError(block, {
+                    text: {
+                        all: [
+                            { pattern: 'foo' },
+                            { pattern: 'bar' },
+                        ],
+                    },
+                });
+                expectError(block, {
+                    element: [
+                        { selector: 'img' },
+                        {
+                            none: [
+                                { selector: 'video' },
+                            ],
+                        },
                     ],
                 });
             });
@@ -318,18 +315,6 @@ describe('webDetection config tests', () => {
                         },
                         { text: { pattern: 'bar' } },
                     ],
-                });
-            });
-
-            itAll('rejects legacy blocks over bodies outside boolean position', () => {
-                expectError('boolean only', {
-                    text: {
-                        any: [
-                            { pattern: 'a' },
-                        ],
-                    },
-                    using: 'length',
-                    is: { gt: 0 },
                 });
             });
 

@@ -17,28 +17,20 @@ export function asArray(value) {
 }
 
 /**
- * Invoke `cb` for every body of a `text` or `element` source, descending through arrays and
- * the legacy `{any|all|none}` blocks.
+ * Invoke `cb` for every body of a `text` or `element` source: the body, or each entry of an array.
  *
  * @param {unknown} node
  * @param {string} path
- * @param {(condition: Record<string, any>, path: string) => void} cb
+ * @param {(body: Record<string, any>, path: string) => void} cb
  */
-export function forEachTextLeaf(node, path, cb) {
+export function forEachSourceBody(node, path, cb) {
     if (Array.isArray(node)) {
-        node.forEach((n, i) => forEachTextLeaf(n, `${path}[${i}]`, cb));
-        return;
+        node.forEach((body, i) => {
+            if (isPlainObject(body)) cb(body, `${path}[${i}]`);
+        });
+    } else if (isPlainObject(node)) {
+        cb(node, path);
     }
-    if (!isPlainObject(node)) return;
-
-    const opKeys = OPERATOR_KEYS.filter((k) => k in node);
-    if (opKeys.length > 0) {
-        for (const op of opKeys) {
-            forEachTextLeaf(node[op], `${path}.${op}`, cb);
-        }
-        return;
-    }
-    cb(node, path);
 }
 
 /**
@@ -87,7 +79,7 @@ export function readsOuterSelf(node) {
                 case 'element':
                 case 'text': {
                     let reads = false;
-                    forEachTextLeaf(value, '', (leaf) => {
+                    forEachSourceBody(value, '', (leaf) => {
                         reads ||= 'root' in leaf && readsOuterSelf(leaf.root);
                     });
                     return reads;

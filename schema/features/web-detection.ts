@@ -26,11 +26,7 @@ type Triggers = Partial<{
     auto: AutoTrigger;
 }>;
 
-export type ConditionBranch<Final> = ConditionNode<Final> | ConditionNode<Final>[];
-
-type ConditionOperator = 'any' | 'all' | 'none';
-
-type ConditionNode<Final> = Final | { [K in ConditionOperator]?: ConditionBranch<Final> };
+export type ConditionBranch<Final> = Final | NonEmptyList<Final>;
 
 /**
  * Tuning for `xpath` text matching, which scans selected text in chunks rather than
@@ -65,10 +61,6 @@ export type ConditionTypes = {
         selector: NonEmptyStrings;
         visibility?: 'visible' | 'hidden' | 'any' | 'content';
     };
-};
-
-export type MatchConditionSingle = {
-    [K in keyof ConditionTypes]?: ConditionBranch<ConditionTypes[K]>;
 };
 
 type Name = string;
