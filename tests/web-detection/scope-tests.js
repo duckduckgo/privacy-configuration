@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+import { bucketWarnings } from './validator/warnings.js';
 import {
     errorsOf,
     expectActionsError,
@@ -25,6 +26,14 @@ import {
  * @param {unknown[]} buckets
  */
 const bucketsOf = (value, buckets) => ({ a: { value, buckets } });
+
+/**
+ * The warnings on a payload field sending the value through the buckets.
+ *
+ * @param {unknown} value
+ * @param {unknown[]} buckets
+ */
+const bucketWarningsOf = (value, buckets) => bucketWarnings({ actions: { breakageReportData: { data: bucketsOf(value, buckets) } } }, '$');
 
 describe('webDetection config tests', () => {
     describe('validateDetector (self-test)', () => {
@@ -566,24 +575,19 @@ describe('webDetection config tests', () => {
                         { name: 'fast', is: { gt: 0, lt: 3000 } },
                     ]),
                 );
-                expectError(
-                    'overlap',
+                expectValid(
                     true,
-                    bucketsOf(imgCount, [
-                        { name: 'none', is: 0 },
-                        { name: '0-3', is: { gte: 0, lt: 3 } },
+                    bucketsOf({ only: text }, [
+                        { name: 'empty', is: { length: 0 } },
+                        { name: 'any', is: { length: { gte: 0 } } },
                     ]),
                 );
+            });
+
+            itAll('rejects a bucket that holds only values an earlier bucket holds', () => {
+                const dead = 'never names a value';
                 expectError(
-                    'overlap',
-                    true,
-                    bucketsOf(imgCount, [
-                        { name: 'low', is: { lte: 3 } },
-                        { name: 'high', is: { gte: 3 } },
-                    ]),
-                );
-                expectError(
-                    'overlap',
+                    dead,
                     true,
                     bucketsOf(fontsStatus, [
                         {
@@ -598,13 +602,88 @@ describe('webDetection config tests', () => {
                         { name: 'mid', is: 'interactive' },
                     ]),
                 );
-                expectValid(
+                expectError(
+                    dead,
                     true,
-                    bucketsOf({ only: text }, [
-                        { name: 'empty', is: { length: 0 } },
-                        { name: 'any', is: { length: { gte: 0 } } },
+                    bucketsOf(imgCount, [
+                        { name: 'a', is: 7 },
+                        {
+                            name: 'b',
+                            is: {
+                                in: [
+                                    7,
+                                ],
+                            },
+                        },
                     ]),
                 );
+                expectError(
+                    dead,
+                    true,
+                    bucketsOf(imgCount, [
+                        { name: 'some', is: { gt: 0 } },
+                        { name: 'many', is: { gte: 10 } },
+                    ]),
+                );
+                expectValid(
+                    true,
+                    bucketsOf(imgCount, [
+                        { name: 'many', is: { gte: 10 } },
+                        { name: 'some', is: { gt: 0 } },
+                    ]),
+                );
+            });
+
+            itAll('rejects two ranges that share an endpoint both include', () => {
+                expectError(
+                    'buckets "low" and "high" both include 3; make one end exclusive with `gt` or `lt`',
+                    true,
+                    bucketsOf(imgCount, [
+                        { name: 'low', is: { lte: 3 } },
+                        { name: 'high', is: { gte: 3 } },
+                    ]),
+                );
+                expectError(
+                    'both include 2',
+                    true,
+                    bucketsOf(imgCount, [
+                        { name: '1-2', is: { gte: 1, lte: 2 } },
+                        { name: '2-3', is: { gte: 2, lte: 3 } },
+                    ]),
+                );
+                expectValid(
+                    true,
+                    bucketsOf(imgCount, [
+                        { name: '1-2', is: { gte: 1, lte: 2 } },
+                        { name: '2-3', is: { gt: 2, lte: 3 } },
+                    ]),
+                );
+            });
+
+            itAll('warns on any other overlap, naming the values and the bucket that takes them', () => {
+                const zeroToThree = [
+                    { name: 'none', is: 0 },
+                    { name: '0-3', is: { gte: 0, lt: 3 } },
+                ];
+                expectValid(true, bucketsOf(imgCount, zeroToThree));
+                expect(bucketWarningsOf(imgCount, zeroToThree)).to.deep.equal([
+                    '$.actions.breakageReportData.data.a.buckets: buckets "none" and "0-3" overlap on 0, which "none" names since it comes first',
+                ]);
+                expect(
+                    bucketWarningsOf(imgCount, [
+                        { name: 'low', is: { lt: 5 } },
+                        { name: 'mid', is: { gte: 3, lt: 8 } },
+                    ]),
+                ).to.deep.equal([
+                    '$.actions.breakageReportData.data.a.buckets: buckets "low" and "mid" overlap on {"gte":3,"lt":5}, which "low" names since it comes first',
+                ]);
+                expect(
+                    bucketWarningsOf(imgCount, [
+                        { name: 'none', is: 0 },
+                        { name: '1-2', is: { gte: 1, lt: 3 } },
+                        { name: '3+', is: { gte: 3 } },
+                    ]),
+                ).to.deep.equal([]);
             });
 
             itAll('takes any non-empty bucket name', () => {
@@ -631,26 +710,39 @@ describe('webDetection config tests', () => {
 
             itAll('checks overlap between a literal and a comparison that converts it', () => {
                 // Config does not type `document.fonts.status`, so its buckets compare without a guard
-                expectError(
-                    'overlap',
-                    true,
-                    bucketsOf(fontsStatus, [
-                        { name: 'none', is: null },
-                        { name: 'some', is: { gte: 0 } },
-                    ]),
-                );
-                expectError(
-                    'overlap',
-                    true,
-                    bucketsOf(fontsStatus, [
-                        { name: 's', is: '7' },
+                /** @type {Array<[unknown, string]>} */
+                const converted = [
+                    [
+                        null,
+                        'null',
+                    ],
+                    [
+                        '7',
+                        '"7"',
+                    ],
+                    [
+                        true,
+                        'true',
+                    ],
+                ];
+                for (const [
+                    literal,
+                    written,
+                ] of converted) {
+                    const buckets = [
+                        { name: 's', is: literal },
                         { name: 'n', is: { gte: 0 } },
-                    ]),
-                );
+                    ];
+                    expectValid(true, bucketsOf(fontsStatus, buckets));
+                    expect(bucketWarningsOf(fontsStatus, buckets)).to.deep.equal([
+                        `$.actions.breakageReportData.data.a.buckets: buckets "s" and "n" overlap on ${written}, which "s" names since it comes first`,
+                    ]);
+                }
                 expectError(
-                    'overlap',
+                    'never names a value',
                     true,
                     bucketsOf(fontsStatus, [
+                        { name: 'n', is: { gte: 1 } },
                         {
                             name: 's',
                             is: {
@@ -659,30 +751,27 @@ describe('webDetection config tests', () => {
                                 ],
                             },
                         },
-                        { name: 'n', is: { gte: 1 } },
                     ]),
                 );
-                expectValid(
-                    true,
-                    bucketsOf(fontsStatus, [
+                /** @type {unknown[][]} */
+                const apart = [
+                    [
                         { name: 's', is: '7' },
                         { name: 'n', is: 7 },
-                    ]),
-                );
-                expectValid(
-                    true,
-                    bucketsOf(fontsStatus, [
+                    ],
+                    [
                         { name: 'none', is: null },
                         { name: 'some', is: { gt: 0 } },
-                    ]),
-                );
-                expectValid(
-                    true,
-                    bucketsOf(fontsStatus, [
+                    ],
+                    [
                         { name: 'unsupported', is: 'unsupported' },
                         { name: 'some', is: { gte: 0 } },
-                    ]),
-                );
+                    ],
+                ];
+                for (const buckets of apart) {
+                    expectValid(true, bucketsOf(fontsStatus, buckets));
+                    expect(bucketWarningsOf(fontsStatus, buckets)).to.deep.equal([]);
+                }
                 expectValid(
                     true,
                     bucketsOf({ only: fieldOf('img', 'currentSrc') }, [

@@ -4,7 +4,7 @@ import { TEMP_EVENT_TYPE_PREFIX, breakageDataErrors, clientViews, eventHubConsum
 import { detectorNameErrors, detectorViews, forEachWebDetectionConfig, latestConfigs, viewErrors } from './configs.js';
 import { ACTION_KEYS, BRANCH_KEYS } from './validator/grammar.js';
 import { validateDetector } from './validator/validate.js';
-import { itemWalkWarnings, repeatedEventWarnings } from './validator/warnings.js';
+import { bucketWarnings, itemWalkWarnings, repeatedEventWarnings } from './validator/warnings.js';
 
 /**
  * Print a warning that fails no test. In GitHub Actions it's a workflow annotation, which shows on the
@@ -52,6 +52,10 @@ describe('webDetection config tests', () => {
 
                 it('warns on walks from each item that no `if` guards', () => {
                     for (const warning of viewErrors(views, itemWalkWarnings)) warn(`${config.name} ${warning}`);
+                });
+
+                it('warns on overlapping buckets', () => {
+                    for (const warning of viewErrors(views, bucketWarnings)) warn(`${config.name} ${warning}`);
                 });
             });
         }

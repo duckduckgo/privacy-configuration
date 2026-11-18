@@ -1,5 +1,6 @@
 // @ts-check
-import { BRANCH_KEYS, apiBody } from './grammar.js';
+import { BRANCH_KEYS, PAYLOAD_ACTIONS, apiBody } from './grammar.js';
+import { bucketOverlaps } from './predicates.js';
 import { definesName, expressionKeysOf, forEachSourceBody, readsOuterSelf, refsIn } from './walk.js';
 import { isPlainObject } from '../../../util.js';
 
@@ -51,6 +52,51 @@ export function repeatedEventWarnings(detector, path) {
         }
     };
     visit(detector.actions, `${path}.actions`, []);
+    return warnings;
+}
+
+/**
+ * Warnings on payload buckets that overlap in a way that is not an error: the earlier bucket names
+ * the values both hold for.
+ *
+ * @param {Record<string, any>} detector
+ * @param {string} path
+ * @returns {string[]}
+ */
+export function bucketWarnings(detector, path) {
+    if (!isPlainObject(detector)) return [];
+    /** @type {string[]} */
+    const warnings = [];
+    /**
+     * @param {unknown} node
+     * @param {string} nodePath
+     */
+    const visit = (node, nodePath) => {
+        if (Array.isArray(node)) {
+            node.forEach((entry, index) => visit(entry, `${nodePath}[${index}]`));
+            return;
+        }
+        if (!isPlainObject(node)) return;
+        for (const [
+            key,
+            value,
+        ] of Object.entries(node)) {
+            const childPath = `${nodePath}.${key}`;
+            if (PAYLOAD_ACTIONS.includes(key) && isPlainObject(value) && isPlainObject(value.data)) {
+                for (const [
+                    field,
+                    spec,
+                ] of Object.entries(value.data)) {
+                    if (!isPlainObject(spec)) continue;
+                    for (const warning of bucketOverlaps(spec.buckets).warnings)
+                        warnings.push(`${childPath}.data.${field}.buckets: ${warning}`);
+                }
+            } else {
+                visit(value, childPath);
+            }
+        }
+    };
+    visit(detector.actions, `${path}.actions`);
     return warnings;
 }
 

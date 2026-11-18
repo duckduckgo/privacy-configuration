@@ -171,7 +171,7 @@ export function checkPayloadSpec(data, action, ctx, path, scope) {
 }
 
 /**
- * @typedef {{ lo: number, loIn: boolean, hi: number, hiIn: boolean, strict?: boolean }} Interval
+ * @typedef {{ lo: number, loIn: boolean, hi: number, hiIn: boolean }} Interval
  * @typedef {{ intervals: Interval[], points: unknown[] }} BucketSet
  */
 
@@ -192,20 +192,14 @@ export function isLiteral(value) {
 
 /**
  * The values a bucket holds for, when its predicate is a literal, `in` over literals or
- * comparisons against literals. Null for any other predicate, which the overlap check skips.
+ * comparisons against literals. A literal, `eq` and `in` test with `===`, so they hold for the
+ * points they list; `lt`, `lte`, `gt` and `gte` convert the value as JS does, so they hold for an
+ * interval. Null for any other predicate, which the overlap check skips.
  *
  * @param {unknown} predicate
  * @returns {BucketSet | null}
  */
 function simpleBucketSet(predicate) {
-    // A number literal tests with `===`, so it holds for no other type
-    if (typeof predicate === 'number')
-        return {
-            intervals: [
-                { lo: predicate, loIn: true, hi: predicate, hiIn: true, strict: true },
-            ],
-            points: [],
-        };
     if (isLiteral(predicate))
         return {
             intervals: [],
@@ -221,8 +215,8 @@ function simpleBucketSet(predicate) {
         return { intervals: [], points: entries };
     }
     if (!keys.length || !keys.every((key) => key === 'eq' || COMPARISON_OPERATORS.includes(key))) return null;
-    if (keys.length === 1 && keys[0] === 'eq' && isLiteral(predicate.eq)) return simpleBucketSet(predicate.eq);
-    if (!keys.every((key) => typeof predicate[key] === 'number')) return null;
+    const comparisons = keys.filter((key) => key !== 'eq');
+    if (!comparisons.every((key) => typeof predicate[key] === 'number')) return null;
 
     /** @type {Interval} */
     const interval = { lo: -Infinity, loIn: false, hi: Infinity, hiIn: false };
@@ -240,57 +234,171 @@ function simpleBucketSet(predicate) {
     const lowerHigh = (bound, inclusive) => {
         if (bound < interval.hi || (bound === interval.hi && !inclusive)) Object.assign(interval, { hi: bound, hiIn: inclusive });
     };
-    for (const key of keys) {
+    for (const key of comparisons) {
         const bound = predicate[key];
-        if (key === 'gte' || key === 'eq') raiseLow(bound, true);
+        if (key === 'gte') raiseLow(bound, true);
         if (key === 'gt') raiseLow(bound, false);
-        if (key === 'lte' || key === 'eq') lowerHigh(bound, true);
+        if (key === 'lte') lowerHigh(bound, true);
         if (key === 'lt') lowerHigh(bound, false);
     }
+    if (!('eq' in predicate))
+        return {
+            intervals: [
+                interval,
+            ],
+            points: [],
+        };
+    if (!isLiteral(predicate.eq)) return null;
+    // `eq` beside comparisons holds for its literal when they hold for it too
     return {
-        intervals: [
-            interval,
-        ],
-        points: [],
+        intervals: [],
+        points: pointIn(predicate.eq, interval)
+            ? [
+                  predicate.eq,
+              ]
+            : [],
     };
 }
 
 /**
- * @param {Interval} a
- * @param {Interval} b
- */
-function intervalsOverlap(a, b) {
-    const lo = Math.max(a.lo, b.lo);
-    const hi = Math.min(a.hi, b.hi);
-    if (lo < hi) return true;
-    if (lo > hi || !Number.isFinite(lo)) return false;
-    // They meet at one point, held only if every bound there is inclusive
-    return (a.lo < lo || a.loIn) && (b.lo < lo || b.loIn) && (a.hi > hi || a.hiIn) && (b.hi > hi || b.hiIn);
-}
-
-/**
- * Whether a comparison interval holds for a literal that is not a number, which it converts as
- * JS does: `null` and `""` to 0, a boolean to 0 or 1, and `"7"` to 7.
+ * Whether a comparison interval holds for a literal, which it converts as JS does: `null` and `""`
+ * to 0, a boolean to 0 or 1, and `"7"` to 7.
  *
  * @param {unknown} point
- * @param {Interval[]} intervals
+ * @param {Interval} interval
  */
-function pointCoercesInto(point, intervals) {
+function pointIn(point, interval) {
     const value = Number(point);
     if (Number.isNaN(value)) return false;
-    return intervals.some((x) => !x.strict && (x.lo < value || (x.lo === value && x.loIn)) && (value < x.hi || (value === x.hi && x.hiIn)));
+    return (
+        (interval.lo < value || (interval.lo === value && interval.loIn)) &&
+        (value < interval.hi || (value === interval.hi && interval.hiIn))
+    );
 }
 
 /**
+ * @param {unknown} point
+ * @param {BucketSet} set
+ */
+function setHolds(point, set) {
+    return set.points.includes(point) || set.intervals.some((interval) => pointIn(point, interval));
+}
+
+/**
+ * The values both intervals hold for, or null when they share none.
+ *
+ * @param {Interval} a
+ * @param {Interval} b
+ * @returns {Interval | null}
+ */
+function intersect(a, b) {
+    const lo = Math.max(a.lo, b.lo);
+    const hi = Math.min(a.hi, b.hi);
+    const loIn = (a.lo < lo || a.loIn) && (b.lo < lo || b.loIn);
+    const hiIn = (a.hi > hi || a.hiIn) && (b.hi > hi || b.hiIn);
+    if (lo < hi || (lo === hi && Number.isFinite(lo) && loIn && hiIn)) return { lo, loIn, hi, hiIn };
+    return null;
+}
+
+/**
+ * Whether `outer` holds for every value `inner` holds for.
+ *
+ * @param {BucketSet} inner
+ * @param {BucketSet} outer
+ */
+function contains(inner, outer) {
+    if (!inner.points.length && !inner.intervals.length) return false;
+    return (
+        inner.points.every((point) => setHolds(point, outer)) &&
+        inner.intervals.every((x) =>
+            outer.intervals.some(
+                (y) => (y.lo < x.lo || (y.lo === x.lo && (y.loIn || !x.loIn))) && (x.hi < y.hi || (x.hi === y.hi && (y.hiIn || !x.hiIn))),
+            ),
+        )
+    );
+}
+
+/**
+ * The values two bucket sets both hold for.
+ *
  * @param {BucketSet} a
  * @param {BucketSet} b
+ * @returns {BucketSet}
  */
-function bucketSetsOverlap(a, b) {
-    return (
-        a.points.some((point) => b.points.includes(point) || pointCoercesInto(point, b.intervals)) ||
-        b.points.some((point) => pointCoercesInto(point, a.intervals)) ||
-        a.intervals.some((x) => b.intervals.some((y) => intervalsOverlap(x, y)))
-    );
+function sharedValues(a, b) {
+    const points = [
+        ...new Set([
+            ...a.points.filter((point) => setHolds(point, b)),
+            ...b.points.filter((point) => setHolds(point, a)),
+        ]),
+    ];
+    const intervals = a.intervals.flatMap((x) => b.intervals.map((y) => intersect(x, y))).filter((x) => x !== null);
+    return { points, intervals };
+}
+
+/**
+ * Values a bucket set holds for, written as predicates.
+ *
+ * @param {BucketSet} set
+ */
+function describeValues(set) {
+    return [
+        ...set.points.map((point) => JSON.stringify(point)),
+        ...set.intervals.map((x) => {
+            /** @type {Record<string, number>} */
+            const bounds = {};
+            if (x.lo === x.hi) return JSON.stringify(x.lo);
+            if (Number.isFinite(x.lo)) bounds[x.loIn ? 'gte' : 'gt'] = x.lo;
+            if (Number.isFinite(x.hi)) bounds[x.hiIn ? 'lte' : 'lt'] = x.hi;
+            return JSON.stringify(bounds);
+        }),
+    ].join(', ');
+}
+
+/**
+ * The overlaps between buckets of different names whose predicates are simple. Buckets are tested
+ * in array order, and the first that holds names the value. A bucket holding only values an
+ * earlier one holds never names a value, and two ranges sharing an endpoint both include are an
+ * error; any other overlap is a warning, since the earlier bucket takes the shared values.
+ * Entries sharing a name may overlap.
+ *
+ * @param {unknown} buckets
+ * @returns {{ errors: string[], warnings: string[] }}
+ */
+export function bucketOverlaps(buckets) {
+    /** @type {{ errors: string[], warnings: string[] }} */
+    const found = { errors: [], warnings: [] };
+    if (!Array.isArray(buckets)) return found;
+    /** @type {{ name: string, set: BucketSet }[]} */
+    const simple = [];
+    for (const bucket of buckets) {
+        const set = isPlainObject(bucket) && 'is' in bucket ? simpleBucketSet(bucket.is) : null;
+        if (set) simple.push({ name: String(bucket.name), set });
+    }
+    simple.forEach((later, j) => {
+        for (const earlier of simple.slice(0, j)) {
+            if (earlier.name === later.name) continue;
+            if (contains(later.set, earlier.set)) {
+                found.errors.push(`bucket "${later.name}" holds only values "${earlier.name}" before it holds, so it never names a value`);
+                break;
+            }
+            const shared = sharedValues(earlier.set, later.set);
+            if (!shared.points.length && !shared.intervals.length) continue;
+            const [
+                interval,
+            ] = shared.intervals;
+            if (!shared.points.length && shared.intervals.length === 1 && interval.lo === interval.hi) {
+                found.errors.push(
+                    `buckets "${earlier.name}" and "${later.name}" both include ${interval.lo}; make one end exclusive with \`gt\` or \`lt\``,
+                );
+            } else {
+                found.warnings.push(
+                    `buckets "${earlier.name}" and "${later.name}" overlap on ${describeValues(shared)}, which "${earlier.name}" names since it comes first`,
+                );
+            }
+        }
+    });
+    return found;
 }
 
 /**
@@ -301,22 +409,10 @@ function bucketSetsOverlap(a, b) {
  */
 function checkBuckets(buckets, type, ctx, path) {
     if (!Array.isArray(buckets)) return;
-    /** @type {{ name: string, set: BucketSet }[]} */
-    const simple = [];
     buckets.forEach((bucket, i) => {
-        const bucketPath = `${path}[${i}]`;
         if (!isPlainObject(bucket) || !('is' in bucket)) return;
-        const { name, is: predicate } = bucket;
-        const isPath = `${bucketPath}.is`;
-        checkPredicate(predicate, 'value', predicateSubject(type, predicate, ctx, isPath), PAYLOAD_SCOPE, ctx, isPath);
-        const set = simpleBucketSet(predicate);
-        if (set) simple.push({ name: String(name), set });
+        const isPath = `${path}[${i}].is`;
+        checkPredicate(bucket.is, 'value', predicateSubject(type, bucket.is, ctx, isPath), PAYLOAD_SCOPE, ctx, isPath);
     });
-    // Buckets are tested in array order. Entries sharing a name may overlap
-    for (let i = 0; i < simple.length; i++) {
-        for (let j = i + 1; j < simple.length; j++) {
-            if (simple[i].name !== simple[j].name && bucketSetsOverlap(simple[i].set, simple[j].set))
-                fail(ctx, path, `buckets "${simple[i].name}" and "${simple[j].name}" overlap`);
-        }
-    }
+    for (const error of bucketOverlaps(buckets).errors) fail(ctx, path, error);
 }
