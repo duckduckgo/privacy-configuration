@@ -55,9 +55,9 @@ export function repeatedEventWarnings(detector, path) {
 }
 
 /**
- * Warnings on a walk from each item of a `where` or `field` that no `if` inside it guards: an
- * `element` or `text` source rooted at the item. Matched
- * elements nest, so each walk covers nodes an enclosing item's walk covers again.
+ * Warnings on a walk from each item of a `where` or `field` that no `if` inside it guards: a `text`
+ * source rooted at the item. Matched elements nest, so each walk covers nodes an enclosing item's
+ * walk covers again. An `element` source runs one native query from each item, and gets no warning.
  *
  * @param {Record<string, any>} detector
  * @param {string} path
@@ -108,7 +108,7 @@ export function itemWalkWarnings(detector, path) {
             const childPath = `${nodePath}.${key}`;
             if (key === 'element' || key === 'text') {
                 forEachSourceBody(value, childPath, (body, bodyPath) => {
-                    if (exposed && 'root' in body && readsOuterSelf(body.root)) warn(`${bodyPath}.root`);
+                    if (key === 'text' && exposed && 'root' in body && readsOuterSelf(body.root)) warn(`${bodyPath}.root`);
                     visit(body.root, `${bodyPath}.root`, exposed);
                     visit(body.where, `${bodyPath}.where`, true);
                     if ('field' in body) visitRead(body.field, `${bodyPath}.field`, true);

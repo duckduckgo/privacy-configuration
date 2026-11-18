@@ -312,10 +312,14 @@ describe('webDetection config tests', () => {
                 is: 'fixed',
             };
 
-            itAll('warns on a source rooted at the item with no `if` above it in the `where`', () => {
+            itAll('warns on a `text` source rooted at the item with no `if` above it in the `where`', () => {
                 expect(walksOf(words)).to.deep.equal([
                     '$.match.element.where.text.root: walks the page from each item of the enclosing `where` or `field`, and nested items walk the same nodes again; test something cheaper in an `if` first',
                 ]);
+            });
+
+            itAll('passes an `element` source rooted at the item, which runs one query from it', () => {
+                expect(walksOf({ element: { selector: 'img', root: { self: {} } } })).to.deep.equal([]);
             });
 
             itAll('passes a walk behind an `if`, and one outside every `where` and `field`', () => {
