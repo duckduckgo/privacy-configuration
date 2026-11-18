@@ -10,6 +10,37 @@ import { CLIENT_RELEASES, clientViews } from './clients.js';
  * @typedef {{ label: string, detectors: Record<string, Record<string, Record<string, any>>>, failed?: unknown[] }} DetectorView
  */
 
+/**
+ * The client views, one for each distinct set of detectors, labelled with every client state that
+ * sees it, and with the entries that fail in any of those states.
+ *
+ * @param {ReturnType<typeof clientViews>} views
+ * @returns {DetectorView[]}
+ */
+function distinctViews(views) {
+    /** @type {Map<string, { labels: string[], detectors: DetectorView['detectors'], failed: Set<string> }>} */
+    const distinct = new Map();
+    for (const { label, detectors, failed } of views) {
+        const key = JSON.stringify(detectors);
+        let entry = distinct.get(key);
+        if (!entry) {
+            entry = { labels: [], detectors, failed: new Set() };
+            distinct.set(key, entry);
+        }
+        entry.labels.push(label);
+        for (const change of failed) entry.failed.add(JSON.stringify(change));
+    }
+    return [
+        ...distinct.values(),
+    ].map(({ labels, detectors, failed }) => ({
+        label: labels.join('; '),
+        detectors,
+        failed: [
+            ...failed,
+        ].map((change) => JSON.parse(change)),
+    }));
+}
+
 const platformOutput = platforms.map((item) => item.replace('browsers/', 'extension-'));
 
 export const latestConfigs = platformOutput.map((plat) => {
@@ -111,8 +142,8 @@ export function patchedViews(webDetection) {
 
 /**
  * Every view of a generated config's detectors a client can see: the literal detectors, those each
- * patch list touches, and each platform client's at this release, on an arbitrary page in a release
- * build and with every page, build and cohort condition holding.
+ * patch list touches, and each platform client's at this release in each state of the page, frame,
+ * build and cohorts that decides a condition.
  *
  * @param {{ name: string, body: Record<string, any> }} config
  * @returns {DetectorView[]}
@@ -124,18 +155,13 @@ export function detectorViews(config) {
     return [
         { label: 'detectors', detectors: webDetection.settings.detectors },
         ...patchedViews(webDetection),
-        ...(release
-            ? [
-                  false,
-                  true,
-              ].flatMap((assumeUndecided) => clientViews(config.body, release.platform, release.version, assumeUndecided))
-            : []),
+        ...(release ? distinctViews(clientViews(config.body, release.platform, release.version)) : []),
     ];
 }
 
 /**
  * The errors a check gives on every detector of the views, each once, with the first view it
- * appears in.
+ * appears in. A detector the same in several views is checked once.
  *
  * @param {DetectorView[]} views
  * @param {(detector: Record<string, any>, path: string) => string[]} check
@@ -144,6 +170,8 @@ export function detectorViews(config) {
 export function viewErrors(views, check) {
     /** @type {Map<string, string>} */
     const errors = new Map();
+    /** @type {Set<string>} */
+    const checked = new Set();
     for (const { label, detectors } of views) {
         for (const [
             groupName,
@@ -153,7 +181,11 @@ export function viewErrors(views, check) {
                 detectorId,
                 detector,
             ] of Object.entries(group)) {
-                for (const error of check(detector, `detectors.${groupName}.${detectorId}`)) {
+                const path = `detectors.${groupName}.${detectorId}`;
+                const key = `${path} ${JSON.stringify(detector)}`;
+                if (checked.has(key)) continue;
+                checked.add(key);
+                for (const error of check(detector, path)) {
                     if (!errors.has(error)) errors.set(error, label);
                 }
             }

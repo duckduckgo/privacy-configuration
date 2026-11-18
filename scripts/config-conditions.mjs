@@ -13,15 +13,30 @@ import { immutableJSONPatch } from 'immutable-json-patch';
  * @property {Version} [minSupportedVersion]
  * @property {Version} [maxSupportedVersion]
  * @property {{ experimentName: string, cohort: string }} [experiment]
+ * @property {string | string[]} [domain]
+ * @property {unknown} [urlPattern]
+ * @property {{ top?: boolean, frame?: boolean }} [context]
+ * @property {boolean} [internal]
+ * @property {boolean} [preview]
+ * @property {string} [minContentScopeScriptsVersion]
+ * @property {string} [maxContentScopeScriptsVersion]
  *
  * @typedef {import('immutable-json-patch').JSONPatchDocument} PatchSettings
- * @typedef {{ condition: ConditionBlock | ConditionBlock[], patchSettings: PatchSettings }} ConditionalChange
+ * @typedef {{ condition?: ConditionBlock | ConditionBlock[], domain?: string | string[], patchSettings?: PatchSettings }} ConditionalChange
  *
  * @typedef {object} Client
  * @property {string} injectName
  * @property {Version | undefined} version
- * @property {Record<string, string | true>} cohorts - assigned cohort by experiment name, or `true` for every cohort
- * @property {boolean} [assumeUndecided] - whether the condition keys in UNDECIDED_KEYS hold
+ * @property {Record<string, string>} cohorts - assigned cohort by experiment name
+ * @property {string} [domain] - the page's hostname
+ * @property {string} [urlPattern] - the `urlPattern` the page's URL matches, as JSON writes it
+ * @property {boolean} [frame] - whether the page is a subframe
+ * @property {boolean} [internal] - whether the build is internal
+ * @property {boolean} [preview] - whether the build is a preview
+ * @property {string} [contentScopeScriptsVersion] - the C-S-S release
+ *
+ * A client that leaves a page, frame or build key undefined matches no block naming it: the state on
+ * an arbitrary page in a release build.
  */
 
 /** @type {Platform[]} */
@@ -109,23 +124,11 @@ export function maxVersion(a, b) {
     return compareVersions(a, b) >= 0 ? a : b;
 }
 
-/**
- * Condition keys C-S-S matches against the page, the frame or the build rather than the client's platform,
- * version and cohorts.
- */
-const UNDECIDED_KEYS = [
-    'domain',
-    'urlPattern',
-    'context',
-    'internal',
-    'preview',
-    'minContentScopeScriptsVersion',
-    'maxContentScopeScriptsVersion',
-];
+/** A C-S-S release, which `minContentScopeScriptsVersion` and `maxContentScopeScriptsVersion` take. */
+const RELEASE_VERSION_PATTERN = /^\d+\.\d+\.\d+$/;
 
 /**
- * Match a condition as C-S-S does. Blocks with a key in UNDECIDED_KEYS match only when the client
- * assumes they hold, so by default the result is the state on an arbitrary page in a release build.
+ * Match a condition as C-S-S does.
  *
  * @param {ConditionBlock | ConditionBlock[]} condition
  * @param {Client} client
@@ -135,42 +138,75 @@ export function matchCondition(condition, client) {
 }
 
 /**
+ * Whether a hostname is the domain or a subdomain of it, as C-S-S matches it.
+ *
+ * @param {string} hostname
+ * @param {string} domain
+ */
+export function matchHostname(hostname, domain) {
+    return hostname === domain || hostname.endsWith(`.${domain}`);
+}
+
+/**
+ * How C-S-S matches each condition key. A block with a key not listed never matches.
+ *
+ * @type {Record<string, (block: ConditionBlock, client: Client) => boolean>}
+ */
+const CONDITION_CHECKS = {
+    injectName: (block, client) => block.injectName === client.injectName,
+    minSupportedVersion: ({ minSupportedVersion: min }, { version }) =>
+        min !== undefined && version !== undefined && typeof version === typeof min && compareVersions(version, min) >= 0,
+    maxSupportedVersion: ({ maxSupportedVersion: max }, { version }) =>
+        max !== undefined && version !== undefined && typeof version === typeof max && compareVersions(version, max) <= 0,
+    experiment: ({ experiment }, client) => experiment !== undefined && client.cohorts[experiment.experimentName] === experiment.cohort,
+    // A list of domains never matches
+    domain: ({ domain }, client) => typeof domain === 'string' && client.domain !== undefined && matchHostname(client.domain, domain),
+    urlPattern: ({ urlPattern }, client) => client.urlPattern !== undefined && JSON.stringify(urlPattern) === client.urlPattern,
+    context: ({ context }, { frame }) => frame !== undefined && Boolean(frame ? context?.frame : context?.top),
+    internal: ({ internal }, client) => internal !== undefined && client.internal !== undefined && Boolean(internal) === client.internal,
+    preview: ({ preview }, client) => preview !== undefined && client.preview !== undefined && Boolean(preview) === client.preview,
+    minContentScopeScriptsVersion: ({ minContentScopeScriptsVersion: min }, { contentScopeScriptsVersion: version }) =>
+        typeof min === 'string' && RELEASE_VERSION_PATTERN.test(min) && version !== undefined && compareVersions(version, min) >= 0,
+    maxContentScopeScriptsVersion: ({ maxContentScopeScriptsVersion: max }, { contentScopeScriptsVersion: version }) =>
+        typeof max === 'string' && RELEASE_VERSION_PATTERN.test(max) && version !== undefined && compareVersions(version, max) <= 0,
+};
+
+/**
  * @param {ConditionBlock} block
  * @param {Client} client
  */
 function matchBlock(block, client) {
-    for (const key of Object.keys(block)) {
-        if (UNDECIDED_KEYS.includes(key) && client.assumeUndecided) continue;
-        if (
-            ![
-                'injectName',
-                'minSupportedVersion',
-                'maxSupportedVersion',
-                'experiment',
-            ].includes(key)
-        )
-            return false;
-    }
-    const { injectName, minSupportedVersion, maxSupportedVersion, experiment } = block;
-    const { version } = client;
-    if (injectName !== undefined && injectName !== client.injectName) return false;
-    if (minSupportedVersion !== undefined) {
-        if (version === undefined || typeof version !== typeof minSupportedVersion) return false;
-        if (compareVersions(version, minSupportedVersion) < 0) return false;
-    }
-    if (maxSupportedVersion !== undefined) {
-        if (version === undefined || typeof version !== typeof maxSupportedVersion) return false;
-        if (compareVersions(version, maxSupportedVersion) > 0) return false;
-    }
-    const cohort = experiment === undefined ? undefined : client.cohorts[experiment.experimentName];
-    if (experiment !== undefined && cohort !== true && cohort !== experiment.cohort) return false;
-    return true;
+    return Object.keys(block).every((key) => Object.hasOwn(CONDITION_CHECKS, key) && CONDITION_CHECKS[key](block, client));
+}
+
+/**
+ * The entries C-S-S matches against a client: `conditionalChanges` when settings have it, otherwise
+ * `domains`. It never reads both.
+ *
+ * @param {{ conditionalChanges?: ConditionalChange[], domains?: ConditionalChange[] }} settings
+ * @returns {ConditionalChange[]}
+ */
+export function conditionalEntries(settings) {
+    return (settings.conditionalChanges ? settings.conditionalChanges : settings.domains) ?? [];
+}
+
+/**
+ * The condition of an entry, with `domain` short for a block per domain. Null for an entry with
+ * neither, which every client matches.
+ *
+ * @param {ConditionalChange} entry
+ * @returns {ConditionBlock | ConditionBlock[] | null}
+ */
+export function entryCondition(entry) {
+    if (entry.condition !== undefined) return entry.condition;
+    if (entry.domain === undefined) return null;
+    return Array.isArray(entry.domain) ? entry.domain.map((domain) => ({ domain })) : { domain: entry.domain };
 }
 
 /**
  * Apply the matching conditional changes in order. A block whose patch fails is skipped, as in C-S-S.
  *
- * @template {{ conditionalChanges?: ConditionalChange[] }} Settings
+ * @template {{ conditionalChanges?: ConditionalChange[], domains?: ConditionalChange[] }} Settings
  * @param {Settings} settings
  * @param {Client} client
  * @returns {{ settings: Settings, failed: ConditionalChange[] }}
@@ -179,10 +215,11 @@ export function applyConditionalChanges(settings, client) {
     let current = settings;
     /** @type {ConditionalChange[]} */
     const failed = [];
-    for (const change of settings.conditionalChanges ?? []) {
-        if (!matchCondition(change.condition, client)) continue;
+    for (const change of conditionalEntries(settings)) {
+        const condition = entryCondition(change);
+        if (condition !== null && !matchCondition(condition, client)) continue;
         try {
-            current = immutableJSONPatch(current, change.patchSettings);
+            current = immutableJSONPatch(current, change.patchSettings ?? []);
         } catch {
             failed.push(change);
         }

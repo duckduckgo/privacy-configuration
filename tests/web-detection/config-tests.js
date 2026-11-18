@@ -1,6 +1,15 @@
 import { expect } from 'chai';
 import { ORDER_FREE_ACTION_KEYS, isPlainObject, sequenceWebDetectionActions } from '../../util.js';
-import { TEMP_EVENT_TYPE_PREFIX, breakageDataErrors, clientViews, eventHubConsumers, fireEventTypes } from './clients.js';
+import {
+    CLIENT_RELEASES,
+    MAX_CLIENT_STATES,
+    TEMP_EVENT_TYPE_PREFIX,
+    breakageDataErrors,
+    clientStates,
+    clientViews,
+    eventHubConsumers,
+    fireEventTypes,
+} from './clients.js';
 import { detectorNameErrors, detectorViews, forEachWebDetectionConfig, latestConfigs, viewErrors } from './configs.js';
 import { ACTION_KEYS, BRANCH_KEYS } from './validator/grammar.js';
 import { validateDetector } from './validator/validate.js';
@@ -38,6 +47,13 @@ describe('webDetection config tests', () => {
                         expect(errors, errors.join('\n')).to.deep.equal([]);
                     });
                 }
+
+                it(`warns when a client can be in more than ${MAX_CLIENT_STATES} states`, () => {
+                    const release = CLIENT_RELEASES.find((entry) => entry.configs.test(config.name));
+                    const count = release ? clientStates(config.body, release.version).length : 0;
+                    if (count > MAX_CLIENT_STATES)
+                        warn(`${config.name}: webDetection conditions give ${count} client states, each checked; CI time grows with them`);
+                });
 
                 it('applies every conditionalChanges entry a client matches', () => {
                     const failed = views.flatMap(({ label, failed }) =>
@@ -287,11 +303,7 @@ describe('webDetection config tests', () => {
             const platform = config.name.includes('ios') ? 'ios' : 'macos';
             const version = PRE_EXPRESSION_APPLE_VERSIONS[platform];
             it(`${config.name} gives apple-isolated ${version} every enabled detector's actions as an object`, () => {
-                const detectors = [
-                    false,
-                    true,
-                ]
-                    .flatMap((assumeUndecided) => clientViews(config.body, platform, version, assumeUndecided))
+                const detectors = clientViews(config.body, platform, version)
                     .filter(({ injectName }) => injectName === 'apple-isolated')
                     .flatMap((view) => Object.entries(view.detectors));
                 /** @type {string[]} */

@@ -335,65 +335,195 @@ describe('webDetection config tests', () => {
         });
 
         describe('client views', () => {
+            const cohorts = [
+                { name: 'control', weight: 1 },
+                { name: 'treatment', weight: 1 },
+            ];
             /**
-             * @param {Record<string, any>} [subfeature] - the `x` experiment's subfeature
+             * A config whose entries patch detector `g.d`, with experiments `x` and `y` on.
+             *
+             * @param {unknown[]} conditionalChanges
+             * @param {Record<string, any>} [experiment] - the `x` experiment's subfeature
              */
-            const configWith = (subfeature) => ({
+            const configWith = (conditionalChanges, experiment = { state: 'enabled', cohorts }) => ({
                 features: {
-                    contentScopeExperiments: { state: 'enabled', features: subfeature ? { x: subfeature } : {} },
-                    webDetection: {
-                        settings: {
-                            detectors: { g: { d: { match: true } } },
-                            conditionalChanges: [
-                                {
-                                    condition: { injectName: 'android', minSupportedVersion: 10 },
-                                    patchSettings: [
-                                        { op: 'add', path: '/detectors/g/d/state', value: 'disabled' },
-                                    ],
-                                },
-                                {
-                                    condition: { experiment: { experimentName: 'x', cohort: 'y' } },
-                                    patchSettings: [
-                                        { op: 'add', path: '/detectors/g/d/triggers', value: {} },
-                                    ],
-                                },
-                                {
-                                    condition: { domain: 'example.com' },
-                                    patchSettings: [
-                                        { op: 'add', path: '/detectors/g/d/state', value: 'enabled' },
-                                    ],
-                                },
-                            ],
-                        },
-                    },
+                    contentScopeExperiments: { state: 'enabled', features: { x: experiment, y: { state: 'enabled', cohorts } } },
+                    webDetection: { settings: { detectors: { g: { d: { match: true, triggers: { auto: {} } } } }, conditionalChanges } },
                 },
             });
             /**
-             * @param {Record<string, any>} config
-             * @param {import('../../scripts/config-conditions.mjs').Platform} platform
-             * @param {number | string} version
-             * @param {boolean} assumeUndecided
+             * An entry adding `key` to `g.d` where the condition holds.
+             *
+             * @param {Record<string, unknown>} condition
+             * @param {string} key
              */
-            const detectorOf = (config, platform, version, assumeUndecided) =>
-                clientViews(config, platform, version, assumeUndecided)[0].detectors.g.d;
+            const adding = (condition, key) => ({
+                condition,
+                patchSettings: [
+                    { op: 'add', path: `/detectors/g/d/${key}`, value: true },
+                ],
+            });
+            /**
+             * Each `android` view at the version, labelled, with the keys the entries added to `g.d`.
+             *
+             * @param {Record<string, any>} config
+             * @param {number} [version]
+             */
+            const addedKeys = (config, version = 10) =>
+                Object.fromEntries(
+                    clientViews(config, 'android', version)
+                        .filter(({ injectName }) => injectName === 'android')
+                        .map(({ label, detectors }) => [
+                            label,
+                            Object.keys(detectors.g.d)
+                                .filter((key) => key !== 'match' && key !== 'triggers')
+                                .join(),
+                        ]),
+                );
 
-            itAll('applies an entry when its platform and version hold', () => {
-                expect(detectorOf(configWith(), 'android', 10, false)).to.deep.equal({ match: true, state: 'disabled' });
-                expect(detectorOf(configWith(), 'android', 9, false)).to.deep.equal({ match: true });
+            itAll('applies an entry when its platform and version hold, and never one with a key C-S-S does not match', () => {
+                const config = configWith([
+                    adding({ injectName: 'android', minSupportedVersion: 10 }, 'a'),
+                    adding({ injectName: 'android', unknownKey: true }, 'b'),
+                ]);
+                expect(addedKeys(config, 10)).to.deep.equal({ 'android 10': 'a' });
+                expect(addedKeys(config, 9)).to.deep.equal({ 'android 9': '' });
             });
 
-            itAll('applies page conditions, and every cohort of an experiment the client can be in, only when assumed', () => {
-                const experiment = { state: 'enabled', minSupportedVersion: '1.2.0' };
-                expect(detectorOf(configWith(experiment), 'windows', '1.2.0', false)).to.deep.equal({ match: true });
-                expect(detectorOf(configWith(experiment), 'windows', '1.2.0', true)).to.deep.equal({
-                    match: true,
-                    triggers: {},
-                    state: 'enabled',
+            itAll('puts the client in one cohort of an experiment at a time, or in none', () => {
+                const config = configWith([
+                    {
+                        condition: { experiment: { experimentName: 'x', cohort: 'control' } },
+                        patchSettings: [
+                            { op: 'remove', path: '/detectors/g/d' },
+                        ],
+                    },
+                    {
+                        condition: { experiment: { experimentName: 'x', cohort: 'treatment' } },
+                        patchSettings: [
+                            {
+                                op: 'add',
+                                path: '/detectors/g/d/triggers/auto/when',
+                                value: {
+                                    intervalMs: [
+                                        1000,
+                                    ],
+                                },
+                            },
+                        ],
+                    },
+                ]);
+                const views = clientViews(config, 'android', 10).filter(({ injectName }) => injectName === 'android');
+                expect(views.flatMap(({ failed }) => failed)).to.deep.equal([]);
+                expect(
+                    views.map(({ label, detectors }) => [
+                        label,
+                        detectors.g.d?.triggers.auto.when ?? (detectors.g.d ? 'unchanged' : 'removed'),
+                    ]),
+                ).to.deep.equal([
+                    [
+                        'android 10, x: not enrolled',
+                        'unchanged',
+                    ],
+                    [
+                        'android 10, x: control',
+                        'removed',
+                    ],
+                    [
+                        'android 10, x: treatment',
+                        {
+                            intervalMs: [
+                                1000,
+                            ],
+                        },
+                    ],
+                ]);
+            });
+
+            itAll('combines the cohorts of two experiments', () => {
+                const config = configWith([
+                    adding({ experiment: { experimentName: 'x', cohort: 'treatment' } }, 'a'),
+                    adding({ experiment: { experimentName: 'y', cohort: 'treatment' } }, 'b'),
+                ]);
+                const keys = addedKeys(config);
+                expect(Object.keys(keys)).to.have.length(9);
+                expect(keys['android 10, x: treatment, y: treatment']).to.equal('a,b');
+                expect(keys['android 10, x: not enrolled, y: treatment']).to.equal('b');
+            });
+
+            itAll('enrols the client only in an experiment on at its version', () => {
+                const config = configWith(
+                    [
+                        adding({ experiment: { experimentName: 'x', cohort: 'treatment' } }, 'a'),
+                    ],
+                    { state: 'enabled', minSupportedVersion: 11, cohorts },
+                );
+                expect(addedKeys(config, 10)).to.deep.equal({ 'android 10, x: not enrolled': '' });
+                expect(
+                    addedKeys(
+                        configWith(
+                            [
+                                adding({ experiment: { experimentName: 'x', cohort: 'treatment' } }, 'a'),
+                            ],
+                            { state: 'disabled', cohorts },
+                        ),
+                    ),
+                ).to.deep.equal({
+                    'android 10, x: not enrolled': '',
                 });
-                expect(detectorOf(configWith(experiment), 'windows', '1.1.0', true)).to.deep.equal({ match: true, state: 'enabled' });
-                expect(detectorOf(configWith({ state: 'disabled' }), 'windows', '1.2.0', true)).to.deep.equal({
-                    match: true,
-                    state: 'enabled',
+            });
+
+            itAll('puts the page on one domain at a time, which also matches its parent domains', () => {
+                expect(
+                    addedKeys(
+                        configWith([
+                            adding({ domain: 'a.com' }, 'a'),
+                            adding({ domain: 'b.com' }, 'b'),
+                        ]),
+                    ),
+                ).to.deep.equal({
+                    'android 10, no domain': '',
+                    'android 10, domain a.com': 'a',
+                    'android 10, domain b.com': 'b',
+                });
+                expect(
+                    addedKeys(
+                        configWith([
+                            adding({ domain: 'example.com' }, 'a'),
+                            adding({ domain: 'shop.example.com' }, 'b'),
+                        ]),
+                    ),
+                ).to.deep.equal({
+                    'android 10, no domain': '',
+                    'android 10, domain example.com': 'a',
+                    'android 10, domain shop.example.com': 'a,b',
+                });
+            });
+
+            itAll('applies an `internal` entry in internal builds only', () => {
+                expect(
+                    addedKeys(
+                        configWith([
+                            adding({ internal: true }, 'a'),
+                        ]),
+                    ),
+                ).to.deep.equal({
+                    'android 10, not internal': '',
+                    'android 10, internal': 'a',
+                });
+            });
+
+            itAll('runs a C-S-S release in each range the C-S-S version bounds split', () => {
+                const config = configWith([
+                    adding({ minContentScopeScriptsVersion: '20.0.0' }, 'a'),
+                    adding({ maxContentScopeScriptsVersion: '25.0.0' }, 'b'),
+                ]);
+                expect(addedKeys(config)).to.deep.equal({
+                    'android 10, C-S-S 0.0.0': 'b',
+                    'android 10, C-S-S 20.0.0': 'a,b',
+                    'android 10, C-S-S 20.0.1': 'a,b',
+                    'android 10, C-S-S 25.0.0': 'a,b',
+                    'android 10, C-S-S 25.0.1': 'a',
                 });
             });
 
