@@ -205,10 +205,34 @@ describe('webDetection config tests', () => {
                     { if: { ref: 'x' }, then: { breakageReportData: {} } },
                 ],
             });
-            expectValid({
+            expectError('"x" is bound to a selected list of values: a list as a condition', {
                 actions: [
                     { define: { x: { element: { selector: 'img', field: 'naturalWidth' } } } },
                     { if: { ref: 'x' }, then: { breakageReportData: {} } },
+                ],
+            });
+            expectError('"x" is bound to a selected list of values: a list as a condition', {
+                actions: [
+                    {
+                        define: {
+                            x: {
+                                api: {
+                                    path: 'performance.getEntriesByType',
+                                    args: [
+                                        'resource',
+                                    ],
+                                    where: { responseStatus: { gte: 400 } },
+                                },
+                            },
+                        },
+                    },
+                    { if: { ref: 'x' }, then: { breakageReportData: {} } },
+                ],
+            });
+            expectValid({
+                actions: [
+                    { define: { x: { element: { selector: 'img', field: 'naturalWidth' } } } },
+                    { if: { ref: 'x', using: 'length', is: { gt: 0 } }, then: { breakageReportData: {} } },
                 ],
             });
             expectValid({

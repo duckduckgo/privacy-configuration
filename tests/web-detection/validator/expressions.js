@@ -368,18 +368,21 @@ function nameType(name, ctx) {
 }
 
 /**
- * Check a name's type in the position a `ref` reads it in: a selected list holds in boolean position
- * when it has an item, and gives its one item in number position.
+ * Check a name's type in the position a `ref` reads it in: the condition leaf holds in boolean
+ * position when it has an item, and a selected list gives its one item in number position.
  *
+ * @param {string} name
  * @param {StaticType} type
  * @param {Position} position
  * @param {Context} ctx
  * @param {string} path
  * @returns {StaticType}
  */
-function refType(type, position, ctx, path) {
+function refType(name, type, position, ctx, path) {
     if (position === 'boolean') {
-        // A selected list holds when it has an item
+        // The condition leaf holds when it has an item. Any other selected list is refused, as the
+        // `element` with `field` or `api` with `where` bound to the name is
+        if (type.list === 'selected' && !type.leaf) fail(ctx, path, `"${name}" is bound to a selected list of values: ${LIST_CONDITION}`);
         if (type.list === 'selected') return typeOf('boolean');
         if ((type.list === undefined && !allows(type, 'boolean')) || type.list === 'array')
             fail(ctx, path, `boolean position takes a boolean, and config types the name as ${describeType(type)}`);
@@ -853,7 +856,7 @@ function checkRef(body, position, scope, ctx, path) {
         );
         return UNKNOWN;
     }
-    return refType(type, position, ctx, path);
+    return refType(body, type, position, ctx, path);
 }
 
 /**
