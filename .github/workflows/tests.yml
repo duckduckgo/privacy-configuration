@@ -36,6 +36,25 @@ jobs:
                     -f context="unit" \
                     -f target_url="$GITHUB_SERVER_URL/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
                     -f description="Unit tests ($JOB_STATUS)"
+    config-changes:
+        if: github.event_name == 'pull_request'
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+        steps:
+            - uses: actions/checkout@v6
+            - name: Fetch the base branch
+              run: git fetch --quiet --depth=1 origin "+refs/heads/$BASE_REF:refs/remotes/origin/$BASE_REF"
+              env:
+                  BASE_REF: ${{ github.base_ref }}
+            - name: Use Node.js
+              uses: actions/setup-node@v6
+              with:
+                  node-version-file: .nvmrc
+            - name: Install dependencies
+              run: npm ci
+            - name: Check config changes against the base branch
+              run: npm run check-config-changes -- "origin/${{ github.base_ref }}"
     lint:
         runs-on: ubuntu-latest
         permissions:
