@@ -21,9 +21,16 @@ interface PerfPaywallSubFeature<VersionType> extends SubFeature<VersionType, Per
     cohorts?: PerfPaywallCohorts[];
 }
 
+type PartnershipsHubSettings = {
+    url?: string;
+    showNewPill?: boolean;
+    showInAppMenu?: boolean;
+};
+
 // Add more privacy-pro subfeatures here
 type SubFeatures<VersionType> = {
     performanceOptimizedPaywalls?: PerfPaywallSubFeature<VersionType>;
+    partnershipsHub?: SubFeature<VersionType, PartnershipsHubSettings>;
 };
 
 export type PrivacyProFeature<VersionType> = Feature<any, VersionType, SubFeatures<VersionType> & Record<string, SubFeature<VersionType>>>;
