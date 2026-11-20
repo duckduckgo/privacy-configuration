@@ -3529,6 +3529,7 @@
                 "#sicredi-cookies-root [data-testid=\"banner\"]",
                 "#sicredi-cookies-root [data-testid=\"management-cookies-button\"]",
                 "#sicredi-cookies-root [data-testid=\"reject-config-button\"]",
+                "#cookie-information-template-wrapper :is(#coiOverlay, #ccb-coiOverlay, #coiConsentBanner, #CcpaWrapper)",
                 "body > div#iubenda-cs-banner > div:not([id]) > div:not([id]) > div:not([id]) > div:nth-child(5):not([id]) > div:nth-child(2):not([id]) > button:nth-child(1):not([id])",
                 "body > div#ds-cookie-consent-banner > div:not([id]) > div:not([id]) > button:nth-child(4)#reject_optional_cookies",
                 "body > div#banner-0 > div:nth-child(1)#grouped-pageload-Banner > div:not([id]) > div:not([id]) > div:not([id]) > div:nth-child(3):not([id]) > button:nth-child(2):not([id])",
@@ -3574,7 +3575,6 @@
                 ".wd-cookie-banner.x-cookie-open",
                 ".wd-cookie-banner",
                 ".wd-cookie-banner.x-cookie-open .wd-cookie-banner__header__close",
-                "#cookie-consent-accept",
                 "body > div:not([id]) > div:nth-child(2):not([id]) > div:nth-child(2):not([id]) > div:nth-child(2):not([id]) > div:not([id]) > button:not([id])",
                 "body > section#cookie-consent > div:not([id]) > form:nth-child(3):not([id]) > div:nth-child(5):not([id]) > button:nth-child(1):not([id])",
                 "body > div:not([id]) > div#cookie-banner > div:nth-child(2):not([id]) > button:nth-child(2)#cookie-banner-reject",
@@ -5897,7 +5897,10 @@
                 "#gdvdl-cookie-consent-dialog-content-button-auswahl-button",
                 "#gdvdl-cookie-consent-dialog-tracking-cookies-checkbox-checkbox-input:checked",
                 "[class*='CookieDisclaimerContainer']",
-                "[class*='CookieDisclaimerContainer'] [class*='CookieDisclaimerClose']"
+                "[class*='CookieDisclaimerContainer'] [class*='CookieDisclaimerClose']",
+                "#cookie-consent-accept",
+                ".huawei-bootom-cookie",
+                ".huawei-bootom-cookie .huawei-cookie-close"
             ],
             "r": [
                 [
@@ -12699,7 +12702,8 @@
                     ],
                     [
                         {
-                            "v": 263
+                            "check": "any",
+                            "v": 2853
                         }
                     ],
                     [
@@ -33711,40 +33715,6 @@
                     [],
                     [
                         {
-                            "e": 2853
-                        }
-                    ],
-                    [
-                        {
-                            "v": 2853
-                        }
-                    ],
-                    [
-                        {
-                            "wait": 500
-                        },
-                        {
-                            "c": 2853
-                        }
-                    ],
-                    [
-                        {
-                            "timeout": 1000,
-                            "check": "none",
-                            "wv": 2853
-                        }
-                    ],
-                    {}
-                ],
-                [
-                    1,
-                    "auto_CA_nationalarchives.gov.uk_rx0",
-                    0,
-                    "^https?://(www\\.)?webarchive\\.nationalarchives\\.gov\\.uk/",
-                    1,
-                    [],
-                    [
-                        {
                             "e": 2854
                         }
                     ],
@@ -33772,9 +33742,9 @@
                 ],
                 [
                     1,
-                    "auto_CH_swisscare.com_arx",
+                    "auto_CA_nationalarchives.gov.uk_rx0",
                     0,
-                    "^https?://(www\\.)?swisscare\\.com/",
+                    "^https?://(www\\.)?webarchive\\.nationalarchives\\.gov\\.uk/",
                     1,
                     [],
                     [
@@ -33806,9 +33776,9 @@
                 ],
                 [
                     1,
-                    "auto_DE_huss-licht-ton.de_jj0",
+                    "auto_CH_swisscare.com_arx",
                     0,
-                    "^https?://(www\\.)?huss-licht-ton\\.de/",
+                    "^https?://(www\\.)?swisscare\\.com/",
                     1,
                     [],
                     [
@@ -33840,9 +33810,9 @@
                 ],
                 [
                     1,
-                    "auto_DE_modellbau-berlinski.de_8vm",
+                    "auto_DE_huss-licht-ton.de_jj0",
                     0,
-                    "^https?://(www\\.)?modellbau-berlinski\\.de/",
+                    "^https?://(www\\.)?huss-licht-ton\\.de/",
                     1,
                     [],
                     [
@@ -33874,9 +33844,9 @@
                 ],
                 [
                     1,
-                    "auto_GB_investing.thisismoney.co.uk_0",
+                    "auto_DE_modellbau-berlinski.de_8vm",
                     0,
-                    "^https?://(www\\.)?thisismoney\\.co\\.uk/",
+                    "^https?://(www\\.)?modellbau-berlinski\\.de/",
                     1,
                     [],
                     [
@@ -33891,17 +33861,26 @@
                     ],
                     [
                         {
+                            "wait": 500
+                        },
+                        {
                             "c": 2858
                         }
                     ],
-                    [],
+                    [
+                        {
+                            "timeout": 1000,
+                            "check": "none",
+                            "wv": 2858
+                        }
+                    ],
                     {}
                 ],
                 [
                     1,
-                    "auto_NL_flitsmeister.nl_ws8",
+                    "auto_GB_investing.thisismoney.co.uk_0",
                     0,
-                    "^https?://(www\\.)?cookies\\.flitsmeister\\.com/",
+                    "^https?://(www\\.)?thisismoney\\.co\\.uk/",
                     1,
                     [],
                     [
@@ -33916,17 +33895,42 @@
                     ],
                     [
                         {
+                            "c": 2859
+                        }
+                    ],
+                    [],
+                    {}
+                ],
+                [
+                    1,
+                    "auto_NL_flitsmeister.nl_ws8",
+                    0,
+                    "^https?://(www\\.)?cookies\\.flitsmeister\\.com/",
+                    1,
+                    [],
+                    [
+                        {
+                            "e": 2860
+                        }
+                    ],
+                    [
+                        {
+                            "v": 2860
+                        }
+                    ],
+                    [
+                        {
                             "wait": 500
                         },
                         {
-                            "c": 2859
+                            "c": 2860
                         }
                     ],
                     [
                         {
                             "timeout": 1000,
                             "check": "none",
-                            "wv": 2859
+                            "wv": 2860
                         }
                     ],
                     {}
@@ -33938,21 +33942,21 @@
                     "^https?://(www\\.)?bmedonline\\.es/",
                     11,
                     [
-                        2860
+                        2861
                     ],
                     [
                         {
-                            "e": 2861
+                            "e": 2862
                         }
                     ],
                     [
                         {
-                            "v": 2860
+                            "v": 2861
                         }
                     ],
                     [
                         {
-                            "c": 2862
+                            "c": 2863
                         }
                     ],
                     [
@@ -33960,7 +33964,7 @@
                             "wait": 500
                         },
                         {
-                            "cc": 2863
+                            "cc": 2864
                         }
                     ],
                     {}
@@ -33974,12 +33978,12 @@
                     [],
                     [
                         {
-                            "e": 2864
+                            "e": 2865
                         }
                     ],
                     [
                         {
-                            "v": 2864
+                            "v": 2865
                         },
                         {
                             "eval": "EVAL_IFRAME_SHOWN"
@@ -33987,18 +33991,18 @@
                     ],
                     [
                         {
-                            "c": 2864
+                            "c": 2865
                         },
                         {
                             "wait": 1000
                         },
                         {
                             "if": {
-                                "v": 2864
+                                "v": 2865
                             },
                             "then": [
                                 {
-                                    "k": 2864
+                                    "k": 2865
                                 }
                             ]
                         }
@@ -34015,23 +34019,23 @@
                     [],
                     [
                         {
-                            "e": 2865
+                            "e": 2866
                         }
                     ],
                     [
                         {
-                            "v": 2865
+                            "v": 2866
                         }
                     ],
                     [
                         {
-                            "wv": 2866
+                            "wv": 2867
                         },
                         {
                             "wait": 500
                         },
                         {
-                            "k": 2865
+                            "k": 2866
                         }
                     ],
                     [],
@@ -34046,12 +34050,12 @@
                     [],
                     [
                         {
-                            "e": 2867
+                            "e": 2868
                         }
                     ],
                     [
                         {
-                            "v": 2867
+                            "v": 2868
                         },
                         {
                             "eval": "EVAL_IFRAME_SHOWN"
@@ -34059,7 +34063,7 @@
                     ],
                     [
                         {
-                            "c": 2867
+                            "c": 2868
                         }
                     ],
                     [],
@@ -34072,30 +34076,30 @@
                     "^https://([a-z0-9-]+\\.)*figma\\.com/",
                     11,
                     [
-                        2868,
-                        2869
+                        2869,
+                        2870
                     ],
                     [
                         {
-                            "e": 2870
+                            "e": 2871
                         }
                     ],
                     [
                         {
-                            "v": 2871
+                            "v": 2872
                         }
                     ],
                     [
                         {
-                            "c": 2872
+                            "c": 2873
                         }
                     ],
                     [
-                        {
-                            "cc": 2873
-                        },
                         {
                             "cc": 2874
+                        },
+                        {
+                            "cc": 2875
                         }
                     ],
                     {}
@@ -34107,47 +34111,47 @@
                     "^https://plus\\.gmx\\.com/lt(?:[?#]|$)",
                     1,
                     [
-                        2875
+                        2876
                     ],
                     [
                         {
-                            "e": 2875
+                            "e": 2876
                         }
                     ],
                     [
                         {
-                            "v": 2876
+                            "v": 2877
                         }
                     ],
                     [
                         {
                             "if": {
-                                "e": 2877
+                                "e": 2878
                             },
                             "then": [
                                 {
-                                    "c": 2877
+                                    "c": 2878
                                 }
                             ],
                             "else": [
                                 {
                                     "if": {
-                                        "e": 2878
+                                        "e": 2879
                                     },
                                     "then": [
                                         {
-                                            "c": 2878
-                                        },
-                                        {
-                                            "wv": 2879
-                                        },
-                                        {
                                             "c": 2879
+                                        },
+                                        {
+                                            "wv": 2880
+                                        },
+                                        {
+                                            "c": 2880
                                         }
                                     ],
                                     "else": [
                                         {
-                                            "c": 2879
+                                            "c": 2880
                                         }
                                     ]
                                 }
@@ -34156,7 +34160,7 @@
                     ],
                     [
                         {
-                            "cc": 2880
+                            "cc": 2881
                         }
                     ],
                     {}
@@ -34170,38 +34174,38 @@
                     [],
                     [
                         {
-                            "e": 2881
+                            "e": 2882
                         }
                     ],
                     [
                         {
-                            "v": 2881
+                            "v": 2882
                         }
                     ],
                     [
                         {
                             "if": {
-                                "v": 2882
+                                "v": 2883
                             },
                             "then": [
                                 {
-                                    "k": 2882
+                                    "k": 2883
                                 }
                             ],
                             "else": [
                                 {
-                                    "k": 2881
+                                    "k": 2882
                                 },
                                 {
-                                    "w": 2883
+                                    "w": 2884
                                 },
                                 {
                                     "all": true,
                                     "optional": true,
-                                    "k": 2884
+                                    "k": 2885
                                 },
                                 {
-                                    "c": 2885
+                                    "c": 2886
                                 }
                             ]
                         }
@@ -34218,33 +34222,33 @@
                     [],
                     [
                         {
-                            "e": 2886
+                            "e": 2887
                         }
                     ],
                     [
                         {
-                            "v": 2887
+                            "v": 2888
                         }
                     ],
                     [
                         {
                             "if": {
-                                "v": 2888
+                                "v": 2889
                             },
                             "then": [
                                 {
-                                    "k": 2888
+                                    "k": 2889
                                 }
                             ],
                             "else": [
                                 {
-                                    "k": 2886
+                                    "k": 2887
                                 },
                                 {
-                                    "wv": 2889
+                                    "wv": 2890
                                 },
                                 {
-                                    "c": 2890
+                                    "c": 2891
                                 }
                             ]
                         }
@@ -34261,17 +34265,17 @@
                     [],
                     [
                         {
-                            "e": 2891
+                            "e": 2892
                         }
                     ],
                     [
                         {
-                            "v": 2892
+                            "v": 2893
                         }
                     ],
                     [
                         {
-                            "c": 2892
+                            "c": 2893
                         }
                     ],
                     [],
@@ -34318,20 +34322,20 @@
                     [],
                     [
                         {
-                            "e": 2893
+                            "e": 2894
                         },
                         {
-                            "e": 2894
+                            "e": 2895
                         }
                     ],
                     [
                         {
-                            "v": 2894
+                            "v": 2895
                         }
                     ],
                     [
                         {
-                            "c": 2894
+                            "c": 2895
                         }
                     ],
                     [],
@@ -34344,28 +34348,28 @@
                     "^https?://(www\\.)?widiba\\.it/",
                     11,
                     [
-                        2895
+                        2896
                     ],
                     [
                         {
-                            "e": 2896
+                            "e": 2897
                         }
                     ],
                     [
                         {
-                            "v": 2895
+                            "v": 2896
                         }
                     ],
                     [
                         {
-                            "c": 2897
+                            "c": 2898
                         }
                     ],
                     [
                         {
                             "check": "none",
                             "timeout": 2000,
-                            "wv": 2895
+                            "wv": 2896
                         }
                     ],
                     {}
@@ -34626,7 +34630,7 @@
                         {
                             "retry": 10,
                             "retryInterval": 500,
-                            "c": 2898
+                            "c": 5222
                         },
                         {
                             "check": "none",
@@ -47967,6 +47971,33 @@
                             "wv": 2981
                         }
                     ],
+                    {}
+                ],
+                [
+                    1,
+                    "huawei-cookie-notice",
+                    2,
+                    "^https?://consumer\\.huawei\\.com/",
+                    22,
+                    [
+                        5223
+                    ],
+                    [
+                        {
+                            "e": 5224
+                        }
+                    ],
+                    [
+                        {
+                            "v": 5223
+                        }
+                    ],
+                    [
+                        {
+                            "c": 5224
+                        }
+                    ],
+                    [],
                     {}
                 ],
                 [
@@ -61768,7 +61799,7 @@
                     1,
                     "xhamster-eu",
                     2,
-                    "^https://(\\w+\\.)?(xhamster\\d*\\.(com|desi)|xh(wide|open|access|vid|fanclub)\\d*\\.com)/",
+                    "^https://(\\w+\\.)?(xhamster\\d*\\.(com|desi)|xh(wide|open|access|vid|fanclub|stream|name|spot)\\d*\\.com)/",
                     22,
                     [
                         5040
@@ -61805,7 +61836,7 @@
                     1,
                     "xhamster-us",
                     1,
-                    "^https://(\\w+\\.)?(xhamster\\d*\\.(com|desi)|xh(wide|open|access|vid|fanclub)\\d*\\.com)/",
+                    "^https://(\\w+\\.)?(xhamster\\d*\\.(com|desi)|xh(wide|open|access|vid|fanclub|stream|name|spot)\\d*\\.com)/",
                     22,
                     [
                         5090
@@ -62390,10 +62421,10 @@
                 ],
                 "specificRuleRange": [
                     635,
-                    1412
+                    1413
                 ],
-                "genericStringEnd": 2853,
-                "frameStringEnd": 2898
+                "genericStringEnd": 2854,
+                "frameStringEnd": 2899
             }
         }
     }

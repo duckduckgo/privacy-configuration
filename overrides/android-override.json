@@ -1147,8 +1147,15 @@
                     "minSupportedVersion": 53010000
                 },
                 "newChatHints": {
-                    "state": "disabled",
-                    "minSupportedVersion": 53040000
+                    "state": "enabled",
+                    "minSupportedVersion": 53040000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 50
+                            }
+                        ]
+                    }
                 }
             }
         },
@@ -5059,13 +5066,24 @@
                 "richDuckAiGridTabItem": {
                     "state": "enabled",
                     "minSupportedVersion": 53000000
+                },
+                "newTabTransitions": {
+                    "state": "enabled",
+                    "minSupportedVersion": 53040000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            }
+                        ]
+                    }
                 }
             }
         },
         "maliciousSiteProtection": {
             "state": "enabled",
             "settings": {
-                "hashPrefixUpdateFrequency": 20,
+                "hashPrefixUpdateFrequency": 480,
                 "filterSetUpdateFrequency": 720
             },
             "features": {
