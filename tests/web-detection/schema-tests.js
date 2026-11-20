@@ -23,9 +23,7 @@ describe('webDetection config tests', () => {
                                 data: {
                                     n: {
                                         value: { ref: 'n' },
-                                        buckets: [
-                                            { name: 'one', is: 1 },
-                                        ],
+                                        buckets: [{ name: 'one', is: 1 }],
                                     },
                                 },
                             },
@@ -42,10 +40,7 @@ describe('webDetection config tests', () => {
             expectRejected('block over text bodies', {
                 match: {
                     text: {
-                        all: [
-                            { pattern: 'a' },
-                            { pattern: 'b' },
-                        ],
+                        all: [{ pattern: 'a' }, { pattern: 'b' }],
                     },
                 },
                 actions,
@@ -58,10 +53,7 @@ describe('webDetection config tests', () => {
             expectRejected('empty selector entry', {
                 match: {
                     element: {
-                        selector: [
-                            'a',
-                            '',
-                        ],
+                        selector: ['a', ''],
                     },
                 },
                 actions,
@@ -79,9 +71,7 @@ describe('webDetection config tests', () => {
                         data: {
                             a: {
                                 value: 1,
-                                buckets: [
-                                    { name: '', is: 1 },
-                                ],
+                                buckets: [{ name: '', is: 1 }],
                             },
                         },
                     },

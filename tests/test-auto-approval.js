@@ -21,9 +21,7 @@ describe('Auto-approval logic tests', () => {
         },
         {
             name: 'Element hiding rules - should NOT approve',
-            patches: [
-                { op: 'add', path: '/features/elementHiding/settings/rules/0', value: { selector: '.ad', type: 'hide' } },
-            ],
+            patches: [{ op: 'add', path: '/features/elementHiding/settings/rules/0', value: { selector: '.ad', type: 'hide' } }],
             expected: false,
         },
         {
@@ -56,9 +54,7 @@ describe('Auto-approval logic tests', () => {
         },
         {
             name: 'Other feature changes - should NOT approve',
-            patches: [
-                { op: 'add', path: '/features/trackingProtection/settings/domains/0', value: { domain: 'test.com' } },
-            ],
+            patches: [{ op: 'add', path: '/features/trackingProtection/settings/domains/0', value: { domain: 'test.com' } }],
             expected: false,
         },
         {
@@ -138,9 +134,7 @@ describe('Auto-approvable features structure tests', () => {
     });
 
     it('should not approve element hiding rules changes', () => {
-        const rulesPatches = [
-            { op: 'add', path: '/features/elementHiding/settings/rules/0', value: { selector: '.ad', type: 'hide' } },
-        ];
+        const rulesPatches = [{ op: 'add', path: '/features/elementHiding/settings/rules/0', value: { selector: '.ad', type: 'hide' } }];
 
         const result = analyzePatchesForApproval(rulesPatches);
 
@@ -150,9 +144,7 @@ describe('Auto-approvable features structure tests', () => {
     });
 
     it('should not approve changes to other features', () => {
-        const otherFeaturePatches = [
-            { op: 'add', path: '/features/trackingProtection/settings/domains/0', value: { domain: 'test.com' } },
-        ];
+        const otherFeaturePatches = [{ op: 'add', path: '/features/trackingProtection/settings/domains/0', value: { domain: 'test.com' } }];
 
         const result = analyzePatchesForApproval(otherFeaturePatches);
 

@@ -57,81 +57,47 @@ function alignObjectStructure(base, update) {
 
     for (const key of baseKeys) {
         if (updateKeySet.has(key)) {
-            const [
-                bVal,
-                uVal,
-            ] = alignJsonStructure(base[key], update[key]);
+            const [bVal, uVal] = alignJsonStructure(base[key], update[key]);
             const isSame = JSON.stringify(bVal) === JSON.stringify(uVal);
             if (isSame) {
-                unchanged.push([
-                    key,
-                    bVal,
-                    uVal,
-                ]);
+                unchanged.push([key, bVal, uVal]);
             } else {
-                replaced.push([
-                    key,
-                    bVal,
-                    uVal,
-                ]);
+                replaced.push([key, bVal, uVal]);
             }
         } else {
-            removed.push([
-                key,
-                base[key],
-            ]);
+            removed.push([key, base[key]]);
         }
     }
 
     for (const key of updateKeys) {
         if (!(key in base)) {
-            added.push([
-                key,
-                update[key],
-            ]);
+            added.push([key, update[key]]);
         }
     }
 
     // 1. Unchanged (preserve base order)
-    for (const [
-        key,
-        b,
-        u,
-    ] of unchanged) {
+    for (const [key, b, u] of unchanged) {
         alignedBase[key] = b;
         alignedUpdate[key] = u;
     }
 
     // 2. Replaced (sorted)
-    for (const [
-        key,
-        b,
-        u,
-    ] of replaced.sort((a, b) => a[0].localeCompare(b[0]))) {
+    for (const [key, b, u] of replaced.sort((a, b) => a[0].localeCompare(b[0]))) {
         alignedBase[key] = b;
         alignedUpdate[key] = u;
     }
 
     // 3. Added (sorted)
-    for (const [
-        key,
-        u,
-    ] of added.sort((a, b) => a[0].localeCompare(b[0]))) {
+    for (const [key, u] of added.sort((a, b) => a[0].localeCompare(b[0]))) {
         alignedUpdate[key] = u;
     }
 
     // 4. Removed (sorted at end of base)
-    for (const [
-        key,
-        b,
-    ] of removed.sort((a, b) => a[0].localeCompare(b[0]))) {
+    for (const [key, b] of removed.sort((a, b) => a[0].localeCompare(b[0]))) {
         alignedBase[key] = b;
     }
 
-    return [
-        alignedBase,
-        alignedUpdate,
-    ];
+    return [alignedBase, alignedUpdate];
 }
 
 /**
@@ -149,9 +115,7 @@ function alignArrayByLCSWithBaseContext(baseArr, updateArr) {
     const updateHashes = updateArr.map(stableJsonStringify);
 
     const common = baseHashes.filter((h) => updateHashes.includes(h));
-    const dedupedCommon = [
-        ...new Set(common),
-    ];
+    const dedupedCommon = [...new Set(common)];
 
     const seenUpdateHashes = new Set();
 
@@ -191,10 +155,7 @@ function alignArrayByLCSWithBaseContext(baseArr, updateArr) {
         }
     }
 
-    return [
-        alignedBase,
-        alignedUpdate,
-    ];
+    return [alignedBase, alignedUpdate];
 }
 
 /**
@@ -209,32 +170,20 @@ function alignArrayByLCSWithBaseContext(baseArr, updateArr) {
 function alignJsonStructure(base, update) {
     if (Array.isArray(update)) {
         if (Array.isArray(base)) {
-            const [
-                alignedBaseArr,
-                alignedUpdateArr,
-            ] = alignArrayByLCSWithBaseContext(base, update);
+            const [alignedBaseArr, alignedUpdateArr] = alignArrayByLCSWithBaseContext(base, update);
             const alignedBase = [];
             const alignedUpdate = [];
 
             for (let i = 0; i < alignedUpdateArr.length; i++) {
-                const [
-                    b,
-                    u,
-                ] = alignJsonStructure(alignedBaseArr[i], alignedUpdateArr[i]);
+                const [b, u] = alignJsonStructure(alignedBaseArr[i], alignedUpdateArr[i]);
                 alignedBase.push(b);
                 alignedUpdate.push(u);
             }
 
-            return [
-                alignedBase,
-                alignedUpdate,
-            ];
+            return [alignedBase, alignedUpdate];
         } else {
             // No matching base array: return update as-is
-            return [
-                [],
-                update,
-            ];
+            return [[], update];
         }
     }
 
@@ -243,10 +192,7 @@ function alignJsonStructure(base, update) {
     }
 
     // primitive
-    return [
-        base,
-        update,
-    ];
+    return [base, update];
 }
 
 /**
@@ -259,10 +205,7 @@ function alignJsonStructure(base, update) {
 function displayApprovalStatus(dir1Files, dir2Files, isOpen) {
     const fileAnalysis = {};
 
-    for (const [
-        filePath,
-        fileContent,
-    ] of Object.entries(dir1Files)) {
+    for (const [filePath, fileContent] of Object.entries(dir1Files)) {
         if (filePath in dir2Files) {
             const fileOut = mungeFileContents(fileContent, filePath);
             const file2Out = mungeFileContents(dir2Files[filePath], filePath);
@@ -293,10 +236,7 @@ function displayApprovalStatus(dir1Files, dir2Files, isOpen) {
                 }
 
                 // Align structure of both objects for stable comparison
-                const [
-                    sortedJson1,
-                    sortedJson2,
-                ] = alignJsonStructure(patchedJson1, patchedJson2);
+                const [sortedJson1, sortedJson2] = alignJsonStructure(patchedJson1, patchedJson2);
 
                 // Compare the aligned configs
                 const patches = compare(sortedJson1, sortedJson2);
@@ -350,10 +290,7 @@ function displayApprovalStatus(dir1Files, dir2Files, isOpen) {
         error: [],
     };
 
-    for (const [
-        filePath,
-        analysis,
-    ] of Object.entries(fileAnalysis)) {
+    for (const [filePath, analysis] of Object.entries(fileAnalysis)) {
         groupedFiles[analysis.status].push({ filePath, ...analysis });
     }
 
@@ -449,10 +386,7 @@ const sections = {
 };
 
 function sortFiles(dirFiles, dirName) {
-    for (const [
-        filePath,
-        fileContent,
-    ] of Object.entries(dirFiles)) {
+    for (const [filePath, fileContent] of Object.entries(dirFiles)) {
         if (filePath.startsWith(`v${CURRENT_CONFIG_VERSION}`)) {
             sections.latest[dirName] = sections.latest[dirName] || {};
             sections.latest[dirName][filePath] = fileContent;
@@ -473,10 +407,7 @@ sortFiles(readFilesRecursively(dir2), 'dir2');
 
 let overallApprovalAnalysis = true;
 
-for (const [
-    section,
-    files,
-] of Object.entries(sections)) {
+for (const [section, files] of Object.entries(sections)) {
     const isOpen = section === 'latest';
     const result = displayApprovalStatus(files.dir1 || {}, files.dir2 || {}, isOpen);
 

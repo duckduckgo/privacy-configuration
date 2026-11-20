@@ -26,10 +26,7 @@ const lockPeerDeps = lock.packages?.['']?.peerDependencies || {};
 function checkDeps(pkgDeps, lockDepsMap, type) {
     const pkgDepsMap = pkgDeps || {};
 
-    for (const [
-        name,
-        specifier,
-    ] of Object.entries(pkgDepsMap)) {
+    for (const [name, specifier] of Object.entries(pkgDepsMap)) {
         // Skip local packages
         if (specifier.startsWith('file:')) continue;
 

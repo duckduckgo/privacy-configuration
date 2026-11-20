@@ -108,12 +108,7 @@ describe('Config schema tests', () => {
 
             it('All features should have a corresponding feature file if used in more than one platform', () => {
                 // Note: We should not add more to this list, only remove
-                const legacyFeatures = [
-                    'webViewBlobDownload',
-                    'experimentTest',
-                    'eme',
-                    'clientContentFeatures',
-                ];
+                const legacyFeatures = ['webViewBlobDownload', 'experimentTest', 'eme', 'clientContentFeatures'];
                 expect(featurePlatformUsage).to.be.an('object');
                 expect(Object.keys(featurePlatformUsage)).to.have.length.greaterThan(0);
 
@@ -153,9 +148,7 @@ describe('Config schema tests', () => {
                     }
                 }
 
-                const legacyFeatures = [
-                    'networkProtection',
-                ];
+                const legacyFeatures = ['networkProtection'];
                 for (const featureName of Object.keys(config.body.features)) {
                     // Ignore a non C-S-S feature that uses "domains"
                     if (legacyFeatures.includes(featureName)) {
@@ -218,19 +211,14 @@ describe('Config schema tests', () => {
             if (platform.startsWith('browsers/')) {
                 continue;
             }
-            for (const [
-                featureName,
-                baseFeature,
-            ] of Object.entries(baseFeatures)) {
+            for (const [featureName, baseFeature] of Object.entries(baseFeatures)) {
                 const overrideFeature = overrideConfig.features[featureName];
                 // Skip over if we have no override for this feature
                 if (!overrideFeature) continue;
                 if (!('features' in overrideFeature)) continue;
                 // Skip over if we have no subfeatures
                 if (!('features' in baseFeature)) continue;
-                for (const [
-                    subFeatureName,
-                ] of Object.entries(baseFeature.features)) {
+                for (const [subFeatureName] of Object.entries(baseFeature.features)) {
                     expect(overrideFeature.features[subFeatureName]).to.be.an(
                         'object',
                         `Missing override for ${platform} ${featureName}.${subFeatureName}`,
@@ -265,15 +253,9 @@ function compareVersions(a, b) {
  */
 function featureEntries(features) {
     const entries = [];
-    for (const [
-        featureName,
-        feature,
-    ] of Object.entries(features)) {
+    for (const [featureName, feature] of Object.entries(features)) {
         entries.push({ path: featureName, entry: feature });
-        for (const [
-            subFeatureName,
-            subFeature,
-        ] of Object.entries(feature.features || {})) {
+        for (const [subFeatureName, subFeature] of Object.entries(feature.features || {})) {
             entries.push({ path: `${featureName}.${subFeatureName}`, entry: subFeature });
         }
     }
@@ -306,10 +288,7 @@ describe('maxSupportedVersion', () => {
         it(`${previous?.name} should disable features that set maxSupportedVersion in ${latest.name}`, () => {
             for (const { path: entryPath, entry } of featureEntries(latest.body.features)) {
                 if (!('maxSupportedVersion' in entry)) continue;
-                const [
-                    featureName,
-                    subFeatureName,
-                ] = entryPath.split('.');
+                const [featureName, subFeatureName] = entryPath.split('.');
                 const feature = previous?.body.features[featureName];
                 const previousEntry = subFeatureName ? feature?.features?.[subFeatureName] : feature;
                 // End-of-life features are absent from older versions entirely.
@@ -322,10 +301,7 @@ describe('maxSupportedVersion', () => {
 
 // `immediate_v2` fires per de-duplicated delivery and `immediate` per raw occurrence, so clients
 // must not treat them as aliases — but every validation rule below applies to both.
-const IMMEDIATE_TRIGGER_TYPES = [
-    'immediate_v2',
-    'immediate',
-];
+const IMMEDIATE_TRIGGER_TYPES = ['immediate_v2', 'immediate'];
 const isImmediateTriggerType = (type) => IMMEDIATE_TRIGGER_TYPES.includes(type);
 
 describe('EventHub validation tests', () => {
@@ -352,19 +328,13 @@ describe('EventHub validation tests', () => {
             });
 
             it('trigger must be a valid period or immediate trigger', () => {
-                for (const [
-                    name,
-                    entry,
-                ] of Object.entries(telemetry)) {
+                for (const [name, entry] of Object.entries(telemetry)) {
                     const trigger = entry.trigger;
                     expect(trigger).to.be.an('object', `Telemetry '${name}' is missing trigger`);
                     // `type` is optional and defaults to 'period'.
                     const type = trigger.type ?? 'period';
                     expect(type).to.be.oneOf(
-                        [
-                            'period',
-                            ...IMMEDIATE_TRIGGER_TYPES,
-                        ],
+                        ['period', ...IMMEDIATE_TRIGGER_TYPES],
                         `Telemetry '${name}' has invalid trigger.type '${trigger.type}'`,
                     );
                     if (isImmediateTriggerType(type)) {
@@ -389,10 +359,7 @@ describe('EventHub validation tests', () => {
             }[config.name.split('/').pop() ?? ''];
             if (unparsedImmediateType) {
                 it(`immediate triggers must not use '${unparsedImmediateType}', which this platform skips`, () => {
-                    for (const [
-                        name,
-                        entry,
-                    ] of Object.entries(telemetry)) {
+                    for (const [name, entry] of Object.entries(telemetry)) {
                         expect(entry.trigger.type).to.not.equal(
                             unparsedImmediateType,
                             `Telemetry '${name}' uses trigger.type '${unparsedImmediateType}', which this platform skips`,
@@ -402,10 +369,7 @@ describe('EventHub validation tests', () => {
             }
 
             it('each telemetry entry declares a parameters object, and non-immediate entries have at least one', () => {
-                for (const [
-                    name,
-                    entry,
-                ] of Object.entries(telemetry)) {
+                for (const [name, entry] of Object.entries(telemetry)) {
                     const params = entry.parameters;
                     expect(params).to.be.an('object', `Telemetry '${name}' is missing parameters`);
                     // Immediate pixels fire once per event and may legitimately carry no parameters (e.g. a
@@ -425,31 +389,13 @@ describe('EventHub validation tests', () => {
             // back-compat default). Grouping the type-specific checks under these buckets means each
             // check only iterates the entries it applies to, and a future trigger type cannot slip
             // through a period-only check (as it would with an `=== 'immediate'` skip guard).
-            const periodEntries = Object.entries(telemetry).filter(
-                ([
-                    ,
-                    entry,
-                ]) => (entry.trigger.type ?? 'period') === 'period',
-            );
-            const immediateEntries = Object.entries(telemetry).filter(
-                ([
-                    ,
-                    entry,
-                ]) => isImmediateTriggerType(entry.trigger.type),
-            );
+            const periodEntries = Object.entries(telemetry).filter(([, entry]) => (entry.trigger.type ?? 'period') === 'period');
+            const immediateEntries = Object.entries(telemetry).filter(([, entry]) => isImmediateTriggerType(entry.trigger.type));
 
             describe('period telemetry entries', () => {
                 it('trigger period must specify at least one non-negative time unit', () => {
-                    const timeUnits = [
-                        'seconds',
-                        'minutes',
-                        'hours',
-                        'days',
-                    ];
-                    for (const [
-                        name,
-                        entry,
-                    ] of periodEntries) {
+                    const timeUnits = ['seconds', 'minutes', 'hours', 'days'];
+                    for (const [name, entry] of periodEntries) {
                         const period = entry.trigger.period;
                         expect(period).to.be.an('object', `Telemetry '${name}' is missing trigger.period`);
                         const hasTimeUnit = timeUnits.some((unit) => unit in period);
@@ -466,10 +412,7 @@ describe('EventHub validation tests', () => {
                 });
 
                 it('total trigger period must be greater than zero', () => {
-                    for (const [
-                        name,
-                        entry,
-                    ] of periodEntries) {
+                    for (const [name, entry] of periodEntries) {
                         const period = entry.trigger.period;
                         const totalSeconds =
                             (period.seconds || 0) + (period.minutes || 0) * 60 + (period.hours || 0) * 3600 + (period.days || 0) * 86400;
@@ -483,15 +426,10 @@ describe('EventHub validation tests', () => {
                 // Clients read an integer `trigger.period.seconds` and ignore days/hours/minutes, so
                 // config generation must collapse any authored unit object to a single integer `seconds`.
                 it('trigger period must be collapsed to a single integer seconds value', () => {
-                    for (const [
-                        name,
-                        entry,
-                    ] of periodEntries) {
+                    for (const [name, entry] of periodEntries) {
                         const period = entry.trigger.period;
                         expect(Object.keys(period)).to.deep.equal(
-                            [
-                                'seconds',
-                            ],
+                            ['seconds'],
                             `Telemetry '${name}' period must be collapsed to only { seconds }, got: ${JSON.stringify(period)}`,
                         );
                         expect(Number.isInteger(period.seconds)).to.equal(
@@ -507,14 +445,8 @@ describe('EventHub validation tests', () => {
                 // The counter template aggregates a count across a window, which is meaningless for a
                 // pixel that fires once per event. Disallow it on immediate triggers for now.
                 it('must not use counter parameters', () => {
-                    for (const [
-                        name,
-                        entry,
-                    ] of immediateEntries) {
-                        for (const [
-                            paramName,
-                            param,
-                        ] of Object.entries(entry.parameters || {})) {
+                    for (const [name, entry] of immediateEntries) {
+                        for (const [paramName, param] of Object.entries(entry.parameters || {})) {
                             expect(param.template).to.not.equal(
                                 'counter',
                                 `Immediate telemetry '${name}' parameter '${paramName}' must not use the 'counter' template`,
@@ -532,26 +464,18 @@ describe('EventHub validation tests', () => {
             const BASELINE_NAME_PREFIX = 'eventHub_baseline_';
             describe('baseline telemetry entries', () => {
                 it('eventHub_baseline_* pixels may only declare the baseline parameter', () => {
-                    for (const [
-                        name,
-                        entry,
-                    ] of Object.entries(telemetry)) {
+                    for (const [name, entry] of Object.entries(telemetry)) {
                         if (!name.startsWith(BASELINE_NAME_PREFIX)) continue;
                         const paramNames = Object.keys(entry.parameters || {});
                         expect(paramNames).to.deep.equal(
-                            [
-                                'baseline',
-                            ],
+                            ['baseline'],
                             `Baseline pixel '${name}' may only declare the 'baseline' parameter (no other parameters allowed for now), got: ${paramNames.join(', ')}`,
                         );
                     }
                 });
 
                 it('the baseline parameter is a counter sourced from "baseline" (fired even if no detector emits it)', () => {
-                    for (const [
-                        name,
-                        entry,
-                    ] of Object.entries(telemetry)) {
+                    for (const [name, entry] of Object.entries(telemetry)) {
                         if (!name.startsWith(BASELINE_NAME_PREFIX)) continue;
                         const param = (entry.parameters || {}).baseline;
                         expect(param, `Baseline pixel '${name}' must declare a 'baseline' parameter`).to.be.an('object');
@@ -569,21 +493,12 @@ describe('EventHub validation tests', () => {
             });
 
             // Every parameter of every entry, labelled `entry.param`, with whether its entry has an immediate trigger.
-            const params = Object.entries(telemetry).flatMap(
-                ([
-                    entryName,
-                    entry,
-                ]) =>
-                    Object.entries(entry.parameters || {}).map(
-                        ([
-                            paramName,
-                            param,
-                        ]) => ({
-                            label: `${entryName}.${paramName}`,
-                            param,
-                            immediate: isImmediateTriggerType(entry.trigger?.type),
-                        }),
-                    ),
+            const params = Object.entries(telemetry).flatMap(([entryName, entry]) =>
+                Object.entries(entry.parameters || {}).map(([paramName, param]) => ({
+                    label: `${entryName}.${paramName}`,
+                    param,
+                    immediate: isImmediateTriggerType(entry.trigger?.type),
+                })),
             );
 
             // Each check collects a message per failing parameter, so one run reports every broken parameter.
@@ -646,10 +561,7 @@ describe('EventHub validation tests', () => {
                 it('lt must be greater than gte', () => {
                     const errors = [];
                     for (const { label, param } of counterParams) {
-                        for (const [
-                            name,
-                            bucket,
-                        ] of Object.entries(param.buckets || {})) {
+                        for (const [name, bucket] of Object.entries(param.buckets || {})) {
                             if (bucket.lt !== undefined && !(bucket.lt > bucket.gte)) {
                                 errors.push(
                                     `Parameter '${label}' bucket '${name}' lt (${bucket.lt}) must be greater than gte (${bucket.gte})`,
@@ -664,10 +576,7 @@ describe('EventHub validation tests', () => {
                     const errors = [];
                     for (const { label, param } of counterParams) {
                         const gteValues = new Set(Object.values(param.buckets || {}).map((b) => b.gte));
-                        for (const [
-                            name,
-                            bucket,
-                        ] of Object.entries(param.buckets || {})) {
+                        for (const [name, bucket] of Object.entries(param.buckets || {})) {
                             if (bucket.lt !== undefined && !gteValues.has(bucket.lt)) {
                                 errors.push(`Parameter '${label}' bucket '${name}' lt (${bucket.lt}) does not match any bucket's gte`);
                             }
@@ -680,10 +589,7 @@ describe('EventHub validation tests', () => {
                     const errors = [];
                     for (const { label, param } of counterParams) {
                         const seen = new Set();
-                        for (const [
-                            name,
-                            bucket,
-                        ] of Object.entries(param.buckets || {})) {
+                        for (const [name, bucket] of Object.entries(param.buckets || {})) {
                             if (seen.has(bucket.gte)) {
                                 errors.push(`Parameter '${label}' has duplicate gte value ${bucket.gte} in bucket '${name}'`);
                             }
@@ -697,10 +603,7 @@ describe('EventHub validation tests', () => {
                     const errors = [];
                     for (const { label, param } of counterParams) {
                         const seen = new Set();
-                        for (const [
-                            name,
-                            bucket,
-                        ] of Object.entries(param.buckets || {})) {
+                        for (const [name, bucket] of Object.entries(param.buckets || {})) {
                             if (bucket.lt !== undefined) {
                                 if (seen.has(bucket.lt)) {
                                     errors.push(`Parameter '${label}' has duplicate lt value ${bucket.lt} in bucket '${name}'`);
@@ -716,17 +619,8 @@ describe('EventHub validation tests', () => {
                     const errors = [];
                     for (const { label, param } of counterParams) {
                         const unbounded = Object.entries(param.buckets || {})
-                            .filter(
-                                ([
-                                    ,
-                                    b,
-                                ]) => b.lt === undefined,
-                            )
-                            .map(
-                                ([
-                                    n,
-                                ]) => n,
-                            );
+                            .filter(([, b]) => b.lt === undefined)
+                            .map(([n]) => n);
                         if (unbounded.length > 1) {
                             errors.push(`Parameter '${label}' has ${unbounded.length} unbounded buckets: ${unbounded.join(', ')}`);
                         }
@@ -780,10 +674,7 @@ describe('dbp revokedBundleSigningKeys', () => {
     // Platform overrides of dbp.settings replace the base settings, so a key revoked in features/dbp.json
     // must also be copied into any override that sets dbp.settings.
     const baseRevokedKeys = readJsoncFile('./features/dbp.json').settings.revokedBundleSigningKeys;
-    for (const config of [
-        ...latestConfigs,
-        ...previousConfigs,
-    ]) {
+    for (const config of [...latestConfigs, ...previousConfigs]) {
         it(`${config.name} has exactly the revoked keys in features/dbp.json`, () => {
             const revokedKeys = config.body.features.dbp?.settings?.revokedBundleSigningKeys || [];
             expect(revokedKeys).to.have.members(baseRevokedKeys, `${config.name} revokedBundleSigningKeys`);
@@ -803,10 +694,7 @@ describe('Web detection detector schema', () => {
                 using: {
                     api: {
                         path: 'Math.max.apply',
-                        args: [
-                            null,
-                            { self: {} },
-                        ],
+                        args: [null, { self: {} }],
                     },
                 },
                 is: { gt: { self: 'length' } },
@@ -821,10 +709,7 @@ describe('Web detection detector schema', () => {
             match: {
                 api: 'document',
                 using: {
-                    div: [
-                        { self: 'title.length' },
-                        { self: { path: 'fonts.size' } },
-                    ],
+                    div: [{ self: 'title.length' }, { self: { path: 'fonts.size' } }],
                 },
                 is: { gt: 0 },
             },
@@ -841,10 +726,7 @@ describe('Web detection detector schema', () => {
                     field: {
                         api: {
                             path: 'Math.min',
-                            args: [
-                                { self: 'naturalWidth' },
-                                2000,
-                            ],
+                            args: [{ self: 'naturalWidth' }, 2000],
                         },
                     },
                 },
@@ -866,16 +748,11 @@ describe('Web detection detector schema', () => {
                         all: [
                             { ref: 'n', is: { gte: 3 } },
                             {
-                                none: [
-                                    { ref: 'this.sent', is: true },
-                                ],
+                                none: [{ ref: 'this.sent', is: true }],
                             },
                         ],
                     },
-                    then: [
-                        { fireEvent: { type: 'manyImages' } },
-                        { define: { 'this.sent': true } },
-                    ],
+                    then: [{ fireEvent: { type: 'manyImages' } }, { define: { 'this.sent': true } }],
                     else: { define: { few: true } },
                 },
             ],
@@ -908,20 +785,8 @@ describe('Web detection detector schema', () => {
         ]);
         expect(validate(array), formatErrors(validate.errors)).to.equal(true);
         expect(validate(field({ none: 0, some: { gte: 1 } }))).to.equal(false);
-        expect(
-            validate(
-                field([
-                    { name: 'none' },
-                ]),
-            ),
-        ).to.equal(false);
-        expect(
-            validate(
-                field([
-                    { name: 'none', is: 0, value: 0 },
-                ]),
-            ),
-        ).to.equal(false);
+        expect(validate(field([{ name: 'none' }]))).to.equal(false);
+        expect(validate(field([{ name: 'none', is: 0, value: 0 }]))).to.equal(false);
     });
 
     it('accepts `actions` without `match`', () => {

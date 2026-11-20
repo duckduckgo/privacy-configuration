@@ -13,10 +13,7 @@ import { Feature, SubFeature } from '../feature';
 // windows x thresholds form a product within one group; several groups express a partial
 // product (e.g. per-day windows at threshold 1, range windows at higher thresholds).
 type MetricConversion = {
-    windows: [
-        number,
-        number,
-    ][];
+    windows: [number, number][];
     // Convert on the Nth in-window occurrence. Sent as the pixel's `value` param.
     thresholds: number[];
 };

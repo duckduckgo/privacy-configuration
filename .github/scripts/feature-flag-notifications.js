@@ -52,9 +52,7 @@ function getCollaborators(projectTask) {
         collaborators.push(...advisorField.people_value.map((p) => p.gid));
     }
 
-    return [
-        ...new Set(collaborators),
-    ];
+    return [...new Set(collaborators)];
 }
 
 async function getSubtasks(id) {
@@ -111,9 +109,7 @@ function extractLatestDiff(body) {
     const latestMatch = body.match(/<details open>\s*<summary>latest<\/summary>([\s\S]*?)(?=<\/details>\s*$)/);
     if (!latestMatch) return null;
 
-    const diffBlocks = [
-        ...latestMatch[1].matchAll(/```diff([\s\S]*?)```/g),
-    ];
+    const diffBlocks = [...latestMatch[1].matchAll(/```diff([\s\S]*?)```/g)];
     if (diffBlocks.length === 0) return null;
 
     return diffBlocks.map((m) => m[1].trim()).join('\n\n');

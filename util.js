@@ -47,9 +47,7 @@ function addDomainRules(allowlist, domain, rule) {
 export function addAllowlistRule(allowlist, rule) {
     const dom = tldts.getDomain(rule.rule);
     addDomainRules(allowlist, dom, {
-        rules: [
-            rule,
-        ],
+        rules: [rule],
     });
 }
 
@@ -61,9 +59,7 @@ function addPathRule(rules, rule) {
     }
     existing.domains = Array.from(new Set(existing.domains.concat(rule.domains).sort()));
     if (existing.domains.includes('<all>')) {
-        existing.domains = [
-            '<all>',
-        ];
+        existing.domains = ['<all>'];
     }
 
     if (existing.reason === undefined) {
@@ -74,9 +70,7 @@ function addPathRule(rules, rule) {
     const newReason = rule.reason;
     if (!reasons.includes(rule.reason)) {
         existing.reason = reasons
-            .concat([
-                newReason,
-            ])
+            .concat([newReason])
             .filter(function (x) {
                 return x !== '';
             })
@@ -163,10 +157,7 @@ export function inlineReasonArrays(data) {
         return data.map(inlineReasonArrays);
     } else if (typeof data === 'object' && data !== null) {
         const res = {};
-        for (const [
-            k,
-            v,
-        ] of Object.entries(data)) {
+        for (const [k, v] of Object.entries(data)) {
             if (k === 'reason') {
                 // we collapse list 'reason' field values into a single string
                 res[k] = Array.isArray(v) ? v.join(' ') : v;
@@ -212,10 +203,7 @@ export function collapseEventHubTelemetryPeriods(config) {
         }
 
         let totalSeconds = 0;
-        for (const [
-            unit,
-            multiplier,
-        ] of Object.entries(PERIOD_UNIT_SECONDS)) {
+        for (const [unit, multiplier] of Object.entries(PERIOD_UNIT_SECONDS)) {
             if (typeof period[unit] === 'number') {
                 totalSeconds += period[unit] * multiplier;
             }
@@ -225,18 +213,11 @@ export function collapseEventHubTelemetryPeriods(config) {
     }
 }
 
-const WEB_DETECTION_ACTION_KEYS = [
-    'fireEvent',
-    'breakageReportData',
-    'define',
-];
+const WEB_DETECTION_ACTION_KEYS = ['fireEvent', 'breakageReportData', 'define'];
 
 // Actions whose order doesn't change what they do. C-S-S before 19.0.0 reads them only from an
 // `actions` object, so an object of just these stays one
-export const ORDER_FREE_ACTION_KEYS = [
-    'fireEvent',
-    'breakageReportData',
-];
+export const ORDER_FREE_ACTION_KEYS = ['fireEvent', 'breakageReportData'];
 
 /**
  * @param {unknown} value
@@ -260,25 +241,12 @@ function splitActions(node) {
         !Object.keys(node).some((key) => WEB_DETECTION_ACTION_KEYS.includes(key)) ||
         Object.keys(node).every((key) => ORDER_FREE_ACTION_KEYS.includes(key))
     ) {
-        return [
-            node,
-        ];
+        return [node];
     }
-    return Object.entries(node).flatMap(
-        ([
-            key,
-            value,
-        ]) =>
-            key === 'define' && isPlainObject(value)
-                ? Object.entries(value).map(
-                      ([
-                          name,
-                          defined,
-                      ]) => ({ define: { [name]: defined } }),
-                  )
-                : [
-                      { [key]: value },
-                  ],
+    return Object.entries(node).flatMap(([key, value]) =>
+        key === 'define' && isPlainObject(value)
+            ? Object.entries(value).map(([name, defined]) => ({ define: { [name]: defined } }))
+            : [{ [key]: value }],
     );
 }
 
@@ -305,15 +273,10 @@ function sequenceExpression(node) {
     if (Array.isArray(node)) return node.map(sequenceExpression);
     if (!isPlainObject(node)) return node;
     return Object.fromEntries(
-        Object.entries(node).map(
-            ([
-                key,
-                value,
-            ]) => [
-                key,
-                key === 'then' || key === 'else' ? sequenceBody(value) : sequenceExpression(value),
-            ],
-        ),
+        Object.entries(node).map(([key, value]) => [
+            key,
+            key === 'then' || key === 'else' ? sequenceBody(value) : sequenceExpression(value),
+        ]),
     );
 }
 
@@ -361,13 +324,7 @@ export function sequenceWebDetectionActions(config) {
                 for (const id of Object.keys(operation.value ?? {})) operation.value[id] = sequenceDetector(operation.value[id]);
             } else if (segments.length === 3) {
                 operation.value = sequenceDetector(operation.value);
-            } else if (
-                [
-                    'actions',
-                    'then',
-                    'else',
-                ].includes(segments[segments.length - 1])
-            ) {
+            } else if (['actions', 'then', 'else'].includes(segments[segments.length - 1])) {
                 operation.value = sequenceBody(operation.value);
             } else {
                 operation.value = sequenceExpression(operation.value);
@@ -416,12 +373,7 @@ export function renameEventHubImmediateTriggers(config, platform) {
  */
 function getCnameSources(tds, cnameTarget) {
     return Object.entries(tds.cnames)
-        .filter(
-            ([
-                k,
-                v,
-            ]) => v.endsWith(cnameTarget),
-        )
+        .filter(([k, v]) => v.endsWith(cnameTarget))
         .map((kv) => kv[0]);
 }
 

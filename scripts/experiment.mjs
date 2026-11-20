@@ -103,20 +103,9 @@ const MERGED_SETTINGS_FEATURES = [
  * @type {Partial<Record<Platform, string[]>>}
  */
 const DEDICATED_BUNDLE_FEATURES = {
-    android: [
-        'duckAiDataClearing',
-        'duckAiChatHistory',
-        'brokerProtection',
-        'autofillImport',
-    ],
-    ios: [
-        'duckAiDataClearing',
-        'duckAiChatHistory',
-    ],
-    macos: [
-        'duckAiDataClearing',
-        'duckAiChatHistory',
-    ],
+    android: ['duckAiDataClearing', 'duckAiChatHistory', 'brokerProtection', 'autofillImport'],
+    ios: ['duckAiDataClearing', 'duckAiChatHistory'],
+    macos: ['duckAiDataClearing', 'duckAiChatHistory'],
 };
 
 /**
@@ -131,10 +120,7 @@ export const ANDROID_SLOTS = [
  * @param {string} slot
  */
 export function slotUsedBefore(slot) {
-    return usedInHistory(slot, [
-        'overrides',
-        'features',
-    ]);
+    return usedInHistory(slot, ['overrides', 'features']);
 }
 
 /**
@@ -146,9 +132,7 @@ export function slotUsedBefore(slot) {
  */
 export function fractionalRolloutWarnings(percent, platforms) {
     if (Number.isInteger(percent) || !platforms.includes('windows')) return [];
-    return [
-        `Windows enrols rollouts by a whole percent, rounded down: ${percent}% enrols ${Math.floor(percent)}% there`,
-    ];
+    return [`Windows enrols rollouts by a whole percent, rounded down: ${percent}% enrols ${Math.floor(percent)}% there`];
 }
 
 /**
@@ -196,9 +180,7 @@ function addLocation(locations, file, path, platform) {
         locations.push({
             file,
             path,
-            platforms: [
-                platform,
-            ],
+            platforms: [platform],
         });
 }
 
@@ -220,28 +202,9 @@ export function locateSubfeature(ws, parent, slot) {
         const file = overrideFile(platform);
         const feature = ws.parse(file).features?.[parent];
         if (feature?.features !== undefined) {
-            if (feature.features[slot] !== undefined)
-                addLocation(
-                    locations,
-                    file,
-                    [
-                        'features',
-                        parent,
-                        'features',
-                        slot,
-                    ],
-                    platform,
-                );
+            if (feature.features[slot] !== undefined) addLocation(locations, file, ['features', parent, 'features', slot], platform);
         } else if (baseFile !== undefined && base.features?.[slot] !== undefined && (feature !== undefined || base.state !== undefined)) {
-            addLocation(
-                locations,
-                baseFile,
-                [
-                    'features',
-                    slot,
-                ],
-                platform,
-            );
+            addLocation(locations, baseFile, ['features', slot], platform);
         }
     }
     return locations;
@@ -263,28 +226,12 @@ export function locateSettings(ws, feature, platforms) {
     for (const platform of platforms) {
         const file = overrideFile(platform);
         if (ws.parse(file).features?.[feature]?.settings !== undefined) {
-            addLocation(
-                locations,
-                file,
-                [
-                    'features',
-                    feature,
-                    'settings',
-                ],
-                platform,
-            );
+            addLocation(locations, file, ['features', feature, 'settings'], platform);
             continue;
         }
         const baseFile = ws.featureFile(feature);
         if (baseFile === undefined) throw new Error(`${feature} has no base file and no settings in ${file}`);
-        addLocation(
-            locations,
-            baseFile,
-            [
-                'settings',
-            ],
-            platform,
-        );
+        addLocation(locations, baseFile, ['settings'], platform);
     }
     return locations;
 }
@@ -374,9 +321,7 @@ function cohortCondition(slot, cohort) {
  * @returns {PatchSettings}
  */
 function additionalCheckPatch(state) {
-    return [
-        { op: 'add', path: '/additionalCheck', value: state },
-    ];
+    return [{ op: 'add', path: '/additionalCheck', value: state }];
 }
 
 /**
@@ -433,26 +378,10 @@ export function appendChanges(ws, location, changes) {
     if (settings === undefined) {
         ws.edit(location.file, location.path, { conditionalChanges: changes });
     } else if (settings.conditionalChanges === undefined) {
-        ws.edit(
-            location.file,
-            [
-                ...location.path,
-                'conditionalChanges',
-            ],
-            changes,
-        );
+        ws.edit(location.file, [...location.path, 'conditionalChanges'], changes);
     } else {
         for (const change of changes)
-            ws.edit(
-                location.file,
-                [
-                    ...location.path,
-                    'conditionalChanges',
-                    -1,
-                ],
-                change,
-                { isArrayInsertion: true },
-            );
+            ws.edit(location.file, [...location.path, 'conditionalChanges', -1], change, { isArrayInsertion: true });
     }
 }
 
@@ -471,42 +400,18 @@ export function addSubfeature(ws, parent, platform, slot, config) {
     const feature = ws.parse(file).features?.[parent];
     if (feature === undefined) {
         if (parent !== EXPERIMENTS_FEATURE) throw new Error(`${parent} is not in ${file}; add it before adding subfeatures`);
-        ws.edit(
-            file,
-            [
-                'features',
-                parent,
-            ],
-            { state: 'enabled', exceptions: [], features: { [slot]: config } },
-        );
+        ws.edit(file, ['features', parent], { state: 'enabled', exceptions: [], features: { [slot]: config } });
     } else if (feature.features === undefined) {
         const baseFile = ws.featureFile(parent);
         const baseSubfeatures = baseFile === undefined ? undefined : ws.parse(baseFile).features;
         if (baseSubfeatures !== undefined && Object.keys(baseSubfeatures).length > 0) {
             throw new Error(`Adding ${slot} to ${file} would hide the subfeatures ${parent} defines in ${baseFile}`);
         }
-        ws.edit(
-            file,
-            [
-                'features',
-                parent,
-                'features',
-            ],
-            { [slot]: config },
-        );
+        ws.edit(file, ['features', parent, 'features'], { [slot]: config });
     } else if (feature.features[slot] !== undefined) {
         throw new Error(`${slot} already exists in ${file}`);
     } else {
-        ws.edit(
-            file,
-            [
-                'features',
-                parent,
-                'features',
-                slot,
-            ],
-            config,
-        );
+        ws.edit(file, ['features', parent, 'features', slot], config);
     }
 }
 
@@ -532,22 +437,13 @@ export function expectedLoads(cohort, control, production) {
  * @returns {string[]} the result as table lines
  */
 export function checkLoads({ slot, cohorts, control, enableFeatures, platforms, versions }, before, after) {
-    const columns = [
-        ...cohorts.map((c) => c.name),
-        'not enrolled',
-    ];
-    const lines = [
-        `| Platform | Feature | Production | ${columns.join(' | ')} |`,
-        `|---|---|---|${columns.map(() => '---|').join('')}`,
-    ];
+    const columns = [...cohorts.map((c) => c.name), 'not enrolled'];
+    const lines = [`| Platform | Feature | Production | ${columns.join(' | ')} |`, `|---|---|---|${columns.map(() => '---|').join('')}`];
     for (const feature of enableFeatures) {
         for (const platform of platforms) {
             const version = versions.get(platform);
             const production = loadsOn(before(feature, platform), platform, version);
-            const cells = [
-                ...cohorts.map((c) => c.name),
-                undefined,
-            ].map((cohort) => {
+            const cells = [...cohorts.map((c) => c.name), undefined].map((cohort) => {
                 const actual = loadsOn(after(feature, platform), platform, version, cohort === undefined ? {} : { [slot]: cohort });
                 if (actual !== expectedLoads(cohort, control, production)) {
                     throw new Error(
@@ -584,10 +480,7 @@ function builtFeature(configs, feature, platform) {
  * @returns {Promise<string[]>} the result as table lines
  */
 export async function checkBuiltLoads(ws, check) {
-    const [
-        before,
-        after,
-    ] = await Promise.all([
+    const [before, after] = await Promise.all([
         buildConfigs(copyWorkingTree(), check.platforms),
         buildConfigs(copyWorkingTree(ws.pending()), check.platforms),
     ]);
@@ -636,10 +529,7 @@ export function createExperiment(ws, options) {
 
     /** @type {Map<string, Map<Platform, MergedFeature>>} */
     const before = new Map();
-    for (const feature of new Set([
-        ...enableFeatures,
-        ...patches.map((patch) => patch.feature),
-    ])) {
+    for (const feature of new Set([...enableFeatures, ...patches.map((patch) => patch.feature)])) {
         /** @type {Map<Platform, MergedFeature>} */
         const perPlatform = new Map();
         for (const platform of platforms) {
@@ -686,9 +576,7 @@ export function createExperiment(ws, options) {
             ...(options.rollout !== undefined &&
                 options.rollout < 100 && {
                     rollout: {
-                        steps: [
-                            { percent: options.rollout },
-                        ],
+                        steps: [{ percent: options.rollout }],
                     },
                 }),
             cohorts,
@@ -718,15 +606,7 @@ export function createExperiment(ws, options) {
                     `${feature} has no minSupportedVersion on ${platform}; add one first, or enabling it reaches clients too old to apply the off block`,
                 );
             }
-            ws.edit(
-                file,
-                [
-                    'features',
-                    feature,
-                    'state',
-                ],
-                'enabled',
-            );
+            ws.edit(file, ['features', feature, 'state'], 'enabled');
         }
         for (const platform of platforms) {
             if (loads.get(platform) && control !== 'disabled')
@@ -762,10 +642,7 @@ export function createExperiment(ws, options) {
     for (const patch of patches) {
         const change = { condition: cohortCondition(slot, patch.cohort), patchSettings: patch.patchSettings };
         patchChanges.push(change);
-        for (const location of locateSettings(ws, patch.feature, platforms))
-            appendChanges(ws, location, [
-                change,
-            ]);
+        for (const location of locateSettings(ws, patch.feature, platforms)) appendChanges(ws, location, [change]);
     }
 
     /** @type {LoadsCheck} */
@@ -846,17 +723,7 @@ export function appendRolloutStep(ws, { parent, slot, percent, allowDecrease, pl
             if (!allowDecrease) throw new Error(`${slot} in ${location.file} is at ${last}%; lowering it needs --allow-decrease`);
             warnings.push(`Lowering ${slot} in ${location.file} from ${last}% to ${percent}%: only Android un-enrols users`);
         }
-        ws.edit(
-            location.file,
-            [
-                ...location.path,
-                'rollout',
-                'steps',
-                -1,
-            ],
-            { percent },
-            { isArrayInsertion: true },
-        );
+        ws.edit(location.file, [...location.path, 'rollout', 'steps', -1], { percent }, { isArrayInsertion: true });
     }
     return warnings;
 }
@@ -867,14 +734,7 @@ export function appendRolloutStep(ws, { parent, slot, percent, allowDecrease, pl
  */
 export function setSubfeatureState(ws, { parent, slot, state, platforms }) {
     for (const location of selectLocations(ws, parent, slot, platforms)) {
-        ws.edit(
-            location.file,
-            [
-                ...location.path,
-                'state',
-            ],
-            state,
-        );
+        ws.edit(location.file, [...location.path, 'state'], state);
     }
 }
 
@@ -886,39 +746,25 @@ export function setSubfeatureState(ws, { parent, slot, state, platforms }) {
  */
 function allConditionalChanges(ws) {
     const lists = [];
-    for (const [
-        feature,
-        file,
-    ] of Object.entries(ws.featureFiles)) {
+    for (const [feature, file] of Object.entries(ws.featureFiles)) {
         const changes = ws.parse(file).settings?.conditionalChanges;
         if (Array.isArray(changes))
             lists.push({
                 file,
                 feature,
-                path: [
-                    'settings',
-                    'conditionalChanges',
-                ],
+                path: ['settings', 'conditionalChanges'],
                 changes,
             });
     }
     for (const platform of PLATFORMS) {
         const file = overrideFile(platform);
-        for (const [
-            feature,
-            config,
-        ] of Object.entries(ws.parse(file).features ?? {})) {
+        for (const [feature, config] of Object.entries(ws.parse(file).features ?? {})) {
             const changes = /** @type {any} */ (config)?.settings?.conditionalChanges;
             if (Array.isArray(changes))
                 lists.push({
                     file,
                     feature,
-                    path: [
-                        'features',
-                        feature,
-                        'settings',
-                        'conditionalChanges',
-                    ],
+                    path: ['features', feature, 'settings', 'conditionalChanges'],
                     changes,
                 });
         }
@@ -935,11 +781,7 @@ function allConditionalChanges(ws) {
  */
 export function experimentChangeIndices(changes, slot) {
     return changes.flatMap((change, index) =>
-        conditionBlocks(change).every((block) => block.experiment?.experimentName === slot)
-            ? [
-                  index,
-              ]
-            : [],
+        conditionBlocks(change).every((block) => block.experiment?.experimentName === slot) ? [index] : [],
     );
 }
 
@@ -960,9 +802,7 @@ export function orphanedOffBlocks(changes, slotIndices) {
         index < lastEnable &&
         isOffBlock(change) &&
         !changes.some((other, later) => later > index && !slotIndices.includes(later) && isEnableBlock(other))
-            ? [
-                  index,
-              ]
+            ? [index]
             : [],
     );
 }
@@ -1008,14 +848,7 @@ export function removeExperiment(ws, parent, slot, { ship = false } = {}) {
     for (const location of locateSubfeature(ws, parent, slot)) {
         const remaining = Object.keys(valueAt(ws.parse(location.file), location.path.slice(0, -1)) ?? {});
         if (parent === EXPERIMENTS_FEATURE && location.file.startsWith('overrides/') && remaining.length === 1) {
-            ws.edit(
-                location.file,
-                [
-                    'features',
-                    parent,
-                ],
-                undefined,
-            );
+            ws.edit(location.file, ['features', parent], undefined);
         } else {
             ws.edit(location.file, location.path, undefined);
         }
@@ -1024,22 +857,11 @@ export function removeExperiment(ws, parent, slot, { ship = false } = {}) {
     for (const { file, feature, path, changes } of lists) {
         const indices = experimentChangeIndices(changes, slot);
         const offBlocks = orphanedOffBlocks(changes, indices);
-        const removed = [
-            ...indices,
-            ...offBlocks,
-        ].sort((a, b) => a - b);
+        const removed = [...indices, ...offBlocks].sort((a, b) => a - b);
         if (removed.length > 0 && removed.length === changes.length) {
             ws.edit(file, path, undefined);
         } else {
-            for (const index of removed.reverse())
-                ws.edit(
-                    file,
-                    [
-                        ...path,
-                        index,
-                    ],
-                    undefined,
-                );
+            for (const index of removed.reverse()) ws.edit(file, [...path, index], undefined);
         }
         if (indices.length > 0) lines.push(`Removed ${indices.length} conditional changes from ${feature} in ${file}`);
         for (const index of offBlocks) {
@@ -1048,34 +870,13 @@ export function removeExperiment(ws, parent, slot, { ship = false } = {}) {
             if (ship) continue;
             for (const platform of platforms) {
                 if (ws.parse(overrideFile(platform)).features?.[feature] !== undefined) {
-                    ws.edit(
-                        overrideFile(platform),
-                        [
-                            'features',
-                            feature,
-                            'state',
-                        ],
-                        'disabled',
-                    );
+                    ws.edit(overrideFile(platform), ['features', feature, 'state'], 'disabled');
                 }
             }
         }
     }
     const after = productionLoads(ws, features);
-    const changed = [
-        ...before,
-    ]
-        .filter(
-            ([
-                key,
-                loads,
-            ]) => after.get(key) !== loads,
-        )
-        .map(
-            ([
-                key,
-            ]) => key,
-        );
+    const changed = [...before].filter(([key, loads]) => after.get(key) !== loads).map(([key]) => key);
     if (changed.length > 0 && !ship) {
         throw new Error(`Removing ${slot} would change production for ${changed.join(', ')}; check its off blocks by hand`);
     }
@@ -1096,10 +897,7 @@ export function removeExperiment(ws, parent, slot, { ship = false } = {}) {
 export function experimentStatus(ws, parent, slot) {
     const locations = locateSubfeature(ws, parent, slot);
     if (locations.length === 0) throw new Error(`${slot} is not defined under ${parent}`);
-    const lines = [
-        '| Platforms | File | State | Rollout steps | Cohorts | minSupportedVersion |',
-        '|---|---|---|---|---|---|',
-    ];
+    const lines = ['| Platforms | File | State | Rollout steps | Cohorts | minSupportedVersion |', '|---|---|---|---|---|---|'];
     for (const location of locations) {
         /** @type {Subfeature} */
         const subfeature = valueAt(ws.parse(location.file), location.path);
@@ -1198,10 +996,7 @@ function parsePlatforms(value) {
  */
 function parseCohorts(value) {
     return value.split(',').map((pair) => {
-        const [
-            name,
-            weight,
-        ] = pair.split(':');
+        const [name, weight] = pair.split(':');
         if (!name || weight === undefined) throw new Error(`Invalid --cohorts entry: ${pair}`);
         return { name, weight: Number(weight) };
     });
@@ -1216,10 +1011,7 @@ export function parseVersions(value, flag) {
     /** @type {Partial<Record<Platform, Version>>} */
     const versions = {};
     for (const pair of value.split(',').filter(Boolean)) {
-        const [
-            platform,
-            version,
-        ] = pair.split('=');
+        const [platform, version] = pair.split('=');
         if (!PLATFORMS.includes(/** @type {Platform} */ (platform)) || !version) throw new Error(`Invalid ${flag} entry: ${pair}`);
         versions[/** @type {Platform} */ (platform)] = /^\d+$/.test(version) ? Number(version) : version;
     }
@@ -1261,21 +1053,8 @@ async function main() {
             help: { type: 'boolean', default: false },
         },
     });
-    const [
-        command,
-        slot,
-    ] = positionals;
-    if (
-        values.help ||
-        ![
-            'status',
-            'create',
-            'rollout',
-            'disable',
-            'remove',
-        ].includes(command) ||
-        !slot
-    ) {
+    const [command, slot] = positionals;
+    if (values.help || !['status', 'create', 'rollout', 'disable', 'remove'].includes(command) || !slot) {
         console.log(HELP);
         process.exit(values.help ? 0 : 1);
     }
@@ -1322,13 +1101,7 @@ async function main() {
     }
 
     for (const warning of warnings) console.warn(`Warning: ${warning}`);
-    console.log(
-        `\n${values['dry-run'] ? 'Would change' : 'Changed'}: ${
-            [
-                ...ws.changed,
-            ].join(', ') || 'nothing'
-        }`,
-    );
+    console.log(`\n${values['dry-run'] ? 'Would change' : 'Changed'}: ${[...ws.changed].join(', ') || 'nothing'}`);
     if (!values['dry-run']) await ws.flush();
 }
 

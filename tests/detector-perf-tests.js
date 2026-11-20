@@ -5,10 +5,7 @@ import platforms from '../platforms.js';
 const platformOutput = platforms.map((item) => item.replace('browsers/', 'extension-'));
 
 // Generated configs carry `immediate` or, for platforms that parse only that name, `immediate_v2`.
-const IMMEDIATE_TRIGGER_TYPES = [
-    'immediate',
-    'immediate_v2',
-];
+const IMMEDIATE_TRIGGER_TYPES = ['immediate', 'immediate_v2'];
 
 const latestConfigs = platformOutput.map((plat) => {
     return {
@@ -29,10 +26,7 @@ function assertThresholdEdges(edges, path) {
     expect(Array.isArray(edges), `${path}: expected an array, got ${JSON.stringify(edges)}`).to.equal(true);
     const values = /** @type {unknown[]} */ (edges);
     expect(values.length, `${path}: expected at least one edge`).to.be.greaterThan(0);
-    for (const [
-        index,
-        edge,
-    ] of values.entries()) {
+    for (const [index, edge] of values.entries()) {
         expect(
             typeof edge === 'number' && Number.isFinite(edge) && edge > 0,
             `${path}[${index}]: expected a positive finite number, got ${JSON.stringify(edge)}`,
@@ -110,10 +104,7 @@ function expectedEventTypes(settings, detectorGroups) {
  */
 function collectSources(telemetry) {
     const sources = new Map();
-    for (const [
-        entryName,
-        entry,
-    ] of Object.entries(telemetry ?? {})) {
+    for (const [entryName, entry] of Object.entries(telemetry ?? {})) {
         if (IMMEDIATE_TRIGGER_TYPES.includes(entry.trigger?.type) && entry.trigger.source) {
             const entries = sources.get(entry.trigger.source) ?? [];
             entries.push(entryName);
@@ -168,10 +159,7 @@ describe('detectorPerf config tests', () => {
                 if (settings.combinedSevereThresholdMs !== undefined) {
                     assertSevereCutoff(settings.combinedSevereThresholdMs, settings.combinedThresholdsMs, 'combinedSevereThresholdMs');
                 }
-                for (const [
-                    name,
-                    override,
-                ] of Object.entries(settings.detectorOverrides ?? {})) {
+                for (const [name, override] of Object.entries(settings.detectorOverrides ?? {})) {
                     expect(Object.hasOwn(webDetectionDetectors, name), `detectorOverrides/${name}: unknown Web Detection group`).to.equal(
                         true,
                     );
@@ -199,10 +187,7 @@ describe('detectorPerf config tests', () => {
             it('every detectorPerf eventHub source is an emittable event type (no stale entries)', () => {
                 const sources = collectSources(config.body.features?.eventHub?.settings?.telemetry);
                 const expected = expectedEventTypes(settings, detectorGroups);
-                for (const [
-                    source,
-                    entryNames,
-                ] of sources) {
+                for (const [source, entryNames] of sources) {
                     if (!source.startsWith('detectorPerf_')) continue;
                     expect(expected.has(source)).to.equal(
                         true,
@@ -226,10 +211,7 @@ describe('detectorPerf config tests', () => {
         for (const config of latestConfigs) {
             if (!config.name.includes('android')) continue;
             const telemetry = config.body.features?.eventHub?.settings?.telemetry ?? {};
-            for (const [
-                entryName,
-                entry,
-            ] of Object.entries(telemetry)) {
+            for (const [entryName, entry] of Object.entries(telemetry)) {
                 expect(entry.trigger?.type).to.not.be.oneOf(
                     IMMEDIATE_TRIGGER_TYPES,
                     `${config.name}: telemetry entry '${entryName}' uses an immediate trigger, which Android's EventHub parser rejects wholesale`,
@@ -247,11 +229,7 @@ describe('detectorPerf config tests', () => {
             if (detectorPerf?.state !== 'enabled') continue;
             const experiments = config.body.features?.contentScopeExperiments?.features ?? {};
             for (const change of detectorPerf.settings?.conditionalChanges ?? []) {
-                const blocks = Array.isArray(change.condition)
-                    ? change.condition
-                    : [
-                          change.condition,
-                      ];
+                const blocks = Array.isArray(change.condition) ? change.condition : [change.condition];
                 for (const block of blocks) {
                     if (!block?.experiment) continue;
                     const { experimentName, cohort } = block.experiment;

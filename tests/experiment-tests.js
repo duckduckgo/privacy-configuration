@@ -118,12 +118,7 @@ function workspace() {
 const CREATE = {
     slot: 'contentScopeExperiment12',
     parent: 'contentScopeExperiments',
-    platforms: [
-        'android',
-        'ios',
-        'macos',
-        'windows',
-    ],
+    platforms: ['android', 'ios', 'macos', 'windows'],
     cohorts: [
         { name: 'control', weight: 1 },
         { name: 'treatment', weight: 1 },
@@ -131,9 +126,7 @@ const CREATE = {
     rollout: 10,
     minVersions: {},
     description: undefined,
-    enableFeatures: [
-        'webDetection',
-    ],
+    enableFeatures: ['webDetection'],
     control: 'production',
     patches: [],
 };
@@ -177,15 +170,7 @@ describe('experiment', () => {
         });
 
         it('matches any block in an array', () => {
-            expect(
-                matchCondition(
-                    [
-                        { injectName: 'android' },
-                        { injectName: 'apple-isolated' },
-                    ],
-                    client,
-                ),
-            ).to.equal(true);
+            expect(matchCondition([{ injectName: 'android' }, { injectName: 'apple-isolated' }], client)).to.equal(true);
         });
 
         it('matches the assigned cohort only', () => {
@@ -194,12 +179,7 @@ describe('experiment', () => {
         });
 
         it('never matches page-scoped or build-scoped blocks', () => {
-            for (const block of [
-                { domain: 'example.com' },
-                { urlPattern: 'https://*' },
-                { internal: true },
-                { context: { top: true } },
-            ]) {
+            for (const block of [{ domain: 'example.com' }, { urlPattern: 'https://*' }, { internal: true }, { context: { top: true } }]) {
                 expect(matchCondition(/** @type {any} */ (block), client)).to.equal(false);
             }
         });
@@ -216,28 +196,19 @@ describe('experiment', () => {
         it('reports patches that fail and keeps applying the rest', () => {
             const failing = {
                 condition: { injectName: 'android' },
-                patchSettings: [
-                    { op: /** @type {const} */ ('add'), path: '/missing/value', value: 1 },
-                ],
+                patchSettings: [{ op: /** @type {const} */ ('add'), path: '/missing/value', value: 1 }],
             };
             const passing = {
                 condition: { injectName: 'android' },
-                patchSettings: [
-                    { op: /** @type {const} */ ('add'), path: '/value', value: 2 },
-                ],
+                patchSettings: [{ op: /** @type {const} */ ('add'), path: '/value', value: 2 }],
             };
             const { settings, failed } = applyConditionalChanges(
                 {
-                    conditionalChanges: [
-                        failing,
-                        passing,
-                    ],
+                    conditionalChanges: [failing, passing],
                 },
                 { injectName: 'android', version: 1, cohorts: {} },
             );
-            expect(failed).to.deep.equal([
-                failing,
-            ]);
+            expect(failed).to.deep.equal([failing]);
             expect(/** @type {any} */ (settings).value).to.equal(2);
         });
     });
@@ -248,77 +219,34 @@ describe('experiment', () => {
             expect(locations).to.deep.equal([
                 {
                     file: 'overrides/android-override.json',
-                    path: [
-                        'features',
-                        'contentScopeExperiments',
-                        'features',
-                        'contentScopeExperiment5',
-                    ],
-                    platforms: [
-                        'android',
-                    ],
+                    path: ['features', 'contentScopeExperiments', 'features', 'contentScopeExperiment5'],
+                    platforms: ['android'],
                 },
             ]);
         });
 
         it('finds a base subfeature on every platform whose override keeps the base subfeatures', () => {
-            const [
-                location,
-            ] = locateSubfeature(workspace(), 'subTest', 'baseSub');
+            const [location] = locateSubfeature(workspace(), 'subTest', 'baseSub');
             expect(location.file).to.equal('features/sub-test.json');
-            expect(location.platforms).to.deep.equal([
-                'android',
-                'ios',
-                'windows',
-                'extension',
-            ]);
+            expect(location.platforms).to.deep.equal(['android', 'ios', 'windows', 'extension']);
         });
 
         it('finds settings in the override that declares them, else the base file', () => {
-            const locations = locateSettings(workspace(), 'webDetection', [
-                'android',
-                'windows',
-                'ios',
-            ]);
-            expect(
-                locations.map((l) => [
-                    l.file,
-                    l.platforms,
-                ]),
-            ).to.deep.equal([
-                [
-                    'features/web-detection.json',
-                    [
-                        'android',
-                        'ios',
-                    ],
-                ],
-                [
-                    'overrides/windows-override.json',
-                    [
-                        'windows',
-                    ],
-                ],
+            const locations = locateSettings(workspace(), 'webDetection', ['android', 'windows', 'ios']);
+            expect(locations.map((l) => [l.file, l.platforms])).to.deep.equal([
+                ['features/web-detection.json', ['android', 'ios']],
+                ['overrides/windows-override.json', ['windows']],
             ]);
         });
 
         it('refuses settings the build merges', () => {
-            expect(() =>
-                locateSettings(workspace(), 'eventHub', [
-                    'android',
-                ]),
-            ).to.throw('merged by the build');
+            expect(() => locateSettings(workspace(), 'eventHub', ['android'])).to.throw('merged by the build');
         });
     });
 
     describe('slots', () => {
         it('lists the slots in use', () => {
-            expect([
-                ...slotsInUse(workspace()),
-            ]).to.deep.equal([
-                'contentScopeExperiment5',
-                'contentScopeExperiment6',
-            ]);
+            expect([...slotsInUse(workspace())]).to.deep.equal(['contentScopeExperiment5', 'contentScopeExperiment6']);
         });
 
         it('skips slots in use or used before', () => {
@@ -341,9 +269,7 @@ describe('experiment', () => {
                         description: 'Cohorts control 1, treatment 1',
                         minSupportedVersion: '0.178.0',
                         rollout: {
-                            steps: [
-                                { percent: 10 },
-                            ],
+                            steps: [{ percent: 10 }],
                         },
                         cohorts: CREATE.cohorts,
                     },
@@ -360,9 +286,7 @@ describe('experiment', () => {
                     ...CREATE,
                     parent: 'subTest',
                     slot: 'newSub',
-                    platforms: [
-                        'android',
-                    ],
+                    platforms: ['android'],
                     enableFeatures: [],
                 }),
             ).to.throw('would hide');
@@ -371,9 +295,7 @@ describe('experiment', () => {
                     ...CREATE,
                     parent: 'missing',
                     slot: 'newSub',
-                    platforms: [
-                        'ios',
-                    ],
+                    platforms: ['ios'],
                     enableFeatures: [],
                 }),
             ).to.throw('is not in overrides/ios-override.json');
@@ -384,26 +306,11 @@ describe('experiment', () => {
             const { warnings } = createExperiment(ws, CREATE);
             expect(ws.parse('overrides/ios-override.json').features.webDetection.state).to.equal('enabled');
             expect(ws.parse('overrides/windows-override.json').features.webDetection.state).to.equal('enabled');
-            for (const [
-                platform,
-                production,
-            ] of /** @type {const} */ ([
-                [
-                    'android',
-                    true,
-                ],
-                [
-                    'ios',
-                    false,
-                ],
-                [
-                    'macos',
-                    true,
-                ],
-                [
-                    'windows',
-                    false,
-                ],
+            for (const [platform, production] of /** @type {const} */ ([
+                ['android', true],
+                ['ios', false],
+                ['macos', true],
+                ['windows', false],
             ])) {
                 expect(webDetectionLoads(ws, platform, undefined), `${platform} not enrolled`).to.equal(production);
                 expect(webDetectionLoads(ws, platform, 'control'), `${platform} control`).to.equal(production);
@@ -415,32 +322,20 @@ describe('experiment', () => {
         it('scopes the off block to iOS without catching macOS', () => {
             const ws = workspace();
             createExperiment(ws, CREATE);
-            const [
-                off,
-                on,
-            ] = ws.parse('features/web-detection.json').settings.conditionalChanges;
+            const [off, on] = ws.parse('features/web-detection.json').settings.conditionalChanges;
             expect(off.condition).to.deep.equal([
                 { injectName: 'apple', minSupportedVersion: '7.0.0' },
                 { injectName: 'apple-isolated', minSupportedVersion: '7.0.0' },
             ]);
-            expect(on.condition).to.deep.equal([
-                { experiment: { experimentName: 'contentScopeExperiment12', cohort: 'treatment' } },
-            ]);
+            expect(on.condition).to.deep.equal([{ experiment: { experimentName: 'contentScopeExperiment12', cohort: 'treatment' } }]);
             const windows = ws.parse('overrides/windows-override.json').features.webDetection.settings.conditionalChanges;
-            expect(windows[0].condition).to.deep.equal([
-                { injectName: 'windows' },
-            ]);
+            expect(windows[0].condition).to.deep.equal([{ injectName: 'windows' }]);
         });
 
         it('control disabled: control off everywhere', () => {
             const ws = workspace();
             createExperiment(ws, { ...CREATE, control: 'disabled' });
-            for (const platform of /** @type {const} */ ([
-                'android',
-                'ios',
-                'macos',
-                'windows',
-            ])) {
+            for (const platform of /** @type {const} */ (['android', 'ios', 'macos', 'windows'])) {
                 expect(webDetectionLoads(ws, platform, 'control'), platform).to.equal(false);
                 expect(webDetectionLoads(ws, platform, 'treatment'), platform).to.equal(true);
             }
@@ -450,12 +345,7 @@ describe('experiment', () => {
         it('control enabled: control on everywhere', () => {
             const ws = workspace();
             createExperiment(ws, { ...CREATE, control: 'enabled' });
-            for (const platform of /** @type {const} */ ([
-                'android',
-                'ios',
-                'macos',
-                'windows',
-            ])) {
+            for (const platform of /** @type {const} */ (['android', 'ios', 'macos', 'windows'])) {
                 expect(webDetectionLoads(ws, platform, 'control'), platform).to.equal(true);
             }
             expect(webDetectionLoads(ws, 'ios', undefined)).to.equal(false);
@@ -463,51 +353,35 @@ describe('experiment', () => {
 
         it('applies a patch for one cohort, and refuses one that fails to apply', () => {
             const ws = workspace();
-            const patchSettings = [
-                { op: /** @type {const} */ ('add'), path: '/detectors/extra', value: {} },
-            ];
+            const patchSettings = [{ op: /** @type {const} */ ('add'), path: '/detectors/extra', value: {} }];
             createExperiment(ws, {
                 ...CREATE,
                 enableFeatures: [],
-                patches: [
-                    { cohort: 'treatment', feature: 'webDetection', patchSettings },
-                ],
+                patches: [{ cohort: 'treatment', feature: 'webDetection', patchSettings }],
             });
-            const [
-                change,
-            ] = ws.parse('features/web-detection.json').settings.conditionalChanges;
+            const [change] = ws.parse('features/web-detection.json').settings.conditionalChanges;
             expect(change).to.deep.equal({
                 condition: { experiment: { experimentName: 'contentScopeExperiment12', cohort: 'treatment' } },
                 patchSettings,
             });
 
-            const failing = [
-                { op: /** @type {const} */ ('add'), path: '/missing/value', value: 1 },
-            ];
+            const failing = [{ op: /** @type {const} */ ('add'), path: '/missing/value', value: 1 }];
             expect(() =>
                 createExperiment(workspace(), {
                     ...CREATE,
                     enableFeatures: [],
-                    patches: [
-                        { cohort: 'treatment', feature: 'webDetection', patchSettings: failing },
-                    ],
+                    patches: [{ cohort: 'treatment', feature: 'webDetection', patchSettings: failing }],
                 }),
             ).to.throw('fails to apply');
         });
 
         it('warns about a patch that changes nothing', () => {
-            const noOp = [
-                { op: /** @type {const} */ ('replace'), path: '/missing', value: 1 },
-            ];
+            const noOp = [{ op: /** @type {const} */ ('replace'), path: '/missing', value: 1 }];
             const { warnings } = createExperiment(workspace(), {
                 ...CREATE,
-                platforms: [
-                    'android',
-                ],
+                platforms: ['android'],
                 enableFeatures: [],
-                patches: [
-                    { cohort: 'treatment', feature: 'webDetection', patchSettings: noOp },
-                ],
+                patches: [{ cohort: 'treatment', feature: 'webDetection', patchSettings: noOp }],
             });
             expect(warnings).to.include('The webDetection patch for treatment changes nothing on android (android)');
         });
@@ -525,12 +399,8 @@ describe('experiment', () => {
             expect(() =>
                 createExperiment(ws, {
                     ...CREATE,
-                    platforms: [
-                        'android',
-                    ],
-                    enableFeatures: [
-                        'duckAiDataClearing',
-                    ],
+                    platforms: ['android'],
+                    enableFeatures: ['duckAiDataClearing'],
                 }),
             ).to.throw('also loads in its own C-S-S bundle on android');
         });
@@ -540,27 +410,20 @@ describe('experiment', () => {
                 ...CREATE,
                 parent: 'subTest',
                 slot: 'newSub',
-                platforms: /** @type {import('../scripts/config-conditions.mjs').Platform[]} */ ([
-                    'android',
-                ]),
+                platforms: /** @type {import('../scripts/config-conditions.mjs').Platform[]} */ (['android']),
             };
             expect(() => createExperiment(workspace(), options)).to.throw('only matches cohorts under contentScopeExperiments');
             expect(() =>
                 createExperiment(workspace(), {
                     ...options,
                     enableFeatures: [],
-                    patches: [
-                        { cohort: 'treatment', feature: 'webDetection', patchSettings: [] },
-                    ],
+                    patches: [{ cohort: 'treatment', feature: 'webDetection', patchSettings: [] }],
                 }),
             ).to.throw('only matches cohorts under contentScopeExperiments');
         });
 
         it('refuses a feature in internal or preview state', () => {
-            for (const state of [
-                'internal',
-                'preview',
-            ]) {
+            for (const state of ['internal', 'preview']) {
                 const files = {
                     ...FILES,
                     'overrides/android-override.json': `{ "features": { "webDetection": { "state": "${state}", "minSupportedVersion": 52700000 } } }`,
@@ -569,9 +432,7 @@ describe('experiment', () => {
                 expect(() =>
                     createExperiment(ws, {
                         ...CREATE,
-                        platforms: [
-                            'android',
-                        ],
+                        platforms: ['android'],
                     }),
                 ).to.throw(`webDetection is ${state} on android; switching it per cohort would turn it off for ${state} users`);
                 expect(ws.pending().size).to.equal(0);
@@ -587,9 +448,7 @@ describe('experiment', () => {
             expect(() =>
                 createExperiment(ws, {
                     ...CREATE,
-                    platforms: [
-                        'android',
-                    ],
+                    platforms: ['android'],
                 }),
             ).to.throw('webDetection has no minSupportedVersion on android');
         });
@@ -607,9 +466,7 @@ describe('experiment', () => {
                     percent: 12.5,
                     allowDecrease: false,
                 }),
-            ).to.deep.equal([
-                'Windows enrols rollouts by a whole percent, rounded down: 12.5% enrols 12% there',
-            ]);
+            ).to.deep.equal(['Windows enrols rollouts by a whole percent, rounded down: 12.5% enrols 12% there']);
         });
 
         it('gives the same result on the built config', async function () {
@@ -630,10 +487,7 @@ describe('experiment', () => {
             appendRolloutStep(ws, { ...options, percent: 25 });
             expect(
                 ws.parse('overrides/ios-override.json').features.contentScopeExperiments.features.contentScopeExperiment12.rollout.steps,
-            ).to.deep.equal([
-                { percent: 10 },
-                { percent: 25 },
-            ]);
+            ).to.deep.equal([{ percent: 10 }, { percent: 25 }]);
             expect(() => appendRolloutStep(ws, { ...options, percent: 25 })).to.throw('already at 25%');
             expect(() => appendRolloutStep(ws, { ...options, percent: 10 })).to.throw('--allow-decrease');
             expect(appendRolloutStep(ws, { ...options, percent: 10, allowDecrease: true })[0]).to.contain('only Android un-enrols');
@@ -660,29 +514,19 @@ describe('experiment', () => {
                     slot: 'baseSub',
                     percent: 50,
                     allowDecrease: false,
-                    platforms: [
-                        'android',
-                    ],
+                    platforms: ['android'],
                 }),
             ).to.throw('include all of them');
             const ws = workspace();
             appendRolloutStep(ws, { parent: 'subTest', slot: 'baseSub', percent: 50, allowDecrease: false });
-            expect(ws.parse('features/sub-test.json').features.baseSub.rollout.steps).to.deep.equal([
-                { percent: 10 },
-                { percent: 50 },
-            ]);
+            expect(ws.parse('features/sub-test.json').features.baseSub.rollout.steps).to.deep.equal([{ percent: 10 }, { percent: 50 }]);
         });
 
         it('disables the slot everywhere', () => {
             const ws = workspace();
             createExperiment(ws, CREATE);
             setSubfeatureState(ws, { parent: 'contentScopeExperiments', slot: 'contentScopeExperiment12', state: 'disabled' });
-            for (const platform of [
-                'android',
-                'ios',
-                'macos',
-                'windows',
-            ]) {
+            for (const platform of ['android', 'ios', 'macos', 'windows']) {
                 expect(
                     ws.parse(`overrides/${platform}-override.json`).features.contentScopeExperiments.features.contentScopeExperiment12
                         .state,
@@ -702,66 +546,22 @@ describe('experiment', () => {
 
         it('finds the blocks that name the slot, and the off blocks only they switch back on', () => {
             const off = {
-                condition: [
-                    { injectName: 'windows' },
-                ],
-                patchSettings: [
-                    { op: 'add', path: '/additionalCheck', value: 'disabled' },
-                ],
+                condition: [{ injectName: 'windows' }],
+                patchSettings: [{ op: 'add', path: '/additionalCheck', value: 'disabled' }],
             };
             /** @param {string} experimentName */
             const enable = (experimentName) => ({
-                condition: [
-                    { experiment: { experimentName, cohort: 'treatment' } },
-                ],
-                patchSettings: [
-                    { op: 'add', path: '/additionalCheck', value: 'enabled' },
-                ],
+                condition: [{ experiment: { experimentName, cohort: 'treatment' } }],
+                patchSettings: [{ op: 'add', path: '/additionalCheck', value: 'enabled' }],
             });
             const patch = { condition: { experiment: { experimentName: 'exp', cohort: 'treatment' } }, patchSettings: [] };
             const other = { condition: { injectName: 'android' }, patchSettings: [] };
-            const changes = /** @type {any} */ ([
-                other,
-                off,
-                enable('exp'),
-                patch,
-            ]);
-            expect(experimentChangeIndices(changes, 'exp')).to.deep.equal([
-                2,
-                3,
-            ]);
-            expect(
-                orphanedOffBlocks(
-                    changes,
-                    [
-                        2,
-                        3,
-                    ],
-                ),
-            ).to.deep.equal([
-                1,
-            ]);
-            const shared = /** @type {any} */ ([
-                off,
-                enable('exp'),
-                enable('later'),
-            ]);
-            expect(
-                orphanedOffBlocks(
-                    shared,
-                    [
-                        1,
-                    ],
-                ),
-            ).to.deep.equal([]);
-            expect(
-                orphanedOffBlocks(
-                    changes,
-                    [
-                        3,
-                    ],
-                ),
-            ).to.deep.equal([]);
+            const changes = /** @type {any} */ ([other, off, enable('exp'), patch]);
+            expect(experimentChangeIndices(changes, 'exp')).to.deep.equal([2, 3]);
+            expect(orphanedOffBlocks(changes, [2, 3])).to.deep.equal([1]);
+            const shared = /** @type {any} */ ([off, enable('exp'), enable('later')]);
+            expect(orphanedOffBlocks(shared, [1])).to.deep.equal([]);
+            expect(orphanedOffBlocks(changes, [3])).to.deep.equal([]);
         });
 
         it('restores every file, turning off the features create turned on', () => {
@@ -769,19 +569,14 @@ describe('experiment', () => {
             createExperiment(ws, {
                 ...CREATE,
                 control: 'disabled',
-                patches: [
-                    { cohort: 'treatment', feature: 'webDetection', patchSettings: [] },
-                ],
+                patches: [{ cohort: 'treatment', feature: 'webDetection', patchSettings: [] }],
             });
             const lines = removeExperiment(ws, 'contentScopeExperiments', 'contentScopeExperiment12');
             expect(lines).to.include('Removed the webDetection off block for ios from features/web-detection.json');
             expect(lines).to.include(
                 'webDetection state: android enabled, ios disabled, macos enabled, windows disabled, extension disabled',
             );
-            for (const [
-                file,
-                original,
-            ] of Object.entries(FILES)) {
+            for (const [file, original] of Object.entries(FILES)) {
                 expect(ws.parse(file), file).to.deep.equal(parseJsonc(original, file));
             }
             expect(ws.read('features/web-detection.json')).to.contain('// Base web detection');
@@ -802,10 +597,7 @@ describe('experiment', () => {
             createExperiment(ws, CREATE);
             createExperiment(ws, { ...CREATE, slot: 'contentScopeExperiment13' });
             removeExperiment(ws, 'contentScopeExperiments', 'contentScopeExperiment12');
-            for (const platform of /** @type {const} */ ([
-                'ios',
-                'windows',
-            ])) {
+            for (const platform of /** @type {const} */ (['ios', 'windows'])) {
                 expect(webDetectionLoads(ws, platform, undefined), platform).to.equal(false);
             }
             const lines = removeExperiment(ws, 'contentScopeExperiments', 'contentScopeExperiment13');

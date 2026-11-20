@@ -14,15 +14,9 @@ import { readJsoncFile } from '../util.js';
 function splitDomainPath(rule) {
     const slashIndex = rule.indexOf('/');
     if (slashIndex === -1) {
-        return [
-            rule,
-            '',
-        ];
+        return [rule, ''];
     }
-    return [
-        rule.slice(0, slashIndex),
-        rule.slice(slashIndex),
-    ];
+    return [rule.slice(0, slashIndex), rule.slice(slashIndex)];
 }
 
 /**
@@ -90,14 +84,8 @@ function compareRules(ruleA, ruleB) {
         return 'incomparable';
     }
 
-    const [
-        domA,
-        pathA,
-    ] = splitDomainPath(ruleA);
-    const [
-        domB,
-        pathB,
-    ] = splitDomainPath(ruleB);
+    const [domA, pathA] = splitDomainPath(ruleA);
+    const [domB, pathB] = splitDomainPath(ruleB);
 
     const pathComp = compareRulePaths(pathA, pathB);
 
@@ -211,10 +199,7 @@ function validateTrackerRules(trackerDomain, rules) {
  */
 function validateAllowlist(allowlistedTrackers) {
     const errors = [];
-    for (const [
-        trackerDomain,
-        tracker,
-    ] of Object.entries(allowlistedTrackers)) {
+    for (const [trackerDomain, tracker] of Object.entries(allowlistedTrackers)) {
         errors.push(...validateTrackerRules(trackerDomain, tracker.rules));
     }
     return errors;
@@ -223,31 +208,19 @@ function validateAllowlist(allowlistedTrackers) {
 describe('tracker-allowlist-validator', () => {
     describe('splitDomainPath', () => {
         it('splits domain and path', () => {
-            expect(splitDomainPath('tracker.com/api/endpoint')).to.deep.equal([
-                'tracker.com',
-                '/api/endpoint',
-            ]);
+            expect(splitDomainPath('tracker.com/api/endpoint')).to.deep.equal(['tracker.com', '/api/endpoint']);
         });
 
         it('returns empty path when no slash', () => {
-            expect(splitDomainPath('tracker.com')).to.deep.equal([
-                'tracker.com',
-                '',
-            ]);
+            expect(splitDomainPath('tracker.com')).to.deep.equal(['tracker.com', '']);
         });
 
         it('returns slash as path when rule ends with slash', () => {
-            expect(splitDomainPath('tracker.com/')).to.deep.equal([
-                'tracker.com',
-                '/',
-            ]);
+            expect(splitDomainPath('tracker.com/')).to.deep.equal(['tracker.com', '/']);
         });
 
         it('handles subdomain with path', () => {
-            expect(splitDomainPath('cdn.tracker.com/api')).to.deep.equal([
-                'cdn.tracker.com',
-                '/api',
-            ]);
+            expect(splitDomainPath('cdn.tracker.com/api')).to.deep.equal(['cdn.tracker.com', '/api']);
         });
     });
 
@@ -384,15 +357,11 @@ describe('tracker-allowlist-validator', () => {
             const rules = [
                 {
                     rule: 'tracker.com/api',
-                    domains: [
-                        'site1.com',
-                    ],
+                    domains: ['site1.com'],
                 },
                 {
                     rule: 'tracker.com/api/endpoint',
-                    domains: [
-                        'site1.com',
-                    ],
+                    domains: ['site1.com'],
                 },
             ];
             const errors = validateTrackerRules('tracker.com', rules);
@@ -404,15 +373,11 @@ describe('tracker-allowlist-validator', () => {
             const rules = [
                 {
                     rule: 'tracker.com/api',
-                    domains: [
-                        'site1.com',
-                    ],
+                    domains: ['site1.com'],
                 },
                 {
                     rule: 'tracker.com/api',
-                    domains: [
-                        'site1.com',
-                    ],
+                    domains: ['site1.com'],
                 },
             ];
             const errors = validateTrackerRules('tracker.com', rules);
@@ -424,16 +389,11 @@ describe('tracker-allowlist-validator', () => {
             const rules = [
                 {
                     rule: 'tracker.com/api/endpoint',
-                    domains: [
-                        'site1.com',
-                    ],
+                    domains: ['site1.com'],
                 },
                 {
                     rule: 'tracker.com/api',
-                    domains: [
-                        'site1.com',
-                        'site2.com',
-                    ],
+                    domains: ['site1.com', 'site2.com'],
                 },
             ];
             const errors = validateTrackerRules('tracker.com', rules);
@@ -445,15 +405,11 @@ describe('tracker-allowlist-validator', () => {
             const rules = [
                 {
                     rule: 'tracker.com/api/endpoint',
-                    domains: [
-                        'site1.com',
-                    ],
+                    domains: ['site1.com'],
                 },
                 {
                     rule: 'tracker.com/api',
-                    domains: [
-                        '<all>',
-                    ],
+                    domains: ['<all>'],
                 },
             ];
             const errors = validateTrackerRules('tracker.com', rules);
@@ -465,15 +421,11 @@ describe('tracker-allowlist-validator', () => {
             const rules = [
                 {
                     rule: 'tracker.com/products',
-                    domains: [
-                        'site1.com',
-                    ],
+                    domains: ['site1.com'],
                 },
                 {
                     rule: 'tracker.com/products-new',
-                    domains: [
-                        'site1.com',
-                    ],
+                    domains: ['site1.com'],
                 },
             ];
             const errors = validateTrackerRules('tracker.com', rules);
@@ -485,15 +437,11 @@ describe('tracker-allowlist-validator', () => {
             const rules = [
                 {
                     rule: 'tracker.com/api',
-                    domains: [
-                        'site1.com',
-                    ],
+                    domains: ['site1.com'],
                 },
                 {
                     rule: 'tracker.com/api/',
-                    domains: [
-                        'site1.com',
-                    ],
+                    domains: ['site1.com'],
                 },
             ];
             const errors = validateTrackerRules('tracker.com', rules);
@@ -505,15 +453,11 @@ describe('tracker-allowlist-validator', () => {
             const rules = [
                 {
                     rule: 'tracker.com/api',
-                    domains: [
-                        'site1.com',
-                    ],
+                    domains: ['site1.com'],
                 },
                 {
                     rule: 'cdn.tracker.com/api',
-                    domains: [
-                        'site1.com',
-                    ],
+                    domains: ['site1.com'],
                 },
             ];
             const errors = validateTrackerRules('tracker.com', rules);
@@ -527,9 +471,7 @@ describe('tracker-allowlist-validator', () => {
             const rules = [
                 {
                     rule: 'tracker.com/api',
-                    domains: [
-                        'site1.com',
-                    ],
+                    domains: ['site1.com'],
                 },
             ];
             expect(validateTrackerRules('tracker.com', rules)).to.deep.equal([]);
@@ -539,15 +481,11 @@ describe('tracker-allowlist-validator', () => {
             const rules = [
                 {
                     rule: 'tracker.com/api',
-                    domains: [
-                        'site1.com',
-                    ],
+                    domains: ['site1.com'],
                 },
                 {
                     rule: 'tracker.com/other',
-                    domains: [
-                        'site2.com',
-                    ],
+                    domains: ['site2.com'],
                 },
             ];
             expect(validateTrackerRules('tracker.com', rules)).to.deep.equal([]);
@@ -557,15 +495,11 @@ describe('tracker-allowlist-validator', () => {
             const rules = [
                 {
                     rule: 'cdn.tracker.com/api',
-                    domains: [
-                        'site1.com',
-                    ],
+                    domains: ['site1.com'],
                 },
                 {
                     rule: 'media.tracker.com/api',
-                    domains: [
-                        'site2.com',
-                    ],
+                    domains: ['site2.com'],
                 },
             ];
             expect(validateTrackerRules('tracker.com', rules)).to.deep.equal([]);
@@ -575,15 +509,11 @@ describe('tracker-allowlist-validator', () => {
             const rules = [
                 {
                     rule: 'tracker.com/products/',
-                    domains: [
-                        'site1.com',
-                    ],
+                    domains: ['site1.com'],
                 },
                 {
                     rule: 'tracker.com/products-new/',
-                    domains: [
-                        'site2.com',
-                    ],
+                    domains: ['site2.com'],
                 },
             ];
             expect(validateTrackerRules('tracker.com', rules)).to.deep.equal([]);
@@ -593,15 +523,11 @@ describe('tracker-allowlist-validator', () => {
             const rules = [
                 {
                     rule: 'tracker.com/api/endpoint',
-                    domains: [
-                        '<all>',
-                    ],
+                    domains: ['<all>'],
                 },
                 {
                     rule: 'tracker.com/api',
-                    domains: [
-                        'site1.com',
-                    ],
+                    domains: ['site1.com'],
                 },
             ];
             expect(validateTrackerRules('tracker.com', rules)).to.deep.equal([]);
@@ -611,16 +537,11 @@ describe('tracker-allowlist-validator', () => {
             const rules = [
                 {
                     rule: 'tracker.com/api/endpoint',
-                    domains: [
-                        'site1.com',
-                        'site2.com',
-                    ],
+                    domains: ['site1.com', 'site2.com'],
                 },
                 {
                     rule: 'tracker.com/api',
-                    domains: [
-                        'site2.com',
-                    ],
+                    domains: ['site2.com'],
                 },
             ];
             expect(validateTrackerRules('tracker.com', rules)).to.deep.equal([]);
@@ -630,15 +551,11 @@ describe('tracker-allowlist-validator', () => {
             const rules = [
                 {
                     rule: 'tracker.com/vendor/.*/user.js',
-                    domains: [
-                        'site1.com',
-                    ],
+                    domains: ['site1.com'],
                 },
                 {
                     rule: 'tracker.com/vendor',
-                    domains: [
-                        'site2.com',
-                    ],
+                    domains: ['site2.com'],
                 },
             ];
             expect(validateTrackerRules('tracker.com', rules)).to.deep.equal([]);
@@ -652,15 +569,11 @@ describe('tracker-allowlist-validator', () => {
                     rules: [
                         {
                             rule: 'good-tracker.com/api/endpoint',
-                            domains: [
-                                'site1.com',
-                            ],
+                            domains: ['site1.com'],
                         },
                         {
                             rule: 'good-tracker.com/api',
-                            domains: [
-                                'site1.com',
-                            ],
+                            domains: ['site1.com'],
                         },
                     ],
                 },
@@ -668,15 +581,11 @@ describe('tracker-allowlist-validator', () => {
                     rules: [
                         {
                             rule: 'bad-tracker.com/api',
-                            domains: [
-                                'site1.com',
-                            ],
+                            domains: ['site1.com'],
                         },
                         {
                             rule: 'bad-tracker.com/api/endpoint',
-                            domains: [
-                                'site1.com',
-                            ],
+                            domains: ['site1.com'],
                         },
                     ],
                 },
@@ -693,9 +602,7 @@ describe('tracker-allowlist-validator', () => {
                     rules: [
                         {
                             rule: 'tracker1.com/api',
-                            domains: [
-                                'site1.com',
-                            ],
+                            domains: ['site1.com'],
                         },
                     ],
                 },
@@ -703,15 +610,11 @@ describe('tracker-allowlist-validator', () => {
                     rules: [
                         {
                             rule: 'tracker2.com/api/endpoint',
-                            domains: [
-                                'site1.com',
-                            ],
+                            domains: ['site1.com'],
                         },
                         {
                             rule: 'tracker2.com/api',
-                            domains: [
-                                'site1.com',
-                            ],
+                            domains: ['site1.com'],
                         },
                     ],
                 },
@@ -725,15 +628,11 @@ describe('tracker-allowlist-validator', () => {
                     rules: [
                         {
                             rule: 'tracker1.com/api',
-                            domains: [
-                                'site1.com',
-                            ],
+                            domains: ['site1.com'],
                         },
                         {
                             rule: 'tracker1.com/api/endpoint',
-                            domains: [
-                                'site1.com',
-                            ],
+                            domains: ['site1.com'],
                         },
                     ],
                 },
@@ -741,15 +640,11 @@ describe('tracker-allowlist-validator', () => {
                     rules: [
                         {
                             rule: 'tracker2.com/api',
-                            domains: [
-                                'site1.com',
-                            ],
+                            domains: ['site1.com'],
                         },
                         {
                             rule: 'tracker2.com/api',
-                            domains: [
-                                'site1.com',
-                            ],
+                            domains: ['site1.com'],
                         },
                     ],
                 },
@@ -806,9 +701,7 @@ describe('tracker-allowlist-validator', () => {
             const srcB = ruleSource(e.tracker, e.ruleB.rule, overrideTrackers);
             const ovrFile = overridePath(platform);
             const sameSource = srcA === srcB;
-            const lines = [
-                `[${e.type}] ${e.tracker}:`,
-            ];
+            const lines = [`[${e.type}] ${e.tracker}:`];
 
             if (e.type === 'DOMAIN_PROPAGATION_VIOLATION') {
                 const isAllNarrowing = e.ruleB.domains?.includes('<all>');

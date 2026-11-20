@@ -9,8 +9,8 @@ import { dirname, join, relative, resolve, sep } from 'path';
 import { fileURLToPath } from 'url';
 import { promisify } from 'util';
 import { applyEdits, modify } from 'jsonc-parser';
-import * as prettier from 'prettier';
 import { CURRENT_CONFIG_VERSION } from '../constants.js';
+import { formatJson, isFormattedJsonFile } from './format-json.mjs';
 import { parseJsonc } from './set-jsonc-path.mjs';
 
 /**
@@ -44,11 +44,7 @@ export function usedInHistory(name, paths, ref = 'HEAD') {
 }
 
 /** Top-level entries the build does not read. */
-const NOT_BUILT = new Set([
-    '.git',
-    'node_modules',
-    'generated',
-]);
+const NOT_BUILT = new Set(['.git', 'node_modules', 'generated']);
 
 /**
  * Copy the working tree to a temporary directory and write `files` over it.
@@ -59,10 +55,7 @@ const NOT_BUILT = new Set([
 export function copyWorkingTree(files = new Map()) {
     const dir = mkdtempSync(join(tmpdir(), 'config-build-'));
     cpSync(ROOT, dir, { recursive: true, filter: (source) => !NOT_BUILT.has(relative(ROOT, source).split(sep)[0]) });
-    for (const [
-        file,
-        text,
-    ] of files) {
+    for (const [file, text] of files) {
         writeFileSync(join(dir, file), text);
     }
     return dir;
@@ -78,13 +71,7 @@ export function copyWorkingTree(files = new Map()) {
 export async function buildConfigs(dir, platforms) {
     try {
         symlinkSync(resolve(ROOT, 'node_modules'), join(dir, 'node_modules'));
-        await promisify(execFile)(
-            'node',
-            [
-                'index.js',
-            ],
-            { cwd: dir },
-        );
+        await promisify(execFile)('node', ['index.js'], { cwd: dir });
         return new Map(
             platforms.map((platform) => [
                 platform,
@@ -146,8 +133,8 @@ export function readRepoFile(file) {
  */
 export async function writeFormatted(file, text) {
     const filepath = resolve(ROOT, file);
-    const config = await prettier.resolveConfig(filepath);
-    writeFileSync(filepath, await prettier.format(text, { ...config, filepath }));
+    // Files that format-json.mjs skips, such as the generated autoconsent.json, keep their layout.
+    writeFileSync(filepath, isFormattedJsonFile(file) ? await formatJson(filepath, text) : text);
 }
 
 /**
@@ -232,14 +219,7 @@ export class Workspace {
      * @returns {Map<string, string>} the edited files' text by path
      */
     pending() {
-        return new Map(
-            [
-                ...this.changed,
-            ].map((file) => [
-                file,
-                /** @type {string} */ (this.texts.get(file)),
-            ]),
-        );
+        return new Map([...this.changed].map((file) => [file, /** @type {string} */ (this.texts.get(file))]));
     }
 
     async flush() {

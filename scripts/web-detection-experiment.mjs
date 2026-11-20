@@ -88,20 +88,11 @@ import {
  */
 const INJECT_NAMES = {
     ...PLATFORM_INJECT_NAMES,
-    ios: [
-        'apple-isolated',
-    ],
-    macos: [
-        'apple-isolated',
-    ],
+    ios: ['apple-isolated'],
+    macos: ['apple-isolated'],
 };
 
-const DEFAULT_PLATFORMS = /** @type {Platform[]} */ ([
-    'android',
-    'ios',
-    'macos',
-    'windows',
-]);
+const DEFAULT_PLATFORMS = /** @type {Platform[]} */ (['android', 'ios', 'macos', 'windows']);
 
 /**
  * @param {number} index - zero-based treatment index
@@ -134,23 +125,10 @@ export function isAutoRunning(config) {
  * @returns {string[]} `group/detector` ids
  */
 export function detectorIds(detectors, predicate = () => true) {
-    return Object.entries(detectors).flatMap(
-        ([
-            group,
-            members,
-        ]) =>
-            Object.entries(members)
-                .filter(
-                    ([
-                        ,
-                        config,
-                    ]) => predicate(config),
-                )
-                .map(
-                    ([
-                        id,
-                    ]) => `${group}/${id}`,
-                ),
+    return Object.entries(detectors).flatMap(([group, members]) =>
+        Object.entries(members)
+            .filter(([, config]) => predicate(config))
+            .map(([id]) => `${group}/${id}`),
     );
 }
 
@@ -229,18 +207,10 @@ export function dealSlices(units, count, seed) {
         throw new Error(`${units.length} units to split across ${count} cohorts`);
     }
     const random = seededRandom(seed);
-    const shuffled = [
-        ...units,
-    ];
+    const shuffled = [...units];
     for (let i = shuffled.length - 1; i > 0; i--) {
         const j = Math.floor(random() * (i + 1));
-        [
-            shuffled[i],
-            shuffled[j],
-        ] = [
-            shuffled[j],
-            shuffled[i],
-        ];
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
     }
     /** @type {string[][]} */
     const slices = Array.from({ length: count }, () => []);
@@ -254,22 +224,14 @@ export function dealSlices(units, count, seed) {
  * @returns {string[][]}
  */
 export function buildUnits(ids, by) {
-    if (by === 'detector')
-        return ids.map((id) => [
-            id,
-        ]);
+    if (by === 'detector') return ids.map((id) => [id]);
     /** @type {Map<string, string[]>} */
     const groups = new Map();
     for (const id of ids) {
         const group = id.split('/')[0];
-        groups.set(group, [
-            ...(groups.get(group) ?? []),
-            id,
-        ]);
+        groups.set(group, [...(groups.get(group) ?? []), id]);
     }
-    return [
-        ...groups.values(),
-    ];
+    return [...groups.values()];
 }
 
 /**
@@ -284,15 +246,7 @@ export function buildUnits(ids, by) {
 export function buildConditionalChanges(mode, experimentName, slices) {
     const treatments = slices.map((_, i) => cohortName(i));
     return slices.map((slice, k) => {
-        const cohorts =
-            mode === 'enable'
-                ? [
-                      'control',
-                      ...treatments.filter((_, i) => i !== k),
-                  ]
-                : [
-                      treatments[k],
-                  ];
+        const cohorts = mode === 'enable' ? ['control', ...treatments.filter((_, i) => i !== k)] : [treatments[k]];
         const blocks = cohorts.map((cohort) => ({ experiment: { experimentName, cohort } }));
         /** @type {PatchSettings} */
         const patchSettings = slice.flatMap((id) =>
@@ -301,9 +255,7 @@ export function buildConditionalChanges(mode, experimentName, slices) {
                       { op: /** @type {const} */ ('add'), path: `/detectors/${id}/state`, value: 'enabled' },
                       { op: /** @type {const} */ ('add'), path: `/detectors/${id}/triggers/auto/state`, value: 'enabled' },
                   ]
-                : [
-                      { op: /** @type {const} */ ('add'), path: `/detectors/${id}/state`, value: 'disabled' },
-                  ],
+                : [{ op: /** @type {const} */ ('add'), path: `/detectors/${id}/state`, value: 'disabled' }],
         );
         return { condition: blocks.length === 1 ? blocks[0] : blocks, patchSettings };
     });
@@ -378,16 +330,8 @@ export function buildCohorts(count, sizing) {
 export function expectedRunning(mode, production, slice) {
     if (slice === undefined) return mode === 'enable' ? new Set() : new Set(production);
     if (mode === 'enable') return new Set(slice.filter((id) => production.has(id)));
-    if (mode === 'disable')
-        return new Set(
-            [
-                ...production,
-            ].filter((id) => !slice.includes(id)),
-        );
-    return new Set([
-        ...production,
-        ...slice,
-    ]);
+    if (mode === 'disable') return new Set([...production].filter((id) => !slice.includes(id)));
+    return new Set([...production, ...slice]);
 }
 
 /**
@@ -402,10 +346,7 @@ export function expectedRunning(mode, production, slice) {
  */
 export function verifyCohorts(mode, experimentName, settingsFor, plans, slices) {
     /** @type {(string[] | undefined)[]} */
-    const cohortSlices = [
-        undefined,
-        ...slices,
-    ];
+    const cohortSlices = [undefined, ...slices];
     return cohortSlices.map((slice, i) => {
         const cohort = i === 0 ? 'control' : cohortName(i - 1);
         /** @type {Map<Platform, number>} */
@@ -416,12 +357,8 @@ export function verifyCohorts(mode, experimentName, settingsFor, plans, slices) 
                 clientsFor(plan.platform, plan.clientVersion, { [experimentName]: cohort }),
             );
             const expected = expectedRunning(mode, plan.production, slice);
-            const missing = [
-                ...expected,
-            ].filter((id) => !actual.has(id));
-            const extra = [
-                ...actual,
-            ].filter((id) => !expected.has(id));
+            const missing = [...expected].filter((id) => !actual.has(id));
+            const extra = [...actual].filter((id) => !expected.has(id));
             if (missing.length || extra.length) {
                 throw new Error(
                     `${plan.platform} ${cohort}: expected detectors not running: [${missing.join(', ')}]; unexpected: [${extra.join(', ')}]`,
@@ -445,10 +382,7 @@ export function verifyCohorts(mode, experimentName, settingsFor, plans, slices) 
  */
 export async function verifyBuiltCohorts(ws, mode, experimentName, plans, slices) {
     const platforms = plans.map((plan) => plan.platform);
-    const [
-        before,
-        after,
-    ] = await Promise.all([
+    const [before, after] = await Promise.all([
         buildConfigs(copyWorkingTree(), platforms),
         buildConfigs(copyWorkingTree(ws.pending()), platforms),
     ]);
@@ -464,10 +398,7 @@ export async function verifyBuiltCohorts(ws, mode, experimentName, plans, slices
     };
     for (const plan of plans) {
         const production = autoRunning(builtSettings(before, plan.platform), clientsFor(plan.platform, plan.clientVersion));
-        const differing = [
-            ...production,
-            ...plan.production,
-        ].filter((id) => production.has(id) !== plan.production.has(id));
+        const differing = [...production, ...plan.production].filter((id) => production.has(id) !== plan.production.has(id));
         if (differing.length > 0) {
             throw new Error(`${plan.platform}: the built config differs in which detectors run in production: ${differing.join(', ')}`);
         }
@@ -527,19 +458,14 @@ export function create(options, ws = Workspace.fromRepository()) {
         return { platform, clientVersion, minSupportedVersion, production: autoRunning(settings, clientsFor(platform, clientVersion)) };
     });
 
-    const allIds = [
-        ...new Set(platforms.flatMap((platform) => detectorIds(settingsFor(platform).detectors))),
-    ].sort();
+    const allIds = [...new Set(platforms.flatMap((platform) => detectorIds(settingsFor(platform).detectors)))].sort();
     let candidates;
     if (mode === 'trial') {
         candidates = allIds.filter((id) => plans.some((plan) => !plan.production.has(id)));
         const unsupported = candidates.filter((id) =>
             plans.some((plan) =>
                 clientsFor(plan.platform, plan.clientVersion).some((client) => {
-                    const [
-                        group,
-                        name,
-                    ] = id.split('/');
+                    const [group, name] = id.split('/');
                     const config = effectiveDetectors(settingsFor(plan.platform), client)[group]?.[name];
                     return config?.triggers?.auto?.when === undefined || config.actions?.fireEvent === undefined;
                 }),
@@ -555,12 +481,7 @@ export function create(options, ws = Workspace.fromRepository()) {
 
     const units = buildUnits(candidates, by);
     if (units.length < options.cohorts) {
-        throw new Error(
-            [
-                `${units.length} ${by}s to split across ${options.cohorts} cohorts`,
-                ...warnings,
-            ].join('\n'),
-        );
+        throw new Error([`${units.length} ${by}s to split across ${options.cohorts} cohorts`, ...warnings].join('\n'));
     }
     const slices = dealSlices(units, options.cohorts, seed);
 
@@ -605,9 +526,7 @@ export function create(options, ws = Workspace.fromRepository()) {
             ...(plan.minSupportedVersion !== undefined && { minSupportedVersion: plan.minSupportedVersion }),
             ...(sizing.rollout < 10000 && {
                 rollout: {
-                    steps: [
-                        { percent: sizing.rollout / 100 },
-                    ],
+                    steps: [{ percent: sizing.rollout / 100 }],
                 },
             }),
             cohorts,
@@ -629,15 +548,9 @@ export function create(options, ws = Workspace.fromRepository()) {
         ...results.map(({ cohort, slice, running }) => {
             const weight = cohort === 'control' ? sizing.control : sizing.cohort;
             const sliceText = slice === undefined ? (mode === 'enable' ? 'nothing' : 'production') : slice.join(', ');
-            return `| ${cohort} | ${formatShare(weight)} | ${sliceText} | ${[
-                ...running.values(),
-            ].join(' / ')} |`;
+            return `| ${cohort} | ${formatShare(weight)} | ${sliceText} | ${[...running.values()].join(' / ')} |`;
         }),
-        ...(sizing.rollout < 10000
-            ? [
-                  `| not enrolled | ${formatShare(10000 - sizing.rollout)} | production | |`,
-              ]
-            : []),
+        ...(sizing.rollout < 10000 ? [`| not enrolled | ${formatShare(10000 - sizing.rollout)} | production | |`] : []),
     ];
     return { experimentName, report: lines.join('\n'), warnings, plans, slices };
 }
@@ -707,9 +620,7 @@ async function main() {
             help: { type: 'boolean', default: false },
         },
     });
-    const [
-        command,
-    ] = positionals;
+    const [command] = positionals;
     if (values.help || command !== 'create') {
         console.log(HELP);
         process.exit(values.help ? 0 : 1);
