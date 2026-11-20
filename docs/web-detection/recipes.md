@@ -11,7 +11,7 @@ Configs for common measurements and detector shapes, built from [expressions](ex
 | Number of items containing a match | `{"element": {"selector": ".card", "where": {"element": {"selector": "img", "root": {"self": {}}}}}, "using": "length"}` ([`self`](expressions.md#self)) |
 | `-x` | `{"mul": [x, -1]}`, or a negative literal |
 | `a − b` | `{"sum": [a, {"mul": [b, -1]}]}` |
-| Smallest or largest item of a list `L` | `{"api": {"path": "Math.min.apply", "args": [null, L]}}` or `Math.max.apply`. Over no items, `Infinity` or `-Infinity`, which `Number.isFinite` tests ([Arguments](sources.md#arguments)) |
+| Smallest or largest item of a list `L` | `{"api": {"path": "Math.min.apply", "args": [null, L]}}` or `Math.max.apply`. With no items, it gives `Infinity` or `-Infinity`, which you can test with `Number.isFinite` ([Arguments](sources.md#arguments)) |
 | Each item's value, capped | `"field": {"api": {"path": "Math.min", "args": [{"self": "naturalWidth"}, 2000]}}` ([`self`](expressions.md#self)) |
 | First or last item of a list | `"using": {"path": "at", "args": [0]}`, or `[-1]`. On a list with no items, `undefined` |
 
@@ -23,7 +23,7 @@ The length of the first `h1`'s text:
 
 ### Ratio
 
-More than 70% of a page's images broken, on pages carrying at least five:
+More than 70% of a page's images broken, on pages with at least five:
 
 ```json
 {"if": {"element": {"selector": "img"}, "using": "length", "is": {"gte": 5}},
@@ -34,11 +34,11 @@ More than 70% of a page's images broken, on pages carrying at least five:
  "else": false}
 ```
 
-`if` counts the broken images only on pages with five images or more ([Evaluation](expressions.md#evaluation)). In `actions`, the image count is bound once with `define` and both places read it through `ref`. A ratio computed for a payload alone guards its denominator with [`if`](expressions.md#if).
+`if` only counts the broken images on pages with five or more images ([Evaluation](expressions.md#evaluation)). In `actions`, bind the image count once with `define` and read it in both places through `ref`. A ratio that's only computed for a payload still needs an [`if`](expressions.md#if) to guard its denominator.
 
 ## Rendered text
 
-`textContent` includes the source of `<script>` elements, so a page carrying a target string in inline JSON or JS, `<script>{"text": "disable your adblocker"}</script>`, matches on it. Rendered text is the text nodes outside `script`, `style`, `template` and `noscript`. Selecting it needs each text node's ancestry, which an [XPath](sources.md#xpath) expression tests and a CSS selector cannot:
+`textContent` includes the source of `<script>` elements, so a page with a target string in inline JSON or JS, such as `<script>{"text": "disable your adblocker"}</script>`, matches on it. Rendered text is the text nodes outside `script`, `style`, `template` and `noscript`. Selecting it means checking each text node's ancestors, which an [XPath](sources.md#xpath) expression can do but a CSS selector can't:
 
 ```
 //body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]
@@ -50,26 +50,26 @@ The expression starting `//body//` reads the whole page. The same expression sta
 //*[local-name()='body']//text()[not(ancestor::*[local-name()='script' or local-name()='style' or local-name()='template' or local-name()='noscript'])]
 ```
 
-`\S` matches each non-whitespace character once, so the `length` of its matches is the number of non-whitespace characters. Here a page with fewer than 2000:
+`\S` matches each non-whitespace character once, so the `length` of its matches is the number of non-whitespace characters. Here's a test for a page with fewer than 2000:
 
 ```json
 {"text": {"xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]", "pattern": "\\S"}, "using": "length", "is": {"lt": 2000}}
 ```
 
-`T(R)` below is `{"text": {"xpath": X, "pattern": "\\S", "root": R}}`, with `X` the expression starting `.//`:
+In the table below, `T(R)` is `{"text": {"xpath": X, "pattern": "\\S", "root": R}}`, where `X` is the expression starting `.//`:
 
 | Value | Config |
 |---|---|
 | A phrase in rendered text | `{"text": {"xpath": "//body//text()[…]", "pattern": "disable your ad ?blocker"}}` |
-| Text on the whole page | `{"text": {"xpath": "//body//text()[…]", "pattern": "\\S"}, "using": "length"}`, with no `root`. Text in `head`, such as `title`, is outside it |
-| Text in one region | `{...T({"ref": "comments"}), "using": "length"}`, with `comments` the region, bound for its guard ([`root`](sources.md#root)) |
+| Text on the whole page | `{"text": {"xpath": "//body//text()[…]", "pattern": "\\S"}, "using": "length"}`, with no `root`. Text in `head`, such as `title`, isn't included |
+| Text in one region | `{...T({"ref": "comments"}), "using": "length"}`, where `comments` is the region, bound for its guard ([`root`](sources.md#root)) |
 | Total text across regions | `T` over a `ref` to the regions' guard. A region inside another is counted once |
 | Each item's text | `"field": {...T({"self": {}}), "using": "length"}` beside the item selector. An outer item's value includes its inner items' text |
 | Smallest or largest item | `Math.min.apply` or `Math.max.apply` over each item's text ([Counting and arithmetic](#counting-and-arithmetic)) |
 | A region with no text | `{"none": T({"ref": "comments"})}`, which stops at the first character |
 | Items with no text | `"where": {"none": T({"self": {}})}` beside the item selector, with `"using": "length"` |
 
-A text read per item walks each item's subtree. Where a cheaper test rules some items out, put the text read behind an `if` on that test. `textContent.length` is one, since it's 0 for an item with no text at all. CI warns on a per-item `text` with no `if` above it, which fails no check ([Sources in `where` and `field`](validation.md#sources-in-where-and-field)):
+A per-item text read walks each item's subtree. When a cheaper test can rule some items out, put the text read behind an `if` on that test. `textContent.length` works for this, since it's 0 for an item with no text at all. CI warns (without failing) on a per-item `text` with no `if` above it ([Sources in `where` and `field`](validation.md#sources-in-where-and-field)):
 
 ```
 "field": {"if": {"self": "textContent.length", "is": {"gt": 0}}, "then": {...T({"self": {}}), "using": "length"}, "else": 0}
@@ -97,7 +97,7 @@ A text read per item walks each item's subtree. Where a cheaper test rules some 
 | Several `title` elements in `head` | The first one's words | The words of all of them |
 | An SVG document | The words of the root `svg`'s `title` | 0 |
 
-A bare `title` selector also selects the `title` tooltips of inline SVG. The `text` form reads no `api` name ([Allowed names](sources.md#allowed-names)).
+A bare `title` selector also selects the `title` tooltips of inline SVG. The `text` form doesn't read an `api` name ([Allowed names](sources.md#allowed-names)).
 
 ## Load state
 
@@ -110,10 +110,10 @@ A bare `title` selector also selects the `title` tooltips of inline SVG. The `te
 
 | Recipe | Behaviour |
 |---|---|
-| Image loaded, image broken | A lazy image not yet requested is not `complete`, and passes neither |
+| Image loaded, image broken | A lazy image that hasn't been requested yet isn't `complete`, so it passes neither |
 | Image broken | `currentSrc` is empty for an `img` with no `src` or `srcset`, which the recipe excludes. An SVG image with no intrinsic size can report `naturalWidth === 0` after loading |
 | Image recipes | An image blocked by our own protections reads the same as one that failed |
-| Stylesheet failed to load | Chromium and Firefox give a stylesheet that failed with an error status an empty `sheet`, the same as an empty stylesheet, so the recipe reads the resource entry's `responseStatus`. Every fetch a `link` element starts has `initiatorType` `link`, so a failed `preload` or `prefetch` counts too. A stylesheet our own protections block counts only where the engine creates an entry with an error status for it. An engine without `responseStatus` counts 0 |
+| Stylesheet failed to load | In Chromium and Firefox, a stylesheet that failed with an error status has an empty `sheet`, the same as an empty stylesheet, so the recipe reads the resource entry's `responseStatus` instead. Every fetch a `link` element starts has `initiatorType` `link`, so a failed `preload` or `prefetch` counts too. A stylesheet blocked by our own protections only counts where the engine creates an entry with an error status for it. An engine without `responseStatus` counts 0 |
 
 ## Computed style
 
@@ -122,13 +122,13 @@ A bare `title` selector also selects the `title` tooltips of inline SVG. The `te
 | One element's computed `position` | `{"api": {"path": "getComputedStyle", "args": [{"only": {"element": {"selector": "#banner"}}}]}, "using": "position"}` |
 | Elements positioned `fixed` or `sticky` | `{"element": {"selector": "div", "where": {"api": {"path": "getComputedStyle", "args": [{"self": {}}]}, "using": "position", "is": {"in": ["fixed", "sticky"]}}}}` ([`self`](expressions.md#self)) |
 
-`getComputedStyle` returns a `CSSStyleDeclaration`, which iterates its property names, so the `api` reading it is also a list ([`api`](sources.md#api)). Read a property through `using`, which reads it from the declaration. `field` would read it from each property name in turn, giving a list of `undefined`.
+`getComputedStyle` returns a `CSSStyleDeclaration`, which iterates its property names, so the `api` reading it is also a list ([`api`](sources.md#api)). Read a property through `using`, which reads it from the declaration, since `field` would read it from each property name in turn and give a list of `undefined`.
 
 A property such as `position` resolves from style alone. A dimension such as `width` resolves through layout, so reading it forces layout.
 
 ## Performance timeline
 
-The timeline's rules are in [Performance timeline](sources.md#performance-timeline).
+See [Performance timeline](sources.md#performance-timeline) for how the timeline is read.
 
 ```jsonc
 // A load ending at 8 s or later
@@ -159,7 +159,7 @@ Bind the entry once with `only`, and read each field with `using`:
 
 ### Load ended a while ago
 
-The load event has ended, and ended at least 3 s before the read. A detector reading the page after it settles puts these in `match`, or in the condition of an `if` around the actions that need them ([Waiting for the page to settle](#waiting-for-the-page-to-settle)). `only` makes `loadEventEnd` a number, which a payload sends raw:
+This holds when the load event has ended, at least 3 s before the read. To read the page after it settles, put these in `match`, or in the condition of an `if` around the actions that need them ([Waiting for the page to settle](#waiting-for-the-page-to-settle)). `only` makes `loadEventEnd` a number, which a payload sends as-is:
 
 ```json
 {"all": [
@@ -168,11 +168,11 @@ The load event has ended, and ended at least 3 s before the read. A detector rea
 ]}
 ```
 
-In `actions`, `loadEventEnd` is bound once with `define`, and both leaves read it through `ref`.
+In `actions`, bind `loadEventEnd` once with `define`, and read it in both places through `ref`.
 
 ### First paint as a fallback
 
-A page with no `first-contentful-paint` entry reads `first-paint` here, and each branch binds the time under its own name:
+Here, a page with no `first-contentful-paint` entry reads `first-paint` instead, and each branch binds the time under its own name:
 
 ```json
 {"if": {"api": {"path": "performance.getEntriesByName", "args": ["first-contentful-paint", "paint"]}, "using": "length", "is": {"gt": 0}},
@@ -184,7 +184,7 @@ A page with no `first-contentful-paint` entry reads `first-paint` here, and each
  "else": {"define": {"firstPaint": {"only": {"api": {"path": "performance.getEntriesByName", "args": ["first-paint", "paint"], "field": "startTime"}}}}}}
 ```
 
-A payload reading `fcp` omits its key when `first-paint` was used, and a payload reading `firstPaint` reports the proxy under its own name. On a page with no `paint` entries, `only` in the `else` branch fails, so a detector running before first paint guards the whole read with an `if` over the `length` of the `paint` entries.
+A payload reading `fcp` leaves its key out when `first-paint` was used, and a payload reading `firstPaint` reports the fallback under its own name. On a page with no `paint` entries, `only` in the `else` branch fails, so a detector that runs before first paint needs to guard the whole read with an `if` over the `length` of the `paint` entries.
 
 ## Missing fields and throwing reads
 
@@ -193,9 +193,9 @@ A payload reading `fcp` omits its key when `first-paint` was used, and a payload
 | A field some engines lack, read as a non-match | `{"responseStatus": {"gte": 400}}` |
 | A field some engines lack, read as a match | `{"responseStatus": {"any": [{"type": "undefined"}, {"gte": 400}]}}` |
 | A property present on the item | `{"api": {"path": "Reflect.has", "args": [{"self": {}}, "responseStatus"]}}` in `where` ([Presence](predicates.md#presence)) |
-| A read that may throw, read as a non-match | `{"cssRules": {"fails": false, "length": 0}}`. `fails` is tested before `length`, and its `false` stops the read ([Failure and type](predicates.md#failure-and-type)) |
+| A read that may throw, read as a non-match | `{"cssRules": {"fails": false, "length": 0}}`. `fails` is tested before `length`, so `length` isn't read when `cssRules` throws ([Failure and type](predicates.md#failure-and-type)) |
 
-A missing field reads `undefined`, and a comparison on `undefined` is `false`. On an engine without `responseStatus`, the first count reads 0 and the second counts every entry ([Failure and type](predicates.md#failure-and-type)):
+A missing field reads `undefined`, and a comparison on `undefined` is `false`. On an engine without `responseStatus`, the first count is 0 and the second counts every entry ([Failure and type](predicates.md#failure-and-type)):
 
 ```json
 {"api": {"path": "performance.getEntriesByType", "args": ["resource"], "where": {"responseStatus": {"gte": 400}}}, "using": "length"}
@@ -204,7 +204,7 @@ A missing field reads `undefined`, and a comparison on `undefined` is `false`. O
 
 ### A value in place of a throwing read
 
-With `fails` in its condition, `if` gives a value in place of a failed read. On a page with a cross-origin stylesheet, `emptySheetsOr0` is 0. The condition and the branch each read the stylesheets:
+With `fails` in its condition, `if` can give a value in place of a failed read. On a page with a cross-origin stylesheet, `emptySheetsOr0` is 0. Note that the condition and the branch each read the stylesheets:
 
 ```json
 {"define": {"emptySheetsOr0": {
@@ -214,11 +214,11 @@ With `fails` in its condition, `if` gives a value in place of a failed read. On 
 }}}
 ```
 
-A `define` of the read alone fails on that page.
+A `define` of just the read would fail on that page.
 
 ### Either of two signals, one of which may throw
 
-`fails` on the number of empty stylesheets lets the failed-stylesheet leaf decide on a page with a cross-origin stylesheet:
+With `fails` on the number of empty stylesheets, the result on a page with a cross-origin stylesheet comes from the failed-stylesheet check alone:
 
 ```json
 {"any": [
@@ -244,14 +244,14 @@ A `define` of the read alone fails on that page.
 
 ## JS builtins
 
-JS builtins called through `api` give the values JSON does not write directly ([Arguments](sources.md#arguments)):
+JS builtins called through `api` give you values that JSON can't express directly ([Arguments](sources.md#arguments)):
 
 | Value | `api` |
 |---|---|
-| `L` with values added, or lists joined | `{...L, "using": {"path": "concat", "args": [100]}}`. `{"expr": [100], "using": {"path": "concat", "args": [L]}}` puts 100 first. Only `concat` through `using` gives a list `apply` takes ([Method calls](validation.md#method-calls)) |
+| `L` with values added, or lists joined | `{...L, "using": {"path": "concat", "args": [100]}}`. `{"expr": [100], "using": {"path": "concat", "args": [L]}}` puts 100 first. Only `concat` through `using` gives a list that `apply` accepts ([Method calls](validation.md#method-calls)) |
 | A list from an iterable that is not an array, such as `FontFaceSet` | `{"api": {"path": "Array.from", "args": [x]}}` |
 | A constant object | `{"api": {"path": "JSON.parse", "args": ["{\"composed\": true}"]}}` |
-| An object holding values read from the page | `{"api": {"path": "Object.fromEntries", "args": [{"expr": [{"expr": ["relativeTo", {"ref": "node"}]}]}]}}` |
+| An object containing values read from the page | `{"api": {"path": "Object.fromEntries", "args": [{"expr": [{"expr": ["relativeTo", {"ref": "node"}]}]}]}}` |
 | `undefined`, `NaN`, `Infinity` | `{"api": "undefined"}` |
 | The words in a string, `\S+` runs: 0 for an empty or whitespace-only string | `Array.from` over the string's `matchAll`, with `"using": "length"` ([Words in the title](#words-in-the-title)) |
 
@@ -260,7 +260,7 @@ JS builtins called through `api` give the values JSON does not write directly ([
 {"only": {"element": {"selector": "my-widget"}}, "using": {"path": "checkVisibility", "args": [{"api": {"path": "JSON.parse", "args": ["{\"checkOpacity\": true}"]}}]}}
 ```
 
-The first is the widest image's natural width or 100 if larger, the second whether the widget is visible with opacity counted.
+The first is the widest image's natural width, or 100 if that's larger, and the second is whether the widget is visible, taking opacity into account.
 
 `matchAll` reads `RegExp.prototype` as the page leaves it ([Page code](predicates.md#page-code)).
 
@@ -268,19 +268,19 @@ The first is the widest image's natural width or 100 if larger, the second wheth
 
 ### Doing something once
 
-A detector with no `match` runs its `actions` on every run. An action inside an `if` on a detector name, which the same branch sets, runs once:
+A detector with no `match` runs its `actions` on every run. To run an action once, put it inside an `if` on a detector name that the same branch sets:
 
 ```json
 {"if": {"none": [{"ref": "this.sent", "is": true}]},
  "then": {"fireEvent": {"type": "pageSize"}, "define": {"this.sent": true}}}
 ```
 
-Before its first `define`, the name reads `undefined` ([Names](expressions.md#names)). `{"is": true}` does not hold for `undefined`, so `none` over it holds, and the branch runs on the first run.
+Before its first `define`, the name reads `undefined` ([Names](expressions.md#names)). `{"is": true}` doesn't hold for `undefined`, so `none` over it holds, and the branch runs on the first run.
 
 | Name | Guards |
 |---|---|
 | `this.sent` | One action, such as the `fireEvent` of a detector that writes its breakage entry on every run |
-| `this.finished` | The whole of `actions`, so a finished detector reads nothing more ([Finishing early](#finishing-early)) |
+| `this.finished` | The whole of `actions`, so a finished detector doesn't read anything more ([Finishing early](#finishing-early)) |
 
 ### A measurement on every page
 
@@ -312,11 +312,11 @@ Every run writes the raw value to breakage reports, and the event sends it bucke
 ]
 ```
 
-`loadEventEnd` is 0 until the load event fires, so a breakage report filed before then includes 0. For a `period` pixel, the event becomes a [chain](expressions.md#sequences) of [per-bucket events](payloads.md#per-bucket-events). A detector reporting only the final value takes `"match": {"only": {"api": {…, "field": "loadEventEnd"}}, "is": {"gt": 0}}`, writes and sends in `actions` with no `this.sent`, and is done once it fires.
+`loadEventEnd` is 0 until the load event fires, so a breakage report filed before then includes 0. For a `period` pixel, turn the event into a [chain](expressions.md#sequences) of [per-bucket events](payloads.md#per-bucket-events). A detector that only reports the final value uses `"match": {"only": {"api": {…, "field": "loadEventEnd"}}, "is": {"gt": 0}}`, writes and sends in `actions` without `this.sent`, and is done once it fires.
 
 ### A measurement that keeps changing
 
-A value that changes after the event is sent, such as the number of elements, is read again by every run, a breakage report's included:
+A value that changes after the event is sent, such as the number of elements, is read again on every run, including a breakage report's run:
 
 ```json
 "actions": [
@@ -342,7 +342,7 @@ A value that changes after the event is sent, such as the number of elements, is
 
 ### A value read the same by every detector
 
-A value fixed for the navigation, such as `loadEventEnd` once the load has ended or the document's `responseStatus`, is written by one detector that runs on the `breakageReport` trigger alone, so each report includes it once:
+A value that's fixed for the navigation, such as `loadEventEnd` once the load has ended or the document's `responseStatus`, can be written by one detector that only runs on the `breakageReport` trigger, so each report includes it once:
 
 ```json
 "triggers": {"breakageReport": {"state": "enabled", "runConditions": {"context": {"top": true}}}},
@@ -352,11 +352,11 @@ A value fixed for the navigation, such as `loadEventEnd` once the load has ended
 ]
 ```
 
-Every other detector binds the value with `define` for its conditions and buckets, and leaves it out of its payloads. A value that changes while the page is open, such as rendered text length, stays in the payload of each detector that tests it.
+Every other detector binds the value with `define` for its conditions and buckets, and leaves it out of its payloads. A value that changes while the page is open, such as rendered text length, should stay in the payload of each detector that tests it.
 
 ### Waiting for the page to settle
 
-`match` holds once the load event ended at least 3 s before the read ([Load ended a while ago](#load-ended-a-while-ago)) and an image is broken. The `if` counts the images only once the page has settled:
+`match` holds once the load event ended at least 3 s before the read ([Load ended a while ago](#load-ended-a-while-ago)) and an image is broken. The `if` only counts the images once the page has settled:
 
 ```json
 "match": {
@@ -372,15 +372,15 @@ Every other detector binds the value with `define` for its conditions and bucket
 
 ### Finishing early
 
-A detector with no `match` keeps running on every trigger. One that has an answer later reads would not change, or that reads a page it must not, puts its body inside a [once guard](#doing-something-once) on `this.finished`, and binds the name once it is finished:
+A detector with no `match` keeps running on every trigger. If later reads wouldn't change its answer, or it's on a page it mustn't read, put its body inside a [once guard](#doing-something-once) on `this.finished`, and bind the name once it's finished:
 
 | Finished when | Config |
 |---|---|
-| The page is one it must not read, `U` | `[{"define": {"this.finished": U}}, {"if": {"none": [{"ref": "this.finished", "is": true}]}, "then": [...]}]`, all inside the outer `if` |
+| The page is one it mustn't read, `U` | `[{"define": {"this.finished": U}}, {"if": {"none": [{"ref": "this.finished", "is": true}]}, "then": [...]}]`, all inside the outer `if` |
 | A value is final, `F` | `{"define": {"this.finished": F}}`, last in the outer `if`'s `then` |
 | The detection is made | `"define": {"this.finished": true}` beside the detecting actions |
 
-Here a page with a password field:
+Here the detector finishes on a page with a password field:
 
 ```jsonc
 "actions": {
@@ -392,7 +392,7 @@ Here a page with a password field:
 }
 ```
 
-After it finishes, each run reads one name. A detector that detects once folds the page it must not read into `match`, `"match": {"any": [U, D]}`, with its actions inside `{"if": D, "then": …}`.
+After it finishes, each run only reads one name. A detector that detects once can put the page it mustn't read into `match` instead, as `"match": {"any": [U, D]}`, with its actions inside `{"if": D, "then": …}`.
 
 ### A weak signal and a strong one
 
@@ -412,7 +412,7 @@ Each signal is inside a once guard on its own name, and the strong one finishes 
 
 ### Counting reads
 
-A detector name, set to 0 on the first run, counts the runs in which a condition holds. Every run counts, a breakage report's included. Here an overlay visible on two reads:
+A detector name, set to 0 on the first run, counts the runs in which a condition holds. Every run counts, including a breakage report's run. Here's an overlay visible on two reads:
 
 ```json
 "actions": {
@@ -429,7 +429,7 @@ A detector name, set to 0 on the first run, counts the runs in which a condition
 
 ### Held for a duration
 
-A detector name records the time of the first read that sees a condition, and a later read compares the time with it. Here an overlay still visible 10 s after a read first saw it. A read that does not see it clears the time:
+A detector name stores the time of the first read that sees a condition, and a later read compares the current time with it. Here's an overlay that's still visible 10 s after a read first saw it. A read that doesn't see it clears the time:
 
 ```json
 "actions": {
@@ -447,11 +447,11 @@ A detector name records the time of the first read that sees a condition, and a 
 }
 ```
 
-The duration is known to the spacing of the reads: a condition first seen at one read held for at least the time since it, and at most the time since the read before it. Timers fire late, so a bound equal to the spacing between two `intervalMs` offsets can miss by a few milliseconds. Set it below the spacing.
+The duration is only as precise as the spacing of the reads: a condition first seen at one read has held for at least the time since that read, and at most the time since the read before it. Timers can fire late, so a bound equal to the spacing between two `intervalMs` offsets can miss by a few milliseconds. Set the bound below the spacing.
 
 ### Two reads in a row
 
-A detector name holds the previous read, and a condition tests the current read and the stored one. The last element stores the current value on every run. Here a count of at least 8 on two consecutive reads:
+A detector name stores the previous read, and a condition tests both the current read and the stored one. The last element stores the current value on every run. Here's a count of at least 8 on two reads in a row:
 
 ```json
 "actions": {
@@ -468,13 +468,13 @@ A detector name holds the previous read, and a condition tests the current read 
 }
 ```
 
-On the first run `this.lastCount` reads `undefined`, which `"type": "number"` excludes. A breakage report's run is one of the reads, so the read before a scheduled one can be a report's. A pair of offsets 200 ms apart, `[5000, 5200]`, re-reads shortly after the first read.
+On the first run, `this.lastCount` reads `undefined`, which `"type": "number"` excludes. A breakage report's run counts as one of the reads, so the read before a scheduled one can be a report's. To re-read shortly after the first read, use a pair of offsets 200 ms apart, such as `[5000, 5200]`.
 
 ### Releasing a held list
 
-A detector name keeps its value until a later `define` of the name, and a list keeps every item it selected, elements included. Where later runs need only a count or a field, hold that: `{"define": {"this.placeholders": {"element": {"selector": ".placeholder"}, "using": "length"}}}`.
+A detector name keeps its value until a later `define` of the name, and a list keeps every item it selected, including elements. When later runs only need a count or a field, store that instead: `{"define": {"this.placeholders": {"element": {"selector": ".placeholder"}, "using": "length"}}}`.
 
-Where a later run reads the items, define the name as `null` in the run that reads them last. Here the overlays the first read sees, whose text each later read tests. A detector that is done runs no more, so the release goes next to `"this.finished": true`:
+When a later run reads the items, define the name as `null` in the run that reads them last. Here the first read stores the overlays it sees, and each later read tests their text. A detector that's done doesn't run again, so the release goes next to `"this.finished": true`:
 
 ```json
 "actions": {
@@ -490,7 +490,7 @@ Where a later run reads the items, define the name as `null` in the run that rea
 
 ### Largest over reads
 
-`Math.max` over the stored value and the current read keeps the largest. Here the largest element count across reads every 500 ms up to 4 s, `intervalMs: [500, 1000, 1500, 2000, 2500, 3000, 3500, 4000]`:
+`Math.max` over the stored value and the current read keeps the largest. Here's the largest element count across reads every 500 ms up to 4 s, with `intervalMs: [500, 1000, 1500, 2000, 2500, 3000, 3500, 4000]`:
 
 ```json
 "actions": [
@@ -506,7 +506,7 @@ Where a later run reads the items, define the name as `null` in the run that rea
 
 ### Counting unreadable pages
 
-A predicate testing the value with `fails` holds on a failed read. Here `match` holds on a page whose stylesheets cannot be read, as on one with three empty stylesheets or more, and `actions` sends which. A comparison on a failed value fails, so the second entry tests `fails` ahead of `gte` ([Failure and type](predicates.md#failure-and-type)):
+A predicate that tests the value with `fails` holds on a failed read. Here `match` holds on a page whose stylesheets can't be read, as well as on one with three or more empty stylesheets, and `actions` sends which one it was. A comparison on a failed value fails, so the second entry tests `fails` before `gte` ([Failure and type](predicates.md#failure-and-type)):
 
 ```json
 "match": {"api": {"path": "document.styleSheets", "where": {"cssRules.length": 0}}, "using": "length", "is": {"any": [{"fails": true}, {"fails": false, "gte": 3}]}},

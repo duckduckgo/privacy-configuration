@@ -1,14 +1,14 @@
 # Web Detection Overview
 
-A web detector looks for a pattern on a page, such as an adwall, a CAPTCHA or a sign of breakage, and reports what it finds. Detectors are defined in the remote config of the `webDetection` C-S-S feature, so adding or changing one needs no client release.
+A web detector looks for a pattern on a page, such as an adwall, a CAPTCHA or a sign of breakage, and reports what it finds. Detectors are defined in the remote config of the `webDetection` C-S-S feature, so adding or changing one doesn't need a client release.
 
-A detector names *when* it runs (`triggers`), an optional condition for when it has detected (`match`), and *what each run does* (`actions`). Its results go to breakage reports through the `breakageReportData` action, and to the [EventHub](https://github.com/duckduckgo/ddg-workflow/blob/main/docs/event-hub/core-design.md) through the `fireEvent` action, where telemetry config can turn them into pixels.
+A detector says *when* it runs (`triggers`), optionally when it has detected something (`match`), and *what each run does* (`actions`). Its results go to breakage reports through the `breakageReportData` action, and to the [EventHub](https://github.com/duckduckgo/ddg-workflow/blob/main/docs/event-hub/core-design.md) through the `fireEvent` action, where telemetry config can turn them into pixels.
 
-> This framework is distinct from the on-demand `webInterferenceDetection` utilities, which other features invoke directly; see the [C-S-S detectors README](https://github.com/duckduckgo/content-scope-scripts/blob/main/injected/src/detectors/README.md).
+> This framework is distinct from the on-demand `webInterferenceDetection` utilities, which other features call directly (see the [C-S-S detectors README](https://github.com/duckduckgo/content-scope-scripts/blob/main/injected/src/detectors/README.md)).
 
 ## How a detector runs
 
-In each frame, every trigger runs the detector as follows ([`match`](#match) has the effect of each result):
+In each frame, each trigger runs the detector like this (see [`match`](#match) for what each result means):
 
 ```mermaid
 flowchart TD
@@ -47,9 +47,9 @@ Detectors are configured under `webDetection.settings.detectors`, in named group
 
 - `detectors` contains detector *groups*
 - each *group* maps detector names to their configs, and namespaces them
-  - Detector names and group names must wholly match the regex `^[a-zA-Z][a-zA-Z0-9_]*$`. CI refuses a name that doesn't, since C-S-S uses each name as config gives it
+  - Detector and group names must fully match the regex `^[a-zA-Z][a-zA-Z0-9_]*$`. CI rejects any name that doesn't, because C-S-S uses each name exactly as it appears in config
 - each detector has four parts:
-  - `state` - a `disabled` detector does not run
+  - `state` - a `disabled` detector doesn't run
   - `triggers` - *when* the detector runs ([Triggers](#triggers))
   - `match` - optional. The condition for the detector having *detected*, after which it's done ([`match`](#match))
   - `actions` - what each run does: an expression, or a sequence of them ([Actions](#actions))
@@ -98,7 +98,7 @@ When fields are omitted from config, detectors take these defaults:
 }
 ```
 
-`actions` has no default, and a detector without it does not parse ([Validation](validation.md#detectors-and-actions)).
+`actions` has no default, and a detector without it doesn't parse ([Validation](validation.md#detectors-and-actions)).
 
 So by default a new detector:
 
@@ -114,11 +114,11 @@ So by default a new detector:
 | `breakageReport` | During the breakage report flow, before the report is submitted | Enabled |
 | `auto` | On page load, at each offset in `when.intervalMs` | Disabled |
 
-Every trigger takes `state` and `runConditions`. A `disabled` trigger doesn't run the detector, whatever its other keys.
+Every trigger takes `state` and `runConditions`. A `disabled` trigger doesn't run the detector, whatever its other keys say.
 
 ### `auto`
 
-`when.intervalMs` is a set of delays in milliseconds, measured from when the feature initialises in the frame, and the detector runs at each one. A timer can fire late, so a run happens at or after its offset. A detector that is [done](#match) runs at no later offset. [Tuning `auto` intervals](authoring/writing-detectors.md#tuning-auto-intervals) covers choosing them.
+`when.intervalMs` is a set of delays in milliseconds, measured from when the feature initialises in the frame, and the detector runs at each one. Timers can fire late, so each run happens at or after its offset. Once a detector is [done](#match), it doesn't run at any later offset. See [Tuning `auto` intervals](authoring/writing-detectors.md#tuning-auto-intervals) for how to choose them.
 
 Here the detector runs on every site when a breakage report is filed, but runs automatically only on `.fr` sites, 100ms, 500ms and 1s after load:
 
@@ -149,29 +149,29 @@ Each trigger's `runConditions` defaults to the top frame only:
 }
 ```
 
-A `runConditions` value replaces this default rather than merging with it, so a detector runs in iframes by setting it to `{}`.
+A `runConditions` value replaces this default instead of merging with it, so setting it to `{}` lets a detector run in iframes too.
 
 ## `match`
 
-Each run evaluates `match` first. `match` is an expression in boolean position ([Positions](expressions.md#positions)). Its leaves are the `text` and `element` conditions ([Conditions](conditions.md)) and the values and tests in [Expressions](expressions.md), combined by `any`, `all` and `none`.
+Each run evaluates `match` first. `match` is an expression that gives a boolean ([Positions](expressions.md#positions)), built from the `text` and `element` conditions ([Conditions](conditions.md)) and the values and tests in [Expressions](expressions.md), combined with `any`, `all` and `none`.
 
 | `match` | Effect on the run | The detector |
 |---|---|---|
 | Holds | `actions` runs once | Done when the run ends, whether `actions` ran to its end or failed |
-| Does not hold, aborts or errors | `actions` does not run. A failure is recorded ([Failures](failures.md)) | Runs again on its next trigger |
+| Doesn't hold, aborts or errors | `actions` doesn't run. A failure is recorded ([Failures](failures.md)) | Runs again on its next trigger |
 | Absent | `actions` runs | Runs again on its next trigger, and is never done |
 
-A done detector runs no more in that frame, whatever the trigger: its timers are cancelled, and a breakage report does not run it. Each frame's detector is done on its own. Its breakage entry keeps what its runs wrote.
+Once a detector is done, it doesn't run again in that frame, whatever the trigger: its timers are cancelled and a breakage report doesn't run it. Each frame tracks this separately, and the detector's breakage entry keeps whatever its runs wrote.
 
-`match` reads the page only: it holds no action and no `ref`. A detector with `match` uses no detector names, since its `actions` runs once ([Validation](validation.md#detectors)). `actions` reads again any value `match` tested that its payloads send.
+`match` only reads the page, so it can't contain an action or a `ref`. A detector with `match` doesn't use detector names, since its `actions` only runs once ([Validation](validation.md#detectors)). If a payload sends a value that `match` tested, `actions` reads it again.
 
 | Use | Config |
 |---|---|
-| Detect once | `"match": D`, and `actions` holding the detection's `fireEvent` and `breakageReportData` |
-| Detect once, once a precondition `P` holds | `"match": {"all": [P, D]}`, or `{"if": P, "then": D, "else": false}` where `D` fails before `P` holds |
+| Detect once | `"match": D`, with the detection's `fireEvent` and `breakageReportData` in `actions` |
+| Detect once, after a precondition `P` holds | `"match": {"all": [P, D]}`, or `{"if": P, "then": D, "else": false}` where `D` fails before `P` holds |
 | Measure on every run | No `match`. A `breakageReportData` on every run, and each event inside a [once guard](recipes.md#doing-something-once) |
 
-In a detector with no `match`, a `fireEvent` outside a once guard sends its event on every run. Weak and strong signals, finishing early and other shapes are in [Detector shapes](recipes.md#detector-shapes).
+In a detector with no `match`, a `fireEvent` outside a once guard sends its event on every run. See [Detector shapes](recipes.md#detector-shapes) for weak and strong signals, finishing early and other patterns.
 
 ## Actions
 
@@ -193,17 +193,17 @@ In a detector with no `match`, a `fireEvent` outside a once guard sends its even
 | `breakageReportData` | `{}`, or `{"data": <payload spec>}` | Writes the detector's entry in breakage reports ([Breakage reports](#breakage-reports)) |
 | `define` | `{<name>: <expression>}` | Binds each name to its expression's value ([Names](expressions.md#names)) |
 
-An action gives `undefined`. An action computes every value its payload names, then sends or writes. An action whose payload fails sends and writes nothing, and the failure propagates as any failure does ([Failures](failures.md)).
+An action computes every value its payload names, then sends or writes. If any of those values fails, the action sends and writes nothing, and the failure propagates like any other ([Failures](failures.md)). The action's own value is `undefined`.
 
-An object holds expression keys with their modifiers, or action keys, never both. Action keys in one object run in the order the config lists them, so `{"fireEvent": A, "breakageReportData": B}` is `[{"fireEvent": A}, {"breakageReportData": B}]`. Note that on Apple, an object with only `fireEvent` and `breakageReportData` stays one object, so those two run in no guaranteed order.
+An object can have expression keys (with their modifiers) or action keys, but not both. Action keys in one object run in the order they're listed in config, so `{"fireEvent": A, "breakageReportData": B}` is `[{"fireEvent": A}, {"breakageReportData": B}]`. Note that on Apple, an object with only `fireEvent` and `breakageReportData` stays one object, so those two run in no guaranteed order.
 
-`define` binds a run name (`"x"`), which lasts for the rest of the run, or a detector name (`"this.x"`), which lasts across every run and trigger in the frame. `{"ref": "x"}` reads it. A detector name keeps state between runs, such as a count of reads, the previous read or a flag that an action has run ([Names](expressions.md#names)).
+`define` binds a run name (`"x"`), which lasts for the rest of the run, or a detector name (`"this.x"`), which lasts across every run and trigger in the frame. `{"ref": "x"}` reads it. Detector names are how a detector keeps state between runs, such as a count of reads, the previous read or a flag that an action has run ([Names](expressions.md#names)).
 
 ## Results
 
 ### Breakage reports
 
-A `breakageReportData` action writes the detector's entry in the `breakageData` parameter of breakage reports, with any values its payload names. The entry also records the detector's failures. The format is in [`breakageData` parameter](breakageData-parameter.md#webdetection).
+A `breakageReportData` action writes the detector's entry in the `breakageData` parameter of breakage reports, with any values its payload names. The entry also records the detector's failures. See [`breakageData` parameter](breakageData-parameter.md#webdetection) for the format.
 
 ### EventHub
 
@@ -230,4 +230,4 @@ Both actions take an optional `data` map of the values to send. Each field's `va
 "fireEvent": {"type": "brokenImages", "data": {"brokenImages": {"value": {"ref": "brokenImages"}, "buckets": [{"name": "one", "is": 1}, {"name": "2-4", "is": {"gte": 2, "lt": 5}}, {"name": "5+", "is": {"gte": 5}}]}}}
 ```
 
-With 3 broken images, this sends `{"type": "brokenImages", "data": {"brokenImages": "2-4"}}`. [Payloads](payloads.md) has the full rules, and how to shape events for period pixels.
+With 3 broken images, this sends `{"type": "brokenImages", "data": {"brokenImages": "2-4"}}`. See [Payloads](payloads.md) for the full rules and how to shape events for period pixels.

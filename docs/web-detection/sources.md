@@ -1,6 +1,6 @@
 # Sources
 
-A source reads the page. What each gives is in [Values](expressions.md#values).
+A source reads the page. See [Values](expressions.md#values) for what each one gives.
 
 | Source | Reads |
 |---|---|
@@ -10,14 +10,14 @@ A source reads the page. What each gives is in [Values](expressions.md#values).
 
 ## Lists: `where` and `field`
 
-`element` and `api` take two keys over the items of a list:
+`element` and `api` take two keys that work on the items of a list:
 
 | Key | Meaning |
 |---|---|
-| `where` | A [predicate](predicates.md) each item must pass, or an expression over the item ([`self`](expressions.md#self)). On `element`, tested on the elements that pass `visibility` |
-| `field` | The value read from each item that passes, in one of the forms below. On an `api` value that is not a list, the value read from it |
+| `where` | A [predicate](predicates.md) each item must pass, or an expression over the item ([`self`](expressions.md#self)). On `element`, it's only tested on the elements that pass `visibility` |
+| `field` | The value read from each item that passes, in one of the forms below. On an `api` value that isn't a list, the value read from it |
 
-A source's items reach the expression around it in this order. `text` takes neither key and gives its matches:
+A source's items go through these steps before they reach the expression around it. `text` takes neither key, and gives its matches:
 
 ```mermaid
 flowchart TD
@@ -30,15 +30,15 @@ flowchart TD
     list -->|elsewhere| pos["Its position takes one item, or each item"]
 ```
 
-The last step is in [Selected lists](expressions.md#selected-lists).
+See [Selected lists](expressions.md#selected-lists) for the last step.
 
-`where` applies before `field`, so one property can select the items and another give their values. The total duration of the videos with metadata loaded:
+`where` applies before `field`, so one property can select the items and another can give their values. Here's the total duration of the videos with metadata loaded:
 
 ```json
 {"sum": {"element": {"selector": "video", "where": {"readyState": {"gte": 1}}, "field": "duration"}}}
 ```
 
-`field` reads from the item as an `api` `path` reads from the global object. It is an object of `path` and optional `args`, a string, short for `{"path": <string>}`, or an expression. [`self`](expressions.md#self) in `args` or in the expression is the item:
+`field` reads from the item the same way an `api` `path` reads from the global object. It's either an object with `path` and optional `args`, a string (short for `{"path": <string>}`), or an expression. [`self`](expressions.md#self) in `args` or in the expression is the item:
 
 | Key | Applies |
 |---|---|
@@ -56,13 +56,13 @@ The last step is in [Selected lists](expressions.md#selected-lists).
 
 The last is each image's natural width, capped at 2000.
 
-Names are read and methods called as [Property reads](predicates.md#property-reads) describes. A `field` value has the type of what it read, and the position it reaches checks it: in number position, a value that is not a number fails ([Positions](expressions.md#positions)). `where: {"<property>": {"type": "number"}}` excludes those items.
+Names are read and methods are called as described in [Property reads](predicates.md#property-reads). A `field` value has the type of whatever it read, and that type is checked where the value is used: in number position, a value that isn't a number fails ([Positions](expressions.md#positions)). `where: {"<property>": {"type": "number"}}` excludes those items.
 
-A method called on `element` items is one that leaves the page unchanged, from the [element allowlist](validation.md#element-allowlist). A method called on `api` items is on the [`api` allowlist](#allowed-names).
+A method called on `element` items must be on the [element allowlist](validation.md#element-allowlist), whose methods leave the page unchanged. A method called on `api` items must be on the [`api` allowlist](#allowed-names).
 
 ## `element`
 
-Takes the keys of the `element` condition, `where` and `field` ([Lists](#lists-where-and-field)), and [`root`](#root).
+It takes the keys of the `element` condition, plus `where` and `field` ([Lists](#lists-where-and-field)) and [`root`](#root).
 
 ```json
 {"element": {"selector": "img", "where": {"complete": true, "naturalWidth": {"gt": 0}}, "root": ["#comments"]}}
@@ -71,11 +71,11 @@ Takes the keys of the `element` condition, `where` and `field` ([Lists](#lists-w
 {"only": {"element": {"selector": "#comments"}}, "is": {"hidden": false}}
 ```
 
-The list is the distinct elements matching any selector and passing `visibility`, then `where`, or with `field`, each one's value. `where` reads no property of an element `visibility` excludes.
+The list is the distinct elements that match any selector and pass `visibility`, then `where` (or with `field`, each one's value). `where` doesn't read any property of an element that `visibility` excludes.
 
 ## `text`
 
-Takes the keys of the [`text` condition](conditions.md#text), and [`root`](#root).
+It takes the keys of the [`text` condition](conditions.md#text), plus [`root`](#root).
 
 ```json
 {"text": {"xpath": "...", "pattern": ["page not found"]}, "using": "length"}
@@ -87,44 +87,44 @@ Overlapping sources count their shared text once per source: `body` together wit
 
 ### XPath
 
-An `xpath` expression selects nodes, and the text of the nodes one expression selects is joined without a separator and matched as a whole. A pattern matches across inline element boundaries: `adblocker <b>detected</b>` matches `adblocker detected`.
+An `xpath` expression selects nodes, and the text of those nodes is joined without a separator and matched as a whole. This means a pattern matches across inline element boundaries: `adblocker <b>detected</b>` matches `adblocker detected`.
 
 An expression starting `//` selects from the whole document, whatever its context node. One starting `.//` selects within each [`root`](#root).
 
 | Limitation | Consequence |
 |---|---|
-| XPath is structural | A pattern inside a `display: none` subtree still matches. Visibility is only expressible through an [`element`](conditions.md#element) condition |
-| XPath 1.0 only | `matches()` and `lower-case()` raise `SyntaxError`; only `translate()` is available. XPath expressions select nodes; pattern matching stays in the regex |
+| XPath is structural | A pattern inside a `display: none` subtree still matches. Visibility can only be checked with an [`element`](conditions.md#element) condition |
+| XPath 1.0 only | `matches()` and `lower-case()` raise `SyntaxError`, and only `translate()` is available. Use XPath to select nodes, and leave pattern matching to the regex |
 | Namespace-aware in XHTML | In a document served as `application/xhtml+xml`, an element name in an expression matches no element, so `//body//text()` selects nothing. `local-name()` matches by name ([Rendered text](recipes.md#rendered-text)) |
 | Shadow DOM is unreachable | `//text()` does not cross shadow roots, and neither does `selector` |
-| Layout-free, but costlier than `textContent` | Under the `auto` trigger the XPath expression re-runs on each interval, so scope it to a container where the detector allows it |
+| Layout-free, but costlier than `textContent` | With the `auto` trigger, the XPath expression re-runs at each interval, so scope it to a container where the detector can |
 
-Each pattern is tested against the selected text in bounded chunks rather than the whole text joined. `xpathConfig` sizes the chunks: `chunkSize` (default 8192) the characters matched at a time, and `chunkTail` (default `chunkSize / 16`) the characters carried between chunks, which bounds the longest match that can span a chunk boundary. `chunkSize: 0` disables chunking. Omit both unless a detector needs tuning. `xpathConfig` does not affect `selector`.
+Each pattern is tested against the selected text in bounded chunks instead of all at once. `xpathConfig` sets the chunk sizes: `chunkSize` (default 8192) is the number of characters matched at a time, and `chunkTail` (default `chunkSize / 16`) is the number of characters carried over between chunks, which limits the longest match that can span a chunk boundary. `chunkSize: 0` turns chunking off. Leave both out unless a detector needs tuning. `xpathConfig` doesn't affect `selector`.
 
-An XPath expression can restrict a search to rendered text, excluding `script`, `style` and the like: [Rendered text](recipes.md#rendered-text).
+An XPath expression can restrict a search to rendered text, leaving out `script`, `style` and similar (see [Rendered text](recipes.md#rendered-text)).
 
 ## `root`
 
-`root` is where `element` and `text` read: an expression, or an array of them. Each gives a selector, a node or a list of nodes, and a selector string, read or literal, selects from the document. The scope is the union of their nodes, with a node inside another dropped. Without `root`, the scope is the document, and `"root": []` is an empty scope. An `api` reads from another value through [`using`](expressions.md#using).
+`root` sets where `element` and `text` read. It's an expression, or an array of them, and each one gives a selector, a node or a list of nodes. A selector string, whether read or literal, selects from the document. The scope is the union of their nodes, and a node inside another is dropped. Without `root`, the scope is the whole document, and `"root": []` is an empty scope. To make an `api` read from another value, use [`using`](expressions.md#using) instead.
 
 A selector `root` `R` is short for `{"element": {"selector": R}}`.
 
-Within each root, `selector`s are queried from the root and `xpath` expressions are evaluated with the root as context node, so a scoped XPath expression starts `.//` ([XPath](#xpath)). A `text` with `root` and neither `selector` nor `xpath` reads each root's `textContent`.
+Within each root, `selector`s are queried from the root and `xpath` expressions are evaluated with the root as the context node, so a scoped XPath expression starts `.//` ([XPath](#xpath)). A `text` with `root` and neither `selector` nor `xpath` reads each root's `textContent`.
 
-A root read through `using` reaches an open shadow root. Here the images in the shadow root of the page's one `my-widget`:
+Reading a root through `using` can reach an open shadow root. Here are the images in the shadow root of the page's one `my-widget`:
 
 ```json
 {"element": {"selector": "img", "root": {"only": {"element": {"selector": "my-widget"}}, "using": "shadowRoot"}}}
 ```
 
-A root that selects nothing, or reads `null` or `undefined`, is an empty scope: `element` and `text` select no items. A guard tells an absent region from an empty one. The guard holds when the region is present, and sits as an operand of the top-level `all` of the condition or `define` value reading the scoped expressions, or in the condition of an `if` around them:
+A root that selects nothing, or reads `null` or `undefined`, is an empty scope, so `element` and `text` select nothing. Use a guard to tell an absent region apart from an empty one. The guard holds when the region is present, and goes either as an operand of the top-level `all` of the condition or `define` value that reads the scoped expressions, or in the condition of an `if` around them:
 
 | Where | Guard and `root` |
 |---|---|
 | `actions` | The root is bound with `define`. The guard and `root` are `ref`s to it |
 | `match` | The guard is the root's expression, and `root` repeats it |
 
-In an array `root`, each entry has its own guard.
+In an array `root`, each entry needs its own guard.
 
 ```json
 "match": {"all": [
@@ -144,13 +144,13 @@ In an array `root`, each entry has its own guard.
 ]
 ```
 
-In boolean position an `element` or `text` guard holds when it selects an item. A guard on a root that is not an `element` or `text` source has `is`, such as `{"ref": "widget", "is": {"type": "object"}}`.
+In boolean position an `element` or `text` guard holds when it selects an item. A guard on a root that isn't an `element` or `text` source needs `is`, such as `{"ref": "widget", "is": {"type": "object"}}`.
 
-A scoped expression needs a guard unless it is read only in boolean position with no `none` above it, or its root is `{"self": {}}`, the item a `where` or `field` binds ([`root` guards](validation.md#root-guards)).
+A scoped expression needs a guard unless it's only read in boolean position with no `none` above it, or its root is `{"self": {}}` (the item a `where` or `field` binds) ([`root` guards](validation.md#root-guards)).
 
 ## `api`
 
-Reads a Web API by path, from the global object, and gives the value it reads. It takes a body, or a path, short for `{"path": <path>}`. [`self`](expressions.md#self) takes the same body and reads from a bound value, such as the expression beside [`using`](expressions.md#using).
+`api` reads a Web API by path from the global object, and gives the value it reads. It takes a body, or a path as short for `{"path": <path>}`. [`self`](expressions.md#self) takes the same body but reads from a bound value, such as the expression beside [`using`](expressions.md#using).
 
 ```json
 {"api": "document.readyState", "is": "complete"}
@@ -168,7 +168,7 @@ Reads a Web API by path, from the global object, and gives the value it reads. I
 | `where` | Optional, on a list. A predicate or an expression each item must pass ([Lists](#lists-where-and-field)) |
 | `field` | Optional. The value read from each item that passes `where`, or from a value that is not a list ([Lists](#lists-where-and-field)) |
 
-Each name is read as [Property reads](predicates.md#property-reads) describes, through the getters and methods C-S-S captures when it parses the detectors.
+Each name is read as described in [Property reads](predicates.md#property-reads), through the getters and methods C-S-S captures when it parses the detectors.
 
 | `path` reads | Gives |
 |---|---|
@@ -178,9 +178,9 @@ Each name is read as [Property reads](predicates.md#property-reads) describes, t
 | Edge | Behaviour |
 |---|---|
 | Maplike interfaces, such as `Headers` | Each item is a `[key, value]` array |
-| A path reading an element, such as `document.activeElement` | The element is the value, with no `visibility` check. A node is never a list, an iterable `select` or `form` included |
-| `where` on an item that is not an object | Tests it as any other item: a property path reads through its prototype, such as a string's `length`, and a read from `null` or `undefined` gives `undefined` |
-| `where` on a value that is not a list | Fails |
+| A path reading an element, such as `document.activeElement` | The element is the value, with no `visibility` check. A node is never a list, even an iterable `select` or `form` |
+| `where` on an item that isn't an object | Tests it like any other item: a property path reads through its prototype, such as a string's `length`, and a read from `null` or `undefined` gives `undefined` |
+| `where` on a value that isn't a list | Fails |
 
 ### Arguments
 
@@ -191,11 +191,11 @@ Each name is read as [Property reads](predicates.md#property-reads) describes, t
 | A literal or an object | An expression in value position: `0`, `"navigation"`, `null`, `{"ref": "navigation"}`, `{"only": {"element": {"selector": "main"}}}`, `{"self": "startTime"}` |
 | `{"expr": [...]}` | A JS array of its entries' values ([`expr`](expressions.md#expr)) |
 
-A selected list gives the list as an array, as it does beside `using` ([Selected lists](expressions.md#selected-lists)). The expression beside `using` is evaluated first, then `args` in order, then the call.
+A selected list is passed as an array, as it is beside `using` ([Selected lists](expressions.md#selected-lists)). The expression beside `using` is evaluated first, then `args` in order, then the call.
 
 A method converts its arguments as JS does: `Math.max` reads `"5"` as 5, `null` as 0 and an object through its `valueOf`. `type` in `where` guards the items of a list ([Failure and type](predicates.md#failure-and-type)).
 
-JS builtins give the values JSON does not write directly ([JS builtins](recipes.md#js-builtins)). The widest image's natural width:
+JS builtins give you values that JSON can't express directly ([JS builtins](recipes.md#js-builtins)). Here's the widest image's natural width:
 
 ```json
 {"api": {"path": "Math.max.apply", "args": [null, {"element": {"selector": "img", "field": "naturalWidth"}}]}}
@@ -204,16 +204,16 @@ JS builtins give the values JSON does not write directly ([JS builtins](recipes.
 | Case | Behaviour |
 |---|---|
 | `apply` over `null`, `undefined` or an iterable with no `length` | No arguments: `Math.max.apply` gives `-Infinity` |
-| A call with more arguments than the engine passes | Fails ([Failures](failures.md)). The limit differs by engine, and a list of a page's elements can exceed it. The `resource` timeline holds 250 entries by default |
+| A call with more arguments than the engine passes | Fails ([Failures](failures.md)). The limit differs by engine, and a list of a page's elements can exceed it. The `resource` timeline keeps up to 250 entries by default |
 | `Array.from`, `Object.fromEntries` | Use the iterator as the page leaves it ([Page code](predicates.md#page-code)) |
 
 ### Allowed names
 
-An `api` reads only names on the allowlist in this repository's CI, and a detector reading a name not on the list adds it in the same change. A name is the path read from the global object, such as `performance.getEntriesByType`, and a name read from its value adds to it: `performance.getEntriesByType.duration`. The naming rules are in [Allowed names](validation.md#allowed-names).
+An `api` can only read names on the allowlist in this repository's CI, so a detector reading a new name needs to add it to the list in the same change. A name is the path read from the global object, such as `performance.getEntriesByType`, and a name read from its value extends it: `performance.getEntriesByType.duration`. See [Allowed names](validation.md#allowed-names) for the naming rules.
 
 ### Performance timeline
 
-The timeline is read synchronously, as it stands at evaluation. Load time, paint times and resource counts are in [Performance timeline](recipes.md#performance-timeline).
+The timeline is read synchronously, as it is at the time of evaluation. See [Performance timeline](recipes.md#performance-timeline) for load time, paint times and resource counts.
 
 ```json
 {"api": {"path": "performance.getEntriesByType", "args": ["navigation"], "field": "loadEventEnd"}, "is": {"gte": 8000}}
@@ -227,12 +227,12 @@ The timeline is read synchronously, as it stands at evaluation. Load time, paint
 
 `getEntriesByType` returns an array, which is a value, so `only` takes one entry from it ([Several fields of the `navigation` entry](recipes.md#several-fields-of-the-navigation-entry)).
 
-A field the engine does not define on the entry, such as `responseStatus` on an engine without it, reads `undefined`, in `where`, in `field` and in a `self` path. A comparison on `undefined` is `false` ([Missing fields and throwing reads](recipes.md#missing-fields-and-throwing-reads)). A `Reflect.has` call tells a field the engine lacks from one holding `undefined` ([Presence](predicates.md#presence)).
+A field the engine doesn't define on the entry, such as `responseStatus` on an engine without it, reads `undefined` in `where`, in `field` and in a `self` path. A comparison on `undefined` is `false` ([Missing fields and throwing reads](recipes.md#missing-fields-and-throwing-reads)). A `Reflect.has` call tells apart a field the engine doesn't have and one set to `undefined` ([Presence](predicates.md#presence)).
 
-`loadEventEnd` is 0 until the load event fires, and 0 is a value. `"is": 0` at a late offset reads a load that never finished.
+`loadEventEnd` is 0 until the load event fires, and 0 is still a value, so `"is": 0` at a late offset means the load never finished.
 
-Entry types that the engine delivers only to a `PerformanceObserver` are not in the timeline. The list is empty, and reading one value from it fails ([Values that do not fit](failures.md#values-that-do-not-fit)).
+Entry types that the engine only delivers to a `PerformanceObserver` aren't in the timeline, so the list is empty and reading one value from it fails ([Values that do not fit](failures.md#values-that-do-not-fit)).
 
-The page sets the names of `mark` and `measure` entries, so `getEntriesByName` without a type also returns a mark the page created with that name. Read for one value, two entries then remain, which fails, and in the list's `length` or under `Math.max.apply` the mark is one of the items. The type argument excludes them.
+The page sets the names of `mark` and `measure` entries, so `getEntriesByName` without a type also returns a mark the page created with that name. If you read one value, there are then two entries, which fails, and in the list's `length` or under `Math.max.apply`, the mark is counted as one of the items. Passing the type argument excludes them.
 
 Reading `resource` entries by name puts a URL in config. Only the value read is sent.

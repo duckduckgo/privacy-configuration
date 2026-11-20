@@ -1,6 +1,6 @@
 # Payloads
 
-The `fireEvent` and `breakageReportData` [actions](overview.md#actions) take an optional `data` map naming values to send when the action runs.
+The `fireEvent` and `breakageReportData` [actions](overview.md#actions) take an optional `data` map of the values to send when the action runs.
 
 ## Payload spec
 
@@ -12,12 +12,12 @@ type PayloadSpec = Record<string, PayloadField>;
 
 | Part | Rule |
 |---|---|
-| Key | The payload key on the wire. Matches `^[a-zA-Z][a-zA-Z0-9_]*$`, and is never `nativeData`. CI checks both ([Payloads](validation.md#payloads)) |
-| `value` | An expression in value position ([Positions](expressions.md#positions)). `{"ref": "<name>"}` reports a value bound with `define` ([Names](expressions.md#names)); anything else is computed where the action runs. Each bucket tests a selected list as [Selected lists](expressions.md#selected-lists) says |
-| `when` | Optional. A [predicate](predicates.md) the value passes to be sent ([`when`](#when)) |
+| Key | The payload key on the wire. It must match `^[a-zA-Z][a-zA-Z0-9_]*$` and can't be `nativeData`, and CI checks both ([Payloads](validation.md#payloads)) |
+| `value` | An expression in value position ([Positions](expressions.md#positions)). `{"ref": "<name>"}` sends a value bound with `define` ([Names](expressions.md#names)), and anything else is computed when the action runs. Each bucket tests a selected list as described in [Selected lists](expressions.md#selected-lists) |
+| `when` | Optional. A [predicate](predicates.md) the value must pass to be sent ([`when`](#when)) |
 | `buckets` | Required in `fireEvent` by CI ([Payloads](validation.md#payloads)), and optional in `breakageReportData`. See [Buckets](#buckets) |
 
-Each field is sent as follows:
+Each field is sent like this:
 
 ```mermaid
 flowchart TD
@@ -33,17 +33,17 @@ flowchart TD
     value & when & bucket & json -.->|fails or errors| fail["Action fails:<br>sends and writes nothing"]
 ```
 
-Unbucketed, a selected list is sent as the array of its items, `NaN` and the infinities as `null`, and an object or node as JSON writes it. `undefined` comes from an `if` with no branch taken or an unbound name.
+Without buckets, a selected list is sent as an array of its items, `NaN` and the infinities are sent as `null`, and an object or node is sent as `JSON.stringify` writes it. A value is `undefined` when it comes from an `if` with no branch taken or from an unbound name.
 
-`when` with `type`, or `Number.isFinite` called on the value ([Calls](predicates.md#calls)), states which values are sent.
+To control which values are sent, use `when` with `type`, or with `Number.isFinite` called on the value ([Calls](predicates.md#calls)).
 
-CI requires `buckets` on every `fireEvent` field, so an event sends a bucket name for each key. Each distinct payload is its own EventHub event: de-duplication separates them, and each is its own immediate pixel.
+CI requires `buckets` on every `fireEvent` field, so an event sends a bucket name for each key. Each distinct payload is a separate EventHub event, so de-duplication treats them separately and each one is its own immediate pixel.
 
-A failed value reaches `when` and the buckets, where `fails` handles it ([Handling](failures.md#handling)).
+A failed value still reaches `when` and the buckets, where `fails` can handle it ([Handling](failures.md#handling)).
 
 ## `when`
 
-A payload field's `when` is a [predicate](predicates.md) on the field's value. It tests the value before it is sent or bucketed. Here a `breakageReportData` field writes the navigation type on a navigation or a reload, and omits it otherwise. The value is written unbucketed, and `only` writes the list's one item:
+A payload field's `when` is a [predicate](predicates.md) on the field's value. It tests the value before it's sent or bucketed. Here a `breakageReportData` field writes the navigation type on a navigation or a reload, and leaves it out otherwise. The value is written without buckets, and `only` takes the list's one item:
 
 ```json
 "data": {"navigationType": {"value": {"only": {"api": {"path": "performance.getEntriesByType", "args": ["navigation"], "field": "type"}}}, "when": {"in": ["navigate", "reload"]}}}
@@ -51,7 +51,7 @@ A payload field's `when` is a [predicate](predicates.md) on the field's value. I
 
 ## Buckets
 
-`buckets` is an array of buckets, each a `name` and a [predicate](predicates.md) `is`. A value is in a bucket when its `is` holds for it. Ranges take the shape of EventHub counter buckets. A detector bucketing a measurement on every page is in [A measurement on every page](recipes.md#a-measurement-on-every-page).
+`buckets` is an array of buckets, each with a `name` and a [predicate](predicates.md) `is`. A value is in a bucket when the bucket's `is` holds for it. Ranges use the same shape as EventHub counter buckets. See [A measurement on every page](recipes.md#a-measurement-on-every-page) for a detector that buckets a measurement on every page.
 
 ```json
 "buckets": [{"name": "0-3s", "is": {"gte": 0, "lt": 3000}}, {"name": "3-8s", "is": {"gte": 3000, "lt": 8000}}, {"name": "8s+", "is": {"gte": 8000}}]
@@ -60,15 +60,15 @@ A payload field's `when` is a [predicate](predicates.md) on the field's value. I
 "buckets": [{"name": "unsupported", "is": "unsupported"}, {"name": "none", "is": 0}, {"name": "one", "is": 1}, {"name": "2+", "is": {"gte": 2}}]
 ```
 
-The last buckets a count that reads `"unsupported"` on engines without the field it counts ([Presence](predicates.md#presence)). A comparison on a string that is not numeric is `false`, so `"unsupported"` is in its own bucket alone.
+The last one buckets a count that reads `"unsupported"` on engines without the field it counts ([Presence](predicates.md#presence)). A comparison on a non-numeric string is `false`, so `"unsupported"` only matches its own bucket.
 
 | Part | Rule |
 |---|---|
-| `buckets` | A non-empty array of objects, each holding `name` and `is` and no other key ([Buckets](validation.md#buckets)) |
+| `buckets` | A non-empty array of objects, each with `name` and `is` and no other keys ([Buckets](validation.md#buckets)) |
 | `name` | Any non-empty string. Sent on the wire as written. Several buckets may share a name |
-| `is` | Any predicate. It tests the value as an expression's [`is`](expressions.md#is) does |
+| `is` | Any predicate. It tests the value the same way an expression's [`is`](expressions.md#is) does |
 
-Buckets are tested in array order, and the first whose `is` holds names the value. A value in no bucket omits its key. CI's checks on overlapping buckets are in [Buckets](validation.md#buckets).
+Buckets are tested in array order, and the value is sent as the name of the first bucket whose `is` holds. If the value isn't in any bucket, its key is left out. See [Buckets](validation.md#buckets) for CI's checks on overlapping buckets.
 
 ## `fireEvent` and the EventHub bridge
 
@@ -84,7 +84,7 @@ sends:
 
 In a `breakageReportData` payload, the same field without `buckets` writes `3`.
 
-`fireEvent` sends a `webEvent` notification, `{type, data}`, from C-S-S to the native client, where EventHub handles it ([EventHub](overview.md#eventhub)). EventHub de-duplicates on type, payload and tab ([De-duplication](https://github.com/duckduckgo/ddg-workflow/blob/main/docs/event-hub/deduplication.md)), so two frames reporting different buckets on one page deliver twice. Triggers default to the top frame.
+`fireEvent` sends a `webEvent` notification, `{type, data}`, from C-S-S to the native client, where EventHub handles it ([EventHub](overview.md#eventhub)). EventHub de-duplicates on type, payload and tab ([De-duplication](https://github.com/duckduckgo/ddg-workflow/blob/main/docs/event-hub/deduplication.md)), so if two frames report different buckets on one page, both are delivered. Note that triggers default to the top frame only.
 
 An `immediate` telemetry trigger reads payload keys as pixel parameters ([Telemetry handler](https://github.com/duckduckgo/ddg-workflow/blob/main/docs/event-hub/handlers/telemetry.md)):
 
@@ -98,11 +98,11 @@ An `immediate` telemetry trigger reads payload keys as pixel parameters ([Teleme
 }
 ```
 
-A `period` counter on the same `type` counts the pages it fired on. The full telemetry-side handling (aggregation, bucketing, pixel firing) is specified in the [EventHub telemetry handler](https://github.com/duckduckgo/ddg-workflow/blob/main/docs/event-hub/handlers/telemetry.md).
+A `period` counter on the same `type` counts the pages it fired on. See the [EventHub telemetry handler](https://github.com/duckduckgo/ddg-workflow/blob/main/docs/event-hub/handlers/telemetry.md) for the full telemetry handling (aggregation, bucketing and pixel firing).
 
 ### Per-bucket events
 
-A `period` pixel counts events by type, and a `data` parameter on it has the last payload value of the period. A distribution over a period takes one event type per bucket: a [chain](expressions.md#sequences) of `if`s fires `loadTime_fast`, `loadTime_mid` or `loadTime_slow`, and the pixel has a `counter` for each:
+A `period` pixel counts events by type, and a `data` parameter on it only has the last payload value of the period. To get a distribution over a period, use one event type per bucket: a [chain](expressions.md#sequences) of `if`s fires `loadTime_fast`, `loadTime_mid` or `loadTime_slow`, and the pixel has a `counter` for each:
 
 ```json
 "webTelemetry_loadTime_day": {

@@ -1,15 +1,10 @@
 # Web detection versions
 
-Which C-S-S release each web detection capability arrived in, and the earliest app version of each platform carrying that release. Use these to pick the version gate for a detector that needs a capability.
+Which C-S-S release each web detection capability arrived in, and the earliest app version on each platform that includes that release. Use these to pick the version gate for a detector that needs a capability.
 
 ## Capabilities by C-S-S release
 
-This table covers core features of web detection and which C-S-S release they
-went out in. When requiring a specific feature, conditional changes can be used
-to isolate enablement of a detector to the specified minimum version, or the
-entire web detection feature can be version gated as appropriate (see the
-[Platform versions by C-S-S release](#platform-versions-by-c-s-s-release)
-section for which version to specify per platform).
+This table lists the core web detection features and the C-S-S release each one shipped in. To require a feature, use conditional changes to enable a detector only from the minimum version, or version-gate the whole web detection feature (see [Platform versions by C-S-S release](#platform-versions-by-c-s-s-release) for which version to use on each platform).
 
 | Group | Capability | First C-S-S release |
 |---|---|---|
@@ -38,7 +33,7 @@ Additional details:
 
 ## Platform versions by C-S-S release
 
-For each C-S-S release named above, the earliest app version of each platform that ships that release **or later**. Use this to pick the `minSupportedVersion` for a version gate.
+For each C-S-S release above, this is the earliest app version on each platform that ships that release or a later one. Use it to pick the `minSupportedVersion` for a version gate.
 
 | C-S-S release | iOS | macOS | Android | Windows | Extension |
 |---|---|---|---|---|---|
@@ -55,6 +50,6 @@ Android is given in both forms: the release version, and the integer that remote
 
 Reading the table:
 
-- A cell is the first release at or above that C-S-S version, not a release pinning it exactly. No platform pinned every C-S-S release, so the version actually shipped is usually higher — Windows 0.147.0 ships 13.1.0, and the extension's 2026.4.28 ships 13.34.0.
-- **not yet shipped** means no released version of that platform carries a C-S-S release that new.
-- Pins are not monotonic across releases. A hotfix cut from an older base can ship an older C-S-S than the release before it — Android 5.294.1 dropped back to 16.7.0 after 5.294.0 shipped 16.14.0. None of the rows above is affected, but a gate set from a neighbouring version can be. In such a situation, the table reflects the _current_ minimum release carrying the C-S-S version, not the historical first release.
+- A cell is the first app release that ships that C-S-S version or a later one, so it may not ship that exact version. No platform pinned every C-S-S release, so the version actually shipped is usually higher (e.g., Windows 0.147.0 ships 13.1.0, and the extension's 2026.4.28 ships 13.34.0).
+- **not yet shipped** means no released version of that platform includes a C-S-S release that new.
+- The pinned C-S-S version doesn't always go up from one app release to the next. A hotfix cut from an older base can ship an older C-S-S than the release before it (e.g., Android 5.294.1 dropped back to 16.7.0 after 5.294.0 shipped 16.14.0). None of the rows above is affected, but a gate set from a neighbouring version can be. In that case, the table gives the _current_ minimum release that includes the C-S-S version, instead of the first release that ever shipped it.
