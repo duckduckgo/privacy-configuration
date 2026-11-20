@@ -4635,6 +4635,14 @@
                     {
                         "domain": "www.smythstoys.com",
                         "brand": "Google Chrome"
+                    },
+                    {
+                        "domain": "app.blackbaud.com",
+                        "brand": "Google Chrome"
+                    },
+                    {
+                        "domain": "*.blackbaud.com",
+                        "brand": "Google Chrome"
                     }
                 ]
             }
@@ -4708,6 +4716,18 @@
                     {
                         "condition": {
                             "domain": "smythstoys.com"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/brandName",
+                                "value": "Google Chrome"
+                            }
+                        ]
+                    },
+                    {
+                        "condition": {
+                            "domain": "blackbaud.com"
                         },
                         "patchSettings": [
                             {
