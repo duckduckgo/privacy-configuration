@@ -200,6 +200,12 @@ type DetectorGroup = Record<string, DetectorConfig>;
 
 export type WebDetectionSettings = CSSInjectFeatureSettings<{
     detectors?: Record<string, DetectorGroup>;
+    /**
+     * How long, in ms, C-S-S keeps the page reads of one run of the detectors (XPath selections and
+     * element text) for later runs, while the page is unchanged. 0 or absent shares them within one run
+     * only.
+     */
+    readCacheMaxAgeMs?: number;
     /** Generic C-S-S load gate, patched per experiment cohort via conditionalChanges. */
     additionalCheck?: FeatureState;
 }>;
