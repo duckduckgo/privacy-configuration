@@ -67,6 +67,8 @@ export type ConditionBlock = {
     injectName?: string;
     minSupportedVersion?: number | string;
     maxSupportedVersion?: number | string;
+    minContentScopeScriptsVersion?: string;
+    maxContentScopeScriptsVersion?: string;
     internal?: boolean;
     preview?: boolean;
     context?: {
