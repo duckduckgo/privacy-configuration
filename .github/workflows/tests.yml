@@ -15,7 +15,7 @@ jobs:
         steps:
             - uses: actions/checkout@v6
             - name: Use Node.js
-              uses: actions/setup-node@v6
+              uses: actions/setup-node@v7
               with:
                   node-version-file: .nvmrc
             - name: Install dependencies
@@ -48,7 +48,7 @@ jobs:
                   repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
                   ref: ${{ github.event.pull_request.head.ref || github.ref }}
             - name: Use Node.js
-              uses: actions/setup-node@v6
+              uses: actions/setup-node@v7
               with:
                   node-version-file: .nvmrc
             - name: Install dependencies
