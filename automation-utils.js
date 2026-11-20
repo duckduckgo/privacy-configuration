@@ -7,56 +7,21 @@ import { immutableJSONPatch } from 'immutable-json-patch';
  * Defines which features can be auto-approved and their allowed paths
  */
 export const AUTO_APPROVABLE_FEATURES = {
-    '/features/elementHiding': [
-        '/settings/domains',
-        '/exceptions',
-    ],
-    '/features/fingerprintingTemporaryStorage': [
-        '/exceptions',
-    ],
-    '/features/fingerprintingAudio': [
-        '/exceptions',
-    ],
-    '/features/fingerprintingBattery': [
-        '/exceptions',
-    ],
-    '/features/fingerprintingCanvas': [
-        '/exceptions',
-    ],
-    '/features/fingerprintingHardware': [
-        '/exceptions',
-    ],
-    '/features/fingerprintingScreenSize': [
-        '/exceptions',
-    ],
-    '/features/trackerAllowlist': [
-        '/settings/allowlistedTrackers',
-    ],
-    '/features/gpc': [
-        '/exceptions',
-    ],
-    '/features/webCompat': [
-        '/exceptions',
-    ],
-    '/features/clickToLoad': [
-        '/exceptions',
-    ],
-    '/features/eme': [
-        '/exceptions',
-    ],
-    '/features/autoconsent': [
-        '/exceptions',
-        '/settings/disabledCMPs',
-    ],
-    '/features/customUserAgent': [
-        '/exceptions',
-        '/settings/ddgFixedSites',
-        '/settings/omitApplicationSites',
-        '/settings/defaultSites',
-    ],
-    '/features/mediaPlaybackRequiresUserGesture': [
-        '/exceptions',
-    ],
+    '/features/elementHiding': ['/settings/domains', '/exceptions'],
+    '/features/fingerprintingTemporaryStorage': ['/exceptions'],
+    '/features/fingerprintingAudio': ['/exceptions'],
+    '/features/fingerprintingBattery': ['/exceptions'],
+    '/features/fingerprintingCanvas': ['/exceptions'],
+    '/features/fingerprintingHardware': ['/exceptions'],
+    '/features/fingerprintingScreenSize': ['/exceptions'],
+    '/features/trackerAllowlist': ['/settings/allowlistedTrackers'],
+    '/features/gpc': ['/exceptions'],
+    '/features/webCompat': ['/exceptions'],
+    '/features/clickToLoad': ['/exceptions'],
+    '/features/eme': ['/exceptions'],
+    '/features/autoconsent': ['/exceptions', '/settings/disabledCMPs'],
+    '/features/customUserAgent': ['/exceptions', '/settings/ddgFixedSites', '/settings/omitApplicationSites', '/settings/defaultSites'],
+    '/features/mediaPlaybackRequiresUserGesture': ['/exceptions'],
 };
 
 /**
@@ -101,10 +66,7 @@ export function readFilesRecursively(directory) {
 
         if (fileStats.isDirectory()) {
             const nestedFiles = readFilesRecursively(filePath);
-            for (const [
-                nestedFilePath,
-                nestedFileContent,
-            ] of Object.entries(nestedFiles)) {
+            for (const [nestedFilePath, nestedFileContent] of Object.entries(nestedFiles)) {
                 files[path.join(filename, nestedFilePath)] = nestedFileContent;
             }
         } else {
@@ -277,10 +239,7 @@ export function applyConditionalChangesToConfig(config) {
 
     const patchedConfig = JSON.parse(JSON.stringify(config));
 
-    for (const [
-        featureName,
-        feature,
-    ] of Object.entries(patchedConfig.features)) {
+    for (const [featureName, feature] of Object.entries(patchedConfig.features)) {
         if (hasConditionalChanges(feature)) {
             const patchedSettings = applyConditionalChanges(feature);
             if (patchedSettings === false) {

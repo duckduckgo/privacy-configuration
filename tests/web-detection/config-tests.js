@@ -89,9 +89,7 @@ describe('webDetection config tests', () => {
                                 conditionalChanges: [
                                     {
                                         condition: { injectName: 'android', minSupportedVersion: 1, maxSupportedVersion: 2 },
-                                        patchSettings: [
-                                            { op: 'add', path: '/detectors/g/gated', value: sending('b') },
-                                        ],
+                                        patchSettings: [{ op: 'add', path: '/detectors/g/gated', value: sending('b') }],
                                     },
                                 ],
                             },
@@ -140,10 +138,7 @@ describe('webDetection config tests', () => {
                     ((actionKeys.length > 1 && !orderFree) || (isPlainObject(node.define) && Object.keys(node.define).length > 1))
                 )
                     found.push(nodePath);
-                for (const [
-                    key,
-                    value,
-                ] of Object.entries(node)) {
+                for (const [key, value] of Object.entries(node)) {
                     visit(value, `${nodePath}.${key}`, BRANCH_KEYS.includes(key));
                 }
             };
@@ -154,17 +149,10 @@ describe('webDetection config tests', () => {
         for (const config of latestConfigs.filter(({ name }) => /^v\d+\/(ios|macos)-config\.json$/.test(name))) {
             it(`${config.name} holds every action of this release's detectors in its own sequence element`, () => {
                 const detectors = config.body.features?.webDetection?.settings?.detectors ?? {};
-                const found = Object.entries(detectors).flatMap(
-                    ([
-                        group,
-                        entries,
-                    ]) =>
-                        Object.entries(/** @type {Record<string, any>} */ (entries)).flatMap(
-                            ([
-                                id,
-                                detector,
-                            ]) => unsequenced(detector.actions, `detectors.${group}.${id}.actions`),
-                        ),
+                const found = Object.entries(detectors).flatMap(([group, entries]) =>
+                    Object.entries(/** @type {Record<string, any>} */ (entries)).flatMap(([id, detector]) =>
+                        unsequenced(detector.actions, `detectors.${group}.${id}.actions`),
+                    ),
                 );
                 expect(found, found.join('\n')).to.deep.equal([]);
             });
@@ -209,27 +197,18 @@ describe('webDetection config tests', () => {
             };
             sequenceWebDetectionActions(config);
             const settings = config.features.webDetection.settings;
-            expect(settings.detectors.g.once.actions).to.deep.equal([
-                { fireEvent: { type: 'a' } },
-                { define: { b: 1 } },
-            ]);
+            expect(settings.detectors.g.once.actions).to.deep.equal([{ fireEvent: { type: 'a' } }, { define: { b: 1 } }]);
             expect(settings.detectors.g.list.actions).to.deep.equal([
                 { define: { x: 1 } },
                 { define: { y: { ref: 'x' } } },
                 {
                     if: true,
-                    then: [
-                        { fireEvent: { type: 'b' } },
-                        { define: { 'this.sent': true } },
-                    ],
+                    then: [{ fireEvent: { type: 'b' } }, { define: { 'this.sent': true } }],
                     else: { breakageReportData: {} },
                 },
             ]);
             expect(settings.conditionalChanges[0].patchSettings[0].value).to.deep.equal({
-                actions: [
-                    { define: { a: 1 } },
-                    { define: { b: 2 } },
-                ],
+                actions: [{ define: { a: 1 } }, { define: { b: 2 } }],
             });
             expect(settings.conditionalChanges[0].patchSettings[1].value).to.deep.equal([
                 { breakageReportData: {} },
@@ -299,14 +278,8 @@ describe('webDetection config tests', () => {
                     .flatMap((view) => Object.entries(view.detectors));
                 /** @type {string[]} */
                 const wrong = [];
-                for (const [
-                    groupName,
-                    group,
-                ] of detectors) {
-                    for (const [
-                        detectorId,
-                        detector,
-                    ] of Object.entries(group)) {
+                for (const [groupName, group] of detectors) {
+                    for (const [detectorId, detector] of Object.entries(group)) {
                         if (detector.state === 'disabled' || detector.actions === undefined) continue;
                         if (
                             !isPlainObject(detector.actions) ||
@@ -358,14 +331,8 @@ describe('webDetection config tests', () => {
         forEachWebDetectionConfig(({ configName, detectors }) => {
             describe(configName, () => {
                 it('custom fireEvent.type values do not use the reserved detectorPerf prefix', () => {
-                    for (const [
-                        groupName,
-                        groupDetectors,
-                    ] of Object.entries(detectors)) {
-                        for (const [
-                            detectorName,
-                            detector,
-                        ] of Object.entries(groupDetectors)) {
+                    for (const [groupName, groupDetectors] of Object.entries(detectors)) {
+                        for (const [detectorName, detector] of Object.entries(groupDetectors)) {
                             for (const type of fireEventTypes(detector)) {
                                 expect(type.startsWith('detectorPerf_')).to.equal(
                                     false,
@@ -394,14 +361,8 @@ describe('webDetection config tests', () => {
                             );
                         }
                     };
-                    for (const [
-                        groupName,
-                        groupDetectors,
-                    ] of Object.entries(detectors)) {
-                        for (const [
-                            detectorName,
-                            detector,
-                        ] of Object.entries(groupDetectors)) {
+                    for (const [groupName, groupDetectors] of Object.entries(detectors)) {
+                        for (const [detectorName, detector] of Object.entries(groupDetectors)) {
                             check(detector, `${groupName}.${detectorName}`);
                         }
                     }
@@ -430,14 +391,7 @@ describe('webDetection config tests', () => {
                     },
                 },
             });
-            expect(
-                [
-                    ...consumers,
-                ].sort(),
-            ).to.deep.equal([
-                'countedEvent',
-                'exampleEvent',
-            ]);
+            expect([...consumers].sort()).to.deep.equal(['countedEvent', 'exampleEvent']);
         });
     });
 });

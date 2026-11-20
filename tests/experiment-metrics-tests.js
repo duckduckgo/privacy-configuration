@@ -15,10 +15,7 @@ import { createValidator, formatErrors } from './schema-validation.js';
 
 // Names the NA experiment framework already fires as built-in retention metrics; a
 // config-declared metric with one of these names would be indistinguishable in the data.
-const RESERVED_METRIC_NAMES = new Set([
-    'search',
-    'app_use',
-]);
+const RESERVED_METRIC_NAMES = new Set(['search', 'app_use']);
 
 // Native (non-web) event types clients fire into the hub. None exist yet; a metric
 // converting on an event nothing produces is silent, so unknown events fail the build.
@@ -63,14 +60,8 @@ function collectFiredEventTypes(config) {
 function forEachDeclaredMetric(config, cb) {
     for (const parent of EXPERIMENT_METRIC_PARENTS) {
         const subFeatures = config?.features?.[parent]?.features ?? {};
-        for (const [
-            subFeatureName,
-            subFeature,
-        ] of Object.entries(subFeatures)) {
-            for (const [
-                metricName,
-                metric,
-            ] of Object.entries(subFeature?.settings?.metrics ?? {})) {
+        for (const [subFeatureName, subFeature] of Object.entries(subFeatures)) {
+            for (const [metricName, metric] of Object.entries(subFeature?.settings?.metrics ?? {})) {
                 cb({
                     parent,
                     subFeatureName,
@@ -93,19 +84,13 @@ function forEachDeclaredMetric(config, cb) {
  */
 function findMisplacedMetrics(config) {
     const misplaced = [];
-    for (const [
-        featureName,
-        feature,
-    ] of Object.entries(config?.features ?? {})) {
+    for (const [featureName, feature] of Object.entries(config?.features ?? {})) {
         const parentParticipates = EXPERIMENT_METRIC_PARENTS.includes(featureName);
         if (feature?.settings && 'metrics' in feature.settings) {
             // Feature-level settings never carry metrics, participating or not.
             misplaced.push(`${featureName}.settings.metrics`);
         }
-        for (const [
-            subFeatureName,
-            subFeature,
-        ] of Object.entries(feature?.features ?? {})) {
+        for (const [subFeatureName, subFeature] of Object.entries(feature?.features ?? {})) {
             if (!parentParticipates && subFeature?.settings && 'metrics' in subFeature.settings) {
                 misplaced.push(`${featureName}.${subFeatureName}.settings.metrics`);
             }
@@ -151,10 +136,7 @@ function assertMetricShape(metricName, metric, path) {
         `${path}.conversions must be a non-empty array, got ${JSON.stringify(metric?.conversions)}`,
     );
 
-    for (const [
-        index,
-        conversion,
-    ] of (metric?.conversions ?? []).entries()) {
+    for (const [index, conversion] of (metric?.conversions ?? []).entries()) {
         const conversionPath = `${path}.conversions[${index}]`;
         const windows = conversion?.windows;
 
@@ -168,16 +150,10 @@ function assertMetricShape(metricName, metric, path) {
                 `write [${JSON.stringify(windows)}] rather than ${JSON.stringify(windows)}`,
         );
 
-        for (const [
-            windowIndex,
-            window,
-        ] of windows.entries()) {
+        for (const [windowIndex, window] of windows.entries()) {
             const windowPath = `${conversionPath}.windows[${windowIndex}]`;
             check(Array.isArray(window) && window.length === 2, `${windowPath} must be a [low, high] pair, got ${JSON.stringify(window)}`);
-            const [
-                low,
-                high,
-            ] = window;
+            const [low, high] = window;
             check(Number.isInteger(low) && Number.isInteger(high), `${windowPath} bounds must be integers, got ${JSON.stringify(window)}`);
             check(low >= 0, `${windowPath} low bound counts days from enrollment and must be >= 0, got ${low}`);
             check(low <= high, `${windowPath} must run low to high, got ${JSON.stringify(window)}`);
@@ -188,10 +164,7 @@ function assertMetricShape(metricName, metric, path) {
             Array.isArray(thresholds) && thresholds.length > 0,
             `${conversionPath}.thresholds must be a non-empty array, got ${JSON.stringify(thresholds)}`,
         );
-        for (const [
-            thresholdIndex,
-            threshold,
-        ] of thresholds.entries()) {
+        for (const [thresholdIndex, threshold] of thresholds.entries()) {
             check(
                 Number.isInteger(threshold) && threshold >= 1,
                 `${conversionPath}.thresholds[${thresholdIndex}] must be an integer >= 1, got ${JSON.stringify(threshold)}`,
@@ -216,15 +189,9 @@ function assertNoDuplicateRequests(metric, path) {
     /** @type {Map<string, string>} */
     const origins = new Map();
 
-    for (const [
-        index,
-        conversion,
-    ] of metric.conversions.entries()) {
+    for (const [index, conversion] of metric.conversions.entries()) {
         const origin = `conversions[${index}]`;
-        for (const [
-            low,
-            high,
-        ] of conversion.windows) {
+        for (const [low, high] of conversion.windows) {
             for (const threshold of conversion.thresholds) {
                 const request = `window [${low}, ${high}] at threshold ${threshold}`;
                 const previous = origins.get(`${low}-${high}@${threshold}`);
@@ -292,16 +259,8 @@ describe('experiment metrics config tests', () => {
             event: 'adwallDetected',
             conversions: [
                 {
-                    windows: [
-                        [
-                            0,
-                            7,
-                        ],
-                    ],
-                    thresholds: [
-                        1,
-                        3,
-                    ],
+                    windows: [[0, 7]],
+                    thresholds: [1, 3],
                 },
             ],
         };
@@ -318,12 +277,7 @@ describe('experiment metrics config tests', () => {
                         event: 'adwallDetected',
                         conversions: [
                             {
-                                windows: [
-                                    [
-                                        0,
-                                        0,
-                                    ],
-                                ],
+                                windows: [[0, 0]],
                             },
                         ],
                     },
@@ -356,13 +310,8 @@ describe('experiment metrics config tests', () => {
                         event: 'adwallDetected',
                         conversions: [
                             {
-                                windows: [
-                                    1,
-                                    2,
-                                ],
-                                thresholds: [
-                                    1,
-                                ],
+                                windows: [1, 2],
+                                thresholds: [1],
                             },
                         ],
                     },
@@ -379,15 +328,8 @@ describe('experiment metrics config tests', () => {
                         event: 'adwallDetected',
                         conversions: [
                             {
-                                windows: [
-                                    [
-                                        0,
-                                        '7',
-                                    ],
-                                ],
-                                thresholds: [
-                                    1,
-                                ],
+                                windows: [[0, '7']],
+                                thresholds: [1],
                             },
                         ],
                     },
@@ -404,15 +346,8 @@ describe('experiment metrics config tests', () => {
                         event: 'adwallDetected',
                         conversions: [
                             {
-                                windows: [
-                                    [
-                                        -1,
-                                        4,
-                                    ],
-                                ],
-                                thresholds: [
-                                    1,
-                                ],
+                                windows: [[-1, 4]],
+                                thresholds: [1],
                             },
                         ],
                     },
@@ -429,12 +364,7 @@ describe('experiment metrics config tests', () => {
                         event: 'adwallDetected',
                         conversions: [
                             {
-                                windows: [
-                                    [
-                                        3,
-                                        1,
-                                    ],
-                                ],
+                                windows: [[3, 1]],
                             },
                         ],
                     },
@@ -451,16 +381,8 @@ describe('experiment metrics config tests', () => {
                         event: 'adwallDetected',
                         conversions: [
                             {
-                                windows: [
-                                    [
-                                        0,
-                                        7,
-                                    ],
-                                ],
-                                thresholds: [
-                                    1,
-                                    1,
-                                ],
+                                windows: [[0, 7]],
+                                thresholds: [1, 1],
                             },
                         ],
                     },
@@ -478,18 +400,10 @@ describe('experiment metrics config tests', () => {
                         conversions: [
                             {
                                 windows: [
-                                    [
-                                        0,
-                                        7,
-                                    ],
-                                    [
-                                        0,
-                                        7,
-                                    ],
+                                    [0, 7],
+                                    [0, 7],
                                 ],
-                                thresholds: [
-                                    2,
-                                ],
+                                thresholds: [2],
                             },
                         ],
                     },
@@ -506,27 +420,12 @@ describe('experiment metrics config tests', () => {
                         event: 'adwallDetected',
                         conversions: [
                             {
-                                windows: [
-                                    [
-                                        0,
-                                        7,
-                                    ],
-                                ],
-                                thresholds: [
-                                    1,
-                                    3,
-                                ],
+                                windows: [[0, 7]],
+                                thresholds: [1, 3],
                             },
                             {
-                                windows: [
-                                    [
-                                        0,
-                                        7,
-                                    ],
-                                ],
-                                thresholds: [
-                                    3,
-                                ],
+                                windows: [[0, 7]],
+                                thresholds: [3],
                             },
                         ],
                     },
@@ -544,18 +443,10 @@ describe('experiment metrics config tests', () => {
                         conversions: [
                             {
                                 windows: [
-                                    [
-                                        0,
-                                        0,
-                                    ],
-                                    [
-                                        0,
-                                        7,
-                                    ],
+                                    [0, 0],
+                                    [0, 7],
                                 ],
-                                thresholds: [
-                                    1,
-                                ],
+                                thresholds: [1],
                             },
                         ],
                     },
@@ -576,15 +467,8 @@ describe('experiment metrics config tests', () => {
                         event: 'adwallDetected',
                         conversions: [
                             {
-                                windows: [
-                                    [
-                                        0,
-                                        7,
-                                    ],
-                                ],
-                                thresholds: [
-                                    0,
-                                ],
+                                windows: [[0, 7]],
+                                thresholds: [0],
                             },
                         ],
                     },
@@ -601,26 +485,17 @@ describe('experiment metrics config tests', () => {
             metrics: {
                 adwallSeen: {
                     event: 'adwallDetected',
-                    conversions: [
-                        conversion,
-                    ],
+                    conversions: [conversion],
                 },
             },
         });
 
-        const window = [
-            [
-                0,
-                7,
-            ],
-        ];
+        const window = [[0, 7]];
 
         it('accepts explicit thresholds', () => {
             const settings = settingsWithConversion({
                 windows: window,
-                thresholds: [
-                    1,
-                ],
+                thresholds: [1],
             });
             expect(validate(settings)).to.equal(true, formatErrors(validate.errors));
         });
@@ -654,9 +529,7 @@ describe('experiment metrics config tests', () => {
                     },
                 },
             };
-            expect(findMisplacedMetrics(config)).to.deep.equal([
-                'someFeature.someSubFeature.settings.metrics',
-            ]);
+            expect(findMisplacedMetrics(config)).to.deep.equal(['someFeature.someSubFeature.settings.metrics']);
         });
 
         it('reports metrics in feature-level settings, even on a participating parent', () => {
@@ -668,9 +541,7 @@ describe('experiment metrics config tests', () => {
                     },
                 },
             };
-            expect(findMisplacedMetrics(config)).to.deep.equal([
-                'blockList.settings.metrics',
-            ]);
+            expect(findMisplacedMetrics(config)).to.deep.equal(['blockList.settings.metrics']);
         });
     });
 });

@@ -41,10 +41,7 @@ const MAX_TAIL_RATIO = 4;
 function checkXPathConfig(xpathConfig, ctx, path) {
     if (!isPlainObject(xpathConfig)) return;
     const { chunkSize, chunkTail } = xpathConfig;
-    for (const [
-        key,
-        value,
-    ] of Object.entries({ chunkSize, chunkTail })) {
+    for (const [key, value] of Object.entries({ chunkSize, chunkTail })) {
         if (value !== undefined && !(Number.isInteger(value) && Number(value) >= 0)) {
             fail(ctx, `${path}.${key}`, `expected a non-negative integer, got ${JSON.stringify(value)}`);
         }
@@ -99,27 +96,12 @@ export function selectsFromDocument(expression) {
  * @param {string} path - the path of the body
  */
 export function checkTextExpressions(body, ctx, path) {
-    for (const [
-        key,
-        parse,
-        what,
-    ] of /** @type {Array<[string, (source: string) => unknown, string]>} */ ([
-        [
-            'pattern',
-            (source) => new RegExp(source, 'i'),
-            'regular expression',
-        ],
-        [
-            'xpath',
-            (source) => xpath.parse(source),
-            'XPath expression',
-        ],
+    for (const [key, parse, what] of /** @type {Array<[string, (source: string) => unknown, string]>} */ ([
+        ['pattern', (source) => new RegExp(source, 'i'), 'regular expression'],
+        ['xpath', (source) => xpath.parse(source), 'XPath expression'],
     ])) {
         const value = body[key];
-        for (const [
-            index,
-            source,
-        ] of asArray(value).entries()) {
+        for (const [index, source] of asArray(value).entries()) {
             if (typeof source !== 'string') continue;
             try {
                 parse(source);

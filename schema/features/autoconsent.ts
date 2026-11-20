@@ -17,18 +17,9 @@ export type AutoconsentFeature<VersionType> = Feature<
             s: string[];
             r: any[];
             index?: {
-                genericRuleRange: [
-                    number,
-                    number,
-                ];
-                frameRuleRange: [
-                    number,
-                    number,
-                ];
-                specificRuleRange: [
-                    number,
-                    number,
-                ];
+                genericRuleRange: [number, number];
+                frameRuleRange: [number, number];
+                specificRuleRange: [number, number];
                 genericStringEnd: number;
                 frameStringEnd: number;
             };

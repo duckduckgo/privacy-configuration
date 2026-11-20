@@ -29,9 +29,7 @@ function runChecks(ctx, walk) {
         if (isDeepStrictEqual(ctx.collected, ctx.detectorNames)) break;
         ctx.detectorNames = ctx.collected;
     }
-    return [
-        ...new Set(ctx.errors),
-    ];
+    return [...new Set(ctx.errors)];
 }
 
 /**
@@ -43,10 +41,7 @@ function runChecks(ctx, walk) {
  * @returns {string[]} the errors, empty when the detector is valid
  */
 export function validateDetector(detector, path) {
-    if (!isPlainObject(detector))
-        return [
-            `${path}: a detector is an object`,
-        ];
+    if (!isPlainObject(detector)) return [`${path}: a detector is an object`];
     const ctx = newContext();
     ctx.hasMatch = 'match' in detector;
     return runChecks(ctx, () => {

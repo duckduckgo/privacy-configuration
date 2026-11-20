@@ -55,34 +55,20 @@ describe('webDetection config tests', () => {
             expectError('$.match.text.xpath[1]: "//span[" is not a valid XPath expression', {
                 text: {
                     pattern: 'a',
-                    xpath: [
-                        '//div//text()',
-                        '//span[',
-                    ],
+                    xpath: ['//div//text()', '//span['],
                 },
             });
         });
 
         itAll('accepts a single pattern and an array of them', () => {
             expectValid(withPattern('foo'));
-            expectValid(
-                withPattern([
-                    'foo',
-                    'bar(baz)?',
-                ]),
-            );
+            expectValid(withPattern(['foo', 'bar(baz)?']));
         });
 
         itAll('rejects a malformed pattern, and entries only valid as a pair', () => {
             expectError('is not a valid regular expression', withPattern('foo('));
             expectError('is not a valid regular expression', withPattern('[a-'));
-            expectError(
-                '$.match.text.pattern[0]: "a(" is not a valid regular expression',
-                withPattern([
-                    'a(',
-                    'b)',
-                ]),
-            );
+            expectError('$.match.text.pattern[0]: "a(" is not a valid regular expression', withPattern(['a(', 'b)']));
         });
     });
 });

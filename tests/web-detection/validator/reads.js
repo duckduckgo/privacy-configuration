@@ -40,14 +40,7 @@ export function checkApi(body, position, scope, ctx, path, root, asFunction = fa
     if (!isPlainObject(body)) return UNKNOWN;
     const hasWhere = 'where' in body;
     if (hasWhere && position === 'boolean') fail(ctx, path, `\`api\` with \`where\`: ${LIST_CONDITION}`);
-    expectPosition(ctx, path, '`api`', position, [
-        'boolean',
-        'value',
-        'number',
-        'list',
-        'spread',
-        'root',
-    ]);
+    expectPosition(ctx, path, '`api`', position, ['boolean', 'value', 'number', 'list', 'spread', 'root']);
     const pathless = bound && body.path === undefined;
     if (pathless && 'args' in body) fail(ctx, path, '`args` calls the last name in `path`, so it needs `path`');
     if (!pathless && typeof body.path !== 'string') return UNKNOWN;
@@ -89,15 +82,9 @@ export function checkApi(body, position, scope, ctx, path, root, asFunction = fa
         });
         const returns = 'args' in body && Object.hasOwn(BUILTIN_RETURN_TYPES, body.path) ? BUILTIN_RETURN_TYPES[body.path] : undefined;
         read = {
-            types: returns
-                ? [
-                      returns,
-                  ]
-                : null,
+            types: returns ? [returns] : null,
             nan: returns === 'number',
-            apiPaths: [
-                body.path,
-            ],
+            apiPaths: [body.path],
         };
         if (argTypes) checkCallArgs(body.path, body.args, argTypes, ctx, `${path}.args`);
     }
@@ -254,9 +241,7 @@ export function numberGuard(predicate) {
     const body = apiBody(field.api);
     if (!isPlainObject(body) || Object.keys(body).length !== 2 || !Array.isArray(body.args) || body.args.length !== 1) return undefined;
     if (body.path !== 'Number.isFinite' && body.path !== 'Number.isNaN') return undefined;
-    const [
-        arg,
-    ] = body.args;
+    const [arg] = body.args;
     if (!isPlainObject(arg) || Object.keys(arg).length !== 1 || !isPlainObject(arg.self) || Object.keys(arg.self).length) return undefined;
     return { name: body.path, expected: is };
 }
@@ -296,10 +281,7 @@ function readName(current, name, isCall, ctx, path, args, options = {}) {
     if (isCall && name === 'concat' && (current.list !== undefined || current.apiPaths !== undefined)) {
         // `concat` joins lists, and each item keeps the name and type of its list
         return {
-            ...mergeTypes([
-                itemOf(current),
-                ...(options.argTypes ?? []).map(itemOf),
-            ]),
+            ...mergeTypes([itemOf(current), ...(options.argTypes ?? []).map(itemOf)]),
             list: 'maybe',
         };
     }
@@ -344,12 +326,7 @@ function readName(current, name, isCall, ctx, path, args, options = {}) {
         } else if ((type === 'string' || type === 'array') && name === 'length') {
             results.push(typeOf('number'));
         } else if (type === 'string' && isIndex) {
-            results.push(
-                mergeTypes([
-                    typeOf('string'),
-                    typeOf('undefined'),
-                ]),
-            );
+            results.push(mergeTypes([typeOf('string'), typeOf('undefined')]));
         } else if (type === 'array' && isIndex) {
             results.push(UNKNOWN);
         } else if (type === 'object' && current.interfaces) {

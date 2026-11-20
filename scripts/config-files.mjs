@@ -43,11 +43,7 @@ export function usedInHistory(name, paths, ref = 'HEAD') {
 }
 
 /** Top-level entries the build does not read. */
-const NOT_BUILT = new Set([
-    '.git',
-    'node_modules',
-    'generated',
-]);
+const NOT_BUILT = new Set(['.git', 'node_modules', 'generated']);
 
 /**
  * Copy the working tree to a temporary directory and write `files` over it.
@@ -58,10 +54,7 @@ const NOT_BUILT = new Set([
 export function copyWorkingTree(files = new Map()) {
     const dir = mkdtempSync(join(tmpdir(), 'config-build-'));
     cpSync(ROOT, dir, { recursive: true, filter: (source) => !NOT_BUILT.has(relative(ROOT, source).split(sep)[0]) });
-    for (const [
-        file,
-        text,
-    ] of files) {
+    for (const [file, text] of files) {
         writeFileSync(join(dir, file), text);
     }
     return dir;
@@ -77,13 +70,7 @@ export function copyWorkingTree(files = new Map()) {
 export async function buildConfigs(dir, platforms) {
     try {
         symlinkSync(resolve(ROOT, 'node_modules'), join(dir, 'node_modules'));
-        await promisify(execFile)(
-            'node',
-            [
-                'index.js',
-            ],
-            { cwd: dir },
-        );
+        await promisify(execFile)('node', ['index.js'], { cwd: dir });
         return new Map(
             platforms.map((platform) => [
                 platform,
@@ -232,14 +219,7 @@ export class Workspace {
      * @returns {Map<string, string>} the edited files' text by path
      */
     pending() {
-        return new Map(
-            [
-                ...this.changed,
-            ].map((file) => [
-                file,
-                /** @type {string} */ (this.texts.get(file)),
-            ]),
-        );
+        return new Map([...this.changed].map((file) => [file, /** @type {string} */ (this.texts.get(file))]));
     }
 
     async flush() {

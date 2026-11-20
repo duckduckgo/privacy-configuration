@@ -33,12 +33,7 @@ export function createValidator(schemaName) {
 function formatParams(params) {
     if (params) {
         return Object.entries(params)
-            .map(
-                ([
-                    key,
-                    value,
-                ]) => `${key}: ${value}`,
-            )
+            .map(([key, value]) => `${key}: ${value}`)
             .join(',\n');
     }
     return '';

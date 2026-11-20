@@ -139,10 +139,7 @@ type ExprKeys = {
     only: Expr;
     sum: Operands;
     mul: Operands;
-    div: [
-        Expr,
-        Expr,
-    ];
+    div: [Expr, Expr];
     if: Expr;
     any: Operands;
     all: Operands;

@@ -8,19 +8,11 @@ describe('set-jsonc-path', () => {
         });
 
         it('parses property segments', () => {
-            expect(parseDotPath('features.autofill.settings')).to.deep.equal([
-                'features',
-                'autofill',
-                'settings',
-            ]);
+            expect(parseDotPath('features.autofill.settings')).to.deep.equal(['features', 'autofill', 'settings']);
         });
 
         it('keeps numeric segments as strings', () => {
-            expect(parseDotPath('buckets.0.gte')).to.deep.equal([
-                'buckets',
-                '0',
-                'gte',
-            ]);
+            expect(parseDotPath('buckets.0.gte')).to.deep.equal(['buckets', '0', 'gte']);
         });
     });
 

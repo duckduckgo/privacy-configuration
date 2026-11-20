@@ -40,11 +40,7 @@ export const CLIENT_RELEASES = [
 ];
 
 /** Subfeature states a client runs an experiment in, in some build. */
-const EXPERIMENT_STATES = [
-    'enabled',
-    'internal',
-    'preview',
-];
+const EXPERIMENT_STATES = ['enabled', 'internal', 'preview'];
 
 /** Above this many client states, the config tests warn, and still check every state. */
 export const MAX_CLIENT_STATES = 1000;
@@ -60,10 +56,7 @@ export const MAX_CLIENT_STATES = 1000;
 function experimentsAt(configBody, version) {
     /** @type {Record<string, string[]>} */
     const cohorts = {};
-    for (const [
-        name,
-        subfeature,
-    ] of Object.entries(configBody.features?.contentScopeExperiments?.features ?? {})) {
+    for (const [name, subfeature] of Object.entries(configBody.features?.contentScopeExperiments?.features ?? {})) {
         const min = subfeature.minSupportedVersion;
         if (!EXPERIMENT_STATES.includes(subfeature.state)) continue;
         if (min !== undefined && (typeof min !== typeof version || compareVersions(version, min) < 0)) continue;
@@ -81,20 +74,10 @@ function experimentsAt(configBody, version) {
 function versionsAround(bounds) {
     /** @param {string} version */
     const next = (version) => {
-        const [
-            major,
-            minor,
-            patch,
-        ] = version.split('.').map(Number);
+        const [major, minor, patch] = version.split('.').map(Number);
         return `${major}.${minor}.${patch + 1}`;
     };
-    const versions = [
-        '0.0.0',
-        ...bounds.flatMap((bound) => [
-            bound,
-            next(bound),
-        ]),
-    ].sort(compareVersions);
+    const versions = ['0.0.0', ...bounds.flatMap((bound) => [bound, next(bound)])].sort(compareVersions);
     return versions.filter((version, index) => index === 0 || compareVersions(version, versions[index - 1]) !== 0);
 }
 
@@ -129,17 +112,7 @@ export function clientStates(configBody, version) {
 
     /** @type {Array<Array<{ label: string, state: Partial<ClientState> }>>} */
     const dimensions = [];
-    const experiments = [
-        ...new Set(
-            blocks.flatMap((block) =>
-                block.experiment
-                    ? [
-                          block.experiment.experimentName,
-                      ]
-                    : [],
-            ),
-        ),
-    ];
+    const experiments = [...new Set(blocks.flatMap((block) => (block.experiment ? [block.experiment.experimentName] : [])))];
     for (const experiment of experiments) {
         dimensions.push([
             { label: `${experiment}: not enrolled`, state: {} },
@@ -149,17 +122,7 @@ export function clientStates(configBody, version) {
             })),
         ]);
     }
-    const domains = [
-        ...new Set(
-            blocks.flatMap((block) =>
-                typeof block.domain === 'string'
-                    ? [
-                          block.domain,
-                      ]
-                    : [],
-            ),
-        ),
-    ];
+    const domains = [...new Set(blocks.flatMap((block) => (typeof block.domain === 'string' ? [block.domain] : [])))];
     if (domains.length)
         dimensions.push([
             { label: 'no domain', state: {} },
@@ -178,10 +141,7 @@ export function clientStates(configBody, version) {
             { label: 'top frame', state: { frame: false } },
             { label: 'subframe', state: { frame: true } },
         ]);
-    for (const key of /** @type {const} */ ([
-        'internal',
-        'preview',
-    ])) {
+    for (const key of /** @type {const} */ (['internal', 'preview'])) {
         if (named(key))
             dimensions.push([
                 { label: `not ${key}`, state: { [key]: false } },
@@ -189,10 +149,9 @@ export function clientStates(configBody, version) {
             ]);
     }
     const bounds = blocks.flatMap((block) =>
-        [
-            block.minContentScopeScriptsVersion,
-            block.maxContentScopeScriptsVersion,
-        ].filter((bound) => typeof bound === 'string' && /^\d+\.\d+\.\d+$/.test(bound)),
+        [block.minContentScopeScriptsVersion, block.maxContentScopeScriptsVersion].filter(
+            (bound) => typeof bound === 'string' && /^\d+\.\d+\.\d+$/.test(bound),
+        ),
     );
     if (named('minContentScopeScriptsVersion') || named('maxContentScopeScriptsVersion'))
         dimensions.push(
@@ -203,16 +162,11 @@ export function clientStates(configBody, version) {
         );
 
     /** @type {Array<{ labels: string[], state: ClientState }>} */
-    let states = [
-        { labels: [], state: { cohorts: {} } },
-    ];
+    let states = [{ labels: [], state: { cohorts: {} } }];
     for (const options of dimensions) {
         states = states.flatMap(({ labels, state }) =>
             options.map((option) => ({
-                labels: [
-                    ...labels,
-                    option.label,
-                ],
+                labels: [...labels, option.label],
                 state: { ...state, ...option.state, cohorts: { ...state.cohorts, ...option.state.cohorts } },
             })),
         );
@@ -238,12 +192,7 @@ export function clientViews(configBody, platform, version) {
         states.map(({ label, state }) => {
             const view = applyConditionalChanges(settings, { ...state, injectName, version }, { requireTargets: true });
             return {
-                label: [
-                    `${injectName} ${version}`,
-                    label,
-                ]
-                    .filter(Boolean)
-                    .join(', '),
+                label: [`${injectName} ${version}`, label].filter(Boolean).join(', '),
                 injectName,
                 detectors: view.settings.detectors ?? {},
                 failed: view.failed,
@@ -300,9 +249,7 @@ export function fireEventTypes(detector) {
         }
     };
     visit(detector.actions);
-    return [
-        ...new Set(types),
-    ];
+    return [...new Set(types)];
 }
 
 /**
