@@ -29,6 +29,12 @@ type SubFeatures<VersionType> = {
             sessionTimeoutMinutes: number;
         }
     >;
+    ntpSuggestedPrompts?: SubFeature<
+        VersionType,
+        {
+            promptLimit: number;
+        }
+    >;
 };
 
 export type AiChatConfig<VersionType> = Feature<

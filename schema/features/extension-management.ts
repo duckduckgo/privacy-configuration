@@ -9,6 +9,8 @@ type ExtensionSpecialBehavior = {
 type ExtensionManagementSettings = {
     hiddenExtensionIds: string[];
     disabledExtensionIds: string[];
+    // macOS only: extensions the App Store build leaves out of its catalog, e.g. ones that need native messaging.
+    appStoreHiddenExtensionIds?: string[];
     specialBehavior: Record<string, ExtensionSpecialBehavior>;
     // Help-page URL for the page-header "Learn more" link on the extensions settings screen.
     learnMoreUrl?: string;
