@@ -31,6 +31,6 @@ As a config reviewer, your role is critical in preventing misconfiguration of ou
 - [Config Maintainer Documentation](./config-maintainer-documentation.md)
 - [Privacy Feature Key Mappings](./privacy-feature-key-mappings.md)
 - [🛠 Implementation Guidelines: Remote Privacy Configuration/Allowlists](./implementation-guidelines-remote-privacy-configuration-allowlists.md)
-- [Incremental Rollout Implementation Guide](./incremental-rollout-implementation-guide.md)
+- [Rollouts and Experiments](./rollouts-and-experiments.md)
 - [Writing a Schema for Your Config Feature](./writing-schema-for-config-feature.md)
 - [Remote Configuration Change Log](./remote-configuration-change-log.md)

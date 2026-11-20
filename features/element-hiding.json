@@ -551,22 +551,62 @@
             3250,
             5250
         ],
+        "conditionalChanges": [
+            {
+                "condition": [
+                    {
+                        "injectName": "android",
+                        "internal": true
+                    },
+                    {
+                        "injectName": "android",
+                        "experiment": {
+                            "experimentName": "contentScopeExperiment10",
+                            "cohort": "treatment"
+                        }
+                    }
+                ],
+                "patchSettings": [
+                    {
+                        "op": "replace",
+                        "path": "/hideTimeouts",
+                        "value": [
+                            0,
+                            100,
+                            500,
+                            1000,
+                            2000
+                        ]
+                    },
+                    {
+                        "op": "replace",
+                        "path": "/unhideTimeouts",
+                        "value": [
+                            3250
+                        ]
+                    }
+                ]
+            }
+        ],
         "mediaAndFormSelectors": "video,canvas,embed,object,audio,map,form,input,textarea,select,option",
         "adLabelStrings": [
             "ad",
             "advert",
             "advert10",
             "advertisement",
+            "advertisementadvertisement",
+            "advertisementadvertisementadvertisement",
+            "advertisementadvertisementadvertisementadvertisement",
             "advertisements",
             "advertisment",
             "advertisementclose",
-            "advertisementadvertisement",
             "advertisementcontinue reading the main story",
             "advertisement\ncontinue reading the main story",
             "advertisement\n\ncontinue reading the main story",
             "advertisement - continue reading below",
             "advertisement\n\nhide ad",
             "advertisementhide ad",
+            "advertisementskip advertisement",
             "advertisement - scroll to continue",
             "advertisement · scroll to continue",
             "advertisement - story continues below",
@@ -739,6 +779,14 @@
                     {
                         "selector": "[class*='td-block']",
                         "type": "hide-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "adamkempfitness.com",
+                "rules": [
+                    {
+                        "type": "disable-default"
                     }
                 ]
             },
@@ -968,6 +1016,24 @@
                 ]
             },
             {
+                "condition": {
+                    "domain": "bhg.com",
+                    "injectName": "apple"
+                },
+                "rules": [
+                    {
+                        "selector": ".min-h-screen",
+                        "type": "modify-style",
+                        "values": [
+                            {
+                                "property": "min-height",
+                                "value": "100dvh"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
                 "domain": "bild.de",
                 "rules": [
                     {
@@ -988,6 +1054,15 @@
                 "rules": [
                     {
                         "selector": ".adwrap",
+                        "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "bjs.com",
+                "rules": [
+                    {
+                        "selector": "[data-cnstrc-recommendations][data-cnstrc-num-results='0']",
                         "type": "closest-empty"
                     }
                 ]
@@ -1788,6 +1863,24 @@
                 ]
             },
             {
+                "condition": {
+                    "domain": "flowkey.com",
+                    "injectName": "apple"
+                },
+                "rules": [
+                    {
+                        "selector": ".css-1g1rvlj",
+                        "type": "modify-style",
+                        "values": [
+                            {
+                                "property": "height",
+                                "value": "100dvh"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
                 "domain": "focus.de",
                 "rules": [
                     {
@@ -2108,19 +2201,19 @@
                 ]
             },
             {
-                "domain": "gute-garne.de",
+                "domain": "guard.io",
                 "rules": [
                     {
-                        "selector": ".ad",
+                        "selector": "#credential_picker_container",
                         "type": "override"
                     }
                 ]
             },
             {
-                "domain": "guard.io",
+                "domain": "gute-garne.de",
                 "rules": [
                     {
-                        "selector": "#credential_picker_container",
+                        "selector": ".ad",
                         "type": "override"
                     }
                 ]
@@ -2181,18 +2274,6 @@
                 ]
             },
             {
-                "domain": "houstonchronicle.com",
-                "rules": [
-                    {
-                        "type": "disable-default"
-                    },
-                    {
-                        "selector": "[id*='google_ads_iframe']",
-                        "type": "hide-empty"
-                    }
-                ]
-            },
-            {
                 "domain": "hindustantimes.com",
                 "rules": [
                     {
@@ -2218,6 +2299,18 @@
                     {
                         "selector": "[id^='div-gpt-ad-']",
                         "type": "closest-empty"
+                    }
+                ]
+            },
+            {
+                "domain": "houstonchronicle.com",
+                "rules": [
+                    {
+                        "type": "disable-default"
+                    },
+                    {
+                        "selector": "[id*='google_ads_iframe']",
+                        "type": "hide-empty"
                     }
                 ]
             },
@@ -2638,6 +2731,15 @@
                     {
                         "selector": "#zdn-adblock-overlay",
                         "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "linkvertise.com",
+                "rules": [
+                    {
+                        "selector": ".ad-wrapper",
+                        "type": "override"
                     }
                 ]
             },
@@ -3707,6 +3809,17 @@
                 "domain": "sfchronicle.com",
                 "rules": [
                     {
+                        "type": "disable-default"
+                    },
+                    {
+                        "selector": "[class*='belowMastheadWrapper']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[data-block-type='ad']",
+                        "type": "hide-empty"
+                    },
+                    {
                         "selector": "[class*='belowMastheadWrapper']",
                         "type": "hide-empty"
                     }
@@ -3765,6 +3878,15 @@
                     {
                         "selector": ".top-ad",
                         "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": "smithsonianmag.com",
+                "rules": [
+                    {
+                        "selector": ".harzsgqwhvxtyit3fqb0yixss3ng",
+                        "type": "hide-empty"
                     }
                 ]
             },
@@ -4457,11 +4579,11 @@
                         "type": "hide-empty"
                     },
                     {
-                        "selector": "[data-pw='top-center-ad']",
+                        "selector": "[data-pw='top-center-ad'], .cls-ad-top-center",
                         "type": "hide"
                     },
                     {
-                        "selector": "[id^='sda-WFPAD-'], .native-ad-item, .stream-ad",
+                        "selector": "[id^='sda-WFPAD-'], .native-ad-item, .stream-ad, .native-ad, .ad-item",
                         "type": "hide-empty"
                     }
                 ]
@@ -4787,22 +4909,6 @@
                     },
                     {
                         "selector": "ins.adsbygoogle",
-                        "type": "hide-empty"
-                    }
-                ]
-            },
-            {
-                "domain": "sfchronicle.com",
-                "rules": [
-                    {
-                        "type": "disable-default"
-                    },
-                    {
-                        "selector": "[data-block-type='ad']",
-                        "type": "hide-empty"
-                    },
-                    {
-                        "selector": "[class*='belowMastheadWrapper']",
                         "type": "hide-empty"
                     }
                 ]

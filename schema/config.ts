@@ -24,13 +24,16 @@ import { CustomUserAgentFeature } from './features/custom-user-agent';
 import { BurnFeature } from './features/burn';
 import { ClientBrandHintFeature } from './features/client-brand-hint';
 import { PreserveHeaderOrderFeature } from './features/preserve-header-order';
+import { ChromiumFeatureOverridesFeature } from './features/chromium-feature-overrides';
 import { Taskbar } from './features/taskbar';
 import { AppHealth } from './features/appHealth';
+import { DetectorPerfFeature } from './features/detector-perf';
 import { ElementHidingFeature } from './features/element-hiding';
 import { EventHubFeature } from './features/event-hub';
 import { ContentScopeExperimentsFeature, TdsExperimentsFeature } from './features/experiment-metrics';
 import { RequestBlocklistFeature } from './features/request-blocklist';
 import { UaChBrandsFeature } from './features/ua-ch-brands';
+import { TrackerProtectionFeature } from './features/tracker-protection';
 import { UrlPredictorFeature } from './features/url-predictor';
 import { WebDetectionFeature } from './features/web-detection';
 import { WebEventsFeature } from './features/web-events';
@@ -51,6 +54,7 @@ export { WebCompatSettings } from './features/webcompat';
 export { DuckPlayerSettings } from './features/duckplayer';
 export { EventHubSettings } from './features/event-hub';
 export { ExperimentMetricsSettings } from './features/experiment-metrics';
+export { DetectorConfig } from './features/web-detection';
 
 export type ExportedSchemas =
     | 'CurrentGenericConfig'
@@ -62,6 +66,7 @@ export type ExportedSchemas =
     | 'DuckPlayerNativeSettings'
     | 'EventHubSettings'
     | 'ExperimentMetricsSettings'
+    | 'DetectorConfig'
     | 'AttributedMetricsFeature';
 
 /**
@@ -82,6 +87,7 @@ export type ConfigV6<VersionType> = {
         burn?: BurnFeature<VersionType>;
         clientBrandHint?: ClientBrandHintFeature<VersionType>;
         preserveHeaderOrder?: PreserveHeaderOrderFeature<VersionType>;
+        chromiumFeatureOverrides?: ChromiumFeatureOverridesFeature<VersionType>;
         taskbar?: Taskbar<VersionType>;
         import?: ImportFeature<VersionType>;
         cookie?: CookieFeature<VersionType>;
@@ -106,9 +112,11 @@ export type ConfigV6<VersionType> = {
         blockList?: TdsExperimentsFeature<VersionType>;
         contentBlocking?: TdsExperimentsFeature<VersionType>;
         contentScopeExperiments?: ContentScopeExperimentsFeature<VersionType>;
+        detectorPerf?: DetectorPerfFeature<VersionType>;
         elementHiding?: ElementHidingFeature<VersionType>;
         eventHub?: EventHubFeature<VersionType>;
         requestBlocklist?: RequestBlocklistFeature<VersionType>;
+        trackerProtection?: TrackerProtectionFeature<VersionType>;
         uaChBrands?: UaChBrandsFeature<VersionType>;
         urlPredictor?: UrlPredictorFeature<VersionType>;
         webInterferenceDetection?: WebInterferenceDetectionFeature<VersionType>;
