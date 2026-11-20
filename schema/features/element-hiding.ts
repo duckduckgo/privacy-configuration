@@ -1,4 +1,5 @@
-import { Feature } from '../feature';
+import { Operation } from '../json-patch';
+import { ConditionBlock, ConditionBlockOrArray, Feature } from '../feature';
 
 type ElementHidingValue = {
     property: string;
@@ -23,10 +24,22 @@ type ElementHidingRuleWithoutSelector = {
 
 type ElementHidingRule = ElementHidingRuleHide | ElementHidingRuleModify | ElementHidingRuleWithoutSelector;
 
-type ElementHidingDomain = {
-    domain: string | string[];
-    rules: ElementHidingRule[];
-};
+// Every block names a domain: a condition without one matches every site.
+type DomainConditionBlock = ConditionBlock & { domain: string };
+
+type DomainCondition = DomainConditionBlock | DomainConditionBlock[];
+
+// When present, `condition` replaces `domain` for matching.
+type ElementHidingDomain =
+    | {
+          domain: string | string[];
+          condition?: DomainCondition;
+          rules: ElementHidingRule[];
+      }
+    | {
+          condition: DomainCondition;
+          rules: ElementHidingRule[];
+      };
 
 type StyleTagException = {
     domain: string;
@@ -42,6 +55,10 @@ interface ElementHidingConfiguration {
     mediaAndFormSelectors?: string;
     adLabelStrings?: string[];
     styleTagExceptions?: StyleTagException[];
+    conditionalChanges?: {
+        condition: ConditionBlockOrArray;
+        patchSettings: Operation<number[]>[];
+    }[];
 }
 
 export type ElementHidingFeature<VersionType> = Feature<ElementHidingConfiguration, VersionType>;

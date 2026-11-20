@@ -1,7 +1,30 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-payload="$(cat)"
+# Cursor sends hook JSON on stdin. On Windows, hooks often run as
+# `bash --login -i`, and stdin may never close — unbounded `cat` hangs forever.
+read_payload() {
+    local line payload=""
+
+    # Wait briefly for the first line of JSON; exit empty on timeout.
+    if IFS= read -r -t 2 line; then
+        payload="$line"
+    elif [[ -n "${line:-}" ]]; then
+        # EOF without a trailing newline still leaves data in $line.
+        payload="$line"
+    else
+        return 0
+    fi
+
+    # Drain any remaining lines briefly (payload is usually one line).
+    while IFS= read -r -t 0.2 line; do
+        payload+=$'\n'"$line"
+    done || true
+
+    printf '%s' "$payload"
+}
+
+payload="$(read_payload)"
 
 if [[ -z "$payload" ]]; then
     exit 0

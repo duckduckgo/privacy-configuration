@@ -90,10 +90,10 @@
             "state": "enabled"
         },
         "adAttributionReporting": {
-            "state": "disabled",
+            "state": "enabled",
             "minSupportedVersion": "7.146.0",
             "settings": {
-                "includeToken": false
+                "includeToken": true
             }
         },
         "additionalCampaignPixelParams": {
@@ -153,7 +153,18 @@
                 "serpSettings": "disabled",
                 "serp": "disabled",
                 "duckAiNativeStorage": "disabled",
+                "internalFeedback": "disabled",
                 "domains": [
+                    {
+                        "domain": "internalapps.duckduckgo.com",
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/internalFeedback",
+                                "value": "enabled"
+                            }
+                        ]
+                    },
                     {
                         "domain": [
                             "duckduckgo.com",
@@ -269,6 +280,10 @@
                 "nativeDataAccess": {
                     "state": "enabled",
                     "minSupportedVersion": "7.217.0"
+                },
+                "homepageChatSuggestions": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.242.0"
                 },
                 "nativeStoragePathMigration": {
                     "state": "enabled",
@@ -407,10 +422,50 @@
                         ]
                     }
                 },
+                "unifiedToggleInputKeyboardEdgeSweep": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.246.0"
+                },
+                "updatedModelPicker": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.235.0"
+                },
+                "updatedCreateImage": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.239.0"
+                },
+                "contextualAttachMoreTabs": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.244.0",
+                    "settings": {
+                        "aiChatAttachMoreTabsLimit": 3,
+                        "promotionStartDate": "2026-08-02T00:00:00Z"
+                    }
+                },
                 "contextualUnifiedToggleInput": {
                     "state": "enabled",
                     "description": "Contextual Unified Toggle Input (UTI) for Duck.ai",
                     "minSupportedVersion": "7.230.0"
+                },
+                "usageWarnings": {
+                    "state": "enabled",
+                    "description": "Warn users as they approach their daily/weekly Duck.ai limits",
+                    "minSupportedVersion": "7.238.0"
+                },
+                "unifiedToggleInputAttachmentPrivacy": {
+                    "state": "enabled",
+                    "description": "Privacy disclosure shown when an image or file is attached in Duck.ai",
+                    "minSupportedVersion": "7.241.0"
+                },
+                "iPadAttachmentPrivacy": {
+                    "state": "enabled",
+                    "description": "Attachment privacy disclosure in Duck.ai on iPad",
+                    "minSupportedVersion": "7.242.0"
+                },
+                "nativeTermsOfService": {
+                    "state": "enabled",
+                    "description": "Duck.ai Terms of Service disclaimer in the native input, where sending accepts them",
+                    "minSupportedVersion": "7.242.0"
                 },
                 "aiChatAtb": {
                     "state": "enabled",
@@ -429,6 +484,16 @@
                     "state": "enabled",
                     "minSupportedVersion": "7.229.0"
                 },
+                "iPadChromeMenuButton": {
+                    "state": "enabled",
+                    "description": "Single Duck.ai menu button in the iPad tabs bar",
+                    "minSupportedVersion": "7.238.0"
+                },
+                "iPadContextualSidebar": {
+                    "state": "enabled",
+                    "description": "Contextual Duck.ai chat shown as a sidebar beside the page on iPad",
+                    "minSupportedVersion": "7.246.0"
+                },
                 "supportsSyncChatsDeletion": {
                     "state": "enabled",
                     "minSupportedVersion": "7.208.2"
@@ -444,6 +509,31 @@
                 "voiceShortcut": {
                     "state": "enabled",
                     "minSupportedVersion": "7.216.0"
+                },
+                "contextualSuggestedPrompts": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.232.0"
+                },
+                "textActions": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.235.0"
+                },
+                "unifiedToggleInputPastedText": {
+                    "state": "enabled",
+                    "description": "Turns long pastes in the native Duck.ai inputs into pasted-text attachments",
+                    "minSupportedVersion": "7.245.0"
+                },
+                "swipeUpNewChat": {
+                    "state": "enabled",
+                    "description": "Pulling up past the bottom of a Duck.ai chat opens a new chat in a new tab",
+                    "minSupportedVersion": "7.247.0",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            }
+                        ]
+                    }
                 }
             },
             "settings": {
@@ -502,7 +592,8 @@
                     "state": "enabled",
                     "minSupportedVersion": "7.159.0",
                     "settings": {
-                        "signInRequiredSelector": "[href*=\"//support.google.com/youtube/answer/3037019\"]"
+                        "signInRequiredSelector": "[href*=\"//support.google.com/youtube/answer/3037019\"]",
+                        "youtubeErrorSelector": ".ytp-error, yt-player-interstitial-renderer"
                     }
                 },
                 "nativeUI": {
@@ -768,6 +859,108 @@
                             "weight": 1
                         }
                     ]
+                },
+                "tdsNextExperiment014": {
+                    "state": "disabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "v5/experiments/202607fbctl02-ios-tds-control.json",
+                        "treatmentUrl": "v5/experiments/202607fbctl02-ios-tds-treatment.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "tdsNextExperiment015": {
+                    "state": "disabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "v5/experiments/202609v1-ios-tds-control.json",
+                        "treatmentUrl": "v5/experiments/202609v1-ios-tds-treatment.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "tdsNextExperiment016": {
+                    "state": "disabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "v5/experiments/202609v2-ios-tds-control.json",
+                        "treatmentUrl": "v5/experiments/202609v2-ios-tds-treatment.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "tdsNextExperiment017": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "v5/experiments/202611v1-ios-tds-control.json",
+                        "treatmentUrl": "v5/experiments/202611v1-ios-tds-treatment.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
                 }
             }
         },
@@ -793,11 +986,37 @@
             }
         },
         "fingerprintingTemporaryStorage": {
-            "state": "enabled"
+            "state": "enabled",
+            "exceptions": [
+                {
+                    "domain": "yahoo.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5774"
+                },
+                {
+                    "domain": "att.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5774"
+                },
+                {
+                    "domain": "att.net",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5774"
+                }
+            ]
         },
         "fingerprintingScreenSize": {
             "state": "enabled",
             "exceptions": [
+                {
+                    "domain": "yahoo.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5774"
+                },
+                {
+                    "domain": "att.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5774"
+                },
+                {
+                    "domain": "att.net",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5774"
+                },
                 {
                     "domain": "yelp.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4668"
@@ -805,7 +1024,21 @@
             ]
         },
         "fingerprintingBattery": {
-            "state": "enabled"
+            "state": "enabled",
+            "exceptions": [
+                {
+                    "domain": "yahoo.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5774"
+                },
+                {
+                    "domain": "att.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5774"
+                },
+                {
+                    "domain": "att.net",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5774"
+                }
+            ]
         },
         "fingerprintingCanvas": {
             "state": "disabled"
@@ -832,6 +1065,18 @@
                 {
                     "domain": "yelp.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4668"
+                },
+                {
+                    "domain": "yahoo.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5774"
+                },
+                {
+                    "domain": "att.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5774"
+                },
+                {
+                    "domain": "att.net",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5774"
                 }
             ]
         },
@@ -897,6 +1142,255 @@
                             "weight": 1
                         }
                     ]
+                },
+                "contentScopeExperiment5": {
+                    "state": "disabled",
+                    "minSupportedVersion": "7.231.0",
+                    "description": "Captcha detection: auto-run + fireEvent for the captcha detectors",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 50
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "contentScopeExperiment6": {
+                    "state": "disabled",
+                    "minSupportedVersion": "7.231.0",
+                    "description": "Captcha detection: auto-run + fireEvent for the captcha detectors, comparing 'content' vs 'visible' element visibility",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatmentCon",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatmentVis",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "contentScopeExperiment7": {
+                    "state": "disabled",
+                    "minSupportedVersion": "7.234.0",
+                    "description": "Adwall detection: rendered-text xpath matching for the generic adwall detectors",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "contentScopeExperiment8": {
+                    "state": "disabled",
+                    "minSupportedVersion": "7.234.0",
+                    "description": "Page issue detection: auto-run + fireEvent for the new block page, error page, geoblock, verification, blank page, captcha and adwall detectors, with retuned adwall and video intervals",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "contentScopeExperiment9": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.240.0",
+                    "description": "Detector performance monitoring: treatment measures Web Detection detector execution time (detectorPerf); control does not",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "contentScopeExperiment11": {
+                    "state": "enabled",
+                    "description": "Page load detectors: treatment also runs the first batch of slow, broken and empty page detectors (webDetection); control runs the live detectors",
+                    "minSupportedVersion": "7.246.0",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 25
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ],
+                    "settings": {
+                        // prettier-ignore
+                        "metrics": {
+                            "adwall": {"event": "adwall", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "admiralAdwall": {"event": "admiralAdwall", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "adwall_vendor": {"event": "adwall_vendor", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "captcha_recaptcha": {"event": "captcha_recaptcha", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "captcha_hcaptcha": {"event": "captcha_hcaptcha", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "captcha_turnstile": {"event": "captcha_turnstile", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "captcha_cloudflare": {"event": "captcha_cloudflare", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "captcha_datadome": {"event": "captcha_datadome", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "captcha_imperva": {"event": "captcha_imperva", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "captcha_arkose": {"event": "captcha_arkose", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "captcha_geetest": {"event": "captcha_geetest", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "captcha_awswaf": {"event": "captcha_awswaf", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "captcha_perimeterx": {"event": "captcha_perimeterx", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "captcha_other": {"event": "captcha_other", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "challenge_cloudflare": {"event": "challenge_cloudflare", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "challenge_generic": {"event": "challenge_generic", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "blockPage_cloudflare": {"event": "blockPage_cloudflare", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "blockPage_generic": {"event": "blockPage_generic", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "blockPage_vendor": {"event": "blockPage_vendor", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "blockPage_verificationfailed": {"event": "blockPage_verificationfailed", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "blockPage_vercel": {"event": "blockPage_vercel", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "blockPage_forbidden": {"event": "blockPage_forbidden", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "blockPage_toomanyrequests": {"event": "blockPage_toomanyrequests", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "blockPage_networksecurity": {"event": "blockPage_networksecurity", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "blockPage_title": {"event": "blockPage_title", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "errorPage_soft404": {"event": "errorPage_soft404", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "errorPage_unavailable": {"event": "errorPage_unavailable", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "geoblock": {"event": "geoblock", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "blankPage_empty": {"event": "blankPage_empty", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "login_error": {"event": "login_error", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "login_cookies": {"event": "login_cookies", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "login_browser": {"event": "login_browser", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]}
+                        }
+                    }
                 }
             }
         },
@@ -923,10 +1417,6 @@
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4648"
                 },
                 {
-                    "domain": "theguardian.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4985"
-                },
-                {
                     "domain": "mumsnet.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5119"
                 }
@@ -949,6 +1439,9 @@
                         ]
                     }
                 },
+                "popupMutationObserver": {
+                    "state": "disabled"
+                },
                 "heuristicAction": {
                     "state": "enabled"
                 },
@@ -963,6 +1456,15 @@
                         "steps": [
                             {
                                 "percent": 2
+                            },
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
                             }
                         ]
                     }
@@ -1029,6 +1531,81 @@
                         "formBoundarySelector": "",
                         "failsafeSettings": {},
                         "conditionalChanges": [
+                            {
+                                "condition": [
+                                    { "domain": "account.greenbacktaxservices.com" }
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "form[action*=\"AppLogin\"] input[type=\"password\"]",
+                                            "type": "credentials.password.current"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "condition": [
+                                    { "domain": "www.aestheticcity.academy" }
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input[name=\"confirm-email\"]",
+                                            "type": "unknown"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "condition": [
+                                    { "urlPattern": "https://login.app.carta.com/registration*" }
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "form",
+                                            "type": "login"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "condition": [
+                                    { "domain": "www.theinformation.com" }
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "#login-email",
+                                            "type": "credentials.username"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "condition": [
+                                    { "domain": "fedex.com" }
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input#password[autocomplete=\"current-password\"]",
+                                            "type": "credentials.password.current"
+                                        }
+                                    }
+                                ]
+                            },
                             {
                                 "condition": [
                                     { "domain": "blindbarber.com" }
@@ -1184,6 +1761,30 @@
                                         "value": {
                                             "selector": "profile-lookup[app-name='account-login'] input[type='text']",
                                             "type": "credentials.username"
+                                        }
+                                    },
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "#ps_month",
+                                            "type": "identities.birthdayMonth"
+                                        }
+                                    },
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "#ps_day",
+                                            "type": "identities.birthdayDay"
+                                        }
+                                    },
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "#ps_year",
+                                            "type": "identities.birthdayYear"
                                         }
                                     }
                                 ]
@@ -1470,6 +2071,26 @@
                                         }
                                     }
                                 ]
+                            },
+                            {
+                                "condition": [
+                                    { "domain": "icloud.com" }
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formBoundarySelector",
+                                        "op": "replace",
+                                        "value": "#sign_in_form"
+                                    },
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "#sign_in_form",
+                                            "type": "login"
+                                        }
+                                    }
+                                ]
                             }
                         ]
                     }
@@ -1618,7 +2239,15 @@
                     },
                     {
                         "domain": "yahoo.com",
-                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4258"
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5774"
+                    },
+                    {
+                        "domain": "att.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5774"
+                    },
+                    {
+                        "domain": "att.net",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5774"
                     },
                     {
                         "domain": "pinterest.com",
@@ -1807,6 +2436,14 @@
                     {
                         "domain": "hulu.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5327"
+                    },
+                    {
+                        "domain": "hsbcpremierlifestyle.tenconcierge.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/6099"
+                    },
+                    {
+                        "domain": "onehome.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/6239"
                     }
                 ],
                 "ddgDefaultSites": [
@@ -1854,6 +2491,14 @@
                     {
                         "domain": "yahoo.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/pull/4258"
+                    },
+                    {
+                        "domain": "att.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5774"
+                    },
+                    {
+                        "domain": "att.net",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5774"
                     },
                     {
                         "domain": "pinterest.com",
@@ -2034,6 +2679,14 @@
                     {
                         "domain": "hulu.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5327"
+                    },
+                    {
+                        "domain": "hsbcpremierlifestyle.tenconcierge.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/6099"
+                    },
+                    {
+                        "domain": "onehome.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/6239"
                     }
                 ],
                 "omitVersionSites": []
@@ -2061,6 +2714,10 @@
                 "exchangeKeysToSyncWithAnotherDevice": {
                     "state": "enabled"
                 },
+                "canUseExchangeV2Point1": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.242.0"
+                },
                 "syncSetupBarcodeIsUrlBased": {
                     "state": "enabled"
                 },
@@ -2075,6 +2732,10 @@
                 "aiChatSyncPromo": {
                     "state": "enabled",
                     "minSupportedVersion": "7.228.0"
+                },
+                "syncAutoRestore": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.240.1"
                 },
                 "simplifiedSyncSetupExperiment": {
                     "state": "enabled",
@@ -2097,6 +2758,14 @@
                 "canShowV2ConnectCode": {
                     "state": "enabled",
                     "minSupportedVersion": "7.225.0"
+                },
+                "canReadUnifiedDeviceList": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.238.0"
+                },
+                "canWriteUnifiedDeviceList": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.238.0"
                 }
             }
         },
@@ -2417,6 +3086,40 @@
                                     "scrolller.com"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1968"
+                            },
+                            {
+                                "rule": "www.google.com/measurement/1p-conversion",
+                                "domains": [
+                                    "allrecipes.com",
+                                    "architecturaldesigns.com",
+                                    "arcteryx.com",
+                                    "bhg.com",
+                                    "byrdie.com",
+                                    "foodandwine.com",
+                                    "furniturerow.com",
+                                    "generation.org",
+                                    "golfavenue.ca",
+                                    "health.com",
+                                    "homedepot.com",
+                                    "instyle.com",
+                                    "iseehair.com",
+                                    "myenneagramtest.org",
+                                    "parents.com",
+                                    "partselect.com",
+                                    "people.com",
+                                    "petsuppliesplus.com",
+                                    "poshmark.com",
+                                    "printerval.com",
+                                    "realsimple.com",
+                                    "thespruce.com",
+                                    "topsecretrecipes.com",
+                                    "travelandleisure.com",
+                                    "verywellhealth.com"
+                                ],
+                                "reason": [
+                                    "architecturaldesigns.com - https://github.com/duckduckgo/privacy-configuration/pull/5632",
+                                    "Selected Dotdash properties - https://github.com/duckduckgo/privacy-configuration/pull/6080"
+                                ]
                             }
                         ]
                     },
@@ -2488,24 +3191,6 @@
                             }
                         ]
                     },
-                    "datadoghq-browser-agent.com": {
-                        "rules": [
-                            {
-                                "rule": "www.datadoghq-browser-agent.com/datadog-logs-v4.js",
-                                "domains": [
-                                    "resy.com"
-                                ],
-                                "reason": "resy.com - https://github.com/duckduckgo/privacy-configuration/pull/4645"
-                            },
-                            {
-                                "rule": "datadoghq-browser-agent.com",
-                                "domains": [
-                                    "resy.com"
-                                ],
-                                "reason": "resy.com - https://github.com/duckduckgo/privacy-configuration/pull/3370"
-                            }
-                        ]
-                    },
                     "skimresources.com": {
                         "rules": [
                             {
@@ -2549,6 +3234,7 @@
             "settings": {
                 "windowSizing": "disabled",
                 "navigatorCredentials": "disabled",
+                "passkeyDetection": "disabled",
                 "safariObject": "disabled",
                 "messageHandlers": {
                     "state": "disabled",
@@ -2570,8 +3256,7 @@
                     {
                         "domain": [
                             "www.cbsnews.com",
-                            "myhome.experian.co.uk",
-                            "luna.amazon.com"
+                            "myhome.experian.co.uk"
                         ],
                         "patchSettings": [
                             {
@@ -2624,11 +3309,45 @@
             "minSupportedVersion": "7.224.0",
             "settings": {
                 "firstContentfulPaint": "disabled",
-                "expandedPerformanceMetricsOnLoad": "enabled"
+                "expandedPerformanceMetricsOnLoad": "enabled",
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "context": {
+                                "frame": true
+                            }
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/additionalCheck",
+                                "value": "disabled"
+                            }
+                        ]
+                    }
+                ]
             }
         },
         "breakageReporting": {
-            "state": "enabled"
+            "state": "enabled",
+            "settings": {
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "context": {
+                                "frame": true
+                            }
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/additionalCheck",
+                                "value": "disabled"
+                            }
+                        ]
+                    }
+                ]
+            }
         },
         "windowsWaitlist": {
             "state": "enabled"
@@ -2763,6 +3482,40 @@
                     ],
                     "minSupportedVersion": "7.157.0"
                 },
+                "monthlyFreeTrialExperiment": {
+                    "state": "disabled",
+                    "targets": [
+                        {
+                            "localeCountry": "US"
+                        }
+                    ],
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ],
+                    "minSupportedVersion": "7.231.0"
+                },
+                "monthlyFreeTrialExperiment2": {
+                    "state": "enabled",
+                    "targets": [
+                        {
+                            "localeCountry": "US"
+                        }
+                    ],
+                    "cohorts": [
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ],
+                    "minSupportedVersion": "7.233.0"
+                },
                 "privacyProOnboardingCTAMarch25": {
                     "state": "enabled",
                     "targets": [
@@ -2836,6 +3589,115 @@
                 "allowProTierPurchase": {
                     "state": "enabled",
                     "minSupportedVersion": "7.210.0"
+                },
+                "performanceOptimizedPaywalls": {
+                    "state": "disabled",
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ],
+                    "settings": {
+                        "entryPoints": {
+                            "vpn": {
+                                "path": "/subscriptions/new/mobile/vpn"
+                            },
+                            "duckai": {
+                                "path": "/subscriptions/new/mobile/duckai"
+                            },
+                            "pir": {
+                                "path": "/subscriptions/new/mobile/pir"
+                            }
+                        }
+                    }
+                },
+                "subscriptionOnboardingFreeTrialsOct2026": {
+                    "state": "enabled",
+                    "targets": [
+                        {
+                            "localeLanguage": "en",
+                            "localeCountry": "US"
+                        }
+                    ],
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 0
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 0
+                        }
+                    ],
+                    "minSupportedVersion": "7.243.0"
+                },
+                "subscriptionOnboardingPaidSubsOct2026": {
+                    "state": "enabled",
+                    "targets": [
+                        {
+                            "localeLanguage": "en",
+                            "localeCountry": "US"
+                        }
+                    ],
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 0
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 0
+                        }
+                    ],
+                    "minSupportedVersion": "7.243.0"
+                },
+                "subscriptionOnboardingFreeTrialsNov2026": {
+                    "state": "enabled",
+                    "targets": [
+                        {
+                            "localeLanguage": "en",
+                            "localeCountry": "US"
+                        }
+                    ],
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ],
+                    "minSupportedVersion": "7.246.0"
+                },
+                "subscriptionOnboardingPaidSubsNov2026": {
+                    "state": "enabled",
+                    "targets": [
+                        {
+                            "localeLanguage": "en",
+                            "localeCountry": "US"
+                        }
+                    ],
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ],
+                    "minSupportedVersion": "7.246.0"
+                },
+                "subscriptionConcurrentExperiments": {
+                    "state": "enabled"
                 }
             }
         },
@@ -2992,21 +3854,82 @@
         "iOSBrowserConfig": {
             "state": "enabled",
             "settings": {
-                "promptCooldownInterval": 24
+                "promptCooldownInterval": 24,
+                "onboardingAIModelsFallback": {
+                    "defaultModelId": "gpt-5.4-nano",
+                    "models": [
+                        { "id": "gpt-5.4-nano", "provider": "openai", "modelShortName": "5.4-nano" },
+                        { "id": "claude-haiku-4-5", "provider": "anthropic", "modelShortName": "Haiku 4.5" },
+                        { "id": "mistral-small-2603", "provider": "mistral", "modelShortName": "Mistral" }
+                    ]
+                }
             },
             "features": {
+                "iPhoneDuoLaunchReporting": {
+                    "state": "enabled"
+                },
+                "contextualOnboardingTimeLimit": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.247.0"
+                },
+                "floatingUIiOS26": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.246.0",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            }
+                        ]
+                    }
+                },
+                "floatingUIiOS27": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.241.0",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
+                },
                 "widgetReporting": {
                     "state": "disabled"
                 },
+                "pageSignals": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.243.0",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 20
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
+                },
                 "inactivityNotification": {
-                    "state": "disabled",
-                    "minSupportedVersion": "7.187.0",
+                    "state": "enabled",
+                    "minSupportedVersion": "7.234.0",
                     "description": "Local inactivity provisional notifications delivered to Notification Center.",
-                    "targets": [
-                        { "localeLanguage": "en", "localeCountry": "US" }
-                    ],
                     "settings": {
-                        "daysInactive": "7"
+                        "daysInactive": 7,
+                        "maxInteractions": 4
                     }
                 },
                 "customization": {
@@ -3100,6 +4023,30 @@
                         "idleThresholdSeconds": 1800
                     }
                 },
+                "alwaysShowKeyboardOnNewTabPage": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.242.0",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
+                },
+                "newTabPageRedesign": {
+                    "state": "internal",
+                    "minSupportedVersion": "7.242.0"
+                },
                 "defaultExistingIPhoneUsersToNewTabAfterIdle": {
                     "state": "enabled",
                     "minSupportedVersion": "7.220.0",
@@ -3113,6 +4060,9 @@
                             },
                             {
                                 "percent": 25
+                            },
+                            {
+                                "percent": 100
                             }
                         ]
                     }
@@ -3167,12 +4117,109 @@
                     "state": "enabled",
                     "minSupportedVersion": "7.222.0"
                 },
+                "scrollableEscapeHatch": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.246.0"
+                },
                 "removeChatHistory": {
                     "state": "enabled",
                     "minSupportedVersion": "7.225.0"
                 },
                 "webScrollFreezeObservability": {
                     "state": "disabled"
+                },
+                "searchTokenExperimentV4": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.236.0",
+                    "settings": {
+                        "tokenTTLSeconds": 300,
+                        "refreshWindowSeconds": 120
+                    },
+                    "description": "NA experiment: search token to speed up SERP by combining Index/Deep responses.",
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "newTabPageSessionInstrumentation": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.233.0",
+                    "description": "Wide event measuring Starting Experience Success Rate."
+                },
+                "onboardingFlowByDownloadReasonExperiment": {
+                    "state": "disabled",
+                    "minSupportedVersion": "7.235.0",
+                    "description": "NA Experiment: tailor the onboarding flow based on the user's download reason. `settings` provides the fallback AI model list for the model-picker step when the /models API is unavailable.",
+                    "targets": [
+                        {
+                            "localeLanguage": "en",
+                            "localeCountry": "US"
+                        }
+                    ],
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "promoPresentationCoordination": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.235.0"
+                },
+                "appRatingPromptCoordination": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.238.0"
+                },
+                "sitePermissions": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.241.0"
+                },
+                "fastTrackingParameterFilter": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.243.0",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
+                },
+                "singleTabBurnOptimization": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.244.0"
+                },
+                "deferredMemoryCacheDelete": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.244.0"
+                },
+                "launchBackgroundTask": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.246.0",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 1
+                            }
+                        ]
+                    }
                 }
             }
         },
@@ -3231,22 +4278,41 @@
                         "steps": [
                             {
                                 "percent": 50
+                            },
+                            {
+                                "percent": 100
                             }
                         ]
                     }
                 },
                 "freemiumPIR": {
-                    "state": "disabled"
+                    "state": "enabled",
+                    "minSupportedVersion": "7.230.0",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
                 },
                 "contentBlocking": {
                     "state": "enabled"
                 },
-                "webViewUserAgent": {
-                    "state": "disabled"
+                "customWebViewUserAgent": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.245.0"
                 },
                 "optOutRetryError96Hours": {
                     "state": "enabled",
                     "minSupportedVersion": "7.226.0"
+                },
+                "deferredSecureVaultInit": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.231.0"
                 }
             },
             "minSupportedVersion": "7.201.1"
@@ -3257,6 +4323,7 @@
             "exceptions": [],
             "settings": {
                 "additionalCheck": "enabled",
+                "includePageTypeSignals": "enabled",
                 "activeCaptureOnFirstMessage": "enabled",
                 "maxContentLength": 9500,
                 "mainContentSelector": "main, article, .content, .main, #content, #main",
@@ -3293,8 +4360,71 @@
                                 "value": "shreddit-comments-page-ad"
                             }
                         ]
+                    },
+                    {
+                        "condition": {
+                            "context": {
+                                "frame": true
+                            }
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/additionalCheck",
+                                "value": "disabled"
+                            }
+                        ]
                     }
-                ]
+                ],
+                "aiPageContextBlocklist": {
+                    "pdf": {
+                        "urlExtensions": [
+                            ".pdf"
+                        ],
+                        "contentTypes": [
+                            "application/pdf"
+                        ]
+                    },
+                    "image": {
+                        "urlExtensions": [
+                            ".png",
+                            ".jpg",
+                            ".jpeg",
+                            ".gif",
+                            ".webp",
+                            ".svg",
+                            ".bmp"
+                        ],
+                        "contentTypePrefixes": [
+                            "image/"
+                        ]
+                    },
+                    "video": {
+                        "urlExtensions": [
+                            ".mp4",
+                            ".webm",
+                            ".avi",
+                            ".mov",
+                            ".mkv"
+                        ],
+                        "contentTypePrefixes": [
+                            "video/"
+                        ]
+                    },
+                    "audio": {
+                        "urlExtensions": [
+                            ".mp3",
+                            ".wav",
+                            ".ogg",
+                            ".flac",
+                            ".aac",
+                            ".m4a"
+                        ],
+                        "contentTypePrefixes": [
+                            "audio/"
+                        ]
+                    }
+                }
             }
         },
         "webInterferenceDetection": {
@@ -3303,73 +4433,6 @@
             "settings": {
                 "autoRunDelayMs": 100,
                 "interferenceTypes": {
-                    "adwallDetection": {
-                        "generic": {
-                            "state": "enabled",
-                            "textPatterns": [
-                                "ad ?block(er)? detected",
-                                "adjust(ing)?( your)? ad blocking settings",
-                                "(turn off|disable|disabling|deactivate)( your| my)? ad ?block(er)?",
-                                "your ad ?blocker is on",
-                                "you('re| are| may be) using an ad blocker"
-                            ],
-                            "textSources": [
-                                "innerText"
-                            ]
-                        },
-                        "generic_de": {
-                            "state": "enabled",
-                            "textPatterns": [
-                                "deaktivieren sie ihren adblocker",
-                                "deaktivieren sie ihre blocker",
-                                "adblocker zu deaktivieren",
-                                "adblocker deaktivieren",
-                                "sie einen adblocker verwenden"
-                            ],
-                            "textSources": [
-                                "innerText"
-                            ]
-                        },
-                        "generic_es": {
-                            "state": "enabled",
-                            "textPatterns": [
-                                "en esta web no aceptamos el uso de adblock"
-                            ],
-                            "textSources": [
-                                "innerText"
-                            ]
-                        },
-                        "generic_it": {
-                            "state": "enabled",
-                            "textPatterns": [
-                                "disattiva l'ad block",
-                                "stai usando un ad block"
-                            ],
-                            "textSources": [
-                                "innerText"
-                            ]
-                        },
-                        "generic_nl": {
-                            "state": "enabled",
-                            "textPatterns": [
-                                "adblock gedetecteerd",
-                                "schakel je adblocker uit om de video te bekijken"
-                            ],
-                            "textSources": [
-                                "innerText"
-                            ]
-                        },
-                        "generic_se": {
-                            "state": "enabled",
-                            "textPatterns": [
-                                "har du en annonsblockerare igång",
-                                "avaktivera din annonsblockerare"
-                            ],
-                            "textSources": [
-                                "innerText"
-                            ]
-                        }
-                    },
                     "botDetection": {
                         "cloudflareTurnstile": {
                             "state": "enabled",
@@ -3542,12 +4605,46 @@
                             "buffering": true
                         }
                     }
-                }
+                },
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "context": {
+                                "frame": true
+                            }
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/additionalCheck",
+                                "value": "disabled"
+                            }
+                        ]
+                    }
+                ]
             }
         },
         "webEvents": {
             "state": "enabled",
-            "minSupportedVersion": "7.219.0"
+            "minSupportedVersion": "7.219.0",
+            "settings": {
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "context": {
+                                "frame": true
+                            }
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/additionalCheck",
+                                "value": "disabled"
+                            }
+                        ]
+                    }
+                ]
+            }
         },
         "hover": {
             "state": "disabled"
@@ -3557,6 +4654,10 @@
         },
         "contextMenu": {
             "state": "disabled"
+        },
+        "textSelection": {
+            "state": "enabled",
+            "minSupportedVersion": "7.235.0"
         },
         "forceDarkModeOnWebsites": {
             "state": "enabled",
@@ -3584,6 +4685,14 @@
                 "embedded": {
                     "state": "enabled",
                     "minSupportedVersion": "7.213.0"
+                },
+                "cpmDiagnosticsRecorder": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.243.0"
+                },
+                "cpmStableBaseURL": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.244.0"
                 }
             }
         },
@@ -3611,9 +4720,343 @@
                 }
             }
         },
+        "sponsorBlock": {
+            "state": "internal",
+            "minSupportedVersion": "7.246.0",
+            "features": {
+                "mvpEnabled": {
+                    "state": "internal"
+                }
+            }
+        },
+        "detectorPerf": {
+            "state": "enabled"
+        },
+        "trackerProtection": {
+            "state": "enabled"
+        },
         "webDetection": {
             "state": "enabled",
             "minSupportedVersion": "7.214.0"
+        },
+        "eventHub": {
+            "state": "enabled",
+            "minSupportedVersion": "7.234.0",
+            "settings": {
+                "telemetry": {
+                    "webTelemetry_youtube_adBlocker_day": {
+                        "state": "enabled",
+                        "trigger": {
+                            "period": {
+                                "days": 1
+                            }
+                        },
+                        "parameters": {
+                            "count": {
+                                "template": "counter",
+                                "source": "youtube_adBlocker",
+                                "buckets": {
+                                    "0": { "gte": 0, "lt": 1 },
+                                    "1": { "gte": 1, "lt": 2 },
+                                    "2-5": { "gte": 2, "lt": 6 },
+                                    "6-9": { "gte": 6, "lt": 10 },
+                                    "10+": { "gte": 10 }
+                                }
+                            },
+                            "loginState": {
+                                "template": "data",
+                                "source": "youtube_adBlocker",
+                                "dataKey": "loginState"
+                            }
+                        }
+                    },
+                    "webTelemetry_youtube_playabilityError_day": {
+                        "state": "enabled",
+                        "trigger": {
+                            "period": {
+                                "days": 1
+                            }
+                        },
+                        "parameters": {
+                            "count": {
+                                "template": "counter",
+                                "source": "youtube_playabilityError",
+                                "buckets": {
+                                    "0": { "gte": 0, "lt": 1 },
+                                    "1": { "gte": 1, "lt": 2 },
+                                    "2-5": { "gte": 2, "lt": 6 },
+                                    "6-9": { "gte": 6, "lt": 10 },
+                                    "10+": { "gte": 10 }
+                                }
+                            },
+                            "loginState": {
+                                "template": "data",
+                                "source": "youtube_playabilityError",
+                                "dataKey": "loginState"
+                            }
+                        }
+                    },
+                    "webTelemetry_youtube_videoAd_day": {
+                        "state": "enabled",
+                        "trigger": {
+                            "period": {
+                                "days": 1
+                            }
+                        },
+                        "parameters": {
+                            "count": {
+                                "template": "counter",
+                                "source": "youtube_videoAd",
+                                "buckets": {
+                                    "0": { "gte": 0, "lt": 1 },
+                                    "1": { "gte": 1, "lt": 2 },
+                                    "2-5": { "gte": 2, "lt": 6 },
+                                    "6-9": { "gte": 6, "lt": 10 },
+                                    "10+": { "gte": 10 }
+                                }
+                            },
+                            "loginState": {
+                                "template": "data",
+                                "source": "youtube_videoAd",
+                                "dataKey": "loginState"
+                            }
+                        }
+                    },
+                    "webTelemetry_youtube_staticAd_day": {
+                        "state": "enabled",
+                        "trigger": {
+                            "period": {
+                                "days": 1
+                            }
+                        },
+                        "parameters": {
+                            "count": {
+                                "template": "counter",
+                                "source": "youtube_staticAd",
+                                "buckets": {
+                                    "0": { "gte": 0, "lt": 1 },
+                                    "1": { "gte": 1, "lt": 2 },
+                                    "2-5": { "gte": 2, "lt": 6 },
+                                    "6-9": { "gte": 6, "lt": 10 },
+                                    "10+": { "gte": 10 }
+                                }
+                            },
+                            "loginState": {
+                                "template": "data",
+                                "source": "youtube_staticAd",
+                                "dataKey": "loginState"
+                            }
+                        }
+                    },
+                    "webTelemetry_youtube_buffering_day": {
+                        "state": "enabled",
+                        "trigger": {
+                            "period": {
+                                "days": 1
+                            }
+                        },
+                        "parameters": {
+                            "count": {
+                                "template": "counter",
+                                "source": "youtube_buffering",
+                                "buckets": {
+                                    "0": { "gte": 0, "lt": 1 },
+                                    "1": { "gte": 1, "lt": 2 },
+                                    "2-5": { "gte": 2, "lt": 6 },
+                                    "6-9": { "gte": 6, "lt": 10 },
+                                    "10+": { "gte": 10 }
+                                }
+                            },
+                            "loginState": {
+                                "template": "data",
+                                "source": "youtube_buffering",
+                                "dataKey": "loginState"
+                            }
+                        }
+                    },
+                    "autoconsent_cpmCoverage_day": {
+                        "state": "enabled",
+                        "trigger": {
+                            "period": {
+                                "days": 1
+                            }
+                        },
+                        "parameters": {
+                            "unhandled": {
+                                "template": "counter",
+                                "source": "autoconsent_unhandled",
+                                "buckets": {
+                                    "1-2": { "gte": 1, "lt": 3 },
+                                    "3-5": { "gte": 3, "lt": 6 },
+                                    "6-10": { "gte": 6, "lt": 11 },
+                                    "11-30": { "gte": 11, "lt": 31 },
+                                    "31+": { "gte": 31 }
+                                }
+                            },
+                            "unhandled_top10k": {
+                                "template": "counter",
+                                "source": "autoconsent_unhandled_top10k",
+                                "buckets": {
+                                    "1-2": { "gte": 1, "lt": 3 },
+                                    "3-5": { "gte": 3, "lt": 6 },
+                                    "6-10": { "gte": 6, "lt": 11 },
+                                    "11-30": { "gte": 11, "lt": 31 },
+                                    "31+": { "gte": 31 }
+                                }
+                            },
+                            "pages": {
+                                "template": "counter",
+                                "source": "autoconsent_pages",
+                                "buckets": {
+                                    "1-9": { "gte": 1, "lt": 10 },
+                                    "10-24": { "gte": 10, "lt": 25 },
+                                    "25-49": { "gte": 25, "lt": 50 },
+                                    "50-99": { "gte": 50, "lt": 100 },
+                                    "100-199": { "gte": 100, "lt": 200 },
+                                    "200+": { "gte": 200 }
+                                }
+                            },
+                            "pages_top10k": {
+                                "template": "counter",
+                                "source": "autoconsent_pages_top10k",
+                                "buckets": {
+                                    "1-9": { "gte": 1, "lt": 10 },
+                                    "10-24": { "gte": 10, "lt": 25 },
+                                    "25-49": { "gte": 25, "lt": 50 },
+                                    "50-99": { "gte": 50, "lt": 100 },
+                                    "100-199": { "gte": 100, "lt": 200 },
+                                    "200+": { "gte": 200 }
+                                }
+                            }
+                        }
+                    },
+                    "webTelemetry_adwall": {
+                        "state": "enabled",
+                        "trigger": {
+                            "type": "immediate",
+                            "source": "adwall"
+                        },
+                        "parameters": {}
+                    },
+                    "webTelemetry_admiralAdwall": {
+                        "state": "enabled",
+                        "trigger": {
+                            "type": "immediate",
+                            "source": "admiralAdwall"
+                        },
+                        "parameters": {}
+                    },
+                    "webTelemetry_captcha_recaptcha": {
+                        "state": "enabled",
+                        "trigger": {
+                            "type": "immediate",
+                            "source": "captcha_recaptcha"
+                        },
+                        "parameters": {}
+                    },
+                    "webTelemetry_captcha_hcaptcha": {
+                        "state": "enabled",
+                        "trigger": {
+                            "type": "immediate",
+                            "source": "captcha_hcaptcha"
+                        },
+                        "parameters": {}
+                    },
+                    "webTelemetry_captcha_turnstile": {
+                        "state": "enabled",
+                        "trigger": {
+                            "type": "immediate",
+                            "source": "captcha_turnstile"
+                        },
+                        "parameters": {}
+                    },
+                    "webTelemetry_captcha_cloudflare": {
+                        "state": "enabled",
+                        "trigger": {
+                            "type": "immediate",
+                            "source": "captcha_cloudflare"
+                        },
+                        "parameters": {}
+                    },
+                    "webTelemetry_captcha_datadome": {
+                        "state": "enabled",
+                        "trigger": {
+                            "type": "immediate",
+                            "source": "captcha_datadome"
+                        },
+                        "parameters": {}
+                    },
+                    "webTelemetry_captcha_imperva": {
+                        "state": "enabled",
+                        "trigger": {
+                            "type": "immediate",
+                            "source": "captcha_imperva"
+                        },
+                        "parameters": {}
+                    },
+                    "webTelemetry_captcha_arkose": {
+                        "state": "enabled",
+                        "trigger": {
+                            "type": "immediate",
+                            "source": "captcha_arkose"
+                        },
+                        "parameters": {}
+                    },
+                    "webTelemetry_captcha_geetest": {
+                        "state": "enabled",
+                        "trigger": {
+                            "type": "immediate",
+                            "source": "captcha_geetest"
+                        },
+                        "parameters": {}
+                    },
+                    "webTelemetry_captcha_awswaf": {
+                        "state": "enabled",
+                        "trigger": {
+                            "type": "immediate",
+                            "source": "captcha_awswaf"
+                        },
+                        "parameters": {}
+                    },
+                    "webTelemetry_captcha_perimeterx": {
+                        "state": "enabled",
+                        "trigger": {
+                            "type": "immediate",
+                            "source": "captcha_perimeterx"
+                        },
+                        "parameters": {}
+                    },
+                    "webTelemetry_captcha_other": {
+                        "state": "enabled",
+                        "trigger": {
+                            "type": "immediate",
+                            "source": "captcha_other"
+                        },
+                        "parameters": {}
+                    },
+                    "detectorPerf_severe": {
+                        "state": "enabled",
+                        "trigger": {
+                            "type": "immediate",
+                            "source": "detectorPerf_severe"
+                        },
+                        "parameters": {
+                            "kind": {
+                                "template": "data",
+                                "dataKey": "kind"
+                            },
+                            "detector": {
+                                "template": "data",
+                                "dataKey": "detector"
+                            },
+                            "thresholdMs": {
+                                "template": "data",
+                                "dataKey": "thresholdMs"
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "unprotectedTemporary": []

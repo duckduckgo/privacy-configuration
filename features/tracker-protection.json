@@ -1,0 +1,23 @@
+{
+    "_meta": {
+        "description": "C-S-S tracker protection (Apple only): observes resource loads, reports them to native and injects surrogates. Exceptions do not stop the feature from wrapping fetch/XHR/Image.src (it is self-gating), so to turn it off completely on a site, patch additionalCheck to disabled for that domain. No base state on purpose: platforms opt in via overrides/."
+    },
+    "exceptions": [],
+    "settings": {
+        "additionalCheck": "enabled",
+        "conditionalChanges": [
+            {
+                "condition": {
+                    "domain": "upwork.com"
+                },
+                "patchSettings": [
+                    {
+                        "op": "replace",
+                        "path": "/additionalCheck",
+                        "value": "disabled"
+                    }
+                ]
+            }
+        ]
+    }
+}
