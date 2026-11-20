@@ -147,6 +147,20 @@
                             "weight": 1
                         }
                     ]
+                },
+                "restartInPlace": {
+                    "state": "enabled",
+                    "minSupportedVersion": 53020000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 50
+                            }
+                        ]
+                    }
                 }
             }
         },
@@ -436,6 +450,31 @@
                     "settings": {
                         "controlUrl": "v5/experiments/202609v2-android-tds-control.json",
                         "treatmentUrl": "v5/experiments/202609v2-android-tds-treatment.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "tdsNextExperiment017": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52361000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "v5/experiments/202611v1-android-tds-control.json",
+                        "treatmentUrl": "v5/experiments/202611v1-android-tds-treatment.json"
                     },
                     "cohorts": [
                         {
@@ -837,6 +876,10 @@
             "minSupportedVersion": 52250000,
             "exceptions": [],
             "features": {
+                "pdfPageContext": {
+                    "state": "enabled",
+                    "minSupportedVersion": 53020000
+                },
                 "duckAiButtonInBrowser": {
                     "state": "enabled",
                     "minSupportedVersion": 52390000,
@@ -1079,6 +1122,10 @@
                     "state": "enabled",
                     "minSupportedVersion": 52950000
                 },
+                "sendDuckAiResponseWaitWideEvent": {
+                    "state": "enabled",
+                    "minSupportedVersion": 53010000
+                },
                 "duckAiUsageWarnings": {
                     "state": "enabled",
                     "minSupportedVersion": 52970000
@@ -1094,6 +1141,21 @@
                 "contextualMenuAllChats": {
                     "state": "enabled",
                     "minSupportedVersion": 52960000
+                },
+                "attachmentPrivacyDisclaimer": {
+                    "state": "enabled",
+                    "minSupportedVersion": 53010000
+                },
+                "newChatHints": {
+                    "state": "enabled",
+                    "minSupportedVersion": 53040000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 50
+                            }
+                        ]
+                    }
                 }
             }
         },
@@ -1189,6 +1251,9 @@
                             }
                         ]
                     }
+                },
+                "popupMutationObserver": {
+                    "state": "disabled"
                 },
                 "heuristicAction": {
                     "state": "enabled",
@@ -2719,7 +2784,8 @@
                 "customError": {
                     "state": "enabled",
                     "settings": {
-                        "signInRequiredSelector": "[href*=\"//support.google.com/youtube/answer/3037019\"]"
+                        "signInRequiredSelector": "[href*=\"//support.google.com/youtube/answer/3037019\"]",
+                        "youtubeErrorSelector": ".ytp-error, yt-player-interstitial-renderer"
                     }
                 },
                 "nativeUI": {
@@ -3568,6 +3634,17 @@
                 "workQueueScheduling": {
                     "state": "enabled",
                     "minSupportedVersion": 52930000
+                },
+                "trackerBlocking": {
+                    "state": "disabled",
+                    "minSupportedVersion": 52981000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25
+                            }
+                        ]
+                    }
                 },
                 "freemium": {
                     "state": "internal",
@@ -4740,6 +4817,23 @@
                             "weight": 1
                         }
                     ]
+                },
+                "undoSubscriptionCancellation": {
+                    "state": "enabled",
+                    "targets": [
+                        {
+                            "localeLanguage": "en"
+                        }
+                    ]
+                },
+                "subscriptionExpirationReminderNotification": {
+                    "state": "enabled"
+                },
+                "userSettingsMessaging": {
+                    "state": "enabled"
+                },
+                "notificationsPermissionMessaging": {
+                    "state": "enabled"
                 }
             }
         },
@@ -4972,13 +5066,24 @@
                 "richDuckAiGridTabItem": {
                     "state": "enabled",
                     "minSupportedVersion": 53000000
+                },
+                "newTabTransitions": {
+                    "state": "enabled",
+                    "minSupportedVersion": 53040000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            }
+                        ]
+                    }
                 }
             }
         },
         "maliciousSiteProtection": {
             "state": "enabled",
             "settings": {
-                "hashPrefixUpdateFrequency": 20,
+                "hashPrefixUpdateFrequency": 480,
                 "filterSetUpdateFrequency": 720
             },
             "features": {
@@ -5542,6 +5647,157 @@
                             "weight": 1
                         }
                     ]
+                },
+                "contentScopeExperiment10": {
+                    "state": "enabled",
+                    "minSupportedVersion": 53000000,
+                    "description": "Element hiding timers: treatment uses fewer hide and unhide passes on page load (elementHiding); control keeps the default timers",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 20
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "contentScopeExperiment11": {
+                    "state": "enabled",
+                    "description": "Page load detectors: treatment also runs the first batch of slow, broken and empty page detectors (webDetection); control runs the live detectors",
+                    "minSupportedVersion": 53020000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 25
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ],
+                    "settings": {
+                        // prettier-ignore
+                        "metrics": {
+                            "adwall": {"event": "adwall", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "admiralAdwall": {"event": "admiralAdwall", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "adwall_vendor": {"event": "adwall_vendor", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "captcha_recaptcha": {"event": "captcha_recaptcha", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "captcha_hcaptcha": {"event": "captcha_hcaptcha", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "captcha_turnstile": {"event": "captcha_turnstile", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "captcha_cloudflare": {"event": "captcha_cloudflare", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "captcha_datadome": {"event": "captcha_datadome", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "captcha_imperva": {"event": "captcha_imperva", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "captcha_arkose": {"event": "captcha_arkose", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "captcha_geetest": {"event": "captcha_geetest", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "captcha_awswaf": {"event": "captcha_awswaf", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "captcha_perimeterx": {"event": "captcha_perimeterx", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "captcha_other": {"event": "captcha_other", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "challenge_cloudflare": {"event": "challenge_cloudflare", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "challenge_generic": {"event": "challenge_generic", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "blockPage_cloudflare": {"event": "blockPage_cloudflare", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "blockPage_generic": {"event": "blockPage_generic", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "blockPage_vendor": {"event": "blockPage_vendor", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "blockPage_verificationfailed": {"event": "blockPage_verificationfailed", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "blockPage_vercel": {"event": "blockPage_vercel", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "blockPage_forbidden": {"event": "blockPage_forbidden", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "blockPage_toomanyrequests": {"event": "blockPage_toomanyrequests", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "blockPage_networksecurity": {"event": "blockPage_networksecurity", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "blockPage_title": {"event": "blockPage_title", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "errorPage_soft404": {"event": "errorPage_soft404", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "errorPage_unavailable": {"event": "errorPage_unavailable", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "geoblock": {"event": "geoblock", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "blankPage_empty": {"event": "blankPage_empty", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "login_error": {"event": "login_error", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "login_cookies": {"event": "login_cookies", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "login_browser": {"event": "login_browser", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]}
+                        }
+                    }
                 }
             }
         },
@@ -6052,6 +6308,12 @@
                 },
                 "indeterminateFallback": {
                     "state": "enabled"
+                },
+                "startProgressAtIntent": {
+                    "state": "enabled"
+                },
+                "holdProgressOnChallengePage": {
+                    "state": "enabled"
                 }
             }
         },
@@ -6122,11 +6384,11 @@
                     "cohorts": [
                         {
                             "name": "control",
-                            "weight": 1
+                            "weight": 0
                         },
                         {
                             "name": "treatment",
-                            "weight": 1
+                            "weight": 0
                         }
                     ]
                 }
@@ -6234,6 +6496,14 @@
             "minSupportedVersion": 52960000,
             "exceptions": []
         },
+        "pixelConcurrencyLimit": {
+            "state": "enabled",
+            "exceptions": [],
+            "minSupportedVersion": 53020000,
+            "settings": {
+                "maxRequestsPerHost": 2
+            }
+        },
         "pageLoad": {
             "state": "enabled",
             "minSupportedVersion": 53010000,
@@ -6246,6 +6516,9 @@
                         "steps": [
                             {
                                 "percent": 25
+                            },
+                            {
+                                "percent": 100
                             }
                         ]
                     }
@@ -6253,6 +6526,14 @@
                 "pageLoadTimeoutError": {
                     "state": "enabled",
                     "minSupportedVersion": 53010000
+                }
+            }
+        },
+        "sponsorBlock": {
+            "state": "internal",
+            "features": {
+                "mvpEnabled": {
+                    "state": "internal"
                 }
             }
         }
