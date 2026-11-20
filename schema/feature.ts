@@ -38,12 +38,13 @@ export type SubFeature<VersionType, SettingsType = Record<string, string>> = {
     }[];
     cohorts?: Cohort[];
     minSupportedVersion?: VersionType;
+    maxSupportedVersion?: VersionType;
 };
 
 export type Feature<
     SettingsType,
     VersionType,
-    SubFeatures extends Record<string, SubFeature<VersionType>> = Record<string, SubFeature<VersionType>>,
+    SubFeatures extends Record<string, SubFeature<VersionType, unknown>> = Record<string, SubFeature<VersionType>>,
 > = {
     readme?: string;
     _meta?: FeatureMeta;
@@ -53,9 +54,10 @@ export type Feature<
     features?: SubFeatures;
     hash: string;
     minSupportedVersion?: VersionType;
+    maxSupportedVersion?: VersionType;
 };
 
-type ConditionBlock = {
+export type ConditionBlock = {
     domain?: string;
     urlPattern?: string;
     experiment?: {

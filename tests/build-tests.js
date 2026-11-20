@@ -5,8 +5,14 @@ import {
     inlineReasonArrays,
     mergeAllowlistedTrackers,
     mergeEventHubTelemetry,
+    mergeInterferenceTypes,
+    renameEventHubImmediateTriggers,
     addHashToFeatures,
 } from '../util.js';
+import { arrayWebDetectionBuckets } from '../web-detection-util.js';
+import { compatFunctions } from '../compatibility.js';
+import { BROWSERS_SUBDIR, TDS_PATH_FOR_PLATFORM } from '../constants.js';
+import platforms from '../platforms.js';
 
 const ta1 = {
     'f1.com': {
@@ -270,6 +276,107 @@ describe('mergeEventHubTelemetry', () => {
     });
 });
 
+describe('renameEventHubImmediateTriggers', () => {
+    const configWith = (telemetry) => ({ features: { eventHub: { state: 'enabled', settings: { telemetry } } } });
+    const immediateEntry = (type) => ({ state: 'enabled', trigger: { type, source: 'adwall' }, parameters: {} });
+    const periodEntry = () => ({
+        state: 'enabled',
+        trigger: { period: { seconds: 86400 } },
+        parameters: { count: { template: 'counter', source: 'adwall', buckets: { 0: { gte: 0 } } } },
+    });
+
+    for (const platform of [
+        'ios',
+        'macos',
+    ]) {
+        it(`rewrites immediate to immediate_v2 for ${platform}`, () => {
+            const config = configWith({ pixel_immediate: immediateEntry('immediate') });
+            renameEventHubImmediateTriggers(config, platform);
+            expect(config.features.eventHub.settings.telemetry.pixel_immediate).to.deep.equal(immediateEntry('immediate_v2'));
+        });
+    }
+
+    for (const platform of [
+        'windows',
+        'android',
+    ]) {
+        it(`leaves immediate unchanged for ${platform}`, () => {
+            const config = configWith({ pixel_immediate: immediateEntry('immediate') });
+            renameEventHubImmediateTriggers(config, platform);
+            expect(config).to.deep.equal(configWith({ pixel_immediate: immediateEntry('immediate') }));
+        });
+    }
+
+    it('leaves period entries unchanged', () => {
+        const config = configWith({ pixel_day: periodEntry() });
+        renameEventHubImmediateTriggers(config, 'ios');
+        expect(config).to.deep.equal(configWith({ pixel_day: periodEntry() }));
+    });
+
+    it('no-ops when the config has no eventHub telemetry', () => {
+        const config = { features: { eventHub: { state: 'enabled' } } };
+        renameEventHubImmediateTriggers(config, 'ios');
+        expect(config).to.deep.equal({ features: { eventHub: { state: 'enabled' } } });
+        expect(() => renameEventHubImmediateTriggers({ features: {} }, 'ios')).to.not.throw();
+    });
+});
+
+describe('mergeInterferenceTypes', () => {
+    const baseType = (interval) => ({
+        state: 'enabled',
+        sweepIntervalMs: interval,
+        playerSelectors: [
+            '#player',
+        ],
+    });
+
+    it('inherits base types not present in the override', () => {
+        const base = { adwallDetection: baseType(1000) };
+        const override = { youtubeAds: baseType(2000) };
+        expect(mergeInterferenceTypes(base, override)).to.deep.equal({
+            adwallDetection: baseType(1000),
+            youtubeAds: baseType(2000),
+        });
+    });
+
+    it('lets the override replace a base type with the same key', () => {
+        const base = { adwallDetection: baseType(1000) };
+        const override = { adwallDetection: baseType(2000) };
+        expect(mergeInterferenceTypes(base, override)).to.deep.equal({
+            adwallDetection: baseType(2000),
+        });
+    });
+
+    it('replaces matching keys wholesale rather than deep-merging them', () => {
+        const base = {
+            adwallDetection: {
+                state: 'enabled',
+                sweepIntervalMs: 1000,
+                playerSelectors: [
+                    '#player',
+                    '#movie_player',
+                ],
+            },
+        };
+        const override = {
+            adwallDetection: {
+                state: 'enabled',
+                sweepIntervalMs: 2000,
+                playerSelectors: [
+                    '#player',
+                ],
+            },
+        };
+        // The override type wins entirely — the extra base selector is not carried over.
+        expect(mergeInterferenceTypes(base, override)).to.deep.equal(override);
+    });
+
+    it('returns base types unchanged when the override is empty', () => {
+        const base = { adwallDetection: baseType(1000) };
+        expect(mergeInterferenceTypes(base, {})).to.deep.equal(base);
+    });
+});
+
 const mkRule = (rulePath, domains, reason) => {
     return {
         rule: rulePath,
@@ -508,6 +615,26 @@ describe('addCnameEntriesToAllowlist', () => {
     });
 });
 
+describe('platforms', () => {
+    it('lists extension before the browser configs built from it', () => {
+        const extensionIndex = platforms.indexOf('extension');
+        expect(extensionIndex).to.be.at.least(0);
+        platforms.forEach((platform, i) => {
+            if (platform.startsWith(BROWSERS_SUBDIR)) {
+                expect(i, platform).to.be.greaterThan(extensionIndex);
+            }
+        });
+    });
+});
+
+describe('TDS_PATH_FOR_PLATFORM', () => {
+    it('has a TDS path for every platform', () => {
+        for (const platform of platforms) {
+            expect(TDS_PATH_FOR_PLATFORM, platform).to.have.property(platform);
+        }
+    });
+});
+
 describe('inlineReasonArrays', () => {
     it('simple object with array reason', () => {
         expect(
@@ -596,5 +723,150 @@ describe('addHashToFeatures', () => {
         testConfig.features.testFeature.settings.setting1 = 456;
         addHashToFeatures(testConfig);
         expect(testConfig.features.testFeature.hash).to.be.equal('91f8efc44dcd8f708619421e045120c4');
+    });
+});
+
+describe('compatFunctions.v5', () => {
+    const config = {
+        features: {
+            capped: { state: 'enabled', maxSupportedVersion: '7.300.0', minSupportedVersion: '7.250.0' },
+            parent: {
+                state: 'enabled',
+                features: {
+                    cappedSub: { state: 'enabled', maxSupportedVersion: '7.300.0' },
+                    plainSub: { state: 'enabled', minSupportedVersion: '7.250.0' },
+                },
+            },
+        },
+    };
+    const v5Config = compatFunctions.v5(config);
+
+    it('disables features that set maxSupportedVersion and removes the key', () => {
+        expect(v5Config.features.capped).to.deep.equal({ state: 'disabled', minSupportedVersion: '7.250.0' });
+    });
+
+    it('disables sub-features that set maxSupportedVersion and removes the key', () => {
+        expect(v5Config.features.parent.state).to.equal('enabled');
+        expect(v5Config.features.parent.features.cappedSub).to.deep.equal({ state: 'disabled' });
+    });
+
+    it('leaves features without maxSupportedVersion unchanged', () => {
+        expect(v5Config.features.parent.features.plainSub).to.deep.equal({ state: 'enabled', minSupportedVersion: '7.250.0' });
+    });
+
+    it('does not modify its input', () => {
+        expect(config.features.capped.state).to.equal('enabled');
+        expect(config.features.capped.maxSupportedVersion).to.equal('7.300.0');
+    });
+});
+
+describe('arrayWebDetectionBuckets', () => {
+    /**
+     * @param {object} settings
+     */
+    const built = (settings) => {
+        const config = { features: { webDetection: { settings } } };
+        arrayWebDetectionBuckets(config);
+        return config.features.webDetection.settings;
+    };
+    const ranges = { '0-1': { gte: 0, lt: 1 }, '1-3': { gte: 1, lt: 3 }, '3+': { gte: 3 } };
+    const rangeArray = [
+        { name: '0-1', is: { gte: 0, lt: 1 } },
+        { name: '1-3', is: { gte: 1, lt: 3 } },
+        { name: '3+', is: { gte: 3 } },
+    ];
+
+    it('rewrites object buckets into an array in config order, and keeps an array', () => {
+        const settings = built({
+            detectors: {
+                g: {
+                    d: {
+                        actions: [
+                            { define: { n: 1 } },
+                            {
+                                if: true,
+                                then: { fireEvent: { type: 'a', data: { n: { value: { ref: 'n' }, buckets: ranges } } } },
+                                else: { breakageReportData: { data: { n: { value: { ref: 'n' }, buckets: rangeArray } } } },
+                            },
+                        ],
+                    },
+                },
+            },
+            conditionalChanges: [
+                {
+                    condition: { injectName: 'apple' },
+                    patchSettings: [
+                        {
+                            op: 'add',
+                            path: '/detectors/g/e',
+                            value: { actions: { fireEvent: { type: 'b', data: { n: { value: 1, buckets: ranges } } } } },
+                        },
+                        {
+                            op: 'replace',
+                            path: '/detectors/g/d/actions/1/then/fireEvent/data',
+                            value: { m: { value: 1, buckets: ranges } },
+                        },
+                        { op: 'replace', path: '/detectors/g/d/actions/1/then/fireEvent/data/n', value: { value: 2, buckets: ranges } },
+                        { op: 'replace', path: '/detectors/g/d/actions/1/then/fireEvent/data/n/buckets', value: ranges },
+                        {
+                            op: 'replace',
+                            path: '/detectors/g/d/actions/1/else/breakageReportData/data/n/buckets/0',
+                            value: { name: 'zero', is: 0 },
+                        },
+                        {
+                            op: 'replace',
+                            path: '/detectors/g/d/actions/1/then/fireEvent',
+                            value: { type: 'c', data: { n: { value: 1, buckets: ranges } } },
+                        },
+                        {
+                            op: 'replace',
+                            path: '/detectors/g/e/actions/breakageReportData',
+                            value: { data: { n: { value: 1, buckets: ranges } } },
+                        },
+                    ],
+                },
+            ],
+        });
+        const [
+            ,
+            branch,
+        ] = settings.detectors.g.d.actions;
+        expect(branch.then.fireEvent.data.n.buckets).to.deep.equal(rangeArray);
+        expect(branch.else.breakageReportData.data.n.buckets).to.deep.equal(rangeArray);
+        const patches = settings.conditionalChanges[0].patchSettings;
+        expect(patches[0].value.actions.fireEvent.data.n.buckets).to.deep.equal(rangeArray);
+        expect(patches[1].value.m.buckets).to.deep.equal(rangeArray);
+        expect(patches[2].value.buckets).to.deep.equal(rangeArray);
+        expect(patches[3].value).to.deep.equal(rangeArray);
+        expect(patches[4].value).to.deep.equal({ name: 'zero', is: 0 });
+        expect(patches[5].value.data.n.buckets).to.deep.equal(rangeArray);
+        expect(patches[6].value.data.n.buckets).to.deep.equal(rangeArray);
+    });
+
+    it('rejects an integer-like name in object buckets, and a patch addressing a bucket by name', () => {
+        const field = (/** @type {unknown} */ buckets) => ({
+            detectors: { g: { d: { actions: { breakageReportData: { data: { n: { value: 1, buckets } } } } } } },
+        });
+        expect(() => built(field({ 0: 0, '1+': { gte: 1 } }))).to.throw('integer-like');
+        expect(() =>
+            built(
+                field([
+                    { name: '0', is: 0 },
+                ]),
+            ),
+        ).not.to.throw();
+        expect(() =>
+            built({
+                ...field(ranges),
+                conditionalChanges: [
+                    {
+                        condition: { injectName: 'apple' },
+                        patchSettings: [
+                            { op: 'replace', path: '/detectors/g/d/actions/breakageReportData/data/n/buckets/3+', value: { gte: 4 } },
+                        ],
+                    },
+                ],
+            }),
+        ).to.throw('by name');
     });
 });
