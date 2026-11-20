@@ -9,7 +9,6 @@ import { dirname, join, relative, resolve, sep } from 'path';
 import { fileURLToPath } from 'url';
 import { promisify } from 'util';
 import { applyEdits, modify } from 'jsonc-parser';
-import * as prettier from 'prettier';
 import { CURRENT_CONFIG_VERSION } from '../constants.js';
 import { parseJsonc } from './set-jsonc-path.mjs';
 
@@ -146,8 +145,9 @@ export function readRepoFile(file) {
  */
 export async function writeFormatted(file, text) {
     const filepath = resolve(ROOT, file);
-    const config = await prettier.resolveConfig(filepath);
-    writeFileSync(filepath, await prettier.format(text, { ...config, filepath }));
+    writeFileSync(filepath, text);
+    // The CLI applies .oxfmtrc.json, so files it ignores, such as the generated autoconsent.json, keep their layout.
+    await promisify(execFile)(resolve(ROOT, 'node_modules/.bin/oxfmt'), ['--no-error-on-unmatched-pattern', filepath], { cwd: ROOT });
 }
 
 /**
