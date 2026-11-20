@@ -27,6 +27,51 @@
                 }
             }
         },
+        "customTabs": {
+            "exceptions": [],
+            "state": "enabled",
+            "features": {
+                "closeTabAfterTrustedCallerNavigation": {
+                    "state": "enabled"
+                },
+                "handleTrustedCallers": {
+                    "state": "enabled"
+                },
+                "handleTrustedCallersNonHttpLinks": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52990000
+                },
+                "handleTrustedCallersWhenAppLinksDisabled": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52990000
+                },
+                "keepCustomTabOnAppSwitch": {
+                    "state": "enabled",
+                    "minSupportedVersion": 53000000
+                }
+            }
+        },
+        "credentialExchange": {
+            "exceptions": [],
+            "state": "enabled",
+            "minSupportedVersion": 52980000,
+            "features": {
+                "canImportPasswords": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52980000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
+                }
+            }
+        },
         "adClickAttribution": {
             "state": "enabled",
             "features": {
@@ -38,6 +83,33 @@
         "adBlockingExtension": {
             "exceptions": [],
             "state": "enabled",
+            "features": {
+                "enabledByDefault": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52890000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
+                },
+                "adBlockingUXImprovements": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52890000
+                },
+                "showAdBlockingOmnibarAnimation": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52910000
+                }
+            },
             "minSupportedVersion": 52840000
         },
         "additionalCampaignPixelParams": {
@@ -75,6 +147,20 @@
                             "weight": 1
                         }
                     ]
+                },
+                "restartInPlace": {
+                    "state": "enabled",
+                    "minSupportedVersion": 53020000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 50
+                            }
+                        ]
+                    }
                 }
             }
         },
@@ -219,6 +305,187 @@
                             "weight": 1
                         }
                     ]
+                },
+                "tdsNextExperiment010": {
+                    "state": "disabled",
+                    "minSupportedVersion": 52361000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "v5/experiments/202606v1-android-tds-control.json",
+                        "treatmentUrl": "v5/experiments/202606v1-android-tds-treatment.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "tdsNextExperiment011": {
+                    "state": "disabled",
+                    "minSupportedVersion": 52361000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "v5/experiments/202606ctl01-android-tds-control.json",
+                        "treatmentUrl": "v5/experiments/202606ctl01-android-tds-treatment.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "tdsNextExperiment012": {
+                    "state": "disabled",
+                    "minSupportedVersion": 52361000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "v5/experiments/202606v2-android-tds-control.json",
+                        "treatmentUrl": "v5/experiments/202606v2-android-tds-treatment.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "tdsNextExperiment014": {
+                    "state": "disabled",
+                    "minSupportedVersion": 52361000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "v5/experiments/202607fbctl02-android-tds-control.json",
+                        "treatmentUrl": "v5/experiments/202607fbctl02-android-tds-treatment.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "tdsNextExperiment015": {
+                    "state": "disabled",
+                    "minSupportedVersion": 52361000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "v5/experiments/202609v1-android-tds-control.json",
+                        "treatmentUrl": "v5/experiments/202609v1-android-tds-treatment.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "tdsNextExperiment016": {
+                    "state": "disabled",
+                    "minSupportedVersion": 52361000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "v5/experiments/202609v2-android-tds-control.json",
+                        "treatmentUrl": "v5/experiments/202609v2-android-tds-treatment.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "tdsNextExperiment017": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52361000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "v5/experiments/202611v1-android-tds-control.json",
+                        "treatmentUrl": "v5/experiments/202611v1-android-tds-treatment.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
                 }
             }
         },
@@ -246,124 +513,349 @@
         "contentBlocking": {
             "exceptions": []
         },
+        "drmPolicy": {
+            "state": "enabled",
+            "minSupportedVersion": 52950000,
+            "features": {
+                "centralPolicy": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
+                }
+            },
+            "exceptions": []
+        },
+        "sitePermissionsDialogRedesign": {
+            "state": "enabled",
+            "features": {
+                "singleTabBurnClearing": {
+                    "minSupportedVersion": 52981000,
+                    "state": "enabled"
+                },
+                "permissionSettingsRedesign": {
+                    "minSupportedVersion": 52981000,
+                    "state": "enabled"
+                },
+                "explicitPermissionsOnly": {
+                    "minSupportedVersion": 52981000,
+                    "state": "enabled"
+                }
+            },
+            "exceptions": []
+        },
         "eme": {
             "state": "enabled",
             "exceptions": [
                 {
-                    "domain": "amazon.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1162"
+                    "domain": "pornhub.com"
                 },
                 {
-                    "domain": "cnn.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1220"
+                    "domain": "xvideos.com"
                 },
                 {
-                    "domain": "foxnews.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/984"
+                    "domain": "youtube.com"
                 },
                 {
-                    "domain": "open.spotify.com",
-                    "reason": "Site displays a 'Playback disabled' notice on some media, preventing listening."
+                    "domain": "xhamster.com"
                 },
                 {
-                    "domain": "plex.tv",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/684"
+                    "domain": "reddit.com"
                 },
                 {
-                    "domain": "primevideo.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1162"
+                    "domain": "facebook.com"
                 },
                 {
-                    "domain": "rte.ie",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1217"
+                    "domain": "xnxx.com"
                 },
                 {
-                    "domain": "showtime.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/867"
+                    "domain": "instagram.com"
                 },
                 {
-                    "domain": "peacocktv.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1356"
+                    "domain": "fandom.com"
                 },
                 {
-                    "domain": "disneyplus.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1363"
+                    "domain": "erome.com"
                 },
                 {
-                    "domain": "hulu.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1363"
+                    "domain": "amazon.com"
                 },
                 {
-                    "domain": "plus.espn.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1363"
+                    "domain": "imdb.com"
                 },
                 {
-                    "domain": "netflix.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1363"
+                    "domain": "viralxxxporn.com"
                 },
                 {
-                    "domain": "paramountplus.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1363"
+                    "domain": "eporner.com"
                 },
                 {
-                    "domain": "tv.apple.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1363"
+                    "domain": "x.com"
                 },
                 {
-                    "domain": "curiositystream.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1363"
+                    "domain": "linkedin.com"
                 },
                 {
-                    "domain": "starz.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1363"
+                    "domain": "rule34.xxx"
                 },
                 {
-                    "domain": "dazn.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1363"
+                    "domain": "yahoo.com"
                 },
                 {
-                    "domain": "crunchyroll.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1363"
+                    "domain": "bbc.com"
                 },
                 {
-                    "domain": "funimation.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1363"
+                    "domain": "tubesafari.com"
                 },
                 {
-                    "domain": "mubi.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1363"
+                    "domain": "t.me"
                 },
                 {
-                    "domain": "crave.ca",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1363"
+                    "domain": "yandex.com"
                 },
                 {
-                    "domain": "britbox.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1363"
+                    "domain": "bbc.co.uk"
                 },
                 {
-                    "domain": "dailywire.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1363"
+                    "domain": "scrolller.com"
                 },
                 {
-                    "domain": "fubo.tv",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1363"
+                    "domain": "rule34video.com"
                 },
                 {
-                    "domain": "acorn.tv",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1363"
+                    "domain": "xhamster.desi"
                 },
                 {
-                    "domain": "shudder.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1363"
+                    "domain": "aznude.com"
                 },
                 {
-                    "domain": "music.amazon.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1363"
+                    "domain": "wikihow.com"
                 },
                 {
-                    "domain": "youtube.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1363"
+                    "domain": "nudevista.com"
+                },
+                {
+                    "domain": "tiktok.com"
+                },
+                {
+                    "domain": "foxnews.com"
+                },
+                {
+                    "domain": "xhamster19.com"
+                },
+                {
+                    "domain": "nytimes.com"
+                },
+                {
+                    "domain": "youporn.com"
+                },
+                {
+                    "domain": "thisvid.com"
+                },
+                {
+                    "domain": "mypikpak.com"
+                },
+                {
+                    "domain": "archive.org"
+                },
+                {
+                    "domain": "chaturbate.com"
+                },
+                {
+                    "domain": "luxuretv.com"
+                },
+                {
+                    "domain": "allrecipes.com"
+                },
+                {
+                    "domain": "accuweather.com"
+                },
+                {
+                    "domain": "webmd.com"
+                },
+                {
+                    "domain": "amazon.de"
+                },
+                {
+                    "domain": "notfans.com"
+                },
+                {
+                    "domain": "pornhub.org"
+                },
+                {
+                    "domain": "spankbang.com"
+                },
+                {
+                    "domain": "msn.com"
+                },
+                {
+                    "domain": "amazon.co.uk"
+                },
+                {
+                    "domain": "erothots.co"
+                },
+                {
+                    "domain": "steamcommunity.com"
+                },
+                {
+                    "domain": "fapello.com"
+                },
+                {
+                    "domain": "alohatube.com"
+                },
+                {
+                    "domain": "leakgallery.com"
+                },
+                {
+                    "domain": "cumguru.com"
+                },
+                {
+                    "domain": "dailymail.com"
+                },
+                {
+                    "domain": "fapopedia.net"
+                },
+                {
+                    "domain": "stripchat.com"
+                },
+                {
+                    "domain": "thothub.to"
+                },
+                {
+                    "domain": "pinterest.com"
+                },
+                {
+                    "domain": "hanime.tv"
+                },
+                {
+                    "domain": "theguardian.com"
+                },
+                {
+                    "domain": "porntrex.com"
+                },
+                {
+                    "domain": "tnaflix.com"
+                },
+                {
+                    "domain": "telegram.im"
+                },
+                {
+                    "domain": "scribd.com"
+                },
+                {
+                    "domain": "people.com"
+                },
+                {
+                    "domain": "tagesschau.de"
+                },
+                {
+                    "domain": "spotify.com"
+                },
+                {
+                    "domain": "play.google.com"
+                },
+                {
+                    "domain": "easyliveauction.com"
+                },
+                {
+                    "domain": "xfinity.com"
+                },
+                {
+                    "domain": "bitchute.com"
+                },
+                {
+                    "domain": "onlyfans.com"
+                },
+                {
+                    "domain": "xhamsterlive.com"
+                },
+                {
+                    "domain": "newsmax.com"
+                },
+                {
+                    "domain": "n-tv.de"
+                },
+                {
+                    "domain": "peacocktv.com"
+                },
+                {
+                    "domain": "sportschau.de"
+                },
+                {
+                    "domain": "cnn.com"
+                },
+                {
+                    "domain": "xgroovy.com"
+                },
+                {
+                    "domain": "espn.com"
+                },
+                {
+                    "domain": "iporntv.net"
+                },
+                {
+                    "domain": "youjizz.com"
+                },
+                {
+                    "domain": "rule34.gg"
+                },
+                {
+                    "domain": "pussyspace.com"
+                },
+                {
+                    "domain": "pornone.com"
+                },
+                {
+                    "domain": "redtube.com"
+                },
+                {
+                    "domain": "trannyclips.com"
+                },
+                {
+                    "domain": "xhamster3.com"
+                },
+                {
+                    "domain": "tubepornstars.com"
+                },
+                {
+                    "domain": "netflix.com"
+                },
+                {
+                    "domain": "tubepleasure.com"
+                },
+                {
+                    "domain": "cums.net"
+                },
+                {
+                    "domain": "vk.com"
+                },
+                {
+                    "domain": "porzo.com"
+                },
+                {
+                    "domain": "dailymotion.com"
+                },
+                {
+                    "domain": "missav.live"
+                },
+                {
+                    "domain": "goldtits.com"
+                },
+                {
+                    "domain": "heavy-r.com"
+                },
+                {
+                    "domain": "gaymaletube.com"
                 }
             ]
         },
@@ -384,6 +876,10 @@
             "minSupportedVersion": 52250000,
             "exceptions": [],
             "features": {
+                "pdfPageContext": {
+                    "state": "enabled",
+                    "minSupportedVersion": 53020000
+                },
                 "duckAiButtonInBrowser": {
                     "state": "enabled",
                     "minSupportedVersion": 52390000,
@@ -525,6 +1021,10 @@
                     "state": "enabled",
                     "minSupportedVersion": 52780000
                 },
+                "homepageChatSuggestions": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52990000
+                },
                 "duckAiVoiceEntryPoint": {
                     "state": "enabled",
                     "minSupportedVersion": 52780000
@@ -541,6 +1041,18 @@
                     "state": "enabled",
                     "minSupportedVersion": 52840000
                 },
+                "nativeChatInput": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52860000
+                },
+                "nativeToSConsent": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52990000
+                },
+                "nativePromptEditing": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52940000
+                },
                 "nativeInputField": {
                     "state": "enabled",
                     "minSupportedVersion": 52840000,
@@ -551,6 +1063,9 @@
                             },
                             {
                                 "percent": 25
+                            },
+                            {
+                                "percent": 100
                             }
                         ]
                     }
@@ -558,6 +1073,89 @@
                 "showNewAddressBarPickerScreen": {
                     "state": "enabled",
                     "minSupportedVersion": 52840000
+                },
+                "updatedPickers": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52960000
+                },
+                "customizeResponses": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52860000
+                },
+                "contextualSheetImprovements": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52860000
+                },
+                "aiFeaturesNativeControls": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52870000
+                },
+                "duckAiSettings": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52870000
+                },
+                "removeChatHistory": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52880000
+                },
+                "nativeInputNavBar": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52890000
+                },
+                "contextualNativeInput": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52920000
+                },
+                "contextualSuggestedPrompts": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52920000
+                },
+                "nativeInputAttachmentChanges": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52950000
+                },
+                "contextualSheetRedesign": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52950000
+                },
+                "sendDuckAiSessionWideEvent": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52950000
+                },
+                "sendDuckAiResponseWaitWideEvent": {
+                    "state": "enabled",
+                    "minSupportedVersion": 53010000
+                },
+                "duckAiUsageWarnings": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52970000
+                },
+                "nativeDuckAiSidebar": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52970000
+                },
+                "duckAiTextSelectionAction": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52970000
+                },
+                "contextualMenuAllChats": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52960000
+                },
+                "attachmentPrivacyDisclaimer": {
+                    "state": "enabled",
+                    "minSupportedVersion": 53010000
+                },
+                "newChatHints": {
+                    "state": "enabled",
+                    "minSupportedVersion": 53040000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 50
+                            }
+                        ]
+                    }
                 }
             }
         },
@@ -569,7 +1167,8 @@
                     "savedAIChats"
                 ],
                 "maxHistoryCount": 10,
-                "maxUrlSuggestions": 3
+                "maxUrlSuggestions": 3,
+                "recentDaysCutoff": 0
             }
         },
         "duckAiDataClearing": {
@@ -632,12 +1231,8 @@
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2790"
                 },
                 {
-                    "domain": "kvb.koeln",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2808"
-                },
-                {
-                    "domain": "ashleyfurniture.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3908"
+                    "domain": "dresden.de",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5532"
                 }
             ],
             "features": {
@@ -657,8 +1252,50 @@
                         ]
                     }
                 },
-                "heuristicAction": {
+                "popupMutationObserver": {
                     "state": "disabled"
+                },
+                "heuristicAction": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52841000
+                },
+                "cookiePopUpPreferenceSetting": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52900000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
+                },
+                "cookiePopUpOptInPrompt": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52960000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 7
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
+                },
+                "cookiePopUpOptInPromptPrimaryButtonV2": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52960000
                 }
             }
         },
@@ -749,6 +1386,113 @@
                         "formBoundarySelector": "",
                         "failsafeSettings": {},
                         "conditionalChanges": [
+                            {
+                                "condition": [
+                                    { "domain": "account.greenbacktaxservices.com" }
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "form[action*=\"AppLogin\"] input[type=\"password\"]",
+                                            "type": "credentials.password.current"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "condition": [
+                                    { "domain": "www.aestheticcity.academy" }
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input[name=\"confirm-email\"]",
+                                            "type": "unknown"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "condition": [
+                                    { "urlPattern": "https://login.app.carta.com/registration*" }
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "form",
+                                            "type": "login"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "condition": [
+                                    { "domain": "www.theinformation.com" }
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "#login-email",
+                                            "type": "credentials.username"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "condition": [
+                                    { "domain": "fedex.com" }
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input#password[autocomplete=\"current-password\"]",
+                                            "type": "credentials.password.current"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "condition": [
+                                    { "domain": "blindbarber.com" }
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formBoundarySelector",
+                                        "op": "replace",
+                                        "value": "app-createcardtoken form"
+                                    },
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "app-createcardtoken form",
+                                            "type": "cc"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "condition": [
+                                    { "domain": "wealthr.co.uk" }
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/failsafeSettings/maxInputsPerPage",
+                                        "op": "add",
+                                        "value": 160
+                                    }
+                                ]
+                            },
                             {
                                 "condition": [
                                     { "domain": "ring.com" }
@@ -892,6 +1636,30 @@
                                         "value": {
                                             "selector": "profile-lookup[app-name='account-login'] input[type='text']",
                                             "type": "credentials.username"
+                                        }
+                                    },
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "#ps_month",
+                                            "type": "identities.birthdayMonth"
+                                        }
+                                    },
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "#ps_day",
+                                            "type": "identities.birthdayDay"
+                                        }
+                                    },
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "#ps_year",
+                                            "type": "identities.birthdayYear"
                                         }
                                     }
                                 ]
@@ -1127,6 +1895,53 @@
                                         "op": "add",
                                         "value": {
                                             "selector": "form",
+                                            "type": "login"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "condition": [
+                                    { "domain": "antarestech.com" }
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formBoundarySelector",
+                                        "op": "replace",
+                                        "value": ".auth_dialog"
+                                    }
+                                ]
+                            },
+                            {
+                                "condition": [
+                                    { "domain": "auth.ibx.com" }
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/inputTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "input#floatingLabelInput109",
+                                            "type": "unknown"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "condition": [
+                                    { "domain": "icloud.com" }
+                                ],
+                                "patchSettings": [
+                                    {
+                                        "path": "/formBoundarySelector",
+                                        "op": "replace",
+                                        "value": "#sign_in_form"
+                                    },
+                                    {
+                                        "path": "/formTypeSettings/-",
+                                        "op": "add",
+                                        "value": {
+                                            "selector": "#sign_in_form",
                                             "type": "login"
                                         }
                                     }
@@ -1408,6 +2223,20 @@
                 },
                 "sendSanitizedStackTraces": {
                     "state": "enabled"
+                },
+                "passkeySupport": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52970000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
                 }
             }
         },
@@ -1743,11 +2572,14 @@
                 },
                 "sendPageLoadWideEvent": {
                     "state": "enabled",
-                    "minSupportedVersion": 52690000,
+                    "minSupportedVersion": 52980000,
                     "rollout": {
                         "steps": [
                             {
                                 "percent": 5
+                            },
+                            {
+                                "percent": 100
                             }
                         ]
                     }
@@ -1759,22 +2591,16 @@
                         "defaultIdleThresholdSeconds": "1800"
                     }
                 },
-                "singleTabFireDialog": {
+                "ntpAsDefaultAfterIdleReturn": {
                     "state": "enabled",
-                    "minSupportedVersion": 52742000,
+                    "minSupportedVersion": 52890000,
                     "rollout": {
                         "steps": [
-                            {
-                                "percent": 5
-                            },
                             {
                                 "percent": 10
                             },
                             {
                                 "percent": 25
-                            },
-                            {
-                                "percent": 50
                             },
                             {
                                 "percent": 100
@@ -1801,6 +2627,32 @@
                 "sendPostIdleSessionWideEvent": {
                     "state": "enabled",
                     "minSupportedVersion": 52810000
+                },
+                "webViewSessionPersistence": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        "androidNativeCrash": {
+            "state": "enabled",
+            "exceptions": [],
+            "features": {
+                "useCrashpad": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52971000
                 }
             }
         },
@@ -1903,6 +2755,10 @@
                 {
                     "domain": "jonesroadbeauty.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/4403"
+                },
+                {
+                    "domain": "ruedesjoueurs.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5534"
                 }
             ]
         },
@@ -1928,7 +2784,8 @@
                 "customError": {
                     "state": "enabled",
                     "settings": {
-                        "signInRequiredSelector": "[href*=\"//support.google.com/youtube/answer/3037019\"]"
+                        "signInRequiredSelector": "[href*=\"//support.google.com/youtube/answer/3037019\"]",
+                        "youtubeErrorSelector": ".ytp-error, yt-player-interstitial-renderer"
                     }
                 },
                 "nativeUI": {
@@ -1936,6 +2793,10 @@
                 },
                 "addCustomEmbedReferer": {
                     "state": "disabled"
+                },
+                "standaloneSettings": {
+                    "state": "enabled",
+                    "minSupportedVersion": 53010100
                 }
             },
             "settings": {
@@ -1988,6 +2849,14 @@
                         },
                         "videoDrawer": {
                             "state": "disabled"
+                        },
+                        "bufferingFeedback": {
+                            "state": "enabled",
+                            "spinnerTimeoutMs": 45000,
+                            "spinnerDelayMs": 500
+                        },
+                        "fullscreenGuard": {
+                            "state": "enabled"
                         }
                     },
                     "serpProxy": {
@@ -2245,6 +3114,210 @@
                 }
             }
         },
+        "edgeToEdge": {
+            "state": "enabled",
+            "exceptions": [],
+            "features": {
+                "browser": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
+                },
+                "settings": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
+                },
+                "autofill": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
+                },
+                "sync": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
+                },
+                "vpn": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
+                },
+                "webview": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
+                },
+                "onboarding": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
+                },
+                "misc": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
+                },
+                "bottomSheets": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
+                }
+            }
+        },
         "incontextSignup": {
             "exceptions": [],
             "state": "enabled",
@@ -2264,8 +3337,20 @@
                 "aiChat": "disabled",
                 "subscriptions": "disabled",
                 "serpSettings": "disabled",
+                "serp": "disabled",
                 "duckAiNativeStorage": "disabled",
+                "internalFeedback": "disabled",
                 "domains": [
+                    {
+                        "domain": "internalapps.duckduckgo.com",
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/internalFeedback",
+                                "value": "enabled"
+                            }
+                        ]
+                    },
                     {
                         "domain": [
                             "duckduckgo.com",
@@ -2290,6 +3375,11 @@
                             },
                             {
                                 "op": "replace",
+                                "path": "/serp",
+                                "value": "enabled"
+                            },
+                            {
+                                "op": "replace",
                                 "path": "/duckAiNativeStorage",
                                 "value": "enabled"
                             }
@@ -2306,6 +3396,36 @@
                 "overflowTypes": [
                     "hidden",
                     "clip"
+                ],
+                "conditionalChanges": [
+                    {
+                        "condition": [
+                            {
+                                "urlPattern": "https://www.nytimes.com/games/*"
+                            }
+                        ],
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/isLockedPage",
+                                "value": "enabled"
+                            }
+                        ]
+                    },
+                    {
+                        "condition": [
+                            {
+                                "urlPattern": "https://www.merriam-webster.com/games/*"
+                            }
+                        ],
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/isLockedPage",
+                                "value": "enabled"
+                            }
+                        ]
+                    }
                 ]
             }
         },
@@ -2376,6 +3496,10 @@
                 },
                 "enforceRoutes": {
                     "state": "disabled"
+                },
+                "endpointPortFallback": {
+                    "state": "enabled",
+                    "minSupportedVersion": 53010000
                 }
             },
             "settings": {
@@ -2457,6 +3581,9 @@
             "state": "enabled",
             "minSupportedVersion": 52701000,
             "exceptions": [],
+            "settings": {
+                "detachedWebViewCount": 20
+            },
             "features": {
                 "pirBeta": {
                     "state": "enabled",
@@ -2488,12 +3615,44 @@
                             },
                             {
                                 "percent": 20
+                            },
+                            {
+                                "percent": 40
+                            },
+                            {
+                                "percent": 75
+                            },
+                            {
+                                "percent": 100
                             }
                         ]
                     }
                 },
                 "ensureBrokerDataBeforeScan": {
                     "state": "enabled"
+                },
+                "workQueueScheduling": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52930000
+                },
+                "trackerBlocking": {
+                    "state": "disabled",
+                    "minSupportedVersion": 52981000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25
+                            }
+                        ]
+                    }
+                },
+                "freemium": {
+                    "state": "internal",
+                    "targets": [
+                        {
+                            "localeCountry": "us"
+                        }
+                    ]
                 }
             }
         },
@@ -2537,6 +3696,39 @@
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5389"
                             }
                         ]
+                    },
+                    "config-factory.com": {
+                        "rules": [
+                            {
+                                "rule": "config-factory.com",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5644"
+                            }
+                        ]
+                    },
+                    "content-settings.com": {
+                        "rules": [
+                            {
+                                "rule": "content-settings.com",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5644"
+                            }
+                        ]
+                    },
+                    "site-config.com": {
+                        "rules": [
+                            {
+                                "rule": "site-config.com",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5644"
+                            }
+                        ]
                     }
                 }
             }
@@ -2547,6 +3739,11 @@
             "settings": {
                 "windowInMs": 200
             },
+            "exceptions": []
+        },
+        "returnSessionWideEvent": {
+            "state": "enabled",
+            "minSupportedVersion": 52930000,
             "exceptions": []
         },
         "sendFullPackageInstallSource": {
@@ -2589,6 +3786,46 @@
                 },
                 "syncAutoRecoveryCapabilityDetectionRead": {
                     "state": "disabled"
+                },
+                "canUseV2ConnectFlow": {
+                    "state": "enabled"
+                },
+                "canShowV2ConnectCode": {
+                    "state": "enabled"
+                },
+                "useSimplifiedSync": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52920000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
+                },
+                "canUseExchangeV2Point1": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52960000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
                 }
             }
         },
@@ -2615,6 +3852,15 @@
                                     "tracfone.com"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/4322"
+                            },
+                            {
+                                "rule": "adobedc.demdex.net/ee",
+                                "domains": [
+                                    "homedepot.com"
+                                ],
+                                "reason": [
+                                    "https://github.com/duckduckgo/privacy-configuration/pull/5538"
+                                ]
                             }
                         ]
                     },
@@ -2626,24 +3872,6 @@
                                     "linkedin.com"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/675"
-                            }
-                        ]
-                    },
-                    "datadoghq-browser-agent.com": {
-                        "rules": [
-                            {
-                                "rule": "www.datadoghq-browser-agent.com/datadog-logs-v4.js",
-                                "domains": [
-                                    "resy.com"
-                                ],
-                                "reason": "resy.com - https://github.com/duckduckgo/privacy-configuration/pull/4645"
-                            },
-                            {
-                                "rule": "datadoghq-browser-agent.com",
-                                "domains": [
-                                    "resy.com"
-                                ],
-                                "reason": "resy.com - https://github.com/duckduckgo/privacy-configuration/pull/3370"
                             }
                         ]
                     },
@@ -2905,6 +4133,7 @@
                 "webShare": "enabled",
                 "screenLock": "enabled",
                 "plainTextViewPort": "enabled",
+                "passkeyDetection": "enabled",
                 "modifyLocalStorage": {
                     "state": "enabled",
                     "changes": []
@@ -2922,6 +4151,18 @@
             "features": {
                 "useNewWebCompatApis": {
                     "state": "disabled"
+                },
+                "optimizeContentScopeInjection": {
+                    "minSupportedVersion": 52920000,
+                    "state": "enabled"
+                },
+                "optimizeContentScopeMessaging": {
+                    "minSupportedVersion": 52920000,
+                    "state": "disabled"
+                },
+                "cacheContentScopeExperiments": {
+                    "minSupportedVersion": 52920000,
+                    "state": "enabled"
                 }
             },
             "exceptions": []
@@ -3344,12 +4585,27 @@
                 {
                     "domain": "id.onfido.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/3295"
+                },
+                {
+                    "domain": "store.kaiserpermanente.org",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/6265"
                 }
             ]
         },
         "privacyPro": {
             "state": "enabled",
             "features": {
+                "partnershipsHub": {
+                    "state": "disabled",
+                    "settings": {
+                        "url": "https://duckduckgo.com/partner-benefits"
+                    },
+                    "targets": [
+                        {
+                            "localeCountry": "us"
+                        }
+                    ]
+                },
                 "refreshSubscriptionPlanFeatures": {
                     "state": "enabled",
                     "minSupportedVersion": 52440000
@@ -3470,6 +4726,114 @@
                 "useQueryPurchases": {
                     "state": "enabled",
                     "minSupportedVersion": 52840000
+                },
+                "serializeTokenRefresh": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 20
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
+                },
+                "performanceOptimizedPaywalls": {
+                    "state": "disabled",
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ],
+                    "settings": {
+                        "entryPoints": {
+                            "vpn": {
+                                "path": "/subscriptions/new/mobile/vpn"
+                            },
+                            "duckai": {
+                                "path": "/subscriptions/new/mobile/duckai"
+                            },
+                            "pir": {
+                                "path": "/subscriptions/new/mobile/pir"
+                            }
+                        }
+                    }
+                },
+                "subscriptionConcurrentExperiments": {
+                    "state": "enabled"
+                },
+                "subscriptionOnboardingFreeTrialsOct2026": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52990000,
+                    "targets": [
+                        {
+                            "localeLanguage": "en",
+                            "localeCountry": "us"
+                        }
+                    ],
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "subscriptionOnboardingPaidSubsOct2026": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52990000,
+                    "targets": [
+                        {
+                            "localeLanguage": "en",
+                            "localeCountry": "us"
+                        }
+                    ],
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "undoSubscriptionCancellation": {
+                    "state": "enabled",
+                    "targets": [
+                        {
+                            "localeLanguage": "en"
+                        }
+                    ]
+                },
+                "subscriptionExpirationReminderNotification": {
+                    "state": "enabled"
+                },
+                "userSettingsMessaging": {
+                    "state": "enabled"
+                },
+                "notificationsPermissionMessaging": {
+                    "state": "enabled"
                 }
             }
         },
@@ -3512,6 +4876,18 @@
                 "subscriptionPromoModalCta": {
                     "state": "enabled",
                     "minSupportedVersion": 52750000
+                },
+                "subscriptionPromoModalCtaExistingUsers": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52920000
+                },
+                "duckAiOnboarding": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52860000
+                },
+                "contextualOnboardingTimeLimit": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52990000
                 },
                 "onboardingDuckAiExperimentMay26": {
                     "state": "enabled",
@@ -3622,6 +4998,11 @@
                 }
             }
         },
+        "nativeInputUrlClearingFeature": {
+            "state": "enabled",
+            "minSupportedVersion": 52940000,
+            "exceptions": []
+        },
         "swipingTabs": {
             "state": "enabled",
             "minSupportedVersion": 52390000,
@@ -3633,7 +5014,13 @@
             }
         },
         "showOnAppLaunch": {
-            "state": "enabled"
+            "state": "enabled",
+            "features": {
+                "afterInactivitySettingsLayout": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52990000
+                }
+            }
         },
         "tabManager": {
             "state": "enabled",
@@ -3663,13 +5050,40 @@
                             }
                         ]
                     }
+                },
+                "tabMaxReuseDistancePixel": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52960000
+                },
+                "duckAiChatsMenu": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52990000
+                },
+                "duckAiPlusMenuUpdate": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52990000
+                },
+                "richDuckAiGridTabItem": {
+                    "state": "enabled",
+                    "minSupportedVersion": 53000000
+                },
+                "newTabTransitions": {
+                    "state": "enabled",
+                    "minSupportedVersion": 53040000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            }
+                        ]
+                    }
                 }
             }
         },
         "maliciousSiteProtection": {
             "state": "enabled",
             "settings": {
-                "hashPrefixUpdateFrequency": 20,
+                "hashPrefixUpdateFrequency": 480,
                 "filterSetUpdateFrequency": 720
             },
             "features": {
@@ -4110,6 +5524,280 @@
                             "weight": 1
                         }
                     ]
+                },
+                "contentScopeExperiment5": {
+                    "state": "disabled",
+                    "minSupportedVersion": 52900000,
+                    "description": "Captcha detection: auto-run + fireEvent for the captcha detectors",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 50
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "contentScopeExperiment6": {
+                    "state": "disabled",
+                    "minSupportedVersion": 52900000,
+                    "description": "Captcha detection: auto-run + fireEvent for the captcha detectors, comparing 'content' vs 'visible' element visibility",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatmentCon",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatmentVis",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "contentScopeExperiment7": {
+                    "state": "disabled",
+                    "minSupportedVersion": 52920000,
+                    "description": "Adwall detection: rendered-text xpath matching for the generic adwall detectors",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "contentScopeExperiment8": {
+                    "state": "disabled",
+                    "minSupportedVersion": 52920000,
+                    "description": "Page issue detection: auto-run + fireEvent for the new block page, error page, geoblock, verification, blank page, captcha and adwall detectors, with retuned adwall and video intervals",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "contentScopeExperiment9": {
+                    "state": "enabled",
+                    "minSupportedVersion": 53000000,
+                    "description": "Detector performance monitoring: treatment measures Web Detection detector execution time (detectorPerf); control does not",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "contentScopeExperiment10": {
+                    "state": "enabled",
+                    "minSupportedVersion": 53000000,
+                    "description": "Element hiding timers: treatment uses fewer hide and unhide passes on page load (elementHiding); control keeps the default timers",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 20
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "contentScopeExperiment11": {
+                    "state": "enabled",
+                    "description": "Page load detectors: treatment also runs the first batch of slow, broken and empty page detectors (webDetection); control runs the live detectors",
+                    "minSupportedVersion": 53020000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 25
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ],
+                    "settings": {
+                        // prettier-ignore
+                        "metrics": {
+                            "adwall": {"event": "adwall", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "admiralAdwall": {"event": "admiralAdwall", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "adwall_vendor": {"event": "adwall_vendor", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "captcha_recaptcha": {"event": "captcha_recaptcha", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "captcha_hcaptcha": {"event": "captcha_hcaptcha", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "captcha_turnstile": {"event": "captcha_turnstile", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "captcha_cloudflare": {"event": "captcha_cloudflare", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "captcha_datadome": {"event": "captcha_datadome", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "captcha_imperva": {"event": "captcha_imperva", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "captcha_arkose": {"event": "captcha_arkose", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "captcha_geetest": {"event": "captcha_geetest", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "captcha_awswaf": {"event": "captcha_awswaf", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "captcha_perimeterx": {"event": "captcha_perimeterx", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "captcha_other": {"event": "captcha_other", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "challenge_cloudflare": {"event": "challenge_cloudflare", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "challenge_generic": {"event": "challenge_generic", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "blockPage_cloudflare": {"event": "blockPage_cloudflare", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "blockPage_generic": {"event": "blockPage_generic", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "blockPage_vendor": {"event": "blockPage_vendor", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "blockPage_verificationfailed": {"event": "blockPage_verificationfailed", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "blockPage_vercel": {"event": "blockPage_vercel", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "blockPage_forbidden": {"event": "blockPage_forbidden", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "blockPage_toomanyrequests": {"event": "blockPage_toomanyrequests", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "blockPage_networksecurity": {"event": "blockPage_networksecurity", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "blockPage_title": {"event": "blockPage_title", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "errorPage_soft404": {"event": "errorPage_soft404", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "errorPage_unavailable": {"event": "errorPage_unavailable", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "geoblock": {"event": "geoblock", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "blankPage_empty": {"event": "blankPage_empty", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "login_error": {"event": "login_error", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "login_cookies": {"event": "login_cookies", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "login_browser": {"event": "login_browser", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]}
+                        }
+                    }
                 }
             }
         },
@@ -4214,13 +5902,13 @@
             }
         },
         "productSurfaceTelemetry": {
-            "state": "enabled",
+            "state": "disabled",
             "exceptions": [],
-            "minSupportedVersion": 52751000,
+            "minSupportedVersion": 52920000,
             "features": {
                 "enableTelemetry": {
-                    "state": "enabled",
-                    "minSupportedVersion": 52751000
+                    "state": "disabled",
+                    "minSupportedVersion": 52920000
                 }
             }
         },
@@ -4233,10 +5921,6 @@
                     "minSupportedVersion": 52690000
                 }
             }
-        },
-        "webViewClipboardImage": {
-            "state": "enabled",
-            "exceptions": []
         },
         "webViewCompat": {
             "state": "disabled",
@@ -4336,6 +6020,7 @@
             "settings": {
                 "additionalCheck": "enabled",
                 "activeCaptureOnFirstMessage": "enabled",
+                "includePageTypeSignals": "enabled",
                 "maxContentLength": 9500,
                 "mainContentSelector": "main, article, .content, .main, #content, #main",
                 "excludeSelectors": [
@@ -4375,6 +6060,10 @@
                 ]
             }
         },
+        "detectorPerf": {
+            "state": "enabled",
+            "minSupportedVersion": 53000000
+        },
         "webDetection": {
             "state": "enabled",
             "minSupportedVersion": 52700000
@@ -4400,35 +6089,101 @@
                                 "template": "counter",
                                 "source": "youtube_videoAd",
                                 "buckets": {
-                                    "true": { "gte": 1 }
+                                    "0": { "gte": 0, "lt": 1 },
+                                    "1": { "gte": 1, "lt": 2 },
+                                    "2-5": { "gte": 2, "lt": 6 },
+                                    "6-9": { "gte": 6, "lt": 10 },
+                                    "10+": { "gte": 10 }
                                 }
                             },
                             "staticAd": {
                                 "template": "counter",
                                 "source": "youtube_staticAd",
                                 "buckets": {
-                                    "true": { "gte": 1 }
+                                    "0": { "gte": 0, "lt": 1 },
+                                    "1": { "gte": 1, "lt": 2 },
+                                    "2-5": { "gte": 2, "lt": 6 },
+                                    "6-9": { "gte": 6, "lt": 10 },
+                                    "10+": { "gte": 10 }
                                 }
                             },
                             "playabilityError": {
                                 "template": "counter",
                                 "source": "youtube_playabilityError",
                                 "buckets": {
-                                    "true": { "gte": 1 }
+                                    "0": { "gte": 0, "lt": 1 },
+                                    "1": { "gte": 1, "lt": 2 },
+                                    "2-5": { "gte": 2, "lt": 6 },
+                                    "6-9": { "gte": 6, "lt": 10 },
+                                    "10+": { "gte": 10 }
                                 }
                             },
                             "adBlocker": {
                                 "template": "counter",
                                 "source": "youtube_adBlocker",
                                 "buckets": {
-                                    "true": { "gte": 1 }
+                                    "0": { "gte": 0, "lt": 1 },
+                                    "1": { "gte": 1, "lt": 2 },
+                                    "2-5": { "gte": 2, "lt": 6 },
+                                    "6-9": { "gte": 6, "lt": 10 },
+                                    "10+": { "gte": 10 }
                                 }
                             },
                             "buffering": {
                                 "template": "counter",
                                 "source": "youtube_buffering",
                                 "buckets": {
-                                    "true": { "gte": 1 }
+                                    "0": { "gte": 0, "lt": 1 },
+                                    "1": { "gte": 1, "lt": 2 },
+                                    "2-5": { "gte": 2, "lt": 6 },
+                                    "6-9": { "gte": 6, "lt": 10 },
+                                    "10+": { "gte": 10 }
+                                }
+                            }
+                        }
+                    },
+                    "webTelemetry_video_unavailable_day": {
+                        "state": "enabled",
+                        "trigger": {
+                            "period": {
+                                "days": 1
+                            }
+                        },
+                        "parameters": {
+                            "count": {
+                                "template": "counter",
+                                "source": "video_unavailable",
+                                "buckets": {
+                                    "1": { "gte": 1, "lt": 2 },
+                                    "2-3": { "gte": 2, "lt": 4 },
+                                    "4-7": { "gte": 4, "lt": 8 },
+                                    "8-14": { "gte": 8, "lt": 15 },
+                                    "15-20": { "gte": 15, "lt": 21 },
+                                    "21-39": { "gte": 21, "lt": 40 },
+                                    "40+": { "gte": 40 }
+                                }
+                            }
+                        }
+                    },
+                    "webTelemetry_video_unavailable_week": {
+                        "state": "enabled",
+                        "trigger": {
+                            "period": {
+                                "days": 7
+                            }
+                        },
+                        "parameters": {
+                            "count": {
+                                "template": "counter",
+                                "source": "video_unavailable",
+                                "buckets": {
+                                    "1": { "gte": 1, "lt": 2 },
+                                    "2-3": { "gte": 2, "lt": 4 },
+                                    "4-7": { "gte": 4, "lt": 8 },
+                                    "8-14": { "gte": 8, "lt": 15 },
+                                    "15-20": { "gte": 15, "lt": 21 },
+                                    "21-39": { "gte": 21, "lt": 40 },
+                                    "40+": { "gte": 40 }
                                 }
                             }
                         }
@@ -4550,6 +6305,15 @@
                 "behaviourUpdate": {
                     "state": "enabled",
                     "minSupportedVersion": 52801000
+                },
+                "indeterminateFallback": {
+                    "state": "enabled"
+                },
+                "startProgressAtIntent": {
+                    "state": "enabled"
+                },
+                "holdProgressOnChallengePage": {
+                    "state": "enabled"
                 }
             }
         },
@@ -4580,14 +6344,196 @@
                     "minSupportedVersion": 52830000,
                     "cohorts": [
                         {
-                            "name": "control",
-                            "weight": 1
-                        },
-                        {
                             "name": "treatment",
                             "weight": 1
                         }
                     ]
+                }
+            }
+        },
+        "onboardingPrompts": {
+            "state": "enabled",
+            "exceptions": [],
+            "features": {
+                "addToDockAndWidgetExperimentJul25": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52920000,
+                    "cohorts": [
+                        {
+                            "name": "treatmentWidgetOnly",
+                            "weight": 1
+                        }
+                    ]
+                }
+            }
+        },
+        "segmentedOnboarding": {
+            "state": "enabled",
+            "exceptions": [],
+            "features": {
+                "onboardingFlowByDownloadReasonExperiment": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52970000,
+                    "targets": [
+                        {
+                            "localeCountry": "us",
+                            "localeLanguage": "en",
+                            "isReturningUser": false
+                        }
+                    ],
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 0
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 0
+                        }
+                    ]
+                }
+            }
+        },
+        "nativeInputOmnibar": {
+            "state": "enabled",
+            "exceptions": [],
+            "minSupportedVersion": 52920000,
+            "features": {
+                "nativeInputSearchOnly": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52920000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        "optimizeCnameDetection": {
+            "state": "enabled",
+            "minSupportedVersion": 52930000,
+            "exceptions": [],
+            "features": {
+                "cacheCnamesInMemory": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52930000
+                }
+            }
+        },
+        "badUrlErrorPageWideEvent": {
+            "state": "enabled",
+            "minSupportedVersion": 52950000,
+            "exceptions": []
+        },
+        "suggestRedirectOnUnresolvedError": {
+            "state": "enabled",
+            "minSupportedVersion": 52950000,
+            "exceptions": [],
+            "features": {
+                "suggestRedirect": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52950000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 20
+                            },
+                            {
+                                "percent": 40
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        "customErrorPages": {
+            "state": "enabled",
+            "minSupportedVersion": 52950000,
+            "exceptions": [],
+            "features": {
+                "keepErrorPageUntilNextPageStartsLoading": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52950000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 20
+                            },
+                            {
+                                "percent": 40
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        "appRatingPromptModal": {
+            "state": "enabled",
+            "minSupportedVersion": 52960000,
+            "exceptions": []
+        },
+        "pixelConcurrencyLimit": {
+            "state": "enabled",
+            "exceptions": [],
+            "minSupportedVersion": 53020000,
+            "settings": {
+                "maxRequestsPerHost": 2
+            }
+        },
+        "pageLoad": {
+            "state": "enabled",
+            "minSupportedVersion": 53010000,
+            "exceptions": [],
+            "features": {
+                "pageLoadTimeoutWatchdog": {
+                    "state": "enabled",
+                    "minSupportedVersion": 53010000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
+                },
+                "pageLoadTimeoutError": {
+                    "state": "enabled",
+                    "minSupportedVersion": 53010000
+                }
+            }
+        },
+        "sponsorBlock": {
+            "state": "internal",
+            "features": {
+                "mvpEnabled": {
+                    "state": "internal"
                 }
             }
         }

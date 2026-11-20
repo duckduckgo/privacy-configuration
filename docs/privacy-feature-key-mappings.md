@@ -38,6 +38,6 @@ This document maps each privacy feature key in the remote config to its correspo
 - [Config Reviewer Documentation](./config-reviewer-documentation.md)
 - [Feature Implementer Documentation](./feature-implementer-documentation.md)
 - [🛠 Implementation Guidelines: Remote Privacy Configuration/Allowlists](./implementation-guidelines-remote-privacy-configuration-allowlists.md)
-- [Incremental Rollout Implementation Guide](./incremental-rollout-implementation-guide.md)
+- [Rollouts and Experiments](./rollouts-and-experiments.md)
 - [Writing a Schema for Your Config Feature](./writing-schema-for-config-feature.md)
 - [Remote Configuration Change Log](./remote-configuration-change-log.md)

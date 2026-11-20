@@ -11,6 +11,10 @@ Unless otherwise noted, each change in a version can be optionally implemented. 
 
 ## Version History
 
+### v6
+- `maxSupportedVersion` (Required Support): added to features and sub-features. If present, the corresponding feature should not be enabled if the platform version is above this value. A platform version equal to the value is supported.
+  - Earlier config versions remove the key and set the feature or sub-feature to `disabled`.
+
 ### v5 ([PR #3358](https://github.com/duckduckgo/privacy-configuration/pull/3358))
 - `preview` added as a possible state for features and sub-features.
   - For release channels, this should be considered as disabled.
@@ -36,5 +40,5 @@ Unless otherwise noted, each change in a version can be optionally implemented. 
 - [Feature Implementer Documentation](./feature-implementer-documentation.md)
 - [Privacy Feature Key Mappings](./privacy-feature-key-mappings.md)
 - [🛠 Implementation Guidelines: Remote Privacy Configuration/Allowlists](./implementation-guidelines-remote-privacy-configuration-allowlists.md)
-- [Incremental Rollout Implementation Guide](./incremental-rollout-implementation-guide.md)
+- [Rollouts and Experiments](./rollouts-and-experiments.md)
 - [Writing a Schema for Your Config Feature](./writing-schema-for-config-feature.md) 
