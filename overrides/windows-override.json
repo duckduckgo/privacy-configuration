@@ -1317,7 +1317,9 @@
                     "state": "enabled",
                     "minSupportedVersion": "0.179.0",
                     "rollout": {
-                        "steps": [{ "percent": 10 }]
+                        "steps": [
+                            { "percent": 10 }
+                        ]
                     }
                 },
                 "omnibarAiChat": {
@@ -1578,7 +1580,9 @@
             "state": "enabled",
             "exceptions": [],
             "settings": {
-                "chatsLocalStorageKeys": ["savedAIChats"],
+                "chatsLocalStorageKeys": [
+                    "savedAIChats"
+                ],
                 "maxHistoryCount": 5
             }
         },
@@ -1591,10 +1595,18 @@
             "state": "enabled",
             "minSupportedVersion": "0.142.0",
             "settings": {
-                "chatsLocalStorageKeys": ["savedAIChats"],
+                "chatsLocalStorageKeys": [
+                    "savedAIChats"
+                ],
                 "chatImagesIndexDbNameObjectStoreNamePairs": [
-                    ["savedAIChatData", "chat-images"],
-                    ["savedAIChatData", "saved-chats"]
+                    [
+                        "savedAIChatData",
+                        "chat-images"
+                    ],
+                    [
+                        "savedAIChatData",
+                        "saved-chats"
+                    ]
                 ]
             }
         },
@@ -1741,7 +1753,9 @@
                         "failsafeSettings": {},
                         "conditionalChanges": [
                             {
-                                "condition": [{ "domain": "account.greenbacktaxservices.com" }],
+                                "condition": [
+                                    { "domain": "account.greenbacktaxservices.com" }
+                                ],
                                 "patchSettings": [
                                     {
                                         "path": "/inputTypeSettings/-",
@@ -1754,7 +1768,9 @@
                                 ]
                             },
                             {
-                                "condition": [{ "domain": "www.aestheticcity.academy" }],
+                                "condition": [
+                                    { "domain": "www.aestheticcity.academy" }
+                                ],
                                 "patchSettings": [
                                     {
                                         "path": "/inputTypeSettings/-",
@@ -1767,7 +1783,9 @@
                                 ]
                             },
                             {
-                                "condition": [{ "urlPattern": "https://login.app.carta.com/registration*" }],
+                                "condition": [
+                                    { "urlPattern": "https://login.app.carta.com/registration*" }
+                                ],
                                 "patchSettings": [
                                     {
                                         "path": "/formTypeSettings/-",
@@ -1780,7 +1798,9 @@
                                 ]
                             },
                             {
-                                "condition": [{ "domain": "www.theinformation.com" }],
+                                "condition": [
+                                    { "domain": "www.theinformation.com" }
+                                ],
                                 "patchSettings": [
                                     {
                                         "path": "/inputTypeSettings/-",
@@ -1793,7 +1813,9 @@
                                 ]
                             },
                             {
-                                "condition": [{ "domain": "fedex.com" }],
+                                "condition": [
+                                    { "domain": "fedex.com" }
+                                ],
                                 "patchSettings": [
                                     {
                                         "path": "/inputTypeSettings/-",
@@ -1806,7 +1828,9 @@
                                 ]
                             },
                             {
-                                "condition": [{ "domain": "blindbarber.com" }],
+                                "condition": [
+                                    { "domain": "blindbarber.com" }
+                                ],
                                 "patchSettings": [
                                     {
                                         "path": "/formBoundarySelector",
@@ -2293,7 +2317,9 @@
                                 ]
                             },
                             {
-                                "condition": [{ "domain": "antarestech.com" }],
+                                "condition": [
+                                    { "domain": "antarestech.com" }
+                                ],
                                 "patchSettings": [
                                     {
                                         "path": "/formBoundarySelector",
@@ -2303,7 +2329,9 @@
                                 ]
                             },
                             {
-                                "condition": [{ "domain": "auth.ibx.com" }],
+                                "condition": [
+                                    { "domain": "auth.ibx.com" }
+                                ],
                                 "patchSettings": [
                                     {
                                         "path": "/inputTypeSettings/-",
@@ -2316,7 +2344,9 @@
                                 ]
                             },
                             {
-                                "condition": [{ "domain": "icloud.com" }],
+                                "condition": [
+                                    { "domain": "icloud.com" }
+                                ],
                                 "patchSettings": [
                                     {
                                         "path": "/formBoundarySelector",
@@ -2589,7 +2619,11 @@
                         ]
                     },
                     {
-                        "domain": ["duckduckgo.com", "duck.co", "duck.ai"],
+                        "domain": [
+                            "duckduckgo.com",
+                            "duck.co",
+                            "duck.ai"
+                        ],
                         "patchSettings": [
                             {
                                 "op": "replace",
@@ -4496,18 +4530,26 @@
                         "rules": [
                             {
                                 "rule": "tags.tiqcdn.com/utag/cbsi/",
-                                "domains": ["<all>"],
+                                "domains": [
+                                    "<all>"
+                                ],
                                 "reason": "<all> - https://github.com/duckduckgo/privacy-configuration/pull/4645"
                             },
                             {
                                 "rule": "tags.tiqcdn.com/utag/",
-                                "domains": ["<all>"],
+                                "domains": [
+                                    "<all>"
+                                ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1534"
                             },
                             {
                                 "rule": "adobedc.demdex.net/ee",
-                                "domains": ["homedepot.com"],
-                                "reason": ["https://github.com/duckduckgo/privacy-configuration/pull/5538"]
+                                "domains": [
+                                    "homedepot.com"
+                                ],
+                                "reason": [
+                                    "https://github.com/duckduckgo/privacy-configuration/pull/5538"
+                                ]
                             }
                         ]
                     },
@@ -4515,7 +4557,10 @@
                         "rules": [
                             {
                                 "rule": "tractorsupply.tt.omtrdc.net/rest/v1/delivery",
-                                "domains": ["tractorsupply.com", "pizzahut.com"],
+                                "domains": [
+                                    "tractorsupply.com",
+                                    "pizzahut.com"
+                                ],
                                 "reason": [
                                     "https://github.com/duckduckgo/privacy-configuration/issues/2042",
                                     "pizzahut.com - https://github.com/duckduckgo/privacy-configuration/pull/4645"
@@ -4527,7 +4572,9 @@
                         "rules": [
                             {
                                 "rule": "npttech.com/advertising.js",
-                                "domains": ["slate.com"],
+                                "domains": [
+                                    "slate.com"
+                                ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2879"
                             }
                         ]
@@ -4536,7 +4583,9 @@
                         "rules": [
                             {
                                 "rule": "app-sx.slickstream.com",
-                                "domains": ["recipetineats.com"],
+                                "domains": [
+                                    "recipetineats.com"
+                                ],
                                 "reason": "recipetineats.com - https://github.com/duckduckgo/privacy-configuration/pull/4387"
                             }
                         ]
@@ -5358,7 +5407,9 @@
                 },
                 "inContextInstructionsExperiment": {
                     "state": "enabled",
-                    "cohorts": [{ "name": "instructions", "weight": 1 }]
+                    "cohorts": [
+                        { "name": "instructions", "weight": 1 }
+                    ]
                 }
             }
         },
@@ -5414,7 +5465,15 @@
                 "includeIframes": "disabled",
                 "includePageTypeSignals": "enabled",
                 "maxContentLength": 9500,
-                "excludeSelectors": [".ad", ".sidebar", ".footer", ".nav", ".header", ".banner", ".popup"],
+                "excludeSelectors": [
+                    ".ad",
+                    ".sidebar",
+                    ".footer",
+                    ".nav",
+                    ".header",
+                    ".banner",
+                    ".popup"
+                ],
                 "conditionalChanges": [
                     {
                         "condition": {
@@ -5431,20 +5490,51 @@
                 ],
                 "aiPageContextBlocklist": {
                     "pdf": {
-                        "urlExtensions": [".pdf"],
-                        "contentTypes": ["application/pdf"]
+                        "urlExtensions": [
+                            ".pdf"
+                        ],
+                        "contentTypes": [
+                            "application/pdf"
+                        ]
                     },
                     "image": {
-                        "urlExtensions": [".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg", ".bmp"],
-                        "contentTypePrefixes": ["image/"]
+                        "urlExtensions": [
+                            ".png",
+                            ".jpg",
+                            ".jpeg",
+                            ".gif",
+                            ".webp",
+                            ".svg",
+                            ".bmp"
+                        ],
+                        "contentTypePrefixes": [
+                            "image/"
+                        ]
                     },
                     "video": {
-                        "urlExtensions": [".mp4", ".webm", ".avi", ".mov", ".mkv"],
-                        "contentTypePrefixes": ["video/"]
+                        "urlExtensions": [
+                            ".mp4",
+                            ".webm",
+                            ".avi",
+                            ".mov",
+                            ".mkv"
+                        ],
+                        "contentTypePrefixes": [
+                            "video/"
+                        ]
                     },
                     "audio": {
-                        "urlExtensions": [".mp3", ".wav", ".ogg", ".flac", ".aac", ".m4a"],
-                        "contentTypePrefixes": ["audio/"]
+                        "urlExtensions": [
+                            ".mp3",
+                            ".wav",
+                            ".ogg",
+                            ".flac",
+                            ".aac",
+                            ".m4a"
+                        ],
+                        "contentTypePrefixes": [
+                            "audio/"
+                        ]
                     }
                 }
             }
@@ -5463,10 +5553,23 @@
                 "reportMsixLogs": {
                     "state": "disabled",
                     "settings": {
-                        "ErrorCodes": [15616],
-                        "AllowList": ["ya2fgkz3nks94", "qzdjx70tn762j", "DuckDuckGo", "8wekyb3d8bbwe"],
+                        "ErrorCodes": [
+                            15616
+                        ],
+                        "AllowList": [
+                            "ya2fgkz3nks94",
+                            "qzdjx70tn762j",
+                            "DuckDuckGo",
+                            "8wekyb3d8bbwe"
+                        ],
                         "DenyList": [],
-                        "LogLevelExceptions": [1, 2, 3, 4, 5]
+                        "LogLevelExceptions": [
+                            1,
+                            2,
+                            3,
+                            4,
+                            5
+                        ]
                     }
                 },
                 "processStatusTracking": {
@@ -5481,7 +5584,9 @@
                 "sendIncidentCrashReports": {
                     "state": "disabled",
                     "settings": {
-                        "ExceptionTypes": ["FaultedException"]
+                        "ExceptionTypes": [
+                            "FaultedException"
+                        ]
                     }
                 },
                 "sendCrcidWithSentry": {
@@ -5640,7 +5745,13 @@
         "urlPredictor": {
             "state": "enabled",
             "settings": {
-                "allowedSchemes": ["http", "https", "file", "mailto", "duck"]
+                "allowedSchemes": [
+                    "http",
+                    "https",
+                    "file",
+                    "mailto",
+                    "duck"
+                ]
             }
         },
         "settingsPage": {
@@ -5716,7 +5827,9 @@
                 "sendOriginParam": {
                     "state": "enabled",
                     "settings": {
-                        "originCampaignSubstrings": ["paid"]
+                        "originCampaignSubstrings": [
+                            "paid"
+                        ]
                     }
                 }
             }
@@ -5729,7 +5842,9 @@
                         "rules": [
                             {
                                 "rule": "privacy-test-pages.site/privacy-protections/request-blocklist/*?block=true",
-                                "domains": ["privacy-test-pages.site"],
+                                "domains": [
+                                    "privacy-test-pages.site"
+                                ],
                                 "reason": "Testing rule for the privacy test page, see https://privacy-test-pages.site/privacy-protections/request-blocklist/"
                             }
                         ]
@@ -5738,7 +5853,9 @@
                         "rules": [
                             {
                                 "rule": "third-party.site/privacy-protections/request-blocklist/*?block=true",
-                                "domains": ["privacy-test-pages.site"],
+                                "domains": [
+                                    "privacy-test-pages.site"
+                                ],
                                 "reason": "Testing rule for the privacy test page, see https://privacy-test-pages.site/privacy-protections/request-blocklist/"
                             }
                         ]
@@ -5747,7 +5864,9 @@
                         "rules": [
                             {
                                 "rule": "protechts.net",
-                                "domains": ["linkedin.com"],
+                                "domains": [
+                                    "linkedin.com"
+                                ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5218"
                             }
                         ]
@@ -5756,7 +5875,9 @@
                         "rules": [
                             {
                                 "rule": "config-factory.com",
-                                "domains": ["<all>"],
+                                "domains": [
+                                    "<all>"
+                                ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5644"
                             }
                         ]
@@ -5765,7 +5886,9 @@
                         "rules": [
                             {
                                 "rule": "content-settings.com",
-                                "domains": ["<all>"],
+                                "domains": [
+                                    "<all>"
+                                ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5644"
                             }
                         ]
@@ -5774,7 +5897,9 @@
                         "rules": [
                             {
                                 "rule": "site-config.com",
-                                "domains": ["<all>"],
+                                "domains": [
+                                    "<all>"
+                                ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5644"
                             }
                         ]
@@ -6483,16 +6608,25 @@
                         "cloudflareTurnstile": {
                             "state": "enabled",
                             "vendor": "cloudflare",
-                            "selectors": [".cf-turnstile", "script[src*=\"challenges.cloudflare.com\"]"],
-                            "windowProperties": ["turnstile"],
+                            "selectors": [
+                                ".cf-turnstile",
+                                "script[src*=\"challenges.cloudflare.com\"]"
+                            ],
+                            "windowProperties": [
+                                "turnstile"
+                            ],
                             "statusSelectors": [
                                 {
                                     "status": "solved",
-                                    "selectors": ["[data-state=\"success\"]"]
+                                    "selectors": [
+                                        "[data-state=\"success\"]"
+                                    ]
                                 },
                                 {
                                     "status": "failed",
-                                    "selectors": ["[data-state=\"error\"]"]
+                                    "selectors": [
+                                        "[data-state=\"error\"]"
+                                    ]
                                 }
                             ]
                         },
@@ -6505,7 +6639,11 @@
                                 "#cf-wrapper",
                                 "script[src*=\"challenges.cloudflare.com\"]"
                             ],
-                            "windowProperties": ["_cf_chl_opt", "__CF$cv$params", "cfjsd"]
+                            "windowProperties": [
+                                "_cf_chl_opt",
+                                "__CF$cv$params",
+                                "cfjsd"
+                            ]
                         },
                         "hcaptcha": {
                             "state": "enabled",
@@ -6516,30 +6654,53 @@
                                 "script[src*=\"hcaptcha.com\"]",
                                 "script[src*=\"assets.hcaptcha.com\"]"
                             ],
-                            "windowProperties": ["hcaptcha"]
+                            "windowProperties": [
+                                "hcaptcha"
+                            ]
                         }
                     },
                     "fraudDetection": {
                         "phishingWarning": {
                             "state": "enabled",
                             "type": "phishing",
-                            "selectors": [".warning-banner", "#security-alert"],
-                            "textPatterns": ["suspicious.*activity", "unusual.*login", "verify.*account"],
-                            "textSources": ["innerText"]
+                            "selectors": [
+                                ".warning-banner",
+                                "#security-alert"
+                            ],
+                            "textPatterns": [
+                                "suspicious.*activity",
+                                "unusual.*login",
+                                "verify.*account"
+                            ],
+                            "textSources": [
+                                "innerText"
+                            ]
                         },
                         "accountSuspension": {
                             "state": "enabled",
                             "type": "suspension",
-                            "selectors": [".account-suspended", "#suspension-notice"],
-                            "textPatterns": ["account.*suspended", "access.*restricted"],
-                            "textSources": ["innerText"]
+                            "selectors": [
+                                ".account-suspended",
+                                "#suspension-notice"
+                            ],
+                            "textPatterns": [
+                                "account.*suspended",
+                                "access.*restricted"
+                            ],
+                            "textSources": [
+                                "innerText"
+                            ]
                         }
                     },
                     "youtubeAds": {
                         "state": "enabled",
                         "sweepIntervalMs": 2000,
                         "slowLoadThresholdMs": 15000,
-                        "playerSelectors": ["#movie_player", ".html5-video-player", "#player"],
+                        "playerSelectors": [
+                            "#movie_player",
+                            ".html5-video-player",
+                            "#player"
+                        ],
                         "adClasses": [
                             "ytp-ad-text",
                             "ytp-ad-skip-button",
@@ -6551,7 +6712,12 @@
                             "ad-showing",
                             "ad-interrupting"
                         ],
-                        "adTextPatterns": ["\\badvertisement\\b", "\\bskip ad\\b", "\\bskip ads\\b", "^ad\\s*[•:·]"],
+                        "adTextPatterns": [
+                            "\\badvertisement\\b",
+                            "\\bskip ad\\b",
+                            "\\bskip ads\\b",
+                            "^ad\\s*[•:·]"
+                        ],
                         "staticAdSelectors": {
                             "background": ".player-container-background",
                             "thumbnail": ".player-container-background-image, .player-container-background ytd-thumbnail",

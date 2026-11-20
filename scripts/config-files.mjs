@@ -10,6 +10,7 @@ import { fileURLToPath } from 'url';
 import { promisify } from 'util';
 import { applyEdits, modify } from 'jsonc-parser';
 import { CURRENT_CONFIG_VERSION } from '../constants.js';
+import { formatJson, isFormattedJsonFile } from './format-json.mjs';
 import { parseJsonc } from './set-jsonc-path.mjs';
 
 /**
@@ -132,9 +133,8 @@ export function readRepoFile(file) {
  */
 export async function writeFormatted(file, text) {
     const filepath = resolve(ROOT, file);
-    writeFileSync(filepath, text);
-    // The CLI applies .oxfmtrc.json, so files it ignores, such as the generated autoconsent.json, keep their layout.
-    await promisify(execFile)(resolve(ROOT, 'node_modules/.bin/oxfmt'), ['--no-error-on-unmatched-pattern', filepath], { cwd: ROOT });
+    // Files that format-json.mjs skips, such as the generated autoconsent.json, keep their layout.
+    writeFileSync(filepath, isFormattedJsonFile(file) ? await formatJson(filepath, text) : text);
 }
 
 /**

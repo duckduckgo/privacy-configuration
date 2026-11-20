@@ -11,16 +11,25 @@
                 "cloudflareTurnstile": {
                     "state": "enabled",
                     "vendor": "cloudflare",
-                    "selectors": [".cf-turnstile", "script[src*=\"challenges.cloudflare.com\"]"],
-                    "windowProperties": ["turnstile"],
+                    "selectors": [
+                        ".cf-turnstile",
+                        "script[src*=\"challenges.cloudflare.com\"]"
+                    ],
+                    "windowProperties": [
+                        "turnstile"
+                    ],
                     "statusSelectors": [
                         {
                             "status": "solved",
-                            "selectors": ["[data-state=\"success\"]"]
+                            "selectors": [
+                                "[data-state=\"success\"]"
+                            ]
                         },
                         {
                             "status": "failed",
-                            "selectors": ["[data-state=\"error\"]"]
+                            "selectors": [
+                                "[data-state=\"error\"]"
+                            ]
                         }
                     ]
                 },
@@ -33,7 +42,11 @@
                         "#cf-wrapper",
                         "script[src*=\"challenges.cloudflare.com\"]"
                     ],
-                    "windowProperties": ["_cf_chl_opt", "__CF$cv$params", "cfjsd"]
+                    "windowProperties": [
+                        "_cf_chl_opt",
+                        "__CF$cv$params",
+                        "cfjsd"
+                    ]
                 },
                 "hcaptcha": {
                     "state": "enabled",
@@ -44,23 +57,42 @@
                         "script[src*=\"hcaptcha.com\"]",
                         "script[src*=\"assets.hcaptcha.com\"]"
                     ],
-                    "windowProperties": ["hcaptcha"]
+                    "windowProperties": [
+                        "hcaptcha"
+                    ]
                 }
             },
             "fraudDetection": {
                 "phishingWarning": {
                     "state": "enabled",
                     "type": "phishing",
-                    "selectors": [".warning-banner", "#security-alert"],
-                    "textPatterns": ["suspicious.*activity", "unusual.*login", "verify.*account"],
-                    "textSources": ["innerText"]
+                    "selectors": [
+                        ".warning-banner",
+                        "#security-alert"
+                    ],
+                    "textPatterns": [
+                        "suspicious.*activity",
+                        "unusual.*login",
+                        "verify.*account"
+                    ],
+                    "textSources": [
+                        "innerText"
+                    ]
                 },
                 "accountSuspension": {
                     "state": "enabled",
                     "type": "suspension",
-                    "selectors": [".account-suspended", "#suspension-notice"],
-                    "textPatterns": ["account.*suspended", "access.*restricted"],
-                    "textSources": ["innerText"]
+                    "selectors": [
+                        ".account-suspended",
+                        "#suspension-notice"
+                    ],
+                    "textPatterns": [
+                        "account.*suspended",
+                        "access.*restricted"
+                    ],
+                    "textSources": [
+                        "innerText"
+                    ]
                 }
             }
         }

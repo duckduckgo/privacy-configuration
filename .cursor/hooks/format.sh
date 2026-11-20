@@ -53,7 +53,11 @@ fi
 
 if ! (
     cd "$repo_root"
-    npx --no-install oxfmt --no-error-on-unmatched-pattern "$format_target"
+    if [[ "$format_target" == *.json ]]; then
+        node scripts/format-json.mjs "$format_target"
+    else
+        npx --no-install oxfmt --no-error-on-unmatched-pattern "$format_target"
+    fi
 ) >/dev/null 2>&1; then
     exit 0
 fi

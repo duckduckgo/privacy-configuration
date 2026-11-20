@@ -8,14 +8,14 @@
     "test": "npm run build && npm run unit-tests && npm run check-revoked-bundle-signing-keys && npm run lint && npm run tsc",
     "check-lockfile": "node scripts/check-lockfile.mjs",
     "check-revoked-bundle-signing-keys": "node scripts/check-revoked-bundle-signing-keys.mjs",
-    "lint": "npm run check-lockfile && eslint . && oxfmt --check",
-    "lint-fix": "npm run check-lockfile && eslint . --fix && oxfmt",
+    "lint": "npm run check-lockfile && eslint . && oxfmt --check && node scripts/format-json.mjs --check",
+    "lint-fix": "npm run check-lockfile && eslint . --fix && oxfmt && node scripts/format-json.mjs",
     "tsc": "tsc && tsc -p tests/web-detection",
     "tsc-watch": "tsc --watch",
     "unit-tests": "mocha './tests/**/*.js'",
     "build": "node index.js",
     "build:debug": "node index.js --debug",
-    "format": "oxfmt"
+    "format": "oxfmt && node scripts/format-json.mjs"
   },
   "author": "DuckDuckGo",
   "license": "Apache 2.0",
