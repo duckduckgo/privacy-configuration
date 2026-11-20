@@ -25,7 +25,7 @@
  * under a `none` anywhere above, in a condition or a predicate: `where` clears `underNone` for its own
  * comparisons, and keeps `noneAbove`. `spreadOf` is set on an operand of `sum`, `mul`, `any`, `all` or
  * `none` checked in spread position: the position an operand that is not spread takes there, which an
- * `if` branch giving no list takes.
+ * `if` branch giving no list, and an entry of an `iter` there, take.
  */
 
 /**

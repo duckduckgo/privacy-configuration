@@ -136,6 +136,24 @@ export function refsIn(node, found = new Set()) {
 }
 
 /**
+ * Every run name a `define` binds in an expression or body: names without `this.`.
+ *
+ * @param {unknown} node
+ * @param {Set<string>} [found]
+ * @returns {Set<string>}
+ */
+export function runNamesDefinedIn(node, found = new Set()) {
+    if (Array.isArray(node)) node.forEach((entry) => runNamesDefinedIn(entry, found));
+    else if (isPlainObject(node)) {
+        if (isPlainObject(node.define)) {
+            for (const name of Object.keys(node.define)) if (!name.startsWith('this.')) found.add(name);
+        }
+        Object.values(node).forEach((value) => runNamesDefinedIn(value, found));
+    }
+    return found;
+}
+
+/**
  * Whether a body holds a `define` of the name.
  *
  * @param {unknown} node
