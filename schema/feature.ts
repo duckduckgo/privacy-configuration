@@ -57,7 +57,7 @@ export type Feature<
     maxSupportedVersion?: VersionType;
 };
 
-type ConditionBlock = {
+export type ConditionBlock = {
     domain?: string;
     urlPattern?: string;
     experiment?: {

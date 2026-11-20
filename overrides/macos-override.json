@@ -246,7 +246,7 @@
                     ]
                 },
                 "contentScopeExperiment8": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": "1.204.0",
                     "description": "Page issue detection: auto-run + fireEvent for the new block page, error page, geoblock, verification, blank page, captcha and adwall detectors, with retuned adwall and video intervals",
                     "rollout": {
@@ -294,6 +294,132 @@
                             "weight": 1
                         }
                     ]
+                },
+                "contentScopeExperiment11": {
+                    "state": "enabled",
+                    "description": "Page load detectors: treatment also runs the first batch of slow, broken and empty page detectors (webDetection); control runs the live detectors",
+                    "minSupportedVersion": "1.216.0",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 25
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ],
+                    "settings": {
+                        // prettier-ignore
+                        "metrics": {
+                            "adwall": {"event": "adwall", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "admiralAdwall": {"event": "admiralAdwall", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "adwall_vendor": {"event": "adwall_vendor", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "captcha_recaptcha": {"event": "captcha_recaptcha", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "captcha_hcaptcha": {"event": "captcha_hcaptcha", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "captcha_turnstile": {"event": "captcha_turnstile", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "captcha_cloudflare": {"event": "captcha_cloudflare", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "captcha_datadome": {"event": "captcha_datadome", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "captcha_imperva": {"event": "captcha_imperva", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "captcha_arkose": {"event": "captcha_arkose", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "captcha_geetest": {"event": "captcha_geetest", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "captcha_awswaf": {"event": "captcha_awswaf", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "captcha_perimeterx": {"event": "captcha_perimeterx", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "captcha_other": {"event": "captcha_other", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "challenge_cloudflare": {"event": "challenge_cloudflare", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "challenge_generic": {"event": "challenge_generic", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "blockPage_cloudflare": {"event": "blockPage_cloudflare", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "blockPage_generic": {"event": "blockPage_generic", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "blockPage_vendor": {"event": "blockPage_vendor", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "blockPage_verificationfailed": {"event": "blockPage_verificationfailed", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "blockPage_vercel": {"event": "blockPage_vercel", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "blockPage_forbidden": {"event": "blockPage_forbidden", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "blockPage_toomanyrequests": {"event": "blockPage_toomanyrequests", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "blockPage_networksecurity": {"event": "blockPage_networksecurity", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "blockPage_title": {"event": "blockPage_title", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "errorPage_soft404": {"event": "errorPage_soft404", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "errorPage_unavailable": {"event": "errorPage_unavailable", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "geoblock": {"event": "geoblock", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "blankPage_empty": {"event": "blankPage_empty", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "login_error": {"event": "login_error", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "login_cookies": {"event": "login_cookies", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]},
+                            "login_browser": {"event": "login_browser", "conversions": [
+                                {"windows": [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 11], [12, 15]], "thresholds": [1, 2, 4, 8, 15, 21, 40]}
+                            ]}
+                        }
+                    }
                 }
             }
         },
@@ -391,6 +517,9 @@
                     "angbnfjncjhdkahaldoipdnholpgogph"
                 ],
                 "disabledExtensionIds": [],
+                "appStoreHiddenExtensionIds": [
+                    "pejdijmoenmkgeppbflobdenhhabjlaj"
+                ],
                 "specialBehavior": {
                     "nngceckbapebfimnlniiiahkandclblb": {
                         "overridesInternalAutofill": true
@@ -515,6 +644,32 @@
                         "cwsUri": "https://chromewebstore.google.com/detail/lastpass-free-password-ma/hdokiejnpimakedhajhdlcegeplioahd",
                         "categoryId": "password-manager",
                         "order": 3
+                    }
+                },
+                "iCloudPasswords": {
+                    "state": "internal",
+                    "settings": {
+                        "id": "pejdijmoenmkgeppbflobdenhhabjlaj",
+                        "name": "iCloud Passwords",
+                        "publisher": "Apple Inc.",
+                        "publisherUri": "https://www.apple.com/",
+                        "iconUri": "https://staticcdn.duckduckgo.com/d5c04536-5379-4709-8d19-d13fdd456ff6/extensions/icloudpasswords-80.png",
+                        "cwsUri": "https://chromewebstore.google.com/detail/icloud-passwords/pejdijmoenmkgeppbflobdenhhabjlaj",
+                        "categoryId": "password-manager",
+                        "order": 4
+                    }
+                },
+                "darkReader": {
+                    "state": "internal",
+                    "settings": {
+                        "id": "eimadpbcbfnmbkopoojfekhnkhdbieeh",
+                        "name": "[Testing] Dark Reader",
+                        "publisher": "Dark Reader Ltd",
+                        "publisherUri": "https://darkreader.org/",
+                        "iconUri": "https://staticcdn.duckduckgo.com/d5c04536-5379-4709-8d19-d13fdd456ff6/extensions/darkreader-80.png",
+                        "cwsUri": "https://chromewebstore.google.com/detail/dark-reader/eimadpbcbfnmbkopoojfekhnkhdbieeh",
+                        "categoryId": "accessibility",
+                        "order": 5
                     }
                 }
             }
@@ -692,6 +847,10 @@
                     "state": "enabled",
                     "minSupportedVersion": "1.187.0"
                 },
+                "homepageChatSuggestions": {
+                    "state": "enabled",
+                    "minSupportedVersion": "1.212.0"
+                },
                 "sidebar": {
                     "state": "enabled",
                     "minSupportedVersion": "1.148.0"
@@ -753,6 +912,13 @@
                     "state": "enabled",
                     "minSupportedVersion": "1.186.0"
                 },
+                "ntpSuggestedPrompts": {
+                    "state": "enabled",
+                    "minSupportedVersion": "1.215.0",
+                    "settings": {
+                        "promptLimit": 5
+                    }
+                },
                 "omnibarWebSearch": {
                     "state": "enabled",
                     "minSupportedVersion": "1.188.0"
@@ -769,6 +935,11 @@
                 "nativeTermsOfService": {
                     "state": "enabled",
                     "description": "Duck.ai Terms of Service disclaimer in the native input, where sending accepts them",
+                    "minSupportedVersion": "1.212.0"
+                },
+                "launcherPromo": {
+                    "state": "enabled",
+                    "description": "Promo in the Duck.ai omnibar suggesting the Prompt Bar shortcut and menu bar icon to users with 3+ chats",
                     "minSupportedVersion": "1.212.0"
                 }
             },
@@ -889,13 +1060,37 @@
                     "state": "enabled",
                     "minSupportedVersion": "1.171.0"
                 },
-                "webViewUserAgent": {
+                "customWebViewUserAgent": {
                     "state": "enabled",
-                    "minSupportedVersion": "1.182.0"
+                    "minSupportedVersion": "1.215.0"
                 },
                 "optOutRetryError96Hours": {
                     "state": "enabled",
                     "minSupportedVersion": "1.196.0"
+                },
+                "challengeSolver": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 20
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "enabledBrokers": [
+                            "clustal.org",
+                            "usa-people-search.com",
+                            "fastbackgroundcheck.com",
+                            "truepeoplesearch.com"
+                        ],
+                        "autoPassWaitSeconds": 5,
+                        "checkboxOffsetPoints": 20,
+                        "labelText": "Verify you are human"
+                    }
                 }
             },
             "minSupportedVersion": "1.70.0"
@@ -1112,6 +1307,30 @@
                             "weight": 1
                         }
                     ]
+                },
+                "tdsNextExperiment017": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 25
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "v6/experiments/202611v1-macos-tds-control.json",
+                        "treatmentUrl": "v6/experiments/202611v1-macos-tds-treatment.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
                 }
             }
         },
@@ -1142,7 +1361,8 @@
                     "state": "enabled",
                     "minSupportedVersion": "1.128.0",
                     "settings": {
-                        "signInRequiredSelector": "[href*=\"//support.google.com/youtube/answer/3037019\"]"
+                        "signInRequiredSelector": "[href*=\"//support.google.com/youtube/answer/3037019\"]",
+                        "youtubeErrorSelector": ".ytp-error, yt-player-interstitial-renderer"
                     }
                 },
                 "nativeUI": {
@@ -1270,33 +1490,6 @@
                 ]
             }
         },
-        "apiManipulation": {
-            "state": "enabled",
-            "exceptions": [],
-            "settings": {
-                "apiChanges": {},
-                "domains": [
-                    {
-                        // https://github.com/duckduckgo/privacy-configuration/pull/5863
-                        "domain": "luna.amazon.com",
-                        "patchSettings": [
-                            {
-                                "op": "add",
-                                "path": "/apiChanges/CefSharp",
-                                "value": {
-                                    "type": "descriptor",
-                                    "value": {
-                                        "type": "object",
-                                        "value": {}
-                                    },
-                                    "define": true
-                                }
-                            }
-                        ]
-                    }
-                ]
-            }
-        },
         "autoconsent": {
             "state": "enabled",
             "exceptions": [
@@ -1311,6 +1504,9 @@
             ],
             "features": {
                 "filterlist": {
+                    "state": "disabled"
+                },
+                "popupMutationObserver": {
                     "state": "disabled"
                 },
                 "heuristicAction": {
@@ -2265,6 +2461,18 @@
                     {
                         "domain": "spotify.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5910"
+                    },
+                    {
+                        "domain": "hsbcpremierlifestyle.tenconcierge.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/6099"
+                    },
+                    {
+                        "domain": "calendar.yahoo.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/6315"
+                    },
+                    {
+                        "domain": "ml.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/6445"
                     }
                 ],
                 "webViewDefault": [
@@ -2304,6 +2512,10 @@
                 },
                 "exchangeKeysToSyncWithAnotherDevice": {
                     "state": "enabled"
+                },
+                "canUseExchangeV2Point1": {
+                    "state": "enabled",
+                    "minSupportedVersion": "1.212.0"
                 },
                 "syncSetupBarcodeIsUrlBased": {
                     "state": "enabled"
@@ -3109,6 +3321,29 @@
                 "hangReporting": {
                     "state": "disabled"
                 },
+                "pageSignals": {
+                    "state": "enabled",
+                    "minSupportedVersion": "1.213.0",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 20
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    }
+                },
                 "unifiedURLPredictor": {
                     "state": "enabled",
                     "minSupportedVersion": "1.162.0"
@@ -3142,6 +3377,10 @@
                 "automaticUpdatesOnly": {
                     "state": "enabled",
                     "minSupportedVersion": "1.183.0"
+                },
+                "moreProminentUpdates": {
+                    "state": "enabled",
+                    "minSupportedVersion": "1.219.0"
                 },
                 "semaphoreAlwaysVisible": {
                     "state": "enabled"
@@ -3225,11 +3464,11 @@
                     "cohorts": [
                         {
                             "name": "control",
-                            "weight": 1
+                            "weight": 0
                         },
                         {
                             "name": "treatment",
-                            "weight": 1
+                            "weight": 0
                         }
                     ]
                 },
@@ -3238,17 +3477,13 @@
                     "minSupportedVersion": "1.202.0",
                     "cohorts": [
                         {
-                            "name": "control",
-                            "weight": 1
-                        },
-                        {
                             "name": "treatment",
                             "weight": 1
                         }
                     ]
                 },
                 "newTabPageRebranding": {
-                    "state": "internal",
+                    "state": "enabled",
                     "minSupportedVersion": "1.203.0"
                 }
             }
@@ -3627,6 +3862,14 @@
                 "embedded": {
                     "state": "enabled",
                     "minSupportedVersion": "1.183.0"
+                },
+                "cpmDiagnosticsRecorder": {
+                    "state": "enabled",
+                    "minSupportedVersion": "1.213.0"
+                },
+                "cpmStableBaseURL": {
+                    "state": "enabled",
+                    "minSupportedVersion": "1.214.0"
                 }
             }
         },
@@ -3654,7 +3897,19 @@
                 }
             }
         },
+        "sponsorBlock": {
+            "state": "internal",
+            "minSupportedVersion": "1.216.0",
+            "features": {
+                "mvpEnabled": {
+                    "state": "internal"
+                }
+            }
+        },
         "detectorPerf": {
+            "state": "enabled"
+        },
+        "trackerProtection": {
             "state": "enabled"
         },
         "webDetection": {
@@ -3793,6 +4048,62 @@
                                 "template": "data",
                                 "source": "youtube_buffering",
                                 "dataKey": "loginState"
+                            }
+                        }
+                    },
+                    "autoconsent_cpmCoverage_day": {
+                        "state": "enabled",
+                        "trigger": {
+                            "period": {
+                                "days": 1
+                            }
+                        },
+                        "parameters": {
+                            "unhandled": {
+                                "template": "counter",
+                                "source": "autoconsent_unhandled",
+                                "buckets": {
+                                    "1-2": { "gte": 1, "lt": 3 },
+                                    "3-5": { "gte": 3, "lt": 6 },
+                                    "6-10": { "gte": 6, "lt": 11 },
+                                    "11-30": { "gte": 11, "lt": 31 },
+                                    "31+": { "gte": 31 }
+                                }
+                            },
+                            "unhandled_top10k": {
+                                "template": "counter",
+                                "source": "autoconsent_unhandled_top10k",
+                                "buckets": {
+                                    "1-2": { "gte": 1, "lt": 3 },
+                                    "3-5": { "gte": 3, "lt": 6 },
+                                    "6-10": { "gte": 6, "lt": 11 },
+                                    "11-30": { "gte": 11, "lt": 31 },
+                                    "31+": { "gte": 31 }
+                                }
+                            },
+                            "pages": {
+                                "template": "counter",
+                                "source": "autoconsent_pages",
+                                "buckets": {
+                                    "1-9": { "gte": 1, "lt": 10 },
+                                    "10-24": { "gte": 10, "lt": 25 },
+                                    "25-49": { "gte": 25, "lt": 50 },
+                                    "50-99": { "gte": 50, "lt": 100 },
+                                    "100-199": { "gte": 100, "lt": 200 },
+                                    "200+": { "gte": 200 }
+                                }
+                            },
+                            "pages_top10k": {
+                                "template": "counter",
+                                "source": "autoconsent_pages_top10k",
+                                "buckets": {
+                                    "1-9": { "gte": 1, "lt": 10 },
+                                    "10-24": { "gte": 10, "lt": 25 },
+                                    "25-49": { "gte": 25, "lt": 50 },
+                                    "50-99": { "gte": 50, "lt": 100 },
+                                    "100-199": { "gte": 100, "lt": 200 },
+                                    "200+": { "gte": 200 }
+                                }
                             }
                         }
                     },

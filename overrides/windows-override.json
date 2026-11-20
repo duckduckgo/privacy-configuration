@@ -1314,7 +1314,13 @@
                     "minSupportedVersion": "0.130.0"
                 },
                 "launcherPromo": {
-                    "state": "disabled"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.179.0",
+                    "rollout": {
+                        "steps": [
+                            { "percent": 10 }
+                        ]
+                    }
                 },
                 "omnibarAiChat": {
                     "state": "enabled",
@@ -1324,8 +1330,18 @@
                     "minSupportedVersion": "0.136.4",
                     "state": "enabled"
                 },
-                "pdfPageContext": {
+                "askAboutLinkedPage": {
+                    "state": "disabled"
+                },
+                "askAboutSerpPage": {
+                    "state": "disabled"
+                },
+                "pasteText": {
                     "state": "internal"
+                },
+                "pdfPageContext": {
+                    "minSupportedVersion": "0.175.0",
+                    "state": "enabled"
                 },
                 "multiplePageContexts": {
                     "state": "enabled",
@@ -1437,6 +1453,10 @@
                         ]
                     }
                 },
+                "homepageChatSuggestions": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.176.0"
+                },
                 "aiFeaturesNativeControls": {
                     "state": "enabled",
                     "minSupportedVersion": "0.166.0"
@@ -1505,6 +1525,9 @@
                     "state": "enabled",
                     "minSupportedVersion": "0.175.0"
                 },
+                "limitBonusOffer": {
+                    "state": "internal"
+                },
                 "attachmentPrivacyDisclosure": {
                     "state": "enabled",
                     "minSupportedVersion": "0.177.0"
@@ -1524,6 +1547,24 @@
                 "ntpPasteImages": {
                     "state": "enabled",
                     "minSupportedVersion": "0.176.0"
+                },
+                "ntpSuggestedPrompts": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.180.0",
+                    "settings": {
+                        "promptLimit": 5
+                    }
+                },
+                "ntpPastedText": {
+                    "state": "internal",
+                    "description": "Turns long pastes in the New Tab Page omnibar into pasted-text attachments"
+                },
+                "localModels": {
+                    "state": "disabled"
+                },
+                "selectionTools": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.181.0"
                 }
             },
             "minSupportedVersion": "0.100.0",
@@ -2344,6 +2385,10 @@
                 "bookmarkAllOpenTabs": {
                     "state": "enabled",
                     "minSupportedVersion": "0.160.0"
+                },
+                "sortByNamePermanentlyOption": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.182.0"
                 }
             }
         },
@@ -2352,6 +2397,9 @@
             "minSupportedVersion": "0.99.0",
             "features": {
                 "filterlist": {
+                    "state": "disabled"
+                },
+                "popupMutationObserver": {
                     "state": "disabled"
                 },
                 "heuristicAction": {
@@ -2456,7 +2504,8 @@
                     "state": "enabled"
                 },
                 "openInNewTab": {
-                    "state": "disabled"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.179.0"
                 },
                 "overlayExperiment": {
                     "state": "disabled"
@@ -2464,11 +2513,16 @@
                 "customError": {
                     "state": "enabled",
                     "settings": {
-                        "signInRequiredSelector": "[href*=\"//support.google.com/youtube/answer/3037019\"]"
+                        "signInRequiredSelector": "[href*=\"//support.google.com/youtube/answer/3037019\"]",
+                        "youtubeErrorSelector": ".ytp-error, yt-player-interstitial-renderer"
                     }
                 },
                 "nativeUI": {
                     "state": "disabled"
+                },
+                "topLevelSettings": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.179.0"
                 }
             }
         },
@@ -4294,6 +4348,10 @@
                     "state": "enabled",
                     "minSupportedVersion": "0.177.0"
                 },
+                "syncImprovedPairingFlow": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.182.0"
+                },
                 "loginAuditLog": {
                     "state": "internal"
                 },
@@ -4603,7 +4661,8 @@
             "state": "enabled",
             "exceptions": [],
             "settings": {
-                "addToEnableFeatures": "ForceWebRequestProxyForTest"
+                "addToEnableFeatures": "ForceWebRequestProxyForTest",
+                "addToDisableFeatures": "CameraAndMicrophoneElements"
             }
         },
         "uaChBrands": {
@@ -4906,7 +4965,7 @@
                     "minSupportedVersion": "0.162.1",
                     "settings": {
                         "probability": 10,
-                        "generation": 5,
+                        "generation": 6,
                         "showInSuspendedState": false
                     }
                 },
@@ -5038,11 +5097,15 @@
                 },
                 "browserLaunchAttempts": {
                     "state": "enabled",
-                    "settings": { "attemptCount": 5 }
+                    "settings": { "attemptCount": 6 }
                 },
                 "setTabTitleEarly": {
                     "state": "enabled",
                     "minSupportedVersion": "0.170.0"
+                },
+                "concurrentInitialization": {
+                    "state": "enabled",
+                    "minSupportedVersion": "0.181.0"
                 }
             },
             "exceptions": []
@@ -5096,7 +5159,8 @@
                     "minSupportedVersion": "0.143.3"
                 },
                 "newTabPageRebranding": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": "0.178.0"
                 }
             },
             "minSupportedVersion": "0.100.0"
@@ -5233,7 +5297,7 @@
             "minSupportedVersion": "0.148.0",
             "exceptions": [],
             "settings": {
-                "extensionUrl": "https://staticcdn.duckduckgo.com/extensions/content-blocker/content-blocker-extension-2026.10.19.crx"
+                "extensionUrl": "https://staticcdn.duckduckgo.com/extensions/content-blocker/content-blocker-extension-2026.11.17.crx"
             },
             "features": {
                 "onboardingEnabled": {
@@ -5344,7 +5408,6 @@
                 "inContextInstructionsExperiment": {
                     "state": "enabled",
                     "cohorts": [
-                        { "name": "control", "weight": 1 },
                         { "name": "instructions", "weight": 1 }
                     ]
                 }
@@ -5990,7 +6053,8 @@
                     }
                 },
                 "lastPass": {
-                    "state": "preview",
+                    "state": "enabled",
+                    "minSupportedVersion": "0.176.0",
                     "settings": {
                         "id": "hdokiejnpimakedhajhdlcegeplioahd",
                         "name": "LastPass: Free Password Manager",
@@ -6724,7 +6788,7 @@
                 },
                 "improvedInstantSuggestions": {
                     "state": "internal",
-                    "minSupportedVersion": "0.177.0"
+                    "minSupportedVersion": "0.180.0"
                 },
                 "addressBarOverlay": {
                     "minSupportedVersion": "0.164.0",
@@ -6848,7 +6912,8 @@
             }
         },
         "architectureX86Deprecation": {
-            "state": "internal",
+            "state": "enabled",
+            "minSupportedVersion": "0.170.0",
             "exceptions": []
         },
         "secureStorageDapper": {
@@ -6938,52 +7003,19 @@
                 }
             }
         },
-        "duplicateTabNavigationHistory": {
-            "state": "internal",
-            "exceptions": []
-        },
-        "forkTabNavigationHistory": {
-            "state": "internal",
-            "exceptions": []
-        },
-        "sessionRestoreNavigationHistory": {
-            "state": "internal",
-            "exceptions": []
-        },
         "tabNavigationHistory": {
             "state": "enabled",
             "exceptions": [],
             "readme": "Parent for the Windows browser tab navigation-history behaviours; each sub-feature rolls out independently.",
             "features": {
                 "duplicateTab": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "forkTab": {
-                    "state": "internal"
+                    "state": "enabled"
                 },
                 "sessionRestore": {
                     "state": "internal"
-                }
-            }
-        },
-        "sessionRestorePrompt": {
-            "state": "enabled",
-            "minSupportedVersion": "0.170.7",
-            "exceptions": [],
-            "features": {
-                "sessionRestorePromptExperiment": {
-                    "state": "enabled",
-                    "minSupportedVersion": "0.170.7",
-                    "cohorts": [
-                        {
-                            "name": "control",
-                            "weight": 1
-                        },
-                        {
-                            "name": "promptAfterRestore",
-                            "weight": 0
-                        }
-                    ]
                 }
             }
         },
@@ -6996,6 +7028,37 @@
                     "state": "enabled",
                     "minSupportedVersion": "0.171.2",
                     "cohorts": [
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                }
+            }
+        },
+        "contentScopeExperiments": {
+            "state": "enabled",
+            "exceptions": [],
+            "features": {
+                "contentScopeExperiment11": {
+                    "state": "enabled",
+                    "description": "Page load detectors: treatment also runs the first batch of slow, broken and empty page detectors (webDetection); control runs the live detectors",
+                    "minSupportedVersion": "0.180.0",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 25
+                            }
+                        ]
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
                         {
                             "name": "treatment",
                             "weight": 1

@@ -1,4 +1,4 @@
-import { Feature } from '../feature';
+import { Feature, SubFeature } from '../feature';
 
 /**
  * Lowercase hex SHA-256 of a broker bundle signing public key's SPKI DER bytes.
@@ -18,4 +18,20 @@ type SettingsType = {
     betaEndingDescription?: string;
 };
 
-export type DbpFeature<VersionType> = Feature<SettingsType, VersionType>;
+type SubFeatures<VersionType> = {
+    challengeSolver?: SubFeature<
+        VersionType,
+        {
+            enabledBrokers: string[];
+            autoPassWaitSeconds: number;
+            checkboxOffsetPoints: number;
+            labelText: string;
+        }
+    >;
+};
+
+export type DbpFeature<VersionType> = Feature<
+    SettingsType,
+    VersionType,
+    SubFeatures<VersionType> & Record<string, SubFeature<VersionType>>
+>;

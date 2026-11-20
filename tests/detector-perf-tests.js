@@ -4,6 +4,12 @@ import platforms from '../platforms.js';
 
 const platformOutput = platforms.map((item) => item.replace('browsers/', 'extension-'));
 
+// Generated configs carry `immediate` or, for platforms that parse only that name, `immediate_v2`.
+const IMMEDIATE_TRIGGER_TYPES = [
+    'immediate',
+    'immediate_v2',
+];
+
 const latestConfigs = platformOutput.map((plat) => {
     return {
         name: `v5/${plat}-config.json`,
@@ -96,41 +102,6 @@ function expectedEventTypes(settings, detectorGroups) {
 }
 
 /**
- * Return Web Detection groups containing at least one enabled detector.
- * Detector state defaults to enabled in C-S-S.
- *
- * @param {Record<string, Record<string, any>>} detectors
- * @returns {string[]}
- */
-function enabledDetectorGroups(detectors) {
-    return Object.entries(detectors)
-        .filter(
-            ([
-                ,
-                groupDetectors,
-            ]) => Object.values(groupDetectors).some((detector) => (detector.state ?? 'enabled') === 'enabled'),
-        )
-        .map(
-            ([
-                groupName,
-            ]) => groupName,
-        );
-}
-
-/**
- * Detector groups with hand-written eventHub counters. Other groups (e.g. video,
- * or groups an experiment enables) emit events that nothing consumes, which
- * EventHub ignores, until the counters are generated from the detector config
- * instead of maintained by hand.
- */
-const COUNTED_DETECTOR_GROUPS = new Set([
-    'adwalls',
-    'captcha',
-    'commentsDisabled',
-    'other',
-]);
-
-/**
  * Collect every eventHub source that consumes an event: parameter sources
  * (period counters/data) and immediate trigger sources.
  *
@@ -143,7 +114,7 @@ function collectSources(telemetry) {
         entryName,
         entry,
     ] of Object.entries(telemetry ?? {})) {
-        if (entry.trigger?.type === 'immediate' && entry.trigger.source) {
+        if (IMMEDIATE_TRIGGER_TYPES.includes(entry.trigger?.type) && entry.trigger.source) {
             const entries = sources.get(entry.trigger.source) ?? [];
             entries.push(entryName);
             sources.set(entry.trigger.source, entries);
@@ -167,7 +138,9 @@ describe('detectorPerf config tests', () => {
         sawDetectorPerf = true;
         const settings = detectorPerf.settings;
         const webDetectionDetectors = config.body.features?.webDetection?.settings?.detectors ?? {};
-        const detectorGroups = enabledDetectorGroups(webDetectionDetectors).filter((name) => COUNTED_DETECTOR_GROUPS.has(name));
+        // Every declared group, enabled or not: conditionalChanges and experiments
+        // enable detectors at runtime, after the config is generated.
+        const detectorGroups = Object.keys(webDetectionDetectors);
         // Android's EventHub parser can't take the immediate severe entry (see
         // the android test below), so severe events go unconsumed there and are
         // dropped at runtime. The period counters must still be consumed.
@@ -257,8 +230,8 @@ describe('detectorPerf config tests', () => {
                 entryName,
                 entry,
             ] of Object.entries(telemetry)) {
-                expect(entry.trigger?.type).to.not.equal(
-                    'immediate',
+                expect(entry.trigger?.type).to.not.be.oneOf(
+                    IMMEDIATE_TRIGGER_TYPES,
                     `${config.name}: telemetry entry '${entryName}' uses an immediate trigger, which Android's EventHub parser rejects wholesale`,
                 );
             }

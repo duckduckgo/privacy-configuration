@@ -11,7 +11,18 @@ type DetectorThresholds = {
     totalPerPageThresholdsMs?: number[];
 };
 
-type DetectorPerfGroup = 'adwalls' | 'captcha' | 'commentsDisabled' | 'other';
+type DetectorPerfGroup =
+    | 'adwalls'
+    | 'captcha'
+    | 'commentsDisabled'
+    | 'video'
+    | 'login'
+    | 'other'
+    | 'blockPage'
+    | 'errorPage'
+    | 'geoblocks'
+    | 'verification'
+    | 'blankPage';
 
 type DetectorPerfSettings = CSSInjectFeatureSettings<{
     /** Threshold edges applied to every detector group unless overridden. */
