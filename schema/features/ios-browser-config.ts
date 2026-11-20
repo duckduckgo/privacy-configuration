@@ -1,7 +1,18 @@
 import { Feature, SubFeature } from '../feature';
 
+type OnboardingAIModel = {
+    id: string;
+    provider: string;
+    modelShortName: string;
+};
+
 type SettingsType = {
     promptCooldownInterval?: number;
+    // Fallback AI model list for the onboarding model-picker step when the /models API is unavailable
+    onboardingAIModelsFallback?: {
+        defaultModelId: string;
+        models: OnboardingAIModel[];
+    };
 };
 
 type SubFeatures<VersionType> = {
@@ -12,13 +23,22 @@ type SubFeatures<VersionType> = {
             idleThresholdSeconds: number;
         }
     >;
-    searchTokenExperimentV2?: SubFeature<
+    searchTokenExperimentV4?: SubFeature<
         VersionType,
         {
             // Lifetime of the search token in seconds
             tokenTTLSeconds: number;
             // Time before expiry within which the token is proactively refreshed, in seconds
             refreshWindowSeconds: number;
+        }
+    >;
+    inactivityNotification?: SubFeature<
+        VersionType,
+        {
+            // Number of days of inactivity before a notification is delivered
+            daysInactive: number;
+            // Maximum number of notification interactions before delivery stops
+            maxInteractions: number;
         }
     >;
 };
