@@ -32,6 +32,20 @@ export function isShallowClone() {
 }
 
 /**
+ * Fetch the full history of the remote-tracking branch `ref` names, and only that branch.
+ *
+ * @param {string} ref
+ * @returns {boolean} false when `ref` is not a remote-tracking branch, so its history can't be fetched by name
+ */
+export function fetchFullHistory(ref) {
+    const name = git('rev-parse', '--symbolic-full-name', ref).trim();
+    const match = /^refs\/remotes\/([^/]+)\/(.+)$/.exec(name);
+    if (!match) return false;
+    git('fetch', '--quiet', '--unshallow', match[1], `+refs/heads/${match[2]}:${name}`);
+    return true;
+}
+
+/**
  * Whether a commit reachable from `ref` added or removed the JSON string `"name"` in `paths`. The quotes are
  * part of the search string, so contentScopeExperiment1 does not match contentScopeExperiment10.
  *
