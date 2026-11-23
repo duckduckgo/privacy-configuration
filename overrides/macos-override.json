@@ -1490,6 +1490,33 @@
                 ]
             }
         },
+        "apiManipulation": {
+            "state": "enabled",
+            "exceptions": [],
+            "settings": {
+                "apiChanges": {},
+                "domains": [
+                    {
+                        // https://github.com/duckduckgo/privacy-configuration/pull/6497
+                        "domain": "luna.amazon.com",
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/apiChanges/CefSharp",
+                                "value": {
+                                    "type": "descriptor",
+                                    "value": {
+                                        "type": "object",
+                                        "value": {}
+                                    },
+                                    "define": true
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
         "autoconsent": {
             "state": "enabled",
             "exceptions": [
