@@ -98,7 +98,31 @@ type WaitRecorded =
     | {
           mutation: MutationOptions;
           target: Expr;
+      }
+    | {
+          intersection: IntersectionOptions;
+          target: Expr;
+      }
+    | {
+          resize: ResizeOptions;
+          target: Expr;
       };
+
+/**
+ * @minimum 0
+ * @maximum 1
+ */
+type Ratio = number;
+
+/** The options of `IntersectionObserver`. The root is always the viewport. */
+type IntersectionOptions = {
+    threshold?: Ratio | NonEmptyList<Ratio>;
+};
+
+/** The options of `ResizeObserver.observe()`. */
+type ResizeOptions = {
+    box?: 'content-box' | 'border-box';
+};
 
 export type WaitBody = WaitRecorded &
     ItemKeys & {

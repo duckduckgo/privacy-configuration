@@ -6,6 +6,11 @@ import {
     EVENT_TARGET_ALLOWLIST,
     EVENT_TYPE_ALLOWLIST,
     DETECTOR_EVENT_FIELDS,
+    INTERSECTION_FIELDS,
+    INTERSECTION_OPTION_ALLOWLIST,
+    NEVER_INTERSECTION_OPTIONS,
+    RESIZE_FIELDS,
+    RESIZE_OPTION_ALLOWLIST,
     LIST_CONDITION,
     MUTATION_FIELDS,
     NAME_PATTERN,
@@ -74,10 +79,28 @@ const PLACE_KEYS = {
     ],
     wait: [
         'mutation',
+        'intersection',
+        'resize',
         'where',
         'field',
         'timeoutMs',
     ],
+};
+
+/**
+ * The body keys of `wait` only, each observing its `target` with an observer of its own while the wait
+ * is open: the field table of its items, what its `target` is, and the check on its options.
+ *
+ * @type {Record<string, { fields: Record<string, import('./grammar.js').TypeSpec>, observes: string, options: (options: unknown, ctx: Context, path: string) => void }>}
+ */
+const WAIT_ONLY_KINDS = {
+    mutation: { fields: MUTATION_FIELDS, observes: 'node', options: (options, ctx, path) => checkMutationOptions(options, ctx, path) },
+    intersection: {
+        fields: INTERSECTION_FIELDS,
+        observes: 'element',
+        options: (options, ctx, path) => checkIntersectionOptions(options, ctx, path),
+    },
+    resize: { fields: RESIZE_FIELDS, observes: 'element', options: (options, ctx, path) => checkResizeOptions(options, ctx, path) },
 };
 
 /** The `target` of a `wait` body that isn't a path on EVENT_TARGET_ALLOWLIST: any expression, read as the wait starts. */
@@ -109,7 +132,7 @@ export function sameRecorded(a, b) {
 export function describeRecorded(recorded) {
     if (recorded.kind === 'entryType') return `\`${recorded.type}\` entries`;
     if (recorded.kind === 'event') return `\`${recorded.type}\` events on \`${recorded.target}\``;
-    if (recorded.kind === 'mutation') return 'mutation records';
+    if (Object.hasOwn(WAIT_ONLY_KINDS, recorded.kind)) return `${recorded.kind} entries`;
     if (recorded.kind === 'detectorEvent') return `\`${recorded.type}\` detector events`;
     return `the \`${recorded.kind}\` trigger`;
 }
@@ -120,7 +143,9 @@ export function describeRecorded(recorded) {
  * @param {Recorded} recorded
  */
 function tableOf(recorded) {
-    return RUN_START_KINDS.includes(recorded.kind) || recorded.kind === 'mutation' ? recorded.kind : `${recorded.kind}:${recorded.type}`;
+    return RUN_START_KINDS.includes(recorded.kind) || Object.hasOwn(WAIT_ONLY_KINDS, recorded.kind)
+        ? recorded.kind
+        : `${recorded.kind}:${recorded.type}`;
 }
 
 /**
@@ -131,7 +156,7 @@ function tableOf(recorded) {
  */
 export function recordedTable(table) {
     if (RUN_START_KINDS.includes(table)) return RUN_START_FIELDS;
-    if (table === 'mutation') return MUTATION_FIELDS;
+    if (Object.hasOwn(WAIT_ONLY_KINDS, table)) return WAIT_ONLY_KINDS[table].fields;
     if (table.startsWith('detectorEvent:')) return DETECTOR_EVENT_FIELDS;
     const colon = table.indexOf(':');
     const kind = table.slice(0, colon);
@@ -147,6 +172,7 @@ export function recordedTable(table) {
 export function describeTable(table) {
     if (RUN_START_KINDS.includes(table)) return `\`${table}\` run start`;
     if (table === 'mutation') return 'mutation record';
+    if (Object.hasOwn(WAIT_ONLY_KINDS, table)) return `${table} entry`;
     const colon = table.indexOf(':');
     if (table.startsWith('detectorEvent:')) return `\`${table.slice(colon + 1)}\` detector event`;
     return `\`${table.slice(colon + 1)}\` ${table.startsWith('entryType:') ? 'entry' : 'event'}`;
@@ -203,11 +229,11 @@ export function checkRecordedBody(body, place, ctx, path) {
     for (const key of Object.keys(body)) {
         if (allowed.includes(key)) continue;
         if (key === 'keep') fail(ctx, `${path}.keep`, '`keep` sets the window of an `observed` body only');
-        else if (key === 'mutation')
+        else if (Object.hasOwn(WAIT_ONLY_KINDS, key))
             fail(
                 ctx,
-                `${path}.mutation`,
-                "`mutation` is allowed in `wait` only, whose observer runs only while it's open",
+                `${path}.${key}`,
+                `\`${key}\` is allowed in \`wait\` only, whose observer runs only while it's open`,
                 'recordedTypes',
             );
         else if (key === 'timeoutMs')
@@ -223,11 +249,7 @@ export function checkRecordedBody(body, place, ctx, path) {
     const kinds = [
         ...RECORDED_KINDS,
         ...(place === 'trigger' ? RUN_START_KINDS : []),
-        ...(place === 'wait'
-            ? [
-                  'mutation',
-              ]
-            : []),
+        ...(place === 'wait' ? Object.keys(WAIT_ONLY_KINDS) : []),
     ];
     const named = kinds.filter((key) => key in body);
     if (named.length !== 1) {
@@ -247,12 +269,18 @@ export function checkRecordedBody(body, place, ctx, path) {
         }
         return { kind, type: kind };
     }
-    if (kind === 'mutation') {
-        checkMutationOptions(body.mutation, ctx, `${path}.mutation`);
+    if (Object.hasOwn(WAIT_ONLY_KINDS, kind)) {
+        const { observes, options } = WAIT_ONLY_KINDS[kind];
+        options(body[kind], ctx, `${path}.${kind}`);
         if (!('target' in body))
-            fail(ctx, path, 'a `mutation` body observes the node its `target` gives, so it needs `target`', 'recordedTypes');
+            fail(
+                ctx,
+                path,
+                `${kind === 'intersection' ? 'an' : 'a'} \`${kind}\` body observes the ${observes} its \`target\` gives, so it needs \`target\``,
+                'recordedTypes',
+            );
         if ('durationThreshold' in body)
-            fail(ctx, `${path}.durationThreshold`, '`durationThreshold` goes with `entryType`, not `mutation`');
+            fail(ctx, `${path}.durationThreshold`, `\`durationThreshold\` goes with \`entryType\`, not \`${kind}\``);
         return { kind, type: kind, target: EXPRESSION_TARGET };
     }
     if (kind === 'detectorEvent') return checkDetectorEventName(body, ctx, path);
@@ -397,6 +425,60 @@ function checkMutationOptions(options, ctx, path) {
             path,
             `\`mutation\` needs at least one of ${MUTATION_SELECTING_OPTIONS.map((key) => `\`${key}\``, 'recordedTypes').join(', ')}, or it observes no change`,
         );
+}
+
+/**
+ * The options of an `intersection` body: `threshold`, a number from 0 to 1 or a non-empty list of
+ * them. `{}` observes at threshold 0.
+ *
+ * @param {unknown} options
+ * @param {Context} ctx
+ * @param {string} path
+ */
+function checkIntersectionOptions(options, ctx, path) {
+    if (!isPlainObject(options)) {
+        fail(ctx, path, '`intersection` is an object of `IntersectionObserver` options');
+        return;
+    }
+    /** @param {unknown} value */
+    const isRatio = (value) => typeof value === 'number' && value >= 0 && value <= 1;
+    for (const [
+        key,
+        value,
+    ] of Object.entries(options)) {
+        const keyPath = `${path}.${key}`;
+        if (NEVER_INTERSECTION_OPTIONS.includes(key)) {
+            fail(ctx, keyPath, `"${key}" is never observed, so an intersection is always with the viewport`);
+        } else if (!INTERSECTION_OPTION_ALLOWLIST.includes(key)) {
+            fail(ctx, keyPath, `intersection option "${key}" is not on INTERSECTION_OPTION_ALLOWLIST`);
+        } else if (Array.isArray(value) ? value.length === 0 || !value.every(isRatio) : !isRatio(value)) {
+            fail(ctx, keyPath, '`threshold` is a number from 0 to 1, or a non-empty array of them');
+        }
+    }
+}
+
+/**
+ * The options of a `resize` body: `box`, one of the boxes on the allowlist. `{}` observes the content
+ * box.
+ *
+ * @param {unknown} options
+ * @param {Context} ctx
+ * @param {string} path
+ */
+function checkResizeOptions(options, ctx, path) {
+    if (!isPlainObject(options)) {
+        fail(ctx, path, '`resize` is an object of `ResizeObserver.observe()` options');
+        return;
+    }
+    for (const [
+        key,
+        value,
+    ] of Object.entries(options)) {
+        const allowed = /** @type {Record<string, string[]>} */ (RESIZE_OPTION_ALLOWLIST)[key];
+        if (!allowed) fail(ctx, `${path}.${key}`, `resize option "${key}" is not on RESIZE_OPTION_ALLOWLIST`);
+        else if (!allowed.includes(value))
+            fail(ctx, `${path}.${key}`, `\`${key}\` is one of ${allowed.map((box) => `"${box}"`).join(', ')}`);
+    }
 }
 
 /**
