@@ -195,9 +195,51 @@ jobs:
                       }
                       core.setOutput('comment_body', commentBody);
 
+            - name: Create Approval Comment Body
+              uses: actions/github-script@v9
+              id: create_approval_body
+              with:
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  script: |
+                      const fs = require('fs');
+                      const approvalOutput = fs.readFileSync('approval_output.txt', 'utf8');
+                      let commentBody = `
+                      ### [JSON approval analysis](https://github.com/duckduckgo/privacy-configuration/blob/main/.github/workflows/auto-respond-pr.yml#L5-L12):
+                      *Time updated:* ${new Date().toUTCString()}
+                      ${approvalOutput}
+                      `
+                      if (commentBody.length > 65536) {
+                          commentBody = '❌ Approval analysis output is too large to post as a comment, run locally to see the analysis and validate'
+                      }
+                      core.setOutput('comment_body', commentBody);
+
+            - name: Create, or Update the Diff Comment
+              uses: peter-evans/create-or-update-comment@v5
+              with:
+                  issue-number: ${{ github.event.pull_request.number }}
+                  comment-id: ${{ steps.find_diff_comment.outputs.comment-id }}
+                  body: ${{ steps.create_diff_body.outputs.comment_body }}
+                  edit-mode: replace
+
+            # Uses PAT (not GITHUB_TOKEN) so this comment triggers issue_comment
+            # events for downstream workflows (e.g., auto-notify-mattermost.yml).
+            # See: https://docs.github.com/en/actions/using-workflows/triggering-a-workflow#triggering-a-workflow-from-a-workflow
+            - name: Create, or Update the Approval Comment
+              uses: peter-evans/create-or-update-comment@v5
+              with:
+                  token: ${{ secrets.PRIVACY_CONFIG_PAT }}
+                  issue-number: ${{ github.event.pull_request.number }}
+                  comment-id: ${{ steps.find_approval_comment.outputs.comment-id }}
+                  body: ${{ steps.create_approval_body.outputs.comment_body }}
+                  edit-mode: replace
+
             - name: Wait for Claude Code Review
               uses: fountainhead/action-wait-for-check@v1.2.0
               id: wait-for-review
+              # Drafts are never reviewed automatically, so don't wait for one.
+              if: github.event.pull_request.draft == false
+              # A failed wait or check counts as not passed, so the Asana sync below still runs.
+              continue-on-error: true
               with:
                   token: ${{ secrets.GITHUB_TOKEN }}
                   checkName: Claude Code Review
@@ -208,6 +250,7 @@ jobs:
             # See https://code.claude.com/docs/en/code-review-pull-requests#read-the-result-from-a-script
             - name: Check Claude Code Review result
               id: claude_review
+              continue-on-error: true
               env:
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                   REPO: ${{ github.repository }}
@@ -294,41 +337,3 @@ jobs:
                        - [Config Reviewer Documentation](https://github.com/duckduckgo/privacy-configuration/blob/main/docs/config-reviewer-documentation.md)
                        - [Config Maintainer Documentation](https://github.com/duckduckgo/privacy-configuration/blob/main/docs/config-maintainer-documentation.md)
                        - [Feature Implementer Documentation](https://github.com/duckduckgo/privacy-configuration/blob/main/docs/feature-implementer-documentation.md)
-
-            - name: Create Approval Comment Body
-              uses: actions/github-script@v9
-              id: create_approval_body
-              with:
-                  github-token: ${{ secrets.GITHUB_TOKEN }}
-                  script: |
-                      const fs = require('fs');
-                      const approvalOutput = fs.readFileSync('approval_output.txt', 'utf8');
-                      let commentBody = `
-                      ### [JSON approval analysis](https://github.com/duckduckgo/privacy-configuration/blob/main/.github/workflows/auto-respond-pr.yml#L5-L12):
-                      *Time updated:* ${new Date().toUTCString()}
-                      ${approvalOutput}
-                      `
-                      if (commentBody.length > 65536) {
-                          commentBody = '❌ Approval analysis output is too large to post as a comment, run locally to see the analysis and validate'
-                      }
-                      core.setOutput('comment_body', commentBody);
-
-            - name: Create, or Update the Diff Comment
-              uses: peter-evans/create-or-update-comment@v5
-              with:
-                  issue-number: ${{ github.event.pull_request.number }}
-                  comment-id: ${{ steps.find_diff_comment.outputs.comment-id }}
-                  body: ${{ steps.create_diff_body.outputs.comment_body }}
-                  edit-mode: replace
-
-            # Uses PAT (not GITHUB_TOKEN) so this comment triggers issue_comment
-            # events for downstream workflows (e.g., auto-notify-mattermost.yml).
-            # See: https://docs.github.com/en/actions/using-workflows/triggering-a-workflow#triggering-a-workflow-from-a-workflow
-            - name: Create, or Update the Approval Comment
-              uses: peter-evans/create-or-update-comment@v5
-              with:
-                  token: ${{ secrets.PRIVACY_CONFIG_PAT }}
-                  issue-number: ${{ github.event.pull_request.number }}
-                  comment-id: ${{ steps.find_approval_comment.outputs.comment-id }}
-                  body: ${{ steps.create_approval_body.outputs.comment_body }}
-                  edit-mode: replace
