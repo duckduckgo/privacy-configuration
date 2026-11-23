@@ -378,10 +378,11 @@ export function sequenceWebDetectionActions(config) {
 
 // The immediate trigger name each platform parses, where it differs from the authored `immediate`.
 // Apple renamed the trigger to `immediate_v2` when web events began de-duplicating at the hub, and
-// skips entries still carrying `immediate`.
+// Android only ever parsed `immediate_v2`. Both skip entries still carrying `immediate`.
 const IMMEDIATE_TRIGGER_TYPE_BY_PLATFORM = {
     ios: 'immediate_v2',
     macos: 'immediate_v2',
+    android: 'immediate_v2',
 };
 
 /**

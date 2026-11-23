@@ -380,11 +380,12 @@ describe('EventHub validation tests', () => {
                 }
             });
 
-            // A client skips an immediate trigger name it does not parse, dropping the pixel. Apple
-            // parses only `immediate_v2`, which the build emits; Windows parses only `immediate`.
+            // A client skips an immediate trigger name it does not parse, dropping the pixel. Apple and
+            // Android parse only `immediate_v2`, which the build emits; Windows parses only `immediate`.
             const unparsedImmediateType = {
                 'ios-config.json': 'immediate',
                 'macos-config.json': 'immediate',
+                'android-config.json': 'immediate',
                 'windows-config.json': 'immediate_v2',
             }[config.name.split('/').pop() ?? ''];
             if (unparsedImmediateType) {
