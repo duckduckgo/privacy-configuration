@@ -12,6 +12,7 @@ import {
     apiBody,
 } from './grammar.js';
 import { checkPayloadSpec, checkPredicate, isLiteral } from './predicates.js';
+import { checkRecordedSource } from './observed.js';
 import { checkApi, checkFieldRead } from './reads.js';
 import {
     UNKNOWN,
@@ -104,6 +105,10 @@ function providesValues(node, single, ctx) {
             });
             return hasField || single === 'number';
         }
+        case 'observed':
+        case 'trigger':
+            // As `element`: without `field`, a presence leaf
+            return (isPlainObject(body) && 'field' in body) || single === 'number';
         case 'expr':
             // Over an array, a list
             return Array.isArray(body) || providesValues(body, single, ctx);
@@ -312,10 +317,28 @@ function checkActions(node, position, scope, ctx, path) {
             continue;
         }
         if (scope.inItem) fail(ctx, actionPath, `\`${key}\` inside a \`where\` or \`field\` runs once per item: run it outside`);
+        if (key === 'done') {
+            checkDone(body, scope, ctx, actionPath);
+            continue;
+        }
         if (isPlainObject(body) && 'data' in body)
             checkPayloadSpec(body.data, /** @type {'fireEvent' | 'breakageReportData'} */ (key), ctx, `${actionPath}.data`, child(scope));
     }
     return typeOf('undefined');
+}
+
+/**
+ * `done`: a condition that, holding, makes the detector done at the end of the run. A detector with
+ * `match` is done when it holds, and runs `actions` once.
+ *
+ * @param {unknown} body
+ * @param {Scope} scope
+ * @param {Context} ctx
+ * @param {string} path
+ */
+function checkDone(body, scope, ctx, path) {
+    if (ctx.hasMatch) fail(ctx, path, 'a detector with `match` is done once `match` holds, so it has no `done`');
+    checkExpr(body, 'boolean', { ...child(scope), conditionRoot: true }, ctx, path);
 }
 
 /**
@@ -511,6 +534,9 @@ function checkExprKey(key, holder, position, scope, ctx, holderPath) {
             return checkConditionSource(key, body, position, scope, ctx, path);
         case 'api':
             return checkApi(apiBody(body), position, scope, ctx, path, undefined, ctx.functionApis.has(holder));
+        case 'observed':
+        case 'trigger':
+            return checkRecordedSource(key, body, position, scope, ctx, path);
         case 'self':
             return checkSelf(body, position, scope, ctx, path);
         case 'expr':

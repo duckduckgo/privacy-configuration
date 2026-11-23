@@ -539,9 +539,9 @@ describe('webDetection config tests', () => {
             });
 
             itAll('rejects an expression beside `using` that CI cannot name', () => {
-                expectError('this expression has neither', { only: text, using: 'length', is: { gt: 0 } });
-                expectError('this expression has neither', { expr: imgCount, using: { path: 'toFixed', args: [] }, is: {} });
-                expectError('this expression has neither', { expr: 1, using: { path: 'toFixed', args: [] }, is: {} });
+                expectError('this expression has none of them', { only: text, using: 'length', is: { gt: 0 } });
+                expectError('this expression has none of them', { expr: imgCount, using: { path: 'toFixed', args: [] }, is: {} });
+                expectError('this expression has none of them', { expr: 1, using: { path: 'toFixed', args: [] }, is: {} });
             });
 
             itAll('places the expression beside `using` in value position', () => {

@@ -21,9 +21,80 @@ type AutoTrigger = TriggerBase & {
     };
 };
 
+/**
+ * A performance entry type a recorder observes. CI allows the types and fields on its entry type
+ * allowlist.
+ */
+type EntryTypeKeys = {
+    entryType: NonEmptyString;
+    /** On `event` entries only: the body gives the entries with `duration` at or over it. */
+    durationThreshold?: number;
+};
+
+/**
+ * An `api` path read once, as the recorders register. CI allows the paths on its target allowlist.
+ */
+type EventTarget = {
+    api: NonEmptyString | { path: NonEmptyString };
+};
+
+/**
+ * An event type a recorder listens for. CI allows the types and fields on its event type allowlist.
+ */
+type EventKeys = {
+    event: NonEmptyString;
+    /** What the recorder listens on, `window` when absent. */
+    target?: EventTarget;
+};
+
+type Recorded = EntryTypeKeys | EventKeys;
+
+/** @minProperties 1 */
+type KeepWindow = {
+    /** @minimum 1 */
+    count?: number;
+    /** @minimum 1 */
+    withinMs?: number;
+};
+
+/**
+ * The window of the log an `observed` body reads: the last `count` items, those recorded in the
+ * last `withinMs` ms, or both. `null` reads every item recorded. The config build writes the default
+ * onto every body without one.
+ */
+type Keep = KeepWindow | null;
+
+export type ObservedBody = Recorded &
+    ItemKeys & {
+        keep?: Keep;
+    };
+
+type EmptyObject = Record<string, never>;
+
+/** The arrival that started the run, of the type a body names, or the trigger that started it. */
+export type TriggerBody = (Recorded | { auto: EmptyObject } | { breakageReport: EmptyObject }) & ItemKeys;
+
+/** A type whose arrival runs the detector. */
+type OnBody = Recorded & {
+    /** Tested as each item is recorded, so it compares fields with literal values. */
+    where?: Predicate;
+    /**
+     * The run is in a task `delayMs` after the arrival.
+     * @minimum 0
+     */
+    delayMs?: number;
+    /** The run is in the listener, during dispatch. */
+    sync?: boolean;
+};
+
+type ObserveTrigger = TriggerBase & {
+    on: NonEmptyList<OnBody>;
+};
+
 type Triggers = Partial<{
     breakageReport: TriggerBase;
     auto: AutoTrigger;
+    observe: ObserveTrigger;
 }>;
 
 export type ConditionBranch<Final> = Final | NonEmptyList<Final>;
@@ -134,6 +205,8 @@ type ExprKeys = {
     element: ConditionBranch<ElementBody>;
     text: ConditionBranch<TextBody>;
     api: string | ApiBody;
+    observed: ObservedBody;
+    trigger: TriggerBody;
     self: string | SelfBody;
     expr: Expr | Expr[];
     only: Expr;
@@ -166,6 +239,8 @@ export type ActionObject = Partial<{
         data?: PayloadSpec;
     };
     define: Defines;
+    /** The detector is done at the end of the run when it holds. */
+    done: Expr;
 }>;
 
 /** @minProperties 1 */

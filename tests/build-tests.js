@@ -9,7 +9,13 @@ import {
     renameEventHubImmediateTriggers,
     addHashToFeatures,
 } from '../util.js';
-import { DEFAULT_READ_CACHE_MAX_AGE_MS, arrayWebDetectionBuckets, defaultWebDetectionSettings } from '../web-detection-util.js';
+import {
+    DEFAULT_READ_CACHE_MAX_AGE_MS,
+    DEFAULT_OBSERVED_KEEP,
+    arrayWebDetectionBuckets,
+    defaultWebDetectionKeep,
+    defaultWebDetectionSettings,
+} from '../web-detection-util.js';
 import { compatFunctions } from '../compatibility.js';
 import { BROWSERS_SUBDIR, TDS_PATH_FOR_PLATFORM } from '../constants.js';
 import platforms from '../platforms.js';
@@ -892,5 +898,129 @@ describe('arrayWebDetectionBuckets', () => {
                 ],
             }),
         ).to.throw('by name');
+    });
+});
+
+describe('defaultWebDetectionKeep', () => {
+    /**
+     * @param {object} settings
+     */
+    const built = (settings) => {
+        const config = { features: { webDetection: { settings } } };
+        defaultWebDetectionKeep(config);
+        return config.features.webDetection.settings;
+    };
+
+    it('writes the default `keep` onto `observed` bodies without one, and leaves a stated `keep`', () => {
+        const settings = built({
+            detectors: {
+                g: {
+                    d: {
+                        match: { observed: { event: 'click' } },
+                        actions: [
+                            { define: { n: { observed: { event: 'click' }, using: 'length' } } },
+                            { define: { m: { observed: { event: 'scroll', keep: { count: 2 } } } } },
+                            { define: { h: { observed: { event: 'pagehide', keep: null } } } },
+                        ],
+                    },
+                },
+            },
+        });
+        const { match, actions } = settings.detectors.g.d;
+        expect(match.observed.keep).to.deep.equal(DEFAULT_OBSERVED_KEEP);
+        expect(actions[0].define.n.observed.keep).to.deep.equal(DEFAULT_OBSERVED_KEEP);
+        expect(actions[1].define.m.observed.keep).to.deep.equal({ count: 2 });
+        expect(actions[2].define.h.observed.keep).to.equal(null);
+    });
+
+    it('leaves `trigger` and `on` bodies, a name `observed`, and a payload key `observed` alone', () => {
+        const settings = built({
+            detectors: {
+                g: {
+                    d: {
+                        triggers: {
+                            observe: {
+                                state: 'enabled',
+                                on: [
+                                    { event: 'click' },
+                                ],
+                            },
+                        },
+                        actions: [
+                            { define: { observed: { trigger: { event: 'click' } } } },
+                            { breakageReportData: { data: { observed: { value: { ref: 'observed' } } } } },
+                        ],
+                    },
+                },
+            },
+        });
+        expect(settings.detectors.g.d).to.deep.equal({
+            triggers: {
+                observe: {
+                    state: 'enabled',
+                    on: [
+                        { event: 'click' },
+                    ],
+                },
+            },
+            actions: [
+                { define: { observed: { trigger: { event: 'click' } } } },
+                { breakageReportData: { data: { observed: { value: { ref: 'observed' } } } } },
+            ],
+        });
+    });
+
+    it('writes it in the values `conditionalChanges` patches add or replace under `/detectors`', () => {
+        const settings = built({
+            detectors: {},
+            conditionalChanges: [
+                {
+                    condition: { injectName: 'android' },
+                    patchSettings: [
+                        { op: 'add', path: '/detectors/g', value: { d: { actions: { define: { n: { observed: { event: 'click' } } } } } } },
+                        { op: 'replace', path: '/detectors/g/d/actions', value: { define: { n: { observed: { event: 'scroll' } } } } },
+                        { op: 'replace', path: '/detectors/g/d/actions/define/n/observed', value: { event: 'keydown' } },
+                        { op: 'add', path: '/detectors/g/d/actions/define/observed', value: { ref: 'x' } },
+                        { op: 'add', path: '/detectors/g/d/actions/define', value: { observed: { ref: 'x' } } },
+                        { op: 'replace', path: '/detectors/g/d/triggers/observe/on/0', value: { event: 'click' } },
+                    ],
+                },
+            ],
+        });
+        const [
+            group,
+            actions,
+            body,
+            name,
+            names,
+            on,
+        ] = settings.conditionalChanges[0].patchSettings.map((/** @type {{ value: any }} */ operation) => operation.value);
+        expect(group.d.actions.define.n.observed.keep).to.deep.equal(DEFAULT_OBSERVED_KEEP);
+        expect(actions.define.n.observed.keep).to.deep.equal(DEFAULT_OBSERVED_KEEP);
+        expect(body.keep).to.deep.equal(DEFAULT_OBSERVED_KEEP);
+        expect(name).to.deep.equal({ ref: 'x' });
+        expect(names).to.deep.equal({ observed: { ref: 'x' } });
+        expect(on).to.deep.equal({ event: 'click' });
+    });
+
+    it('writes a copy of the default onto each body', () => {
+        const settings = built({
+            detectors: {
+                g: {
+                    d: {
+                        actions: [
+                            { observed: { event: 'click' } },
+                            { observed: { event: 'click' } },
+                        ],
+                    },
+                },
+            },
+        });
+        const [
+            first,
+            second,
+        ] = settings.detectors.g.d.actions;
+        expect(first.observed.keep).to.not.equal(second.observed.keep);
+        expect(first.observed.keep).to.not.equal(DEFAULT_OBSERVED_KEEP);
     });
 });
