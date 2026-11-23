@@ -97,7 +97,7 @@ An expression starting `//` selects from the whole document, whatever its contex
 | XPath 1.0 only | `matches()` and `lower-case()` raise `SyntaxError`, and only `translate()` is available. Use XPath to select nodes, and leave pattern matching to the regex |
 | Namespace-aware in XHTML | In a document served as `application/xhtml+xml`, an element name in an expression matches no element, so `//body//text()` selects nothing. `local-name()` matches by name ([Rendered text](recipes.md#rendered-text)) |
 | Shadow DOM is unreachable | `//text()` does not cross shadow roots, and neither does `selector` |
-| Layout-free, but costlier than `textContent` | With the `auto` trigger, the XPath expression re-runs at each interval, so scope it to a container where the detector can |
+| Layout-free, but costlier than `textContent` | With the `auto` trigger, the XPath expression re-runs at each interval unless the page is unchanged and [`readCacheMaxAgeMs`](overview.md#feature-settings) keeps the last read, so scope it to a container where the detector can |
 
 Each pattern is tested against the selected text in bounded chunks instead of all at once. `xpathConfig` sets the chunk sizes: `chunkSize` (default 8192) is the number of characters matched at a time, and `chunkTail` (default `chunkSize / 16`) is the number of characters carried over between chunks, which limits the longest match that can span a chunk boundary. `chunkSize: 0` turns chunking off. Leave both out unless a detector needs tuning. `xpathConfig` doesn't affect `selector`.
 
