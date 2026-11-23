@@ -347,14 +347,16 @@ A body naming another type gives a list with no items, so in boolean position `{
 {"wait": {"event": "click", "timeoutMs": 2000}}
 {"wait": {"entryType": "long-animation-frame", "where": {"blockingDuration": {"gte": 200}}, "timeoutMs": 5000}}
 {"wait": {"mutation": {"childList": true, "subtree": true}, "target": {"api": "document.body"}, "timeoutMs": 2500}}
+{"wait": {"intersection": {}, "target": {"ref": "placeholder"}, "where": {"isIntersecting": false}, "timeoutMs": 10000}}
 {"wait": {"event": "invalid", "target": {"ref": "form"}}, "is": {"type": "object"}}
 ```
 
 | Key | Meaning |
 |---|---|
 | `entryType`, `durationThreshold`, `event`, `detectorEvent` | The type, as on [`observed`](#observed) |
-| `mutation` | The options of `MutationObserver.observe()` ([Mutations](#mutations)). A body has one of `entryType`, `event`, `detectorEvent` and `mutation` |
-| `target` | With `event`, optional, and `window` when absent. With `mutation`, required. Any expression giving an event target or node, read when the wait starts, such as an element the run read earlier |
+| `mutation` | The options of `MutationObserver.observe()` ([Mutations](#mutations)) |
+| `intersection`, `resize` | The options of `IntersectionObserver` or `ResizeObserver.observe()` ([Viewport and size](#viewport-and-size)). A body has one of `entryType`, `event`, `detectorEvent`, `mutation`, `intersection` and `resize` |
+| `target` | With `event`, optional, and `window` when absent. With `mutation`, `intersection` and `resize`, required. Any expression giving an event target or node, read when the wait starts, such as an element the run read earlier |
 | `where` | Optional. A predicate or expression the item must pass. An item that fails it doesn't end the wait |
 | `field` | Optional. The value read from the item |
 | `timeoutMs` | The longest the wait lasts, in ms. Absent, it's 5000, which the config build writes onto the body |
@@ -406,3 +408,27 @@ The body has at least one of `childList`, `attributes`, `characterData` and `att
 An item is a `MutationRecord`, read as `observed` items are. `timeStamp` is when the observer's callback ran, as a record has no time of its own. `target` is the parent for `childList`, the element for `attributes`, and the text node for `characterData`. Changes inside a shadow root or an iframe under the target aren't observed.
 
 A run that waits for the page's response to an input starts in the listener with [`sync`](overview.md#observe), so its `wait` starts before the page's own listeners change the page.
+
+### Viewport and size
+
+An `intersection` body observes the element its `target` gives with an `IntersectionObserver` while the wait is open, and a `resize` body with a `ResizeObserver`:
+
+```jsonc
+{"wait": {"intersection": {"threshold": [0, 1]}, "target": {"ref": "placeholder"}, "where": {"isIntersecting": false}, "timeoutMs": 10000}}
+{"wait": {"resize": {}, "target": {"ref": "region"}, "where": {"contentRect.height": {"lt": 1}}, "timeoutMs": 30000}}
+```
+
+| Body | Options | Fields |
+|---|---|---|
+| `intersection` | `threshold`: a number from 0 to 1, or a list of them. `{}` observes at 0 | `type`, `timeStamp`, `isIntersecting`, `intersectionRatio`, `intersectionRect.width`, `intersectionRect.height` |
+| `resize` | `box`: `"content-box"` (the default) or `"border-box"` | `type`, `timeStamp`, `contentRect.width`, `contentRect.height` |
+
+An intersection is always with the viewport, so `root` and `rootMargin` are never allowed. Both go in `wait` only, with a `target`.
+
+| Rule | Detail |
+|---|---|
+| First entry | The observer gives an entry for the element as it is at the next rendering update, apart from a `resize` on an element that's 0 × 0. A `wait` with no `where` gives the element's place or size within a frame, and a `where` that rejects it keeps waiting for a change |
+| `timeStamp` | For `intersection`, the entry's `time`, the rendering update that computed it. For `resize`, when the observer's callback ran |
+| Reach | `intersectionRect` is the part of the element in the viewport, clipped by its ancestors' `overflow`. An element with `display: none`, or removed from the document, gives `isIntersecting` `false`. The element observed is the one the run read, so an element the page re-renders isn't followed |
+| Layout | The engine computes both after its own layout for the frame, so neither forces layout. `getBoundingClientRect` and `"visibility": "visible"` in a run lay out the page when it has changed since the last layout |
+| The page hiding | Neither observer delivers while the page isn't rendered, so a `timeoutMs` that passes on a hidden page reads as no change. A detector that waits on either also observes `visibilitychange` and `pagehide` with `"whenBusy": "interrupt"`, which abandons the wait when the page hides ([The page hiding](overview.md#the-page-hiding)) |
