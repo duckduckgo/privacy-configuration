@@ -250,10 +250,11 @@ Reading `resource` entries by name puts a URL in config. Only the value read is 
 
 | Key | Meaning |
 |---|---|
-| `entryType` | A performance entry type. A body has one of `entryType` and `event` |
+| `entryType` | A performance entry type. A body has one of `entryType`, `event` and `detectorEvent` |
 | `durationThreshold` | Optional, with `"entryType": "event"` only, and at least 16. The body gives the entries whose `duration` is at or over it. Absent, the engine's default of 104 ms applies |
 | `event` | An event type |
 | `target` | Optional, with `event`. What the listener is on, as `{"api": <path>}` ([Event targets](#event-targets)). Absent, it's `window` |
+| `detectorEvent` | A detector event name, which an [`emit`](overview.md#detector-events) in the config records. It takes no `target` |
 | `where` | Optional. A predicate or expression each item must pass ([Lists](#lists-where-and-field)) |
 | `field` | Optional. The value read from each item that passes `where` |
 | `keep` | The window of recorded items the body reads ([`keep`](#keep)) |
@@ -268,8 +269,9 @@ The entry types, event types and targets a body can name, and the fields each it
 |---|---|
 | Entry | The `PerformanceEntry` the observer delivered |
 | Event | The `Event` the listener received, with `target` as it was during dispatch. Only events with `isTrusted` true are recorded |
+| Detector event | Recorded at the `emit`, with `name`, `timeStamp` (`performance.now()` at the `emit`), `detector` (the emitting detector, as `group.name`) and `data` (the `emit`'s `data` as it was evaluated) |
 
-`where`, `field` and `using` read an item's fields by path, as on `api` items. A path can have several names, such as `changedTouches.0.clientX` for a touch's position. `target` is an element, so names read from it are checked against the [element allowlist](#element-allowlist).
+`where`, `field` and `using` read an item's fields by path, as on `api` items. A path can have several names, such as `changedTouches.0.clientX` for a touch's position. `target` is an element, so names read from it are checked against the [element allowlist](#element-allowlist). On a detector event, a path under `data` reads a field every `emit` of the name builds with `object`, or any path when an `emit` gives `data` as another expression ([Emitting and reading detector events](overview.md#emitting-and-reading-detector-events)).
 
 An event's `timeStamp` is when the user acted, so input that waited behind a busy main thread keeps its earlier time.
 
@@ -324,12 +326,13 @@ Each `observed` body reads a window of the items recorded of its type:
 | `auto` | `{}`. Gives an item when an `auto` timer started the run |
 | `breakageReport` | `{}`. Gives an item when a breakage report started the run |
 
-A body has exactly one of `entryType`, `event`, `auto` and `breakageReport`, and no `keep`. It gives a selected list of the arrival's items:
+A body has exactly one of `entryType`, `event`, `detectorEvent`, `auto` and `breakageReport`, and no `keep`. It gives a selected list of the arrival's items:
 
 | Started by | Items |
 |---|---|
 | An entry type | The entries the observer delivered together, which can be several after a long task |
 | An event | The event |
+| A detector event | The detector event |
 | An `auto` timer, a breakage report | One item, whose `timeStamp` is when the run started |
 
 A body naming another type gives a list with no items, so in boolean position `{"trigger": {"event": "click"}}` holds only in a run a click started. A run with `delayMs` keeps its arrival's items until it runs. A run that arrivals were batched into gives the items of each, in the order they arrived ([Pending runs](overview.md#pending-runs)). CI rejects `trigger` in `match`, which reads the page only.
@@ -347,8 +350,8 @@ A body naming another type gives a list with no items, so in boolean position `{
 
 | Key | Meaning |
 |---|---|
-| `entryType`, `durationThreshold`, `event` | The type, as on [`observed`](#observed) |
-| `mutation` | The options of `MutationObserver.observe()` ([Mutations](#mutations)). A body has one of `entryType`, `event` and `mutation` |
+| `entryType`, `durationThreshold`, `event`, `detectorEvent` | The type, as on [`observed`](#observed) |
+| `mutation` | The options of `MutationObserver.observe()` ([Mutations](#mutations)). A body has one of `entryType`, `event`, `detectorEvent` and `mutation` |
 | `target` | With `event`, optional, and `window` when absent. With `mutation`, required. Any expression giving an event target or node, read when the wait starts, such as an element the run read earlier. A value it can't listen on or observe fails the `wait` ([Values that do not fit](failures.md#values-that-do-not-fit)) |
 | `where` | Optional. A predicate or expression the item must pass. An item that fails it doesn't end the wait |
 | `field` | Optional. The value read from the item |

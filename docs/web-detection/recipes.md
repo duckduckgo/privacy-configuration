@@ -516,3 +516,56 @@ A predicate that tests the value with `fails` holds on a failed read. Here `matc
   "else": {"fireEvent": {"type": "emptySheets_many"}}
 }
 ```
+
+## Detector events
+
+### Polling for a change
+
+A value with no event of its own, such as an element's text, is read on a timer. One detector polls it and emits when it changes, and any number of detectors observe the event:
+
+```jsonc
+"poll_text": {
+  // Every 250 ms, up to the last read the detector needs
+  "triggers": {"breakageReport": {"state": "disabled"}, "auto": {"state": "enabled", "when": {"intervalMs": [250, 500, 750, 1000, 1250, 1500]}}},
+  "actions": [
+    {"define": {"text": {"element": {"selector": "#status", "field": "textContent"}, "using": {"path": "at", "args": [0]}}}},
+    // this.lastText is unbound on the first run, so the first read emits
+    {"if": {"none": [{"ref": "text", "is": {"eq": {"ref": "this.lastText"}}}]},
+     "then": [{"define": {"this.lastText": {"ref": "text"}}}, {"emit": {"name": "textChanged", "data": {"ref": "text"}}}]}
+  ]
+},
+"on_text": {
+  "triggers": {"observe": {"state": "enabled", "on": [{"detectorEvent": "textChanged"}]}},
+  "actions": {"define": {"text": {"observed": {"detectorEvent": "textChanged", "field": "data"}, "using": {"path": "at", "args": [-1]}}}}
+}
+```
+
+The poller reads the page at each interval whether or not anything changed.
+
+### Request and reply
+
+A detector can compute a value for other detectors when they ask. The callee observes a request event and emits a reply, and the caller emits the request and waits for the reply. The callee runs in the same task, once the caller suspends at its `wait`.
+
+When the reply depends on arguments, the request's `data` is an [`object`](expressions.md#object) of them. A reply goes to every caller waiting at the time, so the callee puts the request's `detector` in the reply and each caller's `wait` tests for its own name in `where`:
+
+```jsonc
+"slow_resources": {
+  "triggers": {"observe": {"state": "enabled", "on": [{"detectorEvent": "slowResourcesRequest"}]}},
+  "actions": [
+    {"define": {"request": {"trigger": {"detectorEvent": "slowResourcesRequest"}, "using": {"path": "at", "args": [0]}}}},
+    {"emit": {"name": "slowResources", "data": {"object": {
+      "to": {"ref": "request", "using": "detector"},
+      "count": {"api": {"path": "performance.getEntriesByType", "args": ["resource"], "where": {"duration": {"gt": {"ref": "request", "using": "data.minMs"}}}}, "using": "length"}
+    }}}}
+  ]
+}
+
+// In demo.slow_after_click
+{"emit": {"name": "slowResourcesRequest", "data": {"object": {"minMs": 1000}}}},
+{"define": {"slow": {"wait": {"detectorEvent": "slowResources", "where": {"data.to": "demo.slow_after_click"}, "field": "data.count", "timeoutMs": 500}}}}
+```
+
+When every caller wants the same value, the callee keeps it in a detector name and replies to whoever asks, and a caller that accepts a reply sent before it asked reads it with `observed` first. A detector has one run at a time, so a callee that reaches a `wait` itself answers one request at a time, and the default `"whenBusy": "queue"` runs the rest in order after it.
+
+A callee shares a value it computed. XPath selections and element text are shared between detectors through the read cache instead ([`readCacheMaxAgeMs`](overview.md#feature-settings)).
+

@@ -44,7 +44,8 @@ Detectors are configured under `webDetection.settings.detectors`, in named group
         }
       }
     },
-    ["readCacheMaxAgeMs"]: <int> | null
+    ["readCacheMaxAgeMs"]: <int> | null,
+    ["detectorEventMaxDepth"]: <int>
   }
 }
 ```
@@ -103,7 +104,7 @@ When fields are omitted from config, detectors take these defaults:
 }
 ```
 
-The config build writes `"keep": {"count": 10, "withinMs": 5000}` onto every [`observed`](sources.md#observed) body without `keep`, and `"timeoutMs": 5000` onto every [`wait`](sources.md#wait) without `timeoutMs`.
+The config build writes `"keep": {"count": 10, "withinMs": 5000}` onto every [`observed`](sources.md#observed) body without `keep`, and `"timeoutMs": 5000` onto every [`wait`](sources.md#wait) without `timeoutMs`. It writes `"detectorEventMaxDepth": 4` into the settings when config leaves it out.
 
 `actions` has no default, and a detector without it doesn't parse ([Parse errors](failures.md#parse-errors)).
 
@@ -121,6 +122,7 @@ These sit beside `detectors` in `webDetection.settings`, and apply to every dete
 | Setting | Meaning | Absent |
 |---|---|---|
 | `readCacheMaxAgeMs` | How long the XPath selections and element text the detectors read are kept for later runs while the page is unchanged: `null` until the page changes, a number of ms up to 600000, or `0` for the detectors that run at the same time only. The first change to the DOM under a node that was read clears them | The config build writes `null` ([Feature setting values](#feature-setting-values)) |
+| `detectorEventMaxDepth` | The most runs a chain of detector events with no `delayMs` starts in one task ([Chain depth](#chain-depth)). An integer from 0 to the cap ([Feature setting values](#feature-setting-values)) | The config build writes `4`. Without it, C-S-S reads 0, and detector events start no runs |
 
 ## Triggers
 
@@ -262,7 +264,7 @@ In a detector with no `match`, a `fireEvent` outside a once guard sends its even
 
 ## Actions
 
-`actions` is an expression, or an array of them run in order ([Sequences](expressions.md#sequences)). Actions are expressions with an effect: `fireEvent` sends an event, `breakageReportData` writes the detector's breakage-report entry, `define` binds names that later expressions read, and `done` ends a detector with no `match`.
+`actions` is an expression, or an array of them run in order ([Sequences](expressions.md#sequences)). Actions are expressions with an effect: `fireEvent` sends an event, `breakageReportData` writes the detector's breakage-report entry, `define` binds names that later expressions read, `done` ends a detector with no `match`, and `emit` records a detector event for other detectors in the frame.
 
 ```json
 "<detector>": {
@@ -280,6 +282,7 @@ In a detector with no `match`, a `fireEvent` outside a once guard sends its even
 | `breakageReportData` | `{}`, or `{"data": <payload spec>}` | Writes the detector's entry in breakage reports ([Breakage reports](#breakage-reports)) |
 | `define` | `{<name>: <expression>}` | Binds each name to its expression's value ([Names](expressions.md#names)) |
 | `done` | A condition | Makes the detector done at the end of the run, when it holds ([`done`](#done)) |
+| `emit` | `{"name": <string>, "data"?: <expression>}` | Records a detector event in the frame ([Detector events](#detector-events)) |
 
 An action computes every value its payload names, then sends or writes. If any of those values fails, the action sends and writes nothing, and the failure propagates like any other ([Failures](failures.md)). The action's own value is `undefined`.
 
@@ -304,6 +307,34 @@ An object can have expression keys (with their modifiers) or action keys, but no
 - `done` goes in a detector with no `match`, and not in `match` ([`match` and detector names](#match-and-detector-names)).
 
 A detector with no `match` and no `done` runs on every trigger for the life of the frame, and keeps recording the types it reads.
+
+### Detector events
+
+`emit` records a detector event, which other detectors in the same frame read as they read entries and events: `observed`, `trigger` and `wait` take a `detectorEvent` body, and an `observe` trigger runs a detector on one ([`observed`](sources.md#observed)). A detector event never reaches native or EventHub.
+
+```json
+{"emit": {"name": "textChanged", "data": {"ref": "text"}}}
+```
+
+| Key | Meaning |
+|---|---|
+| `name` | The event's name, which `{"detectorEvent": <name>}` bodies read. It matches `^[a-zA-Z][a-zA-Z0-9_]*$` |
+| `data` | Optional. Any value, with an [`object`](expressions.md#object) for several. It's kept as it was evaluated, so an element stays an element |
+
+A detector event with no `delayMs` runs its observing detectors in the emitting task, once the emitting run ends or suspends at a `wait`, and they share its read cache. A detector can ask another for a value by emitting a request and waiting for the reply ([Detector events](recipes.md#detector-events)).
+
+Each detector event name a body reads needs an `emit` in the config, and a chain of `observe` triggers from an `emit` doesn't lead back to the detector that emits it, with or without `delayMs` ([Emitting and reading detector events](#emitting-and-reading-detector-events)).
+
+#### Chain depth
+
+Runs that detector events start in one task are counted, so a chain of them can't block the main thread indefinitely:
+
+| Run | Depth |
+|---|---|
+| Started by a detector event with no `delayMs` | One more than the run that emitted it |
+| Any other, including one a detector event starts with `delayMs`, and a run resuming from a `wait` in a later task | 0 |
+
+An `emit` in a run whose depth has reached `detectorEventMaxDepth` records its item, which `observed` and `wait` read, and starts only the runs with `delayMs`. A chain through `delayMs` runs one step per timer, so it has no cap.
 
 ## Results
 
@@ -342,7 +373,7 @@ With 3 broken images, this sends `{"type": "brokenImages", "data": {"brokenImage
 
 ### Feature setting values
 
-`readCacheMaxAgeMs` is `null` or an integer from 0 to `MAX_READ_CACHE_MAX_AGE_MS` in [`web-detection-util.js`](../../web-detection-util.js), in the settings and in any value a `conditionalChanges` patch gives it.
+`readCacheMaxAgeMs` is `null` or an integer from 0 to `MAX_READ_CACHE_MAX_AGE_MS`, and `detectorEventMaxDepth` is an integer from 0 to `MAX_DETECTOR_EVENT_MAX_DEPTH` (both in [`web-detection-util.js`](../../web-detection-util.js)), in the settings and in any value a `conditionalChanges` patch gives them.
 
 ### Detector names
 
@@ -369,6 +400,16 @@ CI rejects:
 - A `visibilitychange` or `pagehide` body without `"sync": true` and `"whenBusy": "interrupt"`, and `sync` on a body other than these and `click`.
 - A `sync` body without `"whenBusy": "interrupt"` or `"skip"`, and `"whenBusy": "interrupt"` on a body without `sync`.
 - A body for a type that arrives every frame, `scroll`, without `whenPending` `"skip"` or `"batch"`, or with `delayMs` under `PER_FRAME_MIN_DELAY_MS` in [`web-detection-util.js`](../../web-detection-util.js). With `"batch"`, a `delayMs` over the type's `withinMs` cap, since the run keeps each event until it runs.
+
+### Emitting and reading detector events
+
+CI checks each detector against the `emit`s of every detector a client sees with it, in the same view of the config, so a detector event name a body reads needs an `emit` in that view. CI rejects:
+
+- An `emit` `name`, or a `detectorEvent` name, that doesn't match `^[a-zA-Z][a-zA-Z0-9_]*$`.
+- A `detectorEvent` body in `observed`, `trigger`, `wait` or `on` whose name no `emit` in the config records, and one with `target` or `durationThreshold`.
+- A path under `data` on a detector event item, unless every `emit` of the name gives `data` as an `object` with the path's first field, or any `emit` of it gives `data` as another expression. `name`, `timeStamp` and `detector` are always readable.
+- A chain from an `emit` through the detectors whose `on` bodies observe its name, with or without `delayMs`, back to the emitting detector. The check follows `observe` triggers only, so a detector can `wait` for a reply from a detector that observes its request.
+- A `count` over the detector event cap in `OBSERVED_KEEP_CAPS_BY_KIND` ([`web-detection-util.js`](../../web-detection-util.js)).
 
 ### Apple releases before C-S-S 19.0.0
 
