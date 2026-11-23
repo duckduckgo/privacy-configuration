@@ -3429,6 +3429,34 @@
                         "value": "enabled"
                     }
                 ]
+            },
+            // A cheap domain check so blankPage doesn't run on macOS internal pages (duck://newtab and others), which are
+            // known false positives. This can technically overmatch, e.g., on http://settings/ or http://foo.settings/
+            // (but in practice these should be rare, as none of these hosts is a public TLD).
+            //
+            // Ensure this entry stays after any patches which enable the detector.
+            {
+                "condition": [
+                    {
+                        "domain": "newtab"
+                    },
+                    {
+                        "domain": "settings"
+                    },
+                    {
+                        "domain": "bookmarks"
+                    },
+                    {
+                        "domain": "personal-information-removal"
+                    }
+                ],
+                "patchSettings": [
+                    {
+                        "op": "replace",
+                        "path": "/detectors/blankPage/no_text_or_title/state",
+                        "value": "disabled"
+                    }
+                ]
             }
         ]
     }
