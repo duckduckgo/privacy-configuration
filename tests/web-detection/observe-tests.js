@@ -146,7 +146,7 @@ describe('webDetection config tests', () => {
             );
             expectError('takes exactly one of `entryType`, `event`', readsObserved({ keep: { count: 1 } }));
             expectError('`mutation` is allowed in `wait` only', readsObserved({ mutation: { childList: true }, keep: { count: 1 } }));
-            expectError('"intersection" is not a key of an `observed` body', readsObserved({ intersection: {}, keep: { count: 1 } }));
+            expectError('"listen" is not a key of an `observed` body', readsObserved({ event: 'click', listen: true, keep: { count: 1 } }));
         });
 
         itAll('takes a `target` from the target allowlist, as an `api` path, on event bodies', () => {
