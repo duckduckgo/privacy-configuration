@@ -195,6 +195,42 @@ jobs:
                       }
                       core.setOutput('comment_body', commentBody);
 
+            - name: Wait for Claude Code Review
+              uses: fountainhead/action-wait-for-check@v1.2.0
+              id: wait-for-review
+              with:
+                  token: ${{ secrets.GITHUB_TOKEN }}
+                  checkName: Claude Code Review
+                  ref: ${{ github.event.pull_request.head.sha }}
+                  timeoutSeconds: 600
+
+            # The check run always concludes neutral, so read the severity counts it reports.
+            # See https://code.claude.com/docs/en/code-review-pull-requests#read-the-result-from-a-script
+            - name: Check Claude Code Review result
+              id: claude_review
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  REPO: ${{ github.repository }}
+                  SHA: ${{ github.event.pull_request.head.sha }}
+                  CONCLUSION: ${{ steps.wait-for-review.outputs.conclusion }}
+              run: |
+                  passed=false
+                  if [ "$CONCLUSION" = "neutral" ] || [ "$CONCLUSION" = "skipped" ]; then
+                      run=$(gh api "repos/$REPO/commits/$SHA/check-runs?check_name=Claude%20Code%20Review" --jq '.check_runs[0]')
+                      title=$(echo "$run" | jq -r '.output.title // ""')
+                      if [[ "$title" == *"no new changes" ]]; then
+                          passed=true
+                      elif [[ "$title" != "Code review not repeated"* ]]; then
+                          important=$(echo "$run" | jq -r '(.output.text // "" | split("\n") | last | scan("^<!-- bughunter-severity: (.*) -->$")[0] | fromjson | .normal) // "missing"')
+                          echo "Important findings: $important"
+                          [ "$important" = "0" ] && passed=true
+                      fi
+                      echo "Check run title: $title"
+                  else
+                      echo "No completed Claude Code Review (conclusion: ${CONCLUSION:-none})"
+                  fi
+                  echo "passed=$passed" >> $GITHUB_OUTPUT
+
             - name: Check for existing approved reviews
               uses: actions/github-script@v9
               id: check_reviews
@@ -216,7 +252,7 @@ jobs:
                       core.setOutput('has_approved_review', hasApprovedReview);
 
             - name: Auto approve
-              if: steps.approval.outputs.approved == 'true' && steps.check_files.outputs.files_valid == 'true' && steps.check_reviews.outputs.has_approved_review == 'false'
+              if: steps.claude_review.outputs.passed == 'true' && steps.approval.outputs.approved == 'true' && steps.check_files.outputs.files_valid == 'true' && steps.check_reviews.outputs.has_approved_review == 'false'
               run: |
                   gh pr review --approve "$PR_URL"
               env:
@@ -228,7 +264,7 @@ jobs:
             - uses: duckduckgo/action-asana-sync@v11
               if: |
                   github.event.action != 'closed' &&
-                  ((steps.approval.outputs.approved == 'true' && steps.check_files.outputs.files_valid == 'true') != true)
+                  ((steps.claude_review.outputs.passed == 'true' && steps.approval.outputs.approved == 'true' && steps.check_files.outputs.files_valid == 'true') != true)
               with:
                   ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
                   ASANA_WORKSPACE_ID: ${{ secrets.ASANA_WORKSPACE_ID }}
@@ -238,7 +274,7 @@ jobs:
                   ASSIGN_PR_AUTHOR: 'true'
 
             - name: Create comment
-              if: github.event.action == 'opened' && (steps.approval.outputs.approved == 'true' && steps.check_files.outputs.files_valid == 'true') != true
+              if: github.event.action == 'opened' && (steps.claude_review.outputs.passed == 'true' && steps.approval.outputs.approved == 'true' && steps.check_files.outputs.files_valid == 'true') != true
               uses: peter-evans/create-or-update-comment@v5
               with:
                   issue-number: ${{ github.event.pull_request.number }}
