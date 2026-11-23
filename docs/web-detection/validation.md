@@ -28,6 +28,7 @@ A detector with a parse error doesn't run. It's listed in breakage reports with 
 - An `observed` body without `keep`. The config build writes the default `keep` where config leaves it out ([`keep`](sources.md#keep)).
 - A `wait` without `timeoutMs`, which the config build also writes, or with a `timeoutMs` other than a number of at least 0 or `null`.
 - A `wait` the run can't reach to suspend at ([Where `wait` goes](sources.md#where-wait-goes)).
+- An `emit` with a key other than `name` and `data`, or without a string `name`.
 
 ### Predicates
 
@@ -164,6 +165,20 @@ CI rejects:
 - A body for a type that arrives every frame, `scroll`, without `whenPending` `"skip"` or `"batch"`, or with `delayMs` under `PER_FRAME_MIN_DELAY_MS` in [`web-detection-util.js`](../../web-detection-util.js). With `"batch"`, a `delayMs` over the type's `withinMs` cap, since the run keeps each event until it runs.
 - In a detector with no `match` that observes `visibilitychange` or `pagehide`, a `fireEvent` that's neither inside an `if` testing a detector name its branch binds, nor in a sequence with `{"done": true}` ([The page hiding](overview.md#the-page-hiding)).
 - `done` in `match`, and in a detector with `match`.
+
+### Detector events
+
+CI checks each detector against the detector events of every detector a client sees with it, in each view of the config, so a detector event name a body reads needs an `emit` in the same view.
+
+CI rejects:
+
+- An `emit` `name`, or a `detectorEvent` name, that doesn't match `^[a-zA-Z][a-zA-Z0-9_]*$`.
+- A `detectorEvent` body in `observed`, `trigger`, `wait` or `on` whose name no `emit` in the config records, and one with `target` or `durationThreshold`.
+- A path under `data` on a detector event item, unless every `emit` of the name gives `data` as an `object` with the path's first field, or any `emit` of it gives `data` as another expression. `name`, `timeStamp` and `detector` are always readable.
+- A chain from an `emit` through the detectors whose `on` bodies observe its name, with or without `delayMs`, back to the emitting detector. The check follows `observe` triggers only, so a detector can `wait` for a reply from a detector that observes its request.
+- A `count` over the detector event cap in `OBSERVED_KEEP_CAPS_BY_KIND` ([`web-detection-util.js`](../../web-detection-util.js)).
+- An `object` field name that holds `.`, and a `wait` inside an `object` or an `emit`'s `data`.
+- A `detectorEventMaxDepth` that isn't an integer from 0 to `MAX_DETECTOR_EVENT_MAX_DEPTH`, in the settings or in a value a `conditionalChanges` patch gives it.
 
 ### Buckets
 
