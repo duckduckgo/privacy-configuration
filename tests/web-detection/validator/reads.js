@@ -2,6 +2,7 @@
 import { child, expectPosition, fail } from './context.js';
 import { bindItem, checkExpr, sourceType } from './expressions.js';
 import { API_ALLOWLIST, BUILTIN_RETURN_TYPES, FUNCTION_READS, LIST_CONDITION, apiBody } from './grammar.js';
+import { describeTable, recordedTable } from './observed.js';
 import { checkPredicate } from './predicates.js';
 import {
     UNKNOWN,
@@ -61,11 +62,11 @@ export function checkApi(body, position, scope, ctx, path, root, asFunction = fa
             read.list !== undefined &&
             names.length === 1 &&
             ('args' in body ? names[0] === 'concat' || readsItem(names[0], true, body.args) : names[0] === 'length');
-        if (read.apiPaths === undefined && !read.interfaces && !addsNoName && names.length > 0) {
+        if (read.apiPaths === undefined && read.fieldPaths === undefined && !read.interfaces && !addsNoName && names.length > 0) {
             fail(
                 ctx,
                 path,
-                'CI names what `using` or `self` reads by the `api` names or element type of the value it reads from, and this expression has neither',
+                'CI names what `using` or `self` reads by the `api` names, recorded type or element type of the value it reads from, and this expression has none of them',
             );
             read = UNKNOWN;
         }
@@ -313,6 +314,15 @@ function readName(current, name, isCall, ctx, path, args, options = {}) {
     }
     if (item && (current.list === 'maybe' || current.apiPaths !== undefined)) return itemOf(current);
     if (current.list) current = itemOf(current);
+    if (current.fieldPaths !== undefined) {
+        // An `observed` or `trigger` item, or a value read from one, takes the names of its field table
+        const { fieldPaths, ...rest } = current;
+        const results = [
+            readRecordedField(fieldPaths, name, isCall, ctx, path),
+        ];
+        if (rest.apiPaths !== undefined || rest.interfaces) results.push(readName(rest, name, isCall, ctx, path, args, options));
+        return mergeTypes(results);
+    }
     if (current.apiPaths !== undefined && current.interfaces) {
         // Branches reading an `api` and branches giving an element: check the name both ways
         const { apiPaths, ...element } = current;
@@ -403,4 +413,46 @@ function readMember(current, name, isCall, ctx, path) {
         return UNKNOWN;
     }
     return mergeTypes(entries.map((entry) => typeFromSpec(entry.type)));
+}
+
+/**
+ * Read one name from an `observed` or `trigger` item, or from a value read from one, by its field
+ * table. A name extends the path read so far: a listed path gives its type, and a prefix of one gives
+ * an object the next name reads from.
+ *
+ * @param {string[]} fieldPaths
+ * @param {string} name
+ * @param {boolean} isCall
+ * @param {Context} ctx
+ * @param {string} path
+ * @returns {StaticType}
+ */
+function readRecordedField(fieldPaths, name, isCall, ctx, path) {
+    /** @type {StaticType[]} */
+    const results = [];
+    for (const fieldPath of fieldPaths) {
+        const dot = fieldPath.indexOf('.');
+        const table = dot === -1 ? fieldPath : fieldPath.slice(0, dot);
+        const read = dot === -1 ? name : `${fieldPath.slice(dot + 1)}.${name}`;
+        const fields = recordedTable(table);
+        if (isCall) {
+            fail(ctx, path, `calls "${read}" on ${describeTable(table)} items, whose field allowlist lists no method`);
+        } else if (Object.hasOwn(fields, read)) {
+            results.push(typeFromSpec(fields[read]));
+        } else if (Object.keys(fields).some((field) => field.startsWith(`${read}.`))) {
+            results.push({
+                ...typeOf('object'),
+                fieldPaths: [
+                    `${table}.${read}`,
+                ],
+            });
+        } else {
+            fail(
+                ctx,
+                path,
+                `reads "${read}" on ${describeTable(table)} items, which is not on its field allowlist: ${Object.keys(fields).join(', ')}`,
+            );
+        }
+    }
+    return results.length ? mergeTypes(results) : UNKNOWN;
 }

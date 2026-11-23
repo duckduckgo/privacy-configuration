@@ -86,6 +86,10 @@ export function readsOuterSelf(node) {
                 }
                 case 'ref':
                     return false;
+                case 'observed':
+                case 'trigger':
+                    // `target` is an `api` path, and `where` and `field` bind `self` to each item
+                    return false;
                 default:
                     return (EXPRESSION_KEYS.includes(key) || BRANCH_KEYS.includes(key)) && readsOuterSelf(value);
             }

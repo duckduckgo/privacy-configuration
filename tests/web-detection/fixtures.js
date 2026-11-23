@@ -146,3 +146,73 @@ export const numberTest = (name, expected = true) => ({
     },
     is: expected,
 });
+
+/**
+ * A detector on the `observe` trigger: it keeps the longest long animation frame and counts recent
+ * clicks, and sends once, the first time the page hides.
+ */
+export const observeDetector = {
+    triggers: {
+        breakageReport: { state: 'disabled' },
+        observe: {
+            state: 'enabled',
+            on: [
+                { entryType: 'long-animation-frame', where: { blockingDuration: { gte: 200 } }, delayMs: 1000 },
+                { event: 'click' },
+                { event: 'visibilitychange', sync: true },
+                { event: 'pagehide', sync: true },
+            ],
+        },
+    },
+    actions: [
+        {
+            if: { trigger: { entryType: 'long-animation-frame' } },
+            then: {
+                define: {
+                    'this.longest': {
+                        api: {
+                            path: 'Math.max.apply',
+                            args: [
+                                null,
+                                { trigger: { entryType: 'long-animation-frame', field: 'blockingDuration' } },
+                            ],
+                        },
+                    },
+                },
+            },
+        },
+        {
+            if: { trigger: { event: 'click' } },
+            then: { define: { 'this.clicks': { observed: { event: 'click', keep: { withinMs: 1000 } }, using: 'length' } } },
+        },
+        {
+            if: {
+                all: [
+                    { api: 'document.hidden' },
+                    {
+                        none: [
+                            { ref: 'this.sent', is: true },
+                        ],
+                    },
+                ],
+            },
+            then: [
+                {
+                    fireEvent: {
+                        type: 'longFrames',
+                        data: {
+                            longest: {
+                                value: { ref: 'this.longest' },
+                                buckets: [
+                                    { name: '200+', is: { gte: 200 } },
+                                ],
+                            },
+                        },
+                    },
+                },
+                { define: { 'this.sent': true } },
+                { done: true },
+            ],
+        },
+    ],
+};

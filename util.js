@@ -229,6 +229,7 @@ const WEB_DETECTION_ACTION_KEYS = [
     'fireEvent',
     'breakageReportData',
     'define',
+    'done',
 ];
 
 // Actions whose order doesn't change what they do. C-S-S before 19.0.0 reads them only from an

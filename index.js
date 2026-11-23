@@ -15,7 +15,7 @@ import {
     getBaseFeatureConfigs,
     readJsoncFile,
 } from './util.js';
-import { arrayWebDetectionBuckets, defaultWebDetectionSettings } from './web-detection-util.js';
+import { arrayWebDetectionBuckets, defaultWebDetectionKeep, defaultWebDetectionSettings } from './web-detection-util.js';
 
 import {
     OVERRIDE_DIR,
@@ -422,6 +422,8 @@ async function buildPlatforms() {
         arrayWebDetectionBuckets(platformConfig);
         // Clients keep page reads for one call stack without `readCacheMaxAgeMs`; write the default where config leaves it out.
         defaultWebDetectionSettings(platformConfig);
+        // Clients read only the `keep` config gives each `observed` body; write the default where it's left out.
+        defaultWebDetectionKeep(platformConfig);
 
         if (platform === 'ios' || platform === 'macos') {
             sequenceWebDetectionActions(platformConfig);

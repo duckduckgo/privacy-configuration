@@ -119,6 +119,148 @@ export function arrayWebDetectionBuckets(config) {
 }
 
 /**
+ * The window of its log an `observed` body reads when config gives it no `keep`, which the config
+ * build writes onto the body. C-S-S reads only the `keep` config gives, and a body without one fails
+ * to parse.
+ */
+export const DEFAULT_OBSERVED_KEEP = Object.freeze({ count: 10, withinMs: 5000 });
+
+/** The most an `observed` body's `keep` may hold, for every type: CI rejects a larger `count` or `withinMs`. */
+export const OBSERVED_KEEP_CAPS = Object.freeze({ count: 100, withinMs: 30000 });
+
+/**
+ * Tighter `keep` caps for types that arrive often, by body key and type. A cap listed here replaces
+ * the one in OBSERVED_KEEP_CAPS.
+ *
+ * @type {Readonly<Record<string, Record<string, Partial<typeof OBSERVED_KEEP_CAPS>>>>}
+ */
+export const OBSERVED_KEEP_CAPS_BY_TYPE = Object.freeze({
+    event: { scroll: { withinMs: 5000 } },
+});
+
+/**
+ * The types an `observed` body may read with `keep: null`, every item recorded, by body key. Each
+ * arrives a few times in a page's life.
+ *
+ * @type {Readonly<Record<string, string[]>>}
+ */
+export const UNBOUNDED_KEEP_TYPES = Object.freeze({
+    event: [
+        'visibilitychange',
+        'pagehide',
+    ],
+});
+
+/**
+ * Write the default `keep` onto every `observed` body without one under a webDetection config value.
+ * The names of a `define` and the keys of a payload's `data` are names, never expression keys, so an
+ * `observed` there is left alone.
+ *
+ * @param {unknown} node
+ * @param {boolean} [names] - whether the keys of `node` are names: a `define`, or a payload's `data`
+ * @param {boolean} [payload] - whether `node` is the body of a payload action
+ */
+function keepUnder(node, names = false, payload = false) {
+    if (Array.isArray(node)) {
+        node.forEach((entry) => keepUnder(entry));
+        return;
+    }
+    if (!isPlainObject(node)) return;
+    for (const [
+        key,
+        value,
+    ] of Object.entries(node)) {
+        if (names) {
+            keepUnder(value);
+            continue;
+        }
+        if (key === 'observed') defaultKeep(value);
+        keepUnder(value, key === 'define' || (payload && key === 'data'), WEB_DETECTION_PAYLOAD_ACTIONS.includes(key));
+    }
+}
+
+/**
+ * @param {unknown} body - an `observed` body
+ */
+function defaultKeep(body) {
+    if (isPlainObject(body) && !('keep' in body)) body.keep = { ...DEFAULT_OBSERVED_KEEP };
+}
+
+/**
+ * Write the default `keep` onto the `observed` bodies of a detector, or of each detector of a group
+ * or of the detectors.
+ *
+ * @param {unknown} value
+ * @param {number} depth - 0 for a detector, 1 for a group, 2 for the detectors
+ */
+function keepUnderDetectors(value, depth) {
+    if (!isPlainObject(value)) return;
+    if (depth > 0) {
+        for (const entry of Object.values(value)) keepUnderDetectors(entry, depth - 1);
+        return;
+    }
+    keepUnder(value.match);
+    keepUnder(value.actions);
+}
+
+/**
+ * Write the default `keep` onto every `observed` body without one: in the detectors, and in the values
+ * `conditionalChanges` patches add or replace under `/detectors`. C-S-S reads only the windows config
+ * gives, so each body carries one.
+ *
+ * Mutates the config in place.
+ *
+ * @param {object} config - a fully-merged platform config
+ */
+export function defaultWebDetectionKeep(config) {
+    const settings = config?.features?.webDetection?.settings;
+    if (!settings) {
+        return;
+    }
+    keepUnderDetectors(settings.detectors, 2);
+    for (const entry of settings.conditionalChanges ?? []) {
+        for (const operation of entry.patchSettings ?? []) {
+            if (typeof operation.path !== 'string' || (operation.op !== 'add' && operation.op !== 'replace')) continue;
+            const segments = operation.path
+                .split('/')
+                .slice(1)
+                .map((segment) => segment.replace(/~1/g, '/').replace(/~0/g, '~'));
+            if (segments[0] !== 'detectors') continue;
+            if (segments.length <= 3) {
+                keepUnderDetectors(operation.value, 3 - segments.length);
+                continue;
+            }
+            if (segments[3] !== 'match' && segments[3] !== 'actions') continue;
+            const inner = segments.slice(4);
+            if (inner.length && inner[inner.length - 1] === 'observed' && !pathState(inner.slice(0, -1)).names) {
+                defaultKeep(operation.value);
+                continue;
+            }
+            const { names, payload } = pathState(inner);
+            keepUnder(operation.value, names, payload);
+        }
+    }
+}
+
+/**
+ * What `keepUnder` knows of the value at the end of a path from a detector's `match` or `actions`:
+ * whether its keys are names, and whether it's the body of a payload action.
+ *
+ * @param {string[]} segments
+ * @returns {{ names: boolean, payload: boolean }}
+ */
+function pathState(segments) {
+    let names = false;
+    let payload = false;
+    for (const segment of segments) {
+        const isName = names;
+        names = !isName && (segment === 'define' || (payload && segment === 'data'));
+        payload = !isName && WEB_DETECTION_PAYLOAD_ACTIONS.includes(segment);
+    }
+    return { names, payload };
+}
+
+/**
  * How long C-S-S keeps the page reads of the detectors while the page is unchanged, when config gives
  * no `readCacheMaxAgeMs`, which the config build writes into the settings. `null` keeps them until the
  * page changes. Without it, C-S-S keeps them for the call stack that read them, with no check for changes.

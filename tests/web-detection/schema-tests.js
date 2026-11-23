@@ -35,6 +35,56 @@ describe('webDetection config tests', () => {
             ).to.equal(true);
         });
 
+        it('accepts the `observe` trigger, `observed`, `trigger` and `done`', () => {
+            expect(
+                validate({
+                    triggers: {
+                        observe: {
+                            state: 'enabled',
+                            on: [
+                                { entryType: 'event', durationThreshold: 16, where: { duration: { gte: 200 } }, delayMs: 100 },
+                                { event: 'scroll', target: { api: 'visualViewport' } },
+                                { event: 'pagehide', sync: true },
+                            ],
+                        },
+                    },
+                    actions: [
+                        { define: { n: { observed: { event: 'click', keep: { count: 4, withinMs: 1000 } }, using: 'length' } } },
+                        { define: { h: { observed: { event: 'pagehide', keep: null, field: 'persisted' } } } },
+                        { define: { t: { trigger: { auto: {} } } } },
+                        { done: true },
+                    ],
+                }),
+            ).to.equal(true);
+        });
+
+        it('rejects an empty `on`, an empty `keep`, two types in a body, and keys of other bodies', () => {
+            expectRejected('empty on', { triggers: { observe: { on: [] } }, actions });
+            expectRejected('empty keep', { actions: { define: { n: { observed: { event: 'click', keep: {} } } } } });
+            expectRejected('two types', { actions: { define: { n: { observed: { event: 'click', entryType: 'event' } } } } });
+            expectRejected('a value in `auto`', { actions: { define: { n: { trigger: { auto: { a: 1 } } } } } });
+            expectRejected('whenBusy on an on body', {
+                triggers: {
+                    observe: {
+                        on: [
+                            { event: 'click', whenBusy: 'skip' },
+                        ],
+                    },
+                },
+                actions,
+            });
+            expectRejected('negative delayMs', {
+                triggers: {
+                    observe: {
+                        on: [
+                            { event: 'click', delayMs: -1 },
+                        ],
+                    },
+                },
+                actions,
+            });
+        });
+
         it('rejects an empty source body, an empty body list, and an `any`, `all` or `none` block as a body', () => {
             expectRejected('empty text body', { match: { text: {} }, actions });
             expectRejected('empty element body', { match: { element: {} }, actions });
