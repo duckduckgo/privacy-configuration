@@ -215,6 +215,8 @@ jobs:
 
             - name: Create, or Update the Diff Comment
               uses: peter-evans/create-or-update-comment@v5
+              # A failed comment must not skip the review gate, approval or Asana sync below.
+              continue-on-error: true
               with:
                   issue-number: ${{ github.event.pull_request.number }}
                   comment-id: ${{ steps.find_diff_comment.outputs.comment-id }}
@@ -226,6 +228,7 @@ jobs:
             # See: https://docs.github.com/en/actions/using-workflows/triggering-a-workflow#triggering-a-workflow-from-a-workflow
             - name: Create, or Update the Approval Comment
               uses: peter-evans/create-or-update-comment@v5
+              continue-on-error: true
               with:
                   token: ${{ secrets.PRIVACY_CONFIG_PAT }}
                   issue-number: ${{ github.event.pull_request.number }}
@@ -296,10 +299,18 @@ jobs:
 
             - name: Auto approve
               if: steps.claude_review.outputs.passed == 'true' && steps.approval.outputs.approved == 'true' && steps.check_files.outputs.files_valid == 'true' && steps.check_reviews.outputs.has_approved_review == 'false'
+              # Only approve the reviewed commit, so a push made during the review wait is not approved.
               run: |
-                  gh pr review --approve "$PR_URL"
+                  head=$(gh api "repos/$REPO/pulls/$PR_NUMBER" --jq .head.sha)
+                  if [ "$head" != "$SHA" ]; then
+                      echo "PR head moved from $SHA to $head during the review wait; leaving approval to the run for the new head"
+                      exit 0
+                  fi
+                  gh api "repos/$REPO/pulls/$PR_NUMBER/reviews" -f commit_id="$SHA" -f event=APPROVE
               env:
-                  PR_URL: ${{ github.event.pull_request.html_url }}
+                  REPO: ${{ github.repository }}
+                  PR_NUMBER: ${{ github.event.pull_request.number }}
+                  SHA: ${{ github.event.pull_request.head.sha }}
                   GITHUB_TOKEN: ${{ secrets.PRIVACY_CONFIG_PAT }}
 
             # Sync Asana tasks for PRs that need manual review (non-auto-approved)
