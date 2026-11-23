@@ -55,12 +55,12 @@ function collectFiredEventTypes(config) {
 }
 
 /**
- * Invoke `cb` for every metric declared by a subfeature of a participating parent.
+ * Invoke `visit` for every metric declared by a subfeature of a participating parent.
  *
  * @param {object} config - a generated platform config
- * @param {(ctx: { parent: string, subFeatureName: string, metricName: string, metric: any, path: string }) => void} cb
+ * @param {(ctx: { parent: string, subFeatureName: string, metricName: string, metric: any, path: string }) => void} visit
  */
-function forEachDeclaredMetric(config, cb) {
+function forEachDeclaredMetric(config, visit) {
     for (const parent of EXPERIMENT_METRIC_PARENTS) {
         const subFeatures = config?.features?.[parent]?.features ?? {};
         for (const [
@@ -71,7 +71,7 @@ function forEachDeclaredMetric(config, cb) {
                 metricName,
                 metric,
             ] of Object.entries(subFeature?.settings?.metrics ?? {})) {
-                cb({
+                visit({
                     parent,
                     subFeatureName,
                     metricName,
