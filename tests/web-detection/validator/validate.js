@@ -1,6 +1,6 @@
 // @ts-check
 import { isDeepStrictEqual } from 'node:util';
-import { MATCH_SCOPE, PAYLOAD_SCOPE, newContext } from './context.js';
+import { ACTIONS_SCOPE, MATCH_SCOPE, newContext } from './context.js';
 import { checkBody, checkExpr } from './expressions.js';
 import { onBodiesOf } from './observed.js';
 import { checkTriggers, enabledTriggersOf } from './triggers.js';
@@ -59,7 +59,7 @@ export function validateDetector(detector, path) {
     return [
         ...runChecks(ctx, () => {
             if ('match' in detector) checkExpr(detector.match, 'boolean', MATCH_SCOPE, ctx, `${path}.match`);
-            if ('actions' in detector) checkBody(detector.actions, 'value', PAYLOAD_SCOPE, ctx, `${path}.actions`);
+            if ('actions' in detector) checkBody(detector.actions, 'value', ACTIONS_SCOPE, ctx, `${path}.actions`);
             // After the walk, which gathers the types the sources read
             checkTriggers(detector.triggers, ctx, `${path}.triggers`);
         }),

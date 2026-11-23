@@ -12,8 +12,9 @@ import {
 import {
     DEFAULT_READ_CACHE_MAX_AGE_MS,
     DEFAULT_OBSERVED_KEEP,
+    DEFAULT_WAIT_TIMEOUT_MS,
     arrayWebDetectionBuckets,
-    defaultWebDetectionKeep,
+    defaultWebDetectionBodies,
     defaultWebDetectionSettings,
 } from '../web-detection-util.js';
 import { compatFunctions } from '../compatibility.js';
@@ -901,13 +902,13 @@ describe('arrayWebDetectionBuckets', () => {
     });
 });
 
-describe('defaultWebDetectionKeep', () => {
+describe('defaultWebDetectionBodies', () => {
     /**
      * @param {object} settings
      */
     const built = (settings) => {
         const config = { features: { webDetection: { settings } } };
-        defaultWebDetectionKeep(config);
+        defaultWebDetectionBodies(config);
         return config.features.webDetection.settings;
     };
 
@@ -1001,6 +1002,47 @@ describe('defaultWebDetectionKeep', () => {
         expect(name).to.deep.equal({ ref: 'x' });
         expect(names).to.deep.equal({ observed: { ref: 'x' } });
         expect(on).to.deep.equal({ event: 'click' });
+    });
+
+    it('writes the default `timeoutMs` onto `wait` bodies without one, and leaves a stated one', () => {
+        const settings = built({
+            detectors: {
+                g: {
+                    d: {
+                        actions: [
+                            { define: { a: { wait: { event: 'click' } } } },
+                            { define: { b: { wait: { event: 'click', timeoutMs: 0 } } } },
+                            { define: { c: { wait: { event: 'click', timeoutMs: null } } } },
+                            { breakageReportData: { data: { wait: { value: { wait: { event: 'click' } } } } } },
+                        ],
+                    },
+                },
+            },
+            conditionalChanges: [
+                {
+                    condition: { injectName: 'android' },
+                    patchSettings: [
+                        { op: 'replace', path: '/detectors/g/d/actions/0/define/a/wait', value: { event: 'scroll' } },
+                        { op: 'add', path: '/detectors/g/d/actions/0/define/wait', value: { ref: 'x' } },
+                    ],
+                },
+            ],
+        });
+        const [
+            a,
+            b,
+            c,
+            payload,
+        ] = settings.detectors.g.d.actions;
+        expect(a.define.a.wait.timeoutMs).to.equal(DEFAULT_WAIT_TIMEOUT_MS);
+        expect(b.define.b.wait.timeoutMs).to.equal(0);
+        expect(c.define.c.wait.timeoutMs).to.equal(null);
+        expect(payload.breakageReportData.data.wait.value.wait.timeoutMs).to.equal(DEFAULT_WAIT_TIMEOUT_MS);
+        expect(settings.conditionalChanges[0].patchSettings[0].value).to.deep.equal({
+            event: 'scroll',
+            timeoutMs: DEFAULT_WAIT_TIMEOUT_MS,
+        });
+        expect(settings.conditionalChanges[0].patchSettings[1].value).to.deep.equal({ ref: 'x' });
     });
 
     it('writes a copy of the default onto each body', () => {

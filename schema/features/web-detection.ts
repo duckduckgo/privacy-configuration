@@ -69,6 +69,41 @@ export type ObservedBody = Recorded &
         keep?: Keep;
     };
 
+/**
+ * The options of `MutationObserver.observe()`. CI allows the options and attribute names on its
+ * mutation option allowlist.
+ * @minProperties 1
+ */
+type MutationOptions = {
+    childList?: true;
+    subtree?: true;
+    characterData?: true;
+    attributes?: true;
+    attributeFilter?: NonEmptyList<NonEmptyString>;
+};
+
+/** A type a `wait` reads the next arrival of. Its `target` is read as the wait starts, so it may be any expression. */
+type WaitRecorded =
+    | EntryTypeKeys
+    | {
+          event: NonEmptyString;
+          target?: Expr;
+      }
+    | {
+          mutation: MutationOptions;
+          target: Expr;
+      };
+
+export type WaitBody = WaitRecorded &
+    ItemKeys & {
+        /**
+         * The longest the wait lasts, in ms, or `null` for no limit. The config build writes the
+         * default onto every `wait` without one.
+         * @minimum 0
+         */
+        timeoutMs?: number | null;
+    };
+
 type EmptyObject = Record<string, never>;
 
 /** The arrival that started the run, of the type a body names, or the trigger that started it. */
@@ -90,6 +125,8 @@ type OnBody = Recorded & {
      * schedule nothing, add its items to the pending run, or cancel the pending run and schedule its own.
      */
     whenPending?: 'run' | 'skip' | 'batch' | 'replace';
+    /** What the arrival does while a run of the detector is suspended in a `wait`. */
+    whenBusy?: 'queue' | 'interrupt' | 'skip';
 };
 
 type ObserveTrigger = TriggerBase & {
@@ -212,6 +249,7 @@ type ExprKeys = {
     api: string | ApiBody;
     observed: ObservedBody;
     trigger: TriggerBody;
+    wait: WaitBody;
     self: string | SelfBody;
     expr: Expr | Expr[];
     only: Expr;

@@ -159,8 +159,8 @@ export const observeDetector = {
             on: [
                 { entryType: 'long-animation-frame', where: { blockingDuration: { gte: 200 } }, delayMs: 1000 },
                 { event: 'click' },
-                { event: 'visibilitychange', sync: true },
-                { event: 'pagehide', sync: true },
+                { event: 'visibilitychange', sync: true, whenBusy: 'interrupt' },
+                { event: 'pagehide', sync: true, whenBusy: 'interrupt' },
             ],
         },
     },
@@ -211,6 +211,70 @@ export const observeDetector = {
                     },
                 },
                 { define: { 'this.sent': true } },
+                { done: true },
+            ],
+        },
+    ],
+};
+
+/**
+ * A detector that waits in a `sync` click run for the page to change, and sends once the page hides
+ * after a click that changed nothing.
+ */
+export const waitDetector = {
+    triggers: {
+        breakageReport: { state: 'disabled' },
+        observe: {
+            state: 'enabled',
+            on: [
+                { event: 'click', sync: true, whenBusy: 'skip' },
+                { event: 'visibilitychange', sync: true, whenBusy: 'interrupt' },
+                { event: 'pagehide', sync: true, whenBusy: 'interrupt' },
+            ],
+        },
+    },
+    actions: [
+        {
+            if: { trigger: { event: 'click' } },
+            then: [
+                {
+                    define: {
+                        changed: {
+                            wait: {
+                                mutation: {
+                                    childList: true,
+                                    subtree: true,
+                                    attributeFilter: [
+                                        'hidden',
+                                        'aria-expanded',
+                                    ],
+                                },
+                                target: { api: 'document' },
+                                timeoutMs: 2500,
+                            },
+                            is: { type: 'object' },
+                        },
+                    },
+                },
+                {
+                    if: {
+                        none: [
+                            { ref: 'changed', is: true },
+                        ],
+                    },
+                    then: { define: { 'this.deadTap': true } },
+                },
+            ],
+        },
+        {
+            if: {
+                all: [
+                    { api: 'document.hidden' },
+                    { ref: 'this.deadTap', is: true },
+                ],
+            },
+            then: [
+                { fireEvent: { type: 'deadTap' } },
                 { done: true },
             ],
         },

@@ -35,7 +35,7 @@ describe('webDetection config tests', () => {
             ).to.equal(true);
         });
 
-        it('accepts the `observe` trigger, `observed`, `trigger` and `done`', () => {
+        it('accepts the `observe` trigger, `observed`, `trigger`, `wait` and `done`', () => {
             expect(
                 validate({
                     triggers: {
@@ -44,7 +44,7 @@ describe('webDetection config tests', () => {
                             on: [
                                 { entryType: 'event', durationThreshold: 16, where: { duration: { gte: 200 } }, delayMs: 100 },
                                 { event: 'scroll', target: { api: 'visualViewport' }, delayMs: 250, whenPending: 'batch' },
-                                { event: 'pagehide', sync: true },
+                                { event: 'pagehide', sync: true, whenBusy: 'interrupt' },
                             ],
                         },
                     },
@@ -52,22 +52,41 @@ describe('webDetection config tests', () => {
                         { define: { n: { observed: { event: 'click', keep: { count: 4, withinMs: 1000 } }, using: 'length' } } },
                         { define: { h: { observed: { event: 'pagehide', keep: null, field: 'persisted' } } } },
                         { define: { t: { trigger: { auto: {} } } } },
+                        { define: { w: { wait: { event: 'click', target: { ref: 't' }, timeoutMs: null } } } },
+                        {
+                            define: {
+                                m: {
+                                    wait: {
+                                        mutation: {
+                                            childList: true,
+                                            subtree: true,
+                                            attributeFilter: [
+                                                'hidden',
+                                            ],
+                                        },
+                                        target: { api: 'document.body' },
+                                        where: { 'addedNodes.length': { gt: 0 } },
+                                        timeoutMs: 2500,
+                                    },
+                                },
+                            },
+                        },
                         { done: true },
                     ],
                 }),
             ).to.equal(true);
         });
 
-        it('rejects an empty `on`, an empty `keep`, two types in a body, and keys of other bodies', () => {
+        it('rejects an empty `on`, an empty `keep`, two types in a body, keys of other bodies, and malformed `wait` bodies', () => {
             expectRejected('empty on', { triggers: { observe: { on: [] } }, actions });
             expectRejected('empty keep', { actions: { define: { n: { observed: { event: 'click', keep: {} } } } } });
             expectRejected('two types', { actions: { define: { n: { observed: { event: 'click', entryType: 'event' } } } } });
             expectRejected('a value in `auto`', { actions: { define: { n: { trigger: { auto: { a: 1 } } } } } });
-            expectRejected('whenBusy on an on body', {
+            expectRejected('an unknown whenBusy', {
                 triggers: {
                     observe: {
                         on: [
-                            { event: 'click', whenBusy: 'skip' },
+                            { event: 'click', whenBusy: 'later' },
                         ],
                     },
                 },
@@ -83,6 +102,14 @@ describe('webDetection config tests', () => {
                 },
                 actions,
             });
+            expectRejected('mutation without a target', { actions: { define: { n: { wait: { mutation: { childList: true } } } } } });
+            expectRejected('empty mutation options', {
+                actions: { define: { n: { wait: { mutation: {}, target: { api: 'document' } } } } },
+            });
+            expectRejected('a mutation flag set to false', {
+                actions: { define: { n: { wait: { mutation: { childList: false }, target: { api: 'document' } } } } },
+            });
+            expectRejected('a negative timeoutMs', { actions: { define: { n: { wait: { event: 'click', timeoutMs: -1 } } } } });
             expectRejected('negative delayMs', {
                 triggers: {
                     observe: {
