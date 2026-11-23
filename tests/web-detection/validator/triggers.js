@@ -1,7 +1,7 @@
 // @ts-check
 import { PAYLOAD_SCOPE, fail } from './context.js';
 import { bindItem } from './expressions.js';
-import { EVENT_TYPE_ALLOWLIST, OPERATOR_KEYS } from './grammar.js';
+import { EVENT_TYPE_ALLOWLIST, OPERATOR_KEYS, WHEN_BUSY_VALUES } from './grammar.js';
 import { checkRecordedBody, describeRecorded, itemTypeOf, sameRecorded } from './observed.js';
 import { checkPredicate } from './predicates.js';
 import { expressionKeysOf } from './walk.js';
@@ -124,8 +124,8 @@ function checkPerFrame(body, type, ctx, path) {
 }
 
 /**
- * One `on` body: a type, a `where` over literal values, `delayMs`, `sync` where the type takes it, and
- * `whenPending`, which a type that arrives every frame needs.
+ * One `on` body: a type, a `where` over literal values, `delayMs`, `sync` where the type takes it,
+ * `whenPending`, which a type that arrives every frame needs, and `whenBusy`.
  *
  * @param {unknown} body
  * @param {Context} ctx
@@ -177,12 +177,48 @@ function checkOnBody(body, ctx, path) {
     if (body.sync === true && 'whenPending' in body)
         fail(ctx, `${path}.whenPending`, '`sync` runs the detector at the arrival, so no run is pending and it takes no `whenPending`');
     if (recorded.kind === 'event' && EVENT_TYPE_ALLOWLIST[recorded.type].perFrame) checkPerFrame(body, recorded.type, ctx, path);
+    checkWhenBusy(body, recorded, ctx, path);
 
     if (!isPageHiding(recorded) && !ctx.recordedReads.some((read) => sameRecorded(read, recorded)))
         fail(
             ctx,
             path,
-            `runs the detector on ${describeRecorded(recorded)}, which no \`observed\` or \`trigger\` source in the detector reads: a run reads its arrival through \`trigger\``,
+            `runs the detector on ${describeRecorded(recorded)}, which no \`observed\`, \`trigger\` or \`wait\` source in the detector reads: a run reads its arrival through \`trigger\``,
             'observeTrigger',
         );
+}
+
+/**
+ * `whenBusy`: what an arrival does while a run of the detector is suspended in a `wait`. The page
+ * hiding interrupts, so the run happens as the page hides. A `sync` body interrupts or skips, as a
+ * queued run happens after dispatch. Only these bodies interrupt.
+ *
+ * @param {Record<string, any>} body
+ * @param {Recorded} recorded
+ * @param {Context} ctx
+ * @param {string} path
+ */
+function checkWhenBusy(body, recorded, ctx, path) {
+    const whenBusy = body.whenBusy ?? 'queue';
+    if (!WHEN_BUSY_VALUES.includes(whenBusy)) {
+        fail(ctx, `${path}.whenBusy`, `\`whenBusy\` is one of ${WHEN_BUSY_VALUES.map((value) => `"${value}"`).join(', ')}`);
+        return;
+    }
+    if (isPageHiding(recorded)) {
+        if (whenBusy !== 'interrupt')
+            fail(
+                ctx,
+                path,
+                `\`${recorded.type}\` runs the detector as the page hides, and a run queued behind a \`wait\` runs only when the wait ends, so it needs \`"whenBusy": "interrupt"\``,
+            );
+    } else if (body.sync === true) {
+        if (whenBusy === 'queue')
+            fail(
+                ctx,
+                path,
+                'a `sync` run queued behind a `wait` runs after dispatch, so a `sync` body needs `"whenBusy": "interrupt"` or `"skip"`',
+            );
+    } else if (whenBusy === 'interrupt') {
+        fail(ctx, `${path}.whenBusy`, '`"whenBusy": "interrupt"` goes on `sync` bodies and the page hiding only');
+    }
 }

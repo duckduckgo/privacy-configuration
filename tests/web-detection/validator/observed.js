@@ -1,12 +1,16 @@
 // @ts-check
-import { expectPosition, fail, newContext } from './context.js';
-import { bindItem, sourceType } from './expressions.js';
+import { child, expectPosition, fail, newContext } from './context.js';
+import { bindItem, checkExpr, sourceType } from './expressions.js';
 import {
     ENTRY_TYPE_ALLOWLIST,
     EVENT_TARGET_ALLOWLIST,
     EVENT_TYPE_ALLOWLIST,
     LIST_CONDITION,
+    MUTATION_FIELDS,
+    MUTATION_OPTION_ALLOWLIST,
+    MUTATION_SELECTING_OPTIONS,
     NEVER_EVENT_TYPES,
+    NEVER_MUTATION_OPTIONS,
     RECORDED_KINDS,
     RUN_START_FIELDS,
     apiBody,
@@ -14,9 +18,15 @@ import {
 } from './grammar.js';
 import { checkPredicate } from './predicates.js';
 import { checkFieldRead } from './reads.js';
-import { UNKNOWN, typeOf } from './types.js';
+import { UNKNOWN, allows, describeType, isList, mergeTypes, typeOf } from './types.js';
 import { isPlainObject } from '../../../util.js';
-import { OBSERVED_KEEP_CAPS, OBSERVED_KEEP_CAPS_BY_TYPE, UNBOUNDED_KEEP_TYPES } from '../../../web-detection-util.js';
+import {
+    ALLOW_UNBOUNDED_WAIT,
+    MAX_WAIT_TIMEOUT_MS,
+    OBSERVED_KEEP_CAPS,
+    OBSERVED_KEEP_CAPS_BY_TYPE,
+    UNBOUNDED_KEEP_TYPES,
+} from '../../../web-detection-util.js';
 
 /**
  * @typedef {import('./context.js').Context} Context
@@ -24,7 +34,7 @@ import { OBSERVED_KEEP_CAPS, OBSERVED_KEEP_CAPS_BY_TYPE, UNBOUNDED_KEEP_TYPES } 
  * @typedef {import('./context.js').Scope} Scope
  * @typedef {import('./types.js').Position} Position
  * @typedef {import('./types.js').StaticType} StaticType
- * @typedef {'observed' | 'trigger' | 'on'} Place
+ * @typedef {'observed' | 'trigger' | 'on' | 'wait'} Place
  */
 
 /** The body keys naming the trigger that started a run, on `trigger` only. */
@@ -57,14 +67,25 @@ const PLACE_KEYS = {
         'delayMs',
         'sync',
         'whenPending',
+        'whenBusy',
+    ],
+    wait: [
+        'mutation',
+        'where',
+        'field',
+        'timeoutMs',
     ],
 };
+
+/** The `target` of a `wait` body that isn't a path on EVENT_TARGET_ALLOWLIST: any expression, read as the wait starts. */
+const EXPRESSION_TARGET = '(expression)';
 
 /** @type {Record<Place, string>} */
 const PLACE_NAMES = {
     observed: 'an `observed` body',
     trigger: 'a `trigger` body',
     on: 'an `on` body',
+    wait: 'a `wait` body',
 };
 
 /**
@@ -85,6 +106,7 @@ export function sameRecorded(a, b) {
 export function describeRecorded(recorded) {
     if (recorded.kind === 'entryType') return `\`${recorded.type}\` entries`;
     if (recorded.kind === 'event') return `\`${recorded.type}\` events on \`${recorded.target}\``;
+    if (recorded.kind === 'mutation') return 'mutation records';
     return `the \`${recorded.kind}\` trigger`;
 }
 
@@ -94,7 +116,7 @@ export function describeRecorded(recorded) {
  * @param {Recorded} recorded
  */
 function tableOf(recorded) {
-    return RUN_START_KINDS.includes(recorded.kind) ? recorded.kind : `${recorded.kind}:${recorded.type}`;
+    return RUN_START_KINDS.includes(recorded.kind) || recorded.kind === 'mutation' ? recorded.kind : `${recorded.kind}:${recorded.type}`;
 }
 
 /**
@@ -105,6 +127,7 @@ function tableOf(recorded) {
  */
 export function recordedTable(table) {
     if (RUN_START_KINDS.includes(table)) return RUN_START_FIELDS;
+    if (table === 'mutation') return MUTATION_FIELDS;
     const colon = table.indexOf(':');
     const kind = table.slice(0, colon);
     const type = table.slice(colon + 1);
@@ -118,6 +141,7 @@ export function recordedTable(table) {
  */
 export function describeTable(table) {
     if (RUN_START_KINDS.includes(table)) return `\`${table}\` run start`;
+    if (table === 'mutation') return 'mutation record';
     const colon = table.indexOf(':');
     return `\`${table.slice(colon + 1)}\` ${table.startsWith('entryType:') ? 'entry' : 'event'}`;
 }
@@ -173,6 +197,9 @@ export function checkRecordedBody(body, place, ctx, path) {
     for (const key of Object.keys(body)) {
         if (allowed.includes(key)) continue;
         if (key === 'keep') fail(ctx, `${path}.keep`, '`keep` sets the window of an `observed` body only');
+        else if (key === 'mutation')
+            fail(ctx, `${path}.mutation`, "`mutation` is allowed in `wait` only, whose observer runs only while it's open");
+        else if (key === 'timeoutMs') fail(ctx, `${path}.timeoutMs`, '`timeoutMs` sets how long a `wait` lasts, and goes on `wait` only');
         else if (key === 'field' && place === 'on')
             fail(
                 ctx,
@@ -184,6 +211,11 @@ export function checkRecordedBody(body, place, ctx, path) {
     const kinds = [
         ...RECORDED_KINDS,
         ...(place === 'trigger' ? RUN_START_KINDS : []),
+        ...(place === 'wait'
+            ? [
+                  'mutation',
+              ]
+            : []),
     ];
     const named = kinds.filter((key) => key in body);
     if (named.length !== 1) {
@@ -202,6 +234,13 @@ export function checkRecordedBody(body, place, ctx, path) {
             if (key in body) fail(ctx, `${path}.${key}`, `\`${key}\` goes with \`entryType\` or \`event\`, not \`${kind}\``);
         }
         return { kind, type: kind };
+    }
+    if (kind === 'mutation') {
+        checkMutationOptions(body.mutation, ctx, `${path}.mutation`);
+        if (!('target' in body)) fail(ctx, path, 'a `mutation` body observes the node its `target` gives, so it needs `target`');
+        if ('durationThreshold' in body)
+            fail(ctx, `${path}.durationThreshold`, '`durationThreshold` goes with `entryType`, not `mutation`');
+        return { kind, type: kind, target: EXPRESSION_TARGET };
     }
     const type = body[kind];
     const typePath = `${path}.${kind}`;
@@ -250,6 +289,9 @@ export function checkRecordedBody(body, place, ctx, path) {
     let target = 'window';
     if ('target' in body) {
         const read = targetPath(body.target);
+        // A `wait` reads its `target` as it starts, so it takes any expression
+        if (place === 'wait' && (read === undefined || !EVENT_TARGET_ALLOWLIST.includes(read)))
+            return known ? { kind, type, target: EXPRESSION_TARGET } : undefined;
         if (read === undefined || !EVENT_TARGET_ALLOWLIST.includes(read)) {
             fail(
                 ctx,
@@ -271,6 +313,138 @@ export function checkRecordedBody(body, place, ctx, path) {
         );
     }
     return { kind, type, target };
+}
+
+/**
+ * The options of a `mutation` body: flags on the allowlist as `true`, an `attributeFilter` of listed
+ * names, and at least one option that selects changes.
+ *
+ * @param {unknown} options
+ * @param {Context} ctx
+ * @param {string} path
+ */
+function checkMutationOptions(options, ctx, path) {
+    if (!isPlainObject(options)) {
+        fail(ctx, path, '`mutation` is an object of `MutationObserver.observe()` options');
+        return;
+    }
+    for (const [
+        key,
+        value,
+    ] of Object.entries(options)) {
+        const keyPath = `${path}.${key}`;
+        if (NEVER_MUTATION_OPTIONS.includes(key)) {
+            fail(ctx, keyPath, `"${key}" is never observed, as the old values are the page's text and attribute values`);
+        } else if (MUTATION_OPTION_ALLOWLIST.flags.includes(key)) {
+            if (value !== true) fail(ctx, keyPath, `\`${key}\` is \`true\` or left out`);
+        } else if (key === 'attributeFilter') {
+            if (!Array.isArray(value) || value.length === 0) {
+                fail(ctx, keyPath, '`attributeFilter` is a non-empty array of attribute names');
+                continue;
+            }
+            for (const name of value) {
+                if (!MUTATION_OPTION_ALLOWLIST.attributeFilter.includes(name))
+                    fail(ctx, keyPath, `attribute "${name}" is not on MUTATION_OPTION_ALLOWLIST.attributeFilter`);
+            }
+        } else {
+            fail(ctx, keyPath, `mutation option "${key}" is not on MUTATION_OPTION_ALLOWLIST`);
+        }
+    }
+    if (!MUTATION_SELECTING_OPTIONS.some((key) => key in options))
+        fail(
+            ctx,
+            path,
+            `\`mutation\` needs at least one of ${MUTATION_SELECTING_OPTIONS.map((key) => `\`${key}\``).join(', ')}, or it observes no change`,
+        );
+}
+
+/**
+ * `timeoutMs` on a `wait` body: present, as the config build writes it, a number from 0 to the cap,
+ * or `null` when CI allows a wait with no timeout.
+ *
+ * @param {Record<string, any>} body
+ * @param {Context} ctx
+ * @param {string} path
+ */
+function checkTimeout(body, ctx, path) {
+    if (!('timeoutMs' in body)) {
+        fail(ctx, path, '`wait` needs `timeoutMs`, which the config build writes where config leaves it out');
+        return;
+    }
+    const timeout = body.timeoutMs;
+    const timeoutPath = `${path}.timeoutMs`;
+    if (timeout === null) {
+        if (!ALLOW_UNBOUNDED_WAIT) fail(ctx, timeoutPath, "`timeoutMs: null` waits with no limit, which CI doesn't allow");
+    } else if (typeof timeout !== 'number' || !Number.isFinite(timeout) || timeout < 0) {
+        fail(ctx, timeoutPath, '`timeoutMs` is a number, at least 0');
+    } else if (timeout > MAX_WAIT_TIMEOUT_MS) {
+        fail(ctx, timeoutPath, `\`timeoutMs\` is at most ${MAX_WAIT_TIMEOUT_MS}`);
+    }
+}
+
+/**
+ * `wait`: the first item of a type to arrive after it starts that passes `where`, with `field` read
+ * from it, or `undefined` once `timeoutMs` passes. It suspends the run, so it goes only where C-S-S can
+ * suspend one, in `actions`, and never in a detector a breakage report runs.
+ *
+ * @param {unknown} body
+ * @param {Position} position
+ * @param {Scope} scope
+ * @param {Context} ctx
+ * @param {string} path
+ * @returns {StaticType}
+ */
+export function checkWaitSource(body, position, scope, ctx, path) {
+    if (scope.inMatch) fail(ctx, path, '`match` reads the page only, and holds no `wait`');
+    else if (!scope.waitable)
+        fail(
+            ctx,
+            path,
+            '`wait` suspends the run, so it goes only where a run can suspend: an element of a sequence, the condition or a branch of `if`, the operand of `expr`, the value beside `using`, or the value of a `define`, a `done` or a payload field',
+        );
+    if (ctx.enabledTriggers.has('breakageReport'))
+        fail(
+            ctx,
+            path,
+            '`wait` suspends the run, and a breakage report never waits on one: set `triggers.breakageReport.state` to "disabled", which is enabled by default',
+        );
+    const recorded = checkRecordedBody(body, 'wait', ctx, path);
+    if (!isPlainObject(body)) return UNKNOWN;
+    /** @type {Scope} */
+    const nested = { ...scope, waitable: false };
+    if ('target' in body) {
+        const read = targetPath(body.target);
+        if (read === undefined || !EVENT_TARGET_ALLOWLIST.includes(read)) {
+            const targetType = checkExpr(body.target, 'value', child(nested), ctx, `${path}.target`);
+            if (isList(targetType))
+                fail(ctx, `${path}.target`, 'a `target` gives one node or event target, and this gives a list: `only` takes its one item');
+            else if (targetType.types !== null && !targetType.types.includes('object'))
+                fail(
+                    ctx,
+                    `${path}.target`,
+                    `a \`target\` gives a node or event target, and config types it as ${describeType(targetType)}`,
+                );
+        }
+    }
+    // A `wait` on the default target reads the recorder an `on` body names
+    if (recorded && !('target' in body)) ctx.recordedReads.push(recorded);
+    checkTimeout(body, ctx, path);
+    const itemType = recorded ? itemTypeOf(recorded) : UNKNOWN;
+    if ('where' in body)
+        checkPredicate(body.where, 'item', itemType, { ...bindItem(nested, itemType), underNone: false }, ctx, `${path}.where`);
+    const valueType = 'field' in body ? checkFieldRead(body.field, itemType, nested, ctx, `${path}.field`) : itemType;
+    const type = mergeTypes([
+        valueType,
+        typeOf('undefined'),
+    ]);
+    if (position === 'boolean') {
+        if (!allows(type, 'boolean'))
+            fail(ctx, path, `boolean position takes a boolean, and config types the value as ${describeType(type)}`);
+        return typeOf('boolean');
+    }
+    if (position === 'number' && !allows(type, 'number'))
+        fail(ctx, path, `number position takes a number, and config types the value as ${describeType(type)}`);
+    return type;
 }
 
 /**

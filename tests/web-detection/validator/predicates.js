@@ -25,6 +25,8 @@ import { isPlainObject } from '../../../util.js';
  */
 export function checkPredicate(predicate, level, subject, scope, ctx, path) {
     if (isLiteral(predicate)) return;
+    // C-S-S suspends a run in no predicate
+    if (scope.waitable) scope = { ...scope, waitable: false };
     if (Array.isArray(predicate)) {
         fail(
             ctx,

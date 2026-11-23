@@ -158,17 +158,50 @@ export const UNBOUNDED_KEEP_TYPES = Object.freeze({
 });
 
 /**
- * Write the default `keep` onto every `observed` body without one under a webDetection config value.
+ * The longest a `wait` lasts when config gives it no `timeoutMs`, in ms, which the config build writes
+ * onto the body. C-S-S reads only the `timeoutMs` config gives, and a `wait` without one fails to parse.
+ */
+export const DEFAULT_WAIT_TIMEOUT_MS = 5000;
+
+/** The most a `wait`'s `timeoutMs` may be, in ms: CI rejects a larger one. */
+export const MAX_WAIT_TIMEOUT_MS = 30000;
+
+/**
+ * Whether CI allows `timeoutMs: null`, a `wait` that lasts until an item matches or the run is
+ * abandoned. C-S-S takes it.
+ */
+export const ALLOW_UNBOUNDED_WAIT = false;
+
+/**
+ * The key the config build writes onto each body of an expression key when config leaves it out, and
+ * the value it writes.
+ *
+ * @type {Readonly<Record<string, [string, unknown]>>}
+ */
+const BODY_DEFAULTS = Object.freeze({
+    observed: [
+        'keep',
+        DEFAULT_OBSERVED_KEEP,
+    ],
+    wait: [
+        'timeoutMs',
+        DEFAULT_WAIT_TIMEOUT_MS,
+    ],
+});
+
+/**
+ * Write the default `keep` onto every `observed` body without one, and the default `timeoutMs` onto
+ * every `wait` body without one, under a webDetection config value.
  * The names of a `define` and the keys of a payload's `data` are names, never expression keys, so an
- * `observed` there is left alone.
+ * `observed` or `wait` there is left alone.
  *
  * @param {unknown} node
  * @param {boolean} [names] - whether the keys of `node` are names: a `define`, or a payload's `data`
  * @param {boolean} [payload] - whether `node` is the body of a payload action
  */
-function keepUnder(node, names = false, payload = false) {
+function defaultsUnder(node, names = false, payload = false) {
     if (Array.isArray(node)) {
-        node.forEach((entry) => keepUnder(entry));
+        node.forEach((entry) => defaultsUnder(entry));
         return;
     }
     if (!isPlainObject(node)) return;
@@ -177,53 +210,61 @@ function keepUnder(node, names = false, payload = false) {
         value,
     ] of Object.entries(node)) {
         if (names) {
-            keepUnder(value);
+            defaultsUnder(value);
             continue;
         }
-        if (key === 'observed') defaultKeep(value);
-        keepUnder(value, key === 'define' || (payload && key === 'data'), WEB_DETECTION_PAYLOAD_ACTIONS.includes(key));
+        if (Object.hasOwn(BODY_DEFAULTS, key)) defaultBody(key, value);
+        defaultsUnder(value, key === 'define' || (payload && key === 'data'), WEB_DETECTION_PAYLOAD_ACTIONS.includes(key));
     }
 }
 
 /**
- * @param {unknown} body - an `observed` body
+ * Write the default of an expression key's body onto the body, when config leaves it out.
+ *
+ * @param {string} key - a BODY_DEFAULTS key
+ * @param {unknown} body
  */
-function defaultKeep(body) {
-    if (isPlainObject(body) && !('keep' in body)) body.keep = { ...DEFAULT_OBSERVED_KEEP };
+function defaultBody(key, body) {
+    const [
+        name,
+        value,
+    ] = BODY_DEFAULTS[key];
+    if (isPlainObject(body) && !(name in body)) body[name] = isPlainObject(value) ? { ...value } : value;
 }
 
 /**
- * Write the default `keep` onto the `observed` bodies of a detector, or of each detector of a group
- * or of the detectors.
+ * Write the defaults onto the `observed` and `wait` bodies of a detector, or of each detector of a
+ * group or of the detectors.
  *
  * @param {unknown} value
  * @param {number} depth - 0 for a detector, 1 for a group, 2 for the detectors
  */
-function keepUnderDetectors(value, depth) {
+function defaultsUnderDetectors(value, depth) {
     if (!isPlainObject(value)) return;
     if (depth > 0) {
-        for (const entry of Object.values(value)) keepUnderDetectors(entry, depth - 1);
+        for (const entry of Object.values(value)) defaultsUnderDetectors(entry, depth - 1);
         return;
     }
-    keepUnder(value.match);
-    keepUnder(value.actions);
+    defaultsUnder(value.match);
+    defaultsUnder(value.actions);
 }
 
 /**
- * Write the default `keep` onto every `observed` body without one: in the detectors, and in the values
- * `conditionalChanges` patches add or replace under `/detectors`. C-S-S reads only the windows config
- * gives, so each body carries one.
+ * Write the default `keep` onto every `observed` body without one, and the default `timeoutMs` onto
+ * every `wait` body without one: in the detectors, and in the values `conditionalChanges` patches add
+ * or replace under `/detectors`. C-S-S reads only the windows and timeouts config gives, so each body
+ * has one.
  *
  * Mutates the config in place.
  *
  * @param {object} config - a fully-merged platform config
  */
-export function defaultWebDetectionKeep(config) {
+export function defaultWebDetectionBodies(config) {
     const settings = config?.features?.webDetection?.settings;
     if (!settings) {
         return;
     }
-    keepUnderDetectors(settings.detectors, 2);
+    defaultsUnderDetectors(settings.detectors, 2);
     for (const entry of settings.conditionalChanges ?? []) {
         for (const operation of entry.patchSettings ?? []) {
             if (typeof operation.path !== 'string' || (operation.op !== 'add' && operation.op !== 'replace')) continue;
@@ -233,23 +274,24 @@ export function defaultWebDetectionKeep(config) {
                 .map((segment) => segment.replace(/~1/g, '/').replace(/~0/g, '~'));
             if (segments[0] !== 'detectors') continue;
             if (segments.length <= 3) {
-                keepUnderDetectors(operation.value, 3 - segments.length);
+                defaultsUnderDetectors(operation.value, 3 - segments.length);
                 continue;
             }
             if (segments[3] !== 'match' && segments[3] !== 'actions') continue;
             const inner = segments.slice(4);
-            if (inner.length && inner[inner.length - 1] === 'observed' && !pathState(inner.slice(0, -1)).names) {
-                defaultKeep(operation.value);
+            const last = inner[inner.length - 1];
+            if (inner.length && Object.hasOwn(BODY_DEFAULTS, last) && !pathState(inner.slice(0, -1)).names) {
+                defaultBody(last, operation.value);
                 continue;
             }
             const { names, payload } = pathState(inner);
-            keepUnder(operation.value, names, payload);
+            defaultsUnder(operation.value, names, payload);
         }
     }
 }
 
 /**
- * What `keepUnder` knows of the value at the end of a path from a detector's `match` or `actions`:
+ * What `defaultsUnder` knows of the value at the end of a path from a detector's `match` or `actions`:
  * whether its keys are names, and whether it's the body of a payload action.
  *
  * @param {string[]} segments

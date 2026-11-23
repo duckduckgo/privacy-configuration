@@ -12,7 +12,7 @@ import {
     apiBody,
 } from './grammar.js';
 import { checkPayloadSpec, checkPredicate, isLiteral } from './predicates.js';
-import { checkRecordedSource } from './observed.js';
+import { checkRecordedSource, checkWaitSource } from './observed.js';
 import { checkApi, checkFieldRead } from './reads.js';
 import {
     UNKNOWN,
@@ -260,7 +260,8 @@ export function checkExpr(node, position, scope, ctx, path) {
     const keyPosition = hasUsing ? 'value' : valuePosition;
     let type = checkExprKey(key, node, keyPosition, scope, ctx, path);
     if (hasUsing) {
-        type = checkUsing(node.using, type, valuePosition, { ...scope, bound: type }, ctx, path);
+        // The expression beside `using` may suspend the run, and the `using` operand may not
+        type = checkUsing(node.using, type, valuePosition, { ...scope, bound: type, waitable: false }, ctx, path);
     }
     if (hasIs) {
         checkPredicate(node.is, 'value', predicateSubject(type, node.is, ctx, `${path}.is`), child(scope), ctx, `${path}.is`);
@@ -540,34 +541,38 @@ function isConditionLeaf(node) {
 function checkExprKey(key, holder, position, scope, ctx, holderPath) {
     const body = holder[key];
     const path = `${holderPath}.${key}`;
+    // `if`, `expr` and `wait` itself pass on where a `wait` may be; every other key's operands are out of reach
+    const nested = scope.waitable ? { ...scope, waitable: false } : scope;
     switch (key) {
         case 'element':
         case 'text':
-            return checkConditionSource(key, body, position, scope, ctx, path);
+            return checkConditionSource(key, body, position, nested, ctx, path);
         case 'api':
-            return checkApi(apiBody(body), position, scope, ctx, path, undefined, ctx.functionApis.has(holder));
+            return checkApi(apiBody(body), position, nested, ctx, path, undefined, ctx.functionApis.has(holder));
         case 'observed':
         case 'trigger':
-            return checkRecordedSource(key, body, position, scope, ctx, path);
+            return checkRecordedSource(key, body, position, nested, ctx, path);
+        case 'wait':
+            return checkWaitSource(body, position, scope, ctx, path);
         case 'self':
-            return checkSelf(body, position, scope, ctx, path);
+            return checkSelf(body, position, nested, ctx, path);
         case 'expr':
             return checkExprBody(body, position, scope, ctx, path);
         case 'only':
-            return checkOnly(body, position, scope, ctx, path);
+            return checkOnly(body, position, nested, ctx, path);
         case 'sum':
         case 'mul':
-            return checkArith(key, body, position, scope, ctx, path);
+            return checkArith(key, body, position, nested, ctx, path);
         case 'div':
-            return checkDiv(body, position, scope, ctx, path);
+            return checkDiv(body, position, nested, ctx, path);
         case 'any':
         case 'all':
         case 'none':
-            return checkLogic(key, body, position, scope, ctx, path);
+            return checkLogic(key, body, position, nested, ctx, path);
         case 'if':
             return checkIf(holder, position, scope, ctx, holderPath);
         case 'ref':
-            return checkRef(body, position, scope, ctx, path);
+            return checkRef(body, position, nested, ctx, path);
         default:
             return UNKNOWN;
     }
@@ -619,7 +624,9 @@ function checkExprBody(body, position, scope, ctx, path) {
             'spread',
             'root',
         ]);
-        const entries = body.map((entry, index) => checkExpr(entry, 'value', child(scope), ctx, `${path}[${index}]`));
+        const entries = body.map((entry, index) =>
+            checkExpr(entry, 'value', { ...child(scope), waitable: false }, ctx, `${path}[${index}]`),
+        );
         const item = entries.length ? mergeTypes(entries.map(itemOf)) : UNKNOWN;
         return position === 'spread' ? item : { ...item, list: 'array' };
     }

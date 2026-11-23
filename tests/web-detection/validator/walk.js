@@ -88,7 +88,8 @@ export function readsOuterSelf(node) {
                     return false;
                 case 'observed':
                 case 'trigger':
-                    // `target` is an `api` path, and `where` and `field` bind `self` to each item
+                case 'wait':
+                    // `where` and `field` bind `self` to each item. A `wait` sits in no `where` or `field`
                     return false;
                 default:
                     return (EXPRESSION_KEYS.includes(key) || BRANCH_KEYS.includes(key)) && readsOuterSelf(value);
