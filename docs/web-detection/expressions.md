@@ -12,7 +12,7 @@ A condition (a detector's [`match`](overview.md#match) or the condition of an `i
 |---|---|
 | Boolean | `true`, `false` |
 | Number | Numbers, `NaN` and infinities included |
-| List | Items in order: what `element` and `text` select, an iterable other than a string or a node that `api` reads, the items an `api` `where` or `field` gives, and the values of [`expr`](#expr) over an array |
+| List | Items in order: what `element` and `text` select, an iterable other than a string or a node that `api` reads, the items an `api` `where` or `field` gives, the items `observed` and `trigger` give, and the values of [`expr`](#expr) over an array |
 | Any value | Every value a read can give, including strings, `null`, `undefined` and objects. An action gives `undefined` |
 
 | Source | Gives |
@@ -21,6 +21,8 @@ A condition (a detector's [`match`](overview.md#match) or the condition of an `i
 | `text` | A list of each match's string |
 | `api` | The value its path reads or its call returns. An iterable other than a string or a node is a list too, and an `api` with `where`, or with `field` on a list, gives a list |
 | [`self`](#self) | What an `api` with the same body gives, read from the value `self` is bound to |
+| `observed` | A list of the items recorded of a type, over the body's `keep` window, or with `field`, of each one's value |
+| `trigger` | A list of the items of the arrival that started the run, or with `field`, of each one's value |
 
 See [Sources](sources.md) for each source's keys and items.
 
@@ -40,14 +42,14 @@ See [Sources](sources.md) for each source's keys and items.
 
 A value of a type its position doesn't expect fails ([Values that do not fit](failures.md#values-that-do-not-fit)), and CI rejects it when the type can be told from the config ([Types](#types)). An `api` value's type is checked when it's read: `{"api": "document.hidden"}` is a boolean in boolean position, and `{"api": {"path": "document.readyState"}, "is": "complete"}` tests a string.
 
-`element` and `text` always give lists, so their type is known from the config. In boolean position, a selected list holds when it has at least one item. As an operand of `any`, `all` and `none`, `element` without `field` and `text` each count as one such boolean, while other lists contribute each of their items. `element` with `field`, and `api` or `self` with `where`, aren't conditions ([Types](#types)), so use `only` to get the one item, or `"using": "length"` to count them.
+`element`, `text`, `observed` and `trigger` always give lists, so their type is known from the config. In boolean position, a selected list holds when it has at least one item. As an operand of `any`, `all` and `none`, `text`, and `element`, `observed` and `trigger` without `field`, each count as one such boolean, while other lists contribute each of their items. `element`, `observed` and `trigger` with `field`, and `api` or `self` with `where`, aren't conditions ([Types](#types)), so use `only` to get the one item, or `"using": "length"` to count them.
 
 This table shows what each expression gives in each position. "Refused by CI" marks a type that the config shows is wrong for that position ([Types](#types)). On device it fails when it's read, the same as a type that's only known at read time ([Values that do not fit](failures.md#values-that-do-not-fit)):
 
 | Expression | Boolean | Number | Operand of `only` | Value |
 |---|---|---|---|---|
-| `element`, `text` | Holds when it selects an item | Refused by CI | The list | The list ([Selected lists](#selected-lists)) |
-| `element` with `field` | Holds when it selects an item. Refused by CI | Its one item | The list | The list ([Selected lists](#selected-lists)) |
+| `element`, `text`, `observed`, `trigger` | Holds when it selects an item | Refused by CI | The list | The list ([Selected lists](#selected-lists)) |
+| `element`, `observed` or `trigger` with `field` | Holds when it selects an item. Refused by CI | Its one item | The list | The list ([Selected lists](#selected-lists)) |
 | `api`, `self` | Its value, checked when read | Its value, checked when read | Its value, when it is a list | Its value |
 | `api` or `self` with `where`, or `field` on a list | Holds when it has an item. Refused by CI with `where` | Its one item | The list | The list ([Selected lists](#selected-lists)) |
 | `only` | Its item, checked when read | Its item, checked when read | Its item, checked when read | Its item |
@@ -60,7 +62,7 @@ This table shows what each expression gives in each position. "Refused by CI" ma
 
 ### Selected lists
 
-`element` and `text` give a selected list, and so does an `api` with `where`, or with `field` on a list. Where one value is needed, a selected list gives its one item:
+`element`, `text`, `observed` and `trigger` give a selected list, and so does an `api` with `where`, or with `field` on a list. Where one value is needed, a selected list gives its one item:
 
 | Where | A selected list gives |
 |---|---|
