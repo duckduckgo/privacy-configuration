@@ -32,7 +32,7 @@ A value the config can't use fails. Each of these depends on the page:
 | A list unwrapped, or read by `only`, with several items | `at` through `using`, or a type argument excluding a page's own marks ([Performance timeline](sources.md#performance-timeline)) |
 | `where` on an `api` value that isn't a list | A path that reads a list |
 | A root that isn't a selector, a node or a list of nodes | A guard testing its `type` ([`root`](sources.md#root)) |
-| A `wait` `target` that isn't an event target, or for `mutation` a node | A guard testing its `type` ([`wait`](sources.md#wait)) |
+| A `wait` `target` that isn't an event target, for `mutation` a node, or for `intersection` and `resize` an element | A guard testing its `type` ([`wait`](sources.md#wait)) |
 
 ## Parse errors
 
