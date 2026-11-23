@@ -138,31 +138,97 @@ export function mungeFileContents(fileContent, filePath) {
 }
 
 /**
+ * Escapes a key for use as a JSON pointer segment
+ * @param {string} key - The object key
+ * @returns {string} The escaped segment
+ */
+function toPointerSegment(key) {
+    return key.replace(/~/g, '~0').replace(/\//g, '~1');
+}
+
+/**
+ * Finds sub-feature rollouts whose only change is appending steps that raise the percentage.
+ * Clients persist each step, so a raise must append; editing or removing a step needs review.
+ * See docs/rollouts-and-experiments.md
+ * @param {Object} baseConfig - The config before the change
+ * @param {Object} updatedConfig - The config after the change
+ * @returns {Set<string>} JSON pointers of `rollout/steps` arrays that only had raises appended
+ */
+export function findRolloutStepAppends(baseConfig, updatedConfig) {
+    const appendedPaths = new Set();
+    for (const [
+        featureKey,
+        feature,
+    ] of Object.entries(updatedConfig?.features ?? {})) {
+        for (const [
+            subFeatureKey,
+            subFeature,
+        ] of Object.entries(feature?.features ?? {})) {
+            const steps = subFeature?.rollout?.steps;
+            const baseSteps = baseConfig?.features?.[featureKey]?.features?.[subFeatureKey]?.rollout?.steps;
+            if (!Array.isArray(steps) || !Array.isArray(baseSteps) || baseSteps.length === 0 || steps.length <= baseSteps.length) {
+                continue;
+            }
+
+            // Existing steps must be untouched
+            if (!baseSteps.every((step, i) => JSON.stringify(step) === JSON.stringify(steps[i]))) {
+                continue;
+            }
+
+            // Each new step must only set a percentage higher than the one before, up to 100
+            let previousPercent = baseSteps[baseSteps.length - 1]?.percent;
+            const onlyRaises = steps.slice(baseSteps.length).every((step) => {
+                const isRaise =
+                    Object.keys(step ?? {}).join() === 'percent' &&
+                    typeof step.percent === 'number' &&
+                    typeof previousPercent === 'number' &&
+                    step.percent > previousPercent &&
+                    step.percent <= 100;
+                previousPercent = step.percent;
+                return isRaise;
+            });
+
+            if (onlyRaises) {
+                appendedPaths.add(`/features/${toPointerSegment(featureKey)}/features/${toPointerSegment(subFeatureKey)}/rollout/steps`);
+            }
+        }
+    }
+    return appendedPaths;
+}
+
+/**
+ * Checks if a single patch is auto-approvable
+ * @param {Object} patch - A JSON patch from fast-json-patch
+ * @param {Set<string>} rolloutStepAppends - Paths from findRolloutStepAppends
+ * @returns {boolean} True if the patch is auto-approvable
+ */
+function isPatchAutoApprovable(patch, rolloutStepAppends) {
+    const featurePath = AUTO_APPROVABLE_FEATURE_PATHS.find((feature) => patch.path.startsWith(feature));
+    if (featurePath && isPathAllowedForFeature(patch.path, featurePath)) {
+        return true;
+    }
+    return [
+        ...rolloutStepAppends,
+    ].some((stepsPath) => patch.path === stepsPath || patch.path.startsWith(stepsPath + '/'));
+}
+
+/**
  * Checks if changes are only to allowed paths in auto-approvable features
  * @param {Array} patches - Array of JSON patches from fast-json-patch
+ * @param {Set<string>} [rolloutStepAppends] - Paths from findRolloutStepAppends
  * @returns {boolean} True if changes are only to allowed paths
  */
-export function isAllowedChangesOnly(patches) {
-    // Check if all patches are for auto-approvable features and allowed paths
-    return patches.every((patch) => {
-        // Find which auto-approvable feature this patch belongs to
-        const featurePath = AUTO_APPROVABLE_FEATURE_PATHS.find((feature) => patch.path.startsWith(feature));
-
-        if (!featurePath) {
-            return false; // Not an auto-approvable feature
-        }
-
-        // Check if the path is in the allowed list for this feature
-        return isPathAllowedForFeature(patch.path, featurePath);
-    });
+export function isAllowedChangesOnly(patches, rolloutStepAppends = new Set()) {
+    return patches.every((patch) => isPatchAutoApprovable(patch, rolloutStepAppends));
 }
 
 /**
  * Analyzes patches to determine if they should be auto-approved
  * @param {Array} patches - Array of JSON patches from fast-json-patch
+ * @param {Set<string>} [rolloutStepAppends] - Paths from findRolloutStepAppends
  * @returns {Object} Analysis result with approval status and reasoning
  */
-export function analyzePatchesForApproval(patches) {
+export function analyzePatchesForApproval(patches, rolloutStepAppends = new Set()) {
     if (patches.length === 0) {
         return {
             shouldApprove: false,
@@ -171,37 +237,28 @@ export function analyzePatchesForApproval(patches) {
     }
 
     // Check if changes are only to auto-approvable allowed paths
-    if (isAllowedChangesOnly(patches)) {
+    if (isAllowedChangesOnly(patches, rolloutStepAppends)) {
         return {
             shouldApprove: true,
-            reason: 'Auto-approved: Changes only to auto-approvable feature domains/exceptions',
+            reason: 'Auto-approved: Changes only to auto-approvable feature domains/exceptions or rollout raises',
         };
-    }
-
-    // Check if any changes are outside allowed paths
-    const disallowedPatches = [];
-    for (const patch of patches) {
-        const featurePath = AUTO_APPROVABLE_FEATURE_PATHS.find((feature) => patch.path.startsWith(feature));
-        const isDisallowed = featurePath ? !isPathAllowedForFeature(patch.path, featurePath) : true;
-        if (isDisallowed) {
-            disallowedPatches.push(patch);
-        }
     }
 
     // This case covers changes to non-auto-approvable features
     return {
         shouldApprove: false,
         reason: 'Manual review required: Changes to disallowed paths',
-        disallowedPatches,
+        disallowedPatches: patches.filter((patch) => !isPatchAutoApprovable(patch, rolloutStepAppends)),
     };
 }
 
 /**
  * Generates a summary of changes for reporting
  * @param {Array} patches - Array of JSON patches from fast-json-patch
+ * @param {Set<string>} [rolloutStepAppends] - Paths from findRolloutStepAppends
  * @returns {Object} Summary of changes by operation type and path
  */
-export function generateChangeSummary(patches) {
+export function generateChangeSummary(patches, rolloutStepAppends = new Set()) {
     const summary = {
         total: patches.length,
         byOperation: {},
@@ -219,8 +276,7 @@ export function generateChangeSummary(patches) {
         summary.byPath[pathKey] = (summary.byPath[pathKey] || 0) + 1;
 
         // Count auto-approvable vs other changes
-        const featurePath = AUTO_APPROVABLE_FEATURE_PATHS.find((feature) => patch.path.startsWith(feature));
-        if (featurePath && isPathAllowedForFeature(patch.path, featurePath)) {
+        if (isPatchAutoApprovable(patch, rolloutStepAppends)) {
             summary.autoApprovableChanges++;
         } else {
             summary.otherChanges++;
