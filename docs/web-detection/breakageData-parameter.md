@@ -63,6 +63,29 @@ An `errors` key is the config path to the expression where the failure arose: `m
 
 A detector has an entry once it has written or recorded a failure, whether or not it has a `breakageReportData` action. A detector whose `breakageReportData` runs on every run has an entry in every report, with the values from its latest run. A detector that calls a method one engine doesn't have, without guarding it with `fails`, has an entry in every report from that engine.
 
+### `detectorPerf`
+
+The timings of the detector runs in the frame, when the `detectorPerf` feature is enabled:
+
+```json
+"detectorPerf": {
+  "combinedTotalMs": 41.2,
+  "worstDispatch": {"totalMs": 6.3, "detectors": {"exampleGroup.exampleDetector": 4.9, "exampleGroup.otherDetector": 1.4}},
+  "detectors": {"exampleGroup.exampleDetector": {"runs": 12, "totalMs": 9.8, "worstMs": 3.1}}
+}
+```
+
+| Field | Value |
+|---|---|
+| `combinedTotalMs` | The total time of every detector run in the frame |
+| `worstDispatch.totalMs` | The longest dispatch in the frame: the detector work in one call into web detection, such as an `auto` timer or the breakage report's run |
+| `worstDispatch.detectors` | Each detector's share of that dispatch, by detector ID |
+| `detectors.<id>.runs` | The detector's runs in the frame |
+| `detectors.<id>.totalMs` | The detector's total time in the frame |
+| `detectors.<id>.worstMs` | The detector's longest run |
+
+Times are in ms, rounded to 0.1 ms. `worstDispatch` is left out when no run in the frame had a dispatch. `combinedTotalMs` and `totalMs` grow with how long the page has been open, so compare them across reports with the page's age at the report.
+
 ### Encoded example
 
 The JSON payload:
