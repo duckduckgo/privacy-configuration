@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+import { MAX_READ_CACHE_MAX_AGE_MS } from '../../web-detection-util.js';
 import { ORDER_FREE_ACTION_KEYS, isPlainObject, sequenceWebDetectionActions } from '../../util.js';
 import {
     CLIENT_RELEASES,
@@ -12,6 +13,7 @@ import {
 } from './clients.js';
 import { detectorNameErrors, detectorViews, forEachWebDetectionConfig, latestConfigs, viewErrors } from './configs.js';
 import { ACTION_KEYS, BRANCH_KEYS } from './validator/grammar.js';
+import { readCacheMaxAgeMsErrors } from './validator/settings.js';
 import { validateDetector } from './validator/validate.js';
 import { bucketWarnings, itemWalkWarnings, repeatedEventWarnings } from './validator/warnings.js';
 
@@ -318,6 +320,40 @@ describe('webDetection config tests', () => {
                 expect(wrong, wrong.join('\n')).to.deep.equal([]);
             });
         }
+    });
+
+    describe('feature settings', () => {
+        forEachWebDetectionConfig(({ configName, webDetection }) => {
+            it(`${configName} gives \`readCacheMaxAgeMs\` null or an integer from 0 to the cap, in patches too`, () => {
+                const errors = readCacheMaxAgeMsErrors(webDetection.settings);
+                expect(errors, errors.join('\n')).to.deep.equal([]);
+            });
+        });
+
+        it('checks `readCacheMaxAgeMs` and the values patches give it (self-test)', () => {
+            expect(readCacheMaxAgeMsErrors({ readCacheMaxAgeMs: null })).to.deep.equal([]);
+            expect(readCacheMaxAgeMsErrors({ readCacheMaxAgeMs: 0 })).to.deep.equal([]);
+            expect(readCacheMaxAgeMsErrors({ readCacheMaxAgeMs: MAX_READ_CACHE_MAX_AGE_MS })).to.deep.equal([]);
+            expect(
+                readCacheMaxAgeMsErrors({
+                    readCacheMaxAgeMs: 1.5,
+                    conditionalChanges: [
+                        {
+                            condition: { injectName: 'android' },
+                            patchSettings: [
+                                { op: 'replace', path: '/readCacheMaxAgeMs', value: MAX_READ_CACHE_MAX_AGE_MS + 1 },
+                                { op: 'replace', path: '/readCacheMaxAgeMs', value: null },
+                            ],
+                        },
+                    ],
+                }).map((error) => error.split(':')[0]),
+            ).to.deep.equal([
+                'settings',
+                'conditionalChanges[0]',
+            ]);
+            expect(readCacheMaxAgeMsErrors({ readCacheMaxAgeMs: -1 })).to.have.length(1);
+            expect(readCacheMaxAgeMsErrors({ readCacheMaxAgeMs: '500' })).to.have.length(1);
+        });
     });
 
     describe('naming validation', () => {
