@@ -420,7 +420,8 @@ async function buildPlatforms() {
         renameEventHubImmediateTriggers(platformConfig, platform);
         // Authors may write webDetection payload buckets as an object; clients read an array.
         arrayWebDetectionBuckets(platformConfig);
-        // Clients keep page reads for one call stack without `readCacheMaxAgeMs`; write the default where config leaves it out.
+        // Clients keep page reads for one call stack without `readCacheMaxAgeMs`, and detector events start no runs in the
+        // emitting task without `detectorEventMaxDepth`; write the defaults where config leaves them out.
         defaultWebDetectionSettings(platformConfig);
         // Clients read only the `keep` and `timeoutMs` config gives `observed` and `wait` bodies; write the defaults where they're left out.
         defaultWebDetectionBodies(platformConfig);

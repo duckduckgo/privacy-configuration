@@ -785,6 +785,11 @@ describe('defaultWebDetectionSettings', () => {
         expect(built({ detectors: {}, readCacheMaxAgeMs: null }).readCacheMaxAgeMs).to.equal(null);
     });
 
+    it('writes the default `detectorEventMaxDepth` when config leaves it out, and keeps a stated one', () => {
+        expect(built({ detectors: {} }).detectorEventMaxDepth).to.equal(DEFAULT_DETECTOR_EVENT_MAX_DEPTH);
+        expect(built({ detectors: {}, detectorEventMaxDepth: 0 }).detectorEventMaxDepth).to.equal(0);
+    });
+
     it('leaves a config without webDetection settings alone', () => {
         const config = { features: {} };
         defaultWebDetectionSettings(config);
@@ -1044,11 +1049,6 @@ describe('defaultWebDetectionBodies', () => {
             timeoutMs: DEFAULT_WAIT_TIMEOUT_MS,
         });
         expect(settings.conditionalChanges[0].patchSettings[1].value).to.deep.equal({ ref: 'x' });
-    });
-
-    it('writes the default `detectorEventMaxDepth` when config leaves it out, and keeps a stated one', () => {
-        expect(built({ detectors: {} }).detectorEventMaxDepth).to.equal(DEFAULT_DETECTOR_EVENT_MAX_DEPTH);
-        expect(built({ detectors: {}, detectorEventMaxDepth: 0 }).detectorEventMaxDepth).to.equal(0);
     });
 
     it('leaves the fields of an `object` alone, as names', () => {
