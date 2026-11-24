@@ -39,8 +39,8 @@ type SubFeatures<VersionType> = {
             terminationCount?: number;
             // Window in seconds over which terminationCount kills are counted
             timeWindowSeconds?: number;
-            // Form factors that show the error page: "phone", "tablet"
-            supportedFormFactors?: string[];
+            // Form factors that show the error page
+            supportedFormFactors?: ('phone' | 'tablet')[];
         }
     >;
     inactivityNotification?: SubFeature<
