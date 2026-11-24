@@ -15,7 +15,7 @@ import {
     getBaseFeatureConfigs,
     readJsoncFile,
 } from './util.js';
-import { arrayWebDetectionBuckets } from './web-detection-util.js';
+import { arrayWebDetectionBuckets, defaultWebDetectionSettings } from './web-detection-util.js';
 
 import {
     OVERRIDE_DIR,
@@ -420,6 +420,8 @@ async function buildPlatforms() {
         renameEventHubImmediateTriggers(platformConfig, platform);
         // Authors may write webDetection payload buckets as an object; clients read an array.
         arrayWebDetectionBuckets(platformConfig);
+        // Clients keep page reads for one call stack without `readCacheMaxAgeMs`; write the default where config leaves it out.
+        defaultWebDetectionSettings(platformConfig);
 
         if (platform === 'ios' || platform === 'macos') {
             sequenceWebDetectionActions(platformConfig);

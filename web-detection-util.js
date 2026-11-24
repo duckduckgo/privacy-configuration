@@ -117,3 +117,28 @@ export function arrayWebDetectionBuckets(config) {
         }
     }
 }
+
+/**
+ * How long C-S-S keeps the page reads of the detectors while the page is unchanged, when config gives
+ * no `readCacheMaxAgeMs`, which the config build writes into the settings. `null` keeps them until the
+ * page changes. Without it, C-S-S keeps them for the call stack that read them, with no check for changes.
+ */
+export const DEFAULT_READ_CACHE_MAX_AGE_MS = null;
+
+/** The largest number of ms CI allows for `readCacheMaxAgeMs`, below the 2^31 - 1 ms a timer can wait. */
+export const MAX_READ_CACHE_MAX_AGE_MS = 600000;
+
+/**
+ * Write the default `readCacheMaxAgeMs` into the webDetection settings when config leaves it out.
+ *
+ * Mutates the config in place.
+ *
+ * @param {object} config - a fully-merged platform config
+ */
+export function defaultWebDetectionSettings(config) {
+    const settings = config?.features?.webDetection?.settings;
+    if (!settings) {
+        return;
+    }
+    if (!('readCacheMaxAgeMs' in settings)) settings.readCacheMaxAgeMs = DEFAULT_READ_CACHE_MAX_AGE_MS;
+}

@@ -9,7 +9,7 @@ import {
     renameEventHubImmediateTriggers,
     addHashToFeatures,
 } from '../util.js';
-import { arrayWebDetectionBuckets } from '../web-detection-util.js';
+import { DEFAULT_READ_CACHE_MAX_AGE_MS, arrayWebDetectionBuckets, defaultWebDetectionSettings } from '../web-detection-util.js';
 import { compatFunctions } from '../compatibility.js';
 import { BROWSERS_SUBDIR, TDS_PATH_FOR_PLATFORM } from '../constants.js';
 import platforms from '../platforms.js';
@@ -757,6 +757,30 @@ describe('compatFunctions.v5', () => {
     it('does not modify its input', () => {
         expect(config.features.capped.state).to.equal('enabled');
         expect(config.features.capped.maxSupportedVersion).to.equal('7.300.0');
+    });
+});
+
+describe('defaultWebDetectionSettings', () => {
+    /**
+     * @param {object} settings
+     */
+    const built = (settings) => {
+        const config = { features: { webDetection: { settings } } };
+        defaultWebDetectionSettings(config);
+        return config.features.webDetection.settings;
+    };
+
+    it('writes the default `readCacheMaxAgeMs` when config leaves it out, and keeps a stated one', () => {
+        expect(built({ detectors: {} }).readCacheMaxAgeMs).to.equal(DEFAULT_READ_CACHE_MAX_AGE_MS);
+        expect(built({ detectors: {}, readCacheMaxAgeMs: 0 }).readCacheMaxAgeMs).to.equal(0);
+        expect(built({ detectors: {}, readCacheMaxAgeMs: 500 }).readCacheMaxAgeMs).to.equal(500);
+        expect(built({ detectors: {}, readCacheMaxAgeMs: null }).readCacheMaxAgeMs).to.equal(null);
+    });
+
+    it('leaves a config without webDetection settings alone', () => {
+        const config = { features: {} };
+        defaultWebDetectionSettings(config);
+        expect(config).to.deep.equal({ features: {} });
     });
 });
 

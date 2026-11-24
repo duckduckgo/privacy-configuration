@@ -41,7 +41,7 @@ Detectors are configured under `webDetection.settings.detectors`, in named group
         }
       }
     },
-    ["readCacheMaxAgeMs"]: <int>
+    ["readCacheMaxAgeMs"]: <int> | null
   }
 }
 ```
@@ -114,7 +114,7 @@ These sit beside `detectors` in `webDetection.settings`, and apply to every dete
 
 | Setting | Meaning | Absent |
 |---|---|---|
-| `readCacheMaxAgeMs` | How long, in ms, the XPath selections and element text one run of the detectors reads are kept for later runs while the page is unchanged. The first change to the DOM under a node that was read clears them, as does this age | Reads are shared only by the detectors that run at the same time, as is `0` |
+| `readCacheMaxAgeMs` | How long the XPath selections and element text the detectors read are kept for later runs while the page is unchanged: `null` until the page changes, a number of ms up to 600000, or `0` for the detectors that run at the same time only. The first change to the DOM under a node that was read clears them | The config build writes `null` |
 
 ## Triggers
 
