@@ -277,9 +277,8 @@ function defaultsUnderDetectors(value, depth) {
 }
 
 /**
- * Write the default `detectorEventMaxDepth` into the settings when config leaves it out, the default
- * `keep` onto every `observed` body without one, and the default `timeoutMs` onto every `wait` body
- * without one: in the detectors, and in the values `conditionalChanges` patches add
+ * Write the default `keep` onto every `observed` body without one, and the default `timeoutMs` onto
+ * every `wait` body without one: in the detectors, and in the values `conditionalChanges` patches add
  * or replace under `/detectors`. C-S-S reads only the windows and timeouts config gives, so each body
  * has one.
  *
@@ -292,7 +291,6 @@ export function defaultWebDetectionBodies(config) {
     if (!settings) {
         return;
     }
-    if (!('detectorEventMaxDepth' in settings)) settings.detectorEventMaxDepth = DEFAULT_DETECTOR_EVENT_MAX_DEPTH;
     defaultsUnderDetectors(settings.detectors, 2);
     for (const entry of settings.conditionalChanges ?? []) {
         for (const operation of entry.patchSettings ?? []) {
@@ -348,7 +346,8 @@ export const DEFAULT_READ_CACHE_MAX_AGE_MS = null;
 export const MAX_READ_CACHE_MAX_AGE_MS = 600000;
 
 /**
- * Write the default `readCacheMaxAgeMs` into the webDetection settings when config leaves it out.
+ * Write the default `readCacheMaxAgeMs` and `detectorEventMaxDepth` into the webDetection settings
+ * when config leaves them out.
  *
  * Mutates the config in place.
  *
@@ -360,4 +359,5 @@ export function defaultWebDetectionSettings(config) {
         return;
     }
     if (!('readCacheMaxAgeMs' in settings)) settings.readCacheMaxAgeMs = DEFAULT_READ_CACHE_MAX_AGE_MS;
+    if (!('detectorEventMaxDepth' in settings)) settings.detectorEventMaxDepth = DEFAULT_DETECTOR_EVENT_MAX_DEPTH;
 }
