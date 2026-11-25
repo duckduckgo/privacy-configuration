@@ -9,10 +9,11 @@ A source reads the page. See [Values](expressions.md#values) for what each one g
 | [`api`](#api) | A Web API, by path: a property or a method's result |
 | [`observed`](#observed) | The performance entries or events of one type recorded in the frame, over a recent window |
 | [`trigger`](#trigger) | The arrival that started the run |
+| [`wait`](#wait) | The next arrival of a type, which the run suspends for |
 
 ## Lists: `where` and `field`
 
-`element`, `api`, `observed` and `trigger` take two keys that work on the items of a list:
+`element`, `api`, `observed`, `trigger` and `wait` take two keys that work on the items of a list:
 
 | Key | Meaning |
 |---|---|
@@ -261,7 +262,7 @@ Reading `resource` entries by name puts a URL in config. Only the value read is 
 
 It gives a selected list of the items in its window that pass `where`, in the order they were recorded. A type with nothing recorded, or one the engine doesn't support, gives a list with no items. Without `field`, in boolean position, it holds when it has an item, as `element` does.
 
-The entry types, event types and targets a body can name, and the fields each item has, are on allowlists in this repository's CI ([Recorded types](validation.md#recorded-types-and-observe)). `unload` and `beforeunload` are never on them, since listening for either takes the page out of the back/forward cache.
+The entry types, event types and targets a body can name, and the fields each item has, are on allowlists in this repository's CI ([Recorded types](validation.md#recorded-types-wait-and-observe)). `unload` and `beforeunload` are never on them, since listening for either takes the page out of the back/forward cache.
 
 ### Items
 
@@ -283,7 +284,7 @@ An event's `timeStamp` is when the user acted, so input that waited behind a bus
 | `visualViewport` | Events dispatched at `visualViewport`, such as its `scroll` |
 | `navigation` | `navigate` and `navigatesuccess`, which are dispatched only there |
 
-A `target` is read once, when recording starts, so it's an `api` path on the target allowlist. To read the events on one element, test `target` in `where`, which also covers elements added later and elements the page re-renders.
+On `observed` and `on` bodies, a `target` is read once, when recording starts, so it's an `api` path on the target allowlist. A [`wait`](#wait) reads its `target` as it starts, so there it can be any expression. To read the events on one element, test `target` in `where`, which also covers elements added later and elements the page re-renders.
 
 ### `keep`
 
@@ -307,7 +308,7 @@ Each `observed` body reads a window of the items recorded of its type:
 | Age | From when the item was recorded. An item's `timeStamp` or `startTime` can be earlier, so clicks dispatched together after a long task all count as recent, and a body that needs items by input time tests `timeStamp` in `where` |
 | Anchor | `withinMs` runs back from when the `observed` is evaluated, so in a run with `delayMs` the window includes the delay |
 | Per body | Each body reads its own window, whatever other detectors read of the same type |
-| Caps | CI caps `count` and `withinMs` per type ([Recorded types](validation.md#recorded-types-and-observe)) |
+| Caps | CI caps `count` and `withinMs` per type ([Recorded types](validation.md#recorded-types-wait-and-observe)) |
 
 ## `trigger`
 
@@ -334,3 +335,71 @@ A body has exactly one of `entryType`, `event`, `auto` and `breakageReport`, and
 | An `auto` timer, a breakage report | One item, whose `timeStamp` is when the run started |
 
 A body naming another type gives a list with no items, so in boolean position `{"trigger": {"event": "click"}}` holds only in a run a click started. A run with `delayMs` keeps its arrival's items until it runs. A run that arrivals were batched into gives the items of each, in the order they arrived ([Pending runs](overview.md#pending-runs)). CI rejects `trigger` in `match`, which reads the page only.
+
+## `wait`
+
+`wait` suspends the run until the next item of a type arrives, and gives that item, or `undefined` once `timeoutMs` passes.
+
+```jsonc
+{"wait": {"event": "click", "timeoutMs": 2000}}
+{"wait": {"entryType": "long-animation-frame", "where": {"blockingDuration": {"gte": 200}}, "timeoutMs": 5000}}
+{"wait": {"mutation": {"childList": true, "subtree": true}, "target": {"api": "document.body"}, "timeoutMs": 2500}}
+{"wait": {"event": "invalid", "target": {"ref": "form"}}, "is": {"type": "object"}}
+```
+
+| Key | Meaning |
+|---|---|
+| `entryType`, `durationThreshold`, `event` | The type, as on [`observed`](#observed) |
+| `mutation` | The options of `MutationObserver.observe()` ([Mutations](#mutations)). A body has one of `entryType`, `event` and `mutation` |
+| `target` | With `event`, optional, and `window` when absent. With `mutation`, required. Any expression giving an event target or node, read when the wait starts, such as an element the run read earlier |
+| `where` | Optional. A predicate or expression the item must pass. An item that fails it doesn't end the wait |
+| `field` | Optional. The value read from the item |
+| `timeoutMs` | The longest the wait lasts, in ms. Absent, it's 5000, which the config build writes onto the body |
+
+`wait` gives the first item that arrives after the wait starts and passes `where`. Items recorded before it starts are read with `observed`, so a detector that accepts an earlier item checks `observed` first:
+
+```jsonc
+// A scroll since the touch began, or one in the next 500 ms
+{"define": {"scrolled": {
+  "if": {"observed": {"event": "scroll", "where": {"timeStamp": {"gte": {"ref": "start", "using": "timeStamp"}}}}, "using": "length", "is": {"gt": 0}},
+  "then": true,
+  "else": {"wait": {"event": "scroll", "timeoutMs": 500}, "is": {"type": "object"}}
+}}}
+```
+
+### Where `wait` goes
+
+A run suspends at a `wait` only when it's reachable from `actions` through these, and a `wait` anywhere else is a parse error:
+
+- an element of a sequence
+- the condition or a branch of `if`
+- the operand of `expr`
+- the expression beside `using`
+- the value of a `define`, a `done` or a payload field
+
+An `is` on any of these is fine. Under an operator such as `any` or `sum`, in a source body or a predicate, and in `match`, a `wait` isn't reachable. CI also rejects a `wait` in a detector whose `breakageReport` trigger isn't disabled, which it is by default, so a breakage report never waits on a run.
+
+### Suspended runs
+
+| Rule | Detail |
+|---|---|
+| Names | The run's names and its place in the expression are kept while it's suspended. Values read before the `wait` aren't read again, so an element read before it may be detached by the time the run resumes |
+| `where` | Tested on each item as it arrives. A `ref` in it reads the run's names as they were when the wait started |
+| One run per detector | While a run is suspended, an arrival for the detector queues, interrupts or is skipped, as its `on` body's [`whenBusy`](overview.md#observe) sets. Queued runs run in order after the suspended run ends |
+| Interrupted | An arrival on a `"whenBusy": "interrupt"` body abandons the suspended run before its own run. The rest of the abandoned run never runs, and its `define`s of detector names and its `done`s before the `wait` stand |
+| Windows | `observed` reads its window as it is when evaluated, so a run that needs a window as it was before a `wait` binds it to a name first |
+
+### Mutations
+
+A `mutation` body observes the node its `target` gives with a `MutationObserver` while the wait is open:
+
+| Option | Values |
+|---|---|
+| `childList`, `subtree`, `characterData`, `attributes` | `true` |
+| `attributeFilter` | Attribute names on CI's mutation option allowlist |
+
+The body has at least one of `childList`, `attributes`, `characterData` and `attributeFilter`. The options and attribute names a body can give are on an allowlist in this repository's CI, and `attributeOldValue` and `characterDataOldValue` are never on it, as the old values are the page's text and attribute values. `mutation` goes in `wait` only.
+
+An item is a `MutationRecord`, read as `observed` items are. `timeStamp` is when the observer's callback ran, as a record has no time of its own. `target` is the parent for `childList`, the element for `attributes`, and the text node for `characterData`. Changes inside a shadow root or an iframe under the target aren't observed.
+
+A run that waits for the page's response to an input starts in the listener with [`sync`](overview.md#observe), so its `wait` starts before the page's own listeners change the page.

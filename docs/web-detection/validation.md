@@ -26,6 +26,8 @@ A detector with a parse error doesn't run. It's listed in breakage reports with 
 ### Recorded types
 
 - An `observed` body without `keep`. The config build writes the default `keep` where config leaves it out ([`keep`](sources.md#keep)).
+- A `wait` without `timeoutMs`, which the config build also writes, or with a `timeoutMs` other than a number of at least 0 or `null`.
+- A `wait` the run can't reach to suspend at ([Where `wait` goes](sources.md#where-wait-goes)).
 
 ### Predicates
 
@@ -140,21 +142,25 @@ Some methods are read without being called:
 - Before `apply`, `call` or `bind`: `Math.max.apply` reads `Math.max` and calls `Math.max.apply`, and both are listed as methods.
 - As the last name of an `api` that's an `args` entry, passed to a method that calls a function it receives, such as `Reflect.apply`, `Function.prototype.call` or `Array.prototype.map`. CI checks it as a call of its own name, and rejects one it can't name. A method like this is only added to the list after reviewing which functions config can pass to it.
 
-### Recorded types and `observe`
+### Recorded types, `wait` and `observe`
 
-The entry types, event types, targets and item fields a detector can name are on allowlists in this repository's CI, in [`grammar.js`](../../tests/web-detection/validator/grammar.js): `ENTRY_TYPE_ALLOWLIST`, `EVENT_TYPE_ALLOWLIST` and `EVENT_TARGET_ALLOWLIST`. C-S-S records any type config gives, so a detector that reads a type or field not on the lists needs to add it in the same change. Fields that can contain what the user typed or copied, such as `key`, `data`, `inputType` and `clipboardData`, stay off the lists unless a privacy triage adds them, and `unload` and `beforeunload` are never on them.
+The entry types, event types, targets, mutation options and item fields a detector can name are on allowlists in this repository's CI, in [`grammar.js`](../../tests/web-detection/validator/grammar.js): `ENTRY_TYPE_ALLOWLIST`, `EVENT_TYPE_ALLOWLIST`, `EVENT_TARGET_ALLOWLIST`, `MUTATION_OPTION_ALLOWLIST` and `MUTATION_FIELDS`. C-S-S records any type config gives, so a detector that reads a type or field not on the lists needs to add it in the same change. Fields that can contain what the user typed or copied, such as `key`, `data`, `inputType` and `clipboardData`, stay off the lists unless a privacy triage adds them, and `unload`, `beforeunload`, `attributeOldValue` and `characterDataOldValue` are never on them.
 
 CI rejects:
 
-- An `observed`, `trigger` or `on` body that doesn't name exactly one type: an `entryType` or an `event` on the allowlists, or for `trigger`, `auto` or `breakageReport` as `{}`. A body with a key of another kind of body, such as `keep` outside `observed`.
+- An `observed`, `trigger`, `wait` or `on` body that doesn't name exactly one type: an `entryType` or an `event` on the allowlists, for `trigger`, `auto` or `breakageReport` as `{}`, or for `wait`, `mutation`. A body with a key of another kind of body, such as `keep` outside `observed`, `timeoutMs` outside `wait`, or `mutation` outside `wait`.
 - `durationThreshold` other than on the `event` entry type, or below 16.
-- `target` other than with `event`, or other than an `api` path on the target allowlist. `navigate` and `navigatesuccess` need `"target": {"api": "navigation"}`, which no other event type takes.
+- `target` other than with `event` or `mutation`. On `observed`, `trigger` and `on` bodies, a `target` other than an `api` path on the target allowlist. `navigate` and `navigatesuccess` need `"target": {"api": "navigation"}`, which no other event type takes. A `wait`'s `target` can be any expression, other than one the config shows gives a list or something other than an object.
+- A `mutation` body without `target`, with an option off the allowlist or set to anything but `true`, with an `attributeFilter` that's empty or names an attribute off the allowlist, or with none of `childList`, `attributes`, `characterData` and `attributeFilter`.
 - A name that `where`, `field` or `using` reads on an item and that isn't on the field allowlist of the item's type. Names read from `target` are checked against the [element allowlist](#element-allowlist).
 - An `observed` body without `keep`, a `keep` of `{}`, or a `count` or `withinMs` that isn't a positive integer or is over the cap for its type (`OBSERVED_KEEP_CAPS` and `OBSERVED_KEEP_CAPS_BY_TYPE` in [`web-detection-util.js`](../../web-detection-util.js)). `keep: null` on a type outside `UNBOUNDED_KEEP_TYPES`.
 - A `trigger` body whose type and target match no body of the detector's `on`, one naming `auto` or `breakageReport` when the detector doesn't enable that trigger, and `trigger` in `match`.
-- An `observe` trigger with no body in `on`, and an `on` body naming a type that no `observed` or `trigger` source in the detector reads, apart from `visibilitychange` and `pagehide`.
+- A `wait` without `timeoutMs`, with a `timeoutMs` below 0 or over `MAX_WAIT_TIMEOUT_MS`, or with `timeoutMs: null` while `ALLOW_UNBOUNDED_WAIT` is off (both in [`web-detection-util.js`](../../web-detection-util.js)).
+- A `wait` the run can't reach to suspend at ([Where `wait` goes](sources.md#where-wait-goes)), including one in `match` or in the `where` of another `wait`, and any `wait` in a detector whose `breakageReport` trigger isn't disabled.
+- An `observe` trigger with no body in `on`, and an `on` body naming a type that no `observed` or `trigger` source, or `wait` without a `target`, in the detector reads, apart from `visibilitychange` and `pagehide`.
 - An `on` body with `field`, or whose `where` holds a `ref` or any other expression. It's tested as the item is recorded, so it compares fields with literal values only.
-- A `visibilitychange` or `pagehide` body without `"sync": true`, `sync` on a body other than these and `click`, and `delayMs` or `whenPending` beside `"sync": true`.
+- A `visibilitychange` or `pagehide` body without `"sync": true` and `"whenBusy": "interrupt"`, `sync` on a body other than these and `click`, and `delayMs` or `whenPending` beside `"sync": true`.
+- A `sync` body without `"whenBusy": "interrupt"` or `"skip"`, and `"whenBusy": "interrupt"` on a body without `sync`.
 - A body for a type that arrives every frame, `scroll`, without `whenPending` `"skip"` or `"batch"`, or with `delayMs` under `PER_FRAME_MIN_DELAY_MS` in [`web-detection-util.js`](../../web-detection-util.js). With `"batch"`, a `delayMs` over the type's `withinMs` cap, since the run keeps each event until it runs.
 - In a detector with no `match` that observes `visibilitychange` or `pagehide`, a `fireEvent` that's neither inside an `if` testing a detector name its branch binds, nor in a sequence with `{"done": true}` ([The page hiding](overview.md#the-page-hiding)).
 - `done` in `match`, and in a detector with `match`.
