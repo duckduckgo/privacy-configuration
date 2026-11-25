@@ -280,7 +280,7 @@ export function checkRecordedBody(body, place, ctx, path) {
                 'recordedTypes',
             );
         if ('durationThreshold' in body)
-            fail(ctx, `${path}.durationThreshold`, `\`durationThreshold\` goes with \`entryType\`, not \`${kind}\``);
+            fail(ctx, `${path}.durationThreshold`, `\`durationThreshold\` goes with \`entryType\`, not \`${kind}\``, 'recordedTypes');
         return { kind, type: kind, target: EXPRESSION_TARGET };
     }
     if (kind === 'detectorEvent') return checkDetectorEventName(body, ctx, path);
@@ -448,11 +448,11 @@ function checkIntersectionOptions(options, ctx, path) {
     ] of Object.entries(options)) {
         const keyPath = `${path}.${key}`;
         if (NEVER_INTERSECTION_OPTIONS.includes(key)) {
-            fail(ctx, keyPath, `"${key}" is never observed, so an intersection is always with the viewport`);
+            fail(ctx, keyPath, `"${key}" is never observed, so an intersection is always with the viewport`, 'recordedTypes');
         } else if (!INTERSECTION_OPTION_ALLOWLIST.includes(key)) {
-            fail(ctx, keyPath, `intersection option "${key}" is not on INTERSECTION_OPTION_ALLOWLIST`);
+            fail(ctx, keyPath, `intersection option "${key}" is not on INTERSECTION_OPTION_ALLOWLIST`, 'recordedTypes');
         } else if (Array.isArray(value) ? value.length === 0 || !value.every(isRatio) : !isRatio(value)) {
-            fail(ctx, keyPath, '`threshold` is a number from 0 to 1, or a non-empty array of them');
+            fail(ctx, keyPath, '`threshold` is a number from 0 to 1, or a non-empty array of them', 'recordedTypes');
         }
     }
 }
@@ -475,9 +475,9 @@ function checkResizeOptions(options, ctx, path) {
         value,
     ] of Object.entries(options)) {
         const allowed = /** @type {Record<string, string[]>} */ (RESIZE_OPTION_ALLOWLIST)[key];
-        if (!allowed) fail(ctx, `${path}.${key}`, `resize option "${key}" is not on RESIZE_OPTION_ALLOWLIST`);
+        if (!allowed) fail(ctx, `${path}.${key}`, `resize option "${key}" is not on RESIZE_OPTION_ALLOWLIST`, 'recordedTypes');
         else if (!allowed.includes(value))
-            fail(ctx, `${path}.${key}`, `\`${key}\` is one of ${allowed.map((box) => `"${box}"`).join(', ')}`);
+            fail(ctx, `${path}.${key}`, `\`${key}\` is one of ${allowed.map((box) => `"${box}"`).join(', ')}`, 'recordedTypes');
     }
 }
 
