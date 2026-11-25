@@ -1,5 +1,6 @@
 // @ts-check
 import { BRANCH_KEYS, PAYLOAD_ACTIONS, apiBody } from './grammar.js';
+import { ruleLink } from './context.js';
 import { bucketOverlaps } from './predicates.js';
 import { definesName, expressionKeysOf, forEachSourceBody, readsOuterSelf, refsIn } from './walk.js';
 import { isPlainObject } from '../../../util.js';
@@ -29,7 +30,7 @@ export function repeatedEventWarnings(detector, path) {
         if (!isPlainObject(node)) return;
         if ('fireEvent' in node && !guards.some(({ names, branch }) => names.some((name) => definesName(branch, name))))
             warnings.push(
-                `${nodePath}.fireEvent: sends its event on every run, since the detector has no \`match\` and no enclosing \`if\` tests a detector name its branch binds`,
+                `${nodePath}.fireEvent: sends its event on every run, since the detector has no \`match\` and no enclosing \`if\` tests a detector name its branch binds${ruleLink('events')}`,
             );
         if ('if' in node) {
             const names = [
@@ -89,7 +90,7 @@ export function bucketWarnings(detector, path) {
                 ] of Object.entries(value.data)) {
                     if (!isPlainObject(spec)) continue;
                     for (const warning of bucketOverlaps(spec.buckets).warnings)
-                        warnings.push(`${childPath}.data.${field}.buckets: ${warning}`);
+                        warnings.push(`${childPath}.data.${field}.buckets: ${warning}${ruleLink('bucketOverlap')}`);
                 }
             } else {
                 visit(value, childPath);
@@ -116,7 +117,7 @@ export function itemWalkWarnings(detector, path) {
     /** @param {string} nodePath */
     const warn = (nodePath) =>
         warnings.push(
-            `${nodePath}: walks the page from each item of the enclosing \`where\` or \`field\`, and nested items walk the same nodes again; test something cheaper in an \`if\` first`,
+            `${nodePath}: walks the page from each item of the enclosing \`where\` or \`field\`, and nested items walk the same nodes again; test something cheaper in an \`if\` first${ruleLink('itemSources')}`,
         );
     /**
      * A `field`, `using` or the body of `self`: a path, `{"path", "args"}` or an expression.

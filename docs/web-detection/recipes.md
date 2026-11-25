@@ -69,7 +69,7 @@ In the table below, `T(R)` is `{"text": {"xpath": X, "pattern": "\\S", "root": R
 | A region with no text | `{"none": T({"ref": "comments"})}`, which stops at the first character |
 | Items with no text | `"where": {"none": T({"self": {}})}` beside the item selector, with `"using": "length"` |
 
-A per-item text read walks each item's subtree. When a cheaper test can rule some items out, put the text read behind an `if` on that test. `textContent.length` works for this, since it's 0 for an item with no text at all. CI warns (without failing) on a per-item `text` with no `if` above it ([Sources in `where` and `field`](validation.md#sources-in-where-and-field)):
+A per-item text read walks each item's subtree. When a cheaper test can rule some items out, put the text read behind an `if` on that test. `textContent.length` works for this, since it's 0 for an item with no text at all. CI warns (without failing) on a per-item `text` with no `if` above it ([Sources in `where` and `field`](sources.md#sources-in-where-and-field)):
 
 ```
 "field": {"if": {"self": "textContent.length", "is": {"gt": 0}}, "then": {...T({"self": {}}), "using": "length"}, "else": 0}
@@ -238,7 +238,7 @@ With `fails` on the number of empty stylesheets, the result on a page with a cro
 | A number that may be `null` | `{"selectionStart": {"type": "number", "gt": 0}}` |
 | A number that may be `NaN` or infinite | `{"duration": {"field": {"api": {"path": "Number.isFinite", "args": [{"self": {}}]}}, "is": true, "gt": 0}}` |
 | `NaN` | `{"duration": {"field": {"api": {"path": "Number.isNaN", "args": [{"self": {}}]}}, "is": true}}` |
-| `Infinity` | `{"duration": {"field": {"api": {"path": "Number.isFinite", "args": [{"self": {}}]}}, "is": false, "gt": 0}}`, or `{"duration": {"eq": {"ref": "infinity"}}}` with `infinity` bound to `{"api": "Infinity"}` by a `define` before the source ([Sources in `where` and `field`](validation.md#sources-in-where-and-field)) |
+| `Infinity` | `{"duration": {"field": {"api": {"path": "Number.isFinite", "args": [{"self": {}}]}}, "is": false, "gt": 0}}`, or `{"duration": {"eq": {"ref": "infinity"}}}` with `infinity` bound to `{"api": "Infinity"}` by a `define` before the source ([Sources in `where` and `field`](sources.md#sources-in-where-and-field)) |
 | A string or array that is not empty | `{"currentSrc.length": {"gt": 0}}` |
 | A property named like a reserved key | `{"field": "text", "is": "Sign in"}`, or in `where`, `{"self": "text", "is": "Sign in"}` |
 
@@ -248,7 +248,7 @@ JS builtins called through `api` give you values that JSON can't express directl
 
 | Value | `api` |
 |---|---|
-| `L` with values added, or lists joined | `{...L, "using": {"path": "concat", "args": [100]}}`. `{"expr": [100], "using": {"path": "concat", "args": [L]}}` puts 100 first. Only `concat` through `using` gives a list that `apply` accepts ([Method calls](validation.md#method-calls)) |
+| `L` with values added, or lists joined | `{...L, "using": {"path": "concat", "args": [100]}}`. `{"expr": [100], "using": {"path": "concat", "args": [L]}}` puts 100 first. Only `concat` through `using` gives a list that `apply` accepts ([Lists passed to `apply`](sources.md#lists-passed-to-apply)) |
 | A list from an iterable that is not an array, such as `FontFaceSet` | `{"api": {"path": "Array.from", "args": [x]}}` |
 | A constant object | `{"api": {"path": "JSON.parse", "args": ["{\"composed\": true}"]}}` |
 | An object containing values read from the page | `{"api": {"path": "Object.fromEntries", "args": [{"expr": [{"expr": ["relativeTo", {"ref": "node"}]}]}]}}` |

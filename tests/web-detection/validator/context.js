@@ -53,12 +53,42 @@ export const MATCH_SCOPE = { inMatch: true, underNone: false, conditionRoot: tru
 export const PAYLOAD_SCOPE = { inMatch: false, underNone: false, conditionRoot: false, guards: [] };
 
 /**
+ * The section of `docs/web-detection` that documents each authoring rule. A message that enforces a
+ * rule links to its section.
+ *
+ * Ensure each entry names a heading under an `## Authoring rules` section, which `docs-tests.js` checks.
+ */
+export const RULES = /** @type {const} */ ({
+    types: 'expressions.md#types',
+    boundNames: 'expressions.md#bound-names',
+    rootGuards: 'sources.md#root-guards',
+    itemSources: 'sources.md#sources-in-where-and-field',
+    elementAllowlist: 'sources.md#element-allowlist',
+    allowedNames: 'sources.md#allowed-names',
+    applyLists: 'sources.md#lists-passed-to-apply',
+    comparisonGuards: 'predicates.md#comparison-guards',
+    propertyPaths: 'predicates.md#property-paths',
+    fireEventBuckets: 'payloads.md#buckets-on-fireevent',
+    bucketOverlap: 'payloads.md#bucket-overlap',
+    detectorNames: 'overview.md#detector-names',
+    matchNames: 'overview.md#match-and-detector-names',
+    events: 'overview.md#events',
+});
+
+/**
+ * @param {keyof typeof RULES} rule
+ * @returns {string}
+ */
+export const ruleLink = (rule) => ` (see docs/web-detection/${RULES[rule]})`;
+
+/**
  * @param {Context} ctx
  * @param {string} path
  * @param {string} message
+ * @param {keyof typeof RULES} [rule] - the authoring rule the message enforces
  */
-export function fail(ctx, path, message) {
-    ctx.errors.push(`${path}: ${message}`);
+export function fail(ctx, path, message, rule) {
+    ctx.errors.push(`${path}: ${message}${rule ? ruleLink(rule) : ''}`);
 }
 
 /**
@@ -78,7 +108,7 @@ export function child(scope) {
  */
 export function expectPosition(ctx, path, what, position, fills) {
     if (!fills.includes(position)) {
-        fail(ctx, path, `${what} fills ${fills.join(', ')} position, not ${position} position`);
+        fail(ctx, path, `${what} fills ${fills.join(', ')} position, not ${position} position`, 'types');
     }
 }
 

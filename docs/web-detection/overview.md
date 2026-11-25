@@ -47,7 +47,7 @@ Detectors are configured under `webDetection.settings.detectors`, in named group
 
 - `detectors` contains detector *groups*
 - each *group* maps detector names to their configs, and namespaces them
-  - Detector and group names must fully match the regex `^[a-zA-Z][a-zA-Z0-9_]*$`. CI rejects any name that doesn't, because C-S-S uses each name exactly as it appears in config
+  - Detector and group names must fully match the regex `^[a-zA-Z][a-zA-Z0-9_]*$` ([Detector names](#detector-names))
 - each detector has four parts:
   - `state` - a `disabled` detector doesn't run
   - `triggers` - *when* the detector runs ([Triggers](#triggers))
@@ -98,7 +98,7 @@ When fields are omitted from config, detectors take these defaults:
 }
 ```
 
-`actions` has no default, and a detector without it doesn't parse ([Validation](validation.md#detectors-and-actions)).
+`actions` has no default, and a detector without it doesn't parse ([Parse errors](failures.md#parse-errors)).
 
 So by default a new detector:
 
@@ -163,7 +163,7 @@ Each run evaluates `match` first. `match` is an expression that gives a boolean 
 
 Once a detector is done, it doesn't run again in that frame, whatever the trigger: its timers are cancelled and a breakage report doesn't run it. Each frame tracks this separately, and the detector's breakage entry keeps whatever its runs wrote.
 
-`match` only reads the page, so it can't contain an action or a `ref`. A detector with `match` doesn't use detector names, since its `actions` only runs once ([Validation](validation.md#detectors)). If a payload sends a value that `match` tested, `actions` reads it again.
+`match` only reads the page, and a detector with `match` runs its `actions` once, so it doesn't use detector names ([`match` and detector names](#match-and-detector-names)). If a payload sends a value that `match` tested, `actions` reads it again.
 
 | Use | Config |
 |---|---|
@@ -171,7 +171,7 @@ Once a detector is done, it doesn't run again in that frame, whatever the trigge
 | Detect once, after a precondition `P` holds | `"match": {"all": [P, D]}`, or `{"if": P, "then": D, "else": false}` where `D` fails before `P` holds |
 | Measure on every run | No `match`. A `breakageReportData` on every run, and each event inside a [once guard](recipes.md#doing-something-once) |
 
-In a detector with no `match`, a `fireEvent` outside a once guard sends its event on every run. See [Detector shapes](recipes.md#detector-shapes) for weak and strong signals, finishing early and other patterns.
+In a detector with no `match`, a `fireEvent` outside a once guard sends its event on every run ([Events](#events)). See [Detector shapes](recipes.md#detector-shapes) for weak and strong signals, finishing early and other patterns.
 
 ## Actions
 
@@ -195,7 +195,7 @@ In a detector with no `match`, a `fireEvent` outside a once guard sends its even
 
 An action computes every value its payload names, then sends or writes. If any of those values fails, the action sends and writes nothing, and the failure propagates like any other ([Failures](failures.md)). The action's own value is `undefined`.
 
-An object can have expression keys (with their modifiers) or action keys, but not both. Action keys in one object run in the order they're listed in config, so `{"fireEvent": A, "breakageReportData": B}` is `[{"fireEvent": A}, {"breakageReportData": B}]`. Note that on Apple, an object with only `fireEvent` and `breakageReportData` stays one object, so those two run in no guaranteed order.
+An object can have expression keys (with their modifiers) or action keys, but not both. Action keys in one object run in the order they're listed in config, so `{"fireEvent": A, "breakageReportData": B}` is `[{"fireEvent": A}, {"breakageReportData": B}]`. Note that on Apple, an object with only `fireEvent` and `breakageReportData` stays one object, so those two run in no guaranteed order ([Apple releases before C-S-S 19.0.0](#apple-releases-before-c-s-s-1900)).
 
 `define` binds a run name (`"x"`), which lasts for the rest of the run, or a detector name (`"this.x"`), which lasts across every run and trigger in the frame. `{"ref": "x"}` reads it. Detector names are how a detector keeps state between runs, such as a count of reads, the previous read or a flag that an action has run ([Names](expressions.md#names)).
 
@@ -224,10 +224,30 @@ EventHub de-duplicates events on type, payload and tab ([De-duplication](https:/
 
 ### Payloads
 
-Both actions take an optional `data` map of the values to send. Each field's `value` is an expression computed when the action runs, or a name bound with `define`. An optional `when` tests the value before it's sent, and `buckets` send a bucket name in place of the value. CI requires `buckets` on every `fireEvent` field, and they're optional in `breakageReportData`:
+Both actions take an optional `data` map of the values to send. Each field's `value` is an expression computed when the action runs, or a name bound with `define`. An optional `when` tests the value before it's sent, and `buckets` send a bucket name in place of the value. CI requires `buckets` on every `fireEvent` field ([Buckets on `fireEvent`](payloads.md#buckets-on-fireevent)), and they're optional in `breakageReportData`:
 
 ```json
 "fireEvent": {"type": "brokenImages", "data": {"brokenImages": {"value": {"ref": "brokenImages"}, "buckets": [{"name": "one", "is": 1}, {"name": "2-4", "is": {"gte": 2, "lt": 5}}, {"name": "5+", "is": {"gte": 5}}]}}}
 ```
 
 With 3 broken images, this sends `{"type": "brokenImages", "data": {"brokenImages": "2-4"}}`. See [Payloads](payloads.md) for the full rules and how to shape events for period pixels.
+
+## Authoring rules
+
+### Detector names
+
+Group and detector names fully match `^[a-zA-Z][a-zA-Z0-9_]*$`, since each name appears as written in breakage reports.
+
+### `match` and detector names
+
+`match` doesn't contain an action or a `ref`, and a detector with `match` doesn't use detector names, since its `actions` only runs once.
+
+### Events
+
+- An enabled detector whose `breakageReport` trigger is enabled has a `breakageReportData` action somewhere in its `actions`. So a detector that only fires events needs `triggers.breakageReport.state` set to `"disabled"`.
+- A `fireEvent` in a detector with no `match` warns, unless an `if` around it tests a detector name that a `define` within that `if`'s branch binds ([Doing something once](recipes.md#doing-something-once)).
+- Every `fireEvent` type has a consumer in the same platform's config, unless it starts `temp_`, and no type starts `detectorPerf_`, which is reserved ([The consumer cross-check](authoring/shipping-a-detector.md#the-consumer-cross-check)).
+
+### Apple releases before C-S-S 19.0.0
+
+Each detector enabled on an Apple release older than the first to ship C-S-S 19.0.0 has `actions` as an object with only `fireEvent` and `breakageReportData`, in the config that release matches.

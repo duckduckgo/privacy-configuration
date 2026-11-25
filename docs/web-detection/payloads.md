@@ -12,10 +12,10 @@ type PayloadSpec = Record<string, PayloadField>;
 
 | Part | Rule |
 |---|---|
-| Key | The payload key on the wire. It must match `^[a-zA-Z][a-zA-Z0-9_]*$` and can't be `nativeData`, and CI checks both ([Payloads](validation.md#payloads)) |
+| Key | The payload key on the wire. It must match `^[a-zA-Z][a-zA-Z0-9_]*$` and can't be `nativeData`, or the detector doesn't parse ([Parse errors](failures.md#parse-errors)) |
 | `value` | An expression in value position ([Positions](expressions.md#positions)). `{"ref": "<name>"}` sends a value bound with `define` ([Names](expressions.md#names)), and anything else is computed when the action runs. Each bucket tests a selected list as described in [Selected lists](expressions.md#selected-lists) |
 | `when` | Optional. A [predicate](predicates.md) the value must pass to be sent ([`when`](#when)) |
-| `buckets` | Required in `fireEvent` by CI ([Payloads](validation.md#payloads)), and optional in `breakageReportData`. See [Buckets](#buckets) |
+| `buckets` | Required in `fireEvent` by CI ([Buckets on `fireEvent`](#buckets-on-fireevent)), and optional in `breakageReportData`. See [Buckets](#buckets) |
 
 Each field is sent like this:
 
@@ -37,7 +37,7 @@ Without buckets, a selected list is sent as an array of its items, `NaN` and the
 
 To control which values are sent, use `when` with `type`, or with `Number.isFinite` called on the value ([Calls](predicates.md#calls)).
 
-CI requires `buckets` on every `fireEvent` field, so an event sends a bucket name for each key. Each distinct payload is a separate EventHub event, so de-duplication treats them separately and each one is its own immediate pixel.
+An event sends a bucket name for each key ([Buckets on `fireEvent`](#buckets-on-fireevent)). Each distinct payload is a separate EventHub event, so de-duplication treats them separately and each one is its own immediate pixel.
 
 A failed value still reaches `when` and the buckets, where `fails` can handle it ([Handling](failures.md#handling)).
 
@@ -64,11 +64,11 @@ The last one buckets a count that reads `"unsupported"` on engines without the f
 
 | Part | Rule |
 |---|---|
-| `buckets` | A non-empty array of objects, each with `name` and `is` and no other keys ([Buckets](validation.md#buckets)) |
+| `buckets` | A non-empty array of objects, each with `name` and `is` and no other keys |
 | `name` | Any non-empty string. Sent on the wire as written. Several buckets may share a name |
 | `is` | Any predicate. It tests the value the same way an expression's [`is`](expressions.md#is) does |
 
-Buckets are tested in array order, and the value is sent as the name of the first bucket whose `is` holds. If the value isn't in any bucket, its key is left out. See [Buckets](validation.md#buckets) for CI's checks on overlapping buckets.
+Buckets are tested in array order, and the value is sent as the name of the first bucket whose `is` holds. If the value isn't in any bucket, its key is left out. See [Bucket overlap](#bucket-overlap) for CI's checks on overlapping buckets.
 
 ## `fireEvent` and the EventHub bridge
 
@@ -123,3 +123,18 @@ A `period` pixel counts events by type, and a `data` parameter on it only has th
 | Estimates | Each counter is itself bucketed, so a period's total per bucket is estimated from the counter buckets, with a cap assumed for the open-ended one |
 | Pixel definitions | One parameter per bucket in each platform's pixel schema. New bucket boundaries are new event types and parameters |
 | Privacy | A pixel with k value buckets and m counter buckets takes up to mᵏ distinct values per period |
+
+## Authoring rules
+
+### Buckets on `fireEvent`
+
+Every `fireEvent` payload field has `buckets`. A `breakageReportData` field may leave them out.
+
+### Bucket overlap
+
+`buckets` is a non-empty array of objects, each with `name` and `is` and no other keys. CI rejects:
+
+- A bucket that can never be chosen, since the buckets before it cover all its values.
+- Two numeric ranges that both include an endpoint they share, such as `{"gte": 1, "lte": 2}` then `{"gte": 2, "lte": 3}`. `gt` or `lt` on one side puts the endpoint in one range only.
+
+CI warns (without failing) on any other overlap between buckets with different names. Overlap is only checked where predicates are literals, `in` over literals, or comparisons against literals. A literal is converted the same way a comparison converts it: `null` and `""` to 0, and `"7"` to 7.

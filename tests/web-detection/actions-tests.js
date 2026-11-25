@@ -314,7 +314,7 @@ describe('webDetection config tests', () => {
 
             itAll('warns on a `text` source rooted at the item with no `if` above it in the `where`', () => {
                 expect(walksOf(words)).to.deep.equal([
-                    '$.match.element.where.text.root: walks the page from each item of the enclosing `where` or `field`, and nested items walk the same nodes again; test something cheaper in an `if` first',
+                    '$.match.element.where.text.root: walks the page from each item of the enclosing `where` or `field`, and nested items walk the same nodes again; test something cheaper in an `if` first (see docs/web-detection/sources.md#sources-in-where-and-field)',
                 ]);
             });
 

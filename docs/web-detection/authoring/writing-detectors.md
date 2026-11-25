@@ -10,7 +10,7 @@ Note that if a change to a detector substantially changes its behaviour or priva
 
 Detectors live in [`features/web-detection.json`](../../../features/web-detection.json), under `settings.detectors.<group>.<detector>`. The group namespaces related detectors, and `<group>.<detector>` is the detector's ID everywhere else.
 
-Both names must fully match `^[a-zA-Z][a-zA-Z0-9_]*$`. CI rejects any name that doesn't, because C-S-S uses each name exactly as it appears in config.
+Both names must fully match `^[a-zA-Z][a-zA-Z0-9_]*$` ([Detector names](../overview.md#detector-names)).
 
 ## Choosing a group
 
@@ -45,7 +45,7 @@ A detector with `match` and `"actions": {"breakageReportData": {}}` is enabled, 
 | Run on page load, not only on report submission | `triggers.auto`: `{ "state": "enabled", "when": { "intervalMs": [...] } }` |
 | Run in subframes as well as the top frame | `runConditions` on the trigger |
 | Emit an event | `fireEvent` in `actions`: `{ "type": "..." }` |
-| Emit an event and stay out of breakage reports | `triggers.breakageReport`: `{ "state": "disabled" }`, since CI rejects a detector that a breakage report runs but that writes no breakage data |
+| Emit an event and stay out of breakage reports | `triggers.breakageReport`: `{ "state": "disabled" }`, since CI rejects a detector that a breakage report runs but that writes no breakage data ([Events](../overview.md#events)) |
 | Send values with the event or the entry | `data` on the action ([Payloads](../payloads.md)) |
 | Measure on every run instead of detecting once | No `match`, with each event guarded by a detector name ([`match`](../overview.md#match)) |
 
@@ -72,6 +72,6 @@ When each detector is its own signal, name the event `<group>_<detector>`. For e
 
 Run the detector against the page you're targeting in a debug build. There, each `auto` run whose `match` holds or fails, and each `auto` run of a detector without `match`, sends a `webDetectionAutoRun` notification with the detector ID, the `match` result, each action's outcome and a timestamp ([Reporting](../failures.md#reporting)). Watching these is the quickest way to confirm the conditions hold where you expect and stay quiet on a healthy page.
 
-CI covers a new pattern or selector on an existing detector. Across every config it generates, it checks group and detector names, the [conditions themselves](../validation.md#text-and-element-conditions), and that every `fireEvent.type` has a consumer ([The consumer cross-check](shipping-a-detector.md#the-consumer-cross-check)). Run it with `npm test`, which builds the generated configs before the tests read them.
+CI covers a new pattern or selector on an existing detector. Across every config it generates, it checks that each pattern compiles and each XPath expression parses, the authoring rules at the end of each reference page ([Meaning and authoring rules](../README.md#meaning-and-authoring-rules)), and that every `fireEvent.type` has a consumer ([The consumer cross-check](shipping-a-detector.md#the-consumer-cross-check)). Run it with `npm test`, which builds the generated configs before the tests read them. An XPath expression that parses can still select nothing on a real page, so test it against the page before shipping.
 
 A detector that relies on framework behaviour without existing test coverage needs a fixture page under `content-scope-scripts/injected/integration-test/test-pages/web-detection/pages/` and a case in `web-detection.spec.js`. Run `npm run test-unit` and `npm run test-int` in `content-scope-scripts`.

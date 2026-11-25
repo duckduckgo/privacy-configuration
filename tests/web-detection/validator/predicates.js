@@ -97,6 +97,7 @@ function checkOperators(predicate, subject, scope, ctx, path) {
                 ctx,
                 path,
                 `beside \`"fails": true\`, ${beside.join(', ')} read${beside.length === 1 ? 's' : ''} the failed value, which aborts the detector`,
+                'comparisonGuards',
             );
     }
 
@@ -111,14 +112,19 @@ function checkOperators(predicate, subject, scope, ctx, path) {
     const guardsFirst = keys.indexOf('field') < Math.min(...comparisons.map((key) => keys.indexOf(key)));
     const numberOnly = guard?.name === 'Number.isFinite' && guard.expected === true && guardsFirst;
     if (guard?.expected === true && listed && !listed.includes('number'))
-        fail(ctx, path, `\`${guard.name}\` holding beside a \`type\` that leaves out number never holds`);
+        fail(ctx, path, `\`${guard.name}\` holding beside a \`type\` that leaves out number never holds`, 'comparisonGuards');
 
     if (comparisons.length) {
         const operatorList = comparisons.join(', ');
         if (listed) {
             const outside = listed.filter((name) => name !== 'number');
             if (outside.length)
-                fail(ctx, path, `beside \`type\`, ${operatorList} takes numbers only, and \`type\` also lists ${outside.join(', ')}`);
+                fail(
+                    ctx,
+                    path,
+                    `beside \`type\`, ${operatorList} takes numbers only, and \`type\` also lists ${outside.join(', ')}`,
+                    'comparisonGuards',
+                );
         } else if (!numberOnly && subject.types !== null) {
             // A comparison on a string literal that converts to NaN is false, as on a number out of range
             const outside = subject.types.filter((name) => name !== 'number' && !(name === 'string' && subject.nonNumericStrings));
@@ -127,6 +133,7 @@ function checkOperators(predicate, subject, scope, ctx, path) {
                     ctx,
                     path,
                     `${operatorList} takes numbers, and config types the value as ${describeType(subject)}; guard it with "type": "number", or \`Number.isFinite\` of \`self\` holding, before the comparison`,
+                    'comparisonGuards',
                 );
             }
         }
@@ -135,6 +142,7 @@ function checkOperators(predicate, subject, scope, ctx, path) {
                 ctx,
                 path,
                 `under \`none\`, ${operatorList} on a value that can be NaN needs \`Number.isFinite\` or \`Number.isNaN\` of \`self\` beside it, since a comparison on NaN is false`,
+                'comparisonGuards',
             );
         }
     }
@@ -161,7 +169,8 @@ export function checkPayloadSpec(data, action, ctx, path, scope) {
         if (key === 'nativeData') fail(ctx, fieldPath, 'payload key "nativeData" is reserved');
         if (!isPlainObject(field) || !('value' in field)) continue;
         const type = checkExpr(field.value, 'value', scope, ctx, `${fieldPath}.value`);
-        if (action === 'fireEvent' && !('buckets' in field)) fail(ctx, fieldPath, 'a `fireEvent` payload field is sent through `buckets`');
+        if (action === 'fireEvent' && !('buckets' in field))
+            fail(ctx, fieldPath, 'a `fireEvent` payload field is sent through `buckets`', 'fireEventBuckets');
         if ('when' in field) {
             const whenPath = `${fieldPath}.when`;
             checkPredicate(field.when, 'value', predicateSubject(type, field.when, ctx, whenPath), scope, ctx, whenPath);
@@ -414,5 +423,5 @@ function checkBuckets(buckets, type, ctx, path) {
         const isPath = `${path}[${i}].is`;
         checkPredicate(bucket.is, 'value', predicateSubject(type, bucket.is, ctx, isPath), PAYLOAD_SCOPE, ctx, isPath);
     });
-    for (const error of bucketOverlaps(buckets).errors) fail(ctx, path, error);
+    for (const error of bucketOverlaps(buckets).errors) fail(ctx, path, error, 'bucketOverlap');
 }

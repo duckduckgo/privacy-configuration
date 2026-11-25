@@ -58,7 +58,7 @@ The last is each image's natural width, capped at 2000.
 
 Names are read and methods are called as described in [Property reads](predicates.md#property-reads). A `field` value has the type of whatever it read, and that type is checked where the value is used: in number position, a value that isn't a number fails ([Positions](expressions.md#positions)). `where: {"<property>": {"type": "number"}}` excludes those items.
 
-A method called on `element` items must be on the [element allowlist](validation.md#element-allowlist), whose methods leave the page unchanged. A method called on `api` items must be on the [`api` allowlist](#allowed-names).
+A name read or a method called on `element` items must be on the [element allowlist](#element-allowlist), and on `api` items, on the [`api` allowlist](#allowed-names).
 
 ## `element`
 
@@ -117,7 +117,7 @@ Reading a root through `using` can reach an open shadow root. Here are the image
 {"element": {"selector": "img", "root": {"only": {"element": {"selector": "my-widget"}}, "using": "shadowRoot"}}}
 ```
 
-A root that selects nothing, or reads `null` or `undefined`, is an empty scope, so `element` and `text` select nothing. Use a guard to tell an absent region apart from an empty one. The guard holds when the region is present, and goes either as an operand of the top-level `all` of the condition or `define` value that reads the scoped expressions, or in the condition of an `if` around them:
+A root that selects nothing, or reads `null` or `undefined`, is an empty scope, so `element` and `text` select nothing. Use a guard to tell an absent region apart from an empty one ([`root` guards](#root-guards)). The guard holds when the region is present, and goes either as an operand of the top-level `all` of the condition or `define` value that reads the scoped expressions, or in the condition of an `if` around them:
 
 | Where | Guard and `root` |
 |---|---|
@@ -145,8 +145,6 @@ In an array `root`, each entry needs its own guard.
 ```
 
 In boolean position an `element` or `text` guard holds when it selects an item. A guard on a root that isn't an `element` or `text` source needs `is`, such as `{"ref": "widget", "is": {"type": "object"}}`.
-
-A scoped expression needs a guard unless it's only read in boolean position with no `none` above it, or its root is `{"self": {}}` (the item a `where` or `field` binds) ([`root` guards](validation.md#root-guards)).
 
 ## `api`
 
@@ -207,9 +205,9 @@ JS builtins give you values that JSON can't express directly ([JS builtins](reci
 | A call with more arguments than the engine passes | Fails ([Failures](failures.md)). The limit differs by engine, and a list of a page's elements can exceed it. The `resource` timeline keeps up to 250 entries by default |
 | `Array.from`, `Object.fromEntries` | Use the iterator as the page leaves it ([Page code](predicates.md#page-code)) |
 
-### Allowed names
+The list passed to `apply` must be one the config shows is a list ([Lists passed to `apply`](#lists-passed-to-apply)).
 
-An `api` can only read names on the allowlist in this repository's CI, so a detector reading a new name needs to add it to the list in the same change. A name is the path read from the global object, such as `performance.getEntriesByType`, and a name read from its value extends it: `performance.getEntriesByType.duration`. See [Allowed names](validation.md#allowed-names) for the naming rules.
+An `api` only reads names on the [`api` allowlist](#allowed-names).
 
 ### Performance timeline
 
@@ -236,3 +234,59 @@ Entry types that the engine only delivers to a `PerformanceObserver` aren't in t
 The page sets the names of `mark` and `measure` entries, so `getEntriesByName` without a type also returns a mark the page created with that name. If you read one value, there are then two entries, which fails, and in the list's `length` or under `Math.max.apply`, the mark is counted as one of the items. Passing the type argument excludes them.
 
 Reading `resource` entries by name puts a URL in config. Only the value read is sent.
+
+## Authoring rules
+
+### `root` guards
+
+Every scoped expression has the guard described in [`root`](#root), so an absent region isn't read as an empty one. The guard goes either as an operand of the top-level `all` of the condition or `define` value that reads the expression, or in the condition of an enclosing `if`. These don't need one:
+
+- An expression read only in boolean position, with no `none` above it.
+- A root of `{"self": {}}`, the item a `where` or `field` binds.
+
+In `match`, CI matches the guard to the root by comparing the expressions.
+
+### Sources in `where` and `field`
+
+A source inside a `where` or `field` reads `self` or a `ref`. A source that reads neither gives every item the same value, so `define` the value before the source and read it through `ref` instead.
+
+CI warns (without failing) on a `text` source rooted at a `where` or `field` item, such as through `"root": {"self": {}}`, with no `if` above it inside that `where` or `field`. A text read walks each item's subtree, so an `if` on a cheaper test can skip items ([Rendered text](recipes.md#rendered-text)).
+
+### Element allowlist
+
+Each name a detector reads or calls on an element, through a property path, `field`, a `where` key, `using` or `self`, must be on `ELEMENT_ALLOWLIST` in [`grammar.js`](../../tests/web-detection/validator/grammar.js). The list is keyed by element interface, such as `HTMLImageElement` for `img`. Every element shares the `Element` and `HTMLElement` entries, and each property is listed with its type, which CI uses to check the read's position ([Types](expressions.md#types)). CI rejects a read on a value whose interface isn't listed.
+
+A detector that reads a name not on the list adds it in the same change. Only methods that leave the page unchanged go on the list, and names that read user data or URLs stay off it. These two are review rules, since CI can't check them.
+
+### Allowed names
+
+An `api` only passes when every name it reads is on `API_ALLOWLIST` in [`grammar.js`](../../tests/web-detection/validator/grammar.js), and a detector that reads a name not on the list adds it in the same change. The list only has names, without types, so use `type`, or `Number.isFinite` called on the value ([Calls](predicates.md#calls)), to guard the value a name reads ([Failure and type](predicates.md#failure-and-type)).
+
+A name is the path read from the global object, such as `performance.getEntriesByType`, and a name read from its value extends it:
+
+| Read | Name |
+|---|---|
+| `path` | The path: `document.readyState`, `performance.getEntriesByType` |
+| Each name a `field` path reads, and a method it calls | The path, `.` and the field's names up to it: `document.title`, `document.title.length` |
+| Each name a predicate reads on `api` items or values, through a property path or `field` | The path, `.` and the predicate's names up to it: `document.fonts.status`, `performance.getEntriesByType.duration`, `document.title.length` |
+| `using`, and `self` under it | The name of the expression beside `using`, `.` and the path: `performance.getEntriesByType.loadEventEnd` |
+| `self` in `where` or `field` | The name of the items or value it reads, `.` and the path, as a property path there names it: `performance.getEntriesByType.startTime` |
+| An `api` in `args` | Its own names. A builtin from [Arguments](#arguments) is named by its path: `Math.max.apply`, `JSON.parse` |
+
+The name of the expression beside `using` works like this:
+
+- An `api` read, directly or through `ref` or `only`, is named by its own names.
+- `at` and an index add no name, on a selected list or an `api` value: `at` on the `navigation` entries then `loadEventEnd` is `performance.getEntriesByType.loadEventEnd`. `length` adds no name on a selected list, and on an `api` value it's a name: `performance.getEntriesByType.length`.
+- `concat` joins lists, and each item keeps the name of its list.
+- An expression with several possible names, such as an `if` whose branches read different `api` names, is checked under each name. CI rejects one that gives none of an `api` read, an element or a selected list.
+
+On an element, in `using`, `self` or `field`, names are checked against the [element allowlist](#element-allowlist) instead.
+
+Some methods are read without being called:
+
+- Before `apply`, `call` or `bind`: `Math.max.apply` reads `Math.max` and calls `Math.max.apply`, and both are listed as methods.
+- As the last name of an `api` that's an `args` entry, passed to a method that calls a function it receives, such as `Reflect.apply`, `Function.prototype.call` or `Array.prototype.map`. CI checks it as a call of its own name, and rejects one it can't name. A method like this is only added to the list after reviewing which functions config can pass to it.
+
+### Lists passed to `apply`
+
+The list passed to `apply` must be one the config shows is a list: a selected list, an `api` with `field`, `{"expr": [...]}`, or one of these with `"using": {"path": "concat", …}`, which joins lists. CI rejects `Array.from`, `Array.of` and `Array.prototype.concat.call` there.

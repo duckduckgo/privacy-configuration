@@ -4,7 +4,7 @@ A condition is an expression in boolean position. Conditions appear in two place
 
 ## Structure
 
-Each object has one expression key, so to combine several conditions, wrap them in `all`, `any` or `none`. These blocks can nest at any level. An array is never an expression on its own. Under `text` or `element`, an array lists several bodies, which select the union of their items, and under `pattern`, `selector` and `xpath`, it lists alternatives. See [Arrays](expressions.md#arrays) for its other uses. An unknown key next to an operator key is a parse error ([Validation](validation.md#expressions)).
+Each object has one expression key, so to combine several conditions, wrap them in `all`, `any` or `none`. These blocks can nest at any level. An array is never an expression on its own. Under `text` or `element`, an array lists several bodies, which select the union of their items, and under `pattern`, `selector` and `xpath`, it lists alternatives. See [Arrays](expressions.md#arrays) for its other uses. An unknown key next to an operator key is a parse error ([Parse errors](failures.md#parse-errors)).
 
 ```json
 "match": {

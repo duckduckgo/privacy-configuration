@@ -38,11 +38,11 @@ See [Sources](sources.md) for each source's keys and items.
 | `then` and `else` of [`if`](#if) | What the `if`'s position expects. In a sequence there, the last element must give that, and the elements before it can give any value. An `if` without `else` gives `undefined` when its condition doesn't hold. Under `sum`, `mul`, `any`, `all` and `none`, a branch that gives a list contributes each item, as an operand would |
 | Operand of [`expr`](#expr) | What the `expr`'s position expects. With `is`, a boolean |
 
-A value of a type its position doesn't expect fails ([Values that do not fit](failures.md#values-that-do-not-fit)), and CI rejects it when the type can be told from the config ([Types](validation.md#types)). An `api` value's type is checked when it's read: `{"api": "document.hidden"}` is a boolean in boolean position, and `{"api": {"path": "document.readyState"}, "is": "complete"}` tests a string.
+A value of a type its position doesn't expect fails ([Values that do not fit](failures.md#values-that-do-not-fit)), and CI rejects it when the type can be told from the config ([Types](#types)). An `api` value's type is checked when it's read: `{"api": "document.hidden"}` is a boolean in boolean position, and `{"api": {"path": "document.readyState"}, "is": "complete"}` tests a string.
 
-`element` and `text` always give lists, so their type is known from the config. In boolean position, a selected list holds when it has at least one item. As an operand of `any`, `all` and `none`, `element` without `field` and `text` each count as one such boolean, while other lists contribute each of their items. CI rejects `element` with `field`, and `api` or `self` with `where`, as a condition (directly or through a `ref` to a name bound to one), because they look like a test of their values. Use `only` to get the one item, or `"using": "length"` to count them.
+`element` and `text` always give lists, so their type is known from the config. In boolean position, a selected list holds when it has at least one item. As an operand of `any`, `all` and `none`, `element` without `field` and `text` each count as one such boolean, while other lists contribute each of their items. `element` with `field`, and `api` or `self` with `where`, aren't conditions ([Types](#types)), so use `only` to get the one item, or `"using": "length"` to count them.
 
-This table shows what each expression gives in each position. "Refused by CI" marks a type that the config shows is wrong for that position. CI rejects it ([Types](validation.md#types)), and on device it fails when it's read, the same as a type that's only known at read time ([Values that do not fit](failures.md#values-that-do-not-fit)):
+This table shows what each expression gives in each position. "Refused by CI" marks a type that the config shows is wrong for that position ([Types](#types)). On device it fails when it's read, the same as a type that's only known at read time ([Values that do not fit](failures.md#values-that-do-not-fit)):
 
 | Expression | Boolean | Number | Operand of `only` | Value |
 |---|---|---|---|---|
@@ -226,7 +226,7 @@ At item level in `where`, an object with an expression key other than `any`, `al
 
 To read a property with the same name as an expression key, use `self` or the long form: `{"self": "text", "is": "Sign in"}`. See [Forms](predicates.md#forms) for `self` in a predicate operand, and [Lists](sources.md#lists-where-and-field) for `self` in `field`.
 
-An expression that reads `self` is computed once for each value its binder binds: once per item of a `where` or `field`, and once per evaluation of a `using`. An expression inside a `where` or `field` that doesn't read `self` is computed once per evaluation of the source. CI rejects a source there that reads neither `self` nor a `ref` ([Sources in `where` and `field`](validation.md#sources-in-where-and-field)), so bind a value that's the same for every item with `define` before the source, and read it through `ref`.
+An expression that reads `self` is computed once for each value its binder binds: once per item of a `where` or `field`, and once per evaluation of a `using`. An expression inside a `where` or `field` that doesn't read `self` is computed once per evaluation of the source. To read a value that's the same for every item, bind it with `define` before the source, and read it through `ref` ([Sources in `where` and `field`](sources.md#sources-in-where-and-field)).
 
 ### `expr`
 
@@ -352,3 +352,19 @@ To stop a later operand from being evaluated, the guard must be an `if`. On a pa
  "then": {"only": {"api": {"path": "performance.getEntriesByName", "args": ["first-contentful-paint", "paint"], "field": "startTime"}}, "is": {"lt": 1800}},
  "else": false}
 ```
+
+## Authoring rules
+
+### Types
+
+CI rejects a type that the config shows is wrong for its position ([Positions](#positions)):
+
+- The cells marked "Refused by CI" in the [positions table](#positions): a literal or operator of the wrong type, an `if` without `else` outside value position, `expr` over an array in number or boolean position, and an action outside value position.
+- `is` outside boolean and value position, and `"using": "length"` outside value and number position.
+- A type the [element allowlist](sources.md#element-allowlist) gives that's wrong for its position, such as a numeric `element` property under `all`.
+- `element` with `field`, and `api` or `self` with `where`, as a condition, either directly or through a `ref` to a name bound to one. They hold when they have an item, which looks like a test of their values. A `ref` to a name bound to `element` without `field`, or to `text`, is a condition.
+- An argument whose type the config shows is wrong for its method.
+
+### Bound names
+
+A `ref` to a run name has a `define` binding it earlier in evaluation order, and a `ref` to a detector name has a `define` in the detector binding it. A name bound earlier on only some paths (inside one `if` branch) passes, and reads `undefined` where it isn't bound ([Names](#names)).

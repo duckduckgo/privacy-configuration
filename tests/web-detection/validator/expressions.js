@@ -242,11 +242,12 @@ export function checkExpr(node, position, scope, ctx, path) {
             ctx,
             `${path}.${key}`,
             'reads neither `self` nor a `ref`, so it gives every item of the enclosing `where` or `field` the same value: `define` it before',
+            'itemSources',
         );
     }
     const hasIs = 'is' in node;
     if (hasIs && position !== 'boolean' && position !== 'value')
-        fail(ctx, path, `\`is\` gives a boolean, so it sits in boolean or value position, not ${position} position`);
+        fail(ctx, path, `\`is\` gives a boolean, so it sits in boolean or value position, not ${position} position`, 'types');
 
     // With `is`, the expression computes a value for the predicate
     const valuePosition = hasIs ? 'value' : position;
@@ -296,8 +297,9 @@ export function checkBody(node, position, scope, ctx, path) {
  * @returns {StaticType}
  */
 function checkActions(node, position, scope, ctx, path) {
-    if (scope.inMatch) fail(ctx, path, '`match` reads the page only, and holds no action');
-    if (position !== 'value') fail(ctx, path, `an action gives \`undefined\`, so it sits in value position only, not ${position} position`);
+    if (scope.inMatch) fail(ctx, path, '`match` reads the page only, and holds no action', 'matchNames');
+    if (position !== 'value')
+        fail(ctx, path, `an action gives \`undefined\`, so it sits in value position only, not ${position} position`, 'types');
     for (const [
         key,
         body,
@@ -338,7 +340,12 @@ function checkDefine(define, scope, ctx, path) {
         const type = checkExpr(value, 'value', { ...scope, conditionRoot: true }, ctx, namePath);
         if (name.startsWith('this.')) {
             if (ctx.hasMatch)
-                fail(ctx, namePath, `a detector with \`match\` runs \`actions\` once, so it binds no detector name: "${name}"`);
+                fail(
+                    ctx,
+                    namePath,
+                    `a detector with \`match\` runs \`actions\` once, so it binds no detector name: "${name}"`,
+                    'matchNames',
+                );
             const earlier = ctx.collected.get(name);
             ctx.collected.set(
                 name,
@@ -382,10 +389,11 @@ function refType(name, type, position, ctx, path) {
     if (position === 'boolean') {
         // The condition leaf holds when it has an item. Any other selected list is refused, as the
         // `element` with `field` or `api` with `where` bound to the name is
-        if (type.list === 'selected' && !type.leaf) fail(ctx, path, `"${name}" is bound to a selected list of values: ${LIST_CONDITION}`);
+        if (type.list === 'selected' && !type.leaf)
+            fail(ctx, path, `"${name}" is bound to a selected list of values: ${LIST_CONDITION}`, 'types');
         if (type.list === 'selected') return typeOf('boolean');
         if ((type.list === undefined && !allows(type, 'boolean')) || type.list === 'array')
-            fail(ctx, path, `boolean position takes a boolean, and config types the name as ${describeType(type)}`);
+            fail(ctx, path, `boolean position takes a boolean, and config types the name as ${describeType(type)}`, 'types');
         return typeOf('boolean');
     }
     if (
@@ -395,7 +403,7 @@ function refType(name, type, position, ctx, path) {
         !type.types.includes('array') &&
         !type.types.includes('object')
     )
-        fail(ctx, path, `list position takes a list, and config types the name as ${describeType(type)}`);
+        fail(ctx, path, `list position takes a list, and config types the name as ${describeType(type)}`, 'types');
     return sourceType(itemOf(type), type.list, position, ctx, path);
 }
 
@@ -436,6 +444,7 @@ function checkRootGuard(root, scope, ctx, path) {
                     ctx,
                     entryPath,
                     "`root` needs a guard: the root's expression as an operand of the top-level `all` of the condition reading it, or in the condition of an enclosing `if`",
+                    'rootGuards',
                 );
                 return;
             }
@@ -444,6 +453,7 @@ function checkRootGuard(root, scope, ctx, path) {
                     ctx,
                     entryPath,
                     'the guard of this root is not an `element` or `text` source, so it carries `is`, such as "is": {"type": "object"}',
+                    'rootGuards',
                 );
             return;
         }
@@ -462,6 +472,7 @@ function checkRootGuard(root, scope, ctx, path) {
                 ctx,
                 entryPath,
                 '`root` needs a guard: the root a `ref` to a name bound with `define`, and a `ref` to it as an operand of the top-level `all` of the condition reading it, or in the condition of an enclosing `if`',
+                'rootGuards',
             );
             return;
         }
@@ -470,6 +481,7 @@ function checkRootGuard(root, scope, ctx, path) {
                 ctx,
                 entryPath,
                 `the guard "${name}" is not bound to an \`element\` or \`text\` source, so it carries \`is\`, such as "is": {"type": "object"}`,
+                'rootGuards',
             );
     });
 }
@@ -555,7 +567,7 @@ function checkSelf(body, position, scope, ctx, path) {
         // The bound value itself
         if (position !== 'boolean') return sourceType(itemOf(scope.bound), scope.bound.list, position, ctx, path);
         if (!allows(scope.bound, 'boolean'))
-            fail(ctx, path, `boolean position takes a boolean, and config types the value as ${describeType(scope.bound)}`);
+            fail(ctx, path, `boolean position takes a boolean, and config types the value as ${describeType(scope.bound)}`, 'types');
         return typeOf('boolean');
     }
     return checkApi(selfBody, position, scope, ctx, path, scope.bound, false, true);
@@ -616,11 +628,11 @@ function checkOnly(body, position, scope, ctx, path) {
     ]);
     const type = itemOf(checkExpr(body, 'list', child(scope), ctx, path));
     if (position === 'number' && !allows(type, 'number'))
-        fail(ctx, path, `number position takes a number, and config types the value as ${describeType(type)}`);
+        fail(ctx, path, `number position takes a number, and config types the value as ${describeType(type)}`, 'types');
     if (position === 'boolean' && !allows(type, 'boolean'))
-        fail(ctx, path, `boolean position takes a boolean, and config types the value as ${describeType(type)}`);
+        fail(ctx, path, `boolean position takes a boolean, and config types the value as ${describeType(type)}`, 'types');
     if (position === 'list' && type.types !== null && !type.types.includes('array') && !type.types.includes('object'))
-        fail(ctx, path, `list position takes a list, and config types the value as ${describeType(type)}`);
+        fail(ctx, path, `list position takes a list, and config types the value as ${describeType(type)}`, 'types');
     return type;
 }
 
@@ -652,7 +664,7 @@ function checkArith(key, body, position, scope, ctx, path) {
             operandPath,
         );
         if (listed && !allows(type, 'number'))
-            fail(ctx, operandPath, `\`${key}\` takes numbers, and config types the values as ${describeType(type)}`);
+            fail(ctx, operandPath, `\`${key}\` takes numbers, and config types the values as ${describeType(type)}`, 'types');
         nan ||= type.nan;
     });
     return {
@@ -734,7 +746,7 @@ function checkLogic(key, body, position, scope, ctx, path) {
         if (providesValues(operand, 'boolean', ctx)) {
             const type = checkExpr(operand, 'spread', { ...operandScope, spreadOf: 'boolean' }, ctx, operandPath);
             if (!allows(type, 'boolean'))
-                fail(ctx, operandPath, `\`${key}\` takes booleans, and config types the values as ${describeType(type)}`);
+                fail(ctx, operandPath, `\`${key}\` takes booleans, and config types the values as ${describeType(type)}`, 'types');
         } else {
             checkExpr(operand, 'boolean', operandScope, ctx, operandPath);
         }
@@ -769,6 +781,7 @@ function checkIf(holder, position, scope, ctx, holderPath) {
             ctx,
             path,
             `\`if\` without \`else\` gives \`undefined\` when its condition does not hold, so it fills value position only, not ${position} position`,
+            'types',
         );
     checkExpr(body, 'boolean', { ...child(scope), conditionRoot: true }, ctx, path);
     /** @type {Scope} */
@@ -800,7 +813,12 @@ function checkIf(holder, position, scope, ctx, holderPath) {
         ])) {
             const type = branch === 'then' ? thenType : elseType;
             if (branch in holder && !allows(type, single))
-                fail(ctx, `${holderPath}.${branch}`, `this operand takes ${single}s, and config types the branch as ${describeType(type)}`);
+                fail(
+                    ctx,
+                    `${holderPath}.${branch}`,
+                    `this operand takes ${single}s, and config types the branch as ${describeType(type)}`,
+                    'types',
+                );
         }
     }
     for (const [
@@ -840,11 +858,11 @@ function checkRef(body, position, scope, ctx, path) {
         return UNKNOWN;
     }
     if (scope.inMatch) {
-        fail(ctx, path, '`match` reads the page only, and holds no `ref`');
+        fail(ctx, path, '`match` reads the page only, and holds no `ref`', 'matchNames');
         return UNKNOWN;
     }
     if (body.startsWith('this.') && ctx.hasMatch)
-        fail(ctx, path, `a detector with \`match\` runs \`actions\` once, so it reads no detector name: "${body}"`);
+        fail(ctx, path, `a detector with \`match\` runs \`actions\` once, so it reads no detector name: "${body}"`, 'matchNames');
     const type = nameType(body, ctx);
     if (!type) {
         fail(
@@ -853,6 +871,7 @@ function checkRef(body, position, scope, ctx, path) {
             body.startsWith('this.')
                 ? `\`ref\` "${body}" reads a detector name no \`define\` in the detector binds`
                 : `\`ref\` "${body}" reads a run name no \`define\` binds before it in evaluation order`,
+            'boundNames',
         );
         return UNKNOWN;
     }
@@ -901,7 +920,7 @@ function checkConditionSource(key, branch, position, scope, ctx, path) {
     const withField = bodies.filter(({ body }) => 'field' in body).length;
     if (withField && withField !== bodies.length) fail(ctx, path, 'every body of one `element` source has `field`, or none does');
     const hasField = withField > 0;
-    if (hasField && position === 'boolean') fail(ctx, path, `\`element\` with \`field\`: ${LIST_CONDITION}`);
+    if (hasField && position === 'boolean') fail(ctx, path, `\`element\` with \`field\`: ${LIST_CONDITION}`, 'types');
 
     /** @type {StaticType[]} */
     const valueTypes = [];
@@ -989,7 +1008,7 @@ function checkRootEntry(entry, scope, ctx, path, readsXPath) {
               'undefined',
           ];
     if (type.types !== null && type.types.some((name) => !allowed.includes(name)))
-        fail(ctx, path, `a root gives a selector, a node or a list of nodes, and config types it as ${describeType(type)}`);
+        fail(ctx, path, `a root gives a selector, a node or a list of nodes, and config types it as ${describeType(type)}`, 'types');
     // The expression is valid, but evaluating it from a shadow root throws `NotSupportedError`
     if (readsXPath && type.fragment)
         fail(ctx, path, 'an XPath expression cannot be evaluated from a shadow root; use `selector`, or root at an element inside it');
@@ -1010,11 +1029,12 @@ export function sourceType(type, list, position, ctx, path) {
     if (position === 'spread') return type;
     if (position === 'number') {
         if (list === 'array') {
-            fail(ctx, path, `number position takes a number, and config types the value as ${describeType({ ...type, list })}`);
+            fail(ctx, path, `number position takes a number, and config types the value as ${describeType({ ...type, list })}`, 'types');
             return type;
         }
         const item = list ? itemOf(type) : type;
-        if (!allows(item, 'number')) fail(ctx, path, `number position takes a number, and config types the value as ${describeType(item)}`);
+        if (!allows(item, 'number'))
+            fail(ctx, path, `number position takes a number, and config types the value as ${describeType(item)}`, 'types');
         return item;
     }
     return list ? { ...type, list } : type;

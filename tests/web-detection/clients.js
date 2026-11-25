@@ -9,6 +9,7 @@ import {
 } from '../../scripts/config-conditions.mjs';
 import { isPlainObject } from '../../util.js';
 import { EXPERIMENT_METRIC_PARENTS } from '../../constants.js';
+import { ruleLink } from './validator/context.js';
 
 /**
  * @typedef {import('../../scripts/config-conditions.mjs').Platform} Platform
@@ -347,7 +348,7 @@ export function runsOnBreakageReport(detector) {
 export function breakageDataErrors(detector, path) {
     if (!runsOnBreakageReport(detector) || writesBreakageData(detector)) return [];
     return [
-        `${path}: runs when a breakage report is made, since the \`breakageReport\` trigger is on unless set to "disabled" (on by default), but no \`breakageReportData\` action writes to its breakage entry; add one, or set \`triggers.breakageReport.state\` to "disabled"`,
+        `${path}: runs when a breakage report is made, since the \`breakageReport\` trigger is on unless set to "disabled" (on by default), but no \`breakageReportData\` action writes to its breakage entry; add one, or set \`triggers.breakageReport.state\` to "disabled"${ruleLink('events')}`,
     ];
 }
 

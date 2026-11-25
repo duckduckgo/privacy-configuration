@@ -48,7 +48,7 @@ The operand of `eq`, `lt`, `lte`, `gt` and `gte`, and each entry of `in`, is an 
 
 `eq` against a ratio compares floats exactly, so use a range instead.
 
-The comparison operators coerce values like JS does: a comparison on `undefined` or `NaN` is `false`, and `null >= 0` and `"7" >= 7` both hold. Every operator either holds or doesn't for any value that's read, so `none` over it inverts it, and `none` over a comparison on `undefined` holds. To only compare numbers, put `type`, or `Number.isFinite` called on the value ([Calls](#calls)), before the comparison ([Failure and type](#failure-and-type)).
+The comparison operators coerce values like JS does: a comparison on `undefined` or `NaN` is `false`, and `null >= 0` and `"7" >= 7` both hold. Every operator either holds or doesn't for any value that's read, so `none` over it inverts it, and `none` over a comparison on `undefined` holds. To only compare numbers, put `type`, or `Number.isFinite` called on the value ([Calls](#calls)), before the comparison ([Failure and type](#failure-and-type), [Comparison guards](#comparison-guards)).
 
 ## Keys
 
@@ -119,7 +119,7 @@ The first holds for a finite duration above 0, the second for an infinite one.
 
 Each name follows `typeof`, except that `null` and arrays have names of their own.
 
-JSON has no literal for `NaN` or the infinities. To test for them, call `Number.isFinite` or `Number.isNaN` on the value ([Calls](#calls)), or give `eq` `Infinity` as an expression: `{"eq": {"api": "Infinity"}}`. Inside a `where` or `field`, CI rejects that `api` because it reads neither `self` nor a `ref` ([Sources in `where` and `field`](validation.md#sources-in-where-and-field)), so either `define` the value before the source and compare with its `ref`, or use `Number.isFinite`.
+JSON has no literal for `NaN` or the infinities. To test for them, call `Number.isFinite` or `Number.isNaN` on the value ([Calls](#calls)), or give `eq` `Infinity` as an expression: `{"eq": {"api": "Infinity"}}`. Inside a `where` or `field`, `define` the value before the source and compare with its `ref` ([Sources in `where` and `field`](sources.md#sources-in-where-and-field)), or use `Number.isFinite`.
 
 | Predicate | `foo` is not present | `foo`'s getter throws | `foo` is `null` | `foo` is `"7"` | `foo` is `8` |
 |---|---|---|---|---|---|
@@ -190,7 +190,7 @@ Web detection reads the page without running page code where it can, but this is
 | A builtin the page replaced before C-S-S loaded its detectors | A wrapped `getComputedStyle`. C-S-S loads them when its script loads, or at `init` when the client sends the config later |
 | A property read as it is | A getter the page defines on an element |
 | A method that calls back into the page | `Array.from` and `Object.fromEntries` use the iterator as the page leaves it. `matchAll` reads `Symbol.matchAll` and `exec` from `RegExp.prototype` as the page leaves them |
-| A function passed to a method that calls it | `Reflect.apply`, `Function.prototype.call`, `Array.prototype.map` ([Allowed names](validation.md#allowed-names)) |
+| A function passed to a method that calls it | `Reflect.apply`, `Function.prototype.call`, `Array.prototype.map` ([Allowed names](sources.md#allowed-names)) |
 
 Prefer reads with no side effects.
 
@@ -204,3 +204,22 @@ A predicate fails when the value it tests, a property it reads or an operand fai
 {"api": {"path": "document.styleSheets", "where": {"cssRules": {"fails": false, "length": 0}}}, "using": "length"}
 {"api": {"path": "document.styleSheets", "where": {"cssRules.length": 0}}, "using": "length"}
 ```
+
+## Authoring rules
+
+### Comparison guards
+
+CI rejects these predicates, which either never hold for a value that's read, or coerce a value that the config types as something other than a number:
+
+- `"fails": true` beside any other key: the key reads the failed value, and the detector aborts.
+- Beside `type`, a comparison on a listed type other than `number`, such as `gt` beside `"type": ["string", "null"]`.
+- `Number.isFinite` or `Number.isNaN` called on the value and required to hold, beside a `type` that leaves out `number`.
+- A comparison on a value that the config shows can be something other than a number, such as an element property that can be `null` (where `null >= 0` holds), unless `type`, or `Number.isFinite` called on the value and required to hold, comes before it.
+
+A string literal that converts to `NaN`, such as `"unsupported"` from an `if` branch, doesn't need a guard, since a comparison on it is `false`.
+
+When the value can be `NaN`, CI requires `Number.isFinite` or `Number.isNaN` called on the value beside a comparison under `none`. A value can be `NaN` when it's a `div`, an operator over such a value, a builtin that returns a number (such as `Math.max` or `Math.max.apply`), or an element property the allowlist types as a number that can be `NaN`. A comparison on `NaN` is `false`, so `none` over it holds.
+
+### Property paths
+
+CI rejects a property path on a value it types as a number or a boolean, and any path on a string other than `length` and an index.

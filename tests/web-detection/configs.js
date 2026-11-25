@@ -3,6 +3,7 @@ import fs from 'fs';
 import { immutableJSONPatch } from 'immutable-json-patch';
 import platforms from '../../platforms.js';
 import { CURRENT_CONFIG_VERSION } from '../../constants.js';
+import { ruleLink } from './validator/context.js';
 import { NAME_PATTERN } from './validator/grammar.js';
 import { CLIENT_RELEASES, clientViews } from './clients.js';
 
@@ -210,9 +211,11 @@ export function detectorNameErrors(webDetection) {
      * @param {string} label
      */
     const check = (groupName, detectorNames, label) => {
-        if (!NAME_PATTERN.test(groupName)) errors.add(`${label}: group name "${groupName}" does not match ${NAME_PATTERN}`);
+        if (!NAME_PATTERN.test(groupName))
+            errors.add(`${label}: group name "${groupName}" does not match ${NAME_PATTERN}${ruleLink('detectorNames')}`);
         for (const name of detectorNames) {
-            if (!NAME_PATTERN.test(name)) errors.add(`${label}: detector name "${groupName}.${name}" does not match ${NAME_PATTERN}`);
+            if (!NAME_PATTERN.test(name))
+                errors.add(`${label}: detector name "${groupName}.${name}" does not match ${NAME_PATTERN}${ruleLink('detectorNames')}`);
         }
     };
     for (const [

@@ -667,7 +667,7 @@ describe('webDetection config tests', () => {
                 ];
                 expectValid(true, bucketsOf(imgCount, zeroToThree));
                 expect(bucketWarningsOf(imgCount, zeroToThree)).to.deep.equal([
-                    '$.actions.breakageReportData.data.a.buckets: buckets "none" and "0-3" overlap on 0, which "none" names since it comes first',
+                    '$.actions.breakageReportData.data.a.buckets: buckets "none" and "0-3" overlap on 0, which "none" names since it comes first (see docs/web-detection/payloads.md#bucket-overlap)',
                 ]);
                 expect(
                     bucketWarningsOf(imgCount, [
@@ -675,7 +675,7 @@ describe('webDetection config tests', () => {
                         { name: 'mid', is: { gte: 3, lt: 8 } },
                     ]),
                 ).to.deep.equal([
-                    '$.actions.breakageReportData.data.a.buckets: buckets "low" and "mid" overlap on {"gte":3,"lt":5}, which "low" names since it comes first',
+                    '$.actions.breakageReportData.data.a.buckets: buckets "low" and "mid" overlap on {"gte":3,"lt":5}, which "low" names since it comes first (see docs/web-detection/payloads.md#bucket-overlap)',
                 ]);
                 expect(
                     bucketWarningsOf(imgCount, [
@@ -735,7 +735,7 @@ describe('webDetection config tests', () => {
                     ];
                     expectValid(true, bucketsOf(fontsStatus, buckets));
                     expect(bucketWarningsOf(fontsStatus, buckets)).to.deep.equal([
-                        `$.actions.breakageReportData.data.a.buckets: buckets "s" and "n" overlap on ${written}, which "s" names since it comes first`,
+                        `$.actions.breakageReportData.data.a.buckets: buckets "s" and "n" overlap on ${written}, which "s" names since it comes first (see docs/web-detection/payloads.md#bucket-overlap)`,
                     ]);
                 }
                 expectError(

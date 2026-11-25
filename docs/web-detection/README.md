@@ -29,7 +29,6 @@ flowchart LR
 | [predicates.md](predicates.md) | The predicate syntax shared by `is` and `where`: forms, keys and the long form, failure and type, and property reads. |
 | [payloads.md](payloads.md) | What `fireEvent` and `breakageReportData` send: the payload spec, `when`, buckets, and how events become EventHub pixels. |
 | [failures.md](failures.md) | Failures, errors, parse errors and run errors: what each does to a run, how it's reported, and how to handle it. |
-| [validation.md](validation.md) | Parse errors on device, and the checks CI runs on every detector, including the `api` allowlist. |
 | [recipes.md](recipes.md) | Configs for common measurements: counts, ratios, rendered text, load state, computed style, the performance timeline, missing fields and throwing reads, JS builtins, and detector shapes. |
 | [breakageData-parameter.md](breakageData-parameter.md) | The format of detection results in breakage reports (the `breakageData` parameter): per-detector entries, their `data` and recorded `errors`. |
 | [versions.md](versions.md) | Which C-S-S release each capability arrived in, and the earliest app version on each platform that includes it, for version gates. |
@@ -43,5 +42,18 @@ flowchart LR
 | Config schema | [`schema/features/web-detection.ts`](../../schema/features/web-detection.ts) |
 | `webEvents` schema, used by `fireEvent` | [`schema/features/web-events.ts`](../../schema/features/web-events.ts) |
 | Shipped detectors | [`features/web-detection.json`](../../features/web-detection.json) |
+| Authoring rules | The validator in [`tests/web-detection/validator/`](../../tests/web-detection/validator/), and the Authoring rules section of each page |
 
 Where C-S-S and these docs differ on what config means, the docs describe the intended behaviour.
+
+## Meaning and authoring rules
+
+C-S-S only rejects config it can't run ([Parse errors](failures.md#parse-errors)), and problems that depend on the page, which can only be found at run time ([Failures](failures.md)). Everything else that can be told from the config before it ships is checked in CI by the validator in [`tests/web-detection/validator/`](../../tests/web-detection/validator/). The body of each page describes what config means, and the validator's rules are listed in an `## Authoring rules` section at the end of the page that describes what they restrict.
+
+CI checks every detector in every view of the config a client can see: each platform's generated config, with the `conditionalChanges` entries that client matches applied. Every patch a client matches must apply, and every path it replaces, removes or tests must exist.
+
+When a change adds or changes a rule in the validator:
+
+- describe the rule, and the reason for it, in that Authoring rules section in the same change
+- pass its key in `RULES` ([`context.js`](../../tests/web-detection/validator/context.js)) to `fail`, so the message links to the section
+- mark a rule that CI can't check, such as which names can join an allowlist, as a review rule

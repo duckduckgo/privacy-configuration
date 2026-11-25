@@ -348,8 +348,8 @@ describe('webDetection config tests', () => {
                 },
             });
             expect(detectorNameErrors(webDetection)).to.deep.equal([
-                'conditionalChanges[0] detectors.bad-group.ok: group name "bad-group" does not match /^[a-zA-Z][a-zA-Z0-9_]*$/',
-                'conditionalChanges[0] detectors.good.bad-name: detector name "good.bad-name" does not match /^[a-zA-Z][a-zA-Z0-9_]*$/',
+                'conditionalChanges[0] detectors.bad-group.ok: group name "bad-group" does not match /^[a-zA-Z][a-zA-Z0-9_]*$/ (see docs/web-detection/overview.md#detector-names)',
+                'conditionalChanges[0] detectors.good.bad-name: detector name "good.bad-name" does not match /^[a-zA-Z][a-zA-Z0-9_]*$/ (see docs/web-detection/overview.md#detector-names)',
             ]);
         });
     });

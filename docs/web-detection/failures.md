@@ -7,8 +7,8 @@ Every expression either gives a value or fails. A failure propagates up through 
 | Kind | Cause | Recorded as | `fails` handles it |
 |---|---|---|---|
 | Failure | Anything that goes wrong on the page at run time: a getter or method throws, a call is made on a name whose value isn't a function, or a value doesn't fit the config ([Values that do not fit](#values-that-do-not-fit)). For example, `document.cookie` in a sandboxed frame, `cssRules` on a cross-origin stylesheet, `document.hasStorageAccess()` on an engine without it | `"aborted"`, under the failing expression's path | Yes |
-| Error | Invalid config that reaches the page: an invalid CSS selector or XPath expression. CI checks XPath grammar ([Text and element conditions](validation.md#text-and-element-conditions)), but selectors need testing on the page | `"error"`, under the failing expression's path | No |
-| Parse error | Config that doesn't parse. The detector never runs ([On device](validation.md#on-device)) | `{"parse": "error"}` | No |
+| Error | Invalid config that reaches the page: an invalid CSS selector or XPath expression. CI checks XPath grammar, but selectors need testing on the page | `"error"`, under the failing expression's path | No |
+| Parse error | Config that doesn't parse. The detector never runs ([Parse errors](#parse-errors)) | `{"parse": "error"}` | No |
 | Run error | An error outside any expression | `{"run": "error"}` | No |
 
 These aren't failures:
@@ -32,6 +32,24 @@ A value the config can't use fails. Each of these depends on the page:
 | A list unwrapped, or read by `only`, with several items | `at` through `using`, or a type argument excluding a page's own marks ([Performance timeline](sources.md#performance-timeline)) |
 | `where` on an `api` value that isn't a list | A path that reads a list |
 | A root that isn't a selector, a node or a list of nodes | A guard testing its `type` ([`root`](sources.md#root)) |
+
+## Parse errors
+
+C-S-S parses each detector when it loads its config. A detector parses when every key and value has the shape these docs give it, so C-S-S can give it one meaning. Otherwise it doesn't parse, and it never runs:
+
+| Config | Examples |
+|---|---|
+| An unknown key or name | A key beside an operator key, an unknown `visibility`, an unknown type name in `type` |
+| A value of the wrong JSON type | A `define` that isn't an object, `buckets` that isn't an array, an array in an expression or predicate position ([Arrays](expressions.md#arrays)) |
+| A missing key | A detector without `actions`, an `if` without `then`, a payload field without `value`, an object with no expression key (`{}` included) |
+| Keys that conflict | Several expression keys in one object, an action key beside an expression key or a modifier, `field` without `is` |
+| A key where it can't apply | `self` outside every `using`, `where` and `field`, `then` or `else` without `if` |
+
+An unknown key is a parse error so that a client from before a key was added doesn't run the detector with a different meaning ([Versions](versions.md)).
+
+Two names are also checked when the detector parses: a payload key matches `^[a-zA-Z][a-zA-Z0-9_]*$` and isn't `nativeData` ([Payload spec](payloads.md#payload-spec)), and a `define` name matches the pattern in [Names](expressions.md#names).
+
+Config that parses runs. What a detector may read, how it guards its values and how it buckets its payloads are authoring rules that CI checks before config ships ([Meaning and authoring rules](README.md#meaning-and-authoring-rules)).
 
 ## Propagation
 

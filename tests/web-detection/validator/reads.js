@@ -39,7 +39,7 @@ import { isPlainObject } from '../../../util.js';
 export function checkApi(body, position, scope, ctx, path, root, asFunction = false, bound = false) {
     if (!isPlainObject(body)) return UNKNOWN;
     const hasWhere = 'where' in body;
-    if (hasWhere && position === 'boolean') fail(ctx, path, `\`api\` with \`where\`: ${LIST_CONDITION}`);
+    if (hasWhere && position === 'boolean') fail(ctx, path, `\`api\` with \`where\`: ${LIST_CONDITION}`, 'types');
     expectPosition(ctx, path, '`api`', position, [
         'boolean',
         'value',
@@ -108,7 +108,7 @@ export function checkApi(body, position, scope, ctx, path, root, asFunction = fa
     const list = hasWhere ? 'selected' : 'field' in body || read.list !== undefined ? 'maybe' : undefined;
     if (position === 'boolean') {
         if (!allows(valueType, 'boolean'))
-            fail(ctx, path, `boolean position takes a boolean, and config types the value as ${describeType(valueType)}`);
+            fail(ctx, path, `boolean position takes a boolean, and config types the value as ${describeType(valueType)}`, 'types');
         return typeOf('boolean');
     }
     return sourceType(valueType, list, position, ctx, path);
@@ -129,14 +129,15 @@ export function checkApi(body, position, scope, ctx, path, root, asFunction = fa
 function checkApiName(name, isCall, ctx, path, next, asArgument = false) {
     const kind = Object.hasOwn(API_ALLOWLIST, name) ? API_ALLOWLIST[name] : undefined;
     if (!kind) {
-        fail(ctx, path, `\`api\` reads "${name}", which is not in API_ALLOWLIST`);
+        fail(ctx, path, `\`api\` reads "${name}", which is not in API_ALLOWLIST`, 'allowedNames');
     } else if (isCall && kind !== 'method') {
-        fail(ctx, path, `calls "${name}", which API_ALLOWLIST records as a ${kind}`);
+        fail(ctx, path, `calls "${name}", which API_ALLOWLIST records as a ${kind}`, 'allowedNames');
     } else if (!isCall && kind === 'method' && !asArgument && !(next !== undefined && FUNCTION_READS.includes(next))) {
         fail(
             ctx,
             path,
             `reads the method "${name}" without calling it; a method is called through \`args\`, as the last name of a path, or read before \`apply\`, \`call\` or \`bind\`, or as an \`args\` entry`,
+            'allowedNames',
         );
     }
 }
@@ -184,16 +185,16 @@ function checkArg(arg, scope, ctx, path) {
 function checkCallArgs(apiPath, args, argTypes, ctx, path) {
     const isApply = apiPath.endsWith('.apply');
     if (isApply && argTypes[1]?.list === undefined) {
-        fail(ctx, `${path}[1]`, '`apply` takes its arguments as a selected list or `{"expr": [...]}`');
+        fail(ctx, `${path}[1]`, '`apply` takes its arguments as a selected list or `{"expr": [...]}`', 'applyLists');
     }
     const method = isApply ? apiPath.slice(0, -'.apply'.length) : apiPath;
     if (method !== 'Math.max') return;
     const numbers = isApply ? argTypes.slice(1, 2).map(itemOf) : argTypes;
     numbers.forEach((type, index) => {
         const argPath = `${path}[${isApply ? 1 : index}]`;
-        if (!isApply && isList(type)) fail(ctx, argPath, `\`${method}\` takes numbers; \`${method}.apply\` takes a list`);
+        if (!isApply && isList(type)) fail(ctx, argPath, `\`${method}\` takes numbers; \`${method}.apply\` takes a list`, 'types');
         else if (!allows(type, 'number'))
-            fail(ctx, argPath, `\`${method}\` takes numbers, and config types the value as ${describeType(type)}`);
+            fail(ctx, argPath, `\`${method}\` takes numbers, and config types the value as ${describeType(type)}`, 'types');
     });
 }
 
@@ -356,12 +357,12 @@ function readName(current, name, isCall, ctx, path, args, options = {}) {
             results.push(readMember(current, name, false, ctx, path));
         } else if (type === 'object') {
             // Neither an element, an ELEMENT_ALLOWLIST interface nor an `api` read, so no list names it
-            fail(ctx, path, `reads "${name}" on an object no ELEMENT_ALLOWLIST interface or \`api\` name names`);
+            fail(ctx, path, `reads "${name}" on an object no ELEMENT_ALLOWLIST interface or \`api\` name names`, 'elementAllowlist');
         } else {
             wrong.push(type);
         }
     }
-    if (wrong.length) fail(ctx, path, `reads "${name}" on a value config types as ${wrong.join(' or ')}`);
+    if (wrong.length) fail(ctx, path, `reads "${name}" on a value config types as ${wrong.join(' or ')}`, 'propertyPaths');
     return results.length ? mergeTypes(results) : UNKNOWN;
 }
 
@@ -381,7 +382,12 @@ function readMember(current, name, isCall, ctx, path) {
     const entries = allowlistEntries(interfaces, name);
     if (!entries.length) {
         if (current.customElement) return UNKNOWN;
-        fail(ctx, path, `${isCall ? 'calls' : 'reads'} "${name}" on ${describeInterfaces(interfaces)}, which is not in ELEMENT_ALLOWLIST`);
+        fail(
+            ctx,
+            path,
+            `${isCall ? 'calls' : 'reads'} "${name}" on ${describeInterfaces(interfaces)}, which is not in ELEMENT_ALLOWLIST`,
+            'elementAllowlist',
+        );
         return UNKNOWN;
     }
     const kind = isCall ? 'method' : 'property';
@@ -392,6 +398,7 @@ function readMember(current, name, isCall, ctx, path) {
             isCall
                 ? `calls "${name}", which ELEMENT_ALLOWLIST records as a property`
                 : `reads the method "${name}" without calling it; a method is called through \`args\``,
+            'elementAllowlist',
         );
         return UNKNOWN;
     }

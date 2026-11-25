@@ -71,6 +71,17 @@ Clients snapshot or anchor metric state at enrollment, and users enroll as soon 
 
 If a PR modifies a `webDetection` detector (its `match`, `triggers`, or `actions.fireEvent`) whose `fireEvent.type` is referenced as the `event` of a metric in an experiment that is currently `enabled` with cohorts, warn on the PR: the change applies to both cohorts equally so the A/B comparison survives, but the metric's meaning steps mid-experiment and analysis needs to know the date. This is a **warning**, not a block — ask the author to confirm the experiment owner is aware.
 
+## Web Detection Authoring Rules
+
+### References
+
+- **Docs**: `docs/web-detection/README.md#meaning-and-authoring-rules` - How authoring rules are documented
+- **Validator**: `tests/web-detection/validator/`, `tests/web-detection/clients.js`, `tests/web-detection/configs.js`
+
+### Rules and Docs Change Together
+
+Warn when a PR changes what the web detection validator accepts, rejects or warns on without changing an `## Authoring rules` section in `docs/web-detection/`, and when a PR adds or changes a rule in an `## Authoring rules` section without a matching validator change, unless the rule is marked as a review rule. A message added or changed for an authoring rule should pass its `RULES` key to `fail`.
+
 ## Custom User Agent / Client Hints Validation
 
 ### References
