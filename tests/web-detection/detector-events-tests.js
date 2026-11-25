@@ -223,6 +223,34 @@ describe('webDetection config tests', () => {
             expectDetectorsError(`\`count\` is at most ${cap} for \`counted\` detector events`, reading(cap + 1));
         });
 
+        itAll('takes `whenPending` on an `on` body with a `delayMs`', () => {
+            /** @param {Record<string, unknown>} body */
+            const observing = (body) => ({
+                g: {
+                    counter: counted,
+                    reader: {
+                        triggers: {
+                            ...noReport,
+                            observe: {
+                                state: 'enabled',
+                                on: [
+                                    { detectorEvent: 'counted', ...body },
+                                ],
+                            },
+                        },
+                        actions: { define: { n: { trigger: { detectorEvent: 'counted' }, using: 'length' } } },
+                    },
+                },
+            });
+            expectDetectorsValid(observing({ delayMs: 100, whenPending: 'batch' }));
+            for (const body of [
+                { whenPending: 'skip' },
+                { delayMs: 0, whenPending: 'skip' },
+            ]) {
+                expectDetectorsError('a detector event with no `delayMs` runs the detector in the emitting task', observing(body));
+            }
+        });
+
         itAll('matches `trigger` to an `on` body, and counts a `wait` as reading its name', () => {
             expectDetectorsError("no body of the `observe` trigger's `on` names them", {
                 g: {
