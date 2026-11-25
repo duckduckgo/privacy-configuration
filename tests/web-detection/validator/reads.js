@@ -74,6 +74,7 @@ export function checkApi(body, position, scope, ctx, path, root, asFunction = fa
                 ctx,
                 path,
                 'CI names what `using` or `self` reads by the `api` names, recorded type, `object` fields or element type of the value it reads from, and this expression has none of them',
+                'allowedNames',
             );
             read = UNKNOWN;
         }
@@ -524,6 +525,7 @@ function readEmittedData(name, read, isCall, ctx, path) {
             ctx,
             path,
             `reads "${read}" on \`${name}\` detector event items, and not every \`emit\` of "${name}" gives \`data\` as an \`object\` with "${field}"`,
+            'detectorEvents',
         );
     }
     // The value config gives the field, whose type CI doesn't follow from the `emit`

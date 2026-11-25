@@ -367,7 +367,7 @@ function checkEmit(body, scope, ctx, path) {
             fail(ctx, `${path}.${key}`, `"${key}" is not a key of \`emit\`, which takes \`name\` and \`data\``);
     }
     if (typeof body.name !== 'string' || !NAME_PATTERN.test(body.name))
-        fail(ctx, `${path}.name`, `a detector event name matches ${NAME_PATTERN}`);
+        fail(ctx, `${path}.name`, `a detector event name matches ${NAME_PATTERN}`, 'detectorEvents');
     if ('data' in body) checkExpr(body.data, 'value', { ...child(scope), waitable: false }, ctx, `${path}.data`);
 }
 
@@ -396,7 +396,8 @@ function checkObject(body, position, scope, ctx, path) {
         name,
         value,
     ] of Object.entries(body)) {
-        if (name.includes('.')) fail(ctx, `${path}.${name}`, `field name "${name}" holds ".", which a path splits on, so no path reads it`);
+        if (name.includes('.'))
+            fail(ctx, `${path}.${name}`, `field name "${name}" holds ".", which a path splits on, so no path reads it`, 'objectFields');
         fields[name] = checkExpr(value, 'value', child(scope), ctx, `${path}.${name}`);
     }
     return { ...typeOf('object'), objectFields: fields };

@@ -1,4 +1,5 @@
 // @ts-check
+import { ruleLink } from './context.js';
 import { PAYLOAD_ACTIONS } from './grammar.js';
 import { isPlainObject } from '../../../util.js';
 import { MAX_DETECTOR_EVENT_MAX_DEPTH } from '../../../web-detection-util.js';
@@ -254,7 +255,7 @@ export function detectorEventMaxDepthErrors(settings) {
     const check = (value, label) => {
         if (!Number.isInteger(value) || /** @type {number} */ (value) < 0 || /** @type {number} */ (value) > MAX_DETECTOR_EVENT_MAX_DEPTH)
             errors.push(
-                `${label}: \`detectorEventMaxDepth\` is an integer from 0 to ${MAX_DETECTOR_EVENT_MAX_DEPTH}, and is ${JSON.stringify(value)}`,
+                `${label}: \`detectorEventMaxDepth\` is an integer from 0 to ${MAX_DETECTOR_EVENT_MAX_DEPTH}, and is ${JSON.stringify(value)}${ruleLink('featureSettings')}`,
             );
     };
     if ('detectorEventMaxDepth' in settings) check(settings.detectorEventMaxDepth, 'settings');

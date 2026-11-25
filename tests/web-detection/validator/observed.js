@@ -343,15 +343,16 @@ function checkDetectorEventName(body, ctx, path) {
         'durationThreshold',
         'target',
     ]) {
-        if (key in body) fail(ctx, `${path}.${key}`, `\`${key}\` goes with \`entryType\` or \`event\`, not \`detectorEvent\``);
+        if (key in body)
+            fail(ctx, `${path}.${key}`, `\`${key}\` goes with \`entryType\` or \`event\`, not \`detectorEvent\``, 'detectorEvents');
     }
     const name = body.detectorEvent;
     if (typeof name !== 'string' || !NAME_PATTERN.test(name)) {
-        fail(ctx, `${path}.detectorEvent`, `a detector event name matches ${NAME_PATTERN}`);
+        fail(ctx, `${path}.detectorEvent`, `a detector event name matches ${NAME_PATTERN}`, 'detectorEvents');
         return undefined;
     }
     if (ctx.events && !ctx.events.emits.has(name))
-        fail(ctx, `${path}.detectorEvent`, `no \`emit\` in the config records "${name}", so it never arrives`);
+        fail(ctx, `${path}.detectorEvent`, `no \`emit\` in the config records "${name}", so it never arrives`, 'detectorEvents');
     return { kind: 'detectorEvent', type: name };
 }
 

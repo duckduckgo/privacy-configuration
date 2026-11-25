@@ -99,6 +99,8 @@ export const RULES = /** @type {const} */ ({
     recordedTypes: 'sources.md#recorded-types',
     observeTrigger: 'overview.md#the-observe-trigger',
     waits: 'sources.md#waits',
+    detectorEvents: 'overview.md#emitting-and-reading-detector-events',
+    objectFields: 'expressions.md#object-fields',
 });
 
 /**
