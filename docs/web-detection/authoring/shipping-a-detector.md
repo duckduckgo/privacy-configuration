@@ -72,7 +72,7 @@ Without a `rollouts` block on the feature, a merged detector reaches everyone on
 3. If nothing goes wrong, run the experiment at 100% for a week.
 4. Send new experiments through Data Science (experiments inbox).
 
-Rolling out one detector can change what *other* detectors report when both respond to the same page state. Detector metrics through the EventHub measure this within the experiment, on the platforms listed in [Versions](../versions.md). See [EventHub metrics](https://github.com/duckduckgo/ddg-workflow/blob/main/docs/event-hub/handlers/metrics.md).
+Rolling out one detector can change what *other* detectors report when both respond to the same page state. Detector metrics through the EventHub measure this within the experiment. See [EventHub metrics](https://github.com/duckduckgo/ddg-workflow/blob/main/docs/event-hub/handlers/metrics.md).
 
 ## 8. Verify
 

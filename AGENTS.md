@@ -34,6 +34,8 @@ Read the [web detection docs](docs/web-detection/README.md) before adding or cha
 
 Before changing the web detection validator in `tests/web-detection/`, read [Meaning and authoring rules](docs/web-detection/README.md#meaning-and-authoring-rules). C-S-S only checks what stops a detector running, so the validator checks anything that can be known before run time. Document each authoring rule you add or change on the page it restricts, in the same change.
 
+When a C-S-S release changes web detection or a platform ships a newer C-S-S, update [Versions](docs/web-detection/versions.md) following the [web-detection-versions skill](.agents/skills/web-detection-versions/SKILL.md).
+
 ## Key Concepts
 
 - **Features**: Files in `features/` directory control privacy protection enable/disable
