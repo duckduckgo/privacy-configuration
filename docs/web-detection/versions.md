@@ -12,6 +12,7 @@ This table lists each web detection feature and the first C-S-S release that sup
 | | `auto` trigger, with `when.intervalMs` | [13.10.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/13.10.0) |
 | | `auto` trigger without `when` | [13.25.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/13.25.0) |
 | | No `match`, so `actions` runs on every run | [19.0.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/19.0.0) |
+| | [`observe`](overview.md#observe) trigger, with `on` bodies (`delayMs`, `sync`, `whenPending`) | Unreleased |
 | [Feature settings](overview.md#feature-settings) | `readCacheMaxAgeMs` | Unreleased |
 | [Conditions](conditions.md) | `text` (`pattern`, `selector`) | [12.40.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/12.40.0) |
 | | `xpath` and `xpathConfig` on `text` | [16.5.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/16.5.0) |
@@ -28,12 +29,14 @@ This table lists each web detection feature and the first C-S-S release that sup
 | | `where` and `field` on `element` | [19.0.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/19.0.0) |
 | | `root` on `element` and `text` | [19.0.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/19.0.0) |
 | | `where` on items that aren't objects, such as strings | [22.0.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/22.0.0) |
+| | [`observed`](sources.md#observed), with `keep`, and [`trigger`](sources.md#trigger) | Unreleased |
 | [Predicates](predicates.md) | Comparisons, `eq`, `in`, property paths, `field`, `fails`, `type` | [19.0.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/19.0.0) |
 | | `type` names `function`, `symbol` and `bigint` | [22.0.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/22.0.0) |
 | | `fails` holding for a value that doesn't fit the config ([Values that do not fit](failures.md#values-that-do-not-fit)), or a selector or XPath expression the engine rejects ([Kinds](failures.md#kinds)) | Unreleased |
 | [Actions](overview.md#actions) | `breakageReportData` | [12.40.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/12.40.0) |
 | | `fireEvent` | [13.25.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/13.25.0) |
 | | `actions` as an expression or a sequence | [19.0.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/19.0.0) |
+| | [`done`](overview.md#done) | Unreleased |
 | [Payloads](payloads.md) | `data` on `fireEvent` and `breakageReportData`, with `when` | [19.0.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/19.0.0) |
 | | `buckets` as an array of `{"name", "is"}` | [20.0.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/20.0.0) |
 | [Results](breakageData-parameter.md) | Breakage entries with `data` and `errors`, written by any run | [19.0.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/19.0.0) |
@@ -78,10 +81,14 @@ Each C-S-S release that changed what a detector can do or how it runs, newest fi
 - A run that ends on a failure counts as a failed run for `detectorPerf`, as one that ends on an error does.
 - The `readCacheMaxAgeMs` setting keeps the XPath selections and element text that detectors read for later runs while the page is unchanged ([Feature settings](overview.md#feature-settings)). Without it, only the detectors that run at the same time share their reads.
 - `detectorPerf` in breakage reports includes `worstDispatch`, the longest dispatch in the frame with each detector's share of it ([`detectorPerf`](breakageData-parameter.md#detectorperf)). A dispatch whose total goes past the single-run severe cutoff sends a `detectorPerf_severe` event.
+- The `observe` trigger runs a detector when a performance entry or an event of a type it names is recorded ([`observe`](overview.md#observe)). The `observed` source reads the recent items of a type, and `trigger` reads the arrival that started the run ([`observed`](sources.md#observed), [`trigger`](sources.md#trigger)).
+- The `done` action ends a detector with no `match` ([`done`](overview.md#done)).
 
 #### Breaking changes
 
 Before this release, a value that doesn't fit the config, or a selector or XPath expression the engine rejects, ends the run as `"error"`, which `fails` can't handle. Gate a detector that relies on `fails` handling one on this release. A `define` name that doesn't match the name pattern doesn't parse before this release, so a CI change that allows other names needs the same gate.
+
+A detector that uses the `observe` trigger, `observed`, `trigger` or `done` doesn't parse before this release.
 
 ### [22.0.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/22.0.0)
 
