@@ -112,6 +112,7 @@ Items are in document order for `element`, and in the order the API returns them
 | Boolean literal, `true` or `false` | Boolean |  | The boolean |  |
 | String literal, `"fast"`, and `null` | Any value |  | The string or `null` |  |
 | `ref` | What the name is bound to |  | The name's binding, `undefined` when unbound ([Names](#names)) |  |
+| [`object`](#object) | Any value | An expression per field name | An object with a field per key, holding that key's value |  |
 
 A boolean is a value, so a payload can send a named `all`. Numbers only become booleans through `is`.
 
@@ -231,6 +232,16 @@ At item level in `where`, an object with an expression key other than `any`, `al
 To read a property with the same name as an expression key, use `self` or the long form: `{"self": "text", "is": "Sign in"}`. See [Forms](predicates.md#forms) for `self` in a predicate operand, and [Lists](sources.md#lists-where-and-field) for `self` in `field`.
 
 An expression that reads `self` is computed once for each value its binder binds: once per item of a `where` or `field`, and once per evaluation of a `using`. An expression inside a `where` or `field` that doesn't read `self` is computed once per evaluation of the source. CI rejects a source there that reads neither `self` nor a `ref` ([Sources in `where` and `field`](validation.md#sources-in-where-and-field)), so bind a value that's the same for every item with `define` before the source, and read it through `ref`.
+
+### `object`
+
+`object` builds an object from named values. Each key of its body is a field name, and each value an expression in value position:
+
+```json
+{"object": {"to": {"ref": "request", "using": "detector"}, "count": {"ref": "count"}}}
+```
+
+The values are computed in the order the config lists the keys, and if one fails, the object fails. Values are kept as they are, so an element stays an element. `object` goes in value position, such as a `define` value, a payload value or an `emit`'s `data`, and `using`, `where` and `field` read its fields by path. A path splits on `.`, so CI rejects a field name that holds one.
 
 ### `expr`
 

@@ -62,11 +62,18 @@ export function checkApi(body, position, scope, ctx, path, root, asFunction = fa
             read.list !== undefined &&
             names.length === 1 &&
             ('args' in body ? names[0] === 'concat' || readsItem(names[0], true, body.args) : names[0] === 'length');
-        if (read.apiPaths === undefined && read.fieldPaths === undefined && !read.interfaces && !addsNoName && names.length > 0) {
+        if (
+            read.apiPaths === undefined &&
+            read.fieldPaths === undefined &&
+            read.objectFields === undefined &&
+            !read.interfaces &&
+            !addsNoName &&
+            names.length > 0
+        ) {
             fail(
                 ctx,
                 path,
-                'CI names what `using` or `self` reads by the `api` names, recorded type or element type of the value it reads from, and this expression has none of them',
+                'CI names what `using` or `self` reads by the `api` names, recorded type, `object` fields or element type of the value it reads from, and this expression has none of them',
             );
             read = UNKNOWN;
         }
@@ -322,6 +329,24 @@ function readName(current, name, isCall, ctx, path, args, options = {}) {
         if (rest.apiPaths !== undefined || rest.interfaces) results.push(readName(rest, name, isCall, ctx, path, args, options));
         return mergeTypes(results);
     }
+    if (current.objectFields !== undefined) {
+        // An object an `object` expression builds
+        if (isCall) {
+            fail(ctx, path, `calls ${name}() on an \`object\`, which holds values and no method config can call`);
+            return UNKNOWN;
+        }
+        if (Object.hasOwn(current.objectFields, name)) return current.objectFields[name];
+        fail(
+            ctx,
+            path,
+            `reads "${name}" on an \`object\` that builds ${
+                Object.keys(current.objectFields)
+                    .map((field) => `"${field}"`)
+                    .join(', ') || 'no field'
+            }`,
+        );
+        return UNKNOWN;
+    }
     if (current.apiPaths !== undefined && current.interfaces) {
         // Branches reading an `api` and branches giving an element: check the name both ways
         const { apiPaths, ...element } = current;
@@ -428,6 +453,10 @@ function readRecordedField(fieldPaths, name, isCall, ctx, path) {
         const table = dot === -1 ? fieldPath : fieldPath.slice(0, dot);
         const read = dot === -1 ? name : `${fieldPath.slice(dot + 1)}.${name}`;
         const fields = recordedTable(table);
+        if (table.startsWith('detectorEvent:') && (read === 'data' || read.startsWith('data.'))) {
+            results.push(readEmittedData(table.slice('detectorEvent:'.length), read, isCall, ctx, path));
+            continue;
+        }
         if (isCall) {
             fail(ctx, path, `calls "${read}" on ${describeTable(table)} items, whose field allowlist lists no method`);
         } else if (Object.hasOwn(fields, read)) {
@@ -448,4 +477,47 @@ function readRecordedField(fieldPaths, name, isCall, ctx, path) {
         }
     }
     return results.length ? mergeTypes(results) : UNKNOWN;
+}
+
+/**
+ * Read `data`, or a name under it, from a detector event item, by the `emit`s of its name. A field of
+ * `data` is listed when every `emit` gives `data` as an `object` building it, and any path is when
+ * one gives `data` as another expression.
+ *
+ * @param {string} name - the detector event name
+ * @param {string} read - the path read so far, starting `data`
+ * @param {boolean} isCall
+ * @param {Context} ctx
+ * @param {string} path
+ * @returns {StaticType}
+ */
+function readEmittedData(name, read, isCall, ctx, path) {
+    const emitted = ctx.events?.emits.get(name);
+    // A name no `emit` records is reported on its body
+    if (!emitted || emitted.open) return UNKNOWN;
+    if (read === 'data') {
+        if (isCall) fail(ctx, path, `calls "data" on \`${name}\` detector event items`);
+        const data = {
+            ...typeOf('object'),
+            fieldPaths: [
+                `detectorEvent:${name}.data`,
+            ],
+        };
+        return emitted.absent
+            ? mergeTypes([
+                  data,
+                  typeOf('undefined'),
+              ])
+            : data;
+    }
+    const field = read.split('.')[1];
+    if (!emitted.fields.has(field)) {
+        fail(
+            ctx,
+            path,
+            `reads "${read}" on \`${name}\` detector event items, and not every \`emit\` of "${name}" gives \`data\` as an \`object\` with "${field}"`,
+        );
+    }
+    // The value config gives the field, whose type CI doesn't follow from the `emit`
+    return UNKNOWN;
 }

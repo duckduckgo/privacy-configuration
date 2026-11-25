@@ -7,6 +7,7 @@ import {
     COMPARISON_OPERATORS,
     DEFINE_NAME_PATTERN,
     LIST_CONDITION,
+    NAME_PATTERN,
     OPERATOR_KEYS,
     SOURCE_KEYS,
     apiBody,
@@ -322,6 +323,10 @@ function checkActions(node, position, scope, ctx, path) {
             checkDone(body, scope, ctx, actionPath);
             continue;
         }
+        if (key === 'emit') {
+            checkEmit(body, scope, ctx, actionPath);
+            continue;
+        }
         if (isPlainObject(body) && 'data' in body)
             checkPayloadSpec(body.data, /** @type {'fireEvent' | 'breakageReportData'} */ (key), ctx, `${actionPath}.data`, child(scope));
     }
@@ -340,6 +345,59 @@ function checkActions(node, position, scope, ctx, path) {
 function checkDone(body, scope, ctx, path) {
     if (ctx.hasMatch) fail(ctx, path, 'a detector with `match` is done once `match` holds, so it has no `done`');
     checkExpr(body, 'boolean', { ...child(scope), conditionRoot: true }, ctx, path);
+}
+
+/**
+ * `emit`: a detector event `name`, and an optional `data` value. A run can't suspend in `data`.
+ *
+ * @param {unknown} body
+ * @param {Scope} scope
+ * @param {Context} ctx
+ * @param {string} path
+ */
+function checkEmit(body, scope, ctx, path) {
+    if (!isPlainObject(body)) {
+        fail(ctx, path, '`emit` is an object with `name` and an optional `data`');
+        return;
+    }
+    for (const key of Object.keys(body)) {
+        if (key !== 'name' && key !== 'data')
+            fail(ctx, `${path}.${key}`, `"${key}" is not a key of \`emit\`, which takes \`name\` and \`data\``);
+    }
+    if (typeof body.name !== 'string' || !NAME_PATTERN.test(body.name))
+        fail(ctx, `${path}.name`, `a detector event name matches ${NAME_PATTERN}`);
+    if ('data' in body) checkExpr(body.data, 'value', { ...child(scope), waitable: false }, ctx, `${path}.data`);
+}
+
+/**
+ * `object`: an object with a field per key, holding the value of that key's expression. A path
+ * splits on `.`, so a key holding one can't be read.
+ *
+ * @param {unknown} body
+ * @param {Position} position
+ * @param {Scope} scope
+ * @param {Context} ctx
+ * @param {string} path
+ * @returns {StaticType}
+ */
+function checkObject(body, position, scope, ctx, path) {
+    expectPosition(ctx, path, '`object`', position, [
+        'value',
+    ]);
+    if (!isPlainObject(body)) {
+        fail(ctx, path, '`object` maps field names to expressions');
+        return UNKNOWN;
+    }
+    /** @type {Record<string, StaticType>} */
+    const fields = {};
+    for (const [
+        name,
+        value,
+    ] of Object.entries(body)) {
+        if (name.includes('.')) fail(ctx, `${path}.${name}`, `field name "${name}" holds ".", which a path splits on, so no path reads it`);
+        fields[name] = checkExpr(value, 'value', child(scope), ctx, `${path}.${name}`);
+    }
+    return { ...typeOf('object'), objectFields: fields };
 }
 
 /**
@@ -561,6 +619,8 @@ function checkExprKey(key, holder, position, scope, ctx, holderPath) {
             return checkIf(holder, position, scope, ctx, holderPath);
         case 'ref':
             return checkRef(body, position, nested, ctx, path);
+        case 'object':
+            return checkObject(body, position, nested, ctx, path);
         default:
             return UNKNOWN;
     }

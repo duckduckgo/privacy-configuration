@@ -21,16 +21,16 @@ flowchart LR
 
 | Document | Purpose |
 |---|---|
-| [overview.md](overview.md) | Start here. How a detector runs, its config and defaults, triggers (`breakageReport`, `auto`, `observe`), `match` and when a detector is done, actions (`fireEvent`, `breakageReportData`, `define`, `done`), and where results go. |
+| [overview.md](overview.md) | Start here. How a detector runs, its config and defaults, triggers (`breakageReport`, `auto`, `observe`), `match` and when a detector is done, actions (`fireEvent`, `breakageReportData`, `define`, `done`, `emit`), detector events, and where results go. |
 | [authoring/](authoring/README.md) | Writing a new detector or changing an existing one: the steps from config change to verified rollout, the decisions along the way, and when a change needs a privacy triage. |
 | [conditions.md](conditions.md) | The `text` and `element` conditions in full: operators, every key, and what each one costs on the page. |
-| [expressions.md](expressions.md) | Values, positions, operators, modifiers, `is`, `if`, sequences, names and evaluation order. |
+| [expressions.md](expressions.md) | Values, positions, operators (`object` included), modifiers, `is`, `if`, sequences, names and evaluation order. |
 | [sources.md](sources.md) | The `element`, `text`, `api`, `observed`, `trigger` and `wait` sources, `where` and `field` on items, XPath, arguments and JS builtins, the performance timeline, recorded entries and events, suspended runs, mutations, and `root`. |
 | [predicates.md](predicates.md) | The predicate syntax shared by `is` and `where`: forms, keys and the long form, failure and type, and property reads. |
 | [payloads.md](payloads.md) | What `fireEvent` and `breakageReportData` send: the payload spec, `when`, buckets, and how events become EventHub pixels. |
 | [failures.md](failures.md) | Failures, errors, parse errors and run errors: what each does to a run, how it's reported, and how to handle it. |
 | [validation.md](validation.md) | Parse errors on device, and the checks CI runs on every detector, including the `api` allowlist. |
-| [recipes.md](recipes.md) | Configs for common measurements: counts, ratios, rendered text, load state, computed style, the performance timeline, missing fields and throwing reads, JS builtins, and detector shapes. |
+| [recipes.md](recipes.md) | Configs for common measurements: counts, ratios, rendered text, load state, computed style, the performance timeline, missing fields and throwing reads, JS builtins, detector shapes, and polling and request and reply over detector events. |
 | [breakageData-parameter.md](breakageData-parameter.md) | The format of detection results in breakage reports (the `breakageData` parameter): per-detector entries, their `data` and recorded `errors`. |
 | [versions.md](versions.md) | Which C-S-S release each capability arrived in, and the earliest app version on each platform that includes it, for version gates. |
 

@@ -5,8 +5,10 @@ import {
     ENTRY_TYPE_ALLOWLIST,
     EVENT_TARGET_ALLOWLIST,
     EVENT_TYPE_ALLOWLIST,
+    DETECTOR_EVENT_FIELDS,
     LIST_CONDITION,
     MUTATION_FIELDS,
+    NAME_PATTERN,
     MUTATION_OPTION_ALLOWLIST,
     MUTATION_SELECTING_OPTIONS,
     NEVER_EVENT_TYPES,
@@ -24,6 +26,7 @@ import {
     ALLOW_UNBOUNDED_WAIT,
     MAX_WAIT_TIMEOUT_MS,
     OBSERVED_KEEP_CAPS,
+    OBSERVED_KEEP_CAPS_BY_KIND,
     OBSERVED_KEEP_CAPS_BY_TYPE,
     UNBOUNDED_KEEP_TYPES,
 } from '../../../web-detection-util.js';
@@ -107,6 +110,7 @@ export function describeRecorded(recorded) {
     if (recorded.kind === 'entryType') return `\`${recorded.type}\` entries`;
     if (recorded.kind === 'event') return `\`${recorded.type}\` events on \`${recorded.target}\``;
     if (recorded.kind === 'mutation') return 'mutation records';
+    if (recorded.kind === 'detectorEvent') return `\`${recorded.type}\` detector events`;
     return `the \`${recorded.kind}\` trigger`;
 }
 
@@ -128,6 +132,7 @@ function tableOf(recorded) {
 export function recordedTable(table) {
     if (RUN_START_KINDS.includes(table)) return RUN_START_FIELDS;
     if (table === 'mutation') return MUTATION_FIELDS;
+    if (table.startsWith('detectorEvent:')) return DETECTOR_EVENT_FIELDS;
     const colon = table.indexOf(':');
     const kind = table.slice(0, colon);
     const type = table.slice(colon + 1);
@@ -143,6 +148,7 @@ export function describeTable(table) {
     if (RUN_START_KINDS.includes(table)) return `\`${table}\` run start`;
     if (table === 'mutation') return 'mutation record';
     const colon = table.indexOf(':');
+    if (table.startsWith('detectorEvent:')) return `\`${table.slice(colon + 1)}\` detector event`;
     return `\`${table.slice(colon + 1)}\` ${table.startsWith('entryType:') ? 'entry' : 'event'}`;
 }
 
@@ -242,6 +248,7 @@ export function checkRecordedBody(body, place, ctx, path) {
             fail(ctx, `${path}.durationThreshold`, '`durationThreshold` goes with `entryType`, not `mutation`');
         return { kind, type: kind, target: EXPRESSION_TARGET };
     }
+    if (kind === 'detectorEvent') return checkDetectorEventName(body, ctx, path);
     const type = body[kind];
     const typePath = `${path}.${kind}`;
     if (typeof type !== 'string') {
@@ -302,6 +309,32 @@ export function checkRecordedBody(body, place, ctx, path) {
         );
     }
     return { kind, type, target };
+}
+
+/**
+ * A `detectorEvent` body: a name an `emit` in the config records, with no `target` or
+ * `durationThreshold`.
+ *
+ * @param {Record<string, any>} body
+ * @param {Context} ctx
+ * @param {string} path
+ * @returns {Recorded | undefined}
+ */
+function checkDetectorEventName(body, ctx, path) {
+    for (const key of [
+        'durationThreshold',
+        'target',
+    ]) {
+        if (key in body) fail(ctx, `${path}.${key}`, `\`${key}\` goes with \`entryType\` or \`event\`, not \`detectorEvent\``);
+    }
+    const name = body.detectorEvent;
+    if (typeof name !== 'string' || !NAME_PATTERN.test(name)) {
+        fail(ctx, `${path}.detectorEvent`, `a detector event name matches ${NAME_PATTERN}`);
+        return undefined;
+    }
+    if (ctx.events && !ctx.events.emits.has(name))
+        fail(ctx, `${path}.detectorEvent`, `no \`emit\` in the config records "${name}", so it never arrives`);
+    return { kind: 'detectorEvent', type: name };
 }
 
 /**
@@ -469,7 +502,11 @@ function checkKeep(body, recorded, ctx, path) {
         return;
     }
     /** @type {Record<string, number>} */
-    const caps = { ...OBSERVED_KEEP_CAPS, ...(OBSERVED_KEEP_CAPS_BY_TYPE[recorded.kind]?.[recorded.type] ?? {}) };
+    const caps = {
+        ...OBSERVED_KEEP_CAPS,
+        ...(OBSERVED_KEEP_CAPS_BY_KIND[recorded.kind] ?? {}),
+        ...(OBSERVED_KEEP_CAPS_BY_TYPE[recorded.kind]?.[recorded.type] ?? {}),
+    };
     for (const [
         key,
         value,

@@ -158,6 +158,12 @@ function checkOnBody(body, ctx, path) {
         fail(ctx, `${path}.delayMs`, '`sync` runs the detector in the listener, so it takes no `delayMs`');
     if (body.sync === true && 'whenPending' in body)
         fail(ctx, `${path}.whenPending`, '`sync` runs the detector at the arrival, so no run is pending and it takes no `whenPending`');
+    if (recorded.kind === 'detectorEvent' && !body.delayMs && 'whenPending' in body)
+        fail(
+            ctx,
+            `${path}.whenPending`,
+            'a detector event with no `delayMs` runs the detector in the emitting task, so no run is pending and it takes no `whenPending`',
+        );
     if (recorded.kind === 'event' && EVENT_TYPE_ALLOWLIST[recorded.type].perFrame) checkPerFrame(body, recorded.type, ctx, path);
     checkWhenBusy(body, recorded, ctx, path);
 

@@ -175,7 +175,10 @@ describe('webDetection config tests', () => {
         });
 
         itAll('takes one type, and `target` as any expression giving one object', () => {
-            expectError('a `wait` body takes exactly one of `entryType`, `event`, `mutation`', waiting({ define: { x: wait({}) } }));
+            expectError(
+                'a `wait` body takes exactly one of `entryType`, `event`, `detectorEvent`, `mutation`',
+                waiting({ define: { x: wait({}) } }),
+            );
             expectError('a `wait` body takes exactly one of', waiting({ define: { x: wait({ event: 'click', entryType: 'event' }) } }));
             expectValid(
                 waiting([

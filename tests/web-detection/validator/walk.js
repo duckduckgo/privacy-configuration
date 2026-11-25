@@ -86,6 +86,9 @@ export function readsOuterSelf(node) {
                 }
                 case 'ref':
                     return false;
+                case 'object':
+                    // Its keys are field names, and each value an expression
+                    return isPlainObject(value) && Object.values(value).some(readsOuterSelf);
                 case 'observed':
                 case 'trigger':
                 case 'wait':
