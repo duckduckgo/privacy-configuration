@@ -35,6 +35,7 @@ This table lists each web detection feature and the first C-S-S release that sup
 | | [`observed`](sources.md#observed), with `keep`, and [`trigger`](sources.md#trigger) | Unreleased |
 | | [`wait`](sources.md#wait), on entry types, events and `mutation` | Unreleased |
 | | `detectorEvent` bodies on `observed`, `trigger`, `wait` and `on` | Unreleased |
+| | [`intersection` and `resize`](sources.md#viewport-and-size) on `wait` | Unreleased |
 | [Predicates](predicates.md) | Comparisons, `eq`, `in`, property paths, `field`, `fails`, `type` | [19.0.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/19.0.0) |
 | | `type` names `function`, `symbol` and `bigint` | [22.0.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/22.0.0) |
 | | `fails` holding for a value that doesn't fit the config ([Values that do not fit](failures.md#values-that-do-not-fit)), or a selector or XPath expression the engine rejects ([Kinds](failures.md#kinds)) | Unreleased |
@@ -94,12 +95,13 @@ Each C-S-S release that changed what a detector can do or how it runs, newest fi
 - `detectorPerf` in breakage reports includes `worstSliceMs`, `waitMisses` and `waitMissMs` for runs that wait. `runs` includes abandoned runs, and `worstMs` counts only the slices that move a run forward, which for a run with no `wait` is its whole time ([`detectorPerf`](breakageData-parameter.md#detectorperf)).
 - `emit` records a detector event, which other detectors in the frame read through `detectorEvent` bodies on `observed`, `trigger`, `wait` and `on` ([Detector events](overview.md#detector-events)). The `detectorEventMaxDepth` setting caps how many runs a chain of them starts in one task, and without it, detector events start no runs.
 - `object` builds an object from named values ([`object`](expressions.md#object)).
+- `wait` takes `intersection` and `resize` bodies, which give an element's place in the viewport or its size without forcing layout ([Viewport and size](sources.md#viewport-and-size)).
 
 #### Breaking changes
 
 Before this release, a value that doesn't fit the config, or a selector or XPath expression the engine rejects, ends the run as `"error"`, which `fails` can't handle. Gate a detector that relies on `fails` handling one on this release. A `define` name that doesn't match the name pattern doesn't parse before this release, so a CI change that allows other names needs the same gate.
 
-A detector that uses the `observe` trigger, `observed`, `trigger`, `done`, `wait`, `whenBusy`, `emit`, `detectorEvent` or `object` doesn't parse before this release.
+A detector that uses the `observe` trigger, `observed`, `trigger`, `done`, `wait`, `whenBusy`, `emit`, `detectorEvent`, `object`, `intersection` or `resize` doesn't parse before this release.
 
 ### [22.0.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/22.0.0)
 
