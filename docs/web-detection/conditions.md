@@ -27,7 +27,7 @@ MATCH IF (
 AND (a visible .adwall-overlay element exists)
 ```
 
-Two conditions read the page: [`text`](#text) and [`element`](#element). As a condition, each one holds when it selects at least one item. An invalid CSS selector or XPath expression is an error when it's evaluated ([Kinds](failures.md#kinds)).
+Two conditions read the page: [`text`](#text) and [`element`](#element). As a condition, each one holds when it selects at least one item. A CSS selector or XPath expression the engine rejects fails when it's evaluated, and engines differ in which selectors they accept, so test a selector on each engine the detector runs on ([Kinds](failures.md#kinds)).
 
 ## `text`
 

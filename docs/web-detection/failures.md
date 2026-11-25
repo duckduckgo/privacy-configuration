@@ -6,8 +6,8 @@ Every expression either gives a value or fails. A failure propagates up through 
 
 | Kind | Cause | Recorded as | `fails` handles it |
 |---|---|---|---|
-| Failure | Anything that goes wrong on the page at run time: a getter or method throws, a call is made on a name whose value isn't a function, or a value doesn't fit the config ([Values that do not fit](#values-that-do-not-fit)). For example, `document.cookie` in a sandboxed frame, `cssRules` on a cross-origin stylesheet, `document.hasStorageAccess()` on an engine without it | `"aborted"`, under the failing expression's path | Yes |
-| Error | Invalid config that reaches the page: an invalid CSS selector or XPath expression. CI checks XPath grammar, but selectors need testing on the page | `"error"`, under the failing expression's path | No |
+| Failure | Anything that goes wrong on the page at run time: a getter or method throws, a call is made on a name whose value isn't a function, the engine rejects a CSS selector or XPath expression, or a value doesn't fit the config ([Values that do not fit](#values-that-do-not-fit)). For example, `document.cookie` in a sandboxed frame, `cssRules` on a cross-origin stylesheet, `document.hasStorageAccess()` or a `:has()` selector on an engine without it | `"aborted"`, under the failing expression's path | Yes |
+| Error | A throw from C-S-S itself, which no config causes | `"error"`, under the failing expression's path | No |
 | Parse error | Config that doesn't parse. The detector never runs ([Parse errors](#parse-errors)) | `{"parse": "error"}` | No |
 | Run error | An error outside any expression | `{"run": "error"}` | No |
 
@@ -78,7 +78,7 @@ Each failure or error that ends a run is recorded in the detector's breakage ent
 | Failure | `errors` |
 |---|---|
 | The fourth leaf of a `match` `all` throws | `{"match.all.3.api": "aborted"}` |
-| An invalid XPath expression in the condition of the third action's `if` | `{"actions.2.if.text": "error"}` |
+| An invalid XPath expression in the condition of the third action's `if` | `{"actions.2.if.text": "aborted"}` |
 | A `where` reads `cssRules` on a cross-origin stylesheet | `{"actions.0.define.emptySheets.api.where.cssRules.length": "aborted"}` |
 | The detector does not parse | `{"parse": "error"}` |
 

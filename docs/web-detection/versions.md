@@ -29,7 +29,7 @@ This table lists each web detection feature and the first C-S-S release that sup
 | | `where` on items that aren't objects, such as strings | [22.0.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/22.0.0) |
 | [Predicates](predicates.md) | Comparisons, `eq`, `in`, property paths, `field`, `fails`, `type` | [19.0.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/19.0.0) |
 | | `type` names `function`, `symbol` and `bigint` | [22.0.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/22.0.0) |
-| | `fails` holding for a value that doesn't fit the config ([Values that do not fit](failures.md#values-that-do-not-fit)) | Unreleased |
+| | `fails` holding for a value that doesn't fit the config ([Values that do not fit](failures.md#values-that-do-not-fit)), or a selector or XPath expression the engine rejects ([Kinds](failures.md#kinds)) | Unreleased |
 | [Actions](overview.md#actions) | `breakageReportData` | [12.40.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/12.40.0) |
 | | `fireEvent` | [13.25.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/13.25.0) |
 | | `actions` as an expression or a sequence | [19.0.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/19.0.0) |
@@ -71,12 +71,13 @@ Each C-S-S release that changed what a detector can do or how it runs, newest fi
 ### Unreleased
 
 - A value that doesn't fit the config fails as `"aborted"`, so `fails` can test it ([Values that do not fit](failures.md#values-that-do-not-fit)). This covers a value of the wrong type for its position or for `sum`, `mul`, `any`, `all` or `none`, `only` or an unwrapped list over no items or several, `where` on an `api` value that isn't a list, and a root that isn't a node.
+- A CSS selector or XPath expression the engine rejects fails as `"aborted"`, whether it's in the config or a `root` read from the page, so `fails` can test it ([Kinds](failures.md#kinds)). An error is only a throw from C-S-S itself.
 - C-S-S parses any `define` name, and a name starting `this.` is a detector name. CI checks the name pattern ([Bound names](expressions.md#bound-names)).
 - A run that ends on a failure counts as a failed run for `detectorPerf`, as one that ends on an error does.
 
 #### Breaking changes
 
-Before this release, a value that doesn't fit the config ends the run as `"error"`, which `fails` can't handle. Gate a detector that relies on `fails` handling one on this release. A `define` name that doesn't match the name pattern doesn't parse before this release, so a CI change that allows other names needs the same gate.
+Before this release, a value that doesn't fit the config, or a selector or XPath expression the engine rejects, ends the run as `"error"`, which `fails` can't handle. Gate a detector that relies on `fails` handling one on this release. A `define` name that doesn't match the name pattern doesn't parse before this release, so a CI change that allows other names needs the same gate.
 
 ### [22.0.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/22.0.0)
 
