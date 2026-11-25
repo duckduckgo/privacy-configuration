@@ -47,7 +47,12 @@ type EventKeys = {
     target?: EventTarget;
 };
 
-type Recorded = EntryTypeKeys | EventKeys;
+/** A detector event name, which an `emit` in the config records. */
+type DetectorEventKeys = {
+    detectorEvent: NonEmptyString;
+};
+
+type Recorded = EntryTypeKeys | EventKeys | DetectorEventKeys;
 
 /** @minProperties 1 */
 type KeepWindow = {
@@ -85,6 +90,7 @@ type MutationOptions = {
 /** A type a `wait` reads the next arrival of. Its `target` is read as the wait starts, so it may be any expression. */
 type WaitRecorded =
     | EntryTypeKeys
+    | DetectorEventKeys
     | {
           event: NonEmptyString;
           target?: Expr;
@@ -250,6 +256,8 @@ type ExprKeys = {
     observed: ObservedBody;
     trigger: TriggerBody;
     wait: WaitBody;
+    /** An object with a field per key, holding that key's value. */
+    object: Record<string, Expr>;
     self: string | SelfBody;
     expr: Expr | Expr[];
     only: Expr;
@@ -284,6 +292,11 @@ export type ActionObject = Partial<{
     define: Defines;
     /** The detector is done at the end of the run when it holds. */
     done: Expr;
+    /** Records a detector event in the frame, which `observed`, `trigger`, `wait` and `observe` read. */
+    emit: {
+        name: NonEmptyString;
+        data?: Expr;
+    };
 }>;
 
 /** @minProperties 1 */
@@ -324,6 +337,12 @@ export type WebDetectionSettings = CSSInjectFeatureSettings<{
      * that happen together only. The config build writes the default when this is left out.
      */
     readCacheMaxAgeMs?: number | null;
+    /**
+     * The most runs that detector events with no `delayMs` start in a chain in one task. The config
+     * build writes the default when config leaves it out, and C-S-S reads a missing value as 0.
+     * @minimum 0
+     */
+    detectorEventMaxDepth?: number;
     /** Generic C-S-S load gate, patched per experiment cohort via conditionalChanges. */
     additionalCheck?: FeatureState;
 }>;

@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { validateDetector } from './validator/validate.js';
+import { validateDetector, validateDetectors } from './validator/validate.js';
 
 /** The failures of the checks in the running `itAll` test, or null outside one. */
 /** @type {string[] | null} */
@@ -48,6 +48,25 @@ export const expectDetectorValid = (detector) => {
  */
 export const expectDetectorError = (fragment, detector) => {
     const errors = validateDetector(/** @type {Record<string, any>} */ (detector), '$');
+    if (!errors.some((error) => error.includes(fragment))) {
+        report(`expected an error containing ${JSON.stringify(fragment)}, got:\n${errors.join('\n') || '(none)'}`);
+    }
+};
+
+/**
+ * @param {Record<string, Record<string, unknown>>} detectors - every detector a client sees together, by group and name
+ */
+export const expectDetectorsValid = (detectors) => {
+    const errors = validateDetectors(/** @type {Record<string, Record<string, Record<string, any>>>} */ (detectors));
+    if (errors.length) report(`expected no errors, got:\n${errors.join('\n')}`);
+};
+
+/**
+ * @param {string} fragment - text one of the errors contains
+ * @param {Record<string, Record<string, unknown>>} detectors - every detector a client sees together, by group and name
+ */
+export const expectDetectorsError = (fragment, detectors) => {
+    const errors = validateDetectors(/** @type {Record<string, Record<string, Record<string, any>>>} */ (detectors));
     if (!errors.some((error) => error.includes(fragment))) {
         report(`expected an error containing ${JSON.stringify(fragment)}, got:\n${errors.join('\n') || '(none)'}`);
     }

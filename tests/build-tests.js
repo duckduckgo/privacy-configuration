@@ -11,6 +11,7 @@ import {
 } from '../util.js';
 import {
     DEFAULT_READ_CACHE_MAX_AGE_MS,
+    DEFAULT_DETECTOR_EVENT_MAX_DEPTH,
     DEFAULT_OBSERVED_KEEP,
     DEFAULT_WAIT_TIMEOUT_MS,
     arrayWebDetectionBuckets,
@@ -1043,6 +1044,27 @@ describe('defaultWebDetectionBodies', () => {
             timeoutMs: DEFAULT_WAIT_TIMEOUT_MS,
         });
         expect(settings.conditionalChanges[0].patchSettings[1].value).to.deep.equal({ ref: 'x' });
+    });
+
+    it('writes the default `detectorEventMaxDepth` when config leaves it out, and keeps a stated one', () => {
+        expect(built({ detectors: {} }).detectorEventMaxDepth).to.equal(DEFAULT_DETECTOR_EVENT_MAX_DEPTH);
+        expect(built({ detectors: {}, detectorEventMaxDepth: 0 }).detectorEventMaxDepth).to.equal(0);
+    });
+
+    it('leaves the fields of an `object` alone, as names', () => {
+        const settings = built({
+            detectors: { g: { d: { actions: { emit: { name: 'a', data: { object: { observed: { ref: 'x' }, wait: { ref: 'y' } } } } } } } },
+            conditionalChanges: [
+                {
+                    condition: { injectName: 'android' },
+                    patchSettings: [
+                        { op: 'add', path: '/detectors/g/d/actions/emit/data/object/observed', value: { ref: 'z' } },
+                    ],
+                },
+            ],
+        });
+        expect(settings.detectors.g.d.actions.emit.data.object).to.deep.equal({ observed: { ref: 'x' }, wait: { ref: 'y' } });
+        expect(settings.conditionalChanges[0].patchSettings[0].value).to.deep.equal({ ref: 'z' });
     });
 
     it('writes a copy of the default onto each body', () => {

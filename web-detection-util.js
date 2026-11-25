@@ -145,6 +145,17 @@ export const OBSERVED_KEEP_CAPS_BY_TYPE = Object.freeze({
 export const PER_FRAME_MIN_DELAY_MS = 250;
 
 /**
+ * `keep` caps for every type of a body key, such as every detector event name. A cap listed here
+ * replaces the one in OBSERVED_KEEP_CAPS, and a cap in OBSERVED_KEEP_CAPS_BY_TYPE replaces both. A
+ * detector event's `data` can be an element, which the log keeps in memory while it holds the item.
+ *
+ * @type {Readonly<Record<string, Partial<typeof OBSERVED_KEEP_CAPS>>>}
+ */
+export const OBSERVED_KEEP_CAPS_BY_KIND = Object.freeze({
+    detectorEvent: { count: 20 },
+});
+
+/**
  * The types an `observed` body may read with `keep: null`, every item recorded, by body key. Each
  * arrives a few times in a page's life.
  *
@@ -173,11 +184,27 @@ export const MAX_WAIT_TIMEOUT_MS = 30000;
 export const ALLOW_UNBOUNDED_WAIT = false;
 
 /**
+ * The most runs that detector events with no `delayMs` start in a chain in one task, when config gives
+ * no `detectorEventMaxDepth`, which the config build writes into the settings. C-S-S reads a missing
+ * value as 0, so detector events start no runs without it.
+ */
+export const DEFAULT_DETECTOR_EVENT_MAX_DEPTH = 4;
+
+/** The largest `detectorEventMaxDepth` CI allows. */
+export const MAX_DETECTOR_EVENT_MAX_DEPTH = 8;
+
+/**
  * The key the config build writes onto each body of an expression key when config leaves it out, and
  * the value it writes.
  *
  * @type {Readonly<Record<string, [string, unknown]>>}
  */
+/** Expression and action keys whose body maps names to expressions. */
+const NAME_MAP_KEYS = [
+    'define',
+    'object',
+];
+
 const BODY_DEFAULTS = Object.freeze({
     observed: [
         'keep',
@@ -192,11 +219,11 @@ const BODY_DEFAULTS = Object.freeze({
 /**
  * Write the default `keep` onto every `observed` body without one, and the default `timeoutMs` onto
  * every `wait` body without one, under a webDetection config value.
- * The names of a `define` and the keys of a payload's `data` are names, never expression keys, so an
- * `observed` or `wait` there is left alone.
+ * The names of a `define`, the fields of an `object` and the keys of a payload's `data` are names,
+ * never expression keys, so an `observed` or `wait` there is left alone.
  *
  * @param {unknown} node
- * @param {boolean} [names] - whether the keys of `node` are names: a `define`, or a payload's `data`
+ * @param {boolean} [names] - whether the keys of `node` are names: a `define`, an `object`, or a payload's `data`
  * @param {boolean} [payload] - whether `node` is the body of a payload action
  */
 function defaultsUnder(node, names = false, payload = false) {
@@ -214,7 +241,7 @@ function defaultsUnder(node, names = false, payload = false) {
             continue;
         }
         if (Object.hasOwn(BODY_DEFAULTS, key)) defaultBody(key, value);
-        defaultsUnder(value, key === 'define' || (payload && key === 'data'), WEB_DETECTION_PAYLOAD_ACTIONS.includes(key));
+        defaultsUnder(value, NAME_MAP_KEYS.includes(key) || (payload && key === 'data'), WEB_DETECTION_PAYLOAD_ACTIONS.includes(key));
     }
 }
 
@@ -250,8 +277,9 @@ function defaultsUnderDetectors(value, depth) {
 }
 
 /**
- * Write the default `keep` onto every `observed` body without one, and the default `timeoutMs` onto
- * every `wait` body without one: in the detectors, and in the values `conditionalChanges` patches add
+ * Write the default `detectorEventMaxDepth` into the settings when config leaves it out, the default
+ * `keep` onto every `observed` body without one, and the default `timeoutMs` onto every `wait` body
+ * without one: in the detectors, and in the values `conditionalChanges` patches add
  * or replace under `/detectors`. C-S-S reads only the windows and timeouts config gives, so each body
  * has one.
  *
@@ -264,6 +292,7 @@ export function defaultWebDetectionBodies(config) {
     if (!settings) {
         return;
     }
+    if (!('detectorEventMaxDepth' in settings)) settings.detectorEventMaxDepth = DEFAULT_DETECTOR_EVENT_MAX_DEPTH;
     defaultsUnderDetectors(settings.detectors, 2);
     for (const entry of settings.conditionalChanges ?? []) {
         for (const operation of entry.patchSettings ?? []) {
@@ -302,7 +331,7 @@ function pathState(segments) {
     let payload = false;
     for (const segment of segments) {
         const isName = names;
-        names = !isName && (segment === 'define' || (payload && segment === 'data'));
+        names = !isName && (NAME_MAP_KEYS.includes(segment) || (payload && segment === 'data'));
         payload = !isName && WEB_DETECTION_PAYLOAD_ACTIONS.includes(segment);
     }
     return { names, payload };

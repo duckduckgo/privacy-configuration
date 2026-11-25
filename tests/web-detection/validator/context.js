@@ -42,6 +42,7 @@
  *   recordedReads: Recorded[],
  *   onBodies: Recorded[],
  *   enabledTriggers: Set<string>,
+ *   events?: import('./events.js').DetectorEvents,
  * }} Context
  *
  * `functionApis` holds the expressions whose `api` may read a method as a function: `args`
@@ -53,7 +54,8 @@
  *
  * `recordedReads` holds the type and target of each `observed` and `trigger` body the walk has
  * checked. `onBodies` holds those of the detector's `observe` trigger's `on` bodies, and
- * `enabledTriggers` the triggers that run the detector.
+ * `enabledTriggers` the triggers that run the detector. `events` holds the detector events of the
+ * detectors a client sees with it.
  */
 
 /**

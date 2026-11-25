@@ -4,6 +4,7 @@ import { immutableJSONPatch } from 'immutable-json-patch';
 import platforms from '../../platforms.js';
 import { CURRENT_CONFIG_VERSION } from '../../constants.js';
 import { ruleLink } from './validator/context.js';
+import { detectorEventsKey } from './validator/events.js';
 import { NAME_PATTERN } from './validator/grammar.js';
 import { CLIENT_RELEASES, clientViews } from './clients.js';
 
@@ -156,10 +157,11 @@ export function detectorViews(config) {
 
 /**
  * The errors a check gives on every detector of the views, each once, with the first view it
- * appears in. A detector the same in several views is checked once.
+ * appears in. The check gets every detector of the view too, for the detector events between them.
+ * A detector the same in several views, with the same detector events around it, is checked once.
  *
  * @param {DetectorView[]} views
- * @param {(detector: Record<string, any>, path: string) => string[]} check
+ * @param {(detector: Record<string, any>, path: string, detectors: DetectorView['detectors']) => string[]} check
  * @returns {string[]}
  */
 export function viewErrors(views, check) {
@@ -168,6 +170,7 @@ export function viewErrors(views, check) {
     /** @type {Set<string>} */
     const checked = new Set();
     for (const { label, detectors } of views) {
+        const events = detectorEventsKey(detectors);
         for (const [
             groupName,
             group,
@@ -177,10 +180,10 @@ export function viewErrors(views, check) {
                 detector,
             ] of Object.entries(group)) {
                 const path = `detectors.${groupName}.${detectorId}`;
-                const key = `${path} ${JSON.stringify(detector)}`;
+                const key = `${path} ${JSON.stringify(detector)} ${events}`;
                 if (checked.has(key)) continue;
                 checked.add(key);
-                for (const error of check(detector, path)) {
+                for (const error of check(detector, path, detectors)) {
                     if (!errors.has(error)) errors.set(error, label);
                 }
             }

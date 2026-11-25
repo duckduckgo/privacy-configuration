@@ -1,6 +1,7 @@
 // @ts-check
 import { isDeepStrictEqual } from 'node:util';
 import { ACTIONS_SCOPE, MATCH_SCOPE, newContext } from './context.js';
+import { detectorEntries, detectorEventCycle, detectorEventsOf, detectorEventsOfGroups } from './events.js';
 import { checkBody, checkExpr } from './expressions.js';
 import { onBodiesOf } from './observed.js';
 import { checkTriggers, enabledTriggersOf } from './triggers.js';
@@ -40,14 +41,15 @@ function runChecks(ctx, walk) {
 
 /**
  * Check a detector against the expression, predicate and payload rules: `match` in boolean
- * position, `actions` as an expression or a sequence, and the `observe` trigger against the types
- * its sources read.
+ * position, `actions` as an expression or a sequence, the `observe` trigger against the types its
+ * sources read, and its detector events against those of the detectors a client sees with it.
  *
  * @param {Record<string, any>} detector
  * @param {string} path
+ * @param {Record<string, Record<string, Record<string, any>>>} [detectors] - every detector a client sees with it, by group and name. Without it, the detector alone
  * @returns {string[]} the errors, empty when the detector is valid
  */
-export function validateDetector(detector, path) {
+export function validateDetector(detector, path, detectors) {
     if (!isPlainObject(detector))
         return [
             `${path}: a detector is an object`,
@@ -56,6 +58,16 @@ export function validateDetector(detector, path) {
     ctx.hasMatch = 'match' in detector;
     ctx.onBodies = onBodiesOf(detector.triggers);
     ctx.enabledTriggers = enabledTriggersOf(detector.triggers);
+    const id = (detectors && detectorEntries(detectors).find((entry) => entry[1] === detector)?.[0]) ?? path;
+    ctx.events = detectors
+        ? detectorEventsOfGroups(detectors)
+        : detectorEventsOf([
+              [
+                  id,
+                  detector,
+              ],
+          ]);
+    const cycle = detectorEventCycle(id, ctx.events);
     return [
         ...runChecks(ctx, () => {
             if ('match' in detector) checkExpr(detector.match, 'boolean', MATCH_SCOPE, ctx, `${path}.match`);
@@ -64,5 +76,25 @@ export function validateDetector(detector, path) {
             checkTriggers(detector.triggers, ctx, `${path}.triggers`);
         }),
         ...pageHidingEventErrors(detector, path),
+        ...(cycle
+            ? [
+                  `${path}: a chain of detector events runs from this detector back to itself, through \`observe\` triggers: ${cycle.join(' -> ')}`,
+              ]
+            : []),
     ];
+}
+
+/**
+ * Check every detector a client sees together, each against the others' detector events.
+ *
+ * @param {Record<string, Record<string, Record<string, any>>>} detectors
+ * @returns {string[]}
+ */
+export function validateDetectors(detectors) {
+    return detectorEntries(detectors).flatMap(
+        ([
+            id,
+            detector,
+        ]) => validateDetector(detector, `detectors.${id}`, detectors),
+    );
 }
