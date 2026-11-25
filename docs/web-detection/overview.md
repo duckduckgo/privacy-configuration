@@ -40,7 +40,8 @@ Detectors are configured under `webDetection.settings.detectors`, in named group
           "actions": <EXPR> | [<EXPR>, ...]
         }
       }
-    }
+    },
+    ["readCacheMaxAgeMs"]: <int> | null
   }
 }
 ```
@@ -106,6 +107,14 @@ So by default a new detector:
 - runs only when building data for the breakage report (the `auto` trigger is opt-in)
 - runs only in the top frame
 - writes a breakage report entry only through a `breakageReportData` action, and fires events only through a `fireEvent` action
+
+### Feature settings
+
+These sit beside `detectors` in `webDetection.settings`, and apply to every detector in the frame:
+
+| Setting | Meaning | Absent |
+|---|---|---|
+| `readCacheMaxAgeMs` | How long the XPath selections and element text the detectors read are kept for later runs while the page is unchanged: `null` until the page changes, a number of ms up to 600000, or `0` for the detectors that run at the same time only. The first change to the DOM under a node that was read clears them | The config build writes `null` |
 
 ## Triggers
 

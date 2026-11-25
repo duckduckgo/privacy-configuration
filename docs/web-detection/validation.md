@@ -144,3 +144,7 @@ Some methods are read without being called:
 - Two numeric ranges that both include an endpoint they share, such as `{"gte": 1, "lte": 2}` then `{"gte": 2, "lte": 3}`. `gt` or `lt` on one side puts the endpoint in one range only.
 
 CI warns (without failing) on any other overlap between buckets with different names. Overlap is only checked where predicates are literals, `in` over literals, or comparisons against literals. A literal is converted the same way a comparison converts it: `null` and `""` to 0, and `"7"` to 7.
+
+### Feature settings
+
+CI rejects a `readCacheMaxAgeMs` that isn't `null` or an integer from 0 to `MAX_READ_CACHE_MAX_AGE_MS` ([`web-detection-util.js`](../../web-detection-util.js)), in the settings or in a value a `conditionalChanges` patch gives it.
