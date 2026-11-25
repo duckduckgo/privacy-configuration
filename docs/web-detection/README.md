@@ -25,7 +25,7 @@ flowchart LR
 | [authoring/](authoring/README.md) | Writing a new detector or changing an existing one: the steps from config change to verified rollout, the decisions along the way, and when a change needs a privacy triage. |
 | [conditions.md](conditions.md) | The `text` and `element` conditions in full: operators, every key, and what each one costs on the page. |
 | [expressions.md](expressions.md) | Values, positions, operators, modifiers, `is`, `if`, sequences, names and evaluation order. |
-| [sources.md](sources.md) | The `element`, `text`, `api`, `observed` and `trigger` sources, `where` and `field` on items, XPath, arguments and JS builtins, the performance timeline, recorded entries and events, and `root`. |
+| [sources.md](sources.md) | The `element`, `text`, `api`, `observed`, `trigger` and `wait` sources, `where` and `field` on items, XPath, arguments and JS builtins, the performance timeline, recorded entries and events, suspended runs, mutations, and `root`. |
 | [predicates.md](predicates.md) | The predicate syntax shared by `is` and `where`: forms, keys and the long form, failure and type, and property reads. |
 | [payloads.md](payloads.md) | What `fireEvent` and `breakageReportData` send: the payload spec, `when`, buckets, and how events become EventHub pixels. |
 | [failures.md](failures.md) | Failures, errors, parse errors and run errors: what each does to a run, how it's reported, and how to handle it. |

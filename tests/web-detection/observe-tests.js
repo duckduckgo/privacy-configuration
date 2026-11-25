@@ -145,10 +145,7 @@ describe('webDetection config tests', () => {
                 readsObserved({ event: 'click', entryType: 'event', keep: { count: 1 } }),
             );
             expectError('takes exactly one of `entryType`, `event`', readsObserved({ keep: { count: 1 } }));
-            expectError(
-                '"mutation" is not a key of an `observed` body',
-                readsObserved({ mutation: { childList: true }, keep: { count: 1 } }),
-            );
+            expectError('`mutation` is allowed in `wait` only', readsObserved({ mutation: { childList: true }, keep: { count: 1 } }));
             expectError('"detectorEvent" is not a key of an `observed` body', readsObserved({ detectorEvent: 'a', keep: { count: 1 } }));
         });
 
@@ -441,7 +438,7 @@ describe('webDetection config tests', () => {
                         state: 'enabled',
                         when: {},
                         on: [
-                            { event: 'pagehide', sync: true },
+                            { event: 'pagehide', sync: true, whenBusy: 'interrupt' },
                         ],
                     },
                 },
@@ -453,7 +450,7 @@ describe('webDetection config tests', () => {
                         state: 'enabled',
                         runConditions: { context: { top: true } },
                         on: [
-                            { event: 'pagehide', sync: true },
+                            { event: 'pagehide', sync: true, whenBusy: 'interrupt' },
                         ],
                     },
                 },
@@ -466,7 +463,7 @@ describe('webDetection config tests', () => {
 
         itAll('names a type a source in the detector reads, apart from the page hiding', () => {
             expectError(
-                'runs the detector on `click` events on `window`, which no `observed` or `trigger` source in the detector reads',
+                'runs the detector on `click` events on `window`, which no `observed`, `trigger` or `wait` source in the detector reads',
                 observing(
                     [
                         { event: 'click' },
@@ -485,8 +482,8 @@ describe('webDetection config tests', () => {
             expectValid(
                 observing(
                     [
-                        { event: 'visibilitychange', sync: true },
-                        { event: 'pagehide', sync: true },
+                        { event: 'visibilitychange', sync: true, whenBusy: 'interrupt' },
+                        { event: 'pagehide', sync: true, whenBusy: 'interrupt' },
                     ],
                     { done: true },
                 ),
@@ -577,7 +574,7 @@ describe('webDetection config tests', () => {
             expectValid(
                 observing(
                     [
-                        { event: 'click', sync: true },
+                        { event: 'click', sync: true, whenBusy: 'skip' },
                     ],
                     readsClicks,
                 ),
@@ -595,7 +592,7 @@ describe('webDetection config tests', () => {
                 'so it takes no `delayMs`',
                 observing(
                     [
-                        { event: 'click', sync: true, delayMs: 100 },
+                        { event: 'click', sync: true, whenBusy: 'skip', delayMs: 100 },
                     ],
                     readsClicks,
                 ),
@@ -605,15 +602,6 @@ describe('webDetection config tests', () => {
                 observing(
                     [
                         { event: 'click', delayMs: -1 },
-                    ],
-                    readsClicks,
-                ),
-            );
-            expectError(
-                '"whenBusy" is not a key of an `on` body',
-                observing(
-                    [
-                        { event: 'click', whenBusy: 'skip' },
                     ],
                     readsClicks,
                 ),
@@ -704,8 +692,8 @@ describe('webDetection config tests', () => {
 
         itAll('sends on the page hiding from inside a once guard, or a sequence with `{"done": true}`', () => {
             const hiding = [
-                { event: 'visibilitychange', sync: true },
-                { event: 'pagehide', sync: true },
+                { event: 'visibilitychange', sync: true, whenBusy: 'interrupt' },
+                { event: 'pagehide', sync: true, whenBusy: 'interrupt' },
             ];
             expectError('the detector runs each time the page hides', observing(hiding, { fireEvent: { type: 'a' } }));
             expectError(

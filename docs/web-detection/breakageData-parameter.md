@@ -71,7 +71,7 @@ The timings of the detector runs in the frame, when the `detectorPerf` feature i
 "detectorPerf": {
   "combinedTotalMs": 41.2,
   "worstDispatch": {"totalMs": 6.3, "detectors": {"exampleGroup.exampleDetector": 4.9, "exampleGroup.otherDetector": 1.4}},
-  "detectors": {"exampleGroup.exampleDetector": {"runs": 12, "totalMs": 9.8, "worstMs": 3.1}}
+  "detectors": {"exampleGroup.exampleDetector": {"runs": 12, "totalMs": 9.8, "worstMs": 3.1, "worstSliceMs": 1.4, "waitMisses": 40, "waitMissMs": 2.2}}
 }
 ```
 
@@ -80,9 +80,14 @@ The timings of the detector runs in the frame, when the `detectorPerf` feature i
 | `combinedTotalMs` | The total time of every detector run in the frame |
 | `worstDispatch.totalMs` | The longest dispatch in the frame: the detector work in one call into web detection, such as an `auto` timer or the breakage report's run |
 | `worstDispatch.detectors` | Each detector's share of that dispatch, by detector ID |
-| `detectors.<id>.runs` | The detector's runs in the frame |
-| `detectors.<id>.totalMs` | The detector's total time in the frame |
-| `detectors.<id>.worstMs` | The detector's longest run |
+| `detectors.<id>.runs` | The runs the detector started in the frame, abandoned runs included |
+| `detectors.<id>.totalMs` | The detector's total time in the frame, wait misses included |
+| `detectors.<id>.worstMs` | The detector's largest run total: the time of the slices that move a run forward |
+| `detectors.<id>.worstSliceMs` | The detector's longest slice, wait misses included |
+| `detectors.<id>.waitMisses` | The `where` tests of a [`wait`](sources.md#wait) on an arrival that no item passed, which leave the run suspended |
+| `detectors.<id>.waitMissMs` | The total time of those wait misses, which is also in `totalMs` |
+
+A slice is the part of a run that runs in one go: from its start to its first `wait`, from a `wait` resuming to the next `wait` or the end, or a `where` test that doesn't resume it. A run that reaches no `wait` is one slice.
 
 Times are in ms, rounded to 0.1 ms. `worstDispatch` is left out when no run in the frame had a dispatch. `combinedTotalMs` and `totalMs` grow with how long the page has been open, so compare them across reports with the page's age at the report.
 

@@ -22,6 +22,7 @@ export const SOURCE_KEYS = [
     'api',
     'observed',
     'trigger',
+    'wait',
 ];
 
 export const EXPRESSION_KEYS = [
@@ -164,7 +165,7 @@ export function apiBody(raw) {
  * ELEMENT_ALLOWLIST interface, whose names a read from the value may take. An entry needing
  * another type adds it here.
  *
- * @typedef {'boolean' | 'number' | 'number|nan' | 'string' | 'object|null' | 'fragment|null' | 'DOMRect' | 'Element|HTMLElement|null'} TypeSpec
+ * @typedef {'boolean' | 'number' | 'number|nan' | 'string' | 'object|null' | 'fragment|null' | 'DOMRect' | 'Element|HTMLElement|null' | 'string|null'} TypeSpec
  * @typedef {{ kind: 'method' | 'property', type: TypeSpec }} ElementMember
  */
 
@@ -375,6 +376,69 @@ export const NEVER_EVENT_TYPES = [
 export function eventTargets(type) {
     return EVENT_TYPE_ALLOWLIST[type].targets ?? DOCUMENT_TARGETS;
 }
+
+/**
+ * The `MutationObserver.observe()` options a `mutation` body may give: `true` for each flag listed,
+ * and for `attributeFilter`, a list of the attribute names listed.
+ *
+ * C-S-S observes with any options config gives, so this list is the review point.
+ * `attributeOldValue` and `characterDataOldValue` are never on it, as the old values are the page's
+ * text and attribute values.
+ */
+export const MUTATION_OPTION_ALLOWLIST = {
+    flags: [
+        'childList',
+        'subtree',
+        'characterData',
+        'attributes',
+    ],
+    attributeFilter: [
+        'class',
+        'style',
+        'hidden',
+        'open',
+        'disabled',
+        'aria-expanded',
+        'aria-hidden',
+        'aria-pressed',
+        'aria-selected',
+        'aria-busy',
+    ],
+};
+
+/** Mutation options never observed, whatever a privacy triage finds. */
+export const NEVER_MUTATION_OPTIONS = [
+    'attributeOldValue',
+    'characterDataOldValue',
+];
+
+/** The options a `mutation` body needs at least one of, as `observe()` selects no change without one. */
+export const MUTATION_SELECTING_OPTIONS = [
+    'childList',
+    'attributes',
+    'characterData',
+    'attributeFilter',
+];
+
+/**
+ * The fields of a mutation record a detector reads, by path. `target` is the parent for `childList`,
+ * the element for `attributes`, and the text node for `characterData`.
+ */
+export const MUTATION_FIELDS = /** @type {Record<string, TypeSpec>} */ ({
+    type: 'string',
+    timeStamp: 'number',
+    target: TARGET,
+    attributeName: 'string|null',
+    'addedNodes.length': 'number',
+    'removedNodes.length': 'number',
+});
+
+/** The `whenBusy` values of an `on` body: what an arrival does while a run of the detector is suspended in a `wait`. */
+export const WHEN_BUSY_VALUES = [
+    'queue',
+    'interrupt',
+    'skip',
+];
 
 /** The fields of the one item a `trigger` body gives when an `auto` timer or a breakage report started the run. */
 export const RUN_START_FIELDS = /** @type {Record<string, TypeSpec>} */ ({ timeStamp: 'number' });

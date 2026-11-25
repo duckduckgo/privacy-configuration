@@ -14,6 +14,7 @@
  *   inItem?: boolean,
  *   noneAbove?: boolean,
  *   spreadOf?: 'number' | 'boolean',
+ *   waitable?: boolean,
  * }} Scope
  *
  * `inMatch` is set in `match`. `conditionRoot` is set at the top of a condition, `match` or the
@@ -25,7 +26,9 @@
  * under a `none` anywhere above, in a condition or a predicate: `where` clears `underNone` for its own
  * comparisons, and keeps `noneAbove`. `spreadOf` is set on an operand of `sum`, `mul`, `any`, `all` or
  * `none` checked in spread position: the position an operand that is not spread takes there, which an
- * `if` branch giving no list takes.
+ * `if` branch giving no list takes. `waitable` is set where C-S-S can suspend a run at a `wait`: from
+ * `actions`, through the elements of a sequence, the condition and branches of `if`, the operand of
+ * `expr`, the expression beside `using`, and the values of `define`, `done` and payload fields.
  */
 
 /**
@@ -65,6 +68,9 @@ export const MATCH_SCOPE = { inMatch: true, underNone: false, conditionRoot: tru
 
 /** @type {Scope} */
 export const PAYLOAD_SCOPE = { inMatch: false, underNone: false, conditionRoot: false, guards: [] };
+
+/** @type {Scope} */
+export const ACTIONS_SCOPE = { ...PAYLOAD_SCOPE, waitable: true };
 
 /**
  * @param {Context} ctx
