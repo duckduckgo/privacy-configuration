@@ -23,15 +23,6 @@ type SubFeatures<VersionType> = {
             idleThresholdSeconds: number;
         }
     >;
-    searchTokenExperimentV4?: SubFeature<
-        VersionType,
-        {
-            // Lifetime of the search token in seconds
-            tokenTTLSeconds: number;
-            // Time before expiry within which the token is proactively refreshed, in seconds
-            refreshWindowSeconds: number;
-        }
-    >;
     tabTerminationErrorPage?: SubFeature<
         VersionType,
         {
