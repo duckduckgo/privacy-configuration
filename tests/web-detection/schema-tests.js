@@ -122,6 +122,37 @@ describe('webDetection config tests', () => {
             });
         });
 
+        it('accepts `intersection` and `resize` waits, and rejects them without a `target` or with options off the list', () => {
+            const target = { ref: 'el' };
+            expect(validate({ actions: { define: { x: { wait: { intersection: {}, target, timeoutMs: 100 } } } } })).to.equal(true);
+            expect(
+                validate({
+                    actions: {
+                        define: {
+                            x: {
+                                wait: {
+                                    intersection: {
+                                        threshold: [
+                                            0,
+                                            1,
+                                        ],
+                                    },
+                                    target,
+                                },
+                            },
+                        },
+                    },
+                }),
+            ).to.equal(true);
+            expect(validate({ actions: { define: { x: { wait: { resize: { box: 'border-box' }, target } } } } })).to.equal(true);
+            expectRejected('intersection without a target', { actions: { define: { x: { wait: { intersection: {} } } } } });
+            expectRejected('a threshold over 1', { actions: { define: { x: { wait: { intersection: { threshold: 2 }, target } } } } });
+            expectRejected('rootMargin', { actions: { define: { x: { wait: { intersection: { rootMargin: '1px' }, target } } } } });
+            expectRejected('an unknown box', {
+                actions: { define: { x: { wait: { resize: { box: 'device-pixel-content-box' }, target } } } },
+            });
+        });
+
         it('rejects an empty source body, an empty body list, and an `any`, `all` or `none` block as a body', () => {
             expectRejected('empty text body', { match: { text: {} }, actions });
             expectRejected('empty element body', { match: { element: {} }, actions });

@@ -446,6 +446,47 @@ export const DETECTOR_EVENT_FIELDS = /** @type {Record<string, TypeSpec>} */ ({
     detector: 'string',
 });
 
+/**
+ * The `IntersectionObserver` options an `intersection` body may give: `threshold`, a number from 0 to
+ * 1 or a list of them. `root` and `rootMargin` are never on it, so an intersection is always with the
+ * viewport.
+ */
+export const INTERSECTION_OPTION_ALLOWLIST = [
+    'threshold',
+];
+
+/** The `ResizeObserver.observe()` options a `resize` body may give, with the values each takes. */
+export const RESIZE_OPTION_ALLOWLIST = {
+    box: [
+        'content-box',
+        'border-box',
+    ],
+};
+
+/** Intersection options never observed, as an intersection is always with the viewport. */
+export const NEVER_INTERSECTION_OPTIONS = [
+    'root',
+    'rootMargin',
+];
+
+/** The fields of an `IntersectionObserverEntry` a detector reads, by path. `timeStamp` is the entry's `time`. */
+export const INTERSECTION_FIELDS = /** @type {Record<string, TypeSpec>} */ ({
+    type: 'string',
+    timeStamp: 'number',
+    isIntersecting: 'boolean',
+    intersectionRatio: 'number',
+    'intersectionRect.width': 'number',
+    'intersectionRect.height': 'number',
+});
+
+/** The fields of a `ResizeObserverEntry` a detector reads, by path. */
+export const RESIZE_FIELDS = /** @type {Record<string, TypeSpec>} */ ({
+    type: 'string',
+    timeStamp: 'number',
+    'contentRect.width': 'number',
+    'contentRect.height': 'number',
+});
+
 /** The `whenBusy` values of an `on` body: what an arrival does while a run of the detector is suspended in a `wait`. */
 export const WHEN_BUSY_VALUES = [
     'queue',
