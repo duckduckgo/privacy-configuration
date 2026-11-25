@@ -46,10 +46,7 @@ export function checkPredicate(predicate, level, subject, scope, ctx, path) {
     const operators = level === 'value' ? Object.keys(predicate).filter((key) => VALUE_OPERATORS.includes(key)) : [];
     if (operators.length) checkOperators(predicate, subject, scope, ctx, path);
 
-    for (const [
-        key,
-        value,
-    ] of Object.entries(predicate)) {
+    for (const [key, value] of Object.entries(predicate)) {
         const keyPath = `${path}.${key}`;
         if (OPERATOR_KEYS.includes(key)) {
             const entryScope = { ...scope, underNone: scope.underNone || key === 'none', noneAbove: scope.noneAbove || key === 'none' };
@@ -152,10 +149,7 @@ function checkOperators(predicate, subject, scope, ctx, path) {
  */
 export function checkPayloadSpec(data, action, ctx, path, scope) {
     if (!isPlainObject(data)) return;
-    for (const [
-        key,
-        field,
-    ] of Object.entries(data)) {
+    for (const [key, field] of Object.entries(data)) {
         const fieldPath = `${path}.${key}`;
         if (!NAME_PATTERN.test(key)) fail(ctx, fieldPath, `payload key "${key}" does not match ${NAME_PATTERN}`);
         if (key === 'nativeData') fail(ctx, fieldPath, 'payload key "nativeData" is reserved');
@@ -180,14 +174,7 @@ export function checkPayloadSpec(data, action, ctx, path, scope) {
  * @returns {value is string | number | boolean | null}
  */
 export function isLiteral(value) {
-    return (
-        value === null ||
-        [
-            'string',
-            'number',
-            'boolean',
-        ].includes(typeof value)
-    );
+    return value === null || ['string', 'number', 'boolean'].includes(typeof value);
 }
 
 /**
@@ -203,9 +190,7 @@ function simpleBucketSet(predicate) {
     if (isLiteral(predicate))
         return {
             intervals: [],
-            points: [
-                predicate,
-            ],
+            points: [predicate],
         };
     if (!isPlainObject(predicate)) return null;
     const keys = Object.keys(predicate);
@@ -243,20 +228,14 @@ function simpleBucketSet(predicate) {
     }
     if (!('eq' in predicate))
         return {
-            intervals: [
-                interval,
-            ],
+            intervals: [interval],
             points: [],
         };
     if (!isLiteral(predicate.eq)) return null;
     // `eq` beside comparisons holds for its literal when they hold for it too
     return {
         intervals: [],
-        points: pointIn(predicate.eq, interval)
-            ? [
-                  predicate.eq,
-              ]
-            : [],
+        points: pointIn(predicate.eq, interval) ? [predicate.eq] : [],
     };
 }
 
@@ -326,12 +305,7 @@ function contains(inner, outer) {
  * @returns {BucketSet}
  */
 function sharedValues(a, b) {
-    const points = [
-        ...new Set([
-            ...a.points.filter((point) => setHolds(point, b)),
-            ...b.points.filter((point) => setHolds(point, a)),
-        ]),
-    ];
+    const points = [...new Set([...a.points.filter((point) => setHolds(point, b)), ...b.points.filter((point) => setHolds(point, a))])];
     const intervals = a.intervals.flatMap((x) => b.intervals.map((y) => intersect(x, y))).filter((x) => x !== null);
     return { points, intervals };
 }
@@ -384,9 +358,7 @@ export function bucketOverlaps(buckets) {
             }
             const shared = sharedValues(earlier.set, later.set);
             if (!shared.points.length && !shared.intervals.length) continue;
-            const [
-                interval,
-            ] = shared.intervals;
+            const [interval] = shared.intervals;
             if (!shared.points.length && shared.intervals.length === 1 && interval.lo === interval.hi) {
                 found.errors.push(
                     `buckets "${earlier.name}" and "${later.name}" both include ${interval.lo}; make one end exclusive with \`gt\` or \`lt\``,

@@ -38,22 +38,17 @@ describe('Feature size analysis', () => {
 
         const featureSizes = [];
 
-        Object.entries(config.features).forEach(
-            ([
-                featureName,
-                featureConfig,
-            ]) => {
-                const featureJson = JSON.stringify(featureConfig);
-                const sizeInBytes = Buffer.byteLength(featureJson, 'utf8');
+        Object.entries(config.features).forEach(([featureName, featureConfig]) => {
+            const featureJson = JSON.stringify(featureConfig);
+            const sizeInBytes = Buffer.byteLength(featureJson, 'utf8');
 
-                featureSizes.push({
-                    name: featureName,
-                    size: sizeInBytes,
-                    sizeKB: (sizeInBytes / 1024).toFixed(2),
-                    config: featureConfig,
-                });
-            },
-        );
+            featureSizes.push({
+                name: featureName,
+                size: sizeInBytes,
+                sizeKB: (sizeInBytes / 1024).toFixed(2),
+                config: featureConfig,
+            });
+        });
 
         // Sort by size descending
         return featureSizes.sort((a, b) => b.size - a.size);
@@ -114,12 +109,7 @@ describe('Feature size analysis', () => {
 
             console.log('\n=== Maximum Feature Sizes Across All Platforms ===');
             const sortedMaxSizes = Object.entries(maxSizes)
-                .map(
-                    ([
-                        name,
-                        data,
-                    ]) => ({ name, ...data }),
-                )
+                .map(([name, data]) => ({ name, ...data }))
                 .sort((a, b) => b.size - a.size);
 
             sortedMaxSizes.slice(0, 20).forEach((feature, index) => {
@@ -157,12 +147,7 @@ describe('Feature size analysis', () => {
             if (!global.featureAnalysisData) {
                 const maxSizes = findMaxFeatureSizes();
                 const sortedMaxSizes = Object.entries(maxSizes)
-                    .map(
-                        ([
-                            name,
-                            data,
-                        ]) => ({ name, ...data }),
-                    )
+                    .map(([name, data]) => ({ name, ...data }))
                     .sort((a, b) => b.size - a.size);
 
                 global.featureAnalysisData = {

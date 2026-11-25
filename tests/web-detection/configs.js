@@ -30,14 +30,10 @@ function distinctViews(views) {
         entry.labels.push(label);
         for (const change of failed) entry.failed.add(JSON.stringify(change));
     }
-    return [
-        ...distinct.values(),
-    ].map(({ labels, detectors, failed }) => ({
+    return [...distinct.values()].map(({ labels, detectors, failed }) => ({
         label: labels.join('; '),
         detectors,
-        failed: [
-            ...failed,
-        ].map((change) => JSON.parse(change)),
+        failed: [...failed].map((change) => JSON.parse(change)),
     }));
 }
 
@@ -104,25 +100,11 @@ export function patchedViews(webDetection) {
         /** @type {DetectorView['detectors']} */
         const detectors = {};
         for (const operation of operations) {
-            for (const pointer of [
-                operation.path,
-                operation.from,
-            ]) {
+            for (const pointer of [operation.path, operation.from]) {
                 if (typeof pointer !== 'string' || !pointer.startsWith('/detectors')) continue;
-                const [
-                    group,
-                    name,
-                ] = detectorPointer(pointer);
-                for (const groupName of group === undefined
-                    ? Object.keys(patched)
-                    : [
-                          group,
-                      ]) {
-                    for (const detectorName of name === undefined
-                        ? Object.keys(patched[groupName] ?? {})
-                        : [
-                              name,
-                          ]) {
+                const [group, name] = detectorPointer(pointer);
+                for (const groupName of group === undefined ? Object.keys(patched) : [group]) {
+                    for (const detectorName of name === undefined ? Object.keys(patched[groupName] ?? {}) : [name]) {
                         const detector = patched[groupName]?.[detectorName];
                         if (detector) (detectors[groupName] ??= {})[detectorName] = detector;
                     }
@@ -167,14 +149,8 @@ export function viewErrors(views, check) {
     /** @type {Set<string>} */
     const checked = new Set();
     for (const { label, detectors } of views) {
-        for (const [
-            groupName,
-            group,
-        ] of Object.entries(detectors)) {
-            for (const [
-                detectorId,
-                detector,
-            ] of Object.entries(group)) {
+        for (const [groupName, group] of Object.entries(detectors)) {
+            for (const [detectorId, detector] of Object.entries(group)) {
                 const path = `detectors.${groupName}.${detectorId}`;
                 const key = `${path} ${JSON.stringify(detector)}`;
                 if (checked.has(key)) continue;
@@ -185,14 +161,7 @@ export function viewErrors(views, check) {
             }
         }
     }
-    return [
-        ...errors,
-    ].map(
-        ([
-            error,
-            label,
-        ]) => `${label}: ${error}`,
-    );
+    return [...errors].map(([error, label]) => `${label}: ${error}`);
 }
 
 /**
@@ -215,29 +184,15 @@ export function detectorNameErrors(webDetection) {
             if (!NAME_PATTERN.test(name)) errors.add(`${label}: detector name "${groupName}.${name}" does not match ${NAME_PATTERN}`);
         }
     };
-    for (const [
-        groupName,
-        group,
-    ] of Object.entries(webDetection.settings?.detectors ?? {})) {
+    for (const [groupName, group] of Object.entries(webDetection.settings?.detectors ?? {})) {
         check(groupName, Object.keys(group), 'detectors');
     }
     for (const { label, detectors } of patchedViews(webDetection)) {
-        for (const [
-            groupName,
-            group,
-        ] of Object.entries(detectors)) {
+        for (const [groupName, group] of Object.entries(detectors)) {
             for (const name of Object.keys(group)) {
-                check(
-                    groupName,
-                    [
-                        name,
-                    ],
-                    `${label} detectors.${groupName}.${name}`,
-                );
+                check(groupName, [name], `${label} detectors.${groupName}.${name}`);
             }
         }
     }
-    return [
-        ...errors,
-    ];
+    return [...errors];
 }

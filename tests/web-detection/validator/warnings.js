@@ -32,22 +32,13 @@ export function repeatedEventWarnings(detector, path) {
                 `${nodePath}.fireEvent: sends its event on every run, since the detector has no \`match\` and no enclosing \`if\` tests a detector name its branch binds`,
             );
         if ('if' in node) {
-            const names = [
-                ...refsIn(node.if),
-            ].filter((name) => name.startsWith('this.'));
+            const names = [...refsIn(node.if)].filter((name) => name.startsWith('this.'));
             for (const branch of BRANCH_KEYS) {
-                if (branch in node)
-                    visit(node[branch], `${nodePath}.${branch}`, [
-                        ...guards,
-                        { names, branch: node[branch] },
-                    ]);
+                if (branch in node) visit(node[branch], `${nodePath}.${branch}`, [...guards, { names, branch: node[branch] }]);
             }
             return;
         }
-        for (const [
-            key,
-            value,
-        ] of Object.entries(node)) {
+        for (const [key, value] of Object.entries(node)) {
             if (key !== 'fireEvent') visit(value, `${nodePath}.${key}`, guards);
         }
     };
@@ -77,16 +68,10 @@ export function bucketWarnings(detector, path) {
             return;
         }
         if (!isPlainObject(node)) return;
-        for (const [
-            key,
-            value,
-        ] of Object.entries(node)) {
+        for (const [key, value] of Object.entries(node)) {
             const childPath = `${nodePath}.${key}`;
             if (PAYLOAD_ACTIONS.includes(key) && isPlainObject(value) && isPlainObject(value.data)) {
-                for (const [
-                    field,
-                    spec,
-                ] of Object.entries(value.data)) {
+                for (const [field, spec] of Object.entries(value.data)) {
                     if (!isPlainObject(spec)) continue;
                     for (const warning of bucketOverlaps(spec.buckets).warnings)
                         warnings.push(`${childPath}.data.${field}.buckets: ${warning}`);
@@ -147,10 +132,7 @@ export function itemWalkWarnings(detector, path) {
             return;
         }
         if (!isPlainObject(node)) return;
-        for (const [
-            key,
-            value,
-        ] of Object.entries(node)) {
+        for (const [key, value] of Object.entries(node)) {
             const childPath = `${nodePath}.${key}`;
             if (key === 'element' || key === 'text') {
                 forEachSourceBody(value, childPath, (body, bodyPath) => {

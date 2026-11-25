@@ -26,8 +26,4 @@ export const TDS_PATH_FOR_PLATFORM = {
 // The only features whose subfeatures may carry experiment metrics. The TDS experiment parent is
 // `blockList` on Android and `contentBlocking` on every other platform; content scope experiments use
 // one name everywhere.
-export const EXPERIMENT_METRIC_PARENTS = [
-    'contentScopeExperiments',
-    'blockList',
-    'contentBlocking',
-];
+export const EXPERIMENT_METRIC_PARENTS = ['contentScopeExperiments', 'blockList', 'contentBlocking'];

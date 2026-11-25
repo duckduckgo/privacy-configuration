@@ -21,10 +21,7 @@ describe('webDetection config tests', () => {
                 const maxOf = (/** @type {unknown} */ list) => ({
                     api: {
                         path: 'Math.max.apply',
-                        args: [
-                            null,
-                            list,
-                        ],
+                        args: [null, list],
                     },
                 });
                 expectValid({ ...maxOf(widths), is: { gt: 100 } });
@@ -33,9 +30,7 @@ describe('webDetection config tests', () => {
                         ...widths,
                         using: {
                             path: 'concat',
-                            args: [
-                                100,
-                            ],
+                            args: [100],
                         },
                     }),
                     is: { gt: 0 },
@@ -44,9 +39,7 @@ describe('webDetection config tests', () => {
                     ...maxOf({
                         api: {
                             path: 'performance.getEntriesByType',
-                            args: [
-                                'resource',
-                            ],
+                            args: ['resource'],
                             field: 'duration',
                         },
                     }),
@@ -54,10 +47,7 @@ describe('webDetection config tests', () => {
                 });
                 expectValid({
                     ...maxOf({
-                        expr: [
-                            1,
-                            { ...img, using: 'length' },
-                        ],
+                        expr: [1, { ...img, using: 'length' }],
                     }),
                     is: { gt: 0 },
                 });
@@ -68,10 +58,7 @@ describe('webDetection config tests', () => {
                             most: {
                                 api: {
                                     path: 'Math.max',
-                                    args: [
-                                        { ref: 'images' },
-                                        1,
-                                    ],
+                                    args: [{ ref: 'images' }, 1],
                                 },
                                 is: { gt: 0 },
                             },
@@ -87,9 +74,7 @@ describe('webDetection config tests', () => {
                 expectError('`Math.max.apply` takes a list', {
                     api: {
                         path: 'Math.max',
-                        args: [
-                            widths,
-                        ],
+                        args: [widths],
                     },
                     is: {},
                 });
@@ -101,27 +86,21 @@ describe('webDetection config tests', () => {
                 expectValid({
                     api: {
                         path: 'Math.max',
-                        args: [
-                            { api: { path: 'performance.now' } },
-                        ],
+                        args: [{ api: { path: 'performance.now' } }],
                     },
                     is: {},
                 });
                 expectError('"Math.round", which is not in API_ALLOWLIST', {
                     api: {
                         path: 'Math.max',
-                        args: [
-                            { api: { path: 'Math.round' } },
-                        ],
+                        args: [{ api: { path: 'Math.round' } }],
                     },
                     is: {},
                 });
                 expectError('reads the method "performance.now" without calling it', {
                     api: {
                         path: 'Math.max',
-                        args: [
-                            { only: { api: { path: 'performance.now' } } },
-                        ],
+                        args: [{ only: { api: { path: 'performance.now' } } }],
                     },
                     is: {},
                 });
@@ -257,9 +236,7 @@ describe('webDetection config tests', () => {
                 expectError('"performance.getEntriesByType.name"', {
                     api: {
                         path: 'performance.getEntriesByType',
-                        args: [
-                            'resource',
-                        ],
+                        args: ['resource'],
                         where: { name: 'x' },
                     },
                     using: 'length',
@@ -269,9 +246,7 @@ describe('webDetection config tests', () => {
                 expectValid({
                     api: {
                         path: 'performance.getEntriesByType',
-                        args: [
-                            'resource',
-                        ],
+                        args: ['resource'],
                         where: { responseStatus: { gte: 400 } },
                     },
                     using: 'length',
@@ -286,10 +261,7 @@ describe('webDetection config tests', () => {
                 expectValid({
                     api: {
                         path: 'Math.max',
-                        args: [
-                            1,
-                            { api: 'innerWidth' },
-                        ],
+                        args: [1, { api: 'innerWidth' }],
                     },
                     is: { gt: 0 },
                 });
@@ -304,9 +276,7 @@ describe('webDetection config tests', () => {
                         field: {
                             api: {
                                 path: 'Number.isNaN',
-                                args: [
-                                    { self: 'duration' },
-                                ],
+                                args: [{ self: 'duration' }],
                             },
                         },
                         is: true,
@@ -316,20 +286,14 @@ describe('webDetection config tests', () => {
                 expectValid({
                     ...imgCount,
                     is: {
-                        all: [
-                            numberTest('isFinite'),
-                            numberTest('isNaN', false),
-                        ],
+                        all: [numberTest('isFinite'), numberTest('isNaN', false)],
                     },
                 });
                 expectValid({
                     sum: fieldOf('img', {
                         api: {
                             path: 'Math.max',
-                            args: [
-                                { self: 'naturalWidth' },
-                                5,
-                            ],
+                            args: [{ self: 'naturalWidth' }, 5],
                         },
                     }),
                     is: { gt: 0 },
@@ -343,10 +307,7 @@ describe('webDetection config tests', () => {
                         field: {
                             api: {
                                 path: 'Reflect.has',
-                                args: [
-                                    { self: {} },
-                                    'naturalWidth',
-                                ],
+                                args: [{ self: {} }, 'naturalWidth'],
                             },
                         },
                         is: true,
@@ -360,9 +321,7 @@ describe('webDetection config tests', () => {
                 expectError('"performance.getEntriesByType.name", which is not in API_ALLOWLIST', {
                     api: {
                         path: 'performance.getEntriesByType',
-                        args: [
-                            'resource',
-                        ],
+                        args: ['resource'],
                         where: { duration: { gt: { self: 'name.length' } } },
                     },
                     using: 'length',
@@ -377,9 +336,7 @@ describe('webDetection config tests', () => {
                         field: {
                             api: {
                                 path: 'Number.isInteger',
-                                args: [
-                                    { self: 'duration' },
-                                ],
+                                args: [{ self: 'duration' }],
                             },
                         },
                         is: true,
@@ -395,9 +352,7 @@ describe('webDetection config tests', () => {
             const navigation = {
                 api: {
                     path: 'performance.getEntriesByType',
-                    args: [
-                        'navigation',
-                    ],
+                    args: ['navigation'],
                 },
             };
 
@@ -429,61 +384,33 @@ describe('webDetection config tests', () => {
                     using: { path: 'at', args, ...(field && { field }) },
                 });
                 expectValid({
-                    ...at(
-                        navigation,
-                        [
-                            0,
-                        ],
-                        'loadEventEnd',
-                    ),
+                    ...at(navigation, [0], 'loadEventEnd'),
                     is: { gt: 0 },
                 });
                 expectValid({
-                    ...at(
-                        img,
-                        [
-                            -1,
-                        ],
-                        'naturalWidth',
-                    ),
+                    ...at(img, [-1], 'naturalWidth'),
                     is: { gt: 0 },
                 });
                 expectValid({ ...img, using: '0.naturalWidth', is: { gt: 0 } });
                 expectValid({ ...img, using: 'length', is: { gte: 5 } });
                 expectError(`reads "naturalWidth" on HTMLElement or Element, which is not in ELEMENT_ALLOWLIST`, {
-                    ...at(
-                        { element: { selector: 'h1' } },
-                        [
-                            0,
-                        ],
-                        'naturalWidth',
-                    ),
+                    ...at({ element: { selector: 'h1' } }, [0], 'naturalWidth'),
                     is: { gt: 0 },
                 });
                 expectError('reads "slice" on a list', {
                     ...img,
                     using: {
                         path: 'slice',
-                        args: [
-                            0,
-                        ],
+                        args: [0],
                     },
                     is: {},
                 });
                 expectError('reads "at" on a list', {
-                    ...at(
-                        img,
-                        [
-                            0,
-                            1,
-                        ],
-                    ),
+                    ...at(img, [0, 1]),
                     is: {},
                 });
                 expectError('"performance.getEntriesByType.at", which is not in API_ALLOWLIST', {
-                    ...at(navigation, [
-                        'x',
-                    ]),
+                    ...at(navigation, ['x']),
                     is: {},
                 });
             });
@@ -501,9 +428,7 @@ describe('webDetection config tests', () => {
                     only: {
                         api: {
                             path: 'performance.getEntriesByType',
-                            args: [
-                                'paint',
-                            ],
+                            args: ['paint'],
                         },
                     },
                 };
@@ -511,10 +436,7 @@ describe('webDetection config tests', () => {
                     only: {
                         api: {
                             path: 'performance.getEntriesByName',
-                            args: [
-                                'first-paint',
-                                'paint',
-                            ],
+                            args: ['first-paint', 'paint'],
                         },
                     },
                 };
@@ -546,15 +468,9 @@ describe('webDetection config tests', () => {
 
             itAll('places the expression beside `using` in value position', () => {
                 expectValid({
-                    sum: [
-                        imgCount,
-                        1,
-                    ],
+                    sum: [imgCount, 1],
                     using: {
-                        div: [
-                            { self: {} },
-                            2,
-                        ],
+                        div: [{ self: {} }, 2],
                     },
                     is: { gt: 1 },
                 });
@@ -570,10 +486,7 @@ describe('webDetection config tests', () => {
                 expectValid({
                     only: navigation,
                     using: {
-                        div: [
-                            { self: 'decodedBodySize' },
-                            { self: 'duration' },
-                        ],
+                        div: [{ self: 'decodedBodySize' }, { self: 'duration' }],
                     },
                     is: { gt: 0 },
                 });
@@ -581,9 +494,7 @@ describe('webDetection config tests', () => {
                 expectError('"performance.getEntriesByType.name", which is not in API_ALLOWLIST', {
                     only: navigation,
                     using: {
-                        sum: [
-                            { self: 'name.length' },
-                        ],
+                        sum: [{ self: 'name.length' }],
                     },
                     is: { gt: 0 },
                 });
@@ -608,9 +519,7 @@ describe('webDetection config tests', () => {
                                 imageCount: { value: { ref: 'imageCount' } },
                                 imageElements: {
                                     value: { ref: 'imageElements' },
-                                    buckets: [
-                                        { name: 'two', is: { length: 2 } },
-                                    ],
+                                    buckets: [{ name: 'two', is: { length: 2 } }],
                                 },
                             },
                         },
@@ -625,9 +534,7 @@ describe('webDetection config tests', () => {
                 ]);
                 expectValid(true, { enough: { value: { ...img, using: 'length', is: { gte: 2 } } } });
                 expectError('`expr` over `is` fills', {
-                    sum: [
-                        { expr: { ...img, using: 'length', is: { gte: 2 } } },
-                    ],
+                    sum: [{ expr: { ...img, using: 'length', is: { gte: 2 } } }],
                     is: 1,
                 });
             });

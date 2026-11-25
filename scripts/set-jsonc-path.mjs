@@ -119,10 +119,7 @@ function readStdin() {
 }
 
 async function main() {
-    const [
-        filename,
-        jsonpath,
-    ] = process.argv.slice(2);
+    const [filename, jsonpath] = process.argv.slice(2);
 
     if (!filename || jsonpath === undefined) {
         usage();

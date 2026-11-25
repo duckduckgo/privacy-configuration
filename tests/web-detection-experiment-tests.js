@@ -25,9 +25,7 @@ const auto = (state = 'enabled') => ({
     auto: {
         state,
         when: {
-            intervalMs: [
-                1000,
-            ],
+            intervalMs: [1000],
         },
     },
 });
@@ -48,9 +46,7 @@ function fixtureSettings() {
         conditionalChanges: [
             {
                 condition: { injectName: 'android', minSupportedVersion: 200 },
-                patchSettings: [
-                    { op: 'replace', path: '/detectors/groupB/c/state', value: 'enabled' },
-                ],
+                patchSettings: [{ op: 'replace', path: '/detectors/groupB/c/state', value: 'enabled' }],
             },
         ],
     };
@@ -75,25 +71,9 @@ describe('web-detection-experiment', () => {
     describe('production state', () => {
         it('applies matching blocks', () => {
             const settings = fixtureSettings();
-            expect([
-                ...autoRunning(settings, clientsFor('android', 200)),
-            ]).to.have.members([
-                'groupA/a',
-                'groupA/b',
-                'groupB/c',
-            ]);
-            expect([
-                ...autoRunning(settings, clientsFor('android', 100)),
-            ]).to.have.members([
-                'groupA/a',
-                'groupA/b',
-            ]);
-            expect([
-                ...autoRunning(settings, clientsFor('windows', '0.180.0')),
-            ]).to.have.members([
-                'groupA/a',
-                'groupA/b',
-            ]);
+            expect([...autoRunning(settings, clientsFor('android', 200))]).to.have.members(['groupA/a', 'groupA/b', 'groupB/c']);
+            expect([...autoRunning(settings, clientsFor('android', 100))]).to.have.members(['groupA/a', 'groupA/b']);
+            expect([...autoRunning(settings, clientsFor('windows', '0.180.0'))]).to.have.members(['groupA/a', 'groupA/b']);
         });
 
         it('skips a block whose patch fails', () => {
@@ -144,32 +124,12 @@ describe('web-detection-experiment', () => {
         it('covers every unit once with balanced slices', () => {
             const slices = dealSlices(units, 4, 'seed');
             expect(slices.flat()).to.have.members(units.flat());
-            expect(slices.map((slice) => slice.length)).to.have.members([
-                3,
-                3,
-                3,
-                2,
-            ]);
+            expect(slices.map((slice) => slice.length)).to.have.members([3, 3, 3, 2]);
         });
 
         it('keeps groups together', () => {
-            const groups = buildUnits(
-                [
-                    'g1/a',
-                    'g1/b',
-                    'g2/c',
-                ],
-                'group',
-            );
-            expect(groups).to.deep.equal([
-                [
-                    'g1/a',
-                    'g1/b',
-                ],
-                [
-                    'g2/c',
-                ],
-            ]);
+            const groups = buildUnits(['g1/a', 'g1/b', 'g2/c'], 'group');
+            expect(groups).to.deep.equal([['g1/a', 'g1/b'], ['g2/c']]);
             for (const slice of dealSlices(groups, 2, 'seed')) {
                 expect(new Set(slice.map((id) => id.split('/')[0])).size).to.equal(1);
             }
@@ -225,39 +185,24 @@ describe('web-detection-experiment', () => {
     });
 
     describe('buildConditionalChanges', () => {
-        const slices = [
-            [
-                'groupA/a',
-            ],
-            [
-                'groupA/b',
-            ],
-        ];
+        const slices = [['groupA/a'], ['groupA/b']];
 
         it('disables a slice for every other cohort in enable mode', () => {
-            const [
-                first,
-            ] = buildConditionalChanges('enable', 'exp', slices);
+            const [first] = buildConditionalChanges('enable', 'exp', slices);
             expect(first.condition).to.deep.equal([
                 { experiment: { experimentName: 'exp', cohort: 'control' } },
                 { experiment: { experimentName: 'exp', cohort: 'treatment02' } },
             ]);
-            expect(first.patchSettings).to.deep.equal([
-                { op: 'add', path: '/detectors/groupA/a/state', value: 'disabled' },
-            ]);
+            expect(first.patchSettings).to.deep.equal([{ op: 'add', path: '/detectors/groupA/a/state', value: 'disabled' }]);
         });
 
         it('disables a slice for its own cohort in disable mode', () => {
-            const [
-                first,
-            ] = buildConditionalChanges('disable', 'exp', slices);
+            const [first] = buildConditionalChanges('disable', 'exp', slices);
             expect(first.condition).to.deep.equal({ experiment: { experimentName: 'exp', cohort: 'treatment01' } });
         });
 
         it('enables state and auto trigger in trial mode', () => {
-            const [
-                first,
-            ] = buildConditionalChanges('trial', 'exp', slices);
+            const [first] = buildConditionalChanges('trial', 'exp', slices);
             expect(first.patchSettings.map((op) => op.path)).to.deep.equal([
                 '/detectors/groupA/a/state',
                 '/detectors/groupA/a/triggers/auto/state',
@@ -292,117 +237,43 @@ describe('web-detection-experiment', () => {
             const settings = fixtureSettings();
             const withExperiment = {
                 ...settings,
-                conditionalChanges: [
-                    ...settings.conditionalChanges,
-                    ...buildConditionalChanges(mode, 'exp', slices),
-                ],
+                conditionalChanges: [...settings.conditionalChanges, ...buildConditionalChanges(mode, 'exp', slices)],
             };
             return Object.fromEntries(
-                verifyCohorts(mode, 'exp', () => withExperiment, plans(), slices).map((r) => [
-                    r.cohort,
-                    [
-                        ...r.running.values(),
-                    ],
-                ]),
+                verifyCohorts(mode, 'exp', () => withExperiment, plans(), slices).map((r) => [r.cohort, [...r.running.values()]]),
             );
         };
 
         it('enable: each cohort runs only its slice', () => {
-            expect(
-                run('enable', [
-                    [
-                        'groupA/a',
-                    ],
-                    [
-                        'groupA/b',
-                        'groupB/c',
-                    ],
-                ]),
-            ).to.deep.equal({
-                control: [
-                    0,
-                    0,
-                ],
-                treatment01: [
-                    1,
-                    1,
-                ],
-                treatment02: [
-                    2,
-                    1,
-                ],
+            expect(run('enable', [['groupA/a'], ['groupA/b', 'groupB/c']])).to.deep.equal({
+                control: [0, 0],
+                treatment01: [1, 1],
+                treatment02: [2, 1],
             });
         });
 
         it('disable: each cohort stops its slice', () => {
-            expect(
-                run('disable', [
-                    [
-                        'groupA/a',
-                    ],
-                    [
-                        'groupA/b',
-                        'groupB/c',
-                    ],
-                ]),
-            ).to.deep.equal({
-                control: [
-                    3,
-                    2,
-                ],
-                treatment01: [
-                    2,
-                    1,
-                ],
-                treatment02: [
-                    1,
-                    1,
-                ],
+            expect(run('disable', [['groupA/a'], ['groupA/b', 'groupB/c']])).to.deep.equal({
+                control: [3, 2],
+                treatment01: [2, 1],
+                treatment02: [1, 1],
             });
         });
 
         it('trial: each cohort adds its slice', () => {
-            expect(
-                run('trial', [
-                    [
-                        'groupB/d',
-                    ],
-                    [
-                        'groupB/c',
-                    ],
-                ]),
-            ).to.deep.equal({
-                control: [
-                    3,
-                    2,
-                ],
-                treatment01: [
-                    4,
-                    3,
-                ],
-                treatment02: [
-                    3,
-                    3,
-                ],
+            expect(run('trial', [['groupB/d'], ['groupB/c']])).to.deep.equal({
+                control: [3, 2],
+                treatment01: [4, 3],
+                treatment02: [3, 3],
             });
         });
 
         it('throws when the blocks do not produce the mode', () => {
             const settings = fixtureSettings();
-            const slices = [
-                [
-                    'groupA/a',
-                ],
-                [
-                    'groupA/b',
-                ],
-            ];
+            const slices = [['groupA/a'], ['groupA/b']];
             const wrong = {
                 ...settings,
-                conditionalChanges: [
-                    ...settings.conditionalChanges,
-                    ...buildConditionalChanges('disable', 'exp', slices),
-                ],
+                conditionalChanges: [...settings.conditionalChanges, ...buildConditionalChanges('disable', 'exp', slices)],
             };
             expect(() => verifyCohorts('enable', 'exp', () => wrong, plans(), slices)).to.throw('android control');
         });
@@ -410,22 +281,13 @@ describe('web-detection-experiment', () => {
 
     describe('JSONC edits', () => {
         it('appends conditional changes that remove finds, keeping comments', () => {
-            const changes = buildConditionalChanges('disable', 'exp', [
-                [
-                    'groupA/a',
-                ],
-                [
-                    'groupA/b',
-                ],
-            ]);
+            const changes = buildConditionalChanges('disable', 'exp', [['groupA/a'], ['groupA/b']]);
             const ws = new Workspace(() => FIXTURE_TEXT, {});
             appendChanges(
                 ws,
                 {
                     file: 'features/web-detection.json',
-                    path: [
-                        'settings',
-                    ],
+                    path: ['settings'],
                     platforms: [],
                 },
                 changes,
@@ -436,20 +298,13 @@ describe('web-detection-experiment', () => {
             expect(parsed.settings.conditionalChanges.slice(1)).to.deep.equal(changes);
             expect(added).to.contain('// Existing block');
 
-            expect(experimentChangeIndices(parsed.settings.conditionalChanges, 'exp')).to.deep.equal([
-                1,
-                2,
-            ]);
+            expect(experimentChangeIndices(parsed.settings.conditionalChanges, 'exp')).to.deep.equal([1, 2]);
             expect(added).to.contain('// Leading comment');
         });
     });
 
     describe('create on the real config (dry run)', () => {
-        const files = [
-            'features/web-detection.json',
-            'overrides/android-override.json',
-            'overrides/windows-override.json',
-        ];
+        const files = ['features/web-detection.json', 'overrides/android-override.json', 'overrides/windows-override.json'];
 
         /**
          * @param {'enable' | 'disable'} mode
@@ -463,21 +318,13 @@ describe('web-detection-experiment', () => {
                 by: 'detector',
                 seed: 'test',
                 experiment: FREE_SLOT,
-                platforms: [
-                    'android',
-                    'ios',
-                    'macos',
-                    'windows',
-                ],
+                platforms: ['android', 'ios', 'macos', 'windows'],
                 clientVersions: {},
                 rollout: undefined,
                 dryRun: true,
             });
 
-        for (const mode of /** @type {const} */ ([
-            'enable',
-            'disable',
-        ])) {
+        for (const mode of /** @type {const} */ (['enable', 'disable'])) {
             it(`${mode}: verifies every cohort and writes nothing`, async () => {
                 const before = files.map((file) => readFileSync(file, 'utf8'));
                 const { report } = await dryRun(mode);
@@ -506,12 +353,7 @@ describe('web-detection-experiment', () => {
                     by: 'group',
                     seed: 'test',
                     experiment: FREE_SLOT,
-                    platforms: [
-                        'android',
-                        'ios',
-                        'macos',
-                        'windows',
-                    ],
+                    platforms: ['android', 'ios', 'macos', 'windows'],
                     clientVersions: {},
                     rollout: undefined,
                     dryRun: true,
@@ -559,10 +401,7 @@ describe('web-detection-experiment', () => {
                     by: 'detector',
                     seed: 'test',
                     experiment: 'contentScopeExperiment12',
-                    platforms: [
-                        'android',
-                        'windows',
-                    ],
+                    platforms: ['android', 'windows'],
                     clientVersions: {},
                     rollout: undefined,
                     dryRun: true,
@@ -580,11 +419,7 @@ describe('web-detection-experiment', () => {
             expect(experimentChangeIndices(base, 'contentScopeExperiment12')).to.have.length(3);
             expect(windows).to.have.length(2);
             expect(JSON.stringify(windows)).to.not.contain('groupB');
-            expect(slices.flat().sort()).to.deep.equal([
-                'groupA/a',
-                'groupA/b',
-                'groupB/c',
-            ]);
+            expect(slices.flat().sort()).to.deep.equal(['groupA/a', 'groupA/b', 'groupB/c']);
         });
 
         it('describes only what the experiment cannot change', () => {
@@ -602,9 +437,7 @@ describe('web-detection-experiment', () => {
                 run({
                     cohortPercent: undefined,
                     rollout: 12.5,
-                    platforms: [
-                        'android',
-                    ],
+                    platforms: ['android'],
                 }).warnings.join('\n'),
             ).to.not.contain('Windows');
         });

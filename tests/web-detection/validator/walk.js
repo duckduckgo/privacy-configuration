@@ -9,11 +9,7 @@ import { isPlainObject } from '../../../util.js';
  * @returns {T[]}
  */
 export function asArray(value) {
-    return Array.isArray(value)
-        ? value
-        : [
-              value,
-          ];
+    return Array.isArray(value) ? value : [value];
 }
 
 /**
@@ -62,35 +58,30 @@ export function isItemExpression(node) {
 export function readsOuterSelf(node) {
     if (Array.isArray(node)) return node.some(readsOuterSelf);
     if (!isPlainObject(node)) return false;
-    return Object.entries(node).some(
-        ([
-            key,
-            value,
-        ]) => {
-            switch (key) {
-                case 'self':
-                    return true;
-                case 'is':
-                    return predicateReadsOuterSelf(value, 'value');
-                case 'api': {
-                    const body = apiBody(value);
-                    return isPlainObject(body) && 'args' in body && readsOuterSelf(body.args);
-                }
-                case 'element':
-                case 'text': {
-                    let reads = false;
-                    forEachSourceBody(value, '', (leaf) => {
-                        reads ||= 'root' in leaf && readsOuterSelf(leaf.root);
-                    });
-                    return reads;
-                }
-                case 'ref':
-                    return false;
-                default:
-                    return (EXPRESSION_KEYS.includes(key) || BRANCH_KEYS.includes(key)) && readsOuterSelf(value);
+    return Object.entries(node).some(([key, value]) => {
+        switch (key) {
+            case 'self':
+                return true;
+            case 'is':
+                return predicateReadsOuterSelf(value, 'value');
+            case 'api': {
+                const body = apiBody(value);
+                return isPlainObject(body) && 'args' in body && readsOuterSelf(body.args);
             }
-        },
-    );
+            case 'element':
+            case 'text': {
+                let reads = false;
+                forEachSourceBody(value, '', (leaf) => {
+                    reads ||= 'root' in leaf && readsOuterSelf(leaf.root);
+                });
+                return reads;
+            }
+            case 'ref':
+                return false;
+            default:
+                return (EXPRESSION_KEYS.includes(key) || BRANCH_KEYS.includes(key)) && readsOuterSelf(value);
+        }
+    });
 }
 
 /**
@@ -103,20 +94,15 @@ export function readsOuterSelf(node) {
 function predicateReadsOuterSelf(predicate, level) {
     if (Array.isArray(predicate)) return predicate.some((entry) => predicateReadsOuterSelf(entry, level));
     if (!isPlainObject(predicate)) return false;
-    return Object.entries(predicate).some(
-        ([
-            key,
-            value,
-        ]) => {
-            if (OPERATOR_KEYS.includes(key)) return predicateReadsOuterSelf(value, level);
-            if (key === 'field') return false;
-            if (key === 'is') return predicateReadsOuterSelf(value, 'value');
-            if (level === 'value' && (key === 'eq' || COMPARISON_OPERATORS.includes(key))) return readsOuterSelf(value);
-            if (level === 'value' && key === 'in') return asArray(value).some(readsOuterSelf);
-            if (level === 'value' && VALUE_OPERATORS.includes(key)) return false;
-            return predicateReadsOuterSelf(value, 'value');
-        },
-    );
+    return Object.entries(predicate).some(([key, value]) => {
+        if (OPERATOR_KEYS.includes(key)) return predicateReadsOuterSelf(value, level);
+        if (key === 'field') return false;
+        if (key === 'is') return predicateReadsOuterSelf(value, 'value');
+        if (level === 'value' && (key === 'eq' || COMPARISON_OPERATORS.includes(key))) return readsOuterSelf(value);
+        if (level === 'value' && key === 'in') return asArray(value).some(readsOuterSelf);
+        if (level === 'value' && VALUE_OPERATORS.includes(key)) return false;
+        return predicateReadsOuterSelf(value, 'value');
+    });
 }
 
 /**

@@ -19,9 +19,7 @@ describe('webDetection config tests', () => {
             expectValid({
                 actions: {
                     if: {
-                        none: [
-                            { ref: 'this.finished', is: true },
-                        ],
+                        none: [{ ref: 'this.finished', is: true }],
                     },
                     then: [
                         { define: { n: imgCount } },
@@ -31,16 +29,11 @@ describe('webDetection config tests', () => {
                                 all: [
                                     { ref: 'n', is: { gte: 3 } },
                                     {
-                                        none: [
-                                            { ref: 'this.sent', is: true },
-                                        ],
+                                        none: [{ ref: 'this.sent', is: true }],
                                     },
                                 ],
                             },
-                            then: [
-                                { fireEvent: { type: 'manyImages' } },
-                                { define: { 'this.sent': true } },
-                            ],
+                            then: [{ fireEvent: { type: 'manyImages' } }, { define: { 'this.sent': true } }],
                         },
                         { define: { 'this.finished': { ref: 'n', is: { gt: 0 } } } },
                     ],
@@ -52,19 +45,12 @@ describe('webDetection config tests', () => {
             expectError('"api" is not an action', { actions: { fireEvent: { type: 'a' }, api: 'document' } });
             expectError('sits in value position only, not boolean position', {
                 match: {
-                    all: [
-                        { element: { selector: 'p' } },
-                        { define: { x: 1 } },
-                    ],
+                    all: [{ element: { selector: 'p' } }, { define: { x: 1 } }],
                 },
                 actions: { breakageReportData: {} },
             });
             expectError('an array is not an expression', {
-                actions: [
-                    [
-                        { breakageReportData: {} },
-                    ],
-                ],
+                actions: [[{ breakageReportData: {} }]],
             });
             expectError('`then` sits beside `if` only', { actions: { then: { breakageReportData: {} } } });
             expectError('`if` needs `then`', { actions: { if: true, else: { breakageReportData: {} } } });
@@ -85,10 +71,7 @@ describe('webDetection config tests', () => {
 
         itAll('rejects a run name read before a define binds it, and passes one bound in an earlier branch', () => {
             expectError('reads a run name no `define` binds before it', {
-                actions: [
-                    { define: { y: { ref: 'x' } } },
-                    { define: { x: 1 } },
-                ],
+                actions: [{ define: { y: { ref: 'x' } } }, { define: { x: 1 } }],
             });
             expectError('reads a run name no `define` binds before it', { actions: { define: { y: { ref: 'y' } } } });
             expectValid({ actions: { define: { x: 1, y: { ref: 'x' } } } });
@@ -99,9 +82,7 @@ describe('webDetection config tests', () => {
                 ],
             });
             expectError('reads a run name no `define` binds before it', {
-                actions: [
-                    { if: { ref: 'x', is: 1 }, then: { define: { x: 1 } } },
-                ],
+                actions: [{ if: { ref: 'x', is: 1 }, then: { define: { x: 1 } } }],
             });
         });
 
@@ -113,10 +94,7 @@ describe('webDetection config tests', () => {
                             if: { ref: 'this.count', is: { type: 'undefined' } },
                             then: 1,
                             else: {
-                                sum: [
-                                    { ref: 'this.count' },
-                                    1,
-                                ],
+                                sum: [{ ref: 'this.count' }, 1],
                             },
                         },
                     },
@@ -135,9 +113,7 @@ describe('webDetection config tests', () => {
                     {
                         define: {
                             n: {
-                                sum: [
-                                    { ref: 'this.b' },
-                                ],
+                                sum: [{ ref: 'this.b' }],
                             },
                         },
                     },
@@ -149,17 +125,12 @@ describe('webDetection config tests', () => {
             const bindArray = {
                 define: {
                     list: {
-                        expr: [
-                            6,
-                        ],
+                        expr: [6],
                     },
                 },
             };
             expectError('boolean position takes a boolean, and config types the name as an array of number', {
-                actions: [
-                    bindArray,
-                    { if: { ref: 'list' }, then: { breakageReportData: {} } },
-                ],
+                actions: [bindArray, { if: { ref: 'list' }, then: { breakageReportData: {} } }],
             });
             expectError('number position takes a number, and config types the value as an array of number', {
                 actions: [
@@ -167,20 +138,14 @@ describe('webDetection config tests', () => {
                     {
                         define: {
                             half: {
-                                div: [
-                                    { ref: 'list' },
-                                    2,
-                                ],
+                                div: [{ ref: 'list' }, 2],
                             },
                         },
                     },
                 ],
             });
             expectValid({
-                actions: [
-                    bindArray,
-                    { if: { ref: 'list', using: 'length', is: { gt: 0 } }, then: { breakageReportData: {} } },
-                ],
+                actions: [bindArray, { if: { ref: 'list', using: 'length', is: { gt: 0 } }, then: { breakageReportData: {} } }],
             });
         });
 
@@ -191,19 +156,14 @@ describe('webDetection config tests', () => {
                     {
                         define: {
                             y: {
-                                sum: [
-                                    { ref: 'x' },
-                                ],
+                                sum: [{ ref: 'x' }],
                             },
                         },
                     },
                 ],
             });
             expectValid({
-                actions: [
-                    { define: { x: { element: { selector: 'p' } } } },
-                    { if: { ref: 'x' }, then: { breakageReportData: {} } },
-                ],
+                actions: [{ define: { x: { element: { selector: 'p' } } } }, { if: { ref: 'x' }, then: { breakageReportData: {} } }],
             });
             expectError('"x" is bound to a selected list of values: a list as a condition', {
                 actions: [
@@ -218,9 +178,7 @@ describe('webDetection config tests', () => {
                             x: {
                                 api: {
                                     path: 'performance.getEntriesByType',
-                                    args: [
-                                        'resource',
-                                    ],
+                                    args: ['resource'],
                                     where: { responseStatus: { gte: 400 } },
                                 },
                             },
@@ -241,10 +199,7 @@ describe('webDetection config tests', () => {
                     {
                         define: {
                             has: {
-                                all: [
-                                    { ref: 'x' },
-                                    true,
-                                ],
+                                all: [{ ref: 'x' }, true],
                             },
                         },
                     },
@@ -265,9 +220,7 @@ describe('webDetection config tests', () => {
                     warningsOf({
                         actions: {
                             if: {
-                                none: [
-                                    { ref: 'this.sent', is: true },
-                                ],
+                                none: [{ ref: 'this.sent', is: true }],
                             },
                             then: { fireEvent: { type: 'a' } },
                         },
@@ -280,14 +233,9 @@ describe('webDetection config tests', () => {
                     warningsOf({
                         actions: {
                             if: {
-                                none: [
-                                    { ref: 'this.sent', is: true },
-                                ],
+                                none: [{ ref: 'this.sent', is: true }],
                             },
-                            then: [
-                                { fireEvent: { type: 'a' } },
-                                { define: { 'this.sent': true } },
-                            ],
+                            then: [{ fireEvent: { type: 'a' } }, { define: { 'this.sent': true } }],
                         },
                     }),
                 ).to.deep.equal([]);
@@ -304,9 +252,7 @@ describe('webDetection config tests', () => {
             const positioned = {
                 api: {
                     path: 'getComputedStyle',
-                    args: [
-                        { self: {} },
-                    ],
+                    args: [{ self: {} }],
                 },
                 using: 'position',
                 is: 'fixed',
@@ -359,9 +305,7 @@ describe('webDetection config tests', () => {
              */
             const adding = (condition, key) => ({
                 condition,
-                patchSettings: [
-                    { op: 'add', path: `/detectors/g/d/${key}`, value: true },
-                ],
+                patchSettings: [{ op: 'add', path: `/detectors/g/d/${key}`, value: true }],
             });
             /**
              * Each `android` view at the version, labelled, with the keys the entries added to `g.d`.
@@ -394,9 +338,7 @@ describe('webDetection config tests', () => {
                 const config = configWith([
                     {
                         condition: { experiment: { experimentName: 'x', cohort: 'control' } },
-                        patchSettings: [
-                            { op: 'remove', path: '/detectors/g/d' },
-                        ],
+                        patchSettings: [{ op: 'remove', path: '/detectors/g/d' }],
                     },
                     {
                         condition: { experiment: { experimentName: 'x', cohort: 'treatment' } },
@@ -405,9 +347,7 @@ describe('webDetection config tests', () => {
                                 op: 'add',
                                 path: '/detectors/g/d/triggers/auto/when',
                                 value: {
-                                    intervalMs: [
-                                        1000,
-                                    ],
+                                    intervalMs: [1000],
                                 },
                             },
                         ],
@@ -421,20 +361,12 @@ describe('webDetection config tests', () => {
                         detectors.g.d?.triggers.auto.when ?? (detectors.g.d ? 'unchanged' : 'removed'),
                     ]),
                 ).to.deep.equal([
-                    [
-                        'android 10, x: not enrolled',
-                        'unchanged',
-                    ],
-                    [
-                        'android 10, x: control',
-                        'removed',
-                    ],
+                    ['android 10, x: not enrolled', 'unchanged'],
+                    ['android 10, x: control', 'removed'],
                     [
                         'android 10, x: treatment',
                         {
-                            intervalMs: [
-                                1000,
-                            ],
+                            intervalMs: [1000],
                         },
                     ],
                 ]);
@@ -452,21 +384,18 @@ describe('webDetection config tests', () => {
             });
 
             itAll('enrols the client only in an experiment on at its version', () => {
-                const config = configWith(
-                    [
-                        adding({ experiment: { experimentName: 'x', cohort: 'treatment' } }, 'a'),
-                    ],
-                    { state: 'enabled', minSupportedVersion: 11, cohorts },
-                );
+                const config = configWith([adding({ experiment: { experimentName: 'x', cohort: 'treatment' } }, 'a')], {
+                    state: 'enabled',
+                    minSupportedVersion: 11,
+                    cohorts,
+                });
                 expect(addedKeys(config, 10)).to.deep.equal({ 'android 10, x: not enrolled': '' });
                 expect(
                     addedKeys(
-                        configWith(
-                            [
-                                adding({ experiment: { experimentName: 'x', cohort: 'treatment' } }, 'a'),
-                            ],
-                            { state: 'disabled', cohorts },
-                        ),
+                        configWith([adding({ experiment: { experimentName: 'x', cohort: 'treatment' } }, 'a')], {
+                            state: 'disabled',
+                            cohorts,
+                        }),
                     ),
                 ).to.deep.equal({
                     'android 10, x: not enrolled': '',
@@ -474,25 +403,13 @@ describe('webDetection config tests', () => {
             });
 
             itAll('puts the page on one domain at a time, which also matches its parent domains', () => {
-                expect(
-                    addedKeys(
-                        configWith([
-                            adding({ domain: 'a.com' }, 'a'),
-                            adding({ domain: 'b.com' }, 'b'),
-                        ]),
-                    ),
-                ).to.deep.equal({
+                expect(addedKeys(configWith([adding({ domain: 'a.com' }, 'a'), adding({ domain: 'b.com' }, 'b')]))).to.deep.equal({
                     'android 10, no domain': '',
                     'android 10, domain a.com': 'a',
                     'android 10, domain b.com': 'b',
                 });
                 expect(
-                    addedKeys(
-                        configWith([
-                            adding({ domain: 'example.com' }, 'a'),
-                            adding({ domain: 'shop.example.com' }, 'b'),
-                        ]),
-                    ),
+                    addedKeys(configWith([adding({ domain: 'example.com' }, 'a'), adding({ domain: 'shop.example.com' }, 'b')])),
                 ).to.deep.equal({
                     'android 10, no domain': '',
                     'android 10, domain example.com': 'a',
@@ -501,13 +418,7 @@ describe('webDetection config tests', () => {
             });
 
             itAll('applies an `internal` entry in internal builds only', () => {
-                expect(
-                    addedKeys(
-                        configWith([
-                            adding({ internal: true }, 'a'),
-                        ]),
-                    ),
-                ).to.deep.equal({
+                expect(addedKeys(configWith([adding({ internal: true }, 'a')]))).to.deep.equal({
                     'android 10, not internal': '',
                     'android 10, internal': 'a',
                 });
@@ -530,23 +441,10 @@ describe('webDetection config tests', () => {
             itAll('fails an entry whose operation reads a pointer that names no value', () => {
                 const typo = {
                     condition: { injectName: 'android' },
-                    patchSettings: [
-                        { op: 'replace', path: '/detectors/g/d/matc', value: false },
-                    ],
+                    patchSettings: [{ op: 'replace', path: '/detectors/g/d/matc', value: false }],
                 };
-                const [
-                    view,
-                ] = clientViews(
-                    configWith([
-                        typo,
-                        adding({ injectName: 'android' }, 'state'),
-                    ]),
-                    'android',
-                    10,
-                );
-                expect(view.failed).to.deep.equal([
-                    typo,
-                ]);
+                const [view] = clientViews(configWith([typo, adding({ injectName: 'android' }, 'state')]), 'android', 10);
+                expect(view.failed).to.deep.equal([typo]);
                 expect(view.detectors.g.d).to.deep.equal({ match: true, triggers: { auto: {} }, state: true });
             });
 
@@ -557,21 +455,13 @@ describe('webDetection config tests', () => {
                             { fireEvent: { type: 'a' } },
                             {
                                 if: true,
-                                then: [
-                                    { fireEvent: { type: 'b' } },
-                                ],
+                                then: [{ fireEvent: { type: 'b' } }],
                                 else: { if: false, then: { fireEvent: { type: 'c' } } },
                             },
                         ],
                     }),
-                ).to.deep.equal([
-                    'a',
-                    'b',
-                    'c',
-                ]);
-                expect(fireEventTypes({ match: true, actions: { fireEvent: { type: 'd' } } })).to.deep.equal([
-                    'd',
-                ]);
+                ).to.deep.equal(['a', 'b', 'c']);
+                expect(fireEventTypes({ match: true, actions: { fireEvent: { type: 'd' } } })).to.deep.equal(['d']);
             });
 
             itAll('finds a breakageReportData action in branches and sequences', () => {
@@ -582,9 +472,7 @@ describe('webDetection config tests', () => {
                             {
                                 if: true,
                                 then: { fireEvent: { type: 'a' } },
-                                else: [
-                                    { breakageReportData: {} },
-                                ],
+                                else: [{ breakageReportData: {} }],
                             },
                         ],
                     }),
@@ -592,10 +480,7 @@ describe('webDetection config tests', () => {
                 expect(
                     writesBreakageData({
                         match: true,
-                        actions: [
-                            { fireEvent: { type: 'a' } },
-                            { define: { x: 1 } },
-                        ],
+                        actions: [{ fireEvent: { type: 'a' } }, { define: { x: 1 } }],
                     }),
                 ).to.equal(false);
             });

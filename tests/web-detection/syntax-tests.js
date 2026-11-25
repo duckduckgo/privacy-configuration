@@ -20,16 +20,10 @@ describe('webDetection config tests', () => {
             itAll('passes leaves and boolean literals', () => {
                 expectValid({ text: { pattern: 'foo' } });
                 expectValid({
-                    any: [
-                        { text: { pattern: 'a' } },
-                        { element: { selector: '.x', visibility: 'visible' } },
-                    ],
+                    any: [{ text: { pattern: 'a' } }, { element: { selector: '.x', visibility: 'visible' } }],
                 });
                 expectValid({
-                    any: [
-                        true,
-                        false,
-                    ],
+                    any: [true, false],
                 });
             });
 
@@ -37,19 +31,14 @@ describe('webDetection config tests', () => {
                 const block = 'a source body holds no';
                 expectError(block, {
                     text: {
-                        all: [
-                            { pattern: 'foo' },
-                            { pattern: 'bar' },
-                        ],
+                        all: [{ pattern: 'foo' }, { pattern: 'bar' }],
                     },
                 });
                 expectError(block, {
                     element: [
                         { selector: 'img' },
                         {
-                            none: [
-                                { selector: 'video' },
-                            ],
+                            none: [{ selector: 'video' }],
                         },
                     ],
                 });
@@ -57,50 +46,30 @@ describe('webDetection config tests', () => {
 
             itAll('rejects an array as an expression, in every position', () => {
                 const notExpression = 'an array is not an expression';
-                expectError(notExpression, [
-                    { text: { pattern: 'a' } },
-                    { element: { selector: '.x', visibility: 'visible' } },
-                ]);
+                expectError(notExpression, [{ text: { pattern: 'a' } }, { element: { selector: '.x', visibility: 'visible' } }]);
                 expectError(notExpression, {
-                    all: [
-                        { text: { pattern: 'a' } },
-                        [
-                            true,
-                            false,
-                        ],
-                    ],
+                    all: [{ text: { pattern: 'a' } }, [true, false]],
                 });
                 expectError(notExpression, {
-                    if: [
-                        true,
-                    ],
+                    if: [true],
                     then: true,
                     else: false,
                 });
                 expectError(notExpression, {
                     ...fontsStatus,
                     is: {
-                        eq: [
-                            'a',
-                        ],
+                        eq: ['a'],
                     },
                 });
                 expectError(notExpression, true, {
                     a: {
-                        value: [
-                            1,
-                            2,
-                        ],
+                        value: [1, 2],
                     },
                 });
                 expectError(notExpression, {
                     api: {
                         path: 'Array.of',
-                        args: [
-                            [
-                                1,
-                            ],
-                        ],
+                        args: [[1]],
                     },
                     is: {},
                 });
@@ -109,28 +78,19 @@ describe('webDetection config tests', () => {
             itAll('takes a list through `expr`, which stays a list', () => {
                 expectValid({
                     any: {
-                        expr: [
-                            true,
-                            { text: { pattern: 'a' }, is: { length: { gt: 0 } } },
-                        ],
+                        expr: [true, { text: { pattern: 'a' }, is: { length: { gt: 0 } } }],
                     },
                 });
                 expectValid({
                     sum: {
-                        expr: [
-                            1,
-                            2,
-                        ],
+                        expr: [1, 2],
                     },
                     is: 3,
                 });
                 expectValid({
                     sum: [
                         {
-                            expr: [
-                                1,
-                                2,
-                            ],
+                            expr: [1, 2],
                         },
                         3,
                     ],
@@ -138,17 +98,12 @@ describe('webDetection config tests', () => {
                 });
                 expectValid({
                     only: {
-                        expr: [
-                            'a',
-                        ],
+                        expr: ['a'],
                     },
                     is: 'a',
                 });
                 expectValid({
-                    expr: [
-                        1,
-                        2,
-                    ],
+                    expr: [1, 2],
                     using: 'length',
                     is: 2,
                 });
@@ -158,26 +113,19 @@ describe('webDetection config tests', () => {
                         args: [
                             null,
                             {
-                                expr: [
-                                    1,
-                                    2,
-                                ],
+                                expr: [1, 2],
                             },
                         ],
                     },
                     is: 2,
                 });
                 expectError('`expr` over an array, a list, fills', {
-                    expr: [
-                        true,
-                    ],
+                    expr: [true],
                 });
                 expectError('`expr` over an array, a list, fills', {
                     div: [
                         {
-                            expr: [
-                                6,
-                            ],
+                            expr: [6],
                         },
                         2,
                     ],
@@ -189,46 +137,32 @@ describe('webDetection config tests', () => {
                 const notPredicate = 'an array is not a predicate';
                 expectError(notPredicate, {
                     ...fontsStatus,
-                    is: [
-                        'a',
-                        'b',
-                    ],
+                    is: ['a', 'b'],
                 });
                 expectError(notPredicate, {
                     element: {
                         selector: 'img',
-                        where: [
-                            { complete: true },
-                        ],
+                        where: [{ complete: true }],
                     },
                 });
                 expectError(notPredicate, {
                     element: {
                         selector: 'img',
                         where: {
-                            currentSrc: [
-                                'a',
-                                'b',
-                            ],
+                            currentSrc: ['a', 'b'],
                         },
                     },
                 });
                 expectError(notPredicate, true, {
                     a: {
                         value: fontsStatus,
-                        when: [
-                            'a',
-                            'b',
-                        ],
+                        when: ['a', 'b'],
                     },
                 });
                 expectValid({
                     ...fontsStatus,
                     is: {
-                        in: [
-                            'a',
-                            'b',
-                        ],
+                        in: ['a', 'b'],
                     },
                 });
                 expectValid({ ...fontsStatus, is: { in: 'a' } });
@@ -236,10 +170,7 @@ describe('webDetection config tests', () => {
                     ...fontsStatus,
                     is: {
                         in: {
-                            expr: [
-                                'a',
-                                'b',
-                            ],
+                            expr: ['a', 'b'],
                         },
                     },
                 });
@@ -247,10 +178,7 @@ describe('webDetection config tests', () => {
                     ...fontsStatus,
                     is: {
                         none: {
-                            in: [
-                                'a',
-                                'b',
-                            ],
+                            in: ['a', 'b'],
                         },
                     },
                 });
@@ -259,10 +187,7 @@ describe('webDetection config tests', () => {
                         selector: 'img',
                         where: {
                             currentSrc: {
-                                in: [
-                                    'a',
-                                    'b',
-                                ],
+                                in: ['a', 'b'],
                             },
                         },
                     },
@@ -271,10 +196,7 @@ describe('webDetection config tests', () => {
                     a: {
                         value: fontsStatus,
                         when: {
-                            in: [
-                                'a',
-                                'b',
-                            ],
+                            in: ['a', 'b'],
                         },
                     },
                 });
@@ -282,36 +204,26 @@ describe('webDetection config tests', () => {
                 expectError('"document.cookie", which is not in API_ALLOWLIST', {
                     ...fontsStatus,
                     is: {
-                        in: [
-                            { api: { path: 'document.cookie' } },
-                        ],
+                        in: [{ api: { path: 'document.cookie' } }],
                     },
                 });
                 expectError('an array is not an expression', {
                     ...fontsStatus,
                     is: {
-                        in: [
-                            [
-                                'a',
-                            ],
-                        ],
+                        in: [['a']],
                     },
                 });
             });
 
             itAll('rejects an object mixing operator keys with leaf keys, and passes them under `all`', () => {
                 expectError('an object takes one expression key', {
-                    all: [
-                        { text: { pattern: 'foo' } },
-                    ],
+                    all: [{ text: { pattern: 'foo' } }],
                     text: { pattern: 'bar' },
                 });
                 expectValid({
                     all: [
                         {
-                            all: [
-                                { text: { pattern: 'foo' } },
-                            ],
+                            all: [{ text: { pattern: 'foo' } }],
                         },
                         { text: { pattern: 'bar' } },
                     ],
@@ -323,17 +235,11 @@ describe('webDetection config tests', () => {
                 expectError(oneKey, true, { a: { value: { text: { pattern: 'a' }, element: { selector: 'img' } } } });
                 expectError(oneKey, { text: { pattern: 'a' }, element: { selector: 'img' } });
                 expectError(oneKey, {
-                    any: [
-                        true,
-                    ],
-                    none: [
-                        false,
-                    ],
+                    any: [true],
+                    none: [false],
                 });
                 expectError(oneKey, {
-                    sum: [
-                        { text: { pattern: 'a' }, element: { selector: 'img' } },
-                    ],
+                    sum: [{ text: { pattern: 'a' }, element: { selector: 'img' } }],
                     is: { gt: 0 },
                 });
                 expectError(oneKey, { text: { pattern: 'a' }, element: { selector: 'img' }, is: {} });
@@ -341,10 +247,7 @@ describe('webDetection config tests', () => {
                 expectValid(true, {
                     a: {
                         value: {
-                            all: [
-                                { text: { pattern: 'a' } },
-                                { element: { selector: 'img' } },
-                            ],
+                            all: [{ text: { pattern: 'a' } }, { element: { selector: 'img' } }],
                         },
                     },
                 });
@@ -353,19 +256,14 @@ describe('webDetection config tests', () => {
             itAll('places `is` in boolean and value position', () => {
                 expectValid(true, { a: { value: { ...img, using: 'length', is: { gt: 0 } } } });
                 expectError('`is` gives a boolean', {
-                    sum: [
-                        { ...img, using: 'length', is: { gt: 0 } },
-                    ],
+                    sum: [{ ...img, using: 'length', is: { gt: 0 } }],
                     is: 1,
                 });
             });
 
             itAll('takes two operands in `div`', () => {
                 expectValid({
-                    div: [
-                        now,
-                        1,
-                    ],
+                    div: [now, 1],
                     is: { gt: 0 },
                 });
             });
@@ -374,9 +272,7 @@ describe('webDetection config tests', () => {
                 expectValid({ if: true, then: 1, else: 2, is: 1 });
                 expectValid({ if: true, then: 1, is: 1 });
                 expectError('fills value position only, not number position', {
-                    sum: [
-                        { if: true, then: 1 },
-                    ],
+                    sum: [{ if: true, then: 1 }],
                     is: 1,
                 });
                 expectError('`if` needs `then`', { if: true, else: 2, is: 1 });
@@ -398,10 +294,7 @@ describe('webDetection config tests', () => {
                 expectActionsError('reads a run name no `define` binds before it', {
                     define: {
                         a: {
-                            sum: [
-                                { ref: 'a' },
-                                1,
-                            ],
+                            sum: [{ ref: 'a' }, 1],
                         },
                     },
                 });
@@ -409,10 +302,7 @@ describe('webDetection config tests', () => {
                     define: {
                         a: imgCount,
                         b: {
-                            sum: [
-                                { ref: 'a' },
-                                1,
-                            ],
+                            sum: [{ ref: 'a' }, 1],
                         },
                     },
                 });
@@ -423,10 +313,7 @@ describe('webDetection config tests', () => {
                     { define: { images: img } },
                     { breakageReportData: { data: { images: { value: { ref: 'images', using: 'length' } } } } },
                 ]);
-                expectActionsValid([
-                    { define: { images: imgCount } },
-                    { define: { many: { ref: 'images', is: { gte: 5 } } } },
-                ]);
+                expectActionsValid([{ define: { images: imgCount } }, { define: { many: { ref: 'images', is: { gte: 5 } } } }]);
                 expectActionsError('boolean position takes a boolean, and config types the name as number', [
                     { define: { images: imgCount } },
                     { if: { ref: 'images' }, then: { breakageReportData: {} } },
@@ -458,10 +345,7 @@ describe('webDetection config tests', () => {
 
             itAll('takes `field` on every body of an `element` source, or none', () => {
                 expectError('every body of one `element` source has `field`, or none does', {
-                    element: [
-                        { selector: 'img', field: 'naturalWidth' },
-                        { selector: 'p' },
-                    ],
+                    element: [{ selector: 'img', field: 'naturalWidth' }, { selector: 'p' }],
                     using: 'length',
                     is: 0,
                 });
@@ -470,10 +354,7 @@ describe('webDetection config tests', () => {
             itAll('rejects literals outside their positions', () => {
                 expectError('A number fills', 1);
                 expectError('A boolean fills', {
-                    sum: [
-                        true,
-                        1,
-                    ],
+                    sum: [true, 1],
                     is: { gt: 0 },
                 });
             });
@@ -481,15 +362,10 @@ describe('webDetection config tests', () => {
             itAll('takes string and null literals in value position only', () => {
                 expectError('A string fills', 'x');
                 expectError('`null` fills', {
-                    any: [
-                        null,
-                    ],
+                    any: [null],
                 });
                 expectError('A string fills', {
-                    sum: [
-                        'x',
-                        1,
-                    ],
+                    sum: ['x', 1],
                     is: { gt: 0 },
                 });
                 expectError('A string fills', { only: 'x', is: 1 });
@@ -508,22 +384,15 @@ describe('webDetection config tests', () => {
                 expectValid(true, {
                     matched: {
                         value: text,
-                        buckets: [
-                            { name: 'some', is: { length: { gt: 0 } } },
-                        ],
+                        buckets: [{ name: 'some', is: { length: { gt: 0 } } }],
                     },
                     image: {
                         value: img,
-                        buckets: [
-                            { name: 'some', is: { length: { gt: 0 } } },
-                        ],
+                        buckets: [{ name: 'some', is: { length: { gt: 0 } } }],
                     },
                     either: {
                         value: {
-                            any: [
-                                text,
-                                img,
-                            ],
+                            any: [text, img],
                         },
                     },
                     always: { value: true },
@@ -535,19 +404,12 @@ describe('webDetection config tests', () => {
 
             itAll('rejects a `fireEvent` payload field without buckets, and passes any `breakageReportData` value', () => {
                 const images = { define: { images: img } };
-                for (const value of [
-                    { ref: 'images' },
-                    { ref: 'images', using: 'length' },
-                    true,
-                ]) {
+                for (const value of [{ ref: 'images' }, { ref: 'images', using: 'length' }, true]) {
                     expectActionsError('a `fireEvent` payload field is sent through `buckets`', [
                         images,
                         { fireEvent: { type: 't', data: { x: { value } } } },
                     ]);
-                    expectActionsValid([
-                        images,
-                        { breakageReportData: { data: { x: { value } } } },
-                    ]);
+                    expectActionsValid([images, { breakageReportData: { data: { x: { value } } } }]);
                 }
                 expectActionsValid([
                     images,
@@ -557,9 +419,7 @@ describe('webDetection config tests', () => {
                             data: {
                                 x: {
                                     value: { ref: 'images', using: 'length' },
-                                    buckets: [
-                                        { name: 'some', is: { gt: 0 } },
-                                    ],
+                                    buckets: [{ name: 'some', is: { gt: 0 } }],
                                 },
                             },
                         },
@@ -572,9 +432,7 @@ describe('webDetection config tests', () => {
                             data: {
                                 width: {
                                     value: fieldOf('img', 'naturalWidth'),
-                                    buckets: [
-                                        { name: 'wide', is: { gt: 100 } },
-                                    ],
+                                    buckets: [{ name: 'wide', is: { gt: 100 } }],
                                 },
                             },
                         },
@@ -590,17 +448,11 @@ describe('webDetection config tests', () => {
 
             itAll('rejects `text` and `element` without `field` in number position', () => {
                 expectError('config types the value as string', {
-                    div: [
-                        text,
-                        1,
-                    ],
+                    div: [text, 1],
                     is: { gt: 0 },
                 });
                 expectError('config types the value as object', {
-                    div: [
-                        img,
-                        1,
-                    ],
+                    div: [img, 1],
                     is: { gt: 0 },
                 });
             });
@@ -627,10 +479,7 @@ describe('webDetection config tests', () => {
                 expectError('`all` takes booleans', { all: fieldOf('img', 'naturalWidth') });
                 expectError('`sum` takes numbers', { sum: fieldOf('img', 'currentSrc'), is: { gt: 0 } });
                 expectError('number position takes a number', {
-                    div: [
-                        fieldOf('img', 'currentSrc'),
-                        1,
-                    ],
+                    div: [fieldOf('img', 'currentSrc'), 1],
                     is: { gt: 0 },
                 });
             });
@@ -650,9 +499,7 @@ describe('webDetection config tests', () => {
                         only: {
                             api: {
                                 path: 'performance.getEntriesByType',
-                                args: [
-                                    'navigation',
-                                ],
+                                args: ['navigation'],
                             },
                         },
                     },
@@ -667,10 +514,7 @@ describe('webDetection config tests', () => {
                     any: {
                         if: true,
                         then: {
-                            expr: [
-                                true,
-                                false,
-                            ],
+                            expr: [true, false],
                         },
                         else: false,
                     },
@@ -683,36 +527,24 @@ describe('webDetection config tests', () => {
                 expectValid({ only: fieldOf('img', 'naturalWidth'), is: { gt: 0 } });
                 expectValid({ only: { api: { path: 'document.fonts' } }, is: { field: 'status', is: 'loaded' } });
                 expectValid({
-                    div: [
-                        { only: fieldOf('img', 'naturalWidth') },
-                        1,
-                    ],
+                    div: [{ only: fieldOf('img', 'naturalWidth') }, 1],
                     is: { gt: 0 },
                 });
                 expectError('`using` `length` fills', { only: imgCount, is: { gt: 0 } });
                 expectError('A number fills', { only: 1, is: 0 });
                 expectError('boolean position takes a boolean, and config types the value as object', { only: img });
                 expectError('number position takes a number, and config types the value as string', {
-                    div: [
-                        { only: fieldOf('img', 'currentSrc') },
-                        1,
-                    ],
+                    div: [{ only: fieldOf('img', 'currentSrc') }, 1],
                     is: { gt: 0 },
                 });
             });
 
             itAll('spreads sources under operators, with presence leaves booleans under `any`, `all` and `none`', () => {
                 expectValid({
-                    any: [
-                        img,
-                        text,
-                    ],
+                    any: [img, text],
                 });
                 expectValid({
-                    sum: [
-                        fieldOf('img', 'naturalWidth'),
-                        loadEventEnd,
-                    ],
+                    sum: [fieldOf('img', 'naturalWidth'), loadEventEnd],
                     is: { gt: 0 },
                 });
                 expectError('`sum` takes numbers, and config types the values as object', { sum: img, is: { gt: 0 } });
@@ -727,9 +559,7 @@ describe('webDetection config tests', () => {
                 expectError('guard it', {
                     ...img,
                     is: {
-                        any: [
-                            { gt: 0 },
-                        ],
+                        any: [{ gt: 0 }],
                     },
                 });
                 expectError('reads "length" on a value config types as number', {
@@ -740,27 +570,21 @@ describe('webDetection config tests', () => {
                 expectValid(true, {
                     images: {
                         value: img,
-                        buckets: [
-                            { name: 'many', is: { length: { gte: 5 } } },
-                        ],
+                        buckets: [{ name: 'many', is: { length: { gte: 5 } } }],
                         when: { length: { gt: 1 } },
                     },
                 });
                 expectError('guard it', true, {
                     images: {
                         value: img,
-                        buckets: [
-                            { name: 'many', is: { length: { gte: 5 } } },
-                        ],
+                        buckets: [{ name: 'many', is: { length: { gte: 5 } } }],
                         when: { gt: 1 },
                     },
                 });
                 expectError('guard it', true, {
                     sources: {
                         value: fieldOf('img', 'currentSrc'),
-                        buckets: [
-                            { name: 'long', is: { gt: 100 } },
-                        ],
+                        buckets: [{ name: 'long', is: { gt: 100 } }],
                     },
                 });
             });

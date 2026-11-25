@@ -59,9 +59,7 @@ export const UNKNOWN = { types: null, nan: false };
  */
 export function typeOf(name) {
     return {
-        types: [
-            name,
-        ],
+        types: [name],
         nan: false,
     };
 }
@@ -90,23 +88,13 @@ export function mergeTypes(list) {
     }
     /** @type {StaticType} */
     const merged = {
-        types: types
-            ? [
-                  ...types,
-              ]
-            : null,
+        types: types ? [...types] : null,
         nan,
     };
-    if (interfaces.size)
-        merged.interfaces = [
-            ...interfaces,
-        ];
+    if (interfaces.size) merged.interfaces = [...interfaces];
     if (customElement) merged.customElement = true;
     if (fragment) merged.fragment = true;
-    if (apiPaths.size)
-        merged.apiPaths = [
-            ...apiPaths,
-        ];
+    if (apiPaths.size) merged.apiPaths = [...apiPaths];
     const withStrings = list.filter((entry) => entry.types?.includes('string'));
     if (merged.types && withStrings.length && withStrings.every((entry) => entry.nonNumericStrings)) merged.nonNumericStrings = true;
     const kind = list[0]?.list;
@@ -202,9 +190,7 @@ export function typeFromSpec(spec) {
             if (Object.hasOwn(ELEMENT_ALLOWLIST, part))
                 return {
                     ...typeOf('object'),
-                    interfaces: [
-                        part,
-                    ],
+                    interfaces: [part],
                 };
             return typeOf(/** @type {TypeName} */ (part));
         }),
@@ -221,19 +207,12 @@ export function typeFromSpec(spec) {
 export function allowlistEntries(interfaces, name) {
     return interfaces.flatMap((iface) => {
         const members = ELEMENT_ALLOWLIST[iface];
-        return members && Object.hasOwn(members, name)
-            ? [
-                  members[name],
-              ]
-            : [];
+        return members && Object.hasOwn(members, name) ? [members[name]] : [];
     });
 }
 
 /** Interfaces whose names every element reads, whatever its tag. */
-const ELEMENT_BASE_INTERFACES = [
-    'HTMLElement',
-    'Element',
-];
+const ELEMENT_BASE_INTERFACES = ['HTMLElement', 'Element'];
 
 /**
  * The tags a selector list can match, or null when one of its selectors names no tag.
@@ -267,10 +246,7 @@ export function selectorInterfaces(selector) {
             for (const name of TAG_INTERFACES[tag] ?? []) names.add(name);
         }
     }
-    return [
-        ...names,
-        ...ELEMENT_BASE_INTERFACES,
-    ];
+    return [...names, ...ELEMENT_BASE_INTERFACES];
 }
 
 /**

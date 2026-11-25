@@ -94,9 +94,7 @@ export const imgCount = { ...img, using: 'length' };
 export const loadEventEnd = {
     api: {
         path: 'performance.getEntriesByType',
-        args: [
-            'navigation',
-        ],
+        args: ['navigation'],
         field: 'loadEventEnd',
     },
 };
@@ -105,9 +103,7 @@ export const fontsStatus = { api: { path: 'document.fonts.status' } };
 /** A region, which guards a source rooted at it when `match` repeats it */
 export const guard = {
     element: {
-        selector: [
-            '#comments',
-        ],
+        selector: ['#comments'],
     },
 };
 export const rootedImages = { element: { selector: 'img', root: guard }, using: 'length' };
@@ -139,9 +135,7 @@ export const numberTest = (name, expected = true) => ({
     field: {
         api: {
             path: `Number.${name}`,
-            args: [
-                { self: {} },
-            ],
+            args: [{ self: {} }],
         },
     },
     is: expected,

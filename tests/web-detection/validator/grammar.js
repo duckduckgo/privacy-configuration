@@ -4,11 +4,7 @@
  */
 
 /** Combinators in match and in predicates. */
-export const OPERATOR_KEYS = [
-    'any',
-    'all',
-    'none',
-];
+export const OPERATOR_KEYS = ['any', 'all', 'none'];
 
 /** Payload keys, and group and detector names. */
 export const NAME_PATTERN = /^[a-zA-Z][a-zA-Z0-9_]*$/;
@@ -16,61 +12,26 @@ export const NAME_PATTERN = /^[a-zA-Z][a-zA-Z0-9_]*$/;
 /** Names `define` binds: a run name, or with `this.` a detector name. */
 export const DEFINE_NAME_PATTERN = /^(this\.)?[a-zA-Z][a-zA-Z0-9_]*$/;
 
-export const SOURCE_KEYS = [
-    'element',
-    'text',
-    'api',
-];
+export const SOURCE_KEYS = ['element', 'text', 'api'];
 
-export const EXPRESSION_KEYS = [
-    ...SOURCE_KEYS,
-    'self',
-    'expr',
-    'only',
-    'sum',
-    'mul',
-    'div',
-    'if',
-    ...OPERATOR_KEYS,
-    'ref',
-];
+export const EXPRESSION_KEYS = [...SOURCE_KEYS, 'self', 'expr', 'only', 'sum', 'mul', 'div', 'if', ...OPERATOR_KEYS, 'ref'];
 
 /** Keys valid only beside `if`. */
-export const BRANCH_KEYS = [
-    'then',
-    'else',
-];
+export const BRANCH_KEYS = ['then', 'else'];
 
 /** Why a selected list other than the condition leaf is refused as a condition */
 export const LIST_CONDITION =
     'a list as a condition holds when it has an item, which reads like a test of its values: `only` gives its one item, and `using: "length"` counts them';
 
-export const COMPARISON_OPERATORS = [
-    'lt',
-    'lte',
-    'gt',
-    'gte',
-];
+export const COMPARISON_OPERATORS = ['lt', 'lte', 'gt', 'gte'];
 
 /** Operator names at value level. At item level they are property paths. */
-export const VALUE_OPERATORS = [
-    'eq',
-    'in',
-    ...COMPARISON_OPERATORS,
-    'fails',
-    'type',
-];
+export const VALUE_OPERATORS = ['eq', 'in', ...COMPARISON_OPERATORS, 'fails', 'type'];
 
-export const PAYLOAD_ACTIONS = [
-    'fireEvent',
-    'breakageReportData',
-];
+export const PAYLOAD_ACTIONS = ['fireEvent', 'breakageReportData'];
 
 /** The keys that make an object an action. */
-export const ACTION_KEYS = [
-    ...PAYLOAD_ACTIONS,
-    'define',
-];
+export const ACTION_KEYS = [...PAYLOAD_ACTIONS, 'define'];
 
 /**
  * Every name an `api` may read: each prefix of the `path`, and the path joined by `.` to each
@@ -139,11 +100,7 @@ export const BUILTIN_RETURN_TYPES = {
 };
 
 /** Names that read the method before them as a function. */
-export const FUNCTION_READS = [
-    'apply',
-    'call',
-    'bind',
-];
+export const FUNCTION_READS = ['apply', 'call', 'bind'];
 
 /**
  * An `api` body: a string is short for `{"path": <string>}`.
@@ -214,16 +171,8 @@ export const ELEMENT_ALLOWLIST = {
  * @type {Record<string, string[]>}
  */
 export const TAG_INTERFACES = {
-    audio: [
-        'HTMLMediaElement',
-    ],
-    img: [
-        'HTMLImageElement',
-    ],
-    link: [
-        'HTMLLinkElement',
-    ],
-    video: [
-        'HTMLMediaElement',
-    ],
+    audio: ['HTMLMediaElement'],
+    img: ['HTMLImageElement'],
+    link: ['HTMLLinkElement'],
+    video: ['HTMLMediaElement'],
 };

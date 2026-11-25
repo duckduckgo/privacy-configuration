@@ -40,13 +40,7 @@ import { immutableJSONPatch } from 'immutable-json-patch';
  */
 
 /** @type {Platform[]} */
-export const PLATFORMS = [
-    'android',
-    'ios',
-    'macos',
-    'windows',
-    'extension',
-];
+export const PLATFORMS = ['android', 'ios', 'macos', 'windows', 'extension'];
 
 /**
  * Every C-S-S bundle each platform injects. iOS and macOS share the Apple bundles and are told apart by
@@ -55,25 +49,11 @@ export const PLATFORMS = [
  * @type {Record<Platform, string[]>}
  */
 export const PLATFORM_INJECT_NAMES = {
-    android: [
-        'android',
-        'android-adsjs',
-    ],
-    ios: [
-        'apple',
-        'apple-isolated',
-    ],
-    macos: [
-        'apple',
-        'apple-isolated',
-    ],
-    windows: [
-        'windows',
-    ],
-    extension: [
-        'chrome-mv3',
-        'firefox',
-    ],
+    android: ['android', 'android-adsjs'],
+    ios: ['apple', 'apple-isolated'],
+    macos: ['apple', 'apple-isolated'],
+    windows: ['windows'],
+    extension: ['chrome-mv3', 'firefox'],
 };
 
 /**
@@ -215,14 +195,10 @@ function readPointers(operation) {
         case 'replace':
         case 'remove':
         case 'test':
-            return [
-                operation.path,
-            ];
+            return [operation.path];
         case 'move':
         case 'copy':
-            return [
-                operation.from,
-            ];
+            return [operation.from];
         default:
             return [];
     }
@@ -275,9 +251,7 @@ export function applyConditionalChanges(settings, client, { requireTargets = fal
             for (const operation of change.patchSettings ?? []) {
                 const missing = requireTargets ? readPointers(operation).find((pointer) => !pointerResolves(patched, pointer)) : undefined;
                 if (missing !== undefined) throw new Error(`${operation.op} reads ${missing}, which names no value`);
-                patched = immutableJSONPatch(patched, [
-                    operation,
-                ]);
+                patched = immutableJSONPatch(patched, [operation]);
             }
             current = patched;
         } catch {
@@ -294,9 +268,5 @@ export function applyConditionalChanges(settings, client, { requireTargets = fal
  * @returns {ConditionBlock[]}
  */
 export function conditionBlocks(change) {
-    return Array.isArray(change.condition)
-        ? change.condition
-        : [
-              change.condition,
-          ];
+    return Array.isArray(change.condition) ? change.condition : [change.condition];
 }

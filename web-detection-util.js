@@ -1,9 +1,6 @@
 import { isPlainObject } from './util.js';
 
-const WEB_DETECTION_PAYLOAD_ACTIONS = [
-    'fireEvent',
-    'breakageReportData',
-];
+const WEB_DETECTION_PAYLOAD_ACTIONS = ['fireEvent', 'breakageReportData'];
 
 /** A name a JS object lists first, in ascending order, whatever order the config writes it in. */
 const INTEGER_NAME = /^(0|[1-9][0-9]*)$/;
@@ -18,19 +15,14 @@ const INTEGER_NAME = /^(0|[1-9][0-9]*)$/;
  */
 function bucketArray(buckets, path) {
     if (!isPlainObject(buckets)) return buckets;
-    return Object.entries(buckets).map(
-        ([
-            name,
-            is,
-        ]) => {
-            if (INTEGER_NAME.test(name)) {
-                throw new Error(
-                    `${path}: bucket name "${name}" is integer-like, which a JS object lists first: write \`buckets\` as an array of {"name", "is"}`,
-                );
-            }
-            return { name, is };
-        },
-    );
+    return Object.entries(buckets).map(([name, is]) => {
+        if (INTEGER_NAME.test(name)) {
+            throw new Error(
+                `${path}: bucket name "${name}" is integer-like, which a JS object lists first: write \`buckets\` as an array of {"name", "is"}`,
+            );
+        }
+        return { name, is };
+    });
 }
 
 /**
@@ -47,10 +39,7 @@ function arrayFieldBuckets(field, path) {
  */
 function arrayPayloadBuckets(data, path) {
     if (!isPlainObject(data)) return;
-    for (const [
-        key,
-        field,
-    ] of Object.entries(data)) {
+    for (const [key, field] of Object.entries(data)) {
         arrayFieldBuckets(field, `${path}.${key}`);
     }
 }
@@ -69,10 +58,7 @@ function arrayBucketsUnder(node, path, key) {
     }
     if (!isPlainObject(node)) return;
     if (key !== undefined && WEB_DETECTION_PAYLOAD_ACTIONS.includes(key)) arrayPayloadBuckets(node.data, `${path}.data`);
-    for (const [
-        childKey,
-        value,
-    ] of Object.entries(node)) {
+    for (const [childKey, value] of Object.entries(node)) {
         arrayBucketsUnder(value, `${path}.${childKey}`, childKey);
     }
 }
