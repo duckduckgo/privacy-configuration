@@ -15,6 +15,7 @@ This table lists each web detection feature and the first C-S-S release that sup
 | | [`observe`](overview.md#observe) trigger, with `on` bodies (`delayMs`, `sync`, `whenPending`) | Unreleased |
 | | `whenBusy` on `observe` bodies | Unreleased |
 | [Feature settings](overview.md#feature-settings) | `readCacheMaxAgeMs` | Unreleased |
+| | `detectorEventMaxDepth` | Unreleased |
 | [Conditions](conditions.md) | `text` (`pattern`, `selector`) | [12.40.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/12.40.0) |
 | | `xpath` and `xpathConfig` on `text` | [16.5.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/16.5.0) |
 | | `element` (`selector`) | [12.40.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/12.40.0) |
@@ -26,12 +27,14 @@ This table lists each web detection feature and the first C-S-S release that sup
 | | `using`, `is`, `self`, `expr` | [19.0.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/19.0.0) |
 | | `define` and `ref`, with run names and detector names (`this.x`) | [19.0.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/19.0.0) |
 | | A list from an `if` branch or a sequence's last element, contributing each item under `sum`, `mul`, `any`, `all` and `none` | [22.0.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/22.0.0) |
+| | [`object`](expressions.md#object) | Unreleased |
 | [Sources](sources.md) | `api` (`path`, `args`, `where`, `field`) | [19.0.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/19.0.0) |
 | | `where` and `field` on `element` | [19.0.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/19.0.0) |
 | | `root` on `element` and `text` | [19.0.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/19.0.0) |
 | | `where` on items that aren't objects, such as strings | [22.0.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/22.0.0) |
 | | [`observed`](sources.md#observed), with `keep`, and [`trigger`](sources.md#trigger) | Unreleased |
 | | [`wait`](sources.md#wait), on entry types, events and `mutation` | Unreleased |
+| | `detectorEvent` bodies on `observed`, `trigger`, `wait` and `on` | Unreleased |
 | [Predicates](predicates.md) | Comparisons, `eq`, `in`, property paths, `field`, `fails`, `type` | [19.0.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/19.0.0) |
 | | `type` names `function`, `symbol` and `bigint` | [22.0.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/22.0.0) |
 | | `fails` holding for a value that doesn't fit the config ([Values that do not fit](failures.md#values-that-do-not-fit)), or a selector or XPath expression the engine rejects ([Kinds](failures.md#kinds)) | Unreleased |
@@ -39,6 +42,7 @@ This table lists each web detection feature and the first C-S-S release that sup
 | | `fireEvent` | [13.25.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/13.25.0) |
 | | `actions` as an expression or a sequence | [19.0.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/19.0.0) |
 | | [`done`](overview.md#done) | Unreleased |
+| | [`emit`](overview.md#detector-events) | Unreleased |
 | [Payloads](payloads.md) | `data` on `fireEvent` and `breakageReportData`, with `when` | [19.0.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/19.0.0) |
 | | `buckets` as an array of `{"name", "is"}` | [20.0.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/20.0.0) |
 | [Results](breakageData-parameter.md) | Breakage entries with `data` and `errors`, written by any run | [19.0.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/19.0.0) |
@@ -88,12 +92,14 @@ Each C-S-S release that changed what a detector can do or how it runs, newest fi
 - The `done` action ends a detector with no `match` ([`done`](overview.md#done)).
 - `wait` suspends a run until the next item of a type arrives, or a `mutation` of a node, and gives that item ([`wait`](sources.md#wait)). `whenBusy` on an `observe` body sets what an arrival does while a run of the detector is suspended.
 - `detectorPerf` in breakage reports includes `worstSliceMs`, `waitMisses` and `waitMissMs` for runs that wait. `runs` includes abandoned runs, and `worstMs` counts only the slices that move a run forward, which for a run with no `wait` is its whole time ([`detectorPerf`](breakageData-parameter.md#detectorperf)).
+- `emit` records a detector event, which other detectors in the frame read through `detectorEvent` bodies on `observed`, `trigger`, `wait` and `on` ([Detector events](overview.md#detector-events)). The `detectorEventMaxDepth` setting caps how many runs a chain of them starts in one task, and without it, detector events start no runs.
+- `object` builds an object from named values ([`object`](expressions.md#object)).
 
 #### Breaking changes
 
 Before this release, a value that doesn't fit the config, or a selector or XPath expression the engine rejects, ends the run as `"error"`, which `fails` can't handle. Gate a detector that relies on `fails` handling one on this release. A `define` name that doesn't match the name pattern doesn't parse before this release, so a CI change that allows other names needs the same gate.
 
-A detector that uses the `observe` trigger, `observed`, `trigger`, `done`, `wait` or `whenBusy` doesn't parse before this release.
+A detector that uses the `observe` trigger, `observed`, `trigger`, `done`, `wait`, `whenBusy`, `emit`, `detectorEvent` or `object` doesn't parse before this release.
 
 ### [22.0.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/22.0.0)
 
