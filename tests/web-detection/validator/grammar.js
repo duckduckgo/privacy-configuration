@@ -20,6 +20,8 @@ export const SOURCE_KEYS = [
     'element',
     'text',
     'api',
+    'observed',
+    'trigger',
 ];
 
 export const EXPRESSION_KEYS = [
@@ -70,6 +72,7 @@ export const PAYLOAD_ACTIONS = [
 export const ACTION_KEYS = [
     ...PAYLOAD_ACTIONS,
     'define',
+    'done',
 ];
 
 /**
@@ -161,7 +164,7 @@ export function apiBody(raw) {
  * ELEMENT_ALLOWLIST interface, whose names a read from the value may take. An entry needing
  * another type adds it here.
  *
- * @typedef {'boolean' | 'number' | 'number|nan' | 'string' | 'object|null' | 'fragment|null' | 'DOMRect'} TypeSpec
+ * @typedef {'boolean' | 'number' | 'number|nan' | 'string' | 'object|null' | 'fragment|null' | 'DOMRect' | 'Element|HTMLElement|null'} TypeSpec
  * @typedef {{ kind: 'method' | 'property', type: TypeSpec }} ElementMember
  */
 
@@ -227,3 +230,151 @@ export const TAG_INTERFACES = {
         'HTMLMediaElement',
     ],
 };
+
+/**
+ * The body keys of `observed`, `trigger` and `on` that name a recorded type: a performance entry
+ * type, or an event type.
+ */
+export const RECORDED_KINDS = [
+    'entryType',
+    'event',
+];
+
+/**
+ * @typedef {{ fields: Record<string, TypeSpec>, minDurationThreshold?: number }} EntryTypeSpec
+ *
+ * `fields` are the names a detector reads on each entry, by path, with the type each gives.
+ * `minDurationThreshold` is set on the types whose observer takes `durationThreshold`, as the lowest
+ * a body may state.
+ */
+
+/**
+ * Every performance entry type an `observed`, `trigger` or `on` body may name.
+ *
+ * C-S-S observes any type config gives, so this list is the review point. Types and fields that
+ * read URLs, element ids or elements, such as `resource`, `navigation`, `largest-contentful-paint` and
+ * `element`, stay off the list. `longtask` stays off, as `long-animation-frame` reaches the same engines.
+ *
+ * @type {Record<string, EntryTypeSpec>}
+ */
+export const ENTRY_TYPE_ALLOWLIST = {
+    'long-animation-frame': {
+        fields: { startTime: 'number', duration: 'number', blockingDuration: 'number', firstUIEventTimestamp: 'number' },
+    },
+    event: {
+        fields: { startTime: 'number', duration: 'number', interactionId: 'number' },
+        minDurationThreshold: 16,
+    },
+};
+
+/** The `target`s an event body may name: `api` paths, read once when the recorders register. */
+export const EVENT_TARGET_ALLOWLIST = [
+    'window',
+    'document',
+    'visualViewport',
+    'navigation',
+];
+
+/** The targets an event type is listened for on, unless its EVENT_TYPE_ALLOWLIST entry lists its own. */
+const DOCUMENT_TARGETS = [
+    'window',
+    'document',
+    'visualViewport',
+];
+
+/**
+ * @typedef {{
+ *   fields: Record<string, TypeSpec>,
+ *   targets?: string[],
+ *   sync?: 'required' | 'allowed',
+ *   pageHiding?: boolean,
+ *   perFrame?: boolean,
+ * }} EventTypeSpec
+ *
+ * `fields` are the names a detector reads on each event, by path, with the type each gives. `targets`
+ * are the EVENT_TARGET_ALLOWLIST entries it's listened for on, which need stating when `window`, the
+ * default, isn't one of them. `sync` is whether an `on` body of the type needs `sync: true`, or may
+ * have it; without it, the body has no `sync`. `pageHiding` marks the events of the page hiding, and
+ * `perFrame` the events that arrive every frame while the page changes.
+ */
+
+const TARGET = /** @type {TypeSpec} */ ('Element|HTMLElement|null');
+
+const POINTER_FIELDS = /** @type {Record<string, TypeSpec>} */ ({
+    type: 'string',
+    timeStamp: 'number',
+    target: TARGET,
+    clientX: 'number',
+    clientY: 'number',
+    ctrlKey: 'boolean',
+    metaKey: 'boolean',
+    shiftKey: 'boolean',
+});
+
+const TOUCH_FIELDS = /** @type {Record<string, TypeSpec>} */ ({
+    type: 'string',
+    timeStamp: 'number',
+    target: TARGET,
+    'changedTouches.0.clientX': 'number',
+    'changedTouches.0.clientY': 'number',
+    'touches.length': 'number',
+});
+
+const TARGET_FIELDS = /** @type {Record<string, TypeSpec>} */ ({ type: 'string', timeStamp: 'number', target: TARGET });
+
+const TIME_FIELDS = /** @type {Record<string, TypeSpec>} */ ({ type: 'string', timeStamp: 'number' });
+
+/**
+ * Every event type an `observed`, `trigger` or `on` body may name.
+ *
+ * C-S-S listens for any type config gives, so this list is the review point. Fields that can hold
+ * what the user typed or copied, such as `key`, `data`, `inputType` and `clipboardData`, stay off the
+ * list unless a privacy triage adds them. `currentTarget`, `eventPhase` and `composedPath` are empty
+ * after dispatch, and stay off. `unload` and `beforeunload` are never on it, since a listener for
+ * either takes the page out of the back/forward cache.
+ *
+ * @type {Record<string, EventTypeSpec>}
+ */
+export const EVENT_TYPE_ALLOWLIST = {
+    click: { fields: POINTER_FIELDS, sync: 'allowed' },
+    pointerdown: { fields: POINTER_FIELDS },
+    pointerup: { fields: POINTER_FIELDS },
+    keydown: { fields: TARGET_FIELDS },
+    touchstart: { fields: TOUCH_FIELDS },
+    touchend: { fields: TOUCH_FIELDS },
+    scroll: { fields: TARGET_FIELDS, perFrame: true },
+    visibilitychange: { fields: TIME_FIELDS, sync: 'required', pageHiding: true },
+    pagehide: { fields: { ...TIME_FIELDS, persisted: 'boolean' }, sync: 'required', pageHiding: true },
+    navigatesuccess: {
+        fields: TIME_FIELDS,
+        targets: [
+            'navigation',
+        ],
+    },
+    navigate: {
+        fields: TIME_FIELDS,
+        targets: [
+            'navigation',
+        ],
+    },
+    invalid: { fields: TARGET_FIELDS },
+};
+
+/** Event types never listened for, whatever a privacy triage finds. */
+export const NEVER_EVENT_TYPES = [
+    'unload',
+    'beforeunload',
+];
+
+/**
+ * The targets an event type is listened for on.
+ *
+ * @param {string} type - an EVENT_TYPE_ALLOWLIST key
+ * @returns {string[]}
+ */
+export function eventTargets(type) {
+    return EVENT_TYPE_ALLOWLIST[type].targets ?? DOCUMENT_TARGETS;
+}
+
+/** The fields of the one item a `trigger` body gives when an `auto` timer or a breakage report started the run. */
+export const RUN_START_FIELDS = /** @type {Record<string, TypeSpec>} */ ({ timeStamp: 'number' });

@@ -1,8 +1,68 @@
 // @ts-check
-import { BRANCH_KEYS, PAYLOAD_ACTIONS, apiBody } from './grammar.js';
+import { BRANCH_KEYS, EVENT_TYPE_ALLOWLIST, PAYLOAD_ACTIONS, apiBody } from './grammar.js';
 import { bucketOverlaps } from './predicates.js';
 import { definesName, expressionKeysOf, forEachSourceBody, readsOuterSelf, refsIn } from './walk.js';
 import { isPlainObject } from '../../../util.js';
+
+/**
+ * The paths of each `fireEvent` no enclosing `if` guards by testing a detector name that a `define`
+ * in that `if`'s branch binds. With `doneEnds`, a `fireEvent` in a sequence holding `{"done": true}`,
+ * or beside `"done": true`, is guarded too, as the detector is done once that run ends.
+ *
+ * @param {unknown} actions
+ * @param {string} path - the path of `actions`
+ * @param {boolean} doneEnds
+ * @returns {string[]}
+ */
+function unguardedEvents(actions, path, doneEnds) {
+    /** @type {string[]} */
+    const found = [];
+    /** @param {unknown} node */
+    const isDone = (node) => isPlainObject(node) && node.done === true;
+    /**
+     * @param {unknown} node
+     * @param {string} nodePath
+     * @param {Array<{ names: string[], branch: unknown }>} guards - each enclosing `if` branch, with the detector names its condition reads
+     * @param {boolean} ended - inside a sequence that makes the detector done
+     */
+    const visit = (node, nodePath, guards, ended) => {
+        if (Array.isArray(node)) {
+            const ends = ended || (doneEnds && node.some(isDone));
+            node.forEach((entry, index) => visit(entry, `${nodePath}[${index}]`, guards, ends));
+            return;
+        }
+        if (!isPlainObject(node)) return;
+        const guarded =
+            ended || (doneEnds && isDone(node)) || guards.some(({ names, branch }) => names.some((name) => definesName(branch, name)));
+        if ('fireEvent' in node && !guarded) found.push(`${nodePath}.fireEvent`);
+        if ('if' in node) {
+            const names = [
+                ...refsIn(node.if),
+            ].filter((name) => name.startsWith('this.'));
+            for (const branch of BRANCH_KEYS) {
+                if (branch in node)
+                    visit(
+                        node[branch],
+                        `${nodePath}.${branch}`,
+                        [
+                            ...guards,
+                            { names, branch: node[branch] },
+                        ],
+                        ended,
+                    );
+            }
+            return;
+        }
+        for (const [
+            key,
+            value,
+        ] of Object.entries(node)) {
+            if (key !== 'fireEvent') visit(value, `${nodePath}.${key}`, guards, ended);
+        }
+    };
+    visit(actions, path, [], false);
+    return found;
+}
 
 /**
  * Warnings on a `fireEvent` that sends its event on every run: in a detector with no `match`, one no
@@ -14,45 +74,34 @@ import { isPlainObject } from '../../../util.js';
  */
 export function repeatedEventWarnings(detector, path) {
     if (!isPlainObject(detector) || 'match' in detector) return [];
-    /** @type {string[]} */
-    const warnings = [];
-    /**
-     * @param {unknown} node
-     * @param {string} nodePath
-     * @param {Array<{ names: string[], branch: unknown }>} guards - each enclosing `if` branch, with the detector names its condition reads
-     */
-    const visit = (node, nodePath, guards) => {
-        if (Array.isArray(node)) {
-            node.forEach((entry, index) => visit(entry, `${nodePath}[${index}]`, guards));
-            return;
-        }
-        if (!isPlainObject(node)) return;
-        if ('fireEvent' in node && !guards.some(({ names, branch }) => names.some((name) => definesName(branch, name))))
-            warnings.push(
-                `${nodePath}.fireEvent: sends its event on every run, since the detector has no \`match\` and no enclosing \`if\` tests a detector name its branch binds`,
-            );
-        if ('if' in node) {
-            const names = [
-                ...refsIn(node.if),
-            ].filter((name) => name.startsWith('this.'));
-            for (const branch of BRANCH_KEYS) {
-                if (branch in node)
-                    visit(node[branch], `${nodePath}.${branch}`, [
-                        ...guards,
-                        { names, branch: node[branch] },
-                    ]);
-            }
-            return;
-        }
-        for (const [
-            key,
-            value,
-        ] of Object.entries(node)) {
-            if (key !== 'fireEvent') visit(value, `${nodePath}.${key}`, guards);
-        }
-    };
-    visit(detector.actions, `${path}.actions`, []);
-    return warnings;
+    return unguardedEvents(detector.actions, `${path}.actions`, false).map(
+        (eventPath) =>
+            `${eventPath}: sends its event on every run, since the detector has no \`match\` and no enclosing \`if\` tests a detector name its branch binds`,
+    );
+}
+
+/**
+ * Errors on a `fireEvent` that sends its event every time the page hides: in a detector with no
+ * `match` that observes `visibilitychange` or `pagehide`, one that neither an enclosing `if` on a
+ * detector name its branch binds nor a sequence with `{"done": true}` guards.
+ *
+ * @param {Record<string, any>} detector
+ * @param {string} path
+ * @returns {string[]}
+ */
+export function pageHidingEventErrors(detector, path) {
+    if (!isPlainObject(detector) || 'match' in detector) return [];
+    const on = isPlainObject(detector.triggers) && isPlainObject(detector.triggers.observe) ? detector.triggers.observe.on : undefined;
+    const hiding = Array.isArray(on)
+        ? on
+              .filter((body) => isPlainObject(body) && typeof body.event === 'string' && EVENT_TYPE_ALLOWLIST[body.event]?.pageHiding)
+              .map((body) => body.event)
+        : [];
+    if (!hiding.length) return [];
+    return unguardedEvents(detector.actions, `${path}.actions`, true).map(
+        (eventPath) =>
+            `${eventPath}: the detector runs each time the page hides (${hiding.join(', ')}), and a navigation away runs it on both, so the event goes inside an \`if\` on a detector name its branch binds, or in a sequence with \`{"done": true}\``,
+    );
 }
 
 /**

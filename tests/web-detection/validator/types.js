@@ -24,6 +24,7 @@ import { asArray } from './walk.js';
  *   customElement?: boolean,
  *   fragment?: boolean,
  *   apiPaths?: string[],
+ *   fieldPaths?: string[],
  *   list?: 'selected' | 'array' | 'maybe',
  *   leaf?: boolean,
  *   nonNumericStrings?: boolean,
@@ -35,7 +36,9 @@ import { asArray } from './walk.js';
  * names outside the list. `fragment` is set when the value can be a shadow root or other document fragment, which
  * browsers refuse as an XPath context node. `apiPaths` are the `api` names the value may have been
  * read through, one for each branch that reads a different one, which names read from it extend
- * for the allowlist.
+ * for the allowlist. `fieldPaths` mark an item of an `observed` or `trigger` source, or a value read
+ * from one: each is the item's field table, as `recordedTable` names it, then `.` and the path read so
+ * far, which names read from it extend for that table.
  *
  * `list` marks a list, and the other keys then describe its items. `selected` is what `element`,
  * `text` and `api` with `where` give, which holds as a condition when it has an item and gives its
@@ -76,6 +79,7 @@ export function mergeTypes(list) {
     /** @type {Set<string> | null} */
     const interfaces = new Set();
     const apiPaths = new Set();
+    const fieldPaths = new Set();
     let nan = false;
     let customElement = false;
     let fragment = false;
@@ -87,6 +91,7 @@ export function mergeTypes(list) {
         fragment ||= entry.fragment === true;
         for (const name of entry.interfaces ?? []) interfaces.add(name);
         for (const name of entry.apiPaths ?? []) apiPaths.add(name);
+        for (const name of entry.fieldPaths ?? []) fieldPaths.add(name);
     }
     /** @type {StaticType} */
     const merged = {
@@ -106,6 +111,10 @@ export function mergeTypes(list) {
     if (apiPaths.size)
         merged.apiPaths = [
             ...apiPaths,
+        ];
+    if (fieldPaths.size)
+        merged.fieldPaths = [
+            ...fieldPaths,
         ];
     const withStrings = list.filter((entry) => entry.types?.includes('string'));
     if (merged.types && withStrings.length && withStrings.every((entry) => entry.nonNumericStrings)) merged.nonNumericStrings = true;

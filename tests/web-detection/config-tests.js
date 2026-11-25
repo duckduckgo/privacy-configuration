@@ -240,6 +240,19 @@ describe('webDetection config tests', () => {
             ]);
         });
 
+        it('rewrites `done` beside another action into the sequence (self-test)', () => {
+            const config = {
+                features: {
+                    webDetection: { settings: { detectors: { g: { d: { actions: { fireEvent: { type: 'a' }, done: true } } } } } },
+                },
+            };
+            sequenceWebDetectionActions(config);
+            expect(config.features.webDetection.settings.detectors.g.d.actions).to.deep.equal([
+                { fireEvent: { type: 'a' } },
+                { done: true },
+            ]);
+        });
+
         it('leaves an object of only fireEvent and breakageReportData as one object (self-test)', () => {
             const config = {
                 features: {

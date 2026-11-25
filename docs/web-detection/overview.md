@@ -12,10 +12,12 @@ In each frame, each trigger runs the detector like this (see [`match`](#match) f
 
 ```mermaid
 flowchart TD
-    trigger["A trigger fires:<br>an auto offset, or a breakage report"] --> gate{"Detector and trigger enabled,<br>detector not done,<br>runConditions met?"}
+    trigger["A trigger fires:<br>an auto offset, a breakage report,<br>or an arrival observe names"] --> gate{"Detector and trigger enabled,<br>detector not done,<br>runConditions met?"}
     gate -->|no| skip["No run"]
     gate -->|yes| hasMatch{"match present?"}
-    hasMatch -->|no| everyRun["Run actions"] --> next["Wait for the next trigger"]
+    hasMatch -->|no| everyRun["Run actions"] --> doneAction{"A done action held?"}
+    doneAction -->|no| next["Wait for the next trigger"]
+    doneAction -->|yes| done
     hasMatch -->|yes| match{"Evaluate match"}
     match -->|"false, aborted or error"| next
     match -->|holds| onceRun["Run actions"] --> done["Done: remaining timers cancelled,<br>later triggers do not run it"]
@@ -34,7 +36,8 @@ Detectors are configured under `webDetection.settings.detectors`, in named group
           ["state"]: "<enabled|disabled>",
           ["triggers"]: {
             ["breakageReport"]: {["state"]: "<enabled|disabled>", ["runConditions"]: <COND>},
-            ["auto"]: {["state"]: "<enabled|disabled>", ["runConditions"]: <COND>, "when": {"intervalMs": [<int>]}}
+            ["auto"]: {["state"]: "<enabled|disabled>", ["runConditions"]: <COND>, "when": {"intervalMs": [<int>]}},
+            ["observe"]: {["state"]: "<enabled|disabled>", ["runConditions"]: <COND>, "on": [<ON BODY>, ...]}
           },
           ["match"]: <EXPR>,
           "actions": <EXPR> | [<EXPR>, ...]
@@ -52,7 +55,7 @@ Detectors are configured under `webDetection.settings.detectors`, in named group
 - each detector has four parts:
   - `state` - a `disabled` detector doesn't run
   - `triggers` - *when* the detector runs ([Triggers](#triggers))
-  - `match` - optional. The condition for the detector having *detected*, after which it's done ([`match`](#match))
+  - `match` - optional. The condition for the detector having *detected*, after which it's done ([`match`](#match)). A detector without it can end with a [`done`](#done) action
   - `actions` - what each run does: an expression, or a sequence of them ([Actions](#actions))
 
 ### Example
@@ -94,10 +97,13 @@ When fields are omitted from config, detectors take these defaults:
   "state": "enabled",
   "triggers": {
     "breakageReport": { "state": "enabled", "runConditions": {"context": {"top": true}} },
-    "auto": { "state": "disabled", "runConditions": {"context": {"top": true}}, "when": {"intervalMs": []} }
+    "auto": { "state": "disabled", "runConditions": {"context": {"top": true}}, "when": {"intervalMs": []} },
+    "observe": { "state": "disabled", "runConditions": {"context": {"top": true}} }
   }
 }
 ```
+
+The config build writes `"keep": {"count": 10, "withinMs": 5000}` onto every [`observed`](sources.md#observed) body without `keep`.
 
 `actions` has no default, and a detector without it doesn't parse ([Validation](validation.md#detectors-and-actions)).
 
@@ -122,6 +128,7 @@ These sit beside `detectors` in `webDetection.settings`, and apply to every dete
 |---|---|---|
 | `breakageReport` | During the breakage report flow, before the report is submitted | Enabled |
 | `auto` | On page load, at each offset in `when.intervalMs` | Disabled |
+| `observe` | When a performance entry or an event of a type in `on` is recorded, the page hiding included | Disabled |
 
 Every trigger takes `state` and `runConditions`. A `disabled` trigger doesn't run the detector, whatever its other keys say.
 
@@ -146,6 +153,72 @@ Here the detector runs on every site when a breakage report is filed, but runs a
 }
 ```
 
+### `observe`
+
+`on` lists the types whose arrival runs the detector. Each body names a type as an [`observed`](sources.md#observed) body does:
+
+```json
+"triggers": {
+  "observe": {"state": "enabled", "on": [
+    {"entryType": "long-animation-frame", "delayMs": 1000},
+    {"event": "click"},
+    {"event": "visibilitychange", "sync": true},
+    {"event": "pagehide", "sync": true}
+  ]}
+}
+```
+
+| Key | Meaning |
+|---|---|
+| `entryType`, `durationThreshold`, `event`, `target` | The type, as on `observed` |
+| `where` | Optional. A predicate on the item's fields with literal values. It's tested as the item is recorded, outside any run, so it reads no names and no page values |
+| `delayMs` | Optional, default 0. The run is in a task `delayMs` after the arrival |
+| `sync` | Optional, default `false`. The run is in the listener, during dispatch, before the page's own listeners further along the event's path. Required on `visibilitychange` and `pagehide`, allowed on `click`, and not with `delayMs` |
+| `whenPending` | Optional, default `"run"`. What the arrival does while a run of the detector is pending ([Pending runs](#pending-runs)). Not with `sync` |
+
+Each arrival runs the detector once if its body gives an item from it, unless a run of the detector is pending. A batch of entries delivered together is one arrival, which runs the detector once if any entry passes the body's `durationThreshold` and `where`. The run reads the arrival through [`trigger`](sources.md#trigger), and earlier items through `observed`, so each body names a type a source in the detector reads ([Recorded types](validation.md#recorded-types-and-observe)). Detectors due at the same time run in one task.
+
+A `sync` run adds its cost to the event's dispatch, so a `sync` `click` body delays the page's own response to the click.
+
+#### Pending runs
+
+A run is pending from when an arrival schedules it with `delayMs` until it's due. An arrival acts on the detector's latest pending run, whichever body scheduled it, as its body's `whenPending` sets:
+
+| `whenPending` | The arrival | What the run's `trigger` gives |
+|---|---|---|
+| `"run"` | Schedules its own run | Its own arrival |
+| `"skip"` | Schedules nothing | The pending run's arrival. `observed` reads the skipped one |
+| `"batch"` | Adds its items to the pending run, and schedules nothing | The items of every arrival batched into it, in the order they arrived |
+| `"replace"` | Cancels the pending run, and schedules its own | Its own arrival. `observed` reads the replaced one |
+
+With `"skip"` and `"batch"`, the detector runs `delayMs` after the first arrival, so it runs at most once per `delayMs` while arrivals keep coming. With `"replace"`, it runs `delayMs` after the last, once they stop:
+
+```jsonc
+// At most one run per 250 ms while anything scrolls, after the first scroll of each window
+{"event": "scroll", "delayMs": 250, "whenPending": "skip"}
+// One run 1 s after the first batch of frames, reading every batch since
+{"entryType": "long-animation-frame", "delayMs": 1000, "whenPending": "batch"}
+// One run 3 s after the last of several route changes
+{"event": "navigatesuccess", "target": {"api": "navigation"}, "delayMs": 3000, "whenPending": "replace"}
+```
+
+`scroll` arrives every frame while the page scrolls, so CI requires `"skip"` or `"batch"` on its bodies ([Recorded types](validation.md#recorded-types-and-observe)).
+
+#### The page hiding
+
+A detector that sends when the page hides observes `visibilitychange` and `pagehide`, each with `"sync": true`. After `pagehide`, the page's queued tasks may never run, and a hidden page's timers are throttled, so the run happens in the listener.
+
+A navigation away from a visible page fires `pagehide` and then `visibilitychange`, so the detector runs twice, with `document.hidden` `false` on the first run. A tab or app switch fires `visibilitychange` only. A detector that sends once tests `document.hidden` and a detector name before it sends:
+
+```json
+"actions": {
+  "if": {"all": [{"api": "document.hidden"}, {"none": [{"ref": "this.sent", "is": true}]}]},
+  "then": [{"fireEvent": {"type": "<event type>"}}, {"define": {"this.sent": true}}]
+}
+```
+
+In a detector with no `match` that observes either event, CI requires each `fireEvent` to be inside an `if` like this one, or in a sequence with `{"done": true}`. A page shown again and hidden again runs the detector again, unless it's done.
+
 ### runConditions
 
 `runConditions` narrows when a triggered detector runs, e.g., only on sites matching a given pattern. It uses the same conditions as [ConditionalChanges](https://github.com/duckduckgo/content-scope-scripts/blob/main/injected/docs/coding-guidelines.md#conditional-changes). Translations and other per-site changes go in `runConditions`, or in `conditionalChanges` where more flexibility is needed.
@@ -168,9 +241,9 @@ Each run evaluates `match` first. `match` is an expression that gives a boolean 
 |---|---|---|
 | Holds | `actions` runs once | Done when the run ends, whether `actions` ran to its end or failed |
 | Doesn't hold, aborts or errors | `actions` doesn't run. A failure is recorded ([Failures](failures.md)) | Runs again on its next trigger |
-| Absent | `actions` runs | Runs again on its next trigger, and is never done |
+| Absent | `actions` runs | Runs again on its next trigger, until a [`done`](#done) action holds |
 
-Once a detector is done, it doesn't run again in that frame, whatever the trigger: its timers are cancelled and a breakage report doesn't run it. Each frame tracks this separately, and the detector's breakage entry keeps whatever its runs wrote.
+Once a detector is done, it doesn't run again in that frame, whatever the trigger: its timers and pending runs are cancelled, and neither an arrival nor a breakage report runs it. Each frame tracks this separately, and the detector's breakage entry keeps whatever its runs wrote.
 
 `match` only reads the page, so it can't contain an action or a `ref`. A detector with `match` doesn't use detector names, since its `actions` only runs once ([Validation](validation.md#detectors)). If a payload sends a value that `match` tested, `actions` reads it again.
 
@@ -184,7 +257,7 @@ In a detector with no `match`, a `fireEvent` outside a once guard sends its even
 
 ## Actions
 
-`actions` is an expression, or an array of them run in order ([Sequences](expressions.md#sequences)). Actions are expressions with an effect: `fireEvent` sends an event, `breakageReportData` writes the detector's breakage-report entry, and `define` binds names that later expressions read.
+`actions` is an expression, or an array of them run in order ([Sequences](expressions.md#sequences)). Actions are expressions with an effect: `fireEvent` sends an event, `breakageReportData` writes the detector's breakage-report entry, `define` binds names that later expressions read, and `done` ends a detector with no `match`.
 
 ```json
 "<detector>": {
@@ -201,12 +274,30 @@ In a detector with no `match`, a `fireEvent` outside a once guard sends its even
 | `fireEvent` | `{"type": <string>, "data"?: <payload spec>}` | Sends a `webEvent` of that type, with the payload ([EventHub](#eventhub)) |
 | `breakageReportData` | `{}`, or `{"data": <payload spec>}` | Writes the detector's entry in breakage reports ([Breakage reports](#breakage-reports)) |
 | `define` | `{<name>: <expression>}` | Binds each name to its expression's value ([Names](expressions.md#names)) |
+| `done` | A condition | Makes the detector done at the end of the run, when it holds ([`done`](#done)) |
 
 An action computes every value its payload names, then sends or writes. If any of those values fails, the action sends and writes nothing, and the failure propagates like any other ([Failures](failures.md)). The action's own value is `undefined`.
 
 An object can have expression keys (with their modifiers) or action keys, but not both. Action keys in one object run in the order they're listed in config, so `{"fireEvent": A, "breakageReportData": B}` is `[{"fireEvent": A}, {"breakageReportData": B}]`. Note that on Apple, an object with only `fireEvent` and `breakageReportData` stays one object, so those two run in no guaranteed order.
 
 `define` binds a run name (`"x"`), which lasts for the rest of the run, or a detector name (`"this.x"`), which lasts across every run and trigger in the frame. `{"ref": "x"}` reads it. Detector names are how a detector keeps state between runs, such as a count of reads, the previous read or a flag that an action has run ([Names](expressions.md#names)).
+
+### `done`
+
+`done` ends a detector with no `match`. Its value is in boolean position, and when it holds, the detector is done at the end of the run, the same way it is once `match` holds:
+
+```jsonc
+// Done on an engine without long animation frames
+{"done": {"none": [{"api": {"path": "PerformanceObserver.supportedEntryTypes.includes", "args": ["long-animation-frame"]}}]}}
+// Done once the events are sent
+{"done": {"ref": "this.sent"}}
+```
+
+- A value that doesn't hold, or `undefined`, leaves the detector as it is. Several `done`s in a run combine by OR.
+- A `done` that held stays in effect if the run fails after it.
+- CI rejects `done` in `match`, and in a detector with `match`.
+
+A detector with no `match` and no `done` runs on every trigger for the life of the frame, and keeps recording the types it reads.
 
 ## Results
 

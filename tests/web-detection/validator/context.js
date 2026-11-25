@@ -36,6 +36,9 @@
  *   runNames: Map<string, StaticType>,
  *   detectorNames: Map<string, StaticType>,
  *   collected: Map<string, StaticType>,
+ *   recordedReads: Recorded[],
+ *   onBodies: Recorded[],
+ *   enabledTriggers: Set<string>,
  * }} Context
  *
  * `functionApis` holds the expressions whose `api` may read a method as a function: `args`
@@ -44,6 +47,17 @@
  * `runNames` holds the run names a `define` may have bound at the point of the walk, with the type
  * of each value that can be bound. `detectorNames` holds the type of each detector name, from every
  * `define` of it in the detector, as the walk before gathered them into `collected`.
+ *
+ * `recordedReads` holds the type and target of each `observed` and `trigger` body the walk has
+ * checked. `onBodies` holds those of the detector's `observe` trigger's `on` bodies, and
+ * `enabledTriggers` the triggers that run the detector.
+ */
+
+/**
+ * A recorded type and the target it's recorded on: `kind` is the body key naming it, `entryType` or
+ * `event`, and `target` the `api` path an event is listened for on, `window` when the body states none.
+ *
+ * @typedef {{ kind: string, type: string, target?: string }} Recorded
  */
 
 /** @type {Scope} */
@@ -93,5 +107,8 @@ export function newContext() {
         runNames: new Map(),
         detectorNames: new Map(),
         collected: new Map(),
+        recordedReads: [],
+        onBodies: [],
+        enabledTriggers: new Set(),
     };
 }

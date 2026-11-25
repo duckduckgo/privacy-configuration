@@ -7,10 +7,12 @@ A source reads the page. See [Values](expressions.md#values) for what each one g
 | [`element`](#element) | Elements matching a selector |
 | [`text`](#text) | Matches of a text pattern |
 | [`api`](#api) | A Web API, by path: a property or a method's result |
+| [`observed`](#observed) | The performance entries or events of one type recorded in the frame, over a recent window |
+| [`trigger`](#trigger) | The arrival that started the run |
 
 ## Lists: `where` and `field`
 
-`element` and `api` take two keys that work on the items of a list:
+`element`, `api`, `observed` and `trigger` take two keys that work on the items of a list:
 
 | Key | Meaning |
 |---|---|
@@ -231,8 +233,104 @@ A field the engine doesn't define on the entry, such as `responseStatus` on an e
 
 `loadEventEnd` is 0 until the load event fires, and 0 is still a value, so `"is": 0` at a late offset means the load never finished.
 
-Entry types that the engine only delivers to a `PerformanceObserver` aren't in the timeline, so the list is empty and reading one value from it fails ([Values that do not fit](failures.md#values-that-do-not-fit)).
+Entry types that the engine only delivers to a `PerformanceObserver` aren't in the timeline, so the list is empty and reading one value from it fails ([Values that do not fit](failures.md#values-that-do-not-fit)). [`observed`](#observed) reads them instead.
 
 The page sets the names of `mark` and `measure` entries, so `getEntriesByName` without a type also returns a mark the page created with that name. If you read one value, there are then two entries, which fails, and in the list's `length` or under `Math.max.apply`, the mark is counted as one of the items. Passing the type argument excludes them.
 
 Reading `resource` entries by name puts a URL in config. Only the value read is sent.
+
+## `observed`
+
+`observed` reads the items recorded in the frame of one type: the performance entries of an entry type, or the events of an event type. Recording starts when the detectors are parsed, as the page loads, for each type a detector reads or observes.
+
+```json
+{"observed": {"entryType": "long-animation-frame", "where": {"blockingDuration": {"gte": 200}}, "field": "blockingDuration"}}
+{"observed": {"event": "click", "keep": {"withinMs": 1000}}, "using": "length"}
+{"observed": {"event": "scroll", "target": {"api": "visualViewport"}, "keep": {"count": 1}}, "using": {"path": "at", "args": [-1]}}
+```
+
+| Key | Meaning |
+|---|---|
+| `entryType` | A performance entry type. A body has one of `entryType` and `event` |
+| `durationThreshold` | Optional, with `"entryType": "event"` only, and at least 16. The body gives the entries whose `duration` is at or over it. Absent, the engine's default of 104 ms applies |
+| `event` | An event type |
+| `target` | Optional, with `event`. What the listener is on, as `{"api": <path>}` ([Event targets](#event-targets)). Absent, it's `window` |
+| `where` | Optional. A predicate or expression each item must pass ([Lists](#lists-where-and-field)) |
+| `field` | Optional. The value read from each item that passes `where` |
+| `keep` | The window of recorded items the body reads ([`keep`](#keep)) |
+
+It gives a selected list of the items in its window that pass `where`, in the order they were recorded. A type with nothing recorded, or one the engine doesn't support, gives a list with no items. Without `field`, in boolean position, it holds when it has an item, as `element` does.
+
+The entry types, event types and targets a body can name, and the fields each item has, are on allowlists in this repository's CI ([Recorded types](validation.md#recorded-types-and-observe)). `unload` and `beforeunload` are never on them, since listening for either takes the page out of the back/forward cache.
+
+### Items
+
+| Item | Is |
+|---|---|
+| Entry | The `PerformanceEntry` the observer delivered |
+| Event | The `Event` the listener received, with `target` as it was during dispatch. Only events with `isTrusted` true are recorded |
+
+`where`, `field` and `using` read an item's fields by path, as on `api` items. A path can have several names, such as `changedTouches.0.clientX` for a touch's position. `target` is an element, so names read from it are checked against the [element allowlist](validation.md#element-allowlist).
+
+An event's `timeStamp` is when the user acted, so input that waited behind a busy main thread keeps its earlier time.
+
+### Event targets
+
+| `target` | The listener receives |
+|---|---|
+| `window`, the default | Events dispatched at `window` or through the DOM tree. It listens in the capture phase, so it also receives events that don't bubble, such as element scrolls and `invalid` |
+| `document` | Events dispatched at `document` or through the DOM tree below it |
+| `visualViewport` | Events dispatched at `visualViewport`, such as its `scroll` |
+| `navigation` | `navigate` and `navigatesuccess`, which are dispatched only there |
+
+A `target` is read once, when recording starts, so it's an `api` path on the target allowlist. To read the events on one element, test `target` in `where`, which also covers elements added later and elements the page re-renders.
+
+### `keep`
+
+Each `observed` body reads a window of the items recorded of its type:
+
+| `keep` | The body reads |
+|---|---|
+| `{"count": K}` | The last `K` items |
+| `{"withinMs": N}` | The items recorded in the last `N` ms |
+| `{"count": K, "withinMs": N}` | The items recorded in the last `N` ms, at most the last `K` |
+| `null` | Every item recorded. CI allows it on `visibilitychange` and `pagehide` only |
+| Absent | `{"count": 10, "withinMs": 5000}`, which the config build writes onto the body |
+
+```json
+{"observed": {"event": "touchstart", "keep": {"count": 4}}}
+{"observed": {"event": "scroll", "keep": {"withinMs": 2000, "count": 100}}}
+```
+
+| Rule | Detail |
+|---|---|
+| Age | From when the item was recorded. An item's `timeStamp` or `startTime` can be earlier, so clicks dispatched together after a long task all count as recent, and a body that needs items by input time tests `timeStamp` in `where` |
+| Anchor | `withinMs` runs back from when the `observed` is evaluated, so in a run with `delayMs` the window includes the delay |
+| Per body | Each body reads its own window, whatever other detectors read of the same type |
+| Caps | CI caps `count` and `withinMs` per type ([Recorded types](validation.md#recorded-types-and-observe)) |
+
+## `trigger`
+
+`trigger` reads the arrival that started the run: the entries or event that ran the detector through its [`observe`](overview.md#observe) trigger, or the `auto` timer or breakage report.
+
+```json
+{"trigger": {"event": "click"}, "using": {"path": "at", "args": [0]}}
+{"trigger": {"entryType": "long-animation-frame", "field": "blockingDuration"}, "using": {"api": {"path": "Math.max.apply", "args": [null, {"self": {}}]}}}
+{"none": [{"trigger": {"breakageReport": {}}}]}
+```
+
+| Key | Meaning |
+|---|---|
+| `entryType`, `durationThreshold`, `event`, `target`, `where`, `field` | As on [`observed`](#observed). The type and target are those of a body in the detector's `observe` trigger |
+| `auto` | `{}`. Gives an item when an `auto` timer started the run |
+| `breakageReport` | `{}`. Gives an item when a breakage report started the run |
+
+A body has exactly one of `entryType`, `event`, `auto` and `breakageReport`, and no `keep`. It gives a selected list of the arrival's items:
+
+| Started by | Items |
+|---|---|
+| An entry type | The entries the observer delivered together, which can be several after a long task |
+| An event | The event |
+| An `auto` timer, a breakage report | One item, whose `timeStamp` is when the run started |
+
+A body naming another type gives a list with no items, so in boolean position `{"trigger": {"event": "click"}}` holds only in a run a click started. A run with `delayMs` keeps its arrival's items until it runs. A run that arrivals were batched into gives the items of each, in the order they arrived ([Pending runs](overview.md#pending-runs)). CI rejects `trigger` in `match`, which reads the page only.

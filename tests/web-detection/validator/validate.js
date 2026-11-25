@@ -2,6 +2,9 @@
 import { isDeepStrictEqual } from 'node:util';
 import { MATCH_SCOPE, PAYLOAD_SCOPE, newContext } from './context.js';
 import { checkBody, checkExpr } from './expressions.js';
+import { onBodiesOf } from './observed.js';
+import { checkTriggers, enabledTriggersOf } from './triggers.js';
+import { pageHidingEventErrors } from './warnings.js';
 import { isPlainObject } from '../../../util.js';
 
 /**
@@ -25,6 +28,7 @@ function runChecks(ctx, walk) {
         ctx.errors = [];
         ctx.runNames = new Map();
         ctx.collected = new Map();
+        ctx.recordedReads = [];
         walk();
         if (isDeepStrictEqual(ctx.collected, ctx.detectorNames)) break;
         ctx.detectorNames = ctx.collected;
@@ -36,7 +40,8 @@ function runChecks(ctx, walk) {
 
 /**
  * Check a detector against the expression, predicate and payload rules: `match` in boolean
- * position, and `actions` as an expression or a sequence.
+ * position, `actions` as an expression or a sequence, and the `observe` trigger against the types
+ * its sources read.
  *
  * @param {Record<string, any>} detector
  * @param {string} path
@@ -49,8 +54,15 @@ export function validateDetector(detector, path) {
         ];
     const ctx = newContext();
     ctx.hasMatch = 'match' in detector;
-    return runChecks(ctx, () => {
-        if ('match' in detector) checkExpr(detector.match, 'boolean', MATCH_SCOPE, ctx, `${path}.match`);
-        if ('actions' in detector) checkBody(detector.actions, 'value', PAYLOAD_SCOPE, ctx, `${path}.actions`);
-    });
+    ctx.onBodies = onBodiesOf(detector.triggers);
+    ctx.enabledTriggers = enabledTriggersOf(detector.triggers);
+    return [
+        ...runChecks(ctx, () => {
+            if ('match' in detector) checkExpr(detector.match, 'boolean', MATCH_SCOPE, ctx, `${path}.match`);
+            if ('actions' in detector) checkBody(detector.actions, 'value', PAYLOAD_SCOPE, ctx, `${path}.actions`);
+            // After the walk, which gathers the types the sources read
+            checkTriggers(detector.triggers, ctx, `${path}.triggers`);
+        }),
+        ...pageHidingEventErrors(detector, path),
+    ];
 }
