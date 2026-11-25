@@ -70,6 +70,8 @@ A change that isn't in a C-S-S release yet, such as one in an open C-S-S PR the 
 
 When a release includes the change, rename the heading to that release's link, fill in its capability cells, add its platform row, and replace "this release" with the version.
 
+Changes from several open C-S-S PRs share the one `### Unreleased` heading. When a release ships only some of them, move the entries whose markers are in its tree into a heading for that release, and leave the rest under `### Unreleased`.
+
 ## Check before handing over
 
 - Each capability row's marker is in that release's tree and missing from the release before (or in a different shape, for a changed feature).
