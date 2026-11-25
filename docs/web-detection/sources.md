@@ -402,8 +402,6 @@ An item is a `MutationRecord`, read as `observed` items are. `timeStamp` is when
 
 A run that waits for the page's response to an input starts in the listener with [`sync`](overview.md#observe), so its `wait` starts before the page's own listeners change the page.
 
-A body naming another type gives a list with no items, so in boolean position `{"trigger": {"event": "click"}}` holds only in a run a click started. A run with `delayMs` keeps its arrival's items until it runs. A run that arrivals were batched into gives the items of each, in the order they arrived ([Pending runs](overview.md#pending-runs)). `trigger` doesn't go in `match`, which reads the page only ([Recorded types](#recorded-types)).
-
 ## Authoring rules
 
 ### `root` guards
