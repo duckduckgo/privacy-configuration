@@ -29,6 +29,7 @@ This table lists each web detection feature and the first C-S-S release that sup
 | | `where` on items that aren't objects, such as strings | [22.0.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/22.0.0) |
 | [Predicates](predicates.md) | Comparisons, `eq`, `in`, property paths, `field`, `fails`, `type` | [19.0.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/19.0.0) |
 | | `type` names `function`, `symbol` and `bigint` | [22.0.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/22.0.0) |
+| | `fails` holding for a value that doesn't fit the config ([Values that do not fit](failures.md#values-that-do-not-fit)) | Unreleased |
 | [Actions](overview.md#actions) | `breakageReportData` | [12.40.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/12.40.0) |
 | | `fireEvent` | [13.25.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/13.25.0) |
 | | `actions` as an expression or a sequence | [19.0.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/19.0.0) |
@@ -67,11 +68,21 @@ Reading the table:
 
 Each C-S-S release that changed what a detector can do or how it runs, newest first. Releases that only changed tests, refactored code or fixed internals aren't listed.
 
+### Unreleased
+
+- A value that doesn't fit the config fails as `"aborted"`, so `fails` can test it ([Values that do not fit](failures.md#values-that-do-not-fit)). This covers a value of the wrong type for its position or for `sum`, `mul`, `any`, `all` or `none`, `only` or an unwrapped list over no items or several, `where` on an `api` value that isn't a list, and a root that isn't a node.
+- C-S-S parses any `define` name, and a name starting `this.` is a detector name. CI checks the name pattern ([Bound names](expressions.md#bound-names)).
+- A run that ends on a failure counts as a failed run for `detectorPerf`, as one that ends on an error does.
+
+#### Breaking changes
+
+Before this release, a value that doesn't fit the config ends the run as `"error"`, which `fails` can't handle. Gate a detector that relies on `fails` handling one on this release. A `define` name that doesn't match the name pattern doesn't parse before this release, so a CI change that allows other names needs the same gate.
+
 ### [22.0.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/22.0.0)
 
 - Each object has one expression key. To AND several conditions, wrap them in `all`.
 - `type` in predicates takes `function`, `symbol` and `bigint`, and `"type": "object"` doesn't hold for a function.
-- C-S-S checks a value's type against its position when the value is read, so a value of the wrong type fails as `"aborted"`. CI rejects these where the config shows the type ([Types](expressions.md#types)).
+- C-S-S checks a value's type against its position when the value is read, so a value of the wrong type ends the run as `"error"`. CI rejects these where the config shows the type ([Types](expressions.md#types)).
 - In boolean position, every list holds when it has an item, including `element` with `field` and `api` with `where`.
 - An `if` branch or a sequence's last element that gives a list contributes each item under `sum`, `mul`, `any`, `all` and `none`, as an operand would.
 - `where` tests items that aren't objects, reading properties through their prototype (e.g., a string's `length`).
@@ -84,9 +95,9 @@ A detector with several expression keys in one object, or an object with none (`
 
 On 19.0.0 to 21.x:
 
-- a type error the config shows is a parse error, including `element` with `field` or `api` with `where` in boolean position. Through a `ref`, such a list fails there
-- an `if` branch or a sequence's last element that gives a list is one operand: under `sum` and `mul` it gives its one item, and under `any`, `all` and `none` it fails unless it's `element` without `field`, or `text`
-- `where` fails on an item that isn't an object
+- a type error the config shows is a parse error, including `element` with `field` or `api` with `where` in boolean position. Through a `ref`, such a list ends the run as `"error"` there
+- an `if` branch or a sequence's last element that gives a list is one operand: under `sum` and `mul` it gives its one item, and under `any`, `all` and `none` it ends the run as `"error"` unless it's `element` without `field`, or `text`
+- `where` on an item that isn't an object ends the run as `"error"`
 - a detector whose group or detector name doesn't match the pattern is dropped
 - an `auto` trigger whose `when` has no `intervalMs` array stops every detector in the frame from running automatically
 

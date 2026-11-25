@@ -64,9 +64,15 @@ A Windows gitlink can point at an untagged C-S-S commit, such as a rebuild after
 - Android cells also give the integer remote config uses: major × 10,000,000 + minor × 10,000 + patch × 1,000.
 - Write **not yet shipped** when no release tag includes the version.
 
+## Unreleased changes
+
+A change that isn't in a C-S-S release yet, such as one in an open C-S-S PR the docs change depends on, goes under `### Unreleased` at the top of the changelog, with no link. Its capability cells read `Unreleased`, and it has no platform row. Its Breaking changes say "before this release", with no version.
+
+When a release includes the change, rename the heading to that release's link, fill in its capability cells, add its platform row, and replace "this release" with the version.
+
 ## Check before handing over
 
 - Each capability row's marker is in that release's tree and missing from the release before (or in a different shape, for a changed feature).
 - Each platform cell's pin is at or above the row, and the previous release's pin is below it.
-- Every changelog release has a platform row, and every row is a changelog release.
+- Every changelog release has a platform row, and every row is a changelog release. `Unreleased` has no row.
 - Every feature the other web detection pages document has a capability row.
