@@ -96,6 +96,7 @@ export const RULES = /** @type {const} */ ({
     featureSettings: 'overview.md#feature-setting-values',
     recordedTypes: 'sources.md#recorded-types',
     observeTrigger: 'overview.md#the-observe-trigger',
+    waits: 'sources.md#waits',
 });
 
 /**

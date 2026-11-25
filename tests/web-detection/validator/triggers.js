@@ -210,6 +210,7 @@ function checkWhenBusy(body, recorded, ctx, path) {
                 ctx,
                 path,
                 `\`${recorded.type}\` runs the detector as the page hides, and a run queued behind a \`wait\` runs only when the wait ends, so it needs \`"whenBusy": "interrupt"\``,
+                'observeTrigger',
             );
     } else if (body.sync === true) {
         if (whenBusy === 'queue')
@@ -217,8 +218,9 @@ function checkWhenBusy(body, recorded, ctx, path) {
                 ctx,
                 path,
                 'a `sync` run queued behind a `wait` runs after dispatch, so a `sync` body needs `"whenBusy": "interrupt"` or `"skip"`',
+                'observeTrigger',
             );
     } else if (whenBusy === 'interrupt') {
-        fail(ctx, `${path}.whenBusy`, '`"whenBusy": "interrupt"` goes on `sync` bodies and the page hiding only');
+        fail(ctx, `${path}.whenBusy`, '`"whenBusy": "interrupt"` goes on `sync` bodies and the page hiding only', 'observeTrigger');
     }
 }

@@ -198,8 +198,14 @@ export function checkRecordedBody(body, place, ctx, path) {
         if (allowed.includes(key)) continue;
         if (key === 'keep') fail(ctx, `${path}.keep`, '`keep` sets the window of an `observed` body only');
         else if (key === 'mutation')
-            fail(ctx, `${path}.mutation`, "`mutation` is allowed in `wait` only, whose observer runs only while it's open");
-        else if (key === 'timeoutMs') fail(ctx, `${path}.timeoutMs`, '`timeoutMs` sets how long a `wait` lasts, and goes on `wait` only');
+            fail(
+                ctx,
+                `${path}.mutation`,
+                "`mutation` is allowed in `wait` only, whose observer runs only while it's open",
+                'recordedTypes',
+            );
+        else if (key === 'timeoutMs')
+            fail(ctx, `${path}.timeoutMs`, '`timeoutMs` sets how long a `wait` lasts, and goes on `wait` only', 'recordedTypes');
         else if (key === 'field' && place === 'on')
             fail(
                 ctx,
@@ -237,7 +243,8 @@ export function checkRecordedBody(body, place, ctx, path) {
     }
     if (kind === 'mutation') {
         checkMutationOptions(body.mutation, ctx, `${path}.mutation`);
-        if (!('target' in body)) fail(ctx, path, 'a `mutation` body observes the node its `target` gives, so it needs `target`');
+        if (!('target' in body))
+            fail(ctx, path, 'a `mutation` body observes the node its `target` gives, so it needs `target`', 'recordedTypes');
         if ('durationThreshold' in body)
             fail(ctx, `${path}.durationThreshold`, '`durationThreshold` goes with `entryType`, not `mutation`');
         return { kind, type: kind, target: EXPRESSION_TARGET };
@@ -334,27 +341,27 @@ function checkMutationOptions(options, ctx, path) {
     ] of Object.entries(options)) {
         const keyPath = `${path}.${key}`;
         if (NEVER_MUTATION_OPTIONS.includes(key)) {
-            fail(ctx, keyPath, `"${key}" is never observed, as the old values are the page's text and attribute values`);
+            fail(ctx, keyPath, `"${key}" is never observed, as the old values are the page's text and attribute values`, 'recordedTypes');
         } else if (MUTATION_OPTION_ALLOWLIST.flags.includes(key)) {
-            if (value !== true) fail(ctx, keyPath, `\`${key}\` is \`true\` or left out`);
+            if (value !== true) fail(ctx, keyPath, `\`${key}\` is \`true\` or left out`, 'recordedTypes');
         } else if (key === 'attributeFilter') {
             if (!Array.isArray(value) || value.length === 0) {
-                fail(ctx, keyPath, '`attributeFilter` is a non-empty array of attribute names');
+                fail(ctx, keyPath, '`attributeFilter` is a non-empty array of attribute names', 'recordedTypes');
                 continue;
             }
             for (const name of value) {
                 if (!MUTATION_OPTION_ALLOWLIST.attributeFilter.includes(name))
-                    fail(ctx, keyPath, `attribute "${name}" is not on MUTATION_OPTION_ALLOWLIST.attributeFilter`);
+                    fail(ctx, keyPath, `attribute "${name}" is not on MUTATION_OPTION_ALLOWLIST.attributeFilter`, 'recordedTypes');
             }
         } else {
-            fail(ctx, keyPath, `mutation option "${key}" is not on MUTATION_OPTION_ALLOWLIST`);
+            fail(ctx, keyPath, `mutation option "${key}" is not on MUTATION_OPTION_ALLOWLIST`, 'recordedTypes');
         }
     }
     if (!MUTATION_SELECTING_OPTIONS.some((key) => key in options))
         fail(
             ctx,
             path,
-            `\`mutation\` needs at least one of ${MUTATION_SELECTING_OPTIONS.map((key) => `\`${key}\``).join(', ')}, or it observes no change`,
+            `\`mutation\` needs at least one of ${MUTATION_SELECTING_OPTIONS.map((key) => `\`${key}\``, 'recordedTypes').join(', ')}, or it observes no change`,
         );
 }
 
@@ -374,11 +381,11 @@ function checkTimeout(body, ctx, path) {
     const timeout = body.timeoutMs;
     const timeoutPath = `${path}.timeoutMs`;
     if (timeout === null) {
-        if (!ALLOW_UNBOUNDED_WAIT) fail(ctx, timeoutPath, "`timeoutMs: null` waits with no limit, which CI doesn't allow");
+        if (!ALLOW_UNBOUNDED_WAIT) fail(ctx, timeoutPath, "`timeoutMs: null` waits with no limit, which CI doesn't allow", 'waits');
     } else if (typeof timeout !== 'number' || !Number.isFinite(timeout) || timeout < 0) {
         fail(ctx, timeoutPath, '`timeoutMs` is a number, at least 0');
     } else if (timeout > MAX_WAIT_TIMEOUT_MS) {
-        fail(ctx, timeoutPath, `\`timeoutMs\` is at most ${MAX_WAIT_TIMEOUT_MS}`);
+        fail(ctx, timeoutPath, `\`timeoutMs\` is at most ${MAX_WAIT_TIMEOUT_MS}`, 'waits');
     }
 }
 
@@ -407,6 +414,7 @@ export function checkWaitSource(body, position, scope, ctx, path) {
             ctx,
             path,
             '`wait` suspends the run, and a breakage report never waits on one: set `triggers.breakageReport.state` to "disabled", which is enabled by default',
+            'waits',
         );
     const recorded = checkRecordedBody(body, 'wait', ctx, path);
     if (!isPlainObject(body)) return UNKNOWN;
@@ -417,12 +425,18 @@ export function checkWaitSource(body, position, scope, ctx, path) {
         if (read === undefined || !EVENT_TARGET_ALLOWLIST.includes(read)) {
             const targetType = checkExpr(body.target, 'value', child(nested), ctx, `${path}.target`);
             if (isList(targetType))
-                fail(ctx, `${path}.target`, 'a `target` gives one node or event target, and this gives a list: `only` takes its one item');
+                fail(
+                    ctx,
+                    `${path}.target`,
+                    'a `target` gives one node or event target, and this gives a list: `only` takes its one item',
+                    'recordedTypes',
+                );
             else if (targetType.types !== null && !targetType.types.includes('object'))
                 fail(
                     ctx,
                     `${path}.target`,
                     `a \`target\` gives a node or event target, and config types it as ${describeType(targetType)}`,
+                    'recordedTypes',
                 );
         }
     }
@@ -439,11 +453,11 @@ export function checkWaitSource(body, position, scope, ctx, path) {
     ]);
     if (position === 'boolean') {
         if (!allows(type, 'boolean'))
-            fail(ctx, path, `boolean position takes a boolean, and config types the value as ${describeType(type)}`);
+            fail(ctx, path, `boolean position takes a boolean, and config types the value as ${describeType(type)}`, 'types');
         return typeOf('boolean');
     }
     if (position === 'number' && !allows(type, 'number'))
-        fail(ctx, path, `number position takes a number, and config types the value as ${describeType(type)}`);
+        fail(ctx, path, `number position takes a number, and config types the value as ${describeType(type)}`, 'types');
     return type;
 }
 
