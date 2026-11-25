@@ -12,6 +12,7 @@ This table lists each web detection feature and the first C-S-S release that sup
 | | `auto` trigger, with `when.intervalMs` | [13.10.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/13.10.0) |
 | | `auto` trigger without `when` | [13.25.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/13.25.0) |
 | | No `match`, so `actions` runs on every run | [19.0.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/19.0.0) |
+| [Feature settings](overview.md#feature-settings) | `readCacheMaxAgeMs` | Unreleased |
 | [Conditions](conditions.md) | `text` (`pattern`, `selector`) | [12.40.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/12.40.0) |
 | | `xpath` and `xpathConfig` on `text` | [16.5.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/16.5.0) |
 | | `element` (`selector`) | [12.40.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/12.40.0) |
@@ -74,6 +75,7 @@ Each C-S-S release that changed what a detector can do or how it runs, newest fi
 - A CSS selector or XPath expression the engine rejects fails as `"aborted"`, whether it's in the config or a `root` read from the page, so `fails` can test it ([Kinds](failures.md#kinds)). An error is only a throw from C-S-S itself.
 - C-S-S parses any `define` name, and a name starting `this.` is a detector name. CI checks the name pattern ([Bound names](expressions.md#bound-names)).
 - A run that ends on a failure counts as a failed run for `detectorPerf`, as one that ends on an error does.
+- The `readCacheMaxAgeMs` setting keeps the XPath selections and element text that detectors read for later runs while the page is unchanged ([Feature settings](overview.md#feature-settings)). Without it, only the detectors that run at the same time share their reads.
 
 #### Breaking changes
 
