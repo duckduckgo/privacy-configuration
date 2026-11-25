@@ -349,7 +349,7 @@ A body naming another type gives a list with no items, so in boolean position `{
 |---|---|
 | `entryType`, `durationThreshold`, `event` | The type, as on [`observed`](#observed) |
 | `mutation` | The options of `MutationObserver.observe()` ([Mutations](#mutations)). A body has one of `entryType`, `event` and `mutation` |
-| `target` | With `event`, optional, and `window` when absent. With `mutation`, required. Any expression giving an event target or node, read when the wait starts, such as an element the run read earlier |
+| `target` | With `event`, optional, and `window` when absent. With `mutation`, required. Any expression giving an event target or node, read when the wait starts, such as an element the run read earlier. A value it can't listen on or observe fails the `wait` ([Values that do not fit](failures.md#values-that-do-not-fit)) |
 | `where` | Optional. A predicate or expression the item must pass. An item that fails it doesn't end the wait |
 | `field` | Optional. The value read from the item |
 | `timeoutMs` | The longest the wait lasts, in ms. Absent, it's 5000, which the config build writes onto the body |
