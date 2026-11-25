@@ -447,15 +447,19 @@ export function checkWaitSource(body, position, scope, ctx, path) {
     if ('where' in body)
         checkPredicate(body.where, 'item', itemType, { ...bindItem(nested, itemType), underNone: false }, ctx, `${path}.where`);
     const valueType = 'field' in body ? checkFieldRead(body.field, itemType, nested, ctx, `${path}.field`) : itemType;
+    if (position === 'boolean') {
+        fail(
+            ctx,
+            path,
+            'a `wait` gives `undefined` once `timeoutMs` passes, which fails in boolean position, so test it with `is`, such as `"is": {"type": "object"}`, or `"is": true` on a boolean `field`',
+            'waits',
+        );
+        return typeOf('boolean');
+    }
     const type = mergeTypes([
         valueType,
         typeOf('undefined'),
     ]);
-    if (position === 'boolean') {
-        if (!allows(type, 'boolean'))
-            fail(ctx, path, `boolean position takes a boolean, and config types the value as ${describeType(type)}`, 'types');
-        return typeOf('boolean');
-    }
     if (position === 'number' && !allows(type, 'number'))
         fail(ctx, path, `number position takes a number, and config types the value as ${describeType(type)}`, 'types');
     return type;

@@ -168,9 +168,13 @@ describe('webDetection config tests', () => {
             });
         });
 
-        itAll('gives the item or `undefined`, typed in its position', () => {
-            expectError('boolean position takes a boolean', waiting({ if: click, then: { done: true } }));
-            expectValid(waiting({ if: wait({ event: 'click', field: 'ctrlKey' }), then: { done: true } }));
+        itAll('gives the item or `undefined`, so it takes `is` in boolean position', () => {
+            const TEST_IT = 'which fails in boolean position, so test it with `is`';
+            expectError(TEST_IT, waiting({ if: click, then: { done: true } }));
+            expectError(TEST_IT, waiting({ if: wait({ event: 'click', field: 'ctrlKey' }), then: { done: true } }));
+            expectError(TEST_IT, waiting({ done: wait({ event: 'click', field: 'ctrlKey' }) }));
+            expectValid(waiting({ if: { ...wait({ event: 'click', field: 'ctrlKey' }), is: true }, then: { done: true } }));
+            expectValid(waiting({ if: { ...click, is: { type: 'object' } }, then: { done: true } }));
             expectError('reads "key" on `keydown` event items', waiting({ define: { x: wait({ event: 'keydown', field: 'key' }) } }));
         });
 

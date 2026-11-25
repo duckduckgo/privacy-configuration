@@ -476,3 +476,4 @@ CI rejects:
 
 - `timeoutMs` is at most `MAX_WAIT_TIMEOUT_MS`, and is `null` only while `ALLOW_UNBOUNDED_WAIT` is on (both in [`web-detection-util.js`](../../web-detection-util.js)).
 - A detector with a `wait` has its `breakageReport` trigger disabled, which it isn't by default, so a breakage report never waits on a run.
+- A `wait` in boolean position, such as an `if` condition, has `is`. It gives `undefined` when `timeoutMs` passes, which fails there, so `"is": {"type": "object"}`, or `"is": true` on a boolean `field`, gives `false` on a timeout.
