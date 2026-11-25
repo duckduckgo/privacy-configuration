@@ -28,6 +28,10 @@ Files in `features/` and `overrides/` are JSONC (JSON with comments). Read them 
 
 Change rollouts and run content scope experiments with `scripts/experiment.mjs`; split web detection detectors across cohorts with `scripts/web-detection-experiment.mjs`. Read [Rollouts and Experiments](docs/rollouts-and-experiments.md) first.
 
+## Web detection
+
+Read the [web detection docs](docs/web-detection/README.md) before adding or changing a detector in `features/web-detection.json`. They cover how a detector runs, the config language, recipes and what CI checks.
+
 ## Key Concepts
 
 - **Features**: Files in `features/` directory control privacy protection enable/disable
