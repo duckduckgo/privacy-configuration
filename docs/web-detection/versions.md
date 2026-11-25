@@ -38,6 +38,7 @@ This table lists each web detection feature and the first C-S-S release that sup
 | | `buckets` as an array of `{"name", "is"}` | [20.0.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/20.0.0) |
 | [Results](breakageData-parameter.md) | Breakage entries with `data` and `errors`, written by any run | [19.0.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/19.0.0) |
 | Related feature | `detectorPerf` timing | [17.7.0](https://github.com/duckduckgo/content-scope-scripts/releases/tag/17.7.0) |
+| | [`worstDispatch`](breakageData-parameter.md#detectorperf) in `detectorPerf` breakage data | Unreleased |
 
 ## Platform versions by C-S-S release
 
@@ -76,6 +77,7 @@ Each C-S-S release that changed what a detector can do or how it runs, newest fi
 - C-S-S parses any `define` name, and a name starting `this.` is a detector name. CI checks the name pattern ([Bound names](expressions.md#bound-names)).
 - A run that ends on a failure counts as a failed run for `detectorPerf`, as one that ends on an error does.
 - The `readCacheMaxAgeMs` setting keeps the XPath selections and element text that detectors read for later runs while the page is unchanged ([Feature settings](overview.md#feature-settings)). Without it, only the detectors that run at the same time share their reads.
+- `detectorPerf` in breakage reports includes `worstDispatch`, the longest dispatch in the frame with each detector's share of it ([`detectorPerf`](breakageData-parameter.md#detectorperf)). A dispatch whose total goes past the single-run severe cutoff sends a `detectorPerf_severe` event.
 
 #### Breaking changes
 
