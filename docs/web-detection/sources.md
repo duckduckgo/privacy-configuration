@@ -333,4 +333,4 @@ A body has exactly one of `entryType`, `event`, `auto` and `breakageReport`, and
 | An event | The event |
 | An `auto` timer, a breakage report | One item, whose `timeStamp` is when the run started |
 
-A body naming another type gives a list with no items, so in boolean position `{"trigger": {"event": "click"}}` holds only in a run a click started. A run with `delayMs` keeps its arrival's items until it runs. CI rejects `trigger` in `match`, which reads the page only.
+A body naming another type gives a list with no items, so in boolean position `{"trigger": {"event": "click"}}` holds only in a run a click started. A run with `delayMs` keeps its arrival's items until it runs. A run that arrivals were batched into gives the items of each, in the order they arrived ([Pending runs](overview.md#pending-runs)). CI rejects `trigger` in `match`, which reads the page only.

@@ -154,7 +154,8 @@ CI rejects:
 - A `trigger` body whose type and target match no body of the detector's `on`, one naming `auto` or `breakageReport` when the detector doesn't enable that trigger, and `trigger` in `match`.
 - An `observe` trigger with no body in `on`, and an `on` body naming a type that no `observed` or `trigger` source in the detector reads, apart from `visibilitychange` and `pagehide`.
 - An `on` body with `field`, or whose `where` holds a `ref` or any other expression. It's tested as the item is recorded, so it compares fields with literal values only.
-- A `visibilitychange` or `pagehide` body without `"sync": true`, `sync` on a body other than these and `click`, and `delayMs` beside `"sync": true`.
+- A `visibilitychange` or `pagehide` body without `"sync": true`, `sync` on a body other than these and `click`, and `delayMs` or `whenPending` beside `"sync": true`.
+- A body for a type that arrives every frame, `scroll`, without `whenPending` `"skip"` or `"batch"`, or with `delayMs` under `PER_FRAME_MIN_DELAY_MS` in [`web-detection-util.js`](../../web-detection-util.js). With `"batch"`, a `delayMs` over the type's `withinMs` cap, since the run keeps each event until it runs.
 - In a detector with no `match` that observes `visibilitychange` or `pagehide`, a `fireEvent` that's neither inside an `if` testing a detector name its branch binds, nor in a sequence with `{"done": true}` ([The page hiding](overview.md#the-page-hiding)).
 - `done` in `match`, and in a detector with `match`.
 

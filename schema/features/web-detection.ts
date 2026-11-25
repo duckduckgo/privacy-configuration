@@ -85,6 +85,11 @@ type OnBody = Recorded & {
     delayMs?: number;
     /** The run is in the listener, during dispatch. */
     sync?: boolean;
+    /**
+     * What the arrival does while a run of the detector is pending: schedule its own run (the default),
+     * schedule nothing, add its items to the pending run, or cancel the pending run and schedule its own.
+     */
+    whenPending?: 'run' | 'skip' | 'batch' | 'replace';
 };
 
 type ObserveTrigger = TriggerBase & {

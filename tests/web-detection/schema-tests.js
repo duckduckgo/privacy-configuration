@@ -43,7 +43,7 @@ describe('webDetection config tests', () => {
                             state: 'enabled',
                             on: [
                                 { entryType: 'event', durationThreshold: 16, where: { duration: { gte: 200 } }, delayMs: 100 },
-                                { event: 'scroll', target: { api: 'visualViewport' } },
+                                { event: 'scroll', target: { api: 'visualViewport' }, delayMs: 250, whenPending: 'batch' },
                                 { event: 'pagehide', sync: true },
                             ],
                         },
@@ -68,6 +68,16 @@ describe('webDetection config tests', () => {
                     observe: {
                         on: [
                             { event: 'click', whenBusy: 'skip' },
+                        ],
+                    },
+                },
+                actions,
+            });
+            expectRejected('a whenPending value it does not take', {
+                triggers: {
+                    observe: {
+                        on: [
+                            { event: 'click', whenPending: 'queue' },
                         ],
                     },
                 },
