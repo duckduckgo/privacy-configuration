@@ -25,6 +25,7 @@ import { asArray } from './walk.js';
  *   fragment?: boolean,
  *   apiPaths?: string[],
  *   fieldPaths?: string[],
+ *   objectFields?: Record<string, StaticType>,
  *   list?: 'selected' | 'array' | 'maybe',
  *   leaf?: boolean,
  *   nonNumericStrings?: boolean,
@@ -38,7 +39,8 @@ import { asArray } from './walk.js';
  * read through, one for each branch that reads a different one, which names read from it extend
  * for the allowlist. `fieldPaths` mark an item of an `observed` or `trigger` source, or a value read
  * from one: each is the item's field table, as `recordedTable` names it, then `.` and the path read so
- * far, which names read from it extend for that table.
+ * far, which names read from it extend for that table. `objectFields` marks an object an `object`
+ * expression builds, with the type of each of its fields.
  *
  * `list` marks a list, and the other keys then describe its items. `selected` is what `element`,
  * `text` and `api` with `where` give, which holds as a condition when it has an item and gives its
@@ -116,6 +118,19 @@ export function mergeTypes(list) {
         merged.fieldPaths = [
             ...fieldPaths,
         ];
+    const objects = list.filter((entry) => entry.objectFields);
+    if (objects.length) {
+        // A field one object doesn't build reads `undefined` there
+        const names = new Set(objects.flatMap((entry) => Object.keys(entry.objectFields ?? {})));
+        merged.objectFields = Object.fromEntries(
+            [
+                ...names,
+            ].map((name) => [
+                name,
+                mergeTypes(objects.map((entry) => entry.objectFields?.[name] ?? typeOf('undefined'))),
+            ]),
+        );
+    }
     const withStrings = list.filter((entry) => entry.types?.includes('string'));
     if (merged.types && withStrings.length && withStrings.every((entry) => entry.nonNumericStrings)) merged.nonNumericStrings = true;
     const kind = list[0]?.list;

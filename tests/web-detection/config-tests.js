@@ -12,6 +12,7 @@ import {
     fireEventTypes,
 } from './clients.js';
 import { detectorNameErrors, detectorViews, forEachWebDetectionConfig, latestConfigs, viewErrors } from './configs.js';
+import { detectorEventMaxDepthErrors } from './validator/events.js';
 import { ACTION_KEYS, BRANCH_KEYS } from './validator/grammar.js';
 import { readCacheMaxAgeMsErrors } from './validator/settings.js';
 import { validateDetector } from './validator/validate.js';
@@ -337,10 +338,37 @@ describe('webDetection config tests', () => {
 
     describe('feature settings', () => {
         forEachWebDetectionConfig(({ configName, webDetection }) => {
+            it(`${configName} gives \`detectorEventMaxDepth\` an integer from 0 to the cap, in patches too`, () => {
+                const errors = detectorEventMaxDepthErrors(webDetection.settings);
+                expect(errors, errors.join('\n')).to.deep.equal([]);
+            });
+
             it(`${configName} gives \`readCacheMaxAgeMs\` null or an integer from 0 to the cap, in patches too`, () => {
                 const errors = readCacheMaxAgeMsErrors(webDetection.settings);
                 expect(errors, errors.join('\n')).to.deep.equal([]);
             });
+        });
+
+        it('checks `detectorEventMaxDepth` and the values patches give it (self-test)', () => {
+            expect(detectorEventMaxDepthErrors({ detectorEventMaxDepth: 4 })).to.deep.equal([]);
+            expect(
+                detectorEventMaxDepthErrors({
+                    detectorEventMaxDepth: 1.5,
+                    conditionalChanges: [
+                        {
+                            condition: { injectName: 'android' },
+                            patchSettings: [
+                                { op: 'replace', path: '/detectorEventMaxDepth', value: 9 },
+                                { op: 'replace', path: '/detectorEventMaxDepth', value: 0 },
+                            ],
+                        },
+                    ],
+                }).map((error) => error.split(':')[0]),
+            ).to.deep.equal([
+                'settings',
+                'conditionalChanges[0]',
+            ]);
+            expect(detectorEventMaxDepthErrors({ detectorEventMaxDepth: -1 })).to.have.length(1);
         });
 
         it('checks `readCacheMaxAgeMs` and the values patches give it (self-test)', () => {

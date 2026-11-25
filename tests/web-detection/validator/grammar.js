@@ -36,6 +36,7 @@ export const EXPRESSION_KEYS = [
     'if',
     ...OPERATOR_KEYS,
     'ref',
+    'object',
 ];
 
 /** Keys valid only beside `if`. */
@@ -74,6 +75,7 @@ export const ACTION_KEYS = [
     ...PAYLOAD_ACTIONS,
     'define',
     'done',
+    'emit',
 ];
 
 /**
@@ -233,12 +235,13 @@ export const TAG_INTERFACES = {
 };
 
 /**
- * The body keys of `observed`, `trigger` and `on` that name a recorded type: a performance entry
- * type, or an event type.
+ * The body keys of `observed`, `trigger`, `wait` and `on` that name a recorded type: a performance
+ * entry type, an event type, or a detector event name.
  */
 export const RECORDED_KINDS = [
     'entryType',
     'event',
+    'detectorEvent',
 ];
 
 /**
@@ -431,6 +434,16 @@ export const MUTATION_FIELDS = /** @type {Record<string, TypeSpec>} */ ({
     attributeName: 'string|null',
     'addedNodes.length': 'number',
     'removedNodes.length': 'number',
+});
+
+/**
+ * The fields of a detector event item besides `data`, whose fields are those of the `emit`s of its
+ * name.
+ */
+export const DETECTOR_EVENT_FIELDS = /** @type {Record<string, TypeSpec>} */ ({
+    name: 'string',
+    timeStamp: 'number',
+    detector: 'string',
 });
 
 /** The `whenBusy` values of an `on` body: what an arrival does while a run of the detector is suspended in a `wait`. */
