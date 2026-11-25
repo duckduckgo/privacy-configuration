@@ -73,6 +73,7 @@ export const RULES = /** @type {const} */ ({
     detectorNames: 'overview.md#detector-names',
     matchNames: 'overview.md#match-and-detector-names',
     events: 'overview.md#events',
+    featureSettings: 'overview.md#feature-setting-values',
 });
 
 /**

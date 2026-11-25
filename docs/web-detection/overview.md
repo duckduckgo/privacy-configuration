@@ -114,7 +114,7 @@ These sit beside `detectors` in `webDetection.settings`, and apply to every dete
 
 | Setting | Meaning | Absent |
 |---|---|---|
-| `readCacheMaxAgeMs` | How long the XPath selections and element text the detectors read are kept for later runs while the page is unchanged: `null` until the page changes, a number of ms up to 600000, or `0` for the detectors that run at the same time only. The first change to the DOM under a node that was read clears them | The config build writes `null` |
+| `readCacheMaxAgeMs` | How long the XPath selections and element text the detectors read are kept for later runs while the page is unchanged: `null` until the page changes, a number of ms up to 600000, or `0` for the detectors that run at the same time only. The first change to the DOM under a node that was read clears them | The config build writes `null` ([Feature setting values](#feature-setting-values)) |
 
 ## Triggers
 
@@ -242,6 +242,10 @@ Both actions take an optional `data` map of the values to send. Each field's `va
 With 3 broken images, this sends `{"type": "brokenImages", "data": {"brokenImages": "2-4"}}`. See [Payloads](payloads.md) for the full rules and how to shape events for period pixels.
 
 ## Authoring rules
+
+### Feature setting values
+
+`readCacheMaxAgeMs` is `null` or an integer from 0 to `MAX_READ_CACHE_MAX_AGE_MS` in [`web-detection-util.js`](../../web-detection-util.js), in the settings and in any value a `conditionalChanges` patch gives it.
 
 ### Detector names
 

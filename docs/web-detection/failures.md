@@ -49,6 +49,8 @@ An unknown key is a parse error so that a client from before a key was added doe
 
 A payload key is also checked when the detector parses: it matches `^[a-zA-Z][a-zA-Z0-9_]*$` and isn't `nativeData` ([Payload spec](payloads.md#payload-spec)).
 
+A feature setting C-S-S can't use, such as a negative `readCacheMaxAgeMs`, is read as if it were missing ([Feature settings](overview.md#feature-settings)).
+
 Config that parses runs. What a detector may read, how it guards its values and how it buckets its payloads are authoring rules that CI checks before config ships ([Meaning and authoring rules](README.md#meaning-and-authoring-rules)).
 
 ## Propagation

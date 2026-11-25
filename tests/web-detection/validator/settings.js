@@ -1,5 +1,6 @@
 import { isPlainObject } from '../../../util.js';
 import { MAX_READ_CACHE_MAX_AGE_MS } from '../../../web-detection-util.js';
+import { ruleLink } from './context.js';
 
 /**
  * Errors on the `readCacheMaxAgeMs` setting, and on the values `conditionalChanges` patches give it:
@@ -20,7 +21,7 @@ export function readCacheMaxAgeMsErrors(settings) {
         if (value === null) return;
         if (!Number.isInteger(value) || /** @type {number} */ (value) < 0 || /** @type {number} */ (value) > MAX_READ_CACHE_MAX_AGE_MS)
             errors.push(
-                `${label}: \`readCacheMaxAgeMs\` is null or an integer from 0 to ${MAX_READ_CACHE_MAX_AGE_MS}, and is ${JSON.stringify(value)}`,
+                `${label}: \`readCacheMaxAgeMs\` is null or an integer from 0 to ${MAX_READ_CACHE_MAX_AGE_MS}, and is ${JSON.stringify(value)}${ruleLink('featureSettings')}`,
             );
     };
     if ('readCacheMaxAgeMs' in settings) check(settings.readCacheMaxAgeMs, 'settings');
