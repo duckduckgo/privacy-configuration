@@ -174,10 +174,35 @@ Here the detector runs on every site when a breakage report is filed, but runs a
 | `where` | Optional. A predicate on the item's fields with literal values. It's tested as the item is recorded, outside any run, so it reads no names and no page values |
 | `delayMs` | Optional, default 0. The run is in a task `delayMs` after the arrival |
 | `sync` | Optional, default `false`. The run is in the listener, during dispatch, before the page's own listeners further along the event's path. Not with `delayMs`, and only on `click`, `visibilitychange` and `pagehide`, which need it ([The `observe` trigger](#the-observe-trigger)) |
+| `whenPending` | Optional, default `"run"`. What the arrival does while a run of the detector is pending ([Pending runs](#pending-runs)). Not with `sync` |
 
-Each arrival runs the detector once if its body gives an item from it. A batch of entries delivered together is one arrival, which runs the detector once if any entry passes the body's `durationThreshold` and `where`. The run reads the arrival through [`trigger`](sources.md#trigger), and earlier items through `observed`, so each body names a type a source in the detector reads ([The `observe` trigger](#the-observe-trigger)). Detectors due at the same time run in one task.
+Each arrival runs the detector once if its body gives an item from it, unless a run of the detector is pending. A batch of entries delivered together is one arrival, which runs the detector once if any entry passes the body's `durationThreshold` and `where`. The run reads the arrival through [`trigger`](sources.md#trigger), and earlier items through `observed`, so each body names a type a source in the detector reads ([The `observe` trigger](#the-observe-trigger)). Detectors due at the same time run in one task.
 
 A `sync` run adds its cost to the event's dispatch, so a `sync` `click` body delays the page's own response to the click.
+
+#### Pending runs
+
+A run is pending from when an arrival schedules it with `delayMs` until it's due. An arrival acts on the detector's latest pending run, whichever body scheduled it, as its body's `whenPending` sets:
+
+| `whenPending` | The arrival | What the run's `trigger` gives |
+|---|---|---|
+| `"run"` | Schedules its own run | Its own arrival |
+| `"skip"` | Schedules nothing | The pending run's arrival. `observed` reads the skipped one |
+| `"batch"` | Adds its items to the pending run, and schedules nothing | The items of every arrival batched into it, in the order they arrived |
+| `"replace"` | Cancels the pending run, and schedules its own | Its own arrival. `observed` reads the replaced one |
+
+With `"skip"` and `"batch"`, the detector runs `delayMs` after the first arrival, so it runs at most once per `delayMs` while arrivals keep coming. With `"replace"`, it runs `delayMs` after the last, once they stop:
+
+```jsonc
+// At most one run per 250 ms while anything scrolls, after the first scroll of each window
+{"event": "scroll", "delayMs": 250, "whenPending": "skip"}
+// One run 1 s after the first batch of frames, reading every batch since
+{"entryType": "long-animation-frame", "delayMs": 1000, "whenPending": "batch"}
+// One run 3 s after the last of several route changes
+{"event": "navigatesuccess", "target": {"api": "navigation"}, "delayMs": 3000, "whenPending": "replace"}
+```
+
+`scroll` arrives every frame while the page scrolls, so CI requires `"skip"` or `"batch"` on its bodies ([Recorded types](validation.md#recorded-types-and-observe)).
 
 #### The page hiding
 
@@ -336,6 +361,7 @@ CI rejects:
 - An `on` body naming a type that no `observed` or `trigger` source in the detector reads, apart from `visibilitychange` and `pagehide`.
 - An `on` body with `field`, or whose `where` holds a `ref` or any other expression. It's tested as the item is recorded, so it compares fields with literal values only.
 - A `visibilitychange` or `pagehide` body without `"sync": true`, and `sync` on a body other than these and `click`.
+- A body for a type that arrives every frame, `scroll`, without `whenPending` `"skip"` or `"batch"`, or with `delayMs` under `PER_FRAME_MIN_DELAY_MS` in [`web-detection-util.js`](../../web-detection-util.js). With `"batch"`, a `delayMs` over the type's `withinMs` cap, since the run keeps each event until it runs.
 
 ### Apple releases before C-S-S 19.0.0
 

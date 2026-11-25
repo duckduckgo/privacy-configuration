@@ -288,12 +288,14 @@ const DOCUMENT_TARGETS = [
  *   targets?: string[],
  *   sync?: 'required' | 'allowed',
  *   pageHiding?: boolean,
+ *   perFrame?: boolean,
  * }} EventTypeSpec
  *
  * `fields` are the names a detector reads on each event, by path, with the type each gives. `targets`
  * are the EVENT_TARGET_ALLOWLIST entries it's listened for on, which need stating when `window`, the
  * default, isn't one of them. `sync` is whether an `on` body of the type needs `sync: true`, or may
- * have it; without it, the body has no `sync`. `pageHiding` marks the events of the page hiding.
+ * have it; without it, the body has no `sync`. `pageHiding` marks the events of the page hiding, and
+ * `perFrame` the events that arrive every frame while the page changes.
  */
 
 const TARGET = /** @type {TypeSpec} */ ('Element|HTMLElement|null');
@@ -340,7 +342,7 @@ export const EVENT_TYPE_ALLOWLIST = {
     keydown: { fields: TARGET_FIELDS },
     touchstart: { fields: TOUCH_FIELDS },
     touchend: { fields: TOUCH_FIELDS },
-    scroll: { fields: TARGET_FIELDS },
+    scroll: { fields: TARGET_FIELDS, perFrame: true },
     visibilitychange: { fields: TIME_FIELDS, sync: 'required', pageHiding: true },
     pagehide: { fields: { ...TIME_FIELDS, persisted: 'boolean' }, sync: 'required', pageHiding: true },
     navigatesuccess: {

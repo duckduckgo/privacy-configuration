@@ -56,6 +56,7 @@ const PLACE_KEYS = {
         'where',
         'delayMs',
         'sync',
+        'whenPending',
     ],
 };
 

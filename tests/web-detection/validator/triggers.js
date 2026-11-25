@@ -6,6 +6,7 @@ import { checkRecordedBody, describeRecorded, itemTypeOf, sameRecorded } from '.
 import { checkPredicate } from './predicates.js';
 import { expressionKeysOf } from './walk.js';
 import { isPlainObject } from '../../../util.js';
+import { OBSERVED_KEEP_CAPS, OBSERVED_KEEP_CAPS_BY_TYPE, PER_FRAME_MIN_DELAY_MS } from '../../../web-detection-util.js';
 
 /**
  * @typedef {import('./context.js').Context} Context
@@ -86,7 +87,38 @@ export function checkTriggers(triggers, ctx, path) {
 }
 
 /**
- * One `on` body: a type, a `where` over literal values, `delayMs`, and `sync` where the type takes it.
+ * An `on` body for an event that arrives every frame: it runs the detector at most once per `delayMs`,
+ * and a batched run keeps no more events than the type's log can.
+ *
+ * @param {Record<string, unknown>} body
+ * @param {string} type
+ * @param {Context} ctx
+ * @param {string} path
+ */
+function checkPerFrame(body, type, ctx, path) {
+    if (body.whenPending !== 'skip' && body.whenPending !== 'batch') {
+        fail(
+            ctx,
+            path,
+            `\`${type}\` arrives every frame, so its body has \`whenPending\` "skip" or "batch" to run the detector once per \`delayMs\``,
+        );
+        return;
+    }
+    const delayMs = typeof body.delayMs === 'number' ? body.delayMs : 0;
+    if (delayMs < PER_FRAME_MIN_DELAY_MS)
+        fail(ctx, `${path}.delayMs`, `\`${type}\` arrives every frame, so \`delayMs\` is at least ${PER_FRAME_MIN_DELAY_MS}`);
+    const cap = OBSERVED_KEEP_CAPS_BY_TYPE.event?.[type]?.withinMs ?? OBSERVED_KEEP_CAPS.withinMs;
+    if (body.whenPending === 'batch' && delayMs > cap)
+        fail(
+            ctx,
+            `${path}.delayMs`,
+            `a batched run keeps each \`${type}\` until it runs, so \`delayMs\` is at most ${cap}, as for a \`keep\``,
+        );
+}
+
+/**
+ * One `on` body: a type, a `where` over literal values, `delayMs`, `sync` where the type takes it, and
+ * `whenPending`, which a type that arrives every frame needs.
  *
  * @param {unknown} body
  * @param {Context} ctx
@@ -124,6 +156,9 @@ function checkOnBody(body, ctx, path) {
     }
     if (body.sync === true && 'delayMs' in body)
         fail(ctx, `${path}.delayMs`, '`sync` runs the detector in the listener, so it takes no `delayMs`');
+    if (body.sync === true && 'whenPending' in body)
+        fail(ctx, `${path}.whenPending`, '`sync` runs the detector at the arrival, so no run is pending and it takes no `whenPending`');
+    if (recorded.kind === 'event' && EVENT_TYPE_ALLOWLIST[recorded.type].perFrame) checkPerFrame(body, recorded.type, ctx, path);
 
     if (!isPageHiding(recorded) && !ctx.recordedReads.some((read) => sameRecorded(read, recorded)))
         fail(

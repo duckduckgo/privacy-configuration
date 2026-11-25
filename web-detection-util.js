@@ -139,6 +139,12 @@ export const OBSERVED_KEEP_CAPS_BY_TYPE = Object.freeze({
 });
 
 /**
+ * The least `delayMs` of an `on` body for a type that arrives every frame, which has `whenPending`
+ * `"skip"` or `"batch"`, so the detector runs at most once per `delayMs`.
+ */
+export const PER_FRAME_MIN_DELAY_MS = 250;
+
+/**
  * The types an `observed` body may read with `keep: null`, every item recorded, by body key. Each
  * arrives a few times in a page's life.
  *

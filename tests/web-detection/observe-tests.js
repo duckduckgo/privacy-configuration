@@ -268,7 +268,7 @@ describe('webDetection config tests', () => {
             expectValid(
                 observing(
                     [
-                        { event: 'scroll', target: { api: 'visualViewport' } },
+                        { event: 'scroll', target: { api: 'visualViewport' }, delayMs: 250, whenPending: 'skip' },
                     ],
                     { define: { n: { trigger: { event: 'scroll', target: { api: 'visualViewport' } }, using: 'length' } } },
                 ),
@@ -286,7 +286,7 @@ describe('webDetection config tests', () => {
                 '`trigger` reads `scroll` events on `window`',
                 observing(
                     [
-                        { event: 'scroll', target: { api: 'visualViewport' } },
+                        { event: 'scroll', target: { api: 'visualViewport' }, delayMs: 250, whenPending: 'skip' },
                     ],
                     { define: { n: { trigger: { event: 'scroll' } } } },
                 ),
@@ -616,6 +616,88 @@ describe('webDetection config tests', () => {
                         { event: 'click', whenBusy: 'skip' },
                     ],
                     readsClicks,
+                ),
+            );
+        });
+
+        itAll('takes `whenPending` on a body with no `sync`', () => {
+            const readsClicks = { define: { n: { trigger: { event: 'click' }, using: 'length' } } };
+            expectValid(
+                observing(
+                    [
+                        { event: 'click', delayMs: 100, whenPending: 'replace' },
+                    ],
+                    readsClicks,
+                ),
+            );
+            expectError(
+                'so no run is pending and it takes no `whenPending`',
+                observing(
+                    [
+                        { event: 'click', sync: true, whenPending: 'skip' },
+                    ],
+                    readsClicks,
+                ),
+            );
+        });
+
+        itAll('runs on `scroll` at most once per `delayMs`, from 250, and batches no longer than its log', () => {
+            const readsScrolls = { define: { n: { trigger: { event: 'scroll' }, using: 'length' } } };
+            expectValid(
+                observing(
+                    [
+                        { event: 'scroll', delayMs: 250, whenPending: 'skip' },
+                    ],
+                    readsScrolls,
+                ),
+            );
+            expectValid(
+                observing(
+                    [
+                        { event: 'scroll', delayMs: 5000, whenPending: 'batch' },
+                    ],
+                    readsScrolls,
+                ),
+            );
+            for (const whenPending of [
+                undefined,
+                'run',
+                'replace',
+            ]) {
+                expectError(
+                    '`scroll` arrives every frame, so its body has `whenPending` "skip" or "batch"',
+                    observing(
+                        [
+                            { event: 'scroll', delayMs: 250, ...(whenPending && { whenPending }) },
+                        ],
+                        readsScrolls,
+                    ),
+                );
+            }
+            expectError(
+                '`scroll` arrives every frame, so `delayMs` is at least 250',
+                observing(
+                    [
+                        { event: 'scroll', whenPending: 'skip' },
+                    ],
+                    readsScrolls,
+                ),
+            );
+            expectError(
+                'a batched run keeps each `scroll` until it runs, so `delayMs` is at most 5000',
+                observing(
+                    [
+                        { event: 'scroll', delayMs: 5001, whenPending: 'batch' },
+                    ],
+                    readsScrolls,
+                ),
+            );
+            expectValid(
+                observing(
+                    [
+                        { event: 'scroll', delayMs: 6000, whenPending: 'skip' },
+                    ],
+                    readsScrolls,
                 ),
             );
         });
