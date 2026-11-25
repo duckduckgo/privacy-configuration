@@ -32,6 +32,17 @@ type SubFeatures<VersionType> = {
             refreshWindowSeconds: number;
         }
     >;
+    tabTerminationErrorPage?: SubFeature<
+        VersionType,
+        {
+            // Web content kills of one tab within timeWindowSeconds that show the error page instead of a reload
+            terminationCount?: number;
+            // Window in seconds over which terminationCount kills are counted
+            timeWindowSeconds?: number;
+            // Form factors that show the error page
+            supportedFormFactors?: ('phone' | 'tablet')[];
+        }
+    >;
     inactivityNotification?: SubFeature<
         VersionType,
         {
