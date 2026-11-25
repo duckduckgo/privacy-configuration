@@ -320,7 +320,6 @@ To take the first condition that holds, chain `if`s by nesting each one in the p
 |---|---|
 | `"x"` | A run name. Bound for the rest of the run |
 | `"this.x"` | A detector name. Bound for the detector in its frame, across every run and trigger, for the life of the injection |
-| Pattern | `^(this\.)?[a-zA-Z][a-zA-Z0-9_]*$` |
 | Write | `define` evaluates each value in place, in the order its keys are listed in config, and binds each name before evaluating the next value. `{"define": {"x": a, "y": b}}` is `[{"define": {"x": a}}, {"define": {"y": b}}]`, so `b` reads `x` |
 | Rebinding | Allowed. The latest binding wins |
 | Read | `{"ref": "x"}` reads the binding at the time of the read, in its own position |
@@ -366,5 +365,7 @@ CI rejects a type that the config shows is wrong for its position ([Positions](#
 - An argument whose type the config shows is wrong for its method.
 
 ### Bound names
+
+A `define` name and the name a `ref` reads fully match `^(this\.)?[a-zA-Z][a-zA-Z0-9_]*$`.
 
 A `ref` to a run name has a `define` binding it earlier in evaluation order, and a `ref` to a detector name has a `define` in the detector binding it. A name bound earlier on only some paths (inside one `if` branch) passes, and reads `undefined` where it isn't bound ([Names](#names)).

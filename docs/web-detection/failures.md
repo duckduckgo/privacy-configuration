@@ -47,7 +47,7 @@ C-S-S parses each detector when it loads its config. A detector parses when ever
 
 An unknown key is a parse error so that a client from before a key was added doesn't run the detector with a different meaning ([Versions](versions.md)).
 
-Two names are also checked when the detector parses: a payload key matches `^[a-zA-Z][a-zA-Z0-9_]*$` and isn't `nativeData` ([Payload spec](payloads.md#payload-spec)), and a `define` name matches the pattern in [Names](expressions.md#names).
+A payload key is also checked when the detector parses: it matches `^[a-zA-Z][a-zA-Z0-9_]*$` and isn't `nativeData` ([Payload spec](payloads.md#payload-spec)).
 
 Config that parses runs. What a detector may read, how it guards its values and how it buckets its payloads are authoring rules that CI checks before config ships ([Meaning and authoring rules](README.md#meaning-and-authoring-rules)).
 

@@ -335,7 +335,7 @@ function checkDefine(define, scope, ctx, path) {
         value,
     ] of Object.entries(define)) {
         const namePath = `${path}.${name}`;
-        if (!DEFINE_NAME_PATTERN.test(name)) fail(ctx, namePath, `name does not match ${DEFINE_NAME_PATTERN}`);
+        if (!DEFINE_NAME_PATTERN.test(name)) fail(ctx, namePath, `name does not match ${DEFINE_NAME_PATTERN}`, 'boundNames');
         // The top-level `all` of a bound value guards its operands, as a condition's does
         const type = checkExpr(value, 'value', { ...scope, conditionRoot: true }, ctx, namePath);
         if (name.startsWith('this.')) {
@@ -854,7 +854,7 @@ function checkIf(holder, position, scope, ctx, holderPath) {
  */
 function checkRef(body, position, scope, ctx, path) {
     if (typeof body !== 'string' || !DEFINE_NAME_PATTERN.test(body)) {
-        fail(ctx, path, `\`ref\` ${JSON.stringify(body)} does not match ${DEFINE_NAME_PATTERN}`);
+        fail(ctx, path, `\`ref\` ${JSON.stringify(body)} does not match ${DEFINE_NAME_PATTERN}`, 'boundNames');
         return UNKNOWN;
     }
     if (scope.inMatch) {
