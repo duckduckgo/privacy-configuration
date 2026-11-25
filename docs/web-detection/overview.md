@@ -103,7 +103,7 @@ When fields are omitted from config, detectors take these defaults:
 }
 ```
 
-The config build writes `"keep": {"count": 10, "withinMs": 5000}` onto every [`observed`](sources.md#observed) body without `keep`.
+The config build writes `"keep": {"count": 10, "withinMs": 5000}` onto every [`observed`](sources.md#observed) body without `keep`, and `"timeoutMs": 5000` onto every [`wait`](sources.md#wait) without `timeoutMs`.
 
 `actions` has no default, and a detector without it doesn't parse ([Parse errors](failures.md#parse-errors)).
 
@@ -161,9 +161,9 @@ Here the detector runs on every site when a breakage report is filed, but runs a
 "triggers": {
   "observe": {"state": "enabled", "on": [
     {"entryType": "long-animation-frame", "delayMs": 1000},
-    {"event": "click"},
-    {"event": "visibilitychange", "sync": true},
-    {"event": "pagehide", "sync": true}
+    {"event": "click", "sync": true, "whenBusy": "skip"},
+    {"event": "visibilitychange", "sync": true, "whenBusy": "interrupt"},
+    {"event": "pagehide", "sync": true, "whenBusy": "interrupt"}
   ]}
 }
 ```
@@ -175,10 +175,13 @@ Here the detector runs on every site when a breakage report is filed, but runs a
 | `delayMs` | Optional, default 0. The run is in a task `delayMs` after the arrival |
 | `sync` | Optional, default `false`. The run is in the listener, during dispatch, before the page's own listeners further along the event's path. Not with `delayMs`, and only on `click`, `visibilitychange` and `pagehide`, which need it ([The `observe` trigger](#the-observe-trigger)) |
 | `whenPending` | Optional, default `"run"`. What the arrival does while a run of the detector is pending ([Pending runs](#pending-runs)). Not with `sync` |
+| `whenBusy` | Optional, default `"queue"`. What the arrival does while a run of the detector is suspended in a [`wait`](sources.md#wait): `"queue"` runs it after the suspended run ends, `"interrupt"` abandons the suspended run and runs now, and `"skip"` runs nothing. A `sync` body has `"interrupt"` or `"skip"`, since a queued run happens after dispatch, and only `sync` bodies take `"interrupt"` ([The `observe` trigger](#the-observe-trigger)) |
 
 Each arrival runs the detector once if its body gives an item from it, unless a run of the detector is pending. A batch of entries delivered together is one arrival, which runs the detector once if any entry passes the body's `durationThreshold` and `where`. The run reads the arrival through [`trigger`](sources.md#trigger), and earlier items through `observed`, so each body names a type a source in the detector reads ([The `observe` trigger](#the-observe-trigger)). Detectors due at the same time run in one task.
 
-A `sync` run adds its cost to the event's dispatch, so a `sync` `click` body delays the page's own response to the click.
+A `sync` run adds its cost to the event's dispatch, up to its first `wait`, so a `sync` `click` body delays the page's own response to the click. A `wait` in a `sync` run starts during dispatch, so a `mutation` wait sees the changes the page's own listeners make for the event.
+
+An arrival whose body gives no item doesn't queue behind or interrupt a suspended run.
 
 #### Pending runs
 
@@ -206,7 +209,7 @@ With `"skip"` and `"batch"`, the detector runs `delayMs` after the first arrival
 
 #### The page hiding
 
-A detector that sends when the page hides observes `visibilitychange` and `pagehide`, each with `"sync": true`. After `pagehide`, the page's queued tasks may never run, and a hidden page's timers are throttled, so the run happens in the listener.
+A detector that sends when the page hides observes `visibilitychange` and `pagehide`, each with `"sync": true` and `"whenBusy": "interrupt"`. After `pagehide`, the page's queued tasks may never run, and a hidden page's timers are throttled, so the run happens in the listener. A run queued behind a `wait` would run only when that wait ends, which can be at its `timeoutMs`, so the hide interrupts a suspended run.
 
 A navigation away from a visible page fires `pagehide` and then `visibilitychange`, so the detector runs twice, with `document.hidden` `false` on the first run. A tab or app switch fires `visibilitychange` only. A detector that sends once tests `document.hidden` and a detector name before it sends:
 
@@ -295,6 +298,7 @@ An object can have expression keys (with their modifiers) or action keys, but no
 
 - A value that doesn't hold, or `undefined`, leaves the detector as it is. Several `done`s in a run combine by OR.
 - A `done` that held stays in effect if the run fails after it.
+- In a run suspended at a [`wait`](sources.md#wait), the detector is done when the run ends. A run abandoned by `"whenBusy": "interrupt"` ends there, so a `done` that held before its `wait` makes the detector done, and the interrupting arrival runs nothing.
 - `done` goes in a detector with no `match`, and not in `match` ([`match` and detector names](#match-and-detector-names)).
 
 A detector with no `match` and no `done` runs on every trigger for the life of the frame, and keeps recording the types it reads.
@@ -358,9 +362,10 @@ Group and detector names fully match `^[a-zA-Z][a-zA-Z0-9_]*$`, since each name 
 CI rejects:
 
 - An `observe` trigger with no body in `on`, and an `on` body that doesn't name exactly one type on the allowlists ([Recorded types](sources.md#recorded-types)).
-- An `on` body naming a type that no `observed` or `trigger` source in the detector reads, apart from `visibilitychange` and `pagehide`.
+- An `on` body naming a type that no `observed` or `trigger` source, or `wait` without a `target`, in the detector reads, apart from `visibilitychange` and `pagehide`.
 - An `on` body with `field`, or whose `where` holds a `ref` or any other expression. It's tested as the item is recorded, so it compares fields with literal values only.
-- A `visibilitychange` or `pagehide` body without `"sync": true`, and `sync` on a body other than these and `click`.
+- A `visibilitychange` or `pagehide` body without `"sync": true` and `"whenBusy": "interrupt"`, and `sync` on a body other than these and `click`.
+- A `sync` body without `"whenBusy": "interrupt"` or `"skip"`, and `"whenBusy": "interrupt"` on a body without `sync`.
 - A body for a type that arrives every frame, `scroll`, without `whenPending` `"skip"` or `"batch"`, or with `delayMs` under `PER_FRAME_MIN_DELAY_MS` in [`web-detection-util.js`](../../web-detection-util.js). With `"batch"`, a `delayMs` over the type's `withinMs` cap, since the run keeps each event until it runs.
 
 ### Apple releases before C-S-S 19.0.0

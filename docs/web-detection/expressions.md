@@ -23,6 +23,7 @@ A condition (a detector's [`match`](overview.md#match) or the condition of an `i
 | [`self`](#self) | What an `api` with the same body gives, read from the value `self` is bound to |
 | `observed` | A list of the items recorded of a type, over the body's `keep` window, or with `field`, of each one's value |
 | `trigger` | A list of the items of the arrival that started the run, or with `field`, of each one's value |
+| `wait` | The next item of a type to arrive, or with `field`, its value. `undefined` once `timeoutMs` passes ([`wait`](sources.md#wait)) |
 
 See [Sources](sources.md) for each source's keys and items.
 
@@ -58,6 +59,7 @@ This table shows what each expression gives in each position. "Refused by CI" ma
 | `any`, `all`, `none`, `is`, a boolean literal | A boolean | Refused by CI | Refused by CI | A boolean |
 | `if` with `else` | As its branches | As its branches | As its branches | As its branches |
 | `if` without `else`, a string literal, `null`, an action | Refused by CI | Refused by CI | Refused by CI | Its value |
+| `wait` | Its value, checked when read | Its value, checked when read | Refused by CI | Its value. It goes only where a run can suspend ([Where `wait` goes](sources.md#where-wait-goes)) |
 | `expr` over an array | Refused by CI | Refused by CI | The list | The list |
 
 ### Selected lists

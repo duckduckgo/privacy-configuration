@@ -9,10 +9,11 @@ A source reads the page. See [Values](expressions.md#values) for what each one g
 | [`api`](#api) | A Web API, by path: a property or a method's result |
 | [`observed`](#observed) | The performance entries or events of one type recorded in the frame, over a recent window |
 | [`trigger`](#trigger) | The arrival that started the run |
+| [`wait`](#wait) | The next arrival of a type, which the run suspends for |
 
 ## Lists: `where` and `field`
 
-`element`, `api`, `observed` and `trigger` take two keys that work on the items of a list:
+`element`, `api`, `observed`, `trigger` and `wait` take two keys that work on the items of a list:
 
 | Key | Meaning |
 |---|---|
@@ -281,7 +282,7 @@ An event's `timeStamp` is when the user acted, so input that waited behind a bus
 | `visualViewport` | Events dispatched at `visualViewport`, such as its `scroll` |
 | `navigation` | `navigate` and `navigatesuccess`, which are dispatched only there |
 
-A `target` is read once, when recording starts, so it's an `api` path on the target allowlist. To read the events on one element, test `target` in `where`, which also covers elements added later and elements the page re-renders.
+On `observed` and `on` bodies, a `target` is read once, when recording starts, so it's an `api` path on the target allowlist. A [`wait`](#wait) reads its `target` as it starts, so there it can be any expression. To read the events on one element, test `target` in `where`, which also covers elements added later and elements the page re-renders.
 
 ### `keep`
 
@@ -330,6 +331,76 @@ A body has exactly one of `entryType`, `event`, `auto` and `breakageReport`, and
 | An entry type | The entries the observer delivered together, which can be several after a long task |
 | An event | The event |
 | An `auto` timer, a breakage report | One item, whose `timeStamp` is when the run started |
+
+A body naming another type gives a list with no items, so in boolean position `{"trigger": {"event": "click"}}` holds only in a run a click started. A run with `delayMs` keeps its arrival's items until it runs. A run that arrivals were batched into gives the items of each, in the order they arrived ([Pending runs](overview.md#pending-runs)). CI rejects `trigger` in `match`, which reads the page only.
+
+## `wait`
+
+`wait` suspends the run until the next item of a type arrives, and gives that item, or `undefined` once `timeoutMs` passes.
+
+```jsonc
+{"wait": {"event": "click", "timeoutMs": 2000}}
+{"wait": {"entryType": "long-animation-frame", "where": {"blockingDuration": {"gte": 200}}, "timeoutMs": 5000}}
+{"wait": {"mutation": {"childList": true, "subtree": true}, "target": {"api": "document.body"}, "timeoutMs": 2500}}
+{"wait": {"event": "invalid", "target": {"ref": "form"}}, "is": {"type": "object"}}
+```
+
+| Key | Meaning |
+|---|---|
+| `entryType`, `durationThreshold`, `event` | The type, as on [`observed`](#observed) |
+| `mutation` | The options of `MutationObserver.observe()` ([Mutations](#mutations)). A body has one of `entryType`, `event` and `mutation` |
+| `target` | With `event`, optional, and `window` when absent. With `mutation`, required. Any expression giving an event target or node, read when the wait starts, such as an element the run read earlier |
+| `where` | Optional. A predicate or expression the item must pass. An item that fails it doesn't end the wait |
+| `field` | Optional. The value read from the item |
+| `timeoutMs` | The longest the wait lasts, in ms. Absent, it's 5000, which the config build writes onto the body |
+
+`wait` gives the first item that arrives after the wait starts and passes `where`. Items recorded before it starts are read with `observed`, so a detector that accepts an earlier item checks `observed` first:
+
+```jsonc
+// A scroll since the touch began, or one in the next 500 ms
+{"define": {"scrolled": {
+  "if": {"observed": {"event": "scroll", "where": {"timeStamp": {"gte": {"ref": "start", "using": "timeStamp"}}}}, "using": "length", "is": {"gt": 0}},
+  "then": true,
+  "else": {"wait": {"event": "scroll", "timeoutMs": 500}, "is": {"type": "object"}}
+}}}
+```
+
+### Where `wait` goes
+
+A run suspends at a `wait` only when it's reachable from `actions` through these, and a `wait` anywhere else is a parse error:
+
+- an element of a sequence
+- the condition or a branch of `if`
+- the operand of `expr`
+- the expression beside `using`
+- the value of a `define`, a `done` or a payload field
+
+An `is` on any of these is fine. Under an operator such as `any` or `sum`, in a source body or a predicate, and in `match`, a `wait` isn't reachable. A detector with a `wait` has its `breakageReport` trigger disabled ([Waits](#waits)).
+
+### Suspended runs
+
+| Rule | Detail |
+|---|---|
+| Names | The run's names and its place in the expression are kept while it's suspended. Values read before the `wait` aren't read again, so an element read before it may be detached by the time the run resumes |
+| `where` | Tested on each item as it arrives. A `ref` in it reads the run's names as they were when the wait started |
+| One run per detector | While a run is suspended, an arrival for the detector queues, interrupts or is skipped, as its `on` body's [`whenBusy`](overview.md#observe) sets. Queued runs run in order after the suspended run ends |
+| Interrupted | An arrival on a `"whenBusy": "interrupt"` body abandons the suspended run before its own run. The rest of the abandoned run never runs, and its `define`s of detector names and its `done`s before the `wait` stand |
+| Windows | `observed` reads its window as it is when evaluated, so a run that needs a window as it was before a `wait` binds it to a name first |
+
+### Mutations
+
+A `mutation` body observes the node its `target` gives with a `MutationObserver` while the wait is open:
+
+| Option | Values |
+|---|---|
+| `childList`, `subtree`, `characterData`, `attributes` | `true` |
+| `attributeFilter` | Attribute names on the mutation option allowlist ([Recorded types](#recorded-types)) |
+
+The body has at least one of `childList`, `attributes`, `characterData` and `attributeFilter`. The options and attribute names a body can give are on an allowlist in this repository's CI ([Recorded types](#recorded-types)). `mutation` goes in `wait` only.
+
+An item is a `MutationRecord`, read as `observed` items are. `timeStamp` is when the observer's callback ran, as a record has no time of its own. `target` is the parent for `childList`, the element for `attributes`, and the text node for `characterData`. Changes inside a shadow root or an iframe under the target aren't observed.
+
+A run that waits for the page's response to an input starts in the listener with [`sync`](overview.md#observe), so its `wait` starts before the page's own listeners change the page.
 
 A body naming another type gives a list with no items, so in boolean position `{"trigger": {"event": "click"}}` holds only in a run a click started. A run with `delayMs` keeps its arrival's items until it runs. A run that arrivals were batched into gives the items of each, in the order they arrived ([Pending runs](overview.md#pending-runs)). `trigger` doesn't go in `match`, which reads the page only ([Recorded types](#recorded-types)).
 
@@ -391,13 +462,19 @@ The list passed to `apply` must be one the config shows is a list: a selected li
 
 ### Recorded types
 
-The entry types, event types and targets a body can name, and the fields each item has, are on `ENTRY_TYPE_ALLOWLIST`, `EVENT_TYPE_ALLOWLIST` and `EVENT_TARGET_ALLOWLIST` in [`grammar.js`](../../tests/web-detection/validator/grammar.js). A detector that reads a type or field not on the lists adds it in the same change. Fields that can contain what the user typed or copied, such as `key`, `data`, `inputType` and `clipboardData`, stay off the lists unless a privacy triage adds them, and `unload` and `beforeunload` are never on them. These are review rules.
+The entry types, event types and targets a body can name, and the fields each item has, are on `ENTRY_TYPE_ALLOWLIST`, `EVENT_TYPE_ALLOWLIST`, `EVENT_TARGET_ALLOWLIST`, `MUTATION_OPTION_ALLOWLIST` and `MUTATION_FIELDS` in [`grammar.js`](../../tests/web-detection/validator/grammar.js). A detector that reads a type or field not on the lists adds it in the same change. Fields that can contain what the user typed or copied, such as `key`, `data`, `inputType` and `clipboardData`, stay off the lists unless a privacy triage adds them, `unload` and `beforeunload` are never on them, and nor are `attributeOldValue` and `characterDataOldValue`, as the old values are the page's text and attribute values. These are review rules.
 
 CI rejects:
 
-- An `observed` or `trigger` body that doesn't name exactly one type: an `entryType` or an `event` on the allowlists, or for `trigger`, `auto` or `breakageReport` as `{}`. A body with a key of another kind of body, such as `keep` outside `observed`.
+- An `observed`, `trigger` or `wait` body that doesn't name exactly one type: an `entryType` or an `event` on the allowlists, for `trigger`, `auto` or `breakageReport` as `{}`, or for `wait`, `mutation`. A body with a key of another kind of body, such as `keep` outside `observed`, or `timeoutMs` or `mutation` outside `wait`.
 - `durationThreshold` other than on the `event` entry type, or below 16.
-- `target` other than with `event`, or other than an `api` path on the target allowlist. `navigate` and `navigatesuccess` need `"target": {"api": "navigation"}`, which no other event type takes.
+- `target` other than with `event` or `mutation`. On `observed` and `trigger` bodies, a `target` other than an `api` path on the target allowlist. `navigate` and `navigatesuccess` need `"target": {"api": "navigation"}`, which no other event type takes. A `wait`'s `target` can be any expression, other than one the config shows gives a list or something other than an object.
+- A `mutation` body without `target`, with an option off the allowlist or set to anything but `true`, with an `attributeFilter` that's empty or names an attribute off the allowlist, or with none of `childList`, `attributes`, `characterData` and `attributeFilter`.
 - A name that `where`, `field` or `using` reads on an item and that isn't on the field allowlist of the item's type. Names read from `target` are checked against the [element allowlist](#element-allowlist).
 - A `keep` of `{}`, or a `count` or `withinMs` that isn't a positive integer or is over the cap for its type (`OBSERVED_KEEP_CAPS` and `OBSERVED_KEEP_CAPS_BY_TYPE` in [`web-detection-util.js`](../../web-detection-util.js)), and `keep: null` on a type outside `UNBOUNDED_KEEP_TYPES`.
 - A `trigger` body whose type and target match no body of the detector's `on`, one naming `auto` or `breakageReport` when the detector doesn't enable that trigger, and `trigger` in `match`.
+
+### Waits
+
+- `timeoutMs` is at most `MAX_WAIT_TIMEOUT_MS`, and is `null` only while `ALLOW_UNBOUNDED_WAIT` is on (both in [`web-detection-util.js`](../../web-detection-util.js)).
+- A detector with a `wait` has its `breakageReport` trigger disabled, which it isn't by default, so a breakage report never waits on a run.
