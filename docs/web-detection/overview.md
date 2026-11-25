@@ -185,7 +185,7 @@ An arrival whose body gives no item doesn't queue behind or interrupt a suspende
 
 #### Pending runs
 
-A run is pending from when an arrival schedules it with `delayMs` until it's due. An arrival acts on the detector's latest pending run, whichever body scheduled it, as its body's `whenPending` sets:
+A run is pending from when an arrival schedules it with `delayMs` until it's due, and while it's queued behind a run suspended in a `wait`. An arrival acts on the detector's latest pending run, whichever body scheduled it, as its body's `whenPending` sets:
 
 | `whenPending` | The arrival | What the run's `trigger` gives |
 |---|---|---|
@@ -204,6 +204,8 @@ With `"skip"` and `"batch"`, the detector runs `delayMs` after the first arrival
 // One run 3 s after the last of several route changes
 {"event": "navigatesuccess", "target": {"api": "navigation"}, "delayMs": 3000, "whenPending": "replace"}
 ```
+
+With `"whenBusy": "queue"` and `"skip"` or `"batch"`, a detector has at most one run queued behind a suspended one, and later arrivals are skipped or batched into it.
 
 `scroll` arrives every frame while the page scrolls, so CI requires `"skip"` or `"batch"` on its bodies ([Recorded types](validation.md#recorded-types-wait-and-observe)).
 
