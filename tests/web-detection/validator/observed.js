@@ -213,15 +213,20 @@ export function checkRecordedBody(body, place, ctx, path) {
     let known = true;
     if (kind === 'entryType') {
         if (!Object.hasOwn(ENTRY_TYPE_ALLOWLIST, type)) {
-            fail(ctx, typePath, `entry type "${type}" is not on ENTRY_TYPE_ALLOWLIST`);
+            fail(ctx, typePath, `entry type "${type}" is not on ENTRY_TYPE_ALLOWLIST`, 'recordedTypes');
             known = false;
         }
         if ('target' in body) fail(ctx, `${path}.target`, '`target` goes with `event` only');
     } else if (NEVER_EVENT_TYPES.includes(type)) {
-        fail(ctx, typePath, `"${type}" is never listened for, since a listener for it takes the page out of the back/forward cache`);
+        fail(
+            ctx,
+            typePath,
+            `"${type}" is never listened for, since a listener for it takes the page out of the back/forward cache`,
+            'recordedTypes',
+        );
         known = false;
     } else if (!Object.hasOwn(EVENT_TYPE_ALLOWLIST, type)) {
-        fail(ctx, typePath, `event type "${type}" is not on EVENT_TYPE_ALLOWLIST`);
+        fail(ctx, typePath, `event type "${type}" is not on EVENT_TYPE_ALLOWLIST`, 'recordedTypes');
         known = false;
     }
 
@@ -229,9 +234,14 @@ export function checkRecordedBody(body, place, ctx, path) {
         const min = kind === 'entryType' && known ? ENTRY_TYPE_ALLOWLIST[type].minDurationThreshold : undefined;
         const threshold = body.durationThreshold;
         if (min === undefined) {
-            fail(ctx, `${path}.durationThreshold`, '`durationThreshold` goes with an entry type whose observer takes it, `event` only');
+            fail(
+                ctx,
+                `${path}.durationThreshold`,
+                '`durationThreshold` goes with an entry type whose observer takes it, `event` only',
+                'recordedTypes',
+            );
         } else if (typeof threshold !== 'number' || !Number.isFinite(threshold) || threshold < min) {
-            fail(ctx, `${path}.durationThreshold`, `\`durationThreshold\` is a number, at least ${min}`);
+            fail(ctx, `${path}.durationThreshold`, `\`durationThreshold\` is a number, at least ${min}`, 'recordedTypes');
         }
     }
 
@@ -245,6 +255,7 @@ export function checkRecordedBody(body, place, ctx, path) {
                 ctx,
                 `${path}.target`,
                 `${PLACE_NAMES[place]}'s \`target\` is registered once, as the page loads, and is \`{"api": <path>}\` with a path on EVENT_TARGET_ALLOWLIST: ${EVENT_TARGET_ALLOWLIST.join(', ')}`,
+                'recordedTypes',
             );
             return undefined;
         }
@@ -256,7 +267,7 @@ export function checkRecordedBody(body, place, ctx, path) {
         fail(
             ctx,
             'target' in body ? `${path}.target` : path,
-            `"${type}" is listened for on ${targets.map((name) => `\`${name}\``).join(', ')} only${'target' in body ? '' : ', and `target` is `window` when absent'}`,
+            `"${type}" is listened for on ${targets.map((name) => `\`${name}\``, 'recordedTypes').join(', ')} only${'target' in body ? '' : ', and `target` is `window` when absent'}`,
         );
     }
     return { kind, type, target };
@@ -286,7 +297,7 @@ function checkKeep(body, recorded, ctx, path) {
                     types,
                 ]) => types.map((type) => `\`${type}\` ${kind === 'event' ? 'events' : 'entries'}`),
             );
-            fail(ctx, keepPath, `\`keep: null\` reads every item recorded, which only ${unbounded.join(' and ')} take`);
+            fail(ctx, keepPath, `\`keep: null\` reads every item recorded, which only ${unbounded.join(' and ')} take`, 'recordedTypes');
         }
         return;
     }
@@ -302,8 +313,10 @@ function checkKeep(body, recorded, ctx, path) {
     ] of Object.entries(keep)) {
         if (!Object.hasOwn(caps, key))
             fail(ctx, `${keepPath}.${key}`, `"${key}" is not a key of \`keep\`, which takes \`count\` and \`withinMs\``);
-        else if (!Number.isInteger(value) || value < 1) fail(ctx, `${keepPath}.${key}`, `\`${key}\` is a positive integer`);
-        else if (value > caps[key]) fail(ctx, `${keepPath}.${key}`, `\`${key}\` is at most ${caps[key]} for ${describeRecorded(recorded)}`);
+        else if (!Number.isInteger(value) || value < 1)
+            fail(ctx, `${keepPath}.${key}`, `\`${key}\` is a positive integer`, 'recordedTypes');
+        else if (value > caps[key])
+            fail(ctx, `${keepPath}.${key}`, `\`${key}\` is at most ${caps[key]} for ${describeRecorded(recorded)}`, 'recordedTypes');
     }
 }
 
@@ -320,7 +333,7 @@ function checkKeep(body, recorded, ctx, path) {
  * @returns {StaticType}
  */
 export function checkRecordedSource(key, body, position, scope, ctx, path) {
-    if (key === 'trigger' && scope.inMatch) fail(ctx, path, '`match` reads the page only, and holds no `trigger`');
+    if (key === 'trigger' && scope.inMatch) fail(ctx, path, '`match` reads the page only, and holds no `trigger`', 'recordedTypes');
     expectPosition(ctx, path, `\`${key}\``, position, [
         'boolean',
         'value',
@@ -332,7 +345,7 @@ export function checkRecordedSource(key, body, position, scope, ctx, path) {
     const recorded = checkRecordedBody(body, key, ctx, path);
     if (!isPlainObject(body)) return UNKNOWN;
     const hasField = 'field' in body;
-    if (hasField && position === 'boolean') fail(ctx, path, `\`${key}\` with \`field\`: ${LIST_CONDITION}`);
+    if (hasField && position === 'boolean') fail(ctx, path, `\`${key}\` with \`field\`: ${LIST_CONDITION}`, 'types');
     if (recorded) {
         ctx.recordedReads.push(recorded);
         if (key === 'observed') checkKeep(body, recorded, ctx, path);
@@ -358,7 +371,12 @@ export function checkRecordedSource(key, body, position, scope, ctx, path) {
 function checkStartedBy(recorded, ctx, path) {
     if (RUN_START_KINDS.includes(recorded.kind)) {
         if (!ctx.enabledTriggers.has(recorded.kind))
-            fail(ctx, path, `\`trigger\` reads a run the \`${recorded.kind}\` trigger started, and the detector doesn't enable it`);
+            fail(
+                ctx,
+                path,
+                `\`trigger\` reads a run the \`${recorded.kind}\` trigger started, and the detector doesn't enable it`,
+                'recordedTypes',
+            );
         return;
     }
     if (!ctx.onBodies.some((on) => sameRecorded(on, recorded)))
@@ -366,6 +384,7 @@ function checkStartedBy(recorded, ctx, path) {
             ctx,
             path,
             `\`trigger\` reads ${describeRecorded(recorded)}, and no body of the \`observe\` trigger's \`on\` names them, so it never gives an item`,
+            'recordedTypes',
         );
 }
 

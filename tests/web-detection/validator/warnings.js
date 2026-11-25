@@ -101,7 +101,7 @@ export function pageHidingEventErrors(detector, path) {
     if (!hiding.length) return [];
     return unguardedEvents(detector.actions, `${path}.actions`, true).map(
         (eventPath) =>
-            `${eventPath}: the detector runs each time the page hides (${hiding.join(', ')}), and a navigation away runs it on both, so the event goes inside an \`if\` on a detector name its branch binds, or in a sequence with \`{"done": true}\``,
+            `${eventPath}: the detector runs each time the page hides (${hiding.join(', ')}), and a navigation away runs it on both, so the event goes inside an \`if\` on a detector name its branch binds, or in a sequence with \`{"done": true}\`${ruleLink('events')}`,
     );
 }
 

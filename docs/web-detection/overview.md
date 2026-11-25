@@ -202,7 +202,7 @@ With `"skip"` and `"batch"`, the detector runs `delayMs` after the first arrival
 {"event": "navigatesuccess", "target": {"api": "navigation"}, "delayMs": 3000, "whenPending": "replace"}
 ```
 
-`scroll` arrives every frame while the page scrolls, so CI requires `"skip"` or `"batch"` on its bodies ([Recorded types](validation.md#recorded-types-and-observe)).
+`scroll` arrives every frame while the page scrolls, so CI requires `"skip"` or `"batch"` on its bodies ([The `observe` trigger](#the-observe-trigger)).
 
 #### The page hiding
 

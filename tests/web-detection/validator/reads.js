@@ -436,7 +436,7 @@ function readRecordedField(fieldPaths, name, isCall, ctx, path) {
         const read = dot === -1 ? name : `${fieldPath.slice(dot + 1)}.${name}`;
         const fields = recordedTable(table);
         if (isCall) {
-            fail(ctx, path, `calls "${read}" on ${describeTable(table)} items, whose field allowlist lists no method`);
+            fail(ctx, path, `calls "${read}" on ${describeTable(table)} items, whose field allowlist lists no method`, 'recordedTypes');
         } else if (Object.hasOwn(fields, read)) {
             results.push(typeFromSpec(fields[read]));
         } else if (Object.keys(fields).some((field) => field.startsWith(`${read}.`))) {
@@ -451,6 +451,7 @@ function readRecordedField(fieldPaths, name, isCall, ctx, path) {
                 ctx,
                 path,
                 `reads "${read}" on ${describeTable(table)} items, which is not on its field allowlist: ${Object.keys(fields).join(', ')}`,
+                'recordedTypes',
             );
         }
     }

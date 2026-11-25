@@ -88,6 +88,8 @@ export const RULES = /** @type {const} */ ({
     matchNames: 'overview.md#match-and-detector-names',
     events: 'overview.md#events',
     featureSettings: 'overview.md#feature-setting-values',
+    recordedTypes: 'sources.md#recorded-types',
+    observeTrigger: 'overview.md#the-observe-trigger',
 });
 
 /**

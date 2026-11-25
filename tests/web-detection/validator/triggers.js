@@ -80,7 +80,7 @@ export function checkTriggers(triggers, ctx, path) {
     }
     const on = observe.on;
     if (!Array.isArray(on) || on.length === 0) {
-        fail(ctx, `${observePath}.on`, '`on` lists at least one body: the types whose arrival runs the detector');
+        fail(ctx, `${observePath}.on`, '`on` lists at least one body: the types whose arrival runs the detector', 'observeTrigger');
         return;
     }
     on.forEach((body, index) => checkOnBody(body, ctx, `${observePath}.on[${index}]`));
@@ -101,18 +101,25 @@ function checkPerFrame(body, type, ctx, path) {
             ctx,
             path,
             `\`${type}\` arrives every frame, so its body has \`whenPending\` "skip" or "batch" to run the detector once per \`delayMs\``,
+            'observeTrigger',
         );
         return;
     }
     const delayMs = typeof body.delayMs === 'number' ? body.delayMs : 0;
     if (delayMs < PER_FRAME_MIN_DELAY_MS)
-        fail(ctx, `${path}.delayMs`, `\`${type}\` arrives every frame, so \`delayMs\` is at least ${PER_FRAME_MIN_DELAY_MS}`);
+        fail(
+            ctx,
+            `${path}.delayMs`,
+            `\`${type}\` arrives every frame, so \`delayMs\` is at least ${PER_FRAME_MIN_DELAY_MS}`,
+            'observeTrigger',
+        );
     const cap = OBSERVED_KEEP_CAPS_BY_TYPE.event?.[type]?.withinMs ?? OBSERVED_KEEP_CAPS.withinMs;
     if (body.whenPending === 'batch' && delayMs > cap)
         fail(
             ctx,
             `${path}.delayMs`,
             `a batched run keeps each \`${type}\` until it runs, so \`delayMs\` is at most ${cap}, as for a \`keep\``,
+            'observeTrigger',
         );
 }
 
@@ -131,7 +138,12 @@ function checkOnBody(body, ctx, path) {
     if ('where' in body) {
         // C-S-S tests it as the item is recorded, outside any run, so it reads no name or page value
         if (holdsExpression(body.where))
-            fail(ctx, `${path}.where`, "an `on` body's `where` is tested outside a run, so it compares fields with literal values only");
+            fail(
+                ctx,
+                `${path}.where`,
+                "an `on` body's `where` is tested outside a run, so it compares fields with literal values only",
+                'observeTrigger',
+            );
         if (recorded) {
             const itemType = itemTypeOf(recorded);
             checkPredicate(body.where, 'item', itemType, { ...bindItem(PAYLOAD_SCOPE, itemType), underNone: false }, ctx, `${path}.where`);
@@ -148,9 +160,15 @@ function checkOnBody(body, ctx, path) {
             ctx,
             path,
             `\`${recorded.type}\` runs the detector as the page hides, when a later task may never run, so it needs \`"sync": true\``,
+            'observeTrigger',
         );
     } else if (sync === undefined && 'sync' in body) {
-        fail(ctx, `${path}.sync`, '`sync` runs the detector during dispatch, on `click`, `visibilitychange` and `pagehide` bodies only');
+        fail(
+            ctx,
+            `${path}.sync`,
+            '`sync` runs the detector during dispatch, on `click`, `visibilitychange` and `pagehide` bodies only',
+            'observeTrigger',
+        );
     } else if ('sync' in body && typeof body.sync !== 'boolean') {
         fail(ctx, `${path}.sync`, '`sync` is a boolean');
     }
@@ -165,5 +183,6 @@ function checkOnBody(body, ctx, path) {
             ctx,
             path,
             `runs the detector on ${describeRecorded(recorded)}, which no \`observed\` or \`trigger\` source in the detector reads: a run reads its arrival through \`trigger\``,
+            'observeTrigger',
         );
 }
