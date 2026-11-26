@@ -1504,6 +1504,367 @@
                         }
                     ]
                 },
+                "soft404_features": {
+                    "state": "disabled",
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    3000,
+                                    10000
+                                ]
+                            }
+                        }
+                    },
+                    "match": {
+                        "if": {
+                            "all": [
+                                {
+                                    "div": [
+                                        {
+                                            "text": {
+                                                "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                                "pattern": "\\S"
+                                            },
+                                            "using": "length"
+                                        },
+                                        {
+                                            "api": {
+                                                "path": "performance.getEntriesByType",
+                                                "args": [
+                                                    "navigation"
+                                                ],
+                                                "field": "decodedBodySize"
+                                            }
+                                        }
+                                    ],
+                                    "is": {
+                                        "lt": 0.15
+                                    }
+                                },
+                                {
+                                    "any": [
+                                        {
+                                            "element": {
+                                                "selector": "img"
+                                            },
+                                            "using": "length",
+                                            "is": {
+                                                "lt": 2
+                                            }
+                                        },
+                                        {
+                                            "api": {
+                                                "path": "Array.from",
+                                                "args": [
+                                                    {
+                                                        "api": {
+                                                            "path": "document.title.matchAll",
+                                                            "args": [
+                                                                "\\S+"
+                                                            ]
+                                                        }
+                                                    }
+                                                ]
+                                            },
+                                            "using": "length",
+                                            "is": {
+                                                "lte": 3
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        "then": {
+                            "text": {
+                                "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                "pattern": [
+                                    "\\b404\\b",
+                                    "\\berror\\b",
+                                    "\\bfound\\b",
+                                    "\\bpage\\b",
+                                    "\\bfile\\b",
+                                    "\\bresource\\b",
+                                    "\\burl\\b",
+                                    "\\baccess denied\\b",
+                                    "\\bforbidden\\b",
+                                    "\\bunavailable\\b",
+                                    "\\bgone\\b",
+                                    "\\bredirect\\b",
+                                    "\\btemporary\\b",
+                                    "\\bpermanent\\b",
+                                    "\\bserver\\b",
+                                    "\\bclient\\b",
+                                    "\\bbrowser\\b",
+                                    "\\bnetwork\\b",
+                                    "\\bdns\\b",
+                                    "\\btypo\\b",
+                                    "\\bmisspelling\\b",
+                                    "\\bstale\\b",
+                                    "\\bbroken\\b",
+                                    "\\bdead\\b",
+                                    "\\bobsolete\\b",
+                                    "\\bexpired\\b",
+                                    "\\binvalid\\b",
+                                    "\\bmalformed\\b",
+                                    "\\bcorrupt\\b",
+                                    "\\bunreachable\\b",
+                                    "\\bdeleted\\b"
+                                ]
+                            },
+                            "using": "length",
+                            "is": {
+                                "gte": 5
+                            }
+                        },
+                        "else": false
+                    },
+                    "actions": [
+                        {
+                            "define": {
+                                "bodyTextLength": {
+                                    "text": {
+                                        "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                        "pattern": "\\S"
+                                    },
+                                    "using": "length"
+                                },
+                                "contentByteRatio": {
+                                    "div": [
+                                        {
+                                            "ref": "bodyTextLength"
+                                        },
+                                        {
+                                            "api": {
+                                                "path": "performance.getEntriesByType",
+                                                "args": [
+                                                    "navigation"
+                                                ],
+                                                "field": "decodedBodySize"
+                                            }
+                                        }
+                                    ]
+                                },
+                                "keywordCount": {
+                                    "text": {
+                                        "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                        "pattern": [
+                                            "\\b404\\b",
+                                            "\\berror\\b",
+                                            "\\bfound\\b",
+                                            "\\bpage\\b",
+                                            "\\bfile\\b",
+                                            "\\bresource\\b",
+                                            "\\burl\\b",
+                                            "\\baccess denied\\b",
+                                            "\\bforbidden\\b",
+                                            "\\bunavailable\\b",
+                                            "\\bgone\\b",
+                                            "\\bredirect\\b",
+                                            "\\btemporary\\b",
+                                            "\\bpermanent\\b",
+                                            "\\bserver\\b",
+                                            "\\bclient\\b",
+                                            "\\bbrowser\\b",
+                                            "\\bnetwork\\b",
+                                            "\\bdns\\b",
+                                            "\\btypo\\b",
+                                            "\\bmisspelling\\b",
+                                            "\\bstale\\b",
+                                            "\\bbroken\\b",
+                                            "\\bdead\\b",
+                                            "\\bobsolete\\b",
+                                            "\\bexpired\\b",
+                                            "\\binvalid\\b",
+                                            "\\bmalformed\\b",
+                                            "\\bcorrupt\\b",
+                                            "\\bunreachable\\b",
+                                            "\\bdeleted\\b"
+                                        ]
+                                    },
+                                    "using": "length"
+                                }
+                            }
+                        },
+                        {
+                            "breakageReportData": {
+                                "data": {
+                                    "contentByteRatio": {
+                                        "value": {
+                                            "ref": "contentByteRatio"
+                                        }
+                                    },
+                                    "keywordCount": {
+                                        "value": {
+                                            "ref": "keywordCount"
+                                        }
+                                    },
+                                    "bodyTextLength": {
+                                        "value": {
+                                            "ref": "bodyTextLength"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "if": {
+                                "ref": "bodyTextLength",
+                                "is": {
+                                    "lt": 2000
+                                }
+                            },
+                            "then": [
+                                {
+                                    "if": {
+                                        "ref": "keywordCount",
+                                        "is": {
+                                            "gte": 5,
+                                            "lt": 10
+                                        }
+                                    },
+                                    "then": {
+                                        "fireEvent": {
+                                            "type": "soft404Features_keywords5to9"
+                                        }
+                                    }
+                                },
+                                {
+                                    "if": {
+                                        "ref": "keywordCount",
+                                        "is": {
+                                            "gte": 10,
+                                            "lt": 25
+                                        }
+                                    },
+                                    "then": {
+                                        "fireEvent": {
+                                            "type": "soft404Features_keywords10to24"
+                                        }
+                                    }
+                                },
+                                {
+                                    "if": {
+                                        "ref": "keywordCount",
+                                        "is": {
+                                            "gte": 25
+                                        }
+                                    },
+                                    "then": {
+                                        "fireEvent": {
+                                            "type": "soft404Features_keywords25Plus"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "failure_phrases_small_page": {
+                    "state": "disabled",
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    3000,
+                                    10000
+                                ]
+                            }
+                        }
+                    },
+                    "match": {
+                        "if": {
+                            "text": {
+                                "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                "pattern": [
+                                    "something went wrong",
+                                    "temporary error",
+                                    "this is taking longer than"
+                                ]
+                            }
+                        },
+                        "then": {
+                            "text": {
+                                "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                "pattern": "\\S"
+                            },
+                            "using": "length",
+                            "is": {
+                                "lt": 2000
+                            }
+                        },
+                        "else": false
+                    },
+                    "actions": [
+                        {
+                            "define": {
+                                "bodyTextLength": {
+                                    "text": {
+                                        "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                        "pattern": "\\S"
+                                    },
+                                    "using": "length"
+                                }
+                            }
+                        },
+                        {
+                            "breakageReportData": {
+                                "data": {
+                                    "bodyTextLength": {
+                                        "value": {
+                                            "ref": "bodyTextLength"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "if": {
+                                "ref": "bodyTextLength",
+                                "is": {
+                                    "gte": 0,
+                                    "lt": 500
+                                }
+                            },
+                            "then": {
+                                "fireEvent": {
+                                    "type": "failurePhrasesSmallPage_text0to499"
+                                }
+                            }
+                        },
+                        {
+                            "if": {
+                                "ref": "bodyTextLength",
+                                "is": {
+                                    "gte": 500,
+                                    "lt": 1000
+                                }
+                            },
+                            "then": {
+                                "fireEvent": {
+                                    "type": "failurePhrasesSmallPage_text500to999"
+                                }
+                            }
+                        },
+                        {
+                            "if": {
+                                "ref": "bodyTextLength",
+                                "is": {
+                                    "gte": 1000,
+                                    "lt": 2000
+                                }
+                            },
+                            "then": {
+                                "fireEvent": {
+                                    "type": "failurePhrasesSmallPage_text1000to1999"
+                                }
+                            }
+                        }
+                    ]
+                },
                 "title_unavailable_en": {
                     "state": "disabled",
                     "match": {
@@ -2143,6 +2504,103 @@
                                     "then": {"fireEvent": {"type": "brokenImages_share90Plus"}}
                                 }
                             ]
+                        }
+                    ]
+                }
+            },
+            "protectionsBreakage": {
+                // Measurement, read again for each breakage report. It fires no event
+                "visible_content_counters": {
+                    "state": "disabled",
+                    // One read, 5 s after the detector starts
+                    "triggers": {
+                        "auto": {
+                            "state": "enabled",
+                            "when": {
+                                "intervalMs": [
+                                    5000
+                                ]
+                            }
+                        }
+                    },
+                    "actions": [
+                        // Whitespace, which the text length leaves out
+                        {
+                            "define": {
+                                "ws": {
+                                    "api": {
+                                        "path": "RegExp",
+                                        "args": [
+                                            "\\s+",
+                                            "g"
+                                        ]
+                                    }
+                                }
+                            }
+                        },
+                        // Measurement: loaded images, broken images and rendered text length. An image our protections block reads as broken
+                        {
+                            "breakageReportData": {
+                                "data": {
+                                    "loadedImages": {
+                                        "value": {
+                                            "element": {
+                                                "selector": "img",
+                                                "where": {
+                                                    "complete": true,
+                                                    "naturalWidth": {
+                                                        "gt": 0
+                                                    }
+                                                }
+                                            },
+                                            "using": "length"
+                                        }
+                                    },
+                                    "brokenImages": {
+                                        "value": {
+                                            "element": {
+                                                "selector": "img",
+                                                "where": {
+                                                    "complete": true,
+                                                    "naturalWidth": 0,
+                                                    "currentSrc.length": {
+                                                        "gt": 0
+                                                    }
+                                                }
+                                            },
+                                            "using": "length"
+                                        }
+                                    },
+                                    // Non-whitespace characters, summed over chunks of about 8 KB so no copy of the whole text is kept
+                                    "bodyTextLength": {
+                                        "value": {
+                                            "sum": {
+                                                "iter": {
+                                                    "text": {
+                                                        "xpath": "//body//text()[not(ancestor::script) and not(ancestor::style) and not(ancestor::template) and not(ancestor::noscript)]",
+                                                        "pattern": "[\\s\\S]+"
+                                                    }
+                                                },
+                                                "field": {
+                                                    "api": {
+                                                        "path": "String.prototype.replace.call",
+                                                        "args": [
+                                                            {
+                                                                "self": {}
+                                                            },
+                                                            {
+                                                                "ref": "ws"
+                                                            },
+                                                            ""
+                                                        ]
+                                                    },
+                                                    "using": "length"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                     ]
                 }
