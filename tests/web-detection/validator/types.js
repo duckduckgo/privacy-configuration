@@ -9,7 +9,7 @@ import { asArray } from './walk.js';
 /**
  * What an expression's position expects, as C-S-S names it. `list` is the operand of `only`.
  * `spread` is an operand of `sum`, `mul`, `any`, `all` and `none` that gives a list, contributing
- * each item. `root` is the `root` of a source.
+ * each item, and the position in which an `iter` streams. `root` is the `root` of a source.
  *
  * @typedef {'boolean' | 'value' | 'number' | 'list' | 'spread' | 'root'} Position
  */
@@ -27,6 +27,7 @@ import { asArray } from './walk.js';
  *   list?: 'selected' | 'array' | 'maybe',
  *   leaf?: boolean,
  *   nonNumericStrings?: boolean,
+ *   recipe?: boolean,
  * }} StaticType
  *
  * `types` is null when config does not show the type. `nan` is set when the value can be NaN.
@@ -48,6 +49,9 @@ import { asArray } from './walk.js';
  *
  * `nonNumericStrings` is set when every string the value can be is a literal that converts to
  * NaN, such as `"unsupported"`, so a comparison on it is false.
+ *
+ * `recipe` marks a name bound to an `iter`, which each `ref` evaluates again, so a `ref` to it
+ * fills the positions an `iter` fills.
  */
 
 /** @type {StaticType} */

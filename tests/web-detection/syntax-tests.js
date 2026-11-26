@@ -783,5 +783,157 @@ describe('webDetection config tests', () => {
                 expectValid({ sum: fieldOf('p', { ...rendered({ self: {} }), using: 'length' }), is: { gt: 0 } });
             });
         });
+
+        describe('`iter`', () => {
+            const widths = { iter: img, where: { complete: true }, field: 'naturalWidth' };
+
+            itAll('streams a source under `sum`, `mul`, `any`, `all` and `none`, and through `using` `length`', () => {
+                expectValid({ sum: widths, is: { gt: 0 } });
+                expectValid({ mul: { iter: text, field: 'length' }, is: { gt: 0 } });
+                expectValid({ any: { iter: img, field: 'complete' } });
+                expectValid({ none: { expr: { iter: img, field: 'complete' } } });
+                expectValid({ iter: img, where: { complete: false }, using: 'length', is: 0 });
+                expectError('`sum` takes numbers, and config types the values as string', { sum: { iter: text }, is: { gt: 0 } });
+                expectError('`all` takes booleans, and config types the values as number', { all: widths });
+            });
+
+            itAll('applies `where` then `field` to each item, the expression form of `where` to strings too', () => {
+                expectValid({
+                    sum: {
+                        iter: text,
+                        where: {
+                            self: {},
+                            is: {
+                                in: [
+                                    'a',
+                                    'b',
+                                ],
+                            },
+                        },
+                        field: 'length',
+                    },
+                    is: { gt: 0 },
+                });
+                expectValid({
+                    sum: {
+                        iter: [
+                            1,
+                            2,
+                        ],
+                        where: { self: {}, is: { gt: 1 } },
+                    },
+                    is: { gt: 0 },
+                });
+                expectError('reads "foo" on a value config types as string', {
+                    sum: { iter: text, where: { foo: 1 }, field: 'length' },
+                    is: { gt: 0 },
+                });
+                expectError('reads "foo" on HTMLImageElement or HTMLElement or Element, which is not in ELEMENT_ALLOWLIST', {
+                    sum: { iter: img, field: 'foo' },
+                    is: { gt: 0 },
+                });
+            });
+
+            itAll('takes each array entry in the position the reader gives an operand', () => {
+                expectValid({
+                    any: {
+                        iter: [
+                            img,
+                            { api: 'document.hidden' },
+                            { ...imgCount, is: { gt: 3 } },
+                        ],
+                    },
+                });
+                expectValid({
+                    sum: {
+                        iter: [
+                            imgCount,
+                            2,
+                            fieldOf('img', 'naturalWidth'),
+                        ],
+                    },
+                    is: { gt: 0 },
+                });
+                expectError('`using` `length` fills', {
+                    any: {
+                        iter: [
+                            imgCount,
+                        ],
+                    },
+                });
+                expectError('A string fills', {
+                    sum: {
+                        iter: [
+                            'a',
+                        ],
+                    },
+                    is: { gt: 0 },
+                });
+            });
+
+            itAll('is read in full into a list in value, list and root position', () => {
+                expectValid({ only: { iter: img, field: 'naturalWidth' }, is: { gt: 0 } });
+                expectValid({
+                    iter: [
+                        1,
+                        2,
+                    ],
+                    using: {
+                        api: {
+                            path: 'Math.max.apply',
+                            args: [
+                                null,
+                                { self: {} },
+                            ],
+                        },
+                    },
+                    is: { gt: 1 },
+                });
+                expectValid({ text: { pattern: 'a', root: { iter: { element: { selector: 'dialog' } } } } });
+                expectValid(true, {
+                    widths: { value: widths },
+                    entries: {
+                        value: {
+                            iter: [
+                                1,
+                                'a',
+                            ],
+                        },
+                    },
+                });
+            });
+
+            itAll(
+                'rejects boolean and number position, an operand that is neither a source nor an array, and stages without `iter`',
+                () => {
+                    expectError('`iter` fills value, list, spread, root position, not boolean position', { iter: img });
+                    expectError('`iter` fills value, list, spread, root position, not number position', {
+                        div: [
+                            {
+                                iter: [
+                                    1,
+                                ],
+                            },
+                            1,
+                        ],
+                        is: { gt: 0 },
+                    });
+                    expectError('`iter` takes a source', { sum: { iter: imgCount }, is: { gt: 0 } });
+                    expectError('`iter` takes a source', { sum: { iter: 1 }, is: { gt: 0 } });
+                    expectError('`where` sits beside `iter`', { text: { pattern: 'a' }, where: { self: {}, is: 'a' } });
+                    expectError('`field` sits beside `iter`', { only: img, field: 'naturalWidth', is: 0 });
+                },
+            );
+
+            itAll('holds no action in `match`', () => {
+                expectError('`match` reads the page only, and holds no action', {
+                    any: {
+                        iter: [
+                            { expr: { define: { seen: 1 } }, is: { type: 'undefined' } },
+                        ],
+                    },
+                });
+            });
+        });
     });
 });
