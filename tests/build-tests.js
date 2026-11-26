@@ -288,6 +288,7 @@ describe('renameEventHubImmediateTriggers', () => {
     for (const platform of [
         'ios',
         'macos',
+        'android',
     ]) {
         it(`rewrites immediate to immediate_v2 for ${platform}`, () => {
             const config = configWith({ pixel_immediate: immediateEntry('immediate') });
@@ -298,7 +299,6 @@ describe('renameEventHubImmediateTriggers', () => {
 
     for (const platform of [
         'windows',
-        'android',
     ]) {
         it(`leaves immediate unchanged for ${platform}`, () => {
             const config = configWith({ pixel_immediate: immediateEntry('immediate') });
@@ -757,6 +757,33 @@ describe('compatFunctions.v5', () => {
     it('does not modify its input', () => {
         expect(config.features.capped.state).to.equal('enabled');
         expect(config.features.capped.maxSupportedVersion).to.equal('7.300.0');
+    });
+
+    describe('eventHub immediate entries', () => {
+        const periodEntry = {
+            state: 'enabled',
+            trigger: { period: { seconds: 86400 } },
+            parameters: { count: { template: 'counter', source: 'adwall', buckets: { 1: { gte: 1 } } } },
+        };
+        const immediateEntry = { state: 'enabled', trigger: { type: 'immediate_v2', source: 'adwall' }, parameters: {} };
+        const eventHubConfig = {
+            features: {
+                eventHub: {
+                    state: 'enabled',
+                    settings: { telemetry: { pixel_day: periodEntry, pixel_immediate: immediateEntry } },
+                },
+            },
+        };
+
+        it('drops them from the Android config, keeping period entries', () => {
+            const v5Android = compatFunctions.v5(eventHubConfig, eventHubConfig, 'android');
+            expect(v5Android.features.eventHub.settings.telemetry).to.deep.equal({ pixel_day: periodEntry });
+        });
+
+        it('keeps them for other platforms', () => {
+            const v5Ios = compatFunctions.v5(eventHubConfig, eventHubConfig, 'ios');
+            expect(v5Ios.features.eventHub).to.deep.equal(eventHubConfig.features.eventHub);
+        });
     });
 });
 

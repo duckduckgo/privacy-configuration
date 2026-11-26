@@ -157,10 +157,26 @@ export const compatFunctions = {
         }
         return v4Config;
     },
-    v5: (config) => {
+    v5: (config, _unmodifiedConfig, platform) => {
         // Breaking changes: maxSupportedVersion key in features and sub-features
 
         const v5Config = JSON.parse(JSON.stringify(config));
+
+        // Android up to 5.298.0 reads v5 and parses eventHub telemetry as one block that requires a
+        // `period` on every entry, so a single immediate entry causes it to drop every eventHub pixel.
+        // Android 5.299.0 moved to v6 and skips each entry it can't parse.
+        const telemetry = v5Config.features.eventHub?.settings?.telemetry;
+        if (platform === 'android' && telemetry) {
+            for (const [
+                name,
+                entry,
+            ] of Object.entries(telemetry)) {
+                if ((entry?.trigger?.type ?? 'period') !== 'period') {
+                    delete telemetry[name];
+                }
+            }
+        }
+
         for (const feature of Object.values(v5Config.features)) {
             if ('maxSupportedVersion' in feature) {
                 delete feature.maxSupportedVersion;
