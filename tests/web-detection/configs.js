@@ -57,15 +57,15 @@ export const latestConfigs = platformOutput.map((plat) => {
  *   configName: string,
  *   webDetection: import('../../schema/features/web-detection').WebDetectionFeature<number>,
  *   detectors: NonNullable<import('../../schema/features/web-detection').WebDetectionSettings['detectors']>,
- * }) => void} cb
+ * }) => void} onConfig
  */
-export function forEachWebDetectionConfig(cb) {
+export function forEachWebDetectionConfig(onConfig) {
     for (const config of latestConfigs) {
         const webDetection = /** @type {import('../../schema/features/web-detection').WebDetectionFeature<number> | undefined} */ (
             config.body.features?.webDetection
         );
         if (!webDetection?.settings?.detectors) continue;
-        cb({ configName: config.name, webDetection, detectors: webDetection.settings.detectors });
+        onConfig({ configName: config.name, webDetection, detectors: webDetection.settings.detectors });
     }
 }
 
