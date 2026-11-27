@@ -1560,11 +1560,19 @@
                     "description": "Turns long pastes in the New Tab Page omnibar into pasted-text attachments"
                 },
                 "localModels": {
-                    "state": "disabled"
+                    "state": "internal",
+                    "settings": {
+                        "runtimes": [
+                            "llamaCpp"
+                        ]
+                    }
                 },
                 "selectionTools": {
                     "state": "enabled",
                     "minSupportedVersion": "0.181.0"
+                },
+                "translatePageOffer": {
+                    "state": "disabled"
                 }
             },
             "minSupportedVersion": "0.100.0",
@@ -2706,6 +2714,10 @@
                     {
                         "domain": "disneyplus.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2906"
+                    },
+                    {
+                        "domain": "sts.sky.blackbaud.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/6491"
                     }
                 ],
                 "firstPartyTrackerCookiePolicy": {
@@ -5297,7 +5309,7 @@
             "minSupportedVersion": "0.148.0",
             "exceptions": [],
             "settings": {
-                "extensionUrl": "https://staticcdn.duckduckgo.com/extensions/content-blocker/content-blocker-extension-2026.11.17.crx"
+                "extensionUrl": "https://staticcdn.duckduckgo.com/extensions/content-blocker/content-blocker-extension-2026.11.25.crx"
             },
             "features": {
                 "onboardingEnabled": {
@@ -6911,6 +6923,10 @@
                 }
             }
         },
+        "reinstallDetection": {
+            "state": "internal",
+            "exceptions": []
+        },
         "architectureX86Deprecation": {
             "state": "enabled",
             "minSupportedVersion": "0.170.0",
@@ -7051,6 +7067,9 @@
                             },
                             {
                                 "percent": 25
+                            },
+                            {
+                                "percent": 100
                             }
                         ]
                     },
