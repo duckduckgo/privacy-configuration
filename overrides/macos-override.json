@@ -887,6 +887,11 @@
                     "state": "enabled",
                     "description": "Promo in the Duck.ai omnibar suggesting the Prompt Bar shortcut and menu bar icon to users with 3+ chats",
                     "minSupportedVersion": "1.212.0"
+                },
+                "newChatDefaultModel": {
+                    "state": "enabled",
+                    "description": "New Duck.ai chats start on the user's default model from Duck.ai settings, else the /models default, instead of the last pick",
+                    "minSupportedVersion": "1.218.0"
                 }
             },
             "settings": {
@@ -3947,7 +3952,12 @@
             "state": "enabled"
         },
         "trackerProtection": {
-            "state": "enabled"
+            "state": "enabled",
+            "features": {
+                "appleSurrogateRedirection": {
+                    "state": "disabled"
+                }
+            }
         },
         "webDetection": {
             "state": "enabled",

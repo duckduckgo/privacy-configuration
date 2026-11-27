@@ -2403,7 +2403,8 @@
                     }
                 },
                 "featuresRequestHeader": {
-                    "state": "disabled"
+                    "state": "enabled",
+                    "minSupportedVersion": 53050000
                 },
                 "webLocalStorage": {
                     "state": "enabled",
@@ -5338,6 +5339,22 @@
                                         "type": "boolean",
                                         "value": true
                                     }
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "condition": [
+                            {
+                                "domain": "asnbank.nl"
+                            }
+                        ],
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/apiChanges/android",
+                                "value": {
+                                    "type": "remove"
                                 }
                             }
                         ]
