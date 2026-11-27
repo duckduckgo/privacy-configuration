@@ -195,6 +195,88 @@ jobs:
                       }
                       core.setOutput('comment_body', commentBody);
 
+            - name: Create Approval Comment Body
+              uses: actions/github-script@v9
+              id: create_approval_body
+              with:
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  script: |
+                      const fs = require('fs');
+                      const approvalOutput = fs.readFileSync('approval_output.txt', 'utf8');
+                      let commentBody = `
+                      ### [JSON approval analysis](https://github.com/duckduckgo/privacy-configuration/blob/main/.github/workflows/auto-respond-pr.yml#L5-L12):
+                      *Time updated:* ${new Date().toUTCString()}
+                      ${approvalOutput}
+                      `
+                      if (commentBody.length > 65536) {
+                          commentBody = '❌ Approval analysis output is too large to post as a comment, run locally to see the analysis and validate'
+                      }
+                      core.setOutput('comment_body', commentBody);
+
+            - name: Create, or Update the Diff Comment
+              uses: peter-evans/create-or-update-comment@v5
+              # A failed comment must not skip the review gate, approval or Asana sync below.
+              continue-on-error: true
+              with:
+                  issue-number: ${{ github.event.pull_request.number }}
+                  comment-id: ${{ steps.find_diff_comment.outputs.comment-id }}
+                  body: ${{ steps.create_diff_body.outputs.comment_body }}
+                  edit-mode: replace
+
+            # Uses PAT (not GITHUB_TOKEN) so this comment triggers issue_comment
+            # events for downstream workflows (e.g., auto-notify-mattermost.yml).
+            # See: https://docs.github.com/en/actions/using-workflows/triggering-a-workflow#triggering-a-workflow-from-a-workflow
+            - name: Create, or Update the Approval Comment
+              uses: peter-evans/create-or-update-comment@v5
+              continue-on-error: true
+              with:
+                  token: ${{ secrets.PRIVACY_CONFIG_PAT }}
+                  issue-number: ${{ github.event.pull_request.number }}
+                  comment-id: ${{ steps.find_approval_comment.outputs.comment-id }}
+                  body: ${{ steps.create_approval_body.outputs.comment_body }}
+                  edit-mode: replace
+
+            - name: Wait for Claude Code Review
+              uses: fountainhead/action-wait-for-check@v1.2.0
+              id: wait-for-review
+              # Drafts are never reviewed automatically, so don't wait for one.
+              if: github.event.pull_request.draft == false
+              # A failed wait or check counts as not passed, so the Asana sync below still runs.
+              continue-on-error: true
+              with:
+                  token: ${{ secrets.GITHUB_TOKEN }}
+                  checkName: Claude Code Review
+                  ref: ${{ github.event.pull_request.head.sha }}
+                  timeoutSeconds: 600
+
+            # The check run always concludes neutral, so read the severity counts it reports.
+            # See https://code.claude.com/docs/en/code-review-pull-requests#read-the-result-from-a-script
+            - name: Check Claude Code Review result
+              id: claude_review
+              continue-on-error: true
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  REPO: ${{ github.repository }}
+                  SHA: ${{ github.event.pull_request.head.sha }}
+                  CONCLUSION: ${{ steps.wait-for-review.outputs.conclusion }}
+              run: |
+                  passed=false
+                  if [ "$CONCLUSION" = "neutral" ] || [ "$CONCLUSION" = "skipped" ]; then
+                      run=$(gh api "repos/$REPO/commits/$SHA/check-runs?check_name=Claude%20Code%20Review" --jq '.check_runs[0]')
+                      title=$(echo "$run" | jq -r '.output.title // ""')
+                      if [[ "$title" == *"no new changes" ]]; then
+                          passed=true
+                      elif [[ "$title" != "Code review not repeated"* ]]; then
+                          important=$(echo "$run" | jq -r '(.output.text // "" | split("\n") | last | scan("^<!-- bughunter-severity: (.*) -->$")[0] | fromjson | .normal) // "missing"')
+                          echo "Important findings: $important"
+                          [ "$important" = "0" ] && passed=true
+                      fi
+                      echo "Check run title: $title"
+                  else
+                      echo "No completed Claude Code Review (conclusion: ${CONCLUSION:-none})"
+                  fi
+                  echo "passed=$passed" >> $GITHUB_OUTPUT
+
             - name: Check for existing approved reviews
               uses: actions/github-script@v9
               id: check_reviews
@@ -216,11 +298,19 @@ jobs:
                       core.setOutput('has_approved_review', hasApprovedReview);
 
             - name: Auto approve
-              if: steps.approval.outputs.approved == 'true' && steps.check_files.outputs.files_valid == 'true' && steps.check_reviews.outputs.has_approved_review == 'false'
+              if: steps.claude_review.outputs.passed == 'true' && steps.approval.outputs.approved == 'true' && steps.check_files.outputs.files_valid == 'true' && steps.check_reviews.outputs.has_approved_review == 'false'
+              # Only approve the reviewed commit, so a push made during the review wait is not approved.
               run: |
-                  gh pr review --approve "$PR_URL"
+                  head=$(gh api "repos/$REPO/pulls/$PR_NUMBER" --jq .head.sha)
+                  if [ "$head" != "$SHA" ]; then
+                      echo "PR head moved from $SHA to $head during the review wait; leaving approval to the run for the new head"
+                      exit 0
+                  fi
+                  gh api "repos/$REPO/pulls/$PR_NUMBER/reviews" -f commit_id="$SHA" -f event=APPROVE
               env:
-                  PR_URL: ${{ github.event.pull_request.html_url }}
+                  REPO: ${{ github.repository }}
+                  PR_NUMBER: ${{ github.event.pull_request.number }}
+                  SHA: ${{ github.event.pull_request.head.sha }}
                   GITHUB_TOKEN: ${{ secrets.PRIVACY_CONFIG_PAT }}
 
             # Sync Asana tasks for PRs that need manual review (non-auto-approved)
@@ -228,7 +318,7 @@ jobs:
             - uses: duckduckgo/action-asana-sync@v11
               if: |
                   github.event.action != 'closed' &&
-                  ((steps.approval.outputs.approved == 'true' && steps.check_files.outputs.files_valid == 'true') != true)
+                  ((steps.claude_review.outputs.passed == 'true' && steps.approval.outputs.approved == 'true' && steps.check_files.outputs.files_valid == 'true') != true)
               with:
                   ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
                   ASANA_WORKSPACE_ID: ${{ secrets.ASANA_WORKSPACE_ID }}
@@ -238,7 +328,7 @@ jobs:
                   ASSIGN_PR_AUTHOR: 'true'
 
             - name: Create comment
-              if: github.event.action == 'opened' && (steps.approval.outputs.approved == 'true' && steps.check_files.outputs.files_valid == 'true') != true
+              if: github.event.action == 'opened' && (steps.claude_review.outputs.passed == 'true' && steps.approval.outputs.approved == 'true' && steps.check_files.outputs.files_valid == 'true') != true
               uses: peter-evans/create-or-update-comment@v5
               with:
                   issue-number: ${{ github.event.pull_request.number }}
@@ -258,41 +348,3 @@ jobs:
                        - [Config Reviewer Documentation](https://github.com/duckduckgo/privacy-configuration/blob/main/docs/config-reviewer-documentation.md)
                        - [Config Maintainer Documentation](https://github.com/duckduckgo/privacy-configuration/blob/main/docs/config-maintainer-documentation.md)
                        - [Feature Implementer Documentation](https://github.com/duckduckgo/privacy-configuration/blob/main/docs/feature-implementer-documentation.md)
-
-            - name: Create Approval Comment Body
-              uses: actions/github-script@v9
-              id: create_approval_body
-              with:
-                  github-token: ${{ secrets.GITHUB_TOKEN }}
-                  script: |
-                      const fs = require('fs');
-                      const approvalOutput = fs.readFileSync('approval_output.txt', 'utf8');
-                      let commentBody = `
-                      ### [JSON approval analysis](https://github.com/duckduckgo/privacy-configuration/blob/main/.github/workflows/auto-respond-pr.yml#L5-L12):
-                      *Time updated:* ${new Date().toUTCString()}
-                      ${approvalOutput}
-                      `
-                      if (commentBody.length > 65536) {
-                          commentBody = '❌ Approval analysis output is too large to post as a comment, run locally to see the analysis and validate'
-                      }
-                      core.setOutput('comment_body', commentBody);
-
-            - name: Create, or Update the Diff Comment
-              uses: peter-evans/create-or-update-comment@v5
-              with:
-                  issue-number: ${{ github.event.pull_request.number }}
-                  comment-id: ${{ steps.find_diff_comment.outputs.comment-id }}
-                  body: ${{ steps.create_diff_body.outputs.comment_body }}
-                  edit-mode: replace
-
-            # Uses PAT (not GITHUB_TOKEN) so this comment triggers issue_comment
-            # events for downstream workflows (e.g., auto-notify-mattermost.yml).
-            # See: https://docs.github.com/en/actions/using-workflows/triggering-a-workflow#triggering-a-workflow-from-a-workflow
-            - name: Create, or Update the Approval Comment
-              uses: peter-evans/create-or-update-comment@v5
-              with:
-                  token: ${{ secrets.PRIVACY_CONFIG_PAT }}
-                  issue-number: ${{ github.event.pull_request.number }}
-                  comment-id: ${{ steps.find_approval_comment.outputs.comment-id }}
-                  body: ${{ steps.create_approval_body.outputs.comment_body }}
-                  edit-mode: replace
