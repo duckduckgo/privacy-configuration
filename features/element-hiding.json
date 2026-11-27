@@ -4712,6 +4712,21 @@
                 "domain": "xhamster.com",
                 "rules": [
                     {
+                        "selector": "#credential_picker_container",
+                        "type": "override"
+                    }
+                ]
+            },
+            {
+                "condition": {
+                    "domain": "xhamster.com",
+                    "experiment": {
+                        "experimentName": "contentScopeExperiment12",
+                        "cohort": "treatment"
+                    }
+                },
+                "rules": [
+                    {
                         "selector": "[aria-label=\"Third Party Content\"]",
                         "type": "hide"
                     },
@@ -4732,10 +4747,6 @@
                         "type": "hide"
                     },
                     {
-                        "selector": "#credential_picker_container",
-                        "type": "override"
-                    },
-                    {
                         "selector": "[data-role$=\"banner-underplayer\"]",
                         "type": "hide"
                     },
@@ -4750,7 +4761,13 @@
                 ]
             },
             {
-                "domain": "xvideos.com",
+                "condition": {
+                    "domain": "xvideos.com",
+                    "experiment": {
+                        "experimentName": "contentScopeExperiment12",
+                        "cohort": "treatment"
+                    }
+                },
                 "rules": [
                     {
                         "selector": "div.thumb-block.thumb-ad",
@@ -5165,6 +5182,21 @@
                 "domain": "pornhub.com",
                 "rules": [
                     {
+                        "selector": "#cookieBanner.cbShort",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "condition": {
+                    "domain": "pornhub.com",
+                    "experiment": {
+                        "experimentName": "contentScopeExperiment12",
+                        "cohort": "treatment"
+                    }
+                },
+                "rules": [
+                    {
                         "selector": "li.tjListItem",
                         "type": "hide"
                     },
@@ -5178,10 +5210,6 @@
                     },
                     {
                         "selector": "div:has(> iframe[data-spot-id])",
-                        "type": "hide"
-                    },
-                    {
-                        "selector": "#cookieBanner.cbShort",
                         "type": "hide"
                     },
                     {
