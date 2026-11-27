@@ -5306,7 +5306,15 @@
             "minSupportedVersion": "0.148.0",
             "exceptions": [],
             "settings": {
-                "extensionUrl": "https://staticcdn.duckduckgo.com/extensions/content-blocker/content-blocker-extension-2026.11.25.crx"
+                "extensionUrl": "https://staticcdn.duckduckgo.com/extensions/content-blocker/content-blocker-extension-2026.11.25.crx",
+                "siteGroups": {
+                    "videoSites": {
+                        "experiment": {
+                            "experimentName": "contentScopeExperiment12",
+                            "cohort": "treatment"
+                        }
+                    }
+                }
             },
             "features": {
                 "onboardingEnabled": {
@@ -7070,6 +7078,21 @@
                             }
                         ]
                     },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "contentScopeExperiment12": {
+                    "state": "enabled",
+                    "description": "Cohorts control 1, treatment 1",
+                    "minSupportedVersion": "0.178.0",
                     "cohorts": [
                         {
                             "name": "control",

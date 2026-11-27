@@ -4712,53 +4712,8 @@
                 "domain": "xhamster.com",
                 "rules": [
                     {
-                        "selector": "[aria-label=\"Third Party Content\"]",
-                        "type": "hide"
-                    },
-                    {
-                        "selector": "aside.video-page__layout-ad",
-                        "type": "hide"
-                    },
-                    {
-                        "selector": ".thumb-list > div:has(.mbnr)",
-                        "type": "hide"
-                    },
-                    {
-                        "selector": ".player-handy-sponsor",
-                        "type": "hide"
-                    },
-                    {
-                        "selector": ":is(.thumb-list__item, .thumb-list-mobile-item):has(.dsa-info)",
-                        "type": "hide"
-                    },
-                    {
                         "selector": "#credential_picker_container",
                         "type": "override"
-                    },
-                    {
-                        "selector": "[data-role$=\"banner-underplayer\"]",
-                        "type": "hide"
-                    },
-                    {
-                        "selector": "[class*=\"xplayer-ads-block__footer\"]",
-                        "type": "hide"
-                    },
-                    {
-                        "selector": ".thumb-list__item:has(> [class*=\"tooltip-\"])",
-                        "type": "hide"
-                    }
-                ]
-            },
-            {
-                "domain": "xvideos.com",
-                "rules": [
-                    {
-                        "selector": "div.thumb-block.thumb-ad",
-                        "type": "hide"
-                    },
-                    {
-                        "selector": "div.remove-ads",
-                        "type": "hide"
                     }
                 ]
             },
@@ -5165,6 +5120,75 @@
                 "domain": "pornhub.com",
                 "rules": [
                     {
+                        "selector": "#cookieBanner.cbShort",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "domain": [
+                    "belfastlive.co.uk",
+                    "birminghammail.co.uk",
+                    "cheshire-live.co.uk",
+                    "corkbeo.ie",
+                    "cornwalllive.com",
+                    "coventrytelegraph.net",
+                    "dailypost.co.uk",
+                    "dailyrecord.co.uk",
+                    "dailystar.co.uk",
+                    "derbytelegraph.co.uk",
+                    "devonlive.com",
+                    "dublinlive.ie",
+                    "edinburghlive.co.uk",
+                    "essexlive.news",
+                    "examinerlive.co.uk",
+                    "gazettelive.co.uk",
+                    "getsurrey.co.uk",
+                    "grimsbytelegraph.co.uk",
+                    "hulldailymail.co.uk",
+                    "insider.co.uk",
+                    "irishmirror.ie",
+                    "kentlive.news",
+                    "lancs.live",
+                    "lincolnshirelive.co.uk",
+                    "liverpoolecho.co.uk",
+                    "manchestereveningnews.co.uk",
+                    "mylondon.news",
+                    "nottinghampost.com",
+                    "somersetlive.co.uk",
+                    "stokesentinel.co.uk",
+                    "walesonline.co.uk"
+                ],
+                "rules": [
+                    {
+                        "selector": "[data-tmdatatrack='non-content-unit'], .vf3-conversations-list__promo",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".sticky ~ header",
+                        "type": "modify-style",
+                        "values": [
+                            {
+                                "property": "top",
+                                "value": "0"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "condition": [
+                    {
+                        "domain": "pornhub.com",
+                        "injectName": "windows",
+                        "experiment": {
+                            "experimentName": "contentScopeExperiment12",
+                            "cohort": "treatment"
+                        }
+                    }
+                ],
+                "rules": [
+                    {
                         "selector": "li.tjListItem",
                         "type": "hide"
                     },
@@ -5178,10 +5202,6 @@
                     },
                     {
                         "selector": "div:has(> iframe[data-spot-id])",
-                        "type": "hide"
-                    },
-                    {
-                        "selector": "#cookieBanner.cbShort",
                         "type": "hide"
                     },
                     {
@@ -5235,53 +5255,70 @@
                 ]
             },
             {
-                "domain": [
-                    "belfastlive.co.uk",
-                    "birminghammail.co.uk",
-                    "cheshire-live.co.uk",
-                    "corkbeo.ie",
-                    "cornwalllive.com",
-                    "coventrytelegraph.net",
-                    "dailypost.co.uk",
-                    "dailyrecord.co.uk",
-                    "dailystar.co.uk",
-                    "derbytelegraph.co.uk",
-                    "devonlive.com",
-                    "dublinlive.ie",
-                    "edinburghlive.co.uk",
-                    "essexlive.news",
-                    "examinerlive.co.uk",
-                    "gazettelive.co.uk",
-                    "getsurrey.co.uk",
-                    "grimsbytelegraph.co.uk",
-                    "hulldailymail.co.uk",
-                    "insider.co.uk",
-                    "irishmirror.ie",
-                    "kentlive.news",
-                    "lancs.live",
-                    "lincolnshirelive.co.uk",
-                    "liverpoolecho.co.uk",
-                    "manchestereveningnews.co.uk",
-                    "mylondon.news",
-                    "nottinghampost.com",
-                    "somersetlive.co.uk",
-                    "stokesentinel.co.uk",
-                    "walesonline.co.uk"
+                "condition": [
+                    {
+                        "domain": "xvideos.com",
+                        "injectName": "windows",
+                        "experiment": {
+                            "experimentName": "contentScopeExperiment12",
+                            "cohort": "treatment"
+                        }
+                    }
                 ],
                 "rules": [
                     {
-                        "selector": "[data-tmdatatrack='non-content-unit'], .vf3-conversations-list__promo",
+                        "selector": "div.thumb-block.thumb-ad",
                         "type": "hide"
                     },
                     {
-                        "selector": ".sticky ~ header",
-                        "type": "modify-style",
-                        "values": [
-                            {
-                                "property": "top",
-                                "value": "0"
-                            }
-                        ]
+                        "selector": "div.remove-ads",
+                        "type": "hide"
+                    }
+                ]
+            },
+            {
+                "condition": [
+                    {
+                        "domain": "xhamster.com",
+                        "injectName": "windows",
+                        "experiment": {
+                            "experimentName": "contentScopeExperiment12",
+                            "cohort": "treatment"
+                        }
+                    }
+                ],
+                "rules": [
+                    {
+                        "selector": "[aria-label=\"Third Party Content\"]",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": "aside.video-page__layout-ad",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".thumb-list > div:has(.mbnr)",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".player-handy-sponsor",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ":is(.thumb-list__item, .thumb-list-mobile-item):has(.dsa-info)",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": "[data-role$=\"banner-underplayer\"]",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": "[class*=\"xplayer-ads-block__footer\"]",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".thumb-list__item:has(> [class*=\"tooltip-\"])",
+                        "type": "hide"
                     }
                 ]
             }
