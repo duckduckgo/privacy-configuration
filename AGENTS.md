@@ -22,7 +22,9 @@ Before proposing a site fix, read the matching rule in `.cursor/rules/`:
 | Request blocklist | `request-blocklist.mdc` |
 | User agent or client hints | `user-agent-client-hints.mdc` |
 
-Files in `features/` and `overrides/` are JSONC (JSON with comments). Read them with `readJsoncFile` from `util.js`, not `JSON.parse`.
+Files in `features/` and `overrides/` are JSONC (JSON with comments). Read them with `readJsoncFile` from `util.js`, not `JSON.parse`. Run `npm ci` first if `node_modules` is missing.
+
+When a file is large (over 50 KB, such as `features/web-detection.json`), consider whether you need the whole file or if a grep is enough.
 
 ## Experiments and rollouts
 
