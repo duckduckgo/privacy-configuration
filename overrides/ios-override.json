@@ -531,9 +531,17 @@
                         "steps": [
                             {
                                 "percent": 5
+                            },
+                            {
+                                "percent": 25
                             }
                         ]
                     }
+                },
+                "newChatDefaultModel": {
+                    "state": "enabled",
+                    "description": "New Duck.ai chats start on the user's default model from Duck.ai settings, else the /models default, instead of the last pick",
+                    "minSupportedVersion": "7.248.0"
                 }
             },
             "settings": {
@@ -4195,25 +4203,6 @@
                 "webScrollFreezeObservability": {
                     "state": "disabled"
                 },
-                "searchTokenExperimentV4": {
-                    "state": "enabled",
-                    "minSupportedVersion": "7.236.0",
-                    "settings": {
-                        "tokenTTLSeconds": 300,
-                        "refreshWindowSeconds": 120
-                    },
-                    "description": "NA experiment: search token to speed up SERP by combining Index/Deep responses.",
-                    "cohorts": [
-                        {
-                            "name": "control",
-                            "weight": 1
-                        },
-                        {
-                            "name": "treatment",
-                            "weight": 1
-                        }
-                    ]
-                },
                 "newTabPageSessionInstrumentation": {
                     "state": "enabled",
                     "minSupportedVersion": "7.233.0",
@@ -4816,7 +4805,12 @@
             "state": "enabled"
         },
         "trackerProtection": {
-            "state": "enabled"
+            "state": "enabled",
+            "features": {
+                "appleSurrogateRedirection": {
+                    "state": "disabled"
+                }
+            }
         },
         "webDetection": {
             "state": "enabled",
