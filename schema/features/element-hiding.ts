@@ -46,6 +46,8 @@ type StyleTagException = {
     reason: string;
 };
 
+type EmptyCheck = 'domParser' | 'walk';
+
 interface ElementHidingConfiguration {
     useStrictHideStyleTag?: boolean;
     rules: ElementHidingRule[];
@@ -54,10 +56,11 @@ interface ElementHidingConfiguration {
     unhideTimeouts?: number[];
     mediaAndFormSelectors?: string;
     adLabelStrings?: string[];
+    emptyCheck?: EmptyCheck;
     styleTagExceptions?: StyleTagException[];
     conditionalChanges?: {
         condition: ConditionBlockOrArray;
-        patchSettings: Operation<number[]>[];
+        patchSettings: Operation<number[] | EmptyCheck>[];
     }[];
 }
 
