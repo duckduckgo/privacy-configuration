@@ -1,8 +1,27 @@
-# Bugbot PR Review Guidelines
+# PR Review Guidelines
+
+The rules below are carried over from the Cursor Bugbot guidelines. This first section maps them to Code Review severities.
+
+## Severity
+
+An Important finding stops `auto-respond-pr.yml` from auto-approving the PR, so a human has to review it.
+
+- **Important**: a breach of any rule under "Feature State Transitions", "No Metric Additions to Already-Enabled Experiments", or a header/JS mismatch from the user agent and client hint rule file
+- **Nit at most**: anything a rule marks as a **warning**, not a block ("Feature-Specific Config Transforms", "Detector Changes Affecting Live Experiment Metrics"), and anything a rule file calls recommended but not merge-blocking
+
+Report at most five Nits per review.
+
+## Do not report
+
+- Lint and formatting, which CI checks and fixes
+- Files under `generated/` and `package-lock.json`
+- Removal of a metric from an experiment
+- Missing documentation files
 
 ## Repository-Wide Validation Framework
 
 ### Schema Compliance (All Features)
+
 - **Verify rule structure** matches schema definitions in `schema/features/`
 - **Check required fields** based on feature-specific schemas
 - **Validate JSON structure** and syntax
@@ -11,13 +30,16 @@
 ## Feature State Transitions
 
 ### Minimum Supported Version Bumps
+
 When a feature transitions from `internal` to `enabled` (or from `enabled` to `internal`), the minimum supported version **must** be bumped. Clients rely on the version to detect config changes; without a bump, the state transition will be silently ignored.
 
 ### Parent and Subfeature Independence
+
 Parent features and their subfeatures are **not** co-dependent — a subfeature's state is evaluated independently of its parent. Because of this, they often require the exact same gating (e.g. matching `state`, `minSupportedVersion`, rollout targets). When transitioning a subfeature, ensure its gating is explicitly set rather than assuming it inherits from the parent.
 
 ### Rollout Step Edits
-When a rollout percentage changes, the diff must **append** a new entry to `rollout.steps[]` rather than mutate an existing entry. Each step is a discrete event clients persist; modifying an existing `percent` is silently ignored for already-enrolled users. Flag any PR that edits or removes an existing step object instead of appending a new one. See [`docs/rollouts-and-experiments.md`](../docs/rollouts-and-experiments.md).
+
+When a rollout percentage changes, the diff must **append** a new entry to `rollout.steps[]` rather than mutate an existing entry. Each step is a discrete event clients persist; modifying an existing `percent` is silently ignored for already-enrolled users. Flag any PR that edits or removes an existing step object instead of appending a new one. See [`docs/rollouts-and-experiments.md`](docs/rollouts-and-experiments.md).
 
 ## Build Pipeline
 
@@ -32,6 +54,7 @@ This is a **warning**, not a block.
 ## Element Hiding Feature Validation
 
 ### Schema & Implementation References
+
 - **Rule File**: `.cursor/rules/element-hiding.mdc` - Developer guidance and decision tree
 - **Schema**: `schema/features/element-hiding.ts` - TypeScript type definitions
 - **Implementation**: `https://github.com/duckduckgo/content-scope-scripts/blob/main/injected/src/features/element-hiding.js` - JavaScript runtime logic
@@ -79,12 +102,13 @@ If a PR modifies a `webDetection` detector (its `match`, `triggers`, or `actions
 - **Schemas**: `schema/features/custom-user-agent.ts`, `schema/features/client-brand-hint.ts`, `schema/features/ua-ch-brands.ts`
 - **Configurations**: `overrides/windows-override.json`, `overrides/android-override.json`, `overrides/ios-override.json`, `overrides/macos-override.json`
 
-## Adding New Features to Bugbot
+## Adding New Features to This File
 
 ### Template for New Feature Validation
+
 When adding new features to this repository, the following are **entirely optional** and should only be done when clearly beneficial:
 
-- **Add a reference section to this `BUGBOT.md`** with links to the schema and configuration — only if the feature has specific validation concerns that the bot should check for.
+- **Add a reference section to this `REVIEW.md`** with links to the schema and configuration — only if the feature has specific validation concerns that the reviewer should check for.
 
 - **Create a `.cursor/rules/new-feature.mdc`** — only if the feature has complex validation logic or non-obvious configuration patterns. Most features do not need one.
 

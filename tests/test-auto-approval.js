@@ -1,5 +1,8 @@
 import { expect } from 'chai';
-import { analyzePatchesForApproval, generateChangeSummary } from '../automation-utils.js';
+import pkg from 'fast-json-patch';
+import { analyzePatchesForApproval, findRolloutStepAppends, generateChangeSummary } from '../automation-utils.js';
+
+const { compare } = pkg;
 
 describe('Auto-approval logic tests', () => {
     const testCases = [
@@ -283,5 +286,248 @@ describe('generateChangeSummary specific tests', () => {
         expect(summary.otherChanges).to.equal(0);
         expect(Object.keys(summary.byOperation)).to.have.length(0);
         expect(Object.keys(summary.byPath)).to.have.length(0);
+    });
+});
+
+describe('Rollout step auto-approval', () => {
+    function config(rollout, extra = {}) {
+        return {
+            features: {
+                dbp: {
+                    state: 'enabled',
+                    features: {
+                        challengeSolver: { state: 'enabled', rollout, ...extra },
+                    },
+                },
+            },
+        };
+    }
+
+    function analyze(base, updated) {
+        const patches = compare(base, updated);
+        return analyzePatchesForApproval(patches, findRolloutStepAppends(base, updated));
+    }
+
+    const stepsPath = '/features/dbp/features/challengeSolver/rollout/steps';
+
+    it('should approve appending a higher step', () => {
+        const base = config({
+            steps: [
+                { percent: 10 },
+                { percent: 25 },
+            ],
+        });
+        const updated = config({
+            steps: [
+                { percent: 10 },
+                { percent: 25 },
+                { percent: 50 },
+            ],
+        });
+        expect(analyze(base, updated).shouldApprove).to.equal(true);
+    });
+
+    it('should approve appending several increasing steps', () => {
+        const base = config({
+            steps: [
+                { percent: 10 },
+            ],
+        });
+        const updated = config({
+            steps: [
+                { percent: 10 },
+                { percent: 50 },
+                { percent: 100 },
+            ],
+        });
+        expect(analyze(base, updated).shouldApprove).to.equal(true);
+    });
+
+    it('should approve the padded patch shape produced by the diff alignment', () => {
+        const base = config({
+            steps: [
+                { percent: 10 },
+                { percent: 25 },
+            ],
+        });
+        const updated = config({
+            steps: [
+                { percent: 10 },
+                { percent: 25 },
+                { percent: 50 },
+            ],
+        });
+        const patches = [
+            { op: 'add', path: `${stepsPath}/2/percent`, value: 50 },
+        ];
+        expect(analyzePatchesForApproval(patches, findRolloutStepAppends(base, updated)).shouldApprove).to.equal(true);
+    });
+
+    it('should NOT approve editing an existing step', () => {
+        const base = config({
+            steps: [
+                { percent: 10 },
+                { percent: 25 },
+            ],
+        });
+        const updated = config({
+            steps: [
+                { percent: 10 },
+                { percent: 50 },
+            ],
+        });
+        expect(analyze(base, updated).shouldApprove).to.equal(false);
+    });
+
+    it('should NOT approve editing an existing step while appending', () => {
+        const base = config({
+            steps: [
+                { percent: 10 },
+                { percent: 25 },
+            ],
+        });
+        const updated = config({
+            steps: [
+                { percent: 5 },
+                { percent: 25 },
+                { percent: 50 },
+            ],
+        });
+        expect(analyze(base, updated).shouldApprove).to.equal(false);
+    });
+
+    it('should NOT approve removing a step', () => {
+        const base = config({
+            steps: [
+                { percent: 10 },
+                { percent: 25 },
+            ],
+        });
+        const updated = config({
+            steps: [
+                { percent: 10 },
+            ],
+        });
+        expect(analyze(base, updated).shouldApprove).to.equal(false);
+    });
+
+    it('should NOT approve lowering the percentage', () => {
+        const base = config({
+            steps: [
+                { percent: 25 },
+            ],
+        });
+        const updated = config({
+            steps: [
+                { percent: 25 },
+                { percent: 10 },
+            ],
+        });
+        expect(analyze(base, updated).shouldApprove).to.equal(false);
+    });
+
+    it('should NOT approve repeating the same percentage', () => {
+        const base = config({
+            steps: [
+                { percent: 25 },
+            ],
+        });
+        const updated = config({
+            steps: [
+                { percent: 25 },
+                { percent: 25 },
+            ],
+        });
+        expect(analyze(base, updated).shouldApprove).to.equal(false);
+    });
+
+    it('should NOT approve a percentage above 100', () => {
+        const base = config({
+            steps: [
+                { percent: 50 },
+            ],
+        });
+        const updated = config({
+            steps: [
+                { percent: 50 },
+                { percent: 150 },
+            ],
+        });
+        expect(analyze(base, updated).shouldApprove).to.equal(false);
+    });
+
+    it('should NOT approve a new step with other keys', () => {
+        const base = config({
+            steps: [
+                { percent: 10 },
+            ],
+        });
+        const updated = config({
+            steps: [
+                { percent: 10 },
+                { percent: 50, extra: true },
+            ],
+        });
+        expect(analyze(base, updated).shouldApprove).to.equal(false);
+    });
+
+    it('should NOT approve adding a rollout where there was none', () => {
+        const base = config(undefined);
+        const updated = config({
+            steps: [
+                { percent: 10 },
+            ],
+        });
+        expect(analyze(base, updated).shouldApprove).to.equal(false);
+    });
+
+    it('should NOT approve a rollout raise alongside a state change', () => {
+        const base = config(
+            {
+                steps: [
+                    { percent: 10 },
+                ],
+            },
+            { state: 'internal' },
+        );
+        const updated = config(
+            {
+                steps: [
+                    { percent: 10 },
+                    { percent: 50 },
+                ],
+            },
+            { state: 'enabled' },
+        );
+        const result = analyze(base, updated);
+        expect(result.shouldApprove).to.equal(false);
+        expect(result.disallowedPatches.map((patch) => patch.path)).to.deep.equal([
+            '/features/dbp/features/challengeSolver/state',
+        ]);
+    });
+
+    it('should NOT approve a steps patch when the rollout was not a pure append', () => {
+        const patches = [
+            { op: 'add', path: `${stepsPath}/2/percent`, value: 50 },
+        ];
+        expect(analyzePatchesForApproval(patches).shouldApprove).to.equal(false);
+    });
+
+    it('should count rollout raises as auto-approvable in the summary', () => {
+        const base = config({
+            steps: [
+                { percent: 10 },
+            ],
+        });
+        const updated = config({
+            steps: [
+                { percent: 10 },
+                { percent: 50 },
+            ],
+        });
+        const patches = compare(base, updated);
+        const summary = generateChangeSummary(patches, findRolloutStepAppends(base, updated));
+        expect(summary.autoApprovableChanges).to.equal(patches.length);
+        expect(summary.otherChanges).to.equal(0);
     });
 });
