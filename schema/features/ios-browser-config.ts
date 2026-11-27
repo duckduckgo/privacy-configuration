@@ -23,13 +23,15 @@ type SubFeatures<VersionType> = {
             idleThresholdSeconds: number;
         }
     >;
-    searchTokenExperimentV4?: SubFeature<
+    tabTerminationErrorPage?: SubFeature<
         VersionType,
         {
-            // Lifetime of the search token in seconds
-            tokenTTLSeconds: number;
-            // Time before expiry within which the token is proactively refreshed, in seconds
-            refreshWindowSeconds: number;
+            // Web content kills of one tab within timeWindowSeconds that show the error page instead of a reload
+            terminationCount?: number;
+            // Window in seconds over which terminationCount kills are counted
+            timeWindowSeconds?: number;
+            // Form factors that show the error page
+            supportedFormFactors?: ('phone' | 'tablet')[];
         }
     >;
     inactivityNotification?: SubFeature<

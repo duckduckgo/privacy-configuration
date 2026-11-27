@@ -35,6 +35,30 @@ type SubFeatures<VersionType> = {
             promptLimit: number;
         }
     >;
+    // Windows: on-device models for Duck.ai. Missing settings fall back to the browser's built-in defaults.
+    localModels?: SubFeature<
+        VersionType,
+        {
+            // The runtimes a PC may use, in the order it tries them. An empty list turns every runtime off.
+            runtimes?: LocalModelRuntime[];
+            // Each runtime's model. Replaces the built-in models as a whole, so a runtime left out has no model.
+            models?: {
+                llamaCpp?: LocalModelSource;
+                windowsMl?: LocalModelSource;
+            };
+        }
+    >;
+};
+
+type LocalModelRuntime = 'llamaCpp' | 'windowsMl';
+
+type LocalModelSource = {
+    id: string;
+    name: string;
+    // The download stops once it passes this many bytes. Windows ML's size depends on the PC's NPU, so it can be left out.
+    bytes?: number;
+    url?: string;
+    sha256?: string;
 };
 
 export type AiChatConfig<VersionType> = Feature<
