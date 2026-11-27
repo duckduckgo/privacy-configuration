@@ -531,9 +531,17 @@
                         "steps": [
                             {
                                 "percent": 5
+                            },
+                            {
+                                "percent": 25
                             }
                         ]
                     }
+                },
+                "newChatDefaultModel": {
+                    "state": "enabled",
+                    "description": "New Duck.ai chats start on the user's default model from Duck.ai settings, else the /models default, instead of the last pick",
+                    "minSupportedVersion": "7.248.0"
                 }
             },
             "settings": {
@@ -939,7 +947,7 @@
                     ]
                 },
                 "tdsNextExperiment017": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "rollout": {
                         "steps": [
                             {
@@ -950,6 +958,55 @@
                     "settings": {
                         "controlUrl": "v5/experiments/202611v1-ios-tds-control.json",
                         "treatmentUrl": "v5/experiments/202611v1-ios-tds-treatment.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "tdsNextExperiment018": {
+                    "state": "disabled",
+                    "minSupportedVersion": "7.238.0",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "v5/experiments/202611v2-ios-tds-control.json",
+                        "treatmentUrl": "v5/experiments/202611v2-ios-tds-treatment.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "tdsNextExperiment019": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "v5/experiments/202611v2-ios-tds-control.json",
+                        "treatmentUrl": "v5/experiments/202611v2-ios-tds-treatment.json"
                     },
                     "cohorts": [
                         {
@@ -1277,6 +1334,9 @@
                             },
                             {
                                 "percent": 25
+                            },
+                            {
+                                "percent": 100
                             }
                         ]
                     },
@@ -3698,6 +3758,10 @@
                 },
                 "subscriptionConcurrentExperiments": {
                     "state": "enabled"
+                },
+                "subscriptionCancellationFlow": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.247.0"
                 }
             }
         },
@@ -3860,11 +3924,19 @@
                     "models": [
                         { "id": "gpt-5.4-nano", "provider": "openai", "modelShortName": "5.4-nano" },
                         { "id": "claude-haiku-4-5", "provider": "anthropic", "modelShortName": "Haiku 4.5" },
-                        { "id": "mistral-small-2603", "provider": "mistral", "modelShortName": "Mistral" }
+                        { "id": "mistral-small-2603", "provider": "mistral", "modelShortName": "Mistral" },
+                        { "id": "tinfoil/gemma4-31b", "provider": "tinfoil", "modelShortName": "Gemma" }
                     ]
                 }
             },
             "features": {
+                "tabTerminationErrorPage": {
+                    "state": "enabled",
+                    "settings": {
+                        "terminationCount": 2,
+                        "timeWindowSeconds": 180
+                    }
+                },
                 "iPhoneDuoLaunchReporting": {
                     "state": "enabled"
                 },
@@ -3879,6 +3951,9 @@
                         "steps": [
                             {
                                 "percent": 10
+                            },
+                            {
+                                "percent": 50
                             }
                         ]
                     }
@@ -4128,25 +4203,6 @@
                 "webScrollFreezeObservability": {
                     "state": "disabled"
                 },
-                "searchTokenExperimentV4": {
-                    "state": "enabled",
-                    "minSupportedVersion": "7.236.0",
-                    "settings": {
-                        "tokenTTLSeconds": 300,
-                        "refreshWindowSeconds": 120
-                    },
-                    "description": "NA experiment: search token to speed up SERP by combining Index/Deep responses.",
-                    "cohorts": [
-                        {
-                            "name": "control",
-                            "weight": 1
-                        },
-                        {
-                            "name": "treatment",
-                            "weight": 1
-                        }
-                    ]
-                },
                 "newTabPageSessionInstrumentation": {
                     "state": "enabled",
                     "minSupportedVersion": "7.233.0",
@@ -4217,9 +4273,16 @@
                         "steps": [
                             {
                                 "percent": 1
+                            },
+                            {
+                                "percent": 10
                             }
                         ]
                     }
+                },
+                "idleReturnNewTabPageAtLaunch": {
+                    "state": "enabled",
+                    "minSupportedVersion": "7.246.0"
                 }
             }
         },
@@ -4729,11 +4792,25 @@
                 }
             }
         },
+        "segmentSkip": {
+            "state": "internal",
+            "minSupportedVersion": "7.246.0",
+            "features": {
+                "mvpEnabled": {
+                    "state": "internal"
+                }
+            }
+        },
         "detectorPerf": {
             "state": "enabled"
         },
         "trackerProtection": {
-            "state": "enabled"
+            "state": "enabled",
+            "features": {
+                "appleSurrogateRedirection": {
+                    "state": "disabled"
+                }
+            }
         },
         "webDetection": {
             "state": "enabled",
