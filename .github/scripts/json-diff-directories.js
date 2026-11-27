@@ -6,6 +6,7 @@ import {
     mungeFileContents,
     analyzePatchesForApproval,
     generateChangeSummary,
+    findRolloutStepAppends,
     applyConditionalChangesToConfig,
 } from '../../automation-utils.js';
 
@@ -307,8 +308,9 @@ function displayApprovalStatus(dir1Files, dir2Files, isOpen) {
                     continue;
                 }
 
-                const analysis = analyzePatchesForApproval(patches);
-                const summary = generateChangeSummary(patches);
+                const rolloutStepAppends = findRolloutStepAppends(patchedJson1, patchedJson2);
+                const analysis = analyzePatchesForApproval(patches, rolloutStepAppends);
+                const summary = generateChangeSummary(patches, rolloutStepAppends);
 
                 fileAnalysis[filePath] = {
                     status: analysis.shouldApprove ? 'approved' : 'manual_review',
