@@ -1,4 +1,4 @@
-import { Feature, FeatureState } from '../feature';
+import { Feature, FeatureState, SubFeature } from '../feature';
 
 type TelemetryParameterBase = {
     template: string;
@@ -30,16 +30,19 @@ type ImmediateTelemetryParameterData = TelemetryParameterBase & {
     dataKey: string;
 };
 
+// A length of time, authored in any of these units.
+type TelemetryDuration = {
+    seconds?: number;
+    minutes?: number;
+    hours?: number;
+    days?: number;
+};
+
 // Aggregates events over a recurring window. `type` is optional and defaults to
 // 'period' for backward compatibility with entries authored before the discriminator.
 type PeriodTrigger = {
     type?: 'period';
-    period: {
-        seconds?: number;
-        minutes?: number;
-        hours?: number;
-        days?: number;
-    };
+    period: TelemetryDuration;
 };
 
 // Fires once per event rather than aggregating, so it carries no `period`.
@@ -47,10 +50,19 @@ type PeriodTrigger = {
 // that event's payload and so omit their own `source`.
 // Overrides author `immediate`. The build emits `immediate_v2`, which fires once per event the
 // hub delivers after de-duplication, for platforms that parse only that name.
-type ImmediateTrigger = {
-    type: 'immediate_v2' | 'immediate';
-    source: string;
-};
+// `maxDelay` holds each pixel for a random time of up to that long, so its send time can't be tied
+// to a page visit. Only Windows reads it, so it is authored in the Windows override alone, in
+// `seconds` (the build does not convert other units).
+type ImmediateTrigger =
+    | {
+          type: 'immediate';
+          source: string;
+          maxDelay?: TelemetryDuration;
+      }
+    | {
+          type: 'immediate_v2';
+          source: string;
+      };
 
 // Period entries aggregate over a window; their data params must identify a `source` stream.
 type PeriodTelemetryEntry = {
@@ -75,4 +87,10 @@ export type EventHubSettings = {
     telemetry?: Record<string, TelemetryEntry>;
 };
 
-export type EventHubFeature<VersionType> = Feature<EventHubSettings, VersionType>;
+// Subfeatures carry the same settings as the feature, so entries can be limited to the app
+// versions that support them (minSupportedVersion / maxSupportedVersion).
+export type EventHubFeature<VersionType> = Feature<
+    EventHubSettings,
+    VersionType,
+    Record<string, SubFeature<VersionType, EventHubSettings>>
+>;

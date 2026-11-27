@@ -333,408 +333,470 @@ describe('EventHub validation tests', () => {
         const eventHub = /** @type {import('../schema/features/event-hub').EventHubFeature<number> | undefined} */ (
             config.body.features?.eventHub
         );
-        if (!eventHub?.settings?.telemetry) continue;
 
-        const telemetry = eventHub.settings.telemetry;
-
-        describe(`${config.name} eventHub`, () => {
-            it('telemetry entry names should be valid pixel names', () => {
-                // Segments of [a-zA-Z][a-zA-Z0-9]* separated by underscores,
-                // e.g. "webTelemetry_adwalls_day" (at least two segments must
-                // be specified)
-                const pixelNameRegex = /^[a-zA-Z][a-zA-Z0-9]*(_[a-zA-Z][a-zA-Z0-9]*)+$/;
-                for (const name of Object.keys(telemetry)) {
-                    expect(name).to.match(
-                        pixelNameRegex,
-                        `Telemetry name '${name}' is not a valid pixel name (must match ${pixelNameRegex})`,
-                    );
-                }
-            });
-
-            it('trigger must be a valid period or immediate trigger', () => {
-                for (const [
-                    name,
-                    entry,
-                ] of Object.entries(telemetry)) {
-                    const trigger = entry.trigger;
-                    expect(trigger).to.be.an('object', `Telemetry '${name}' is missing trigger`);
-                    // `type` is optional and defaults to 'period'.
-                    const type = trigger.type ?? 'period';
-                    expect(type).to.be.oneOf(
-                        [
-                            'period',
-                            ...IMMEDIATE_TRIGGER_TYPES,
+        // Entries in a subfeature follow the same rules as entries in settings.
+        const telemetrySources =
+            /** @type {Array<[string, NonNullable<import('../schema/features/event-hub').EventHubSettings['telemetry']>]>} */ (
+                [
+                    [
+                        'settings',
+                        eventHub?.settings?.telemetry,
+                    ],
+                    ...Object.entries(eventHub?.features ?? {}).map(
+                        ([
+                            subFeatureName,
+                            subFeature,
+                        ]) => [
+                            `features.${subFeatureName}`,
+                            subFeature.settings?.telemetry,
                         ],
-                        `Telemetry '${name}' has invalid trigger.type '${trigger.type}'`,
-                    );
-                    if (isImmediateTriggerType(type)) {
-                        // Immediate triggers fire per event: no period, and a `source` naming the event.
-                        expect(trigger.period, `Immediate telemetry '${name}' must not specify a period`).to.equal(undefined);
-                        expect(trigger.source, `Immediate telemetry '${name}' source must be a string`).to.be.a('string');
-                        expect(trigger.source.length, `Immediate telemetry '${name}' source must not be empty`).to.be.greaterThan(0);
-                    } else {
-                        // Period triggers carry a period and no trigger-level source.
-                        expect(trigger.period, `Period telemetry '${name}' is missing trigger.period`).to.be.an('object');
-                        expect(trigger.source, `Period telemetry '${name}' must not specify a trigger-level source`).to.equal(undefined);
-                    }
-                }
-            });
+                    ),
+                ].filter(
+                    ([
+                        ,
+                        telemetry,
+                    ]) => telemetry,
+                )
+            );
 
-            // A client skips an immediate trigger name it does not parse, dropping the pixel. Apple
-            // parses only `immediate_v2`, which the build emits; Windows parses only `immediate`.
-            const unparsedImmediateType = {
-                'ios-config.json': 'immediate',
-                'macos-config.json': 'immediate',
-                'windows-config.json': 'immediate_v2',
-            }[config.name.split('/').pop() ?? ''];
-            if (unparsedImmediateType) {
-                it(`immediate triggers must not use '${unparsedImmediateType}', which this platform skips`, () => {
+        for (const [
+            telemetrySource,
+            telemetry,
+        ] of telemetrySources) {
+            describe(`${config.name} eventHub ${telemetrySource}`, () => {
+                it('telemetry entry names should be valid pixel names', () => {
+                    // Segments of [a-zA-Z][a-zA-Z0-9]* separated by underscores,
+                    // e.g. "webTelemetry_adwalls_day" (at least two segments must
+                    // be specified)
+                    const pixelNameRegex = /^[a-zA-Z][a-zA-Z0-9]*(_[a-zA-Z][a-zA-Z0-9]*)+$/;
+                    for (const name of Object.keys(telemetry)) {
+                        expect(name).to.match(
+                            pixelNameRegex,
+                            `Telemetry name '${name}' is not a valid pixel name (must match ${pixelNameRegex})`,
+                        );
+                    }
+                });
+
+                it('trigger must be a valid period or immediate trigger', () => {
                     for (const [
                         name,
                         entry,
                     ] of Object.entries(telemetry)) {
-                        expect(entry.trigger.type).to.not.equal(
-                            unparsedImmediateType,
-                            `Telemetry '${name}' uses trigger.type '${unparsedImmediateType}', which this platform skips`,
-                        );
-                    }
-                });
-            }
-
-            it('each telemetry entry declares a parameters object, and non-immediate entries have at least one', () => {
-                for (const [
-                    name,
-                    entry,
-                ] of Object.entries(telemetry)) {
-                    const params = entry.parameters;
-                    expect(params).to.be.an('object', `Telemetry '${name}' is missing parameters`);
-                    // Immediate pixels fire once per event and may legitimately carry no parameters (e.g. a
-                    // per-provider captcha pixel, where the provider is the pixel itself). Skip the check only
-                    // for immediate triggers rather than matching on 'period', so any future trigger type is
-                    // still required to carry at least one parameter until it's explicitly exempted here.
-                    if (!isImmediateTriggerType(entry.trigger.type ?? 'period')) {
-                        expect(Object.keys(params).length).to.be.greaterThan(
-                            0,
-                            `Non-immediate telemetry '${name}' must have at least one parameter`,
-                        );
-                    }
-                }
-            });
-
-            // Partition entries by trigger type once, defaulting a missing type to 'period' (the
-            // back-compat default). Grouping the type-specific checks under these buckets means each
-            // check only iterates the entries it applies to, and a future trigger type cannot slip
-            // through a period-only check (as it would with an `=== 'immediate'` skip guard).
-            const periodEntries = Object.entries(telemetry).filter(
-                ([
-                    ,
-                    entry,
-                ]) => (entry.trigger.type ?? 'period') === 'period',
-            );
-            const immediateEntries = Object.entries(telemetry).filter(
-                ([
-                    ,
-                    entry,
-                ]) => isImmediateTriggerType(entry.trigger.type),
-            );
-
-            describe('period telemetry entries', () => {
-                it('trigger period must specify at least one non-negative time unit', () => {
-                    const timeUnits = [
-                        'seconds',
-                        'minutes',
-                        'hours',
-                        'days',
-                    ];
-                    for (const [
-                        name,
-                        entry,
-                    ] of periodEntries) {
-                        const period = entry.trigger.period;
-                        expect(period).to.be.an('object', `Telemetry '${name}' is missing trigger.period`);
-                        const hasTimeUnit = timeUnits.some((unit) => unit in period);
-                        expect(hasTimeUnit).to.equal(
-                            true,
-                            `Telemetry '${name}' period must specify at least one of: ${timeUnits.join(', ')}`,
-                        );
-                        for (const unit of timeUnits) {
-                            if (unit in period) {
-                                expect(period[unit]).to.be.at.least(0, `Telemetry '${name}' period.${unit} must not be negative`);
-                            }
-                        }
-                    }
-                });
-
-                it('total trigger period must be greater than zero', () => {
-                    for (const [
-                        name,
-                        entry,
-                    ] of periodEntries) {
-                        const period = entry.trigger.period;
-                        const totalSeconds =
-                            (period.seconds || 0) + (period.minutes || 0) * 60 + (period.hours || 0) * 3600 + (period.days || 0) * 86400;
-                        expect(totalSeconds).to.be.greaterThan(
-                            0,
-                            `Telemetry '${name}' total period is ${totalSeconds}s — must be greater than zero`,
-                        );
-                    }
-                });
-
-                // Clients read an integer `trigger.period.seconds` and ignore days/hours/minutes, so
-                // config generation must collapse any authored unit object to a single integer `seconds`.
-                it('trigger period must be collapsed to a single integer seconds value', () => {
-                    for (const [
-                        name,
-                        entry,
-                    ] of periodEntries) {
-                        const period = entry.trigger.period;
-                        expect(Object.keys(period)).to.deep.equal(
+                        const trigger = entry.trigger;
+                        expect(trigger).to.be.an('object', `Telemetry '${name}' is missing trigger`);
+                        // `type` is optional and defaults to 'period'.
+                        const type = trigger.type ?? 'period';
+                        expect(type).to.be.oneOf(
                             [
-                                'seconds',
+                                'period',
+                                ...IMMEDIATE_TRIGGER_TYPES,
                             ],
-                            `Telemetry '${name}' period must be collapsed to only { seconds }, got: ${JSON.stringify(period)}`,
+                            `Telemetry '${name}' has invalid trigger.type '${trigger.type}'`,
                         );
-                        expect(Number.isInteger(period.seconds)).to.equal(
-                            true,
-                            `Telemetry '${name}' period.seconds must be an integer, got: ${period.seconds}`,
-                        );
-                        expect(period.seconds).to.be.greaterThan(0, `Telemetry '${name}' period.seconds must be greater than zero`);
-                    }
-                });
-            });
-
-            describe('immediate telemetry entries', () => {
-                // The counter template aggregates a count across a window, which is meaningless for a
-                // pixel that fires once per event. Disallow it on immediate triggers for now.
-                it('must not use counter parameters', () => {
-                    for (const [
-                        name,
-                        entry,
-                    ] of immediateEntries) {
-                        for (const [
-                            paramName,
-                            param,
-                        ] of Object.entries(entry.parameters || {})) {
-                            expect(param.template).to.not.equal(
-                                'counter',
-                                `Immediate telemetry '${name}' parameter '${paramName}' must not use the 'counter' template`,
+                        if (isImmediateTriggerType(type)) {
+                            // Immediate triggers fire per event: no period, and a `source` naming the event.
+                            expect(trigger.period, `Immediate telemetry '${name}' must not specify a period`).to.equal(undefined);
+                            expect(trigger.source, `Immediate telemetry '${name}' source must be a string`).to.be.a('string');
+                            expect(trigger.source.length, `Immediate telemetry '${name}' source must not be empty`).to.be.greaterThan(0);
+                        } else {
+                            // Period triggers carry a period and no trigger-level source.
+                            expect(trigger.period, `Period telemetry '${name}' is missing trigger.period`).to.be.an('object');
+                            expect(trigger.source, `Period telemetry '${name}' must not specify a trigger-level source`).to.equal(
+                                undefined,
                             );
                         }
                     }
                 });
-            });
 
-            // `eventHub_baseline_*` pixels fire purely on their period to
-            // provide a baseline / denominator: the `baseline` parameter is a
-            // counter sourced from an empty "baseline" stream, so its count
-            // stays at 0 and the single unbounded `0+` bucket always matches.
-            // For now these pixels may carry no other parameters.
-            const BASELINE_NAME_PREFIX = 'eventHub_baseline_';
-            describe('baseline telemetry entries', () => {
-                it('eventHub_baseline_* pixels may only declare the baseline parameter', () => {
+                // Clients read `maxDelay` as integer seconds, and only Windows reads it at all. An entry with a
+                // `maxDelay` reaching another platform would fire undelayed.
+                it('maxDelay is whole seconds on an immediate trigger, and only in the Windows config', () => {
                     for (const [
                         name,
                         entry,
                     ] of Object.entries(telemetry)) {
-                        if (!name.startsWith(BASELINE_NAME_PREFIX)) continue;
-                        const paramNames = Object.keys(entry.parameters || {});
-                        expect(paramNames).to.deep.equal(
-                            [
-                                'baseline',
-                            ],
-                            `Baseline pixel '${name}' may only declare the 'baseline' parameter (no other parameters allowed for now), got: ${paramNames.join(', ')}`,
+                        const maxDelay = /** @type {{ maxDelay?: Record<string, number> }} */ (entry.trigger).maxDelay;
+                        if (maxDelay === undefined) continue;
+                        expect(config.name, `Telemetry '${name}' carries maxDelay, which only Windows reads`).to.match(
+                            /\/windows-config\.json$/,
                         );
-                    }
-                });
-
-                it('the baseline parameter is a counter sourced from "baseline" (fired even if no detector emits it)', () => {
-                    for (const [
-                        name,
-                        entry,
-                    ] of Object.entries(telemetry)) {
-                        if (!name.startsWith(BASELINE_NAME_PREFIX)) continue;
-                        const param = (entry.parameters || {}).baseline;
-                        expect(param, `Baseline pixel '${name}' must declare a 'baseline' parameter`).to.be.an('object');
-                        expect(param.template).to.equal(
-                            'counter',
-                            `Baseline pixel '${name}' baseline parameter must use the 'counter' template`,
+                        expect(entry.trigger.type, `Telemetry '${name}' may carry maxDelay only on an 'immediate' trigger`).to.equal(
+                            'immediate',
                         );
-                        expect(param.source).to.equal('baseline', `Baseline pixel '${name}' baseline parameter source must be 'baseline'`);
-                        expect(param.buckets).to.deep.equal(
-                            { '0+': { gte: 0 } },
-                            `Baseline pixel '${name}' baseline parameter buckets must be exactly 0+`,
-                        );
+                        expect(Object.keys(maxDelay), `Telemetry '${name}' maxDelay must be authored as { seconds }`).to.deep.equal([
+                            'seconds',
+                        ]);
+                        expect(
+                            Number.isInteger(maxDelay.seconds) && maxDelay.seconds > 0,
+                            `Telemetry '${name}' maxDelay.seconds must be a positive integer`,
+                        ).to.equal(true);
                     }
                 });
-            });
 
-            // Every parameter of every entry, labelled `entry.param`, with whether its entry has an immediate trigger.
-            const params = Object.entries(telemetry).flatMap(
-                ([
-                    entryName,
-                    entry,
-                ]) =>
-                    Object.entries(entry.parameters || {}).map(
-                        ([
-                            paramName,
-                            param,
-                        ]) => ({
-                            label: `${entryName}.${paramName}`,
-                            param,
-                            immediate: isImmediateTriggerType(entry.trigger?.type),
-                        }),
-                    ),
-            );
-
-            // Each check collects a message per failing parameter, so one run reports every broken parameter.
-            describe('parameters', () => {
-                // Immediate-trigger data params forward the triggering event's payload; the
-                // event stream is named by the trigger's `source`, so a param-level `source`
-                // is disallowed.
-                it('source must be omitted on immediate-trigger data params', () => {
-                    const errors = [];
-                    for (const { label, param, immediate } of params) {
-                        if (param.template !== 'data' || !immediate) continue;
-                        if (param.source !== undefined) {
-                            errors.push(`Parameter '${label}' must not specify source on an immediate trigger`);
-                        }
-                    }
-                    expect(errors).to.deep.equal([]);
-                });
-
-                // Counter params and period data params identify their event stream via `source`.
-                it('source should be a non-empty string on every other param', () => {
-                    const errors = [];
-                    for (const { label, param, immediate } of params) {
-                        if (param.template === 'data' && immediate) continue;
-                        if (typeof param.source !== 'string' || param.source.length === 0) {
-                            errors.push(`Parameter '${label}' source must be a non-empty string, got: ${JSON.stringify(param.source)}`);
-                        }
-                    }
-                    expect(errors).to.deep.equal([]);
-                });
-
-                it('dataKey should be a non-empty string on data params', () => {
-                    const errors = [];
-                    for (const { label, param } of params) {
-                        if (param.template !== 'data') continue;
-                        if (typeof param.dataKey !== 'string' || param.dataKey.length === 0) {
-                            errors.push(`Parameter '${label}' dataKey must be a non-empty string, got: ${JSON.stringify(param.dataKey)}`);
-                        }
-                    }
-                    expect(errors).to.deep.equal([]);
-                });
-            });
-
-            // Only the "counter" template defines buckets; other templates (e.g. "data",
-            // which forwards a value from the event payload) carry none.
-            const counterParams = params.filter(({ param }) => param.template === 'counter');
-
-            // A counter with missing buckets fails 'buckets should not be empty'; the other bucket
-            // checks treat it as having none so it can't stop them checking later parameters.
-            describe('counter parameter buckets', () => {
-                it('buckets should not be empty', () => {
-                    const errors = [];
-                    for (const { label, param } of counterParams) {
-                        if (typeof param.buckets !== 'object' || param.buckets === null || Object.keys(param.buckets).length === 0) {
-                            errors.push(`Parameter '${label}' buckets must be a non-empty object`);
-                        }
-                    }
-                    expect(errors).to.deep.equal([]);
-                });
-
-                it('lt must be greater than gte', () => {
-                    const errors = [];
-                    for (const { label, param } of counterParams) {
+                // A client skips an immediate trigger name it does not parse, dropping the pixel. Apple
+                // parses only `immediate_v2`, which the build emits; Windows parses only `immediate`.
+                const unparsedImmediateType = {
+                    'ios-config.json': 'immediate',
+                    'macos-config.json': 'immediate',
+                    'windows-config.json': 'immediate_v2',
+                }[config.name.split('/').pop() ?? ''];
+                if (unparsedImmediateType) {
+                    it(`immediate triggers must not use '${unparsedImmediateType}', which this platform skips`, () => {
                         for (const [
                             name,
-                            bucket,
-                        ] of Object.entries(param.buckets || {})) {
-                            if (bucket.lt !== undefined && !(bucket.lt > bucket.gte)) {
-                                errors.push(
-                                    `Parameter '${label}' bucket '${name}' lt (${bucket.lt}) must be greater than gte (${bucket.gte})`,
+                            entry,
+                        ] of Object.entries(telemetry)) {
+                            expect(entry.trigger.type).to.not.equal(
+                                unparsedImmediateType,
+                                `Telemetry '${name}' uses trigger.type '${unparsedImmediateType}', which this platform skips`,
+                            );
+                        }
+                    });
+                }
+
+                it('each telemetry entry declares a parameters object, and non-immediate entries have at least one', () => {
+                    for (const [
+                        name,
+                        entry,
+                    ] of Object.entries(telemetry)) {
+                        const params = entry.parameters;
+                        expect(params).to.be.an('object', `Telemetry '${name}' is missing parameters`);
+                        // Immediate pixels fire once per event and may legitimately carry no parameters (e.g. a
+                        // per-provider captcha pixel, where the provider is the pixel itself). Skip the check only
+                        // for immediate triggers rather than matching on 'period', so any future trigger type is
+                        // still required to carry at least one parameter until it's explicitly exempted here.
+                        if (!isImmediateTriggerType(entry.trigger.type ?? 'period')) {
+                            expect(Object.keys(params).length).to.be.greaterThan(
+                                0,
+                                `Non-immediate telemetry '${name}' must have at least one parameter`,
+                            );
+                        }
+                    }
+                });
+
+                // Partition entries by trigger type once, defaulting a missing type to 'period' (the
+                // back-compat default). Grouping the type-specific checks under these buckets means each
+                // check only iterates the entries it applies to, and a future trigger type cannot slip
+                // through a period-only check (as it would with an `=== 'immediate'` skip guard).
+                const periodEntries = Object.entries(telemetry).filter(
+                    ([
+                        ,
+                        entry,
+                    ]) => (entry.trigger.type ?? 'period') === 'period',
+                );
+                const immediateEntries = Object.entries(telemetry).filter(
+                    ([
+                        ,
+                        entry,
+                    ]) => isImmediateTriggerType(entry.trigger.type),
+                );
+
+                describe('period telemetry entries', () => {
+                    it('trigger period must specify at least one non-negative time unit', () => {
+                        const timeUnits = [
+                            'seconds',
+                            'minutes',
+                            'hours',
+                            'days',
+                        ];
+                        for (const [
+                            name,
+                            entry,
+                        ] of periodEntries) {
+                            const period = entry.trigger.period;
+                            expect(period).to.be.an('object', `Telemetry '${name}' is missing trigger.period`);
+                            const hasTimeUnit = timeUnits.some((unit) => unit in period);
+                            expect(hasTimeUnit).to.equal(
+                                true,
+                                `Telemetry '${name}' period must specify at least one of: ${timeUnits.join(', ')}`,
+                            );
+                            for (const unit of timeUnits) {
+                                if (unit in period) {
+                                    expect(period[unit]).to.be.at.least(0, `Telemetry '${name}' period.${unit} must not be negative`);
+                                }
+                            }
+                        }
+                    });
+
+                    it('total trigger period must be greater than zero', () => {
+                        for (const [
+                            name,
+                            entry,
+                        ] of periodEntries) {
+                            const period = entry.trigger.period;
+                            const totalSeconds =
+                                (period.seconds || 0) +
+                                (period.minutes || 0) * 60 +
+                                (period.hours || 0) * 3600 +
+                                (period.days || 0) * 86400;
+                            expect(totalSeconds).to.be.greaterThan(
+                                0,
+                                `Telemetry '${name}' total period is ${totalSeconds}s — must be greater than zero`,
+                            );
+                        }
+                    });
+
+                    // Clients read an integer `trigger.period.seconds` and ignore days/hours/minutes, so
+                    // config generation must collapse any authored unit object to a single integer `seconds`.
+                    it('trigger period must be collapsed to a single integer seconds value', () => {
+                        for (const [
+                            name,
+                            entry,
+                        ] of periodEntries) {
+                            const period = entry.trigger.period;
+                            expect(Object.keys(period)).to.deep.equal(
+                                [
+                                    'seconds',
+                                ],
+                                `Telemetry '${name}' period must be collapsed to only { seconds }, got: ${JSON.stringify(period)}`,
+                            );
+                            expect(Number.isInteger(period.seconds)).to.equal(
+                                true,
+                                `Telemetry '${name}' period.seconds must be an integer, got: ${period.seconds}`,
+                            );
+                            expect(period.seconds).to.be.greaterThan(0, `Telemetry '${name}' period.seconds must be greater than zero`);
+                        }
+                    });
+                });
+
+                describe('immediate telemetry entries', () => {
+                    // The counter template aggregates a count across a window, which is meaningless for a
+                    // pixel that fires once per event. Disallow it on immediate triggers for now.
+                    it('must not use counter parameters', () => {
+                        for (const [
+                            name,
+                            entry,
+                        ] of immediateEntries) {
+                            for (const [
+                                paramName,
+                                param,
+                            ] of Object.entries(entry.parameters || {})) {
+                                expect(param.template).to.not.equal(
+                                    'counter',
+                                    `Immediate telemetry '${name}' parameter '${paramName}' must not use the 'counter' template`,
                                 );
                             }
                         }
-                    }
-                    expect(errors).to.deep.equal([]);
+                    });
                 });
 
-                it('every lt must match another bucket gte (no gaps)', () => {
-                    const errors = [];
-                    for (const { label, param } of counterParams) {
-                        const gteValues = new Set(Object.values(param.buckets || {}).map((b) => b.gte));
+                // `eventHub_baseline_*` pixels fire purely on their period to
+                // provide a baseline / denominator: the `baseline` parameter is a
+                // counter sourced from an empty "baseline" stream, so its count
+                // stays at 0 and the single unbounded `0+` bucket always matches.
+                // For now these pixels may carry no other parameters.
+                const BASELINE_NAME_PREFIX = 'eventHub_baseline_';
+                describe('baseline telemetry entries', () => {
+                    it('eventHub_baseline_* pixels may only declare the baseline parameter', () => {
                         for (const [
                             name,
-                            bucket,
-                        ] of Object.entries(param.buckets || {})) {
-                            if (bucket.lt !== undefined && !gteValues.has(bucket.lt)) {
-                                errors.push(`Parameter '${label}' bucket '${name}' lt (${bucket.lt}) does not match any bucket's gte`);
-                            }
-                        }
-                    }
-                    expect(errors).to.deep.equal([]);
-                });
-
-                it('gte values must be unique across buckets', () => {
-                    const errors = [];
-                    for (const { label, param } of counterParams) {
-                        const seen = new Set();
-                        for (const [
-                            name,
-                            bucket,
-                        ] of Object.entries(param.buckets || {})) {
-                            if (seen.has(bucket.gte)) {
-                                errors.push(`Parameter '${label}' has duplicate gte value ${bucket.gte} in bucket '${name}'`);
-                            }
-                            seen.add(bucket.gte);
-                        }
-                    }
-                    expect(errors).to.deep.equal([]);
-                });
-
-                it('lt values must be unique across buckets', () => {
-                    const errors = [];
-                    for (const { label, param } of counterParams) {
-                        const seen = new Set();
-                        for (const [
-                            name,
-                            bucket,
-                        ] of Object.entries(param.buckets || {})) {
-                            if (bucket.lt !== undefined) {
-                                if (seen.has(bucket.lt)) {
-                                    errors.push(`Parameter '${label}' has duplicate lt value ${bucket.lt} in bucket '${name}'`);
-                                }
-                                seen.add(bucket.lt);
-                            }
-                        }
-                    }
-                    expect(errors).to.deep.equal([]);
-                });
-
-                it('should have at most one unbounded bucket (missing lt)', () => {
-                    const errors = [];
-                    for (const { label, param } of counterParams) {
-                        const unbounded = Object.entries(param.buckets || {})
-                            .filter(
-                                ([
-                                    ,
-                                    b,
-                                ]) => b.lt === undefined,
-                            )
-                            .map(
-                                ([
-                                    n,
-                                ]) => n,
+                            entry,
+                        ] of Object.entries(telemetry)) {
+                            if (!name.startsWith(BASELINE_NAME_PREFIX)) continue;
+                            const paramNames = Object.keys(entry.parameters || {});
+                            expect(paramNames).to.deep.equal(
+                                [
+                                    'baseline',
+                                ],
+                                `Baseline pixel '${name}' may only declare the 'baseline' parameter (no other parameters allowed for now), got: ${paramNames.join(', ')}`,
                             );
-                        if (unbounded.length > 1) {
-                            errors.push(`Parameter '${label}' has ${unbounded.length} unbounded buckets: ${unbounded.join(', ')}`);
                         }
-                    }
-                    expect(errors).to.deep.equal([]);
+                    });
+
+                    it('the baseline parameter is a counter sourced from "baseline" (fired even if no detector emits it)', () => {
+                        for (const [
+                            name,
+                            entry,
+                        ] of Object.entries(telemetry)) {
+                            if (!name.startsWith(BASELINE_NAME_PREFIX)) continue;
+                            const param = (entry.parameters || {}).baseline;
+                            expect(param, `Baseline pixel '${name}' must declare a 'baseline' parameter`).to.be.an('object');
+                            expect(param.template).to.equal(
+                                'counter',
+                                `Baseline pixel '${name}' baseline parameter must use the 'counter' template`,
+                            );
+                            expect(param.source).to.equal(
+                                'baseline',
+                                `Baseline pixel '${name}' baseline parameter source must be 'baseline'`,
+                            );
+                            expect(param.buckets).to.deep.equal(
+                                { '0+': { gte: 0 } },
+                                `Baseline pixel '${name}' baseline parameter buckets must be exactly 0+`,
+                            );
+                        }
+                    });
+                });
+
+                // Every parameter of every entry, labelled `entry.param`, with whether its entry has an immediate trigger.
+                const params = Object.entries(telemetry).flatMap(
+                    ([
+                        entryName,
+                        entry,
+                    ]) =>
+                        Object.entries(entry.parameters || {}).map(
+                            ([
+                                paramName,
+                                param,
+                            ]) => ({
+                                label: `${entryName}.${paramName}`,
+                                param,
+                                immediate: isImmediateTriggerType(entry.trigger?.type),
+                            }),
+                        ),
+                );
+
+                // Each check collects a message per failing parameter, so one run reports every broken parameter.
+                describe('parameters', () => {
+                    // Immediate-trigger data params forward the triggering event's payload; the
+                    // event stream is named by the trigger's `source`, so a param-level `source`
+                    // is disallowed.
+                    it('source must be omitted on immediate-trigger data params', () => {
+                        const errors = [];
+                        for (const { label, param, immediate } of params) {
+                            if (param.template !== 'data' || !immediate) continue;
+                            if (param.source !== undefined) {
+                                errors.push(`Parameter '${label}' must not specify source on an immediate trigger`);
+                            }
+                        }
+                        expect(errors).to.deep.equal([]);
+                    });
+
+                    // Counter params and period data params identify their event stream via `source`.
+                    it('source should be a non-empty string on every other param', () => {
+                        const errors = [];
+                        for (const { label, param, immediate } of params) {
+                            if (param.template === 'data' && immediate) continue;
+                            if (typeof param.source !== 'string' || param.source.length === 0) {
+                                errors.push(`Parameter '${label}' source must be a non-empty string, got: ${JSON.stringify(param.source)}`);
+                            }
+                        }
+                        expect(errors).to.deep.equal([]);
+                    });
+
+                    it('dataKey should be a non-empty string on data params', () => {
+                        const errors = [];
+                        for (const { label, param } of params) {
+                            if (param.template !== 'data') continue;
+                            if (typeof param.dataKey !== 'string' || param.dataKey.length === 0) {
+                                errors.push(
+                                    `Parameter '${label}' dataKey must be a non-empty string, got: ${JSON.stringify(param.dataKey)}`,
+                                );
+                            }
+                        }
+                        expect(errors).to.deep.equal([]);
+                    });
+                });
+
+                // Only the "counter" template defines buckets; other templates (e.g. "data",
+                // which forwards a value from the event payload) carry none.
+                const counterParams = params.filter(({ param }) => param.template === 'counter');
+
+                // A counter with missing buckets fails 'buckets should not be empty'; the other bucket
+                // checks treat it as having none so it can't stop them checking later parameters.
+                describe('counter parameter buckets', () => {
+                    it('buckets should not be empty', () => {
+                        const errors = [];
+                        for (const { label, param } of counterParams) {
+                            if (typeof param.buckets !== 'object' || param.buckets === null || Object.keys(param.buckets).length === 0) {
+                                errors.push(`Parameter '${label}' buckets must be a non-empty object`);
+                            }
+                        }
+                        expect(errors).to.deep.equal([]);
+                    });
+
+                    it('lt must be greater than gte', () => {
+                        const errors = [];
+                        for (const { label, param } of counterParams) {
+                            for (const [
+                                name,
+                                bucket,
+                            ] of Object.entries(param.buckets || {})) {
+                                if (bucket.lt !== undefined && !(bucket.lt > bucket.gte)) {
+                                    errors.push(
+                                        `Parameter '${label}' bucket '${name}' lt (${bucket.lt}) must be greater than gte (${bucket.gte})`,
+                                    );
+                                }
+                            }
+                        }
+                        expect(errors).to.deep.equal([]);
+                    });
+
+                    it('every lt must match another bucket gte (no gaps)', () => {
+                        const errors = [];
+                        for (const { label, param } of counterParams) {
+                            const gteValues = new Set(Object.values(param.buckets || {}).map((b) => b.gte));
+                            for (const [
+                                name,
+                                bucket,
+                            ] of Object.entries(param.buckets || {})) {
+                                if (bucket.lt !== undefined && !gteValues.has(bucket.lt)) {
+                                    errors.push(`Parameter '${label}' bucket '${name}' lt (${bucket.lt}) does not match any bucket's gte`);
+                                }
+                            }
+                        }
+                        expect(errors).to.deep.equal([]);
+                    });
+
+                    it('gte values must be unique across buckets', () => {
+                        const errors = [];
+                        for (const { label, param } of counterParams) {
+                            const seen = new Set();
+                            for (const [
+                                name,
+                                bucket,
+                            ] of Object.entries(param.buckets || {})) {
+                                if (seen.has(bucket.gte)) {
+                                    errors.push(`Parameter '${label}' has duplicate gte value ${bucket.gte} in bucket '${name}'`);
+                                }
+                                seen.add(bucket.gte);
+                            }
+                        }
+                        expect(errors).to.deep.equal([]);
+                    });
+
+                    it('lt values must be unique across buckets', () => {
+                        const errors = [];
+                        for (const { label, param } of counterParams) {
+                            const seen = new Set();
+                            for (const [
+                                name,
+                                bucket,
+                            ] of Object.entries(param.buckets || {})) {
+                                if (bucket.lt !== undefined) {
+                                    if (seen.has(bucket.lt)) {
+                                        errors.push(`Parameter '${label}' has duplicate lt value ${bucket.lt} in bucket '${name}'`);
+                                    }
+                                    seen.add(bucket.lt);
+                                }
+                            }
+                        }
+                        expect(errors).to.deep.equal([]);
+                    });
+
+                    it('should have at most one unbounded bucket (missing lt)', () => {
+                        const errors = [];
+                        for (const { label, param } of counterParams) {
+                            const unbounded = Object.entries(param.buckets || {})
+                                .filter(
+                                    ([
+                                        ,
+                                        b,
+                                    ]) => b.lt === undefined,
+                                )
+                                .map(
+                                    ([
+                                        n,
+                                    ]) => n,
+                                );
+                            if (unbounded.length > 1) {
+                                errors.push(`Parameter '${label}' has ${unbounded.length} unbounded buckets: ${unbounded.join(', ')}`);
+                            }
+                        }
+                        expect(errors).to.deep.equal([]);
+                    });
                 });
             });
-        });
+        }
     }
 });
 
@@ -753,6 +815,34 @@ describe('EventHub telemetry override merge', () => {
 
     it('keeps windows-specific telemetry entries', () => {
         expect(telemetry).to.have.property('webTelemetry_youtube_videoAd_day');
+    });
+});
+
+describe('EventHub delayed entry in a Windows subfeature', () => {
+    // The Windows override limits delayed immediate entries to the app versions that support them by declaring
+    // them in an eventHub subfeature. The generated config must still validate against the full schema.
+    const windowsConfig = latestConfigs.find((c) => c.name === `${latestVersion}/windows-config.json`);
+
+    it('validates against the full config schema', () => {
+        const config = structuredClone(windowsConfig?.body);
+        config.features.eventHub.features = {
+            eventHub001: {
+                state: 'enabled',
+                minSupportedVersion: '0.200.0',
+                settings: {
+                    telemetry: {
+                        webTelemetry_delayedTest_immediate: {
+                            state: 'enabled',
+                            trigger: { type: 'immediate', source: 'testEvent', maxDelay: { seconds: 3600 } },
+                            parameters: {},
+                        },
+                    },
+                },
+            },
+        };
+
+        const validate = createValidator('CurrentGenericConfig');
+        expect(validate(config), formatErrors(validate.errors)).to.equal(true);
     });
 });
 
@@ -991,6 +1081,22 @@ describe('EventHub schema source rules', () => {
             const settings = immediateEntry({ template: 'data', dataKey: 'loginState' }, type);
             expect(validate(settings), formatErrors(validate.errors)).to.equal(true);
         }
+    });
+
+    it('accepts maxDelay on an immediate trigger', () => {
+        const settings = immediateEntry({ template: 'data', dataKey: 'loginState' }, 'immediate');
+        settings.telemetry.test_pixel_immediate.trigger.maxDelay = { seconds: 3600 };
+        expect(validate(settings), formatErrors(validate.errors)).to.equal(true);
+    });
+
+    it('rejects maxDelay on an immediate_v2 or period trigger', () => {
+        const immediateV2 = immediateEntry({ template: 'data', dataKey: 'loginState' }, 'immediate_v2');
+        immediateV2.telemetry.test_pixel_immediate.trigger.maxDelay = { seconds: 3600 };
+        expect(validate(immediateV2)).to.equal(false);
+
+        const period = periodEntry({ template: 'counter', source: 'someStream', buckets: { '0+': { gte: 0 } } });
+        period.telemetry.test_pixel_day.trigger.maxDelay = { seconds: 3600 };
+        expect(validate(period)).to.equal(false);
     });
 
     it('rejects an unknown immediate trigger spelling', () => {
