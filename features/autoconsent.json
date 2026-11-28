@@ -3488,7 +3488,7 @@
                 "#cookie_banner.cookie-banner > a#cookie_banner_accept[href*=\"/accept_cookie/\"], #page > div.busi > a[href*=\"/accept_cookie/\"]",
                 "#cookie_banner.cookie-banner, #page > div.busi:has(> a[href*=\"/accept_cookie/\"])",
                 "ui-cookie-consent .ui-cookie-consent__decline-button",
-                "div:has(> div:has(> a[aria-label=\"learn more about cookies\"]) + div.t-cookie-bar)",
+                "#show-cookie-settings",
                 "div:has(> a[aria-label=\"learn more about cookies\"]) + div.t-cookie-bar",
                 ".fc-consent-root .fc-dialog-container",
                 "div.t-cookie-bar",
@@ -4028,6 +4028,7 @@
                 "#__cookie-consent-wrapper",
                 "#__cookie-consent-wrapper #__cookie-consent-button",
                 "#__cookie-consent",
+                "div:has(> div > a[aria-label=\"learn more about cookies\"]):has(> div.t-cookie-bar)",
                 "body > div#iubenda-cs-banner > div:not([id]) > div:not([id]) > div:not([id]) > div:nth-child(5):not([id]) > div:nth-child(2):not([id]) > button:nth-child(1):not([id])",
                 "body > div#app > div#app > div:not([id]) > div:not([id]) > div:not([id]) > div:not([id]) > div:nth-child(3):not([id]) > div:not([id]) > button:nth-child(1):not([id]) > div:not([id])",
                 "#CybotCookiebotDialog",
@@ -4069,7 +4070,6 @@
                 "#consent-dialog #btn-accept-necessary",
                 "#save-all-pur",
                 "#reminder",
-                ".cookie-popup.js-cookie-popup",
                 ".js-cookie-popup .js-cookie-popup-close",
                 "body > div#gdrp-cookieoverlay > div:nth-child(3)#cs2gdpr-cookiebanner > div:not([id]) > div:nth-child(3):not([id]) > div:not([id]) > div:nth-child(2):not([id]) > button#btn-accept-required-banner",
                 "[class^='cookieContainer'] div[class^='settings'] button",
@@ -6042,7 +6042,7 @@
                 ".cdk-overlay-container",
                 ".cdk-overlay-container app-esaa-cookie-component",
                 ".btn-cookie-refuser",
-                "#show-cookie-settings",
+                ".cookie-popup.js-cookie-popup",
                 "#avisoCookies",
                 "#avisoCookies .cerrarAvisoCookies",
                 ".cookie-banner .cookie-banner__manage",
@@ -24662,6 +24662,117 @@
                 ],
                 [
                     1,
+                    "kape-usercentrics",
+                    2,
+                    "",
+                    22,
+                    [],
+                    [
+                        {
+                            "exists": [
+                                "#shadowHost",
+                                "#app .first-layer-card"
+                            ]
+                        }
+                    ],
+                    [
+                        {
+                            "visible": [
+                                "#shadowHost",
+                                "#app .first-layer-card"
+                            ]
+                        }
+                    ],
+                    [
+                        {
+                            "if": {
+                                "exists": [
+                                    "#shadowHost",
+                                    ".first-layer-card .v3-reject-btn"
+                                ]
+                            },
+                            "then": [
+                                {
+                                    "click": [
+                                        "#shadowHost",
+                                        ".first-layer-card .v3-reject-btn"
+                                    ]
+                                }
+                            ],
+                            "else": [
+                                {
+                                    "if": {
+                                        "exists": [
+                                            "#shadowHost",
+                                            ".first-layer-card .moreButton button"
+                                        ]
+                                    },
+                                    "then": [
+                                        {
+                                            "click": [
+                                                "#shadowHost",
+                                                ".first-layer-card .moreButton button"
+                                            ]
+                                        },
+                                        {
+                                            "waitForVisible": [
+                                                "#shadowHost",
+                                                ".v-dialog--active #saveButton"
+                                            ]
+                                        },
+                                        {
+                                            "click": [
+                                                "#shadowHost",
+                                                ".v-dialog--active .v-expansion-panel-header input[type=checkbox]:checked:not([disabled])"
+                                            ],
+                                            "all": true,
+                                            "optional": true
+                                        },
+                                        {
+                                            "waitForThenClick": [
+                                                "#shadowHost",
+                                                ".v-dialog--active #saveButton"
+                                            ]
+                                        }
+                                    ],
+                                    "else": [
+                                        {
+                                            "c": 2820
+                                        },
+                                        {
+                                            "waitForVisible": [
+                                                "#shadowHost",
+                                                ".g-card-actions"
+                                            ]
+                                        },
+                                        {
+                                            "click": [
+                                                "#shadowHost",
+                                                ".g-expansion-panel-header input[type=checkbox]:checked:not([disabled])"
+                                            ],
+                                            "all": true,
+                                            "optional": true
+                                        },
+                                        {
+                                            "waitForThenClick": [
+                                                "#shadowHost",
+                                                ".g-card-actions #saveButton"
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    [
+                        {
+                            "cc": 1268
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
                     "kaspersky-cookies-notification",
                     1,
                     "",
@@ -34371,7 +34482,7 @@
                     "",
                     22,
                     [
-                        2820
+                        3360
                     ],
                     [
                         {
@@ -39440,40 +39551,6 @@
                     [],
                     [
                         {
-                            "e": 3360
-                        }
-                    ],
-                    [
-                        {
-                            "v": 3360
-                        }
-                    ],
-                    [
-                        {
-                            "wait": 500
-                        },
-                        {
-                            "c": 3360
-                        }
-                    ],
-                    [
-                        {
-                            "timeout": 1000,
-                            "check": "none",
-                            "wv": 3360
-                        }
-                    ],
-                    {}
-                ],
-                [
-                    1,
-                    "auto_NL_flitsmeister.nl_ws8",
-                    0,
-                    "^https?://(www\\.)?cookies\\.flitsmeister\\.com/",
-                    1,
-                    [],
-                    [
-                        {
                             "e": 3361
                         }
                     ],
@@ -39501,16 +39578,14 @@
                 ],
                 [
                     1,
-                    "bmedonline.es",
+                    "auto_NL_flitsmeister.nl_ws8",
                     0,
-                    "^https?://(www\\.)?bmedonline\\.es/",
-                    11,
-                    [
-                        3362
-                    ],
+                    "^https?://(www\\.)?cookies\\.flitsmeister\\.com/",
+                    1,
+                    [],
                     [
                         {
-                            "e": 3363
+                            "e": 3362
                         }
                     ],
                     [
@@ -39520,7 +39595,43 @@
                     ],
                     [
                         {
-                            "c": 3364
+                            "wait": 500
+                        },
+                        {
+                            "c": 3362
+                        }
+                    ],
+                    [
+                        {
+                            "timeout": 1000,
+                            "check": "none",
+                            "wv": 3362
+                        }
+                    ],
+                    {}
+                ],
+                [
+                    1,
+                    "bmedonline.es",
+                    0,
+                    "^https?://(www\\.)?bmedonline\\.es/",
+                    11,
+                    [
+                        3363
+                    ],
+                    [
+                        {
+                            "e": 3364
+                        }
+                    ],
+                    [
+                        {
+                            "v": 3363
+                        }
+                    ],
+                    [
+                        {
+                            "c": 3365
                         }
                     ],
                     [
@@ -39528,7 +39639,7 @@
                             "wait": 500
                         },
                         {
-                            "cc": 3365
+                            "cc": 3366
                         }
                     ],
                     {}
@@ -39542,17 +39653,17 @@
                     [],
                     [
                         {
-                            "e": 3366
+                            "e": 3367
                         }
                     ],
                     [
                         {
-                            "v": 3366
+                            "v": 3367
                         }
                     ],
                     [
                         {
-                            "c": 3366
+                            "c": 3367
                         }
                     ],
                     [],
@@ -39567,12 +39678,12 @@
                     [],
                     [
                         {
-                            "e": 3367
+                            "e": 3368
                         }
                     ],
                     [
                         {
-                            "v": 3367
+                            "v": 3368
                         },
                         {
                             "eval": "EVAL_IFRAME_SHOWN"
@@ -39580,18 +39691,18 @@
                     ],
                     [
                         {
-                            "c": 3367
+                            "c": 3368
                         },
                         {
                             "wait": 1000
                         },
                         {
                             "if": {
-                                "v": 3367
+                                "v": 3368
                             },
                             "then": [
                                 {
-                                    "k": 3367
+                                    "k": 3368
                                 }
                             ]
                         }
@@ -39608,23 +39719,23 @@
                     [],
                     [
                         {
-                            "e": 3368
+                            "e": 3369
                         }
                     ],
                     [
                         {
-                            "v": 3368
+                            "v": 3369
                         }
                     ],
                     [
                         {
-                            "wv": 3369
+                            "wv": 3370
                         },
                         {
                             "wait": 500
                         },
                         {
-                            "k": 3368
+                            "k": 3369
                         }
                     ],
                     [],
@@ -39639,12 +39750,12 @@
                     [],
                     [
                         {
-                            "e": 3370
+                            "e": 3371
                         }
                     ],
                     [
                         {
-                            "v": 3370
+                            "v": 3371
                         },
                         {
                             "eval": "EVAL_IFRAME_SHOWN"
@@ -39652,7 +39763,7 @@
                     ],
                     [
                         {
-                            "c": 3370
+                            "c": 3371
                         }
                     ],
                     [],
@@ -39665,30 +39776,30 @@
                     "^https://([a-z0-9-]+\\.)*figma\\.com/",
                     11,
                     [
-                        3371,
-                        3372
+                        3372,
+                        3373
                     ],
                     [
                         {
-                            "e": 3373
+                            "e": 3374
                         }
                     ],
                     [
                         {
-                            "v": 3374
+                            "v": 3375
                         }
                     ],
                     [
                         {
-                            "c": 3375
+                            "c": 3376
                         }
                     ],
                     [
-                        {
-                            "cc": 3376
-                        },
                         {
                             "cc": 3377
+                        },
+                        {
+                            "cc": 3378
                         }
                     ],
                     {}
@@ -39700,47 +39811,47 @@
                     "^https://plus\\.gmx\\.com/lt(?:[?#]|$)",
                     1,
                     [
-                        3378
+                        3379
                     ],
                     [
                         {
-                            "e": 3378
+                            "e": 3379
                         }
                     ],
                     [
                         {
-                            "v": 3379
+                            "v": 3380
                         }
                     ],
                     [
                         {
                             "if": {
-                                "e": 3380
+                                "e": 3381
                             },
                             "then": [
                                 {
-                                    "c": 3380
+                                    "c": 3381
                                 }
                             ],
                             "else": [
                                 {
                                     "if": {
-                                        "e": 3381
+                                        "e": 3382
                                     },
                                     "then": [
                                         {
-                                            "c": 3381
-                                        },
-                                        {
-                                            "wv": 3382
-                                        },
-                                        {
                                             "c": 3382
+                                        },
+                                        {
+                                            "wv": 3383
+                                        },
+                                        {
+                                            "c": 3383
                                         }
                                     ],
                                     "else": [
                                         {
-                                            "c": 3382
+                                            "c": 3383
                                         }
                                     ]
                                 }
@@ -39749,7 +39860,7 @@
                     ],
                     [
                         {
-                            "cc": 3383
+                            "cc": 3384
                         }
                     ],
                     {}
@@ -39763,7 +39874,7 @@
                     [],
                     [
                         {
-                            "e": 3384
+                            "e": 3385
                         },
                         {
                             "eval": "EVAL_MERCADOLIBRE_CROSS_ORIGIN_PARENT"
@@ -39771,31 +39882,31 @@
                     ],
                     [
                         {
-                            "v": 3384
+                            "v": 3385
                         }
                     ],
                     [
                         {
                             "timeout": 10000,
-                            "w": 3385
+                            "w": 3386
                         },
                         {
                             "if": {
-                                "e": 3386
+                                "e": 3387
                             },
                             "then": [
                                 {
                                     "all": true,
                                     "retry": 5,
                                     "retryInterval": 500,
-                                    "c": 3386
+                                    "c": 3387
                                 }
                             ]
                         },
                         {
                             "check": "none",
                             "timeout": 3000,
-                            "wv": 3386
+                            "wv": 3387
                         },
                         {
                             "eval": "EVAL_MERCADOLIBRE_SAVE"
@@ -39815,39 +39926,39 @@
                     [],
                     [
                         {
-                            "e": 3387
+                            "e": 3388
                         }
                     ],
                     [
                         {
-                            "v": 3387
+                            "v": 3388
                         }
                     ],
                     [
                         {
                             "if": {
-                                "v": 3388
+                                "v": 3389
                             },
                             "then": [
                                 {
-                                    "k": 3388
+                                    "k": 3389
                                 }
                             ],
                             "else": [
                                 {
                                     "retry": 10,
-                                    "c": 3387
+                                    "c": 3388
                                 },
                                 {
-                                    "w": 3389
+                                    "w": 3390
                                 },
                                 {
                                     "all": true,
                                     "optional": true,
-                                    "k": 3390
+                                    "k": 3391
                                 },
                                 {
-                                    "c": 3391
+                                    "c": 3392
                                 }
                             ]
                         }
@@ -39864,33 +39975,33 @@
                     [],
                     [
                         {
-                            "e": 3392
+                            "e": 3393
                         }
                     ],
                     [
                         {
-                            "v": 3393
+                            "v": 3394
                         }
                     ],
                     [
                         {
                             "if": {
-                                "v": 3394
+                                "v": 3395
                             },
                             "then": [
                                 {
-                                    "k": 3394
+                                    "k": 3395
                                 }
                             ],
                             "else": [
                                 {
-                                    "k": 3392
+                                    "k": 3393
                                 },
                                 {
-                                    "wv": 3395
+                                    "wv": 3396
                                 },
                                 {
-                                    "c": 3396
+                                    "c": 3397
                                 }
                             ]
                         }
@@ -39937,17 +40048,17 @@
                     [],
                     [
                         {
-                            "e": 3397
+                            "e": 3398
                         }
                     ],
                     [
                         {
-                            "v": 3398
+                            "v": 3399
                         }
                     ],
                     [
                         {
-                            "c": 3398
+                            "c": 3399
                         }
                     ],
                     [],
@@ -39994,20 +40105,20 @@
                     [],
                     [
                         {
-                            "e": 3399
+                            "e": 3400
                         },
                         {
-                            "e": 3400
+                            "e": 3401
                         }
                     ],
                     [
                         {
-                            "v": 3400
+                            "v": 3401
                         }
                     ],
                     [
                         {
-                            "c": 3400
+                            "c": 3401
                         }
                     ],
                     [],
@@ -48885,7 +48996,7 @@
                     "^https?://(\\w+\\.)?championat\\.com/",
                     22,
                     [
-                        3401
+                        5374
                     ],
                     [
                         {
@@ -52288,79 +52399,6 @@
                         }
                     ],
                     [],
-                    {}
-                ],
-                [
-                    1,
-                    "expressvpn",
-                    2,
-                    "^https?://(\\w+\\.)?expressvpn\\.com/",
-                    22,
-                    [],
-                    [
-                        {
-                            "exists": [
-                                "#shadowHost",
-                                "#app .first-layer-card"
-                            ]
-                        }
-                    ],
-                    [
-                        {
-                            "visible": [
-                                "#shadowHost",
-                                "#app .first-layer-card"
-                            ]
-                        }
-                    ],
-                    [
-                        {
-                            "if": {
-                                "exists": [
-                                    "#shadowHost",
-                                    ".first-layer-card .v3-reject-btn"
-                                ]
-                            },
-                            "then": [
-                                {
-                                    "click": [
-                                        "#shadowHost",
-                                        ".first-layer-card .v3-reject-btn"
-                                    ]
-                                }
-                            ],
-                            "else": [
-                                {
-                                    "c": 5374
-                                },
-                                {
-                                    "waitForVisible": [
-                                        "#shadowHost",
-                                        ".g-card-actions"
-                                    ]
-                                },
-                                {
-                                    "click": [
-                                        "#shadowHost",
-                                        ".g-expansion-panel-header input[type=checkbox]:checked:not([disabled])"
-                                    ],
-                                    "all": true,
-                                    "optional": true
-                                },
-                                {
-                                    "waitForThenClick": [
-                                        "#shadowHost",
-                                        ".g-card-actions #saveButton"
-                                    ]
-                                }
-                            ]
-                        }
-                    ],
-                    [
-                        {
-                            "cc": 1268
-                        }
-                    ],
                     {}
                 ],
                 [
@@ -68191,7 +68229,7 @@
                             "v": 5810
                         },
                         {
-                            "cc": 3365
+                            "cc": 3366
                         }
                     ],
                     {}
@@ -72089,18 +72127,18 @@
             "index": {
                 "genericRuleRange": [
                     0,
-                    734
+                    735
                 ],
                 "frameRuleRange": [
-                    734,
-                    750
+                    735,
+                    751
                 ],
                 "specificRuleRange": [
-                    734,
+                    735,
                     1606
                 ],
-                "genericStringEnd": 3360,
-                "frameStringEnd": 3401
+                "genericStringEnd": 3361,
+                "frameStringEnd": 3402
             }
         }
     }
