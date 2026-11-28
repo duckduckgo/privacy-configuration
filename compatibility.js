@@ -82,9 +82,9 @@ export const compatFunctions = {
          * @param {Array} source - the array to pull reasons from
          */
         function assignReasons(target, source) {
-            target = target.map((exception, i) => {
+            target.forEach((exception, i) => {
                 const reason = source[i]?.reason || '';
-                return Object.assign(exception, { reason });
+                Object.assign(exception, { reason });
             });
         }
 
