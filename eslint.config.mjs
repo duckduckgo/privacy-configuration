@@ -36,5 +36,9 @@ export default [
                 ...globals.node,
             },
         },
+        rules: {
+            // Our `cb` callbacks take data objects, not Node-style error-first arguments.
+            'n/no-callback-literal': 'off',
+        },
     },
 ];
