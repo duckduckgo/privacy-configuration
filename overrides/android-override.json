@@ -27,6 +27,21 @@
                 }
             }
         },
+        "newTabReturnHatch": {
+            "state": "enabled",
+            "exceptions": [],
+            "features": {
+                "idleReturnFirstFrameHold": {
+                    "state": "enabled",
+                    "minSupportedVersion": 53030000
+                }
+            }
+        },
+        "deviceMigration": {
+            "state": "enabled",
+            "minSupportedVersion": 53040000,
+            "exceptions": []
+        },
         "customTabs": {
             "exceptions": [],
             "state": "enabled",
@@ -161,6 +176,9 @@
                             }
                         ]
                     }
+                },
+                "keepExclusionsInNullTunnel": {
+                    "state": "disabled"
                 }
             }
         },
@@ -463,7 +481,7 @@
                     ]
                 },
                 "tdsNextExperiment017": {
-                    "state": "enabled",
+                    "state": "disabled",
                     "minSupportedVersion": 52361000,
                     "rollout": {
                         "steps": [
@@ -475,6 +493,56 @@
                     "settings": {
                         "controlUrl": "v5/experiments/202611v1-android-tds-control.json",
                         "treatmentUrl": "v5/experiments/202611v1-android-tds-treatment.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "tdsNextExperiment018": {
+                    "state": "disabled",
+                    "minSupportedVersion": 53020000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "v5/experiments/202611v2-android-tds-control.json",
+                        "treatmentUrl": "v5/experiments/202611v2-android-tds-treatment.json"
+                    },
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                },
+                "tdsNextExperiment019": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52361000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "settings": {
+                        "controlUrl": "v5/experiments/202611v2-android-tds-control.json",
+                        "treatmentUrl": "v5/experiments/202611v2-android-tds-treatment.json"
                     },
                     "cohorts": [
                         {
@@ -1138,6 +1206,10 @@
                     "state": "enabled",
                     "minSupportedVersion": 52970000
                 },
+                "duckAiShareSheetAction": {
+                    "state": "enabled",
+                    "minSupportedVersion": 53050000
+                },
                 "contextualMenuAllChats": {
                     "state": "enabled",
                     "minSupportedVersion": 52960000
@@ -1233,6 +1305,14 @@
                 {
                     "domain": "dresden.de",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/pull/5532"
+                },
+                {
+                    "domain": "dailymotion.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/6538"
+                },
+                {
+                    "domain": "formula1.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/pull/6566"
                 }
             ],
             "features": {
@@ -2331,88 +2411,7 @@
                 },
                 "featuresRequestHeader": {
                     "state": "enabled",
-                    "minSupportedVersion": 52210000,
-                    "settings": {
-                        "versions": [
-                            {
-                                "appVersion": 52210000,
-                                "daysUntilLoggingStarts": 6,
-                                "daysLogging": 10,
-                                "featuresLogged": {
-                                    "gpc": true,
-                                    "cpm": true,
-                                    "appTP": false,
-                                    "netP": false
-                                }
-                            },
-                            {
-                                "appVersion": 52220000,
-                                "daysUntilLoggingStarts": 6,
-                                "daysLogging": 28,
-                                "featuresLogged": {
-                                    "gpc": false,
-                                    "cpm": false,
-                                    "appTP": true,
-                                    "netP": false
-                                }
-                            },
-                            {
-                                "appVersion": 52230000,
-                                "daysUntilLoggingStarts": 6,
-                                "daysLogging": 10,
-                                "featuresLogged": {
-                                    "gpc": false,
-                                    "cpm": true,
-                                    "appTP": false,
-                                    "netP": false
-                                }
-                            },
-                            {
-                                "appVersion": 52231000,
-                                "daysUntilLoggingStarts": 6,
-                                "daysLogging": 10,
-                                "featuresLogged": {
-                                    "gpc": false,
-                                    "cpm": true,
-                                    "appTP": false,
-                                    "netP": false
-                                }
-                            },
-                            {
-                                "appVersion": 52240000,
-                                "daysUntilLoggingStarts": 6,
-                                "daysLogging": 10,
-                                "featuresLogged": {
-                                    "gpc": false,
-                                    "cpm": true,
-                                    "appTP": false,
-                                    "netP": false
-                                }
-                            },
-                            {
-                                "appVersion": 52250000,
-                                "daysUntilLoggingStarts": 9,
-                                "daysLogging": 10,
-                                "featuresLogged": {
-                                    "gpc": false,
-                                    "cpm": true,
-                                    "appTP": false,
-                                    "netP": false
-                                }
-                            },
-                            {
-                                "appVersion": 52290000,
-                                "daysUntilLoggingStarts": 8,
-                                "daysLogging": 10,
-                                "featuresLogged": {
-                                    "gpc": false,
-                                    "cpm": false,
-                                    "appTP": false,
-                                    "netP": false
-                                }
-                            }
-                        ]
-                    }
+                    "minSupportedVersion": 53050000
                 },
                 "webLocalStorage": {
                     "state": "enabled",
@@ -3636,8 +3635,8 @@
                     "minSupportedVersion": 52930000
                 },
                 "trackerBlocking": {
-                    "state": "disabled",
-                    "minSupportedVersion": 52981000,
+                    "state": "enabled",
+                    "minSupportedVersion": 53040000,
                     "rollout": {
                         "steps": [
                             {
@@ -3647,12 +3646,18 @@
                     }
                 },
                 "freemium": {
-                    "state": "internal",
-                    "targets": [
-                        {
-                            "localeCountry": "us"
-                        }
-                    ]
+                    "state": "enabled",
+                    "minSupportedVersion": 53040000,
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 50
+                            }
+                        ]
+                    }
+                },
+                "notificationPermissionPrompt": {
+                    "state": "enabled"
                 }
             }
         },
@@ -4834,6 +4839,9 @@
                 },
                 "notificationsPermissionMessaging": {
                     "state": "enabled"
+                },
+                "backupRefreshToken": {
+                    "state": "internal"
                 }
             }
         },
@@ -5010,6 +5018,10 @@
                 "enabledForUsers": {
                     "state": "enabled",
                     "minSupportedVersion": 52390000
+                },
+                "removeSelectedTabDebounce": {
+                    "state": "enabled",
+                    "minSupportedVersion": 53030000
                 }
             }
         },
@@ -5341,6 +5353,22 @@
                     {
                         "condition": [
                             {
+                                "domain": "asnbank.nl"
+                            }
+                        ],
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/apiChanges/android",
+                                "value": {
+                                    "type": "remove"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "condition": [
+                            {
                                 "domain": "target.com"
                             }
                         ],
@@ -5659,6 +5687,9 @@
                             },
                             {
                                 "percent": 20
+                            },
+                            {
+                                "percent": 50
                             }
                         ]
                     },
@@ -5684,6 +5715,9 @@
                             },
                             {
                                 "percent": 25
+                            },
+                            {
+                                "percent": 100
                             }
                         ]
                     },
@@ -6536,6 +6570,19 @@
                     "state": "internal"
                 }
             }
+        },
+        "segmentSkip": {
+            "state": "internal",
+            "features": {
+                "mvpEnabled": {
+                    "state": "internal"
+                }
+            }
+        },
+        "autocompleteSpeed": {
+            "state": "enabled",
+            "minSupportedVersion": 53050000,
+            "exceptions": []
         }
     },
     "unprotectedTemporary": [],
